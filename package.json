@@ -1,5 +1,5 @@
 {
-  "name": "opentelemetry",
+  "name": "opentelemetry-base",
   "version": "0.0.1",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "main": "build/src/index.js",
