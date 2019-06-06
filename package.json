@@ -6,7 +6,7 @@
   "types": "build/src/index.d.ts",
   "scripts": {
     "fix": "lerna run fix",
-    "postinstall": "npm run bootstrap",
+    "postinstall": "yarn run bootstrap",
     "compile": "lerna run compile",
     "test": "lerna run test",
     "bootstrap": "lerna bootstrap",

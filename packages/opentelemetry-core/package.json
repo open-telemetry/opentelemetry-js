@@ -7,14 +7,15 @@
   "repository": "open-telemetry/opentelemetry-node",
   "scripts": {
     "test": "nyc ts-mocha -p ./tsconfig.json test/**/*.ts",
+    "tdd": "yarn run test -- --watch-extensions ts --watch",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
     "compile:release": "tsc -p tsconfig-release.json",
     "fix": "gts fix",
-    "prepare": "npm run compile:release",
-    "posttest": "npm run check"
+    "prepare": "yarn run compile:release",
+    "posttest": "yarn run check"
   },
   "keywords": [
     "opentelemetry",
