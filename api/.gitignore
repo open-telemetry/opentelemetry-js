@@ -35,6 +35,7 @@ build/Release
 # Dependency directories
 node_modules/
 jspm_packages/
+build/
 
 # TypeScript v1 declaration files
 typings/
@@ -59,3 +60,9 @@ typings/
 
 # next.js build output
 .next
+
+# lock files
+yarn.lock
+package-lock.json
+packages/**/yarn.lock
+packages/**/package-lock.json
