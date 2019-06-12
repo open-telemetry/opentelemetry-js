@@ -1,7 +1,7 @@
 {
-  "name": "opentelemetry-types",
+  "name": "@opentelemetry/types",
   "version": "0.0.1",
-  "description": "opentelemetry types",
+  "description": "TypeScript types for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-node",
@@ -18,7 +18,8 @@
     "tracing",
     "profiling",
     "metrics",
-    "stats"
+    "stats",
+    "monitoring"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
