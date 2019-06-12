@@ -1,0 +1,32 @@
+{
+  "name": "opentelemetry-base",
+  "version": "0.0.1",
+  "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "fix": "lerna run fix",
+    "postinstall": "yarn run bootstrap",
+    "compile": "lerna run compile",
+    "test": "lerna run test",
+    "bootstrap": "lerna bootstrap",
+    "bump": "lerna publish",
+    "codecov": "lerna run codecov",
+    "check": "lerna run check"
+  },
+  "repository": "open-telemetry/opentelemetry-node",
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "lerna": "^3.13.4",
+    "typescript": "^3.4.5"
+  }
+}
