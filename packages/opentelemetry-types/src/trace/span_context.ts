@@ -14,7 +14,17 @@
  * limitations under the License.
  */
 
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
+/**
+ * A SpanContext represents the portion of a Span which must be serialized and
+ * propagated along side of a distributed context.
+ */
+export interface SpanContext {
+  /** The ID of the trace that this span belongs to. */
+  traceId: string;
+  /** The ID of the Span. */
+  spanId: string;
+  /** Trace options to propagate. */
+  traceOptions?: number;
+  /** Tracing-system-specific info to propagate. */
+  traceState?: string;
+}
