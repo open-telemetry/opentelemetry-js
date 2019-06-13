@@ -1,0 +1,43 @@
+{
+  "name": "@opentelemetry/types",
+  "version": "0.0.1",
+  "description": "TypeScript types for OpenTelemetry",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-node",
+  "scripts": {
+    "build": "npm run compile",
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "test": "npm run compile && npm run check"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats",
+    "monitoring"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "gts": "^1.0.0",
+    "typescript": "^3.4.5"
+  }
+}
