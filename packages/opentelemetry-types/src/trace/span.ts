@@ -43,7 +43,8 @@ export interface Span {
    * Sets an attribute to the span.
    *
    * @param key the key for this attribute.
-   * @param value the value for this attribute.
+   * @param value the value for this attribute. If the value is a typeof object
+   *     it has to be JSON.stringify-able otherwise it will raise an exception.
    */
   setAttribute(key: string, value: string | number | boolean | object): void;
 
@@ -56,7 +57,7 @@ export interface Span {
    */
   addEvent(
     name: string,
-    attributes?: { [key: string]: string | number | boolean }
+    attributes?: { [key: string]: string | number | boolean | object }
   ): void;
 
   /**
@@ -68,7 +69,7 @@ export interface Span {
    */
   addLink(
     spanContext: SpanContext,
-    attributes?: { [key: string]: string | number | boolean }
+    attributes?: { [key: string]: string | number | boolean | object }
   ): void;
 
   /**
