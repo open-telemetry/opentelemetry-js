@@ -45,7 +45,8 @@ export interface Span {
    * @param key the key for this attribute.
    * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: string | number | boolean | object): this;
+  //tslint:disable-next-line:no-any
+  setAttribute(key: string, value: any): this;
 
   /**
    * Adds an event to the Span.
@@ -54,10 +55,8 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this event.
    */
-  addEvent(
-    name: string,
-    attributes?: { [key: string]: string | number | boolean | object }
-  ): this;
+  //tslint:disable-next-line:no-any
+  addEvent(name: string, attributes?: { [key: string]: any }): this;
 
   /**
    * Adds a link to the Span.
@@ -66,10 +65,8 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this link.
    */
-  addLink(
-    spanContext: SpanContext,
-    attributes?: { [key: string]: string | number | boolean | object }
-  ): this;
+  //tslint:disable-next-line:no-any
+  addLink(spanContext: SpanContext, attributes?: { [key: string]: any }): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
@@ -81,6 +78,8 @@ export interface Span {
 
   /**
    * Updates the Span name.
+   *
+   * TODO (revision): https://github.com/open-telemetry/opentelemetry-specification/issues/119
    *
    * @param name the Span name.
    */
