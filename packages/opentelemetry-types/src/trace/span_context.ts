@@ -23,8 +23,29 @@ export interface SpanContext {
   traceId: string;
   /** The ID of the Span. */
   spanId: string;
-  /** Trace options to propagate. */
+  /**
+   * Trace options to propagate.
+   *
+   * It is represented as 1 byte (bitmap). Bit to represent whether trace is
+   * sampled or not.
+   * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
+   */
   traceOptions?: number;
-  /** Tracing-system-specific info to propagate. */
+  /**
+   * Tracing-system-specific info to propagate.
+   *
+   * The tracestate field value is a `list` as defined below. The `list` is a
+   * series of `list-members` separated by commas `,`, and a list-member is a
+   * key/value pair separated by an equals sign `=`. Spaces and horizontal tabs
+   * surrounding `list-members` are ignored. There can be a maximum of 32
+   * `list-members` in a `list`.
+   * More Info: https://www.w3.org/TR/trace-context/#tracestate-field
+   *
+   * Examples:
+   *     Single tracing system (generic format):
+   *         tracestate: rojo=00f067aa0ba902b7
+   *     Multiple tracing systems (with different formatting):
+   *         tracestate: rojo=00f067aa0ba902b7,congo=t61rcWkgMzE
+   */
   traceState?: string;
 }

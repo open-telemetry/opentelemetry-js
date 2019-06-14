@@ -25,7 +25,11 @@ export interface Status {
   message?: string;
 }
 
-/** An enumeration of canonical status codes. */
+/**
+ * An enumeration of canonical status codes.
+ *
+ * TODO (revision): https://github.com/open-telemetry/opentelemetry-specification/issues/59
+ */
 export enum CanonicalCode {
   /**
    * Not an error; returned on success
