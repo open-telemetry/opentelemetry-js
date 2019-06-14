@@ -43,10 +43,9 @@ export interface Span {
    * Sets an attribute to the span.
    *
    * @param key the key for this attribute.
-   * @param value the value for this attribute. If the value is a typeof object
-   *     it has to be JSON.stringify-able otherwise it will raise an exception.
+   * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: string | number | boolean | object): void;
+  setAttribute(key: string, value: string | number | boolean | object): this;
 
   /**
    * Adds an event to the Span.
@@ -58,7 +57,7 @@ export interface Span {
   addEvent(
     name: string,
     attributes?: { [key: string]: string | number | boolean | object }
-  ): void;
+  ): this;
 
   /**
    * Adds a link to the Span.
@@ -70,7 +69,7 @@ export interface Span {
   addLink(
     spanContext: SpanContext,
     attributes?: { [key: string]: string | number | boolean | object }
-  ): void;
+  ): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
@@ -78,23 +77,28 @@ export interface Span {
    *
    * @param status the Status to set.
    */
-  setStatus(status: Status): void;
+  setStatus(status: Status): this;
 
   /**
    * Updates the Span name.
    *
    * @param name the Span name.
    */
-  updateName(name: string): void;
+  updateName(name: string): this;
 
   /**
-   * Marks the end of Span execution and sets the current time as the span's
-   * end time.
+   * Marks the end of Span execution.
    *
    * Call to End of a Span MUST not have any effects on child spans. Those may
    * still be running and can be ended later.
+   *
+   * Do not return `this`. The Span generally should not be used after it
+   * is ended so chaining is not desired in this context.
+   *
+   * @param [endTime] the timestamp to set as Span's end time. If not provided,
+   *     use the current time as the span's end time.
    */
-  end(): void;
+  end(endTime?: number): void;
 
   /**
    * Returns the flag whether this span will be recorded.
