@@ -18,6 +18,7 @@ export * from './context/propagation/Propagator';
 export * from './resources/Resource';
 export * from './trace/attributes';
 export * from './trace/link';
+export * from './distributedcontext/entry';
 export * from './trace/span';
 export * from './trace/span_context';
 export * from './trace/span_kind';
