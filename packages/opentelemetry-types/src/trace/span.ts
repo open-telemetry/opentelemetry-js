@@ -45,8 +45,7 @@ export interface Span {
    * @param key the key for this attribute.
    * @param value the value for this attribute.
    */
-  //tslint:disable-next-line:no-any
-  setAttribute(key: string, value: any): this;
+  setAttribute(key: string, value: unknown): this;
 
   /**
    * Adds an event to the Span.
@@ -55,8 +54,7 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this event.
    */
-  //tslint:disable-next-line:no-any
-  addEvent(name: string, attributes?: { [key: string]: any }): this;
+  addEvent(name: string, attributes?: { [key: string]: unknown }): this;
 
   /**
    * Adds a link to the Span.
@@ -65,8 +63,7 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this link.
    */
-  //tslint:disable-next-line:no-any
-  addLink(spanContext: SpanContext, attributes?: { [key: string]: any }): this;
+  addLink(spanContext: SpanContext, attributes?: { [key: string]: unknown }): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
