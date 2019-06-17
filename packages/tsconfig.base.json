@@ -8,12 +8,12 @@
     "noEmitOnError": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
+    "noUnusedLocals": true,
     "pretty": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es6",
     "strictNullChecks": true,
-    "noUnusedLocals": true
+    "target": "esnext"
   },
   "exclude": [
     "node_modules"
