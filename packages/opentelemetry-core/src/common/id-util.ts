@@ -27,7 +27,7 @@ export function randomTraceId(): string {
 }
 
 /**
- * Returns a random 8-byte span ID formatted/Encoded as a 16 lowercase hex
+ * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
  * characters corresponding to 64 bits.
  */
 export function randomSpanId(): string {
