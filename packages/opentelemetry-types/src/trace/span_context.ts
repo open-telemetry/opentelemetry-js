@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { TraceState } from './tracestate';
+import { TraceOptions } from './traceoptions';
+
 /**
  * A SpanContext represents the portion of a Span which must be serialized and
  * propagated along side of a distributed context.
@@ -39,7 +42,7 @@ export interface SpanContext {
    * sampled or not.
    * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
    */
-  traceOptions?: number;
+  traceOptions?: TraceOptions;
   /**
    * Tracing-system-specific info to propagate.
    *
@@ -56,5 +59,5 @@ export interface SpanContext {
    *     Multiple tracing systems (with different formatting):
    *         tracestate: rojo=00f067aa0ba902b7,congo=t61rcWkgMzE
    */
-  traceState?: string;
+  traceState?: TraceState;
 }
