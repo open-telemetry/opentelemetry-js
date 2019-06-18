@@ -20,33 +20,11 @@
  */
 export interface Entry {
   /** The entry key */
-  readonly entryKey: EntryKey;
+  readonly key: string;
   /** The entry value */
-  readonly entryValue: EntryValue;
-  /** The metadata for the entry */
-  readonly entryMetadata: EntryMetadata;
-}
-
-/** EntryKey is the name of the Entry. */
-export interface EntryKey {
-  /**
-   * The name of the key.
-   * Restrictions:
-   *   1. Must contain only printable ASCII (codes between 32 and 126 inclusive)
-   *   2. Must have length greater than zero and less than 256.
-   *   3. Must not be empty.
-   */
-  readonly name: string;
-}
-
-/** A validated entry value. */
-export interface EntryValue {
-  /**
-   * The value of a entry.
-   * Restrictions:
-   *   1. It MUST contain only printable ASCII (codes between 32 and 126)
-   */
   readonly value: string;
+  /** The metadata for the entry */
+  readonly metadata: EntryMetadata;
 }
 
 /**
