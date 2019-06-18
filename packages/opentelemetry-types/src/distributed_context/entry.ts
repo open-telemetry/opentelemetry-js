@@ -43,7 +43,7 @@ export interface EntryMetadata {
    * For now, only special values of EntryTtl are supported. In future,
    * additional properties may be added to address specific situations.
    */
-  readonly entryTtl: EntryTtl;
+  readonly ttl: EntryTtl;
 }
 
 /**
