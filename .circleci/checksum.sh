@@ -2,9 +2,9 @@
 #
 # Usage: checksum.sh filename
 #
-# checksum.sh is a script that computes the checksum of the repos top level
-# `package.json` and package `package.json`s, outputting them into a file
-# in alphabetical order. Must be run at the top level of the repository.
+# checksum.sh computes the checksum of the repo's top level `package.json`
+# and `package.json` files in package/, putting the hashes into a file in
+# alphabetical order. Must be run at the top level of the repository.
 
 
 if [ -z $1 ]; then
