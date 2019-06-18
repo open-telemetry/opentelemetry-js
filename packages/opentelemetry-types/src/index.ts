@@ -18,3 +18,7 @@ export * from './trace/span';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/status';
+export * from './trace/link';
+export * from './trace/attributes';
+export * from './trace/traceoptions';
+export * from './trace/tracestate';
