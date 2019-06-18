@@ -25,5 +25,5 @@ export interface Link {
   /** The SpanContext of a linked span. */
   spanContext: SpanContext;
   /** A set of attributes on the link. */
-  attributes: Attributes;
+  attributes?: Attributes;
 }
