@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/link';
-export * from './trace/attributes';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+import { Attributes } from './attributes';
+import { SpanContext } from './span_context';
+
+/**
+ * A pointer from the current span to another span in the same trace or in a
+ * different trace.
+ */
+export interface Link {
+  /** The SpanContext of a linked span. */
+  spanContext: SpanContext;
+  /** A set of attributes on the link. */
+  attributes?: Attributes;
+}
