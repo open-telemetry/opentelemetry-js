@@ -63,7 +63,10 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this link.
    */
-  addLink(spanContext: SpanContext, attributes?: { [key: string]: unknown }): this;
+  addLink(
+    spanContext: SpanContext,
+    attributes?: { [key: string]: unknown }
+  ): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
@@ -93,6 +96,7 @@ export interface Span {
    *
    * @param [endTime] the timestamp to set as Span's end time. If not provided,
    *     use the current time as the span's end time.
+   *     TODO (Add timestamp format): https://github.com/open-telemetry/opentelemetry-js/issues/19
    */
   end(endTime?: number): void;
 

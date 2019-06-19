@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export class TraceOptions {
+export interface TraceOptions {
   // TODO
 }

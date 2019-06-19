@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- /** Defines a attributes interface. */
+/** Defines a attributes interface. */
 export interface Attributes {
   [attributeKey: string]: unknown;
 }

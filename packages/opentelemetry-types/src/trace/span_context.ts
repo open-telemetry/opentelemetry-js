@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { TraceState } from './tracestate';
-import { TraceOptions } from './traceoptions';
+import { TraceState } from './trace_state';
+import { TraceOptions } from './trace_options';
 
 /**
  * A SpanContext represents the portion of a Span which must be serialized and

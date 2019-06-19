@@ -20,5 +20,5 @@ export * from './trace/span_kind';
 export * from './trace/status';
 export * from './trace/link';
 export * from './trace/attributes';
-export * from './trace/traceoptions';
-export * from './trace/tracestate';
+export * from './trace/trace_options';
+export * from './trace/trace_state';

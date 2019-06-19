@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export class TraceState {
+export interface TraceState {
   // TODO
 }
