@@ -23,6 +23,9 @@ jobs:
             - ./packages/*/node_modules
             - ./packages/*/yarn.lock
       - run:
+          name: Lint
+          command: yarn run check
+      - run:
           name: Compile
           command: yarn run compile
       - run:
