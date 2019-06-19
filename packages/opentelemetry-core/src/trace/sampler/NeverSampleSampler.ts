@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
-export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/link';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
-export * from './trace/Sampler';
+import { Sampler, SpanContext } from '@opentelemetry/types';
+
+/** Sampler that samples no traces. */
+export class NeverSampleSampler implements Sampler {
+  readonly description = 'NeverSampleSampler';
+
+  shouldSample(
+    traceId: string,
+    spanId: string,
+    name?: string,
+    parentContext?: SpanContext
+  ) {
+    return false;
+  }
+}
