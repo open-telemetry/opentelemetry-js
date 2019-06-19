@@ -14,4 +14,5 @@
  * limitations under the License.
  */
 
+export * from './default_span';
 export * from './resources/Resource';
