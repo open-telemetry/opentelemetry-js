@@ -16,6 +16,7 @@
 
 import { SpanContext } from './span_context';
 import { Status } from './status';
+import { Attributes } from './attributes';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -46,6 +47,13 @@ export interface Span {
    * @param value the value for this attribute.
    */
   setAttribute(key: string, value: unknown): this;
+
+  /**
+   * Sets attributes to the span.
+   *
+   * @param attributes the attributes that will be added.
+   */
+  setAttributes(attributes: Attributes): this;
 
   /**
    * Adds an event to the Span.
