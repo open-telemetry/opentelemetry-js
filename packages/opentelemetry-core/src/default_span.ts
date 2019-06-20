@@ -44,6 +44,11 @@ export class DefaultSpan implements Span {
     return this;
   }
 
+  setAttributes(attributes: Attributes): this {
+    this._setAttributes(attributes);
+    return this;
+  }
+
   addEvent(name: string, attributes?: Attributes): this {
     this._addEvent(name, attributes);
     return this;

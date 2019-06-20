@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { DefaultSpan } from '../src/default_span';
 import { CanonicalCode } from '@opentelemetry/types';
 
-describe('DefaultSpan()', () => {
+describe('DefaultSpan', () => {
   it('do not crash', () => {
     const span = new DefaultSpan();
     span.setAttribute('my_string_attribute', 'foo');
@@ -26,6 +26,10 @@ describe('DefaultSpan()', () => {
     span.setAttribute('my_boolean_attribute', false);
     span.setAttribute('my_obj_attribute', { a: true });
     span.setAttribute('my_sym_attribute', Symbol('a'));
+    span.setAttributes({
+      my_string_attribute: 'foo',
+      my_number_attribute: 123,
+    });
 
     span.addEvent('sent');
     span.addEvent('sent', { id: '42', key: 'value' });
