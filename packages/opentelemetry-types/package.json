@@ -4,7 +4,7 @@
   "description": "TypeScript types for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-node",
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "build": "npm run compile",
     "check": "gts check",
