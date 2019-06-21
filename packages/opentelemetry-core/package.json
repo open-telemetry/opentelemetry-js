@@ -12,9 +12,7 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "compile:release": "tsc -p tsconfig-release.json",
     "fix": "gts fix",
-    "prepare": "yarn run compile:release",
     "posttest": "yarn run check"
   },
   "keywords": [
