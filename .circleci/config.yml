@@ -1,0 +1,33 @@
+version: 2
+
+jobs:
+  build:
+    docker:
+      - image: circleci/node:12
+    steps:
+      - checkout
+      - run:
+          name: Create Checksum
+          command: sh .circleci/checksum.sh /tmp/checksums.txt
+      - restore_cache:
+          keys:
+            - npm-cache-{{ checksum "/tmp/checksums.txt" }}
+      - run:
+          name: Install Dependencies
+          command: yarn install
+      - save_cache:
+          key: npm-cache-{{ checksum "/tmp/checksums.txt" }}
+          paths:
+            - ./node_modules
+            - ./yarn.lock
+            - ./packages/*/node_modules
+            - ./packages/*/yarn.lock
+      - run:
+          name: Lint
+          command: yarn run check
+      - run:
+          name: Compile
+          command: yarn run compile
+      - run:
+          name: Test
+          command: yarn run test
