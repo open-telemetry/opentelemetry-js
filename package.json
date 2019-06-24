@@ -14,7 +14,7 @@
     "codecov": "lerna run codecov",
     "check": "lerna run check"
   },
-  "repository": "open-telemetry/opentelemetry-node",
+  "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
     "opentelemetry",
     "nodejs",

@@ -4,7 +4,7 @@
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-node",
+  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p ./tsconfig.json test/**/*.ts",
     "tdd": "yarn run test -- --watch-extensions ts --watch",
