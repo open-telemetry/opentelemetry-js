@@ -12,7 +12,8 @@
     "bootstrap": "lerna bootstrap",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
-    "check": "lerna run check"
+    "check": "lerna run check",
+    "docs": "typedoc --tsconfig  ./packages/opentelemetry-types/tsconfig.json"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
@@ -27,6 +28,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "lerna": "^3.13.4",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   }
 }

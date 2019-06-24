@@ -18,12 +18,12 @@ import { Attributes } from './attributes';
 import { SpanContext } from './span_context';
 
 /**
- * A pointer from the current span to another span in the same trace or in a
- * different trace.
+ * A pointer from the current {@link Span} to another span in the same trace or
+ * in a different trace.
  */
 export interface Link {
-  /** The SpanContext of a linked span. */
+  /** The {@link SpanContext} of a linked span. */
   spanContext: SpanContext;
-  /** A set of attributes on the link. */
+  /** A set of {@link Attributes} on the link. */
   attributes?: Attributes;
 }
