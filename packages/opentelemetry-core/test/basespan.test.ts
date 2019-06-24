@@ -15,12 +15,12 @@
  */
 
 import * as assert from 'assert';
-import { DefaultSpan } from '../src/trace/DefaultSpan';
+import { BaseSpan } from '../src/trace/BaseSpan';
 import { CanonicalCode } from '@opentelemetry/types';
 
-describe('DefaultSpan', () => {
+describe('BaseSpan', () => {
   it('do not crash', () => {
-    const span = new DefaultSpan();
+    const span = new BaseSpan();
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);
     span.setAttribute('my_boolean_attribute', false);
@@ -51,7 +51,7 @@ describe('DefaultSpan', () => {
     span.updateName('my-span');
 
     assert.ok(!span.isRecordingEvents());
-    assert.strictEqual(span.context(), null);
+    assert.ok(span.context());
     span.end();
   });
 });

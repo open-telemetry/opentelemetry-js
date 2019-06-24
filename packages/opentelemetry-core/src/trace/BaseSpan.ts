@@ -14,32 +14,31 @@
  * limitations under the License.
  */
 
-import {
-  Span,
-  SpanContext,
-  Status,
-  Attributes,
-  SpanKind,
-} from '@opentelemetry/types';
+import * as types from '@opentelemetry/types';
+import { randomSpanId, randomTraceId } from '../common/util/id';
 
-/** This is a no-op implementation of Span. */
-export class DefaultSpan implements Span {
-  name = 'DefaultSpan'; // default
+/** This is a base/default implementation of {@link Span}. */
+export class BaseSpan implements types.Span {
+  name = 'DefaultSpan'; // default name
   spanId = '';
   traceId = '';
   parentSpanId = '';
-  kind = SpanKind.INTERNAL; // default
-  spanContext: SpanContext | null = null;
+  kind = types.SpanKind.INTERNAL; // default kind
 
   constructor() {
-    // TODO: https://github.com/open-telemetry/opentelemetry-js/pull/35
-    // this.spanId = randomSpanId();
-    // this.traceId = randomTraceId();
+    // TODO: Consider to add SpanOptions with name, kind, spanContext properties
+    this.traceId = randomTraceId();
+    this.spanId = randomSpanId();
   }
 
   // By default returns a no-op SpanContext.
-  context(): SpanContext {
-    return this.spanContext!;
+  context(): types.SpanContext {
+    // TODO: Consider to add default span context (either empty string or
+    // invalid data). Also, add/update traceOptions and traceState.
+    return {
+      traceId: this.traceId,
+      spanId: this.spanId,
+    };
   }
 
   // By default does nothing
@@ -48,22 +47,22 @@ export class DefaultSpan implements Span {
   }
 
   // By default does nothing
-  setAttributes(attributes: Attributes): this {
+  setAttributes(attributes: types.Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(name: string, attributes?: Attributes): this {
+  addEvent(name: string, attributes?: types.Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addLink(spanContext: SpanContext, attributes?: Attributes): this {
+  addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
     return this;
   }
 
   // By default does nothing
-  setStatus(status: Status): this {
+  setStatus(status: types.Status): this {
     return this;
   }
 
