@@ -14,6 +14,25 @@
  * limitations under the License.
  */
 
+/**
+ * Tracestate carries system-specific configuration data, represented as a list
+ * of key-value pairs. TraceState allows multiple tracing systems to
+ * participate in the same trace.
+ */
 export interface TraceState {
-  // TODO
+  /**
+   * Adds or updates the TraceState that has the given `key` if it is
+   * present. The new State will always be added in the front of the
+   * list of states.
+   */
+  set(name: string, value: string): void;
+
+  /**
+   * Returns the value to which the specified key is mapped, or `undefined` if
+   * this map contains no mapping for the key.
+   */
+  get(name: string): string | undefined;
+
+  /** Returns a list of key string contained in this TraceState. */
+  keys(): string[];
 }
