@@ -16,22 +16,23 @@
 
 import { SpanContext } from '../../trace/span_context';
 
+/** Defines a propagation interface. */
 export interface Propagation {
   /**
-   * Injects the given SpanContext instance to transmit over the wire.
+   * Injects the given {@link SpanContext} instance to transmit over the wire.
    *
    * OpenTelemetry defines a common set of format values (BinaryFormat and
-   * HTTPTextFormat), and each has an expected carrier type.
+   * HTTPTextFormat), and each has an expected `carrier` type.
    *
-   * @param spanContext the SpanContext to transmit over the wire..
+   * @param spanContext the SpanContext to transmit over the wire.
    * @param format the format of the carrier.
    * @param carrier the carrier of propagation fields, such as an http request.
    */
   inject(spanContext: SpanContext, format: string, carrier: unknown): void;
 
   /**
-   * Returns a SpanContext instance extracted from carrier in the given
-   * format from upstream.
+   * Returns a {@link SpanContext} instance extracted from `carrier` in the
+   * given format from upstream.
    *
    * @param format the format of the carrier.
    * @param carrier the carrier of propagation fields, such as an http request.
