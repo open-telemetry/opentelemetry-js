@@ -9,7 +9,7 @@
   ],
   "typedocOptions": {
     "name": "OpenTelemetry Documentation",
-    "out": "docs",
+    "out": "../../documentation",
     "mode": "file",
     "hideGenerator": true
   }
