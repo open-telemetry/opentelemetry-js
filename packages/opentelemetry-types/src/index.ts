@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './resources/Resource';
 export * from './trace/span';
 export * from './trace/span_context';
 export * from './trace/span_kind';
