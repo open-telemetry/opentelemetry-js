@@ -24,15 +24,30 @@ export interface TraceState {
    * Adds or updates the TraceState that has the given `key` if it is
    * present. The new State will always be added in the front of the
    * list of states.
+   *
+   * @param name key of the TraceState entry.
+   * @param value value of the TraceState entry.
    */
   set(name: string, value: string): void;
 
-  /**
-   * Returns the value to which the specified key is mapped, or `undefined` if
-   * this map contains no mapping for the key.
-   */
-  get(name: string): string | undefined;
+  // TODO: Consider to add support for merging an object as well by also
+  // accepting a single internalTraceState argument similar to the constructor.
 
-  /** Returns a list of key string contained in this TraceState. */
-  keys(): string[];
+  /**
+   * Serializes the TraceState to a `list` as defined below. The `list` is a
+   * series of `list-members` separated by commas `,`, and a list-member is a
+   * key/value pair separated by an equals sign `=`. Spaces and horizontal tabs
+   * surrounding `list-members` are ignored. There can be a maximum of 32
+   * `list-members` in a `list`.
+   *
+   * @returns the serialized string.
+   */
+  serialize(): string;
+
+  /**
+   * Parses the input string and generates a TraceState.
+   *
+   * @param s the string to parse.
+   */
+  parse(s: string): void;
 }

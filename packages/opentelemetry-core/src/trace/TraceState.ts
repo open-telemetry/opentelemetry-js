@@ -20,23 +20,16 @@ import * as types from '@opentelemetry/types';
 // const maximumTraceStateItems = 32;
 
 const maximumTraceStateLength = 512;
-export interface InternalTraceState {
+
+interface InternalTraceState {
   [key: string]: string;
 }
 
 export class TraceState implements types.TraceState {
   private internalState: InternalTraceState = {};
 
-  constructor(internalState?: InternalTraceState) {
-    if (internalState) this.internalState = internalState;
-  }
-
-  get(name: string): string | undefined {
-    return this.internalState[name];
-  }
-
-  keys(): string[] {
-    return Object.keys(this.internalState);
+  constructor(s?: string) {
+    if (s) this.parse(s);
   }
 
   set(name: string, value: string): void {
@@ -48,32 +41,39 @@ export class TraceState implements types.TraceState {
       [name]: value,
     };
   }
-}
 
-export function serialize(state: TraceState): string {
-  return state
-    .keys()
-    .reduce((agg: string[], key) => {
-      agg.push(`${key}=${state.get(key)}`);
-      return agg;
-    }, [])
-    .join(',');
-}
+  serialize(): string {
+    return this.keys()
+      .reduce((agg: string[], key) => {
+        agg.push(`${key}=${this.get(key)}`);
+        return agg;
+      }, [])
+      .join(',');
+  }
 
-export function parse(s: string | null): TraceState | null {
-  if (s == null || s.length > maximumTraceStateLength) return null;
+  parse(s: string) {
+    if (s.length > maximumTraceStateLength) return;
 
-  // TODO validate maximum number of items
-  const states = s
-    .split(',')
-    .reduce((agg: InternalTraceState, part: string) => {
-      const i = part.indexOf('=');
-      if (i !== -1) {
-        // TODO validate key/value constraints defined in the spec
-        agg[part.slice(0, i)] = part.slice(i + 1, part.length);
-      }
-      return agg;
-    }, {});
+    // TODO validate maximum number of items
+    this.internalState = s
+      .split(',')
+      .reduce((agg: InternalTraceState, part: string) => {
+        const i = part.indexOf('=');
+        if (i !== -1) {
+          // TODO validate key/value constraints defined in the spec
+          agg[part.slice(0, i)] = part.slice(i + 1, part.length);
+        }
+        return agg;
+      }, {});
+  }
 
-  return new TraceState(states);
+  // TEST_ONLY
+  keys(): string[] {
+    return Object.keys(this.internalState);
+  }
+
+  // TEST_ONLY
+  get(name: string): string | undefined {
+    return this.internalState[name];
+  }
 }
