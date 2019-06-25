@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { TraceOptions } from './trace_options';
 import { TraceState } from './trace_state';
 
 /**
@@ -39,10 +38,13 @@ export interface SpanContext {
    * Trace options to propagate.
    *
    * It is represented as 1 byte (bitmap). Bit to represent whether trace is
-   * sampled or not.
+   * sampled or not. When set, the least significant bit documents that the
+   * caller may have recorded trace data. A caller who does not record trace
+   * data out-of-band leaves this flag unset.
+   *
    * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
    */
-  traceOptions?: TraceOptions;
+  traceOptions?: number;
   /**
    * Tracing-system-specific info to propagate.
    *
