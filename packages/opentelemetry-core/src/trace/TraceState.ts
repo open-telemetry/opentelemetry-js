@@ -17,9 +17,11 @@
 import * as types from '@opentelemetry/types';
 
 // TODO validate maximum number of items
-// const maximumTraceStateItems = 32;
+// const MAX_TRACE_STATE_ITEMS = 32;
 
-const maximumTraceStateLength = 512;
+const MAX_TRACE_STATE_LEN = 512;
+const LIST_MEMBERS_SEPARATOR = ',';
+const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
 interface InternalTraceState {
   [key: string]: string;
@@ -33,6 +35,8 @@ export class TraceState implements types.TraceState {
   }
 
   set(name: string, value: string): void {
+    // TODO: Consider to use `list` or `Map` to preserve ordering.
+    // Benchmark the different approaches and use the faster one.
     this.internalState = {
       // ensure that the new key ends up in the beginning of the list
       [name]: value,
@@ -45,20 +49,20 @@ export class TraceState implements types.TraceState {
   serialize(): string {
     return this.keys()
       .reduce((agg: string[], key) => {
-        agg.push(`${key}=${this.get(key)}`);
+        agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
         return agg;
       }, [])
-      .join(',');
+      .join(LIST_MEMBERS_SEPARATOR);
   }
 
   parse(s: string) {
-    if (s.length > maximumTraceStateLength) return;
+    if (s.length > MAX_TRACE_STATE_LEN) return;
 
     // TODO validate maximum number of items
     this.internalState = s
-      .split(',')
+      .split(LIST_MEMBERS_SEPARATOR)
       .reduce((agg: InternalTraceState, part: string) => {
-        const i = part.indexOf('=');
+        const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
           // TODO validate key/value constraints defined in the spec
           agg[part.slice(0, i)] = part.slice(i + 1, part.length);
