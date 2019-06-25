@@ -16,8 +16,8 @@
 
 import { SpanContext } from '../../trace/span_context';
 
-/** Defines a propagation interface. */
-export interface Propagation {
+/** Defines a Propagator interface. */
+export interface Propagator {
   /**
    * Injects the given {@link SpanContext} instance to transmit over the wire.
    *
