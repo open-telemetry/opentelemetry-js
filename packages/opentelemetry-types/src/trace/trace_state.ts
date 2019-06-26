@@ -43,11 +43,4 @@ export interface TraceState {
    * @returns the serialized string.
    */
   serialize(): string;
-
-  /**
-   * Parses the input string and generates a TraceState.
-   *
-   * @param s the string to parse.
-   */
-  parse(s: string): void;
 }

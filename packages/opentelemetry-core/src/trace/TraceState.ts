@@ -23,27 +23,19 @@ const MAX_TRACE_STATE_LEN = 512;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
-interface InternalTraceState {
-  [key: string]: string;
-}
-
 export class TraceState implements types.TraceState {
-  private internalState: InternalTraceState = {};
+  private internalState: Map<string, string> = new Map();
 
   constructor(s?: string) {
     if (s) this.parse(s);
   }
 
   set(name: string, value: string): void {
-    // TODO: Consider to use `list` or `Map` to preserve ordering.
-    // Benchmark the different approaches and use the faster one.
-    this.internalState = {
-      // ensure that the new key ends up in the beginning of the list
-      [name]: value,
-      ...this.internalState,
-      // ensure that updates work
-      [name]: value,
-    };
+    // TODO: Benchmark the different approaches and use the faster one.
+    if (this.internalState.has(name)) {
+      this.internalState.delete(name);
+    }
+    this.internalState.set(name, value);
   }
 
   serialize(): string {
@@ -55,29 +47,29 @@ export class TraceState implements types.TraceState {
       .join(LIST_MEMBERS_SEPARATOR);
   }
 
-  parse(s: string) {
+  private parse(s: string) {
     if (s.length > MAX_TRACE_STATE_LEN) return;
-
     // TODO validate maximum number of items
     this.internalState = s
       .split(LIST_MEMBERS_SEPARATOR)
-      .reduce((agg: InternalTraceState, part: string) => {
+      .reverse()
+      .reduce((agg: Map<string, string>, part: string) => {
         const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
           // TODO validate key/value constraints defined in the spec
-          agg[part.slice(0, i)] = part.slice(i + 1, part.length);
+          agg.set(part.slice(0, i), part.slice(i + 1, part.length));
         }
         return agg;
-      }, {});
+      }, new Map());
   }
 
   // TEST_ONLY
   keys(): string[] {
-    return Object.keys(this.internalState);
+    return Array.from(this.internalState.keys()).reverse();
   }
 
   // TEST_ONLY
   get(name: string): string | undefined {
-    return this.internalState[name];
+    return this.internalState.get(name);
   }
 }
