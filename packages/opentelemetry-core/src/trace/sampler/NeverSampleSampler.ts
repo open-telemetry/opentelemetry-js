@@ -20,12 +20,7 @@ import { Sampler, SpanContext } from '@opentelemetry/types';
 export class NeverSampleSampler implements Sampler {
   readonly description = 'NeverSampleSampler';
 
-  shouldSample(
-    traceId: string,
-    spanId: string,
-    name?: string,
-    parentContext?: SpanContext
-  ) {
+  shouldSample(parentContext?: SpanContext) {
     return false;
   }
 }

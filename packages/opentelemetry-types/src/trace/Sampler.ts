@@ -16,7 +16,11 @@
 
 import { SpanContext } from './span_context';
 
-/** This interface represent a sampler. */
+/**
+ * This interface represent a sampler. Sampling is a mechanism to control the
+ * noise and overhead introduced by OpenTelemetry by reducing the number of
+ * samples of traces collected and sent to the backend.
+ */
 export interface Sampler {
   /**
    * A string that uniquely describes the sampling behavior of this instance.
@@ -26,18 +30,10 @@ export interface Sampler {
   /**
    * Checks whether span needs to be created and tracked.
    *
-   * @param traceId the TraceId for the new Span. This will be identical to
-   *     that in the parentContext, unless this is a root span.
-   * @param spanId the SpanId for the new Span.
-   * @param [name] the name of the new Span.
+   * TODO: Consider to add required arguments https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sampling-api.md#shouldsample
    * @param [parentContext] Parent span context. Typically taken from the wire.
    *     Can be null.
    * @returns whether span should be sampled or not.
    */
-  shouldSample(
-    traceId: string,
-    spanId: string,
-    name?: string,
-    parentContext?: SpanContext
-  ): boolean;
+  shouldSample(parentContext?: SpanContext): boolean;
 }

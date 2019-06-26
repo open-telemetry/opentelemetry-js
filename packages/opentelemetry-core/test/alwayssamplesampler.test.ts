@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { AlwaysSampleSampler } from '../src/trace/sampler/AlwaysSampleSampler';
 
 describe('AlwaysSampleSampler()', () => {
-  it('AlwaysSampleSampler always return true ', () => {
+  it('AlwaysSampleSampler always return true', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -26,14 +26,6 @@ describe('AlwaysSampleSampler()', () => {
     const sampler = new AlwaysSampleSampler();
 
     assert.strictEqual(sampler.description, 'AlwaysSampleSampler');
-    assert.strictEqual(
-      sampler.shouldSample(
-        'd4cda95b652f4a1592b449d5929fda1b',
-        '6e0c63257de34c92',
-        'Another name',
-        spanContext
-      ),
-      true
-    );
+    assert.strictEqual(sampler.shouldSample(spanContext), true);
   });
 });

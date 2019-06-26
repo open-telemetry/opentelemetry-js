@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { NeverSampleSampler } from '../src/trace/sampler/NeverSampleSampler';
 
 describe('NeverSampleSampler()', () => {
-  it('NeverSampleSampler always return false ', () => {
+  it('NeverSampleSampler always return false', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -26,14 +26,6 @@ describe('NeverSampleSampler()', () => {
     const sampler = new NeverSampleSampler();
 
     assert.strictEqual(sampler.description, 'NeverSampleSampler');
-    assert.strictEqual(
-      sampler.shouldSample(
-        'd4cda95b652f4a1592b449d5929fda1b',
-        '6e0c63257de34c92',
-        'Yet another name',
-        spanContext
-      ),
-      false
-    );
+    assert.strictEqual(sampler.shouldSample(spanContext), false);
   });
 });

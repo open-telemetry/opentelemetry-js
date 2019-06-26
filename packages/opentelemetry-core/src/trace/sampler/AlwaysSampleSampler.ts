@@ -20,12 +20,7 @@ import { Sampler, SpanContext } from '@opentelemetry/types';
 export class AlwaysSampleSampler implements Sampler {
   readonly description = 'AlwaysSampleSampler';
 
-  shouldSample(
-    traceId: string,
-    spanId: string,
-    name?: string,
-    parentContext?: SpanContext
-  ) {
+  shouldSample(parentContext?: SpanContext) {
     return true;
   }
 }
