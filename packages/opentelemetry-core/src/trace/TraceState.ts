@@ -24,18 +24,18 @@ const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
 
 export class TraceState implements types.TraceState {
-  private internalState: Map<string, string> = new Map();
+  private _internalState: Map<string, string> = new Map();
 
-  constructor(s?: string) {
-    if (s) this.parse(s);
+  constructor(rawTraceState?: string) {
+    if (rawTraceState) this._parse(rawTraceState);
   }
 
   set(name: string, value: string): void {
     // TODO: Benchmark the different approaches and use the faster one.
-    if (this.internalState.has(name)) {
-      this.internalState.delete(name);
+    if (this._internalState.has(name)) {
+      this._internalState.delete(name);
     }
-    this.internalState.set(name, value);
+    this._internalState.set(name, value);
   }
 
   serialize(): string {
@@ -47,10 +47,10 @@ export class TraceState implements types.TraceState {
       .join(LIST_MEMBERS_SEPARATOR);
   }
 
-  private parse(s: string) {
-    if (s.length > MAX_TRACE_STATE_LEN) return;
+  private _parse(rawTraceState: string) {
+    if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
     // TODO validate maximum number of items
-    this.internalState = s
+    this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
       .reverse()
       .reduce((agg: Map<string, string>, part: string) => {
@@ -65,11 +65,11 @@ export class TraceState implements types.TraceState {
 
   // TEST_ONLY
   keys(): string[] {
-    return Array.from(this.internalState.keys()).reverse();
+    return Array.from(this._internalState.keys()).reverse();
   }
 
   // TEST_ONLY
   get(name: string): string | undefined {
-    return this.internalState.get(name);
+    return this._internalState.get(name);
   }
 }
