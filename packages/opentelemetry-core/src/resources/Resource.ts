@@ -17,12 +17,10 @@
 import * as types from '@opentelemetry/types';
 
 export class Resource implements types.Resource {
-  readonly labels: { [key: string]: string };
-
-  constructor(labels: { [key: string]: string }) {
+  constructor(
     // TODO: Consider to add check/validation on labels.
-    this.labels = labels;
-  }
+    readonly labels: { [key: string]: string }
+  ) {}
 
   merge(other: types.Resource | null): types.Resource {
     if (!other || !Object.keys(other.labels).length) return this;
