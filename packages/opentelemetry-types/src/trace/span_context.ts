@@ -43,7 +43,7 @@ export interface SpanContext {
    * caller may have recorded trace data. A caller who does not record trace
    * data out-of-band leaves this flag unset.
    *
-   * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
+   * TRACE_OPTIONS_SAMPLED = 0x1 and TRACE_OPTIONS_UNSAMPLED = 0x0;
    */
   traceOptions?: TraceOptions;
   /**

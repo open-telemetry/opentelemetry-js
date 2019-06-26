@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-type TraceOptionsSampled = 0x1;
-type TraceOptionsUnsampled = 0x0;
-
-export type TraceOptions = TraceOptionsSampled | TraceOptionsUnsampled;
-
 /** Bit to represent whether trace is sampled in trace options. */
 export const TRACE_OPTIONS_SAMPLED = 0x1;
 
 /** Bit to represent whether trace is unsampled in trace options. */
 export const TRACE_OPTIONS_UNSAMPLED = 0x0;
+
+export type TraceOptions = 0x0 | 0x1;
