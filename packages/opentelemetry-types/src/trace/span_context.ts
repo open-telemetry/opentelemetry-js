@@ -15,6 +15,7 @@
  */
 
 import { TraceState } from './trace_state';
+import { TraceOptions } from './trace_options';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
@@ -44,7 +45,7 @@ export interface SpanContext {
    *
    * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
    */
-  traceOptions?: number;
+  traceOptions?: TraceOptions;
   /**
    * Tracing-system-specific info to propagate.
    *

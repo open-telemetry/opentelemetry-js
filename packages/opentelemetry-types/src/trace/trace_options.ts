@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
-export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/link';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/link';
-export * from './trace/attributes';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+type TraceOptionsSampled = 0x1;
+type TraceOptionsUnsampled = 0x0;
+
+export type TraceOptions = TraceOptionsSampled | TraceOptionsUnsampled;
+
+/** Bit to represent whether trace is sampled in trace options. */
+export const TRACE_OPTIONS_SAMPLED = 0x1;
+
+/** Bit to represent whether trace is unsampled in trace options. */
+export const TRACE_OPTIONS_UNSAMPLED = 0x0;
