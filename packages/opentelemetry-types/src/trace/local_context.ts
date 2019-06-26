@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/local_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/link';
-export * from './trace/attributes';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
-export * from './trace/event';
+import { SpanKind } from './span_kind';
+import { Status } from './status';
+import { Link } from './link';
+import { Attributes } from './attributes';
+import { Event } from './event';
+
+/** LocalContext allows to attach arbitrary data on the span. */
+export interface LocalContext {
+  name?: string;
+  kind?: SpanKind;
+  spanId: string;
+  traceId: string;
+  parentSpanId?: string;
+  startTime?: number;
+  endTime?: number;
+  status?: Status;
+  links?: Link[];
+  events?: Event[];
+  attributes?: Attributes;
+  isRecordingEvents?: boolean;
+}

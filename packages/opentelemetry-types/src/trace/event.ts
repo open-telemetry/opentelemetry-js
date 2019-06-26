@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/local_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/link';
-export * from './trace/attributes';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
-export * from './trace/event';
+import { Attributes } from './attributes';
+
+/** A text annotation with a set of attributes. */
+export interface Event {
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: Attributes;
+}
