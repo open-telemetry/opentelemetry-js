@@ -38,8 +38,12 @@ export class TraceState implements types.TraceState {
     this._internalState.set(name, value);
   }
 
+  get(name: string): string | undefined {
+    return this._internalState.get(name);
+  }
+
   serialize(): string {
-    return this.keys()
+    return this._keys()
       .reduce((agg: string[], key) => {
         agg.push(key + LIST_MEMBER_KEY_VALUE_SPLITTER + this.get(key));
         return agg;
@@ -63,13 +67,7 @@ export class TraceState implements types.TraceState {
       }, new Map());
   }
 
-  // TEST_ONLY
-  keys(): string[] {
+  private _keys(): string[] {
     return Array.from(this._internalState.keys()).reverse();
-  }
-
-  // TEST_ONLY
-  get(name: string): string | undefined {
-    return this._internalState.get(name);
   }
 }

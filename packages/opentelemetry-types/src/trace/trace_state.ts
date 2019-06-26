@@ -25,10 +25,20 @@ export interface TraceState {
    * present. The new State will always be added in the front of the
    * list of states.
    *
-   * @param name key of the TraceState entry.
+   * @param key key of the TraceState entry.
    * @param value value of the TraceState entry.
    */
-  set(name: string, value: string): void;
+  set(key: string, value: string): void;
+
+  /**
+   * Returns the value to which the specified key is mapped, or `undefined` if
+   * this map contains no mapping for the key.
+   *
+   * @param key with which the specified value is to be associated.
+   * @returns the value to which the specified key is mapped, or `undefined` if
+   *     this map contains no mapping for the key.
+   */
+  get(key: string): string | undefined;
 
   // TODO: Consider to add support for merging an object as well by also
   // accepting a single internalTraceState argument similar to the constructor.
