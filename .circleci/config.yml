@@ -31,3 +31,6 @@ jobs:
       - run:
           name: Test
           command: yarn test
+      - run:
+          name: report-coverage
+          command: yarn codecov
