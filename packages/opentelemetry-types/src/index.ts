@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './context/propagation/Propagator';
 export * from './resources/Resource';
 export * from './trace/attributes';
 export * from './trace/link';
