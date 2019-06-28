@@ -10,7 +10,8 @@
     "check": "gts check",
     "compile": "tsc -p .",
     "fix": "gts fix",
-    "test": "npm run compile && npm run check"
+    "test": "npm run compile && npm run check",
+    "docs": "typedoc --tsconfig tsconfig.json"
   },
   "keywords": [
     "opentelemetry",
@@ -38,6 +39,7 @@
   },
   "devDependencies": {
     "gts": "^1.0.0",
+    "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   }
 }

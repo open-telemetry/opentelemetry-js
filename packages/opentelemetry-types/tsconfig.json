@@ -6,5 +6,11 @@
   },
   "include": [
     "src/**/*.ts"
-  ]
+  ],
+  "typedocOptions": {
+    "name": "OpenTelemetry Documentation",
+    "out": "docs/out",
+    "mode": "file",
+    "hideGenerator": true
+  }
 }

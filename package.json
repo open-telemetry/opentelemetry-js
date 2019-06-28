@@ -12,7 +12,8 @@
     "bootstrap": "lerna bootstrap",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
-    "check": "lerna run check"
+    "check": "lerna run check",
+    "docs": "lerna run docs"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
