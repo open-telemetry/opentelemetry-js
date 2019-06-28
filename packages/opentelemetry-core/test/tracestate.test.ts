@@ -41,6 +41,15 @@ describe('TraceState', () => {
         'vendorname2=opaqueValue2,vendorname1=opaqueValue1'
       );
     });
+
+    it('must unset the entries', () => {
+      const state = new TraceState('c=4,b=3,a=1');
+      state.unset('b');
+      assert.deepStrictEqual(state.serialize(), 'c=4,a=1');
+      state.unset('c');
+      state.unset('A');
+      assert.deepStrictEqual(state.serialize(), 'a=1');
+    });
   });
 
   describe('parse', () => {

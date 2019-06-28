@@ -39,16 +39,19 @@ export class TraceState implements types.TraceState {
     if (rawTraceState) this._parse(rawTraceState);
   }
 
-  set(name: string, value: string): void {
-    // TODO: Benchmark the different approaches and use the faster one.
-    if (this._internalState.has(name)) {
-      this._internalState.delete(name);
-    }
-    this._internalState.set(name, value);
+  set(key: string, value: string): void {
+    // TODO: Benchmark the different approaches(map vs list) and
+    // use the faster one.
+    if (this._internalState.has(key)) this._internalState.delete(key);
+    this._internalState.set(key, value);
   }
 
-  get(name: string): string | undefined {
-    return this._internalState.get(name);
+  unset(key: string): void {
+    this._internalState.delete(key);
+  }
+
+  get(key: string): string | undefined {
+    return this._internalState.get(key);
   }
 
   serialize(): string {

@@ -31,6 +31,13 @@ export interface TraceState {
   set(key: string, value: string): void;
 
   /**
+   * Removes the TraceState Entry that has the given `key` if it is present.
+   *
+   * @param key the key for the TraceState Entry to be removed.
+   */
+  unset(key: string): void;
+
+  /**
    * Returns the value to which the specified key is mapped, or `undefined` if
    * this map contains no mapping for the key.
    *
