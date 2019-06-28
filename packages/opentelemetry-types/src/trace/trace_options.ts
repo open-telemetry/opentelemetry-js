@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-/** Bit to represent whether trace is sampled in trace options. */
-export const SAMPLED = 0x1;
-
-/** Bit to represent whether trace is unsampled in trace options. */
-export const UNSAMPLED = 0x0;
+export enum SampleOptions {
+  /** Bit to represent whether trace is unsampled in trace options. */
+  UNSAMPLED = 0x0,
+  /** Bit to represent whether trace is sampled in trace options. */
+  SAMPLED = 0x1,
+}
 
 export type TraceOptions = 0x0 | 0x1;
