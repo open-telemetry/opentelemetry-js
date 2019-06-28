@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { TraceState } from './trace_state';
 import { TraceOptions } from './trace_options';
+import { TraceState } from './trace_state';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
