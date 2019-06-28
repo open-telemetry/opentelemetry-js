@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { Attributes } from './attributes';
 import { SpanContext } from './span_context';
 import { Status } from './status';
-import { Attributes } from './attributes';
 
 /**
  * An interface that represents a span. A span represents a single operation
