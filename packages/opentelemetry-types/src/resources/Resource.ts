@@ -14,11 +14,24 @@
  * limitations under the License.
  */
 
-/** A Resource describes the entity for which a signal was collected. */
+/**
+ * A Resource describes the entity for which a signals (metrics or trace) are
+ * collected.
+ */
 export interface Resource {
   /**
    * A dictionary of labels with string keys and values that provide information
    * about the entity.
    */
   readonly labels: { [key: string]: string };
+
+  /**
+   * Returns a new, merged {@link Resource} by merging the current Resource
+   * with the other Resource. In case of a collision, current Resource takes
+   * precedence.
+   *
+   * @param other the Resource that will be merged with this.
+   * @returns the newly merged Resource.
+   */
+  merge(other: Resource | null): Resource;
 }
