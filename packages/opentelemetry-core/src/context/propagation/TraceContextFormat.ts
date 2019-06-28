@@ -42,22 +42,20 @@ export interface HeaderSetter {
  * https://www.w3.org/TR/trace-context/
  */
 export class TraceContextFormat implements Propagator {
-  inject(spanContext: SpanContext, format: string, carrier: unknown) {
-    const setter: HeaderSetter = carrier as HeaderSetter;
+  inject(spanContext: SpanContext, format: string, carrier: HeaderSetter) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
     }-0${(spanContext.traceOptions || DEFAULT_OPTIONS).toString(16)}`;
 
-    setter.setHeader(TRACE_PARENT_HEADER, traceParent);
+    carrier.setHeader(TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
       // TODO: https://github.com/open-telemetry/opentelemetry-js/pull/57
       //setter.setHeader(TRACE_STATE_HEADER, spanContext.traceState);
     }
   }
 
-  extract(format: string, carrier: unknown): SpanContext | null {
-    const getter: HeaderGetter = carrier as HeaderGetter;
-    const traceParentHeader = getter.getHeader(TRACE_PARENT_HEADER);
+  extract(format: string, carrier: HeaderGetter): SpanContext | null {
+    const traceParentHeader = carrier.getHeader(TRACE_PARENT_HEADER);
     if (!traceParentHeader) return null;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
@@ -65,7 +63,7 @@ export class TraceContextFormat implements Propagator {
     const spanContext = parse(traceParent);
     if (!spanContext) return null;
 
-    const traceStateHeader = getter.getHeader(TRACE_STATE_HEADER);
+    const traceStateHeader = carrier.getHeader(TRACE_STATE_HEADER);
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a
       // single header.
@@ -98,20 +96,13 @@ export function parse(traceParent: string): SpanContext | null {
 }
 
 function isValidVersion(version: string): boolean {
-  if (version !== VERSION) return false;
-  return true;
+  return version === VERSION;
 }
 
 function isValidTraceId(traceId: string): boolean {
-  if (!traceIdFormat.test(traceId) || invalidIdFormat.test(traceId)) {
-    return false;
-  }
-  return true;
+  return traceIdFormat.test(traceId) && !invalidIdFormat.test(traceId);
 }
 
 function isValidSpanId(spanId: string): boolean {
-  if (!spanIdFormat.test(spanId) || invalidIdFormat.test(spanId)) {
-    return false;
-  }
-  return true;
+  return spanIdFormat.test(spanId) && !invalidIdFormat.test(spanId);
 }
