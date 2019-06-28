@@ -27,7 +27,7 @@ import { Attributes } from './attributes';
  */
 export interface Span {
   /**
-   * Returns the SpanContext object associated with this Span.
+   * Returns the {@link SpanContext} object associated with this Span.
    *
    * @returns the SpanContext object associated with this Span.
    */
@@ -62,7 +62,7 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this event.
    */
-  addEvent(name: string, attributes?: { [key: string]: unknown }): this;
+  addEvent(name: string, attributes?: Attributes): this;
 
   /**
    * Adds a link to the Span.
@@ -71,14 +71,11 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this link.
    */
-  addLink(
-    spanContext: SpanContext,
-    attributes?: { [key: string]: unknown }
-  ): this;
+  addLink(spanContext: SpanContext, attributes?: Attributes): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is 'OK'.
+   * status. Default is {@link CanonicalCode.OK}.
    *
    * @param status the Status to set.
    */
