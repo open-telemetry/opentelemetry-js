@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-export * from './resources/Resource';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/link';
-export * from './trace/attributes';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+import * as types from '@opentelemetry/types';
+
+export class Resource implements types.Resource {
+  constructor(
+    // TODO: Consider to add check/validation on labels.
+    readonly labels: { [key: string]: string }
+  ) {}
+
+  merge(other: types.Resource | null): types.Resource {
+    if (!other || !Object.keys(other.labels).length) return this;
+
+    // Labels from resource overwrite labels from other resource.
+    const mergedLabels = Object.assign({}, other.labels, this.labels);
+    return new Resource(mergedLabels);
+  }
+}
