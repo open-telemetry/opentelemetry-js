@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Attributes } from './attributes';
 import { SpanContext } from './span_context';
 import { Status } from './status';
+import { Attributes } from './attributes';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -27,7 +27,7 @@ import { Status } from './status';
  */
 export interface Span {
   /**
-   * Returns the {@link SpanContext} object associated with this Span.
+   * Returns the SpanContext object associated with this Span.
    *
    * @returns the SpanContext object associated with this Span.
    */
@@ -62,7 +62,7 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this event.
    */
-  addEvent(name: string, attributes?: Attributes): this;
+  addEvent(name: string, attributes?: { [key: string]: unknown }): this;
 
   /**
    * Adds a link to the Span.
@@ -71,11 +71,14 @@ export interface Span {
    * @param [attributes] the attributes that will be added; these are
    *     associated with this link.
    */
-  addLink(spanContext: SpanContext, attributes?: Attributes): this;
+  addLink(
+    spanContext: SpanContext,
+    attributes?: { [key: string]: unknown }
+  ): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link CanonicalCode.OK}.
+   * status. Default is 'OK'.
    *
    * @param status the Status to set.
    */
