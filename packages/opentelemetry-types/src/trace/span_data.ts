@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanContext } from "./span_context";
-import { Resource } from "../resources/Resource";
-import { SpanKind } from "./span_kind";
-import { Attributes } from "./attributes";
-import { Link } from "./link";
-import { Status } from "./status";
+import { SpanContext } from './span_context';
+import { Resource } from '../resources/Resource';
+import { SpanKind } from './span_kind';
+import { Attributes } from './attributes';
+import { Link } from './link';
+import { Status } from './status';
 
 /**
  * SpanData an object that is used to report out-of-band completed spans.
@@ -77,7 +77,7 @@ export interface SpanData {
    *
    * @todo: Add Event type
    */
-  getTimedEvents(): any[];
+  getTimedEvents(): unknown[];
 
   /**
    * Returns the Links collection associated with this SpanData.
