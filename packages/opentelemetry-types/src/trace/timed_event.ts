@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-import { Attributes } from "./attributes";
+import { Event } from './event';
 
 /**
- * Represents an event.
+ * Represents a timed event.
+ * A timed event is an event with a timestamp.
  */
-export interface Event {
+export interface TimedEvent {
 
   /**
-   * Returns the name of the Event.
+   * Returns a new timed event.
+   * An Event has to be treated as immutable.
+   *
+   * @param timestamp The timestamp of this event
+   * @param event The event
    */
-  getName(): string;
+  create(timestamp: number, event: Event): TimedEvent;
 
   /**
-   * Returns the attributes of the Event.
+   * Returns the Timestamp of this event.
    */
-  getAttributes(): Attributes;
+  getTimestamp(): number;
+
+  /**
+   * Returns the Event.
+   */
+  getEvent(): Event;
 }
