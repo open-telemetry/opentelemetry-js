@@ -1,4 +1,3 @@
-import { Attributes } from "./attributes";
 
 /**
  * Copyright 2019, OpenTelemetry Authors
@@ -15,6 +14,8 @@ import { Attributes } from "./attributes";
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { Attributes } from "./attributes";
 
 export interface Event {
 
