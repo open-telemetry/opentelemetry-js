@@ -68,7 +68,7 @@ export interface SpanData {
    * The order of attributes in this collection is not significant.
    * This collection MUST be immutable.
    */
-  getAttributes(): Attributes[];
+  getAttributes(): Attributes;
 
   /**
    * Return the collection of Events with the timestamps associated with this SpanData.
