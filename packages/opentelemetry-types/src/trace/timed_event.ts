@@ -21,7 +21,6 @@ import { Event } from './event';
  * A timed event is an event with a timestamp.
  */
 export interface TimedEvent {
-
   /**
    * Returns a new timed event.
    * An Event has to be treated as immutable.

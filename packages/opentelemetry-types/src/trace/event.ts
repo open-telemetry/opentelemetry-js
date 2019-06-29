@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { Attributes } from "./attributes";
+import { Attributes } from './attributes';
 
 /**
  * Represents an event.
  */
 export interface Event {
-
   /**
    * Returns the name of the Event.
    */
