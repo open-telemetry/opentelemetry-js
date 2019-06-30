@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
-export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/link';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+export interface EntryValue {
+  value: string;
+  ttl?: EntryTtl;
+}
+
+/**
+ * EntryTtl is an integer that represents number of hops an entry can propagate.
+ *
+ * For now, ONLY special values (0 and -1) are supported.
+ */
+export enum EntryTtl {
+  /**
+   * NO_PROPAGATION is considered to have local scope and is used within the
+   * process it created.
+   */
+  NO_PROPAGATION = 0,
+
+  /** UNLIMITED_PROPAGATION can propagate unlimited hops. */
+  UNLIMITED_PROPAGATION = -1,
+}
