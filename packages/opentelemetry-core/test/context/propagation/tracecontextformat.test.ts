@@ -21,9 +21,9 @@ import {
   HeaderSetter,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-  DEFAULT_OPTIONS,
 } from '../../../src/context/propagation/TraceContextFormat';
 import { SpanContext } from '@opentelemetry/types';
+import { TraceState } from '../../../src/trace/TraceState';
 
 class DummyHeaders implements HeaderSetter, HeaderGetter {
   private _headers = new Map<string, string | string[]>();
@@ -66,7 +66,7 @@ describe('TraceContextFormat', () => {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceOptions: 0x1,
-        traceState: 'foo=bar,baz=qux',
+        traceState: new TraceState('foo=bar,baz=qux'),
       };
 
       traceContextFormat.inject(spanContext, '', headers);
@@ -74,7 +74,10 @@ describe('TraceContextFormat', () => {
         headers.getHeader(TRACE_PARENT_HEADER),
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
       );
-      assert.deepStrictEqual(headers.getHeader(TRACE_STATE_HEADER), undefined);
+      assert.deepStrictEqual(
+        headers.getHeader(TRACE_STATE_HEADER),
+        'foo=bar,baz=qux'
+      );
     });
   });
 
@@ -111,6 +114,21 @@ describe('TraceContextFormat', () => {
       );
     });
 
+    it('extracts traceparent from list of header', () => {
+      headers.setHeader(TRACE_PARENT_HEADER, [
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
+      ]);
+      const extractedSpanContext = traceContextFormat.extract(
+        'TraceContextFormat',
+        headers
+      );
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        traceOptions: 1,
+      });
+    });
+
     it('extracts tracestate from header', () => {
       headers.setHeader(
         TRACE_PARENT_HEADER,
@@ -121,12 +139,14 @@ describe('TraceContextFormat', () => {
         'TraceContextFormat',
         headers
       );
-      assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: 1,
-        traceState: 'foo=bar,baz=qux',
-      });
+      assert.deepStrictEqual(
+        extractedSpanContext!.traceState!.get('foo'),
+        'bar'
+      );
+      assert.deepStrictEqual(
+        extractedSpanContext!.traceState!.get('baz'),
+        'qux'
+      );
     });
 
     it('combines multiple tracestate headers', () => {
@@ -143,7 +163,7 @@ describe('TraceContextFormat', () => {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
         traceOptions: 1,
-        traceState: 'foo=bar,baz=qux,quux=quuz',
+        traceState: new TraceState('foo=bar,baz=qux,quux=quuz'),
       });
     });
 
@@ -192,35 +212,6 @@ describe('TraceContextFormat', () => {
           headers
         );
         assert.deepStrictEqual(extractedSpanContext, null, testCase);
-      });
-    });
-
-    it('should reset options if they are invalid', () => {
-      const testCases: Record<string, string> = {
-        invalidOptions_empty:
-          '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff-',
-        invalidOptions_notHex:
-          '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff-0x',
-        invalidOptions_tooShort:
-          '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff-0',
-        invalidOptions_tooLong:
-          '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff-0f0',
-      };
-
-      Object.getOwnPropertyNames(testCases).forEach(testCase => {
-        headers.setHeader(TRACE_PARENT_HEADER, testCases[testCase]);
-
-        const extractedSpanContext = traceContextFormat.extract(
-          'TraceContextFormat',
-          headers
-        );
-        if (extractedSpanContext !== null) {
-          assert.strictEqual(
-            extractedSpanContext.traceOptions,
-            DEFAULT_OPTIONS,
-            testCase
-          );
-        }
       });
     });
   });
