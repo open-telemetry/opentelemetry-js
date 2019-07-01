@@ -16,11 +16,18 @@
 
 import { Sampler, SpanContext } from '@opentelemetry/types';
 
-/** Sampler that samples every trace. */
-export class AlwaysSampleSampler implements Sampler {
-  readonly description = 'AlwaysSampleSampler';
+/** Sampler that samples a given fraction of traces. */
+export class ProbabilitySampler implements Sampler {
+  readonly description = 'ProbabilitySampler';
+
+  constructor(readonly probability: number = 1) {}
 
   shouldSample(parentContext?: SpanContext) {
-    return true;
+    if (this.probability >= 1.0) return true;
+    else if (this.probability <= 0) return false;
+    return false;
   }
 }
+
+export const ALWAYS_SAMPLER = new ProbabilitySampler(1);
+export const NEVER_SAMPLER = new ProbabilitySampler(0);
