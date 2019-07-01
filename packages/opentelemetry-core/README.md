@@ -1,4 +1,3 @@
-OpenTelemetry Core
-======================================================
+# OpenTelemetry Core
 
 TODO

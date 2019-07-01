@@ -27,7 +27,7 @@ jobs:
           command: yarn run check
       - run:
           name: Compile
-          command: yarn run compile
+          command: yarn compile
       - run:
           name: Test
-          command: yarn run test
+          command: yarn test
