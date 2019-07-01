@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanContext, Propagator } from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
 import { TraceState } from '../../trace/TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
@@ -73,7 +73,7 @@ function isValidSpanId(spanId: string): boolean {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class TraceContextFormat implements Propagator {
+export class HttpTraceContext implements HttpTextFormat {
   inject(spanContext: SpanContext, format: string, carrier: HeaderSetter) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId

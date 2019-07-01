@@ -16,8 +16,17 @@
 
 import { SpanContext } from '../../trace/span_context';
 
-/** Defines a Propagator interface. */
-export interface Propagator {
+/**
+ * Injects and extracts a value as text into carriers that travel in-band
+ * across process boundaries. Encoding is expected to conform to the HTTP
+ * Header Field semantics. Values are often encoded as RPC/HTTP request headers.
+ *
+ * The carrier of propagated data on both the client (injector) and server
+ * (extractor) side is usually an http request. Propagation is usually
+ * implemented via library- specific request interceptors, where the
+ * client-side injects values and the server-side extracts them.
+ */
+export interface HttpTextFormat {
   /**
    * Injects the given {@link SpanContext} instance to transmit over the wire.
    *

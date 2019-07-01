@@ -16,12 +16,12 @@
 
 import * as assert from 'assert';
 import {
-  TraceContextFormat,
+  HttpTraceContext,
   HeaderGetter,
   HeaderSetter,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
-} from '../../../src/context/propagation/TraceContextFormat';
+} from '../../../src/context/propagation/HttpTraceContext';
 import { SpanContext } from '@opentelemetry/types';
 import { TraceState } from '../../../src/trace/TraceState';
 
@@ -37,8 +37,8 @@ class DummyHeaders implements HeaderSetter, HeaderGetter {
   }
 }
 
-describe('TraceContextFormat', () => {
-  const traceContextFormat = new TraceContextFormat();
+describe('HttpTraceContext', () => {
+  const httpTraceContext = new HttpTraceContext();
   let headers: DummyHeaders;
 
   beforeEach(() => {
@@ -53,7 +53,7 @@ describe('TraceContextFormat', () => {
         traceOptions: 0x1,
       };
 
-      traceContextFormat.inject(spanContext, 'TraceContextFormat', headers);
+      httpTraceContext.inject(spanContext, 'HttpTraceContext', headers);
       assert.deepStrictEqual(
         headers.getHeader(TRACE_PARENT_HEADER),
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
@@ -69,7 +69,7 @@ describe('TraceContextFormat', () => {
         traceState: new TraceState('foo=bar,baz=qux'),
       };
 
-      traceContextFormat.inject(spanContext, '', headers);
+      httpTraceContext.inject(spanContext, '', headers);
       assert.deepStrictEqual(
         headers.getHeader(TRACE_PARENT_HEADER),
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
@@ -87,8 +87,8 @@ describe('TraceContextFormat', () => {
         TRACE_PARENT_HEADER,
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
       );
-      const extractedSpanContext = traceContextFormat.extract(
-        'TraceContextFormat',
+      const extractedSpanContext = httpTraceContext.extract(
+        'HttpTraceContext',
         headers
       );
 
@@ -101,7 +101,7 @@ describe('TraceContextFormat', () => {
 
     it('returns null if traceparent header is missing', () => {
       assert.deepStrictEqual(
-        traceContextFormat.extract('TraceContextFormat', headers),
+        httpTraceContext.extract('HttpTraceContext', headers),
         null
       );
     });
@@ -109,7 +109,7 @@ describe('TraceContextFormat', () => {
     it('returns null if traceparent header is invalid', () => {
       headers.setHeader(TRACE_PARENT_HEADER, 'invalid!');
       assert.deepStrictEqual(
-        traceContextFormat.extract('TraceContextFormat', headers),
+        httpTraceContext.extract('HttpTraceContext', headers),
         null
       );
     });
@@ -118,8 +118,8 @@ describe('TraceContextFormat', () => {
       headers.setHeader(TRACE_PARENT_HEADER, [
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
       ]);
-      const extractedSpanContext = traceContextFormat.extract(
-        'TraceContextFormat',
+      const extractedSpanContext = httpTraceContext.extract(
+        'HttpTraceContext',
         headers
       );
       assert.deepStrictEqual(extractedSpanContext, {
@@ -135,8 +135,8 @@ describe('TraceContextFormat', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
       );
       headers.setHeader(TRACE_STATE_HEADER, 'foo=bar,baz=qux');
-      const extractedSpanContext = traceContextFormat.extract(
-        'TraceContextFormat',
+      const extractedSpanContext = httpTraceContext.extract(
+        'HttpTraceContext',
         headers
       );
       assert.deepStrictEqual(
@@ -155,8 +155,8 @@ describe('TraceContextFormat', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
       );
       headers.setHeader(TRACE_STATE_HEADER, ['foo=bar,baz=qux', 'quux=quuz']);
-      const extractedSpanContext = traceContextFormat.extract(
-        'TraceContextFormat',
+      const extractedSpanContext = httpTraceContext.extract(
+        'HttpTraceContext',
         headers
       );
       assert.deepStrictEqual(extractedSpanContext, {
@@ -207,8 +207,8 @@ describe('TraceContextFormat', () => {
       Object.getOwnPropertyNames(testCases).forEach(testCase => {
         headers.setHeader(TRACE_PARENT_HEADER, testCases[testCase]);
 
-        const extractedSpanContext = traceContextFormat.extract(
-          'TraceContextFormat',
+        const extractedSpanContext = httpTraceContext.extract(
+          'HttpTraceContext',
           headers
         );
         assert.deepStrictEqual(extractedSpanContext, null, testCase);
