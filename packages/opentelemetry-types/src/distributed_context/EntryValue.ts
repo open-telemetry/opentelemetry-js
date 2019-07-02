@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * {@link EntryValue} contains properties associated with a {@link
+ * DistributedContext}.
+ */
 export interface EntryValue {
   value: string;
   ttl?: EntryTtl;

@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { TraceState } from '../src/trace/TraceState';
+import { TraceState } from '../../src/trace/TraceState';
 
 describe('TraceState', () => {
   describe('serialize', () => {

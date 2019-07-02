@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { randomSpanId, randomTraceId } from '../src/common/util/id';
+import { randomSpanId, randomTraceId } from '../../src/common/util/id';
 
 describe('randomTraceId', () => {
   it('returns different 32-char hex strings', () => {
