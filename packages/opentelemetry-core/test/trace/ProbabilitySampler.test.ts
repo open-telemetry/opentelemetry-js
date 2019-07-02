@@ -19,7 +19,7 @@ import {
   ProbabilitySampler,
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
-} from '../../../src/trace/sampler/ProbabilitySampler';
+} from '../../src/trace/sampler/ProbabilitySampler';
 
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
