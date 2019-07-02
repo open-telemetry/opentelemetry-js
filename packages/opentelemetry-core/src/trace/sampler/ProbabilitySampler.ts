@@ -20,12 +20,12 @@ import { Sampler, SpanContext } from '@opentelemetry/types';
 export class ProbabilitySampler implements Sampler {
   readonly description = 'ProbabilitySampler';
 
-  constructor(readonly probability: number = 1) {}
+  constructor(private readonly _probability: number = 1) {}
 
   shouldSample(parentContext?: SpanContext) {
-    if (this.probability >= 1.0) return true;
-    else if (this.probability <= 0) return false;
-    return false;
+    if (this._probability >= 1.0) return true;
+    else if (this._probability <= 0) return false;
+    return Math.random() < this._probability;
   }
 }
 
