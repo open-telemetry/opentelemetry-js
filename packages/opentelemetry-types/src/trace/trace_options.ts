@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
-export interface TraceOptions {
-  // TODO
+export enum TraceOptions {
+  /** Bit to represent whether trace is unsampled in trace options. */
+  UNSAMPLED = 0x0,
+  /** Bit to represent whether trace is sampled in trace options. */
+  SAMPLED = 0x1,
 }
