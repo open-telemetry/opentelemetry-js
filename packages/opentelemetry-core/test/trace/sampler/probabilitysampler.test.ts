@@ -19,7 +19,7 @@ import {
   ProbabilitySampler,
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
-} from '../../src/trace/sampler/ProbabilitySampler';
+} from '../../../src/trace/sampler/ProbabilitySampler';
 
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
@@ -45,6 +45,15 @@ describe('ProbabilitySampler', () => {
 
   it('should return a never sampler for <0', () => {
     const sampler = new ProbabilitySampler(-1);
+    assert.strictEqual(sampler.shouldSample(), false);
+  });
+
+  it('should sample according to the probability', () => {
+    Math.random = () => 1 / 10;
+    const sampler = new ProbabilitySampler(0.2);
+    assert.strictEqual(sampler.shouldSample(), true);
+
+    Math.random = () => 5 / 10;
     assert.strictEqual(sampler.shouldSample(), false);
   });
 
