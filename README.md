@@ -2,11 +2,11 @@
 [![Gitter chat][node-gitter-image]][node-gitter-url]
 [![CircleCI][circleci-image]][circleci-url]
 
+## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. Follow
 [CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
 
-## Contributing
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#nodejs-sdk) for meeting details and notes.
 
 [circleci-image]: https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=svg
