@@ -36,7 +36,7 @@ describe('ProbabilitySampler', () => {
   it('should return a always sampler for >1', () => {
     const sampler = new ProbabilitySampler(100);
     assert.strictEqual(sampler.shouldSample(), true);
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{100}');
+    assert.strictEqual(sampler.toString(), 'AlwaysSampleSampler');
   });
 
   it('should return a never sampler for 0', () => {
@@ -53,6 +53,7 @@ describe('ProbabilitySampler', () => {
     Math.random = () => 1 / 10;
     const sampler = new ProbabilitySampler(0.2);
     assert.strictEqual(sampler.shouldSample(), true);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0.2}');
 
     Math.random = () => 5 / 10;
     assert.strictEqual(sampler.shouldSample(), false);
@@ -60,11 +61,11 @@ describe('ProbabilitySampler', () => {
 
   it('should return true for ALWAYS_SAMPLER', () => {
     assert.strictEqual(ALWAYS_SAMPLER.shouldSample(), true);
-    assert.strictEqual(ALWAYS_SAMPLER.toString(), 'AlwaysSampleSampler{1}');
+    assert.strictEqual(ALWAYS_SAMPLER.toString(), 'AlwaysSampleSampler');
   });
 
   it('should return false for NEVER_SAMPLER', () => {
     assert.strictEqual(NEVER_SAMPLER.shouldSample(), false);
-    assert.strictEqual(NEVER_SAMPLER.toString(), 'NeverSampleSampler{0}');
+    assert.strictEqual(NEVER_SAMPLER.toString(), 'NeverSampleSampler');
   });
 });
