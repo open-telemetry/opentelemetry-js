@@ -15,30 +15,18 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { randomSpanId, randomTraceId } from '../common/util/id';
 
-/** This is a base/default implementation of {@link Span}. */
-export class BaseSpan implements types.Span {
-  name = 'DefaultSpan'; // default name
-  spanId = '';
-  traceId = '';
-  parentSpanId = '';
-  kind = types.SpanKind.INTERNAL; // default kind
+const INVALID_SPAN_CONTEXT = { traceId: '', spanId: '' };
 
-  constructor() {
-    // TODO: Consider to add SpanOptions with name, kind, spanContext properties
-    this.traceId = randomTraceId();
-    this.spanId = randomSpanId();
-  }
-
-  // By default returns a no-op SpanContext.
+/**
+ * The NoopSpan is the default {@link Span} that is used when no Span
+ * implementation is available. All operations are no-op except context
+ * propagation.
+ */
+export class NoopSpan implements types.Span {
+  // Returns an invalid SpanContext.
   context(): types.SpanContext {
-    // TODO: Consider to add default span context (either empty string or
-    // invalid data). Also, add/update traceOptions and traceState.
-    return {
-      traceId: this.traceId,
-      spanId: this.spanId,
-    };
+    return INVALID_SPAN_CONTEXT;
   }
 
   // By default does nothing
@@ -74,6 +62,7 @@ export class BaseSpan implements types.Span {
   // By default does nothing
   end(endTime?: number): void {}
 
+  // isRecordingEvents always returns false for noopSpan.
   isRecordingEvents(): boolean {
     return false;
   }

@@ -15,3 +15,4 @@
  */
 
 export * from './resources/Resource';
+export * from './trace/NoopSpan';

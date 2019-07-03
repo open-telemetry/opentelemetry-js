@@ -15,12 +15,12 @@
  */
 
 import * as assert from 'assert';
-import { BaseSpan } from '../src/trace/BaseSpan';
+import { NoopSpan } from '../../src/trace/NoopSpan';
 import { CanonicalCode } from '@opentelemetry/types';
 
-describe('BaseSpan', () => {
+describe('NoopSpan', () => {
   it('do not crash', () => {
-    const span = new BaseSpan();
+    const span = new NoopSpan();
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);
     span.setAttribute('my_boolean_attribute', false);
