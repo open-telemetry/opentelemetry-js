@@ -36,4 +36,6 @@ export interface Sampler {
    * @returns whether span should be sampled or not.
    */
   shouldSample(parentContext?: SpanContext): boolean;
+
+  toString(): string;
 }
