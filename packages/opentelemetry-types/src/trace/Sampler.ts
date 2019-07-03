@@ -37,5 +37,6 @@ export interface Sampler {
    */
   shouldSample(parentContext?: SpanContext): boolean;
 
+  /** Returns the sampler name or short description with the configuration. */
   toString(): string;
 }
