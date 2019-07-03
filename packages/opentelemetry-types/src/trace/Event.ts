@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
-export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/Event';
-export * from './trace/link';
-export * from './trace/Sampler';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+import { Attributes } from './attributes';
+
+/** A text annotation with a set of attributes. */
+export interface Event {
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: Attributes;
+}
