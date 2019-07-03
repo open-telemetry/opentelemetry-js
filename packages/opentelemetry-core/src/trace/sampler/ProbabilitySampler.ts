@@ -14,16 +14,20 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
-export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/link';
-export * from './trace/Sampler';
-export * from './trace/span';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+import { Sampler, SpanContext } from '@opentelemetry/types';
+
+/** Sampler that samples a given fraction of traces. */
+export class ProbabilitySampler implements Sampler {
+  readonly description = 'ProbabilitySampler';
+
+  constructor(private readonly _probability: number = 1) {}
+
+  shouldSample(parentContext?: SpanContext) {
+    if (this._probability >= 1.0) return true;
+    else if (this._probability <= 0) return false;
+    return Math.random() < this._probability;
+  }
+}
+
+export const ALWAYS_SAMPLER = new ProbabilitySampler(1);
+export const NEVER_SAMPLER = new ProbabilitySampler(0);
