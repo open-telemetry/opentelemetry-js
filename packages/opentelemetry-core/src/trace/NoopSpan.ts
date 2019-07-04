@@ -15,8 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-
-const INVALID_SPAN_CONTEXT = { traceId: '', spanId: '' };
+import { SpanContext } from '@opentelemetry/types';
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span
@@ -24,9 +23,11 @@ const INVALID_SPAN_CONTEXT = { traceId: '', spanId: '' };
  * propagation.
  */
 export class NoopSpan implements types.Span {
-  // Returns an invalid SpanContext.
+  constructor(private readonly _spanContext: SpanContext) {}
+
+  // Returns a SpanContext.
   context(): types.SpanContext {
-    return INVALID_SPAN_CONTEXT;
+    return this._spanContext;
   }
 
   // By default does nothing

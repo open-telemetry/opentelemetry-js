@@ -16,11 +16,17 @@
 
 import * as assert from 'assert';
 import { NoopSpan } from '../../src/trace/NoopSpan';
-import { CanonicalCode } from '@opentelemetry/types';
+import { CanonicalCode, TraceOptions } from '@opentelemetry/types';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
-    const span = new NoopSpan();
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceOptions: TraceOptions.UNSAMPLED,
+    };
+
+    const span = new NoopSpan(spanContext);
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);
     span.setAttribute('my_boolean_attribute', false);
@@ -51,7 +57,7 @@ describe('NoopSpan', () => {
     span.updateName('my-span');
 
     assert.ok(!span.isRecordingEvents());
-    assert.ok(span.context());
+    assert.deepStrictEqual(span.context(), spanContext);
     span.end();
   });
 });
