@@ -27,8 +27,8 @@ export class ProbabilitySampler implements Sampler {
   }
 
   toString(): string {
-    if (this._probability >= 1.0) return 'AlwaysSampleSampler';
-    else if (this._probability <= 0) return 'NeverSampleSampler';
+    // TODO: Consider to use `AlwaysSampleSampler` and `NeverSampleSampler`
+    // based on the specs.
     return `ProbabilitySampler{${this._probability}}`;
   }
 }
