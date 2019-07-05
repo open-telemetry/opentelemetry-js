@@ -3,10 +3,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:12
-        environment:
-          # This is needed for the browser Karma tests
-          - CHROME_BIN=/usr/bin/google-chrome
+      - image: circleci/node:12-browsers
     steps:
       - checkout
       - run:
