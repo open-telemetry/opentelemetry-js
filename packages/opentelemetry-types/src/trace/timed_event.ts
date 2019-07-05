@@ -20,23 +20,6 @@ import { Event } from './event';
  * Represents a timed event.
  * A timed event is an event with a timestamp.
  */
-export interface TimedEvent {
-  /**
-   * Returns a new timed event.
-   * An Event has to be treated as immutable.
-   *
-   * @param timestamp The timestamp of this event
-   * @param event The event
-   */
-  create(timestamp: number, event: Event): TimedEvent;
-
-  /**
-   * Returns the Timestamp of this event.
-   */
-  getTimestamp(): number;
-
-  /**
-   * Returns the Event.
-   */
-  getEvent(): Event;
+export interface TimeEvent extends Event {
+  time: number;
 }
