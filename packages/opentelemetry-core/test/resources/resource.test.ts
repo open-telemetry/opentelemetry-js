@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Resource } from '../src/resources/Resource';
+import { Resource } from '../../src/resources/Resource';
 
 describe('Resource', () => {
   const resource1 = new Resource({
