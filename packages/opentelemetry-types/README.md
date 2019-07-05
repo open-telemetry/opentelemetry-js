@@ -1,4 +1,4 @@
-# OpenTelemetry types
+# OpenTelemetry Types
 
 This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model.
 

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { TraceState } from './trace_state';
 import { TraceOptions } from './trace_options';
+import { TraceState } from './trace_state';
 
 /**
- * A SpanContext represents the portion of a Span which must be serialized and
- * propagated along side of a distributed context.
+ * A SpanContext represents the portion of a {@link Span} which must be
+ * serialized and propagated along side of a distributed context.
  */
 export interface SpanContext {
   /**
@@ -39,8 +39,11 @@ export interface SpanContext {
    * Trace options to propagate.
    *
    * It is represented as 1 byte (bitmap). Bit to represent whether trace is
-   * sampled or not.
-   * SAMPLED_VALUE = 0x1 and NOT_SAMPLED_VALUE = 0x0;
+   * sampled or not. When set, the least significant bit documents that the
+   * caller may have recorded trace data. A caller who does not record trace
+   * data out-of-band leaves this flag unset.
+   *
+   * SAMPLED = 0x1 and UNSAMPLED = 0x0;
    */
   traceOptions?: TraceOptions;
   /**

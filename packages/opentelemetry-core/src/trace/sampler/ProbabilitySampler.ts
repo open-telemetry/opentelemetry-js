@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-/**
- * An enumeration that represents global trace options. These options are
- * propagated to all child {@link Span}. These determine features such as
- * whether a Span should be traced. It is implemented as a bitmask.
- */
-export enum TraceOptions {
-  /** Bit to represent whether trace is unsampled in trace options. */
-  UNSAMPLED = 0x0,
-  /** Bit to represent whether trace is sampled in trace options. */
-  SAMPLED = 0x1,
+import { Sampler, SpanContext } from '@opentelemetry/types';
+
+/** Sampler that samples a given fraction of traces. */
+export class ProbabilitySampler implements Sampler {
+  readonly description = 'ProbabilitySampler';
+
+  constructor(private readonly _probability: number = 1) {}
+
+  shouldSample(parentContext?: SpanContext) {
+    if (this._probability >= 1.0) return true;
+    else if (this._probability <= 0) return false;
+    return Math.random() < this._probability;
+  }
 }
+
+export const ALWAYS_SAMPLER = new ProbabilitySampler(1);
+export const NEVER_SAMPLER = new ProbabilitySampler(0);

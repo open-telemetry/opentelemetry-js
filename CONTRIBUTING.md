@@ -51,3 +51,4 @@ The `opentelemetry-js` project is written in TypeScript.
 - `yarn bootstrap` or `npm run bootstrap` Bootstrap the packages in the current Lerna repo. Installs all of their dependencies and links any cross-dependencies.
 - `yarn test` or `npm test` tests code the same way that our CI will test it.
 - `yarn fix` or `npm run fix` lint (and maybe fix) any changes.
+- `yarn docs` or `npm run docs` to generate API documentation.

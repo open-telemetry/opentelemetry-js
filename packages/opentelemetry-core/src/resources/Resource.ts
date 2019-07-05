@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { randomSpanId, randomTraceId } from '../src/common/util/id';
+import * as types from '@opentelemetry/types';
 
-describe('randomTraceId', () => {
-  it('returns different 32-char hex strings', () => {
-    const traceId = randomTraceId();
-    assert.ok(traceId.match(/[a-f0-9]{32}/));
-  });
-});
+export class Resource implements types.Resource {
+  constructor(
+    // TODO: Consider to add check/validation on labels.
+    readonly labels: { [key: string]: string }
+  ) {}
 
-describe('randomSpanId', () => {
-  it('returns different 16-char hex string', () => {
-    const spanId = randomSpanId();
-    assert.ok(spanId.match(/[a-f0-9]{16}/));
-  });
-});
+  merge(other: types.Resource | null): types.Resource {
+    if (!other || !Object.keys(other.labels).length) return this;
+
+    // Labels from resource overwrite labels from other resource.
+    const mergedLabels = Object.assign({}, other.labels, this.labels);
+    return new Resource(mergedLabels);
+  }
+}

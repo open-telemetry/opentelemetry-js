@@ -14,4 +14,16 @@
  * limitations under the License.
  */
 
-export * from './resources/Resource';
+import { EntryValue } from './EntryValue';
+
+/**
+ * DistributedContext represents collection of entries. Each key of
+ * DistributedContext is associated with exactly one value. DistributedContext
+ * is serializable, to facilitate propagating it not only inside the process
+ * but also across process boundaries. DistributedContext is used to annotate
+ * telemetry with the name:value pair Entry. Those values can be used to add
+ * dimension to the metric or additional contest properties to logs and traces.
+ */
+export interface DistributedContext {
+  [entryKey: string]: EntryValue;
+}

@@ -14,4 +14,27 @@
  * limitations under the License.
  */
 
-export * from './resources/Resource';
+/**
+ * {@link EntryValue} contains properties associated with a {@link
+ * DistributedContext}.
+ */
+export interface EntryValue {
+  value: string;
+  ttl?: EntryTtl;
+}
+
+/**
+ * EntryTtl is an integer that represents number of hops an entry can propagate.
+ *
+ * For now, ONLY special values (0 and -1) are supported.
+ */
+export enum EntryTtl {
+  /**
+   * NO_PROPAGATION is considered to have local scope and is used within the
+   * process it created.
+   */
+  NO_PROPAGATION = 0,
+
+  /** UNLIMITED_PROPAGATION can propagate unlimited hops. */
+  UNLIMITED_PROPAGATION = -1,
+}
