@@ -16,17 +16,10 @@
 
 import { Attributes } from './attributes';
 
-/**
- * Represents an event.
- */
+/** A text annotation with a set of attributes. */
 export interface Event {
-  /**
-   * Returns the name of the Event.
-   */
-  getName(): string;
-
-  /**
-   * Returns the attributes of the Event.
-   */
-  getAttributes(): Attributes;
+  /** The name of the event. */
+  name: string;
+  /** The attributes of the event. */
+  attributes?: Attributes;
 }
