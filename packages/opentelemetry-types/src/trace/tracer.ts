@@ -16,24 +16,17 @@
 
 import { Span } from './span';
 import { Attributes } from './attributes';
-import { SpanContext } from './span_context';
-
-/**
- * @todo: Move into module with commonly used types
- */
-export type Func<T> = (...args: any[]) => T;
 
 /**
  * Options needed for span creation
  *
  * @todo: Move into module of its own
  */
-export type SpanOptions = {
-  attributes: Attributes[],
-};
+export interface SpanOptions {
+  attributes: Attributes[];
+}
 
 export interface Tracer {
-
   /**
    * Returns the current Span from the current context if available.
    *
@@ -53,25 +46,27 @@ export interface Tracer {
 
   /**
    * Executes the function given by fn within the context provided by Span
-   * <pre>{@code
-   * 	tracer.withSpan(span, "myOperation", () => {
-	 *	  console.log(bar("HelloWorld"));
-	 *  });
-   * }</pre>
+   *
    * @param span The span that provides the context
    * @param operation The name of the function
    * @param fn The function to be eexcuted inside the provided context
    */
-  withSpan<T extends (...args: unknown[]) => unknown>(span: Span, operation: string, fn: T): ReturnType<T>;
+  withSpan<T extends (...args: unknown[]) => unknown>(
+    span: Span,
+    operation: string,
+    fn: T
+  ): ReturnType<T>;
 
   /**
    * Send a pre-populated span object to the exporter.
    * Sampling and recording decisions as well as other collection optimizations
    * are the responsibility of a caller.
    *
+   * @todo: Pending API discussion. Revisit if Span or SpanData should be passed
+   *        in here once this is sorted out.
    * @param span
    */
-  recordSpanData(span: Span): any;
+  recordSpanData(span: Span): void;
 
   /**
    * Returns the binary format interface which can serialize/deserialize Spans.
@@ -84,5 +79,5 @@ export interface Tracer {
    *
    * @todo: Change return type once HttpTextFormat is available
    */
-  getHttpTextFormat: any;
-};
+  getHttpTextFormat: unknown;
+}
