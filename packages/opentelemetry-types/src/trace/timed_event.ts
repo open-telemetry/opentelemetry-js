@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { Event } from './event';
+import { Event } from './Event';
 
 /**
  * Represents a timed event.
  * A timed event is an event with a timestamp.
  */
-export interface TimeEvent extends Event {
+export interface TimedEvent extends Event {
   time: number;
 }
