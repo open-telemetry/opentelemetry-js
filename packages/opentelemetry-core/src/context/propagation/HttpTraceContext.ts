@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
+import {
+  SpanContext,
+  HttpTextFormat,
+  TraceOptions,
+} from '@opentelemetry/types';
 import { TraceState } from '../../trace/TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
-// TODO: https://github.com/open-telemetry/opentelemetry-js/pull/60
-// Consider to import const from TraceOptions.UNSAMPLED
-export const DEFAULT_OPTIONS = 0x0;
 const VALID_TRACE_PARENT_REGEX = /^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$/;
 const VALID_TRACEID_REGEX = /^[0-9a-f]{32}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
-const VALID_ID_REGEX = /^0+$/i;
+const INVALID_ID_REGEX = /^0+$/i;
 const VERSION = '00';
 
 // TODO: Consider to move these interfaces in otel-types.
@@ -60,11 +61,11 @@ function isValidVersion(version: string): boolean {
 }
 
 function isValidTraceId(traceId: string): boolean {
-  return VALID_TRACEID_REGEX.test(traceId) && !VALID_ID_REGEX.test(traceId);
+  return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
 }
 
 function isValidSpanId(spanId: string): boolean {
-  return VALID_SPANID_REGEX.test(spanId) && !VALID_ID_REGEX.test(spanId);
+  return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
 }
 
 /**
@@ -77,7 +78,9 @@ export class HttpTraceContext implements HttpTextFormat {
   inject(spanContext: SpanContext, format: string, carrier: HeaderSetter) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
-    }-0${Number(spanContext.traceOptions || DEFAULT_OPTIONS).toString(16)}`;
+    }-0${Number(spanContext.traceOptions || TraceOptions.UNSAMPLED).toString(
+      16
+    )}`;
 
     carrier.setHeader(TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
