@@ -16,6 +16,8 @@
 
 import { Span } from './span';
 import { Attributes } from './attributes';
+import { SpanKind } from './span_kind';
+import { SpanContext } from './span_context';
 
 /**
  * Options needed for span creation
@@ -23,9 +25,16 @@ import { Attributes } from './attributes';
  * @todo: Move into module of its own
  */
 export interface SpanOptions {
-  attributes: Attributes[];
+  kind?: SpanKind;
+  attributes?: Attributes;
+  isRecordingEvents?: boolean;
+  parent?: Span | SpanContext;
+  startTime?: number;
 }
 
+/**
+ * Tracer provides an interface for creating spans and propagating context in-process.
+ */
 export interface Tracer {
   /**
    * Returns the current Span from the current context if available.
@@ -33,7 +42,7 @@ export interface Tracer {
    * If there is no Span associated with the current context, a default Span
    * with invalid SpanContext is returned.
    *
-   * @returns Span
+   * @returns Span The currently active Span
    */
   getCurrentSpan(): Span;
 
@@ -48,12 +57,10 @@ export interface Tracer {
    * Executes the function given by fn within the context provided by Span
    *
    * @param span The span that provides the context
-   * @param operation The name of the function
    * @param fn The function to be eexcuted inside the provided context
    */
   withSpan<T extends (...args: unknown[]) => unknown>(
     span: Span,
-    operation: string,
     fn: T
   ): ReturnType<T>;
 
