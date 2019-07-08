@@ -29,14 +29,6 @@ const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
 const VERSION = '00';
 
-// TODO: Consider to move these interfaces in otel-types.
-export interface HeaderGetter {
-  getHeader(name: string): string | string[] | undefined;
-}
-export interface HeaderSetter {
-  setHeader(name: string, value: string): void;
-}
-
 function parse(traceParent: string): SpanContext | null {
   const match = traceParent.match(VALID_TRACE_PARENT_REGEX);
   if (!match) return null;
@@ -75,21 +67,28 @@ function isValidSpanId(spanId: string): boolean {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContext implements HttpTextFormat {
-  inject(spanContext: SpanContext, format: string, carrier: HeaderSetter) {
+  inject(
+    spanContext: SpanContext,
+    format: string,
+    carrier: { [key: string]: unknown }
+  ) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
     }-0${Number(spanContext.traceOptions || TraceOptions.UNSAMPLED).toString(
       16
     )}`;
 
-    carrier.setHeader(TRACE_PARENT_HEADER, traceParent);
+    carrier[TRACE_PARENT_HEADER] = traceParent;
     if (spanContext.traceState) {
-      carrier.setHeader(TRACE_STATE_HEADER, spanContext.traceState.serialize());
+      carrier[TRACE_STATE_HEADER] = spanContext.traceState.serialize();
     }
   }
 
-  extract(format: string, carrier: HeaderGetter): SpanContext | null {
-    const traceParentHeader = carrier.getHeader(TRACE_PARENT_HEADER);
+  extract(
+    format: string,
+    carrier: { [key: string]: unknown }
+  ): SpanContext | null {
+    const traceParentHeader = carrier[TRACE_PARENT_HEADER];
     if (!traceParentHeader) return null;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
@@ -97,14 +96,14 @@ export class HttpTraceContext implements HttpTextFormat {
     const spanContext = parse(traceParent);
     if (!spanContext) return null;
 
-    const traceStateHeader = carrier.getHeader(TRACE_STATE_HEADER);
+    const traceStateHeader = carrier[TRACE_STATE_HEADER];
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a
       // single header.
       const state = Array.isArray(traceStateHeader)
         ? traceStateHeader.join(',')
         : traceStateHeader;
-      spanContext.traceState = new TraceState(state);
+      spanContext.traceState = new TraceState(state as string);
     }
     return spanContext;
   }

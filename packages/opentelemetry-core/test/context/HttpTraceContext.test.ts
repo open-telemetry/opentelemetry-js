@@ -17,32 +17,18 @@
 import * as assert from 'assert';
 import {
   HttpTraceContext,
-  HeaderGetter,
-  HeaderSetter,
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/context/propagation/HttpTraceContext';
 import { SpanContext, TraceOptions } from '@opentelemetry/types';
 import { TraceState } from '../../src/trace/TraceState';
 
-class DummyHeaders implements HeaderSetter, HeaderGetter {
-  private _headers = new Map<string, string | string[]>();
-
-  getHeader(header: string): string | string[] | undefined {
-    return this._headers.get(header);
-  }
-
-  setHeader(header: string, value: string | string[]) {
-    this._headers.set(header, value);
-  }
-}
-
 describe('HttpTraceContext', () => {
   const httpTraceContext = new HttpTraceContext();
-  let headers: DummyHeaders;
+  let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
-    headers = new DummyHeaders();
+    carrier = {};
   });
 
   describe('inject', () => {
@@ -53,12 +39,12 @@ describe('HttpTraceContext', () => {
         traceOptions: TraceOptions.SAMPLED,
       };
 
-      httpTraceContext.inject(spanContext, 'HttpTraceContext', headers);
+      httpTraceContext.inject(spanContext, 'HttpTraceContext', carrier);
       assert.deepStrictEqual(
-        headers.getHeader(TRACE_PARENT_HEADER),
+        carrier[TRACE_PARENT_HEADER],
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
       );
-      assert.deepStrictEqual(headers.getHeader(TRACE_STATE_HEADER), undefined);
+      assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], undefined);
     });
 
     it('should set traceparent and tracestate header', () => {
@@ -69,27 +55,22 @@ describe('HttpTraceContext', () => {
         traceState: new TraceState('foo=bar,baz=qux'),
       };
 
-      httpTraceContext.inject(spanContext, '', headers);
+      httpTraceContext.inject(spanContext, '', carrier);
       assert.deepStrictEqual(
-        headers.getHeader(TRACE_PARENT_HEADER),
+        carrier[TRACE_PARENT_HEADER],
         '00-d4cda95b652f4a1592b449d5929fda1b-6e0c63257de34c92-01'
       );
-      assert.deepStrictEqual(
-        headers.getHeader(TRACE_STATE_HEADER),
-        'foo=bar,baz=qux'
-      );
+      assert.deepStrictEqual(carrier[TRACE_STATE_HEADER], 'foo=bar,baz=qux');
     });
   });
 
   describe('extract', () => {
-    it('should extract context of a sampled span from headers', () => {
-      headers.setHeader(
-        TRACE_PARENT_HEADER,
-        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
-      );
+    it('should extract context of a sampled span from carrier', () => {
+      carrier[TRACE_PARENT_HEADER] =
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       const extractedSpanContext = httpTraceContext.extract(
         'HttpTraceContext',
-        headers
+        carrier
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -101,26 +82,26 @@ describe('HttpTraceContext', () => {
 
     it('returns null if traceparent header is missing', () => {
       assert.deepStrictEqual(
-        httpTraceContext.extract('HttpTraceContext', headers),
+        httpTraceContext.extract('HttpTraceContext', carrier),
         null
       );
     });
 
     it('returns null if traceparent header is invalid', () => {
-      headers.setHeader(TRACE_PARENT_HEADER, 'invalid!');
+      carrier[TRACE_PARENT_HEADER] = 'invalid!';
       assert.deepStrictEqual(
-        httpTraceContext.extract('HttpTraceContext', headers),
+        httpTraceContext.extract('HttpTraceContext', carrier),
         null
       );
     });
 
     it('extracts traceparent from list of header', () => {
-      headers.setHeader(TRACE_PARENT_HEADER, [
+      carrier[TRACE_PARENT_HEADER] = [
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
-      ]);
+      ];
       const extractedSpanContext = httpTraceContext.extract(
         'HttpTraceContext',
-        headers
+        carrier
       );
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
@@ -130,14 +111,12 @@ describe('HttpTraceContext', () => {
     });
 
     it('extracts tracestate from header', () => {
-      headers.setHeader(
-        TRACE_PARENT_HEADER,
-        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
-      );
-      headers.setHeader(TRACE_STATE_HEADER, 'foo=bar,baz=qux');
+      carrier[TRACE_PARENT_HEADER] =
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
+      carrier[TRACE_STATE_HEADER] = 'foo=bar,baz=qux';
       const extractedSpanContext = httpTraceContext.extract(
         'HttpTraceContext',
-        headers
+        carrier
       );
       assert.deepStrictEqual(
         extractedSpanContext!.traceState!.get('foo'),
@@ -149,15 +128,13 @@ describe('HttpTraceContext', () => {
       );
     });
 
-    it('combines multiple tracestate headers', () => {
-      headers.setHeader(
-        TRACE_PARENT_HEADER,
-        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01'
-      );
-      headers.setHeader(TRACE_STATE_HEADER, ['foo=bar,baz=qux', 'quux=quuz']);
+    it('combines multiple tracestate carrier', () => {
+      carrier[TRACE_PARENT_HEADER] =
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
+      carrier[TRACE_STATE_HEADER] = ['foo=bar,baz=qux', 'quux=quuz'];
       const extractedSpanContext = httpTraceContext.extract(
         'HttpTraceContext',
-        headers
+        carrier
       );
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
@@ -205,11 +182,11 @@ describe('HttpTraceContext', () => {
       };
 
       Object.getOwnPropertyNames(testCases).forEach(testCase => {
-        headers.setHeader(TRACE_PARENT_HEADER, testCases[testCase]);
+        carrier[TRACE_PARENT_HEADER] = testCases[testCase];
 
         const extractedSpanContext = httpTraceContext.extract(
           'HttpTraceContext',
-          headers
+          carrier
         );
         assert.deepStrictEqual(extractedSpanContext, null, testCase);
       });
