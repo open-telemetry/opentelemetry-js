@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BinaryFormat, SpanContext } from '@opentelemetry/types';
+import { BinaryFormat, SpanContext, TraceOptions } from '@opentelemetry/types';
 
 const VERSION_ID = 0;
 const TRACE_ID_FIELD_ID = 0;
@@ -61,7 +61,7 @@ export class BinaryTraceContext implements BinaryFormat {
     result.write(spanContext.spanId, SPAN_ID_OFFSET, SPAN_ID_SIZE, 'hex');
     result.writeUInt8(TRACE_OPTION_FIELD_ID, TRACE_OPTION_FIELD_ID_OFFSET);
     result.writeUInt8(
-      Number(spanContext.traceOptions) || 0,
+      Number(spanContext.traceOptions) || TraceOptions.UNSAMPLED,
       TRACE_OPTIONS_OFFSET
     );
     return result;

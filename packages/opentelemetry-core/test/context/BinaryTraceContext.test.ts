@@ -15,8 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { BinaryTraceContext } from '../../../src/context/propagation/BinaryTraceContext';
-import { SpanContext } from '@opentelemetry/types';
+import { BinaryTraceContext } from '../../src/context/propagation/BinaryTraceContext';
+import { SpanContext, TraceOptions } from '@opentelemetry/types';
 
 describe('BinaryTraceContext', () => {
   const binaryTraceContext = new BinaryTraceContext();
@@ -32,7 +32,7 @@ describe('BinaryTraceContext', () => {
       structured: {
         traceId: commonTraceId,
         spanId: commonSpanId,
-        traceOptions: 1,
+        traceOptions: TraceOptions.SAMPLED,
       },
       binary: `0000${commonTraceId}01${commonSpanId}02${'01'}`,
       description: 'span context with 64-bit span ID',
@@ -73,7 +73,10 @@ describe('BinaryTraceContext', () => {
         assert.deepStrictEqual(
           binaryTraceContext.fromBytes(Buffer.from(testCase.binary, 'hex')),
           testCase.structured &&
-            Object.assign({ traceOptions: 0 }, testCase.structured)
+            Object.assign(
+              { traceOptions: TraceOptions.UNSAMPLED },
+              testCase.structured
+            )
         );
       })
     );
