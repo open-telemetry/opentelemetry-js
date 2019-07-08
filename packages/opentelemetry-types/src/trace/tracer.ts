@@ -25,10 +25,29 @@ import { SpanContext } from './span_context';
  * @todo: Move into module of its own
  */
 export interface SpanOptions {
+  /**
+   * The SpanKind of a span
+   */
   kind?: SpanKind;
+
+  /**
+   * A spans attributes
+   */
   attributes?: Attributes;
+
+  /**
+   * Indicates that events are being recorded for a span
+   */
   isRecordingEvents?: boolean;
+
+  /**
+   * The parent span
+   */
   parent?: Span | SpanContext;
+
+  /**
+   * The start timestamp of a span
+   */
   startTime?: number;
 }
 
@@ -49,7 +68,8 @@ export interface Tracer {
   /**
    *
    * @param name The name of the span
-   * @param options? SpanOptions used for span creation
+   * @param [options] SpanOptions used for span creation
+   * @returns Span The newly created span
    */
   start(name: string, options?: SpanOptions): Span;
 
