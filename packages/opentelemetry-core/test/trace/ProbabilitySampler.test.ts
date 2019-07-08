@@ -36,7 +36,7 @@ describe('ProbabilitySampler', () => {
   it('should return a always sampler for >1', () => {
     const sampler = new ProbabilitySampler(100);
     assert.strictEqual(sampler.shouldSample(), true);
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{100}');
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
   });
 
   it('should return a never sampler for 0', () => {
