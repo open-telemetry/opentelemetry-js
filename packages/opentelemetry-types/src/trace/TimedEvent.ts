@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Event } from './event';
+import { Event } from './Event';
 
 /**
  * Represents a timed event.
