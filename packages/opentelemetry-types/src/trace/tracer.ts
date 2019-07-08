@@ -48,10 +48,10 @@ export interface Tracer {
 
   /**
    *
-   * @param name
-   * @param options
+   * @param name The name of the span
+   * @param options? SpanOptions used for span creation
    */
-  start(name: string, options: SpanOptions): Span;
+  start(name: string, options?: SpanOptions): Span;
 
   /**
    * Executes the function given by fn within the context provided by Span
