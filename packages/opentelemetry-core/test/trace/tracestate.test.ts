@@ -79,9 +79,9 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1,c=3');
     });
 
-    it('must parse states that only have a single value with an equal sign', () => {
+    it('must skip states that only have a single value with an equal sign', () => {
       const state = new TraceState('a=1=');
-      assert.deepStrictEqual(state.get('a'), '1=');
+      assert.deepStrictEqual(state.get('a'), undefined);
     });
   });
 });
