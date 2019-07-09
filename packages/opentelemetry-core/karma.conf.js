@@ -14,5 +14,18 @@
  * limitations under the License.
  */
 
-export * from './resources/Resource';
-export * from './trace/NoopSpan';
+const webpackConfig = require('./webpack/test.config.js');
+
+module.exports = (config) => {
+  config.set({
+    listenAddress: 'localhost',
+    hostname: 'localhost',
+    browsers: ['ChromeHeadless'],
+    frameworks: ['mocha'],
+    reporters: ['spec'],
+    files: ['test/index-webpack.ts'],
+    preprocessors: {'test/index-webpack.ts': ['webpack']},
+    webpack: webpackConfig,
+    webpackMiddleware: {noInfo: true},
+  });
+};
