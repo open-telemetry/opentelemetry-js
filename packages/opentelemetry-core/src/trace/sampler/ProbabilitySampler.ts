@@ -18,7 +18,9 @@ import { Sampler, SpanContext } from '@opentelemetry/types';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {
-  constructor(private readonly _probability: number = 1) {}
+  constructor(private readonly _probability: number = 1) {
+    this._probability = this._normalize(_probability);
+  }
 
   shouldSample(parentContext?: SpanContext) {
     if (this._probability >= 1.0) return true;
@@ -29,9 +31,11 @@ export class ProbabilitySampler implements Sampler {
   toString(): string {
     // TODO: Consider to use `AlwaysSampleSampler` and `NeverSampleSampler`
     // based on the specs.
-    return `ProbabilitySampler{${
-      this._probability > 1 ? 1 : this._probability
-    }}`;
+    return `ProbabilitySampler{${this._probability}}`;
+  }
+
+  private _normalize(probability: number): number {
+    return probability >= 1 ? 1 : probability <= 0 ? 0 : probability;
   }
 }
 
