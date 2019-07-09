@@ -16,9 +16,7 @@
 
 import * as types from '@opentelemetry/types';
 
-// TODO validate maximum number of items
-// const MAX_TRACE_STATE_ITEMS = 32;
-
+const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
@@ -65,9 +63,15 @@ export class TraceState implements types.TraceState {
 
   private _parse(rawTraceState: string) {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-    // TODO validate maximum number of items
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
+      .reduce((trunc: string[], part: string) => {
+        // validate maximum number of items
+        if (trunc.length < MAX_TRACE_STATE_ITEMS) {
+          trunc.push(part);
+        }
+        return trunc;
+      }, [])
       .reverse()
       .reduce((agg: Map<string, string>, part: string) => {
         const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);

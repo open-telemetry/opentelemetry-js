@@ -83,5 +83,17 @@ describe('TraceState', () => {
       const state = new TraceState('a=1=');
       assert.deepStrictEqual(state.get('a'), '1=');
     });
+
+    it('must truncate states with too many items', () => {
+      const state = new TraceState(
+        new Array(33).fill(0)
+          .map((_: null, num: number) => `a${num}=1`)
+          .join(',')
+      );
+      assert.deepStrictEqual(state['_keys']().length, 32);
+      assert.deepStrictEqual(state.get('a0'), '1');
+      assert.deepStrictEqual(state.get('a31'), '1');
+      assert.deepStrictEqual(state.get('a32'), undefined, 'should truncate from the tail');
+    });
   });
 });
