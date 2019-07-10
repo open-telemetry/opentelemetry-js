@@ -25,34 +25,24 @@ import { SpanContext } from './span_context';
  * @todo: Move into module of its own
  */
 export interface SpanOptions {
-  /**
-   * The SpanKind of a span
-   */
+  /** The SpanKind of a span */
   kind?: SpanKind;
-
-  /**
-   * A spans attributes
-   */
+  /** A spans attributes */
   attributes?: Attributes;
-
-  /**
-   * Indicates that events are being recorded for a span
-   */
+  /** Indicates that events are being recorded for a span */
   isRecordingEvents?: boolean;
-
-  /**
-   * The parent span
-   */
+  /** The parent span */
   parent?: Span | SpanContext;
-
-  /**
-   * The start timestamp of a span
-   */
+  /** The start timestamp of a span */
   startTime?: number;
 }
 
 /**
- * Tracer provides an interface for creating spans and propagating context in-process.
+ * Tracer provides an interface for creating {@link Span}s and propagating
+ * context in-process.
+ *
+ * Users may choose to use manual or automatic Context propagation. Because of
+ * that this class offers APIs to facilitate both usages.
  */
 export interface Tracer {
   /**
@@ -66,12 +56,12 @@ export interface Tracer {
   getCurrentSpan(): Span;
 
   /**
-   *
+   * Starts a new {@link Span}.
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation
    * @returns Span The newly created span
    */
-  start(name: string, options?: SpanOptions): Span;
+  startSpan(name: string, options?: SpanOptions): Span;
 
   /**
    * Executes the function given by fn within the context provided by Span
@@ -91,20 +81,32 @@ export interface Tracer {
    *
    * @todo: Pending API discussion. Revisit if Span or SpanData should be passed
    *        in here once this is sorted out.
-   * @param span
+   * @param span Span Data to be reported to all exporters.
    */
   recordSpanData(span: Span): void;
 
   /**
-   * Returns the binary format interface which can serialize/deserialize Spans.
+   * Returns the {@link BinaryFormat} interface which can serialize/deserialize
+   * Spans.
+   *
+   * If no tracer implementation is provided, this defaults to the W3C Trace
+   * Context binary format ({@link BinaryFormat}). For more details see
+   * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
+   * binary protocol</a>.
+   *
    * @todo: Change return type once BinaryFormat is available
    */
   getBinaryFormat(): unknown;
 
   /**
-   * Returns the HTTP text format interface which can inject/extract Spans.
+   * Returns the {@link HttpTextFormat} interface which can inject/extract
+   * Spans.
+   *
+   * If no tracer implementation is provided, this defaults to the W3C Trace
+   * Context HTTP text format ({@link HttpTraceContext}). For more details see
+   * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
    *
    * @todo: Change return type once HttpTextFormat is available
    */
-  getHttpTextFormat: unknown;
+  getHttpTextFormat(): unknown;
 }
