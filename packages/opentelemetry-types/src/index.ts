@@ -24,6 +24,7 @@ export * from './trace/Event';
 export * from './trace/link';
 export * from './trace/Sampler';
 export * from './trace/span';
+export * from './trace/SpanOptions';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/status';
