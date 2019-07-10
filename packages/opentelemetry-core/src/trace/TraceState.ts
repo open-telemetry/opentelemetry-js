@@ -65,13 +65,7 @@ export class TraceState implements types.TraceState {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
-      .reduce((trunc: string[], part: string) => {
-        // validate maximum number of items
-        if (trunc.length < MAX_TRACE_STATE_ITEMS) {
-          trunc.push(part);
-        }
-        return trunc;
-      }, [])
+      .slice(0, MAX_TRACE_STATE_ITEMS)
       .reverse()
       .reduce((agg: Map<string, string>, part: string) => {
         const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
