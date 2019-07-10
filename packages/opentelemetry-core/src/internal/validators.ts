@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const KEY_MAX_SIZE = 256;
 const VALUE_MAX_SIZE = 256;
+const VALID_KEY_REGEX = /^[a-z][_0-9a-z-*/]{0,255}$/;
 
 /**
  * Key is opaque string up to 256 characters printable. It MUST begin with a
@@ -23,23 +23,7 @@ const VALUE_MAX_SIZE = 256;
  * underscores _, dashes -, asterisks *, and forward slashes /.
  */
 export function validateKey(key: string): boolean {
-  if (key.length > KEY_MAX_SIZE || key.charAt(0) < 'a' || key.charAt(0) > 'z') {
-    return false;
-  }
-  for (let i = 1; i < key.length; i++) {
-    const c = key.charAt(i);
-    if (
-      !(c >= 'a' && c <= 'z') &&
-      !(c >= '0' && c <= '9') &&
-      c !== '_' &&
-      c !== '-' &&
-      c !== '*' &&
-      c !== '/'
-    ) {
-      return false;
-    }
-  }
-  return true;
+  return VALID_KEY_REGEX.test(key);
 }
 
 /**
