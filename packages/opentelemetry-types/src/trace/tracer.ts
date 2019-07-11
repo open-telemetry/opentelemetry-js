@@ -15,27 +15,7 @@
  */
 
 import { Span } from './span';
-import { Attributes } from './attributes';
-import { SpanKind } from './span_kind';
-import { SpanContext } from './span_context';
-
-/**
- * Options needed for span creation
- *
- * @todo: Move into module of its own
- */
-export interface SpanOptions {
-  /** The SpanKind of a span */
-  kind?: SpanKind;
-  /** A spans attributes */
-  attributes?: Attributes;
-  /** Indicates that events are being recorded for a span */
-  isRecordingEvents?: boolean;
-  /** The parent span */
-  parent?: Span | SpanContext;
-  /** The start timestamp of a span */
-  startTime?: number;
-}
+import { SpanOptions } from './SpanOptions';
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
