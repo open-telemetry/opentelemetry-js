@@ -42,7 +42,7 @@ describe('validators', () => {
       assert.ok(!validateValue('my_vakue=5'));
     });
 
-    it('returns false when value contain equal', () => {
+    it('returns false when value contain comma', () => {
       assert.ok(!validateValue('first,second'));
     });
 
@@ -52,10 +52,6 @@ describe('validators', () => {
 
     it('returns false when invalid value size', () => {
       assert.ok(!validateValue('k'.repeat(257)));
-    });
-
-    it('returns true when value is empty', () => {
-      assert.ok(validateValue(''));
     });
   });
 });

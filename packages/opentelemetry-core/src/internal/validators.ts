@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const VALUE_MAX_SIZE = 256;
 const VALID_KEY_REGEX = /^[a-z][_0-9a-z-*/]{0,255}$/;
+const VALID_VALUE_REGEX = /^[\x20-\x2b\x2d-\x3c\x3e-\x7e]{0,255}[\x21-\x2b\x2d-\x3c\x3e-\x7e]$/;
 
 /**
  * Key is opaque string up to 256 characters printable. It MUST begin with a
@@ -31,14 +31,5 @@ export function validateKey(key: string): boolean {
  * characters (i.e., the range 0x20 to 0x7E) except comma , and =.
  */
 export function validateValue(value: string): boolean {
-  if (value.length > VALUE_MAX_SIZE || value.charAt(value.length - 1) === ' ') {
-    return false;
-  }
-  for (let i = 0; i < value.length; i++) {
-    const c = value.charAt(i);
-    if (c === ',' || c === '=' || c < ' ' || c > '~') {
-      return false;
-    }
-  }
-  return true;
+  return VALID_VALUE_REGEX.test(value);
 }
