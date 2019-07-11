@@ -35,6 +35,7 @@ export class ProbabilitySampler implements Sampler {
   }
 
   private _normalize(probability: number): number {
+    if (typeof probability !== 'number' || isNaN(probability)) return 0;
     return probability >= 1 ? 1 : probability <= 0 ? 0 : probability;
   }
 }

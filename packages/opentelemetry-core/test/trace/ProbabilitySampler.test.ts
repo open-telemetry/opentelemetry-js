@@ -68,4 +68,22 @@ describe('ProbabilitySampler', () => {
     assert.strictEqual(NEVER_SAMPLER.shouldSample(), false);
     assert.strictEqual(NEVER_SAMPLER.toString(), 'ProbabilitySampler{0}');
   });
+
+  it('should handle NaN', () => {
+    const sampler = new ProbabilitySampler(NaN);
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+  });
+
+  it('should handle -NaN', () => {
+    const sampler = new ProbabilitySampler(-NaN);
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+  });
+
+  it('should handle undefined', () => {
+    const sampler = new ProbabilitySampler(undefined);
+    assert.strictEqual(sampler.shouldSample(), true);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
+  });
 });
