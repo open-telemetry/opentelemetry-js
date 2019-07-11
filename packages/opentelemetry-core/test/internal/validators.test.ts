@@ -19,39 +19,71 @@ import { validateKey, validateValue } from '../../src/internal/validators';
 
 describe('validators', () => {
   describe('validateKey', () => {
-    it('returns true when key contain all allowed characters', () => {
-      const allowedKeys = 'abcdefghijklmnopqrstuvwxyz0123456789-_*/';
-      assert.ok(validateKey(allowedKeys));
-    });
+    const validKeysTestCases = [
+      'abcdefghijklmnopqrstuvwxyz0123456789-_*/',
+      'baz-',
+      'baz_',
+      'baz*',
+      'baz*bar',
+      'baz/',
+      'tracestate',
+    ];
+    validKeysTestCases.forEach(testCase =>
+      it(`returns true when key contains valid chars ${testCase}`, () => {
+        assert.ok(validateKey(testCase));
+      })
+    );
 
-    it('returns false when invalid first key character', () => {
-      assert.ok(!validateKey('1_key'));
-    });
-
-    it('returns false when invalid key characters', () => {
-      assert.ok(!validateKey('kEy_1'));
-    });
-
-    it('returns false when invalid key size', () => {
-      assert.ok(!validateKey('k'.repeat(257)));
-    });
+    const invalidKeysTestCases = [
+      '1_key',
+      'kEy_1',
+      'k'.repeat(257),
+      'key,',
+      'TrAcEsTaTE',
+      'TRACESTATE',
+      '',
+    ];
+    invalidKeysTestCases.forEach(testCase =>
+      it(`returns true when key contains invalid chars ${testCase}`, () => {
+        assert.ok(!validateKey(testCase));
+      })
+    );
   });
 
   describe('validateValue', () => {
-    it('returns false when value contain equal', () => {
-      assert.ok(!validateValue('my_vakue=5'));
-    });
+    const validValuesTestCases = [
+      'first second',
+      'baz*',
+      'baz$',
+      'baz@',
+      'first-second',
+      'baz~bar',
+      'test-v1:120',
+      '-second',
+      'first.second',
+      'TrAcEsTaTE',
+      'TRACESTATE',
+    ];
+    validValuesTestCases.forEach(testCase =>
+      it(`returns true when value contains valid chars ${testCase}`, () => {
+        assert.ok(validateValue(testCase));
+      })
+    );
 
-    it('returns false when value contain comma', () => {
-      assert.ok(!validateValue('first,second'));
-    });
-
-    it('returns false when value contain trailing spaces', () => {
-      assert.ok(!validateValue('first '));
-    });
-
-    it('returns false when invalid value size', () => {
-      assert.ok(!validateValue('k'.repeat(257)));
-    });
+    const invalidValuesTestCases = [
+      'my_value=5',
+      'first,second',
+      'first ',
+      'k'.repeat(257),
+      ',baz',
+      'baz,',
+      'baz=',
+      '',
+    ];
+    invalidValuesTestCases.forEach(testCase =>
+      it(`returns true when value contains invalid chars ${testCase}`, () => {
+        assert.ok(!validateValue(testCase));
+      })
+    );
   });
 });
