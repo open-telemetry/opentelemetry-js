@@ -25,7 +25,7 @@ describe('BinaryTraceContext', () => {
 
   const testCases: Array<{
     structured: SpanContext | null;
-    binary: string;
+    binary: Uint8Array;
     description: string;
   }> = [
     {
@@ -34,22 +34,82 @@ describe('BinaryTraceContext', () => {
         spanId: commonSpanId,
         traceOptions: TraceOptions.SAMPLED,
       },
-      binary: `0000${commonTraceId}01${commonSpanId}02${'01'}`,
+      binary: new Uint8Array([
+        0,
+        0,
+        212,
+        205,
+        169,
+        91,
+        101,
+        47,
+        74,
+        21,
+        146,
+        180,
+        73,
+        213,
+        146,
+        159,
+        218,
+        27,
+        1,
+        117,
+        232,
+        237,
+        73,
+        26,
+        236,
+        126,
+        202,
+        2,
+        1,
+      ]),
       description: 'span context with 64-bit span ID',
     },
     {
       structured: { traceId: commonTraceId, spanId: commonSpanId },
-      binary: `0000${commonTraceId}01${commonSpanId}02${'00'}`,
+      binary: new Uint8Array([
+        0,
+        0,
+        212,
+        205,
+        169,
+        91,
+        101,
+        47,
+        74,
+        21,
+        146,
+        180,
+        73,
+        213,
+        146,
+        159,
+        218,
+        27,
+        1,
+        117,
+        232,
+        237,
+        73,
+        26,
+        236,
+        126,
+        202,
+        2,
+        0,
+      ]),
       description: 'span context with no traceOptions',
     },
     {
       structured: null,
-      binary: '00',
+      binary: new Uint8Array([0, 0]),
       description: 'incomplete binary span context (by returning null)',
     },
     {
       structured: null,
-      binary: '0'.repeat(58),
+      binary: new Uint8Array(58),
       description: 'bad binary span context (by returning null)',
     },
   ];
@@ -60,7 +120,7 @@ describe('BinaryTraceContext', () => {
         testCase.structured &&
         it(`should serialize ${testCase.description}`, () => {
           assert.deepStrictEqual(
-            binaryTraceContext.toBytes(testCase.structured!).toString('hex'),
+            binaryTraceContext.toBytes(testCase.structured!),
             testCase.binary
           );
         })
@@ -71,7 +131,7 @@ describe('BinaryTraceContext', () => {
     testCases.forEach(testCase =>
       it(`should deserialize ${testCase.description}`, () => {
         assert.deepStrictEqual(
-          binaryTraceContext.fromBytes(Buffer.from(testCase.binary, 'hex')),
+          binaryTraceContext.fromBytes(testCase.binary),
           testCase.structured &&
             Object.assign(
               { traceOptions: TraceOptions.UNSAMPLED },

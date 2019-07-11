@@ -24,7 +24,7 @@ export interface BinaryFormat {
    * Serialize the given span context into a Buffer.
    * @param spanContext The span context to serialize.
    */
-  toBytes(spanContext: SpanContext): Buffer;
+  toBytes(spanContext: SpanContext): ArrayBuffer;
 
   /**
    * Deseralize the given span context from binary encoding. If the input is a
@@ -32,5 +32,5 @@ export interface BinaryFormat {
    * return `null`.
    * @param buffer The span context to deserialize.
    */
-  fromBytes(buffer: Buffer): SpanContext | null;
+  fromBytes(buffer: ArrayBuffer): SpanContext | null;
 }
