@@ -16,10 +16,14 @@
 
 import * as types from '@opentelemetry/types';
 import { BaseScopeManager } from '@opentelemetry/scope-base';
-import { ALWAYS_SAMPLER } from './sampler/ProbabilitySampler';
-import { NoopSpan } from './NoopSpan';
-import { NoopLogger } from '../common/NoopLogger';
-import { randomTraceId, randomSpanId } from '../platform';
+import {
+  ALWAYS_SAMPLER,
+  NoopLogger,
+  NoopSpan,
+  randomSpanId,
+  randomTraceId,
+} from '@opentelemetry/core';
+import { BasicTracerConfig } from '../src/types';
 
 /**
  * This class represents a basic tracer.
@@ -43,7 +47,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: types.TracerConfig = {}) {
+  constructor(config: BasicTracerConfig = {}) {
     this.sampler = config.sampler || ALWAYS_SAMPLER;
     this.scopeManager = config.scopeManager;
     this.defaultAttributes = config.defaultAttributes || {};

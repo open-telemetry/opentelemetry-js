@@ -15,12 +15,8 @@
  */
 
 import * as assert from 'assert';
-import { BasicTracer } from '../../src/trace/BasicTracer';
-import {
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
-} from '../../src/trace/sampler/ProbabilitySampler';
-import { NoopLogger } from '../../src/common/NoopLogger';
+import { BasicTracer } from '../src/BasicTracer';
+import { ALWAYS_SAMPLER, NEVER_SAMPLER, NoopLogger } from '@opentelemetry/core';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
