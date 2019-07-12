@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export interface BaseScopeManager {
+export interface ScopeManager {
   /**
    * Get the current active scope
    */
@@ -25,17 +25,17 @@ export interface BaseScopeManager {
    * @param scope Any object to set as the current active scope
    * @param fn A callback to be imediately run within a specific scope
    */
-  with<T extends (...args: unknown[]) => unknown>(
+  with<T extends (...args: unknown[]) => ReturnType<T>>(
     scope: unknown,
     fn: T
   ): ReturnType<T>;
 
   /**
    * Bind an object as the current scope (or a specific one)
-   * @param object Object to which a scope need to be set
+   * @param target Any object to which a scope need to be set
    * @param [scope] Optionaly specify the scope which you want to assign
    */
-  bind<T>(object: T, scope?: unknown): T;
+  bind<T>(target: T, scope?: unknown): T;
 
   /**
    * Enable scope management
@@ -45,5 +45,5 @@ export interface BaseScopeManager {
   /**
    * Disable scope management
    */
-  disable(): void;
+  disable(): this;
 }
