@@ -17,11 +17,11 @@
 import * as types from '@opentelemetry/types';
 import { BaseScopeManager } from '@opentelemetry/scope-base';
 import {
-  ALWAYS_SAMPLER,
   NoopLogger,
   NoopSpan,
   randomSpanId,
   randomTraceId,
+  NEVER_SAMPLER,
 } from '@opentelemetry/core';
 import { BasicTracerConfig } from '../src/types';
 
@@ -48,7 +48,7 @@ export class BasicTracer implements types.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig = {}) {
-    this.sampler = config.sampler || ALWAYS_SAMPLER;
+    this.sampler = config.sampler || NEVER_SAMPLER;
     this.scopeManager = config.scopeManager;
     this.defaultAttributes = config.defaultAttributes || {};
     this.logger = config.logger || new NoopLogger();
