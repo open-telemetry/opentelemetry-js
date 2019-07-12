@@ -15,7 +15,7 @@
     "tdd": "yarn tdd:node",
     "tdd:node": "yarn test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "codecov": "c8 report --reporter=json && codecov -f coverage/*.json",
+    "codecov": "c8 report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
