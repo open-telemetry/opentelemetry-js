@@ -67,5 +67,3 @@ packages/**/package-lock.json
 # docs files
 docs
 
-# coverage files
-.nyc_output

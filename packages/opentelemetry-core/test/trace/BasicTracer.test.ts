@@ -15,28 +15,28 @@
  */
 
 import * as assert from 'assert';
-import { Tracer } from '../../src/trace/Tracer';
+import { BasicTracer } from '../../src/trace/BasicTracer';
 import {
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
 } from '../../src/trace/sampler/ProbabilitySampler';
 import { NoopLogger } from '../../src/common/NoopLogger';
 
-describe('Tracer', () => {
+describe('BasicTracer', () => {
   describe('constructor', () => {
     it('should construct an instance without options', () => {
-      const tracer = new Tracer();
-      assert.ok(tracer instanceof Tracer);
+      const tracer = new BasicTracer();
+      assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with logger', () => {
-      const tracer = new Tracer({ logger: new NoopLogger() });
-      assert.ok(tracer instanceof Tracer);
+      const tracer = new BasicTracer({ logger: new NoopLogger() });
+      assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with sampler', () => {
-      const tracer = new Tracer({ sampler: ALWAYS_SAMPLER });
-      assert.ok(tracer instanceof Tracer);
+      const tracer = new BasicTracer({ sampler: ALWAYS_SAMPLER });
+      assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with scope manager');
@@ -44,33 +44,33 @@ describe('Tracer', () => {
     it('should construct an instance with propagation');
 
     it('should construct an instance with default attributes', () => {
-      const tracer = new Tracer({
+      const tracer = new BasicTracer({
         defaultAttributes: {
           region: 'eu-west',
           asg: 'my-asg',
         },
       });
-      assert.ok(tracer instanceof Tracer);
+      assert.ok(tracer instanceof BasicTracer);
     });
   });
 
   describe('#startSpan', () => {
     it('should start a span with name only', () => {
-      const tracer = new Tracer();
+      const tracer = new BasicTracer();
       const span = tracer.startSpan('my-span');
       assert.ok(span);
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new Tracer();
+      const tracer = new BasicTracer();
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
     });
 
     it('should return a default span with no sampling', () => {
-      const tracer = new Tracer({ sampler: NEVER_SAMPLER });
+      const tracer = new BasicTracer({ sampler: NEVER_SAMPLER });
       const span = tracer.startSpan('my-span');
-      assert.deepStrictEqual(span, Tracer.defaultSpan);
+      assert.deepStrictEqual(span, BasicTracer.defaultSpan);
     });
 
     it('should start a Span with always sampling');
@@ -80,9 +80,9 @@ describe('Tracer', () => {
 
   describe('#getCurrentSpan', () => {
     it('should return default span without scope manager', () => {
-      const tracer = new Tracer();
+      const tracer = new BasicTracer();
       const currentSpan = tracer.getCurrentSpan();
-      assert.deepStrictEqual(currentSpan, Tracer.defaultSpan);
+      assert.deepStrictEqual(currentSpan, BasicTracer.defaultSpan);
     });
 
     it('should return a span with scope manager');
@@ -90,7 +90,7 @@ describe('Tracer', () => {
 
   describe('#withSpan', () => {
     it('should run scope without scope manager', done => {
-      const tracer = new Tracer();
+      const tracer = new BasicTracer();
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         return done();

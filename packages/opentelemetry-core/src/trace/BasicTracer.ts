@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import * as uuid from 'uuid';
 import * as types from '@opentelemetry/types';
 import { BaseScopeManager } from '@opentelemetry/scope-base';
 import { ALWAYS_SAMPLER } from './sampler/ProbabilitySampler';
 import { NoopSpan } from './NoopSpan';
 import { NoopLogger } from '../common/NoopLogger';
+import { randomTraceId, randomSpanId } from '../platform';
 
 /**
- * This class represents a tracer.
+ * This class represents a basic tracer.
  */
-export class Tracer implements types.Tracer {
+export class BasicTracer implements types.Tracer {
   static INVALID_ID = '0';
 
-  private logger!: types.Logger;
-  private sampler!: types.Sampler;
+  private defaultAttributes: types.Attributes;
+  private logger: types.Logger;
+  private sampler: types.Sampler;
   private scopeManager?: BaseScopeManager;
-  private defaultAttributes?: types.Attributes;
 
   // TODO: consume invalid span context from `SpanContext.INVALID`
   static defaultSpan = new NoopSpan({
-    traceId: Tracer.INVALID_ID,
+    traceId: BasicTracer.INVALID_ID,
     // TODO: consume invalid `spanId` from `Span.INVALID`
     spanId: '0',
     traceOptions: types.TraceOptions.UNSAMPLED,
@@ -46,7 +46,7 @@ export class Tracer implements types.Tracer {
   constructor(config: types.TracerConfig = {}) {
     this.sampler = config.sampler || ALWAYS_SAMPLER;
     this.scopeManager = config.scopeManager;
-    this.defaultAttributes = config.defaultAttributes;
+    this.defaultAttributes = config.defaultAttributes || {};
     this.logger = config.logger || new NoopLogger();
   }
 
@@ -56,6 +56,7 @@ export class Tracer implements types.Tracer {
    */
   startSpan(name: string, options: types.SpanOptions = {}): types.Span {
     let parentSpanContext: types.SpanContext | undefined;
+
     // parent is a SpanContext
     if (
       options.parent &&
@@ -73,16 +74,14 @@ export class Tracer implements types.Tracer {
 
     // make sampling decision
     if (!this.sampler.shouldSample(parentSpanContext)) {
-      return Tracer.defaultSpan;
+      return BasicTracer.defaultSpan;
     }
 
     // span context
     const traceId = parentSpanContext
       ? parentSpanContext.traceId
-      : generateTraceId();
-
-    // TODO: generate span id in a browser compatible way
-    const spanId = '';
+      : randomTraceId();
+    const spanId = randomSpanId();
 
     // TODO: create a real Span
     const span = new NoopSpan({
@@ -91,9 +90,7 @@ export class Tracer implements types.Tracer {
     });
 
     // Set default attributes
-    if (this.defaultAttributes) {
-      span.setAttributes(this.defaultAttributes);
-    }
+    span.setAttributes(this.defaultAttributes);
 
     return span;
   }
@@ -107,7 +104,7 @@ export class Tracer implements types.Tracer {
       this.logger.warn(
         'getCurrentSpan() returns an invalid default span without a scopeManager'
       );
-      return Tracer.defaultSpan;
+      return BasicTracer.defaultSpan;
     }
 
     // Get the current Span from the context.
@@ -152,16 +149,4 @@ export class Tracer implements types.Tracer {
     // TODO: get binary format form propagation
     throw new Error('Method not implemented.');
   }
-}
-
-/**
- * Generates a new trace id.
- */
-function generateTraceId(): string {
-  // TODO: revisit algorithm, copied from OpenCensus for now
-  // TODO: move to utils
-  return uuid
-    .v4()
-    .split('-')
-    .join('');
 }
