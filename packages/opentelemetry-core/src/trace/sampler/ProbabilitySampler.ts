@@ -18,7 +18,7 @@ import { Sampler, SpanContext } from '@opentelemetry/types';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {
-  constructor(private readonly _probability: number = 1) {
+  constructor(private readonly _probability: number = 0) {
     this._probability = this._normalize(_probability);
   }
 

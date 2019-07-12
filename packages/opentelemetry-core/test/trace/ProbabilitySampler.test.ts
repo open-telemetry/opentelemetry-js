@@ -23,7 +23,7 @@ import {
 
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
-    const sampler = new ProbabilitySampler();
+    const sampler = new ProbabilitySampler(1);
     assert.strictEqual(
       sampler.shouldSample({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -83,7 +83,7 @@ describe('ProbabilitySampler', () => {
 
   it('should handle undefined', () => {
     const sampler = new ProbabilitySampler(undefined);
-    assert.strictEqual(sampler.shouldSample(), true);
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 });
