@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanContext } from '@opentelemetry/types';
+import { SpanContext, BinaryFormat } from '@opentelemetry/types';
 
 /**
  * No-op implementations of {@link BinaryFormat}.
- *
- * @todo: Implement BinaryFormat based on https://github.com/open-telemetry/opentelemetry-js/pull/74
  */
-class NoopBinaryFormat {
+class NoopBinaryFormat implements BinaryFormat {
   private readonly _buff = new ArrayBuffer(0);
   // By default does nothing
   toBytes(spanContext: SpanContext): ArrayBuffer {

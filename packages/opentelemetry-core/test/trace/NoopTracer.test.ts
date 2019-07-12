@@ -19,7 +19,8 @@ import { NoopTracer, NOOP_SPAN } from '../../src/trace/NoopTracer';
 import { SpanKind } from '@opentelemetry/types';
 
 describe('NoopTracer', () => {
-  it('do not crash', () => {
+  it('does not crash', () => {
+    const spanContext = { traceId: '', spanId: '' };
     const tracer = new NoopTracer();
 
     assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);
@@ -40,7 +41,16 @@ describe('NoopTracer', () => {
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
     const httpTextFormat = tracer.getHttpTextFormat();
     assert.ok(httpTextFormat);
-    httpTextFormat.inject({ traceId: '', spanId: '' }, 'HttpTextFormat', {});
-    httpTextFormat.extract('HttpTextFormat', {});
+    httpTextFormat.inject(spanContext, 'HttpTextFormat', {});
+    assert.deepStrictEqual(httpTextFormat.extract('HttpTextFormat', {}), null);
+
+    const binaryFormat = tracer.getBinaryFormat();
+    assert.ok(binaryFormat);
+    assert.ok(binaryFormat.toBytes(spanContext), typeof ArrayBuffer);
+    assert.deepStrictEqual(binaryFormat.fromBytes(new ArrayBuffer(0)), null);
+
+    assert.throws(() => {
+      tracer.withSpan(NOOP_SPAN, () => {});
+    });
   });
 });

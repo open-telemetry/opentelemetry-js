@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Tracer, SpanOptions, Span, Propagator } from '@opentelemetry/types';
+import {
+  Tracer,
+  SpanOptions,
+  Span,
+  Propagator,
+  BinaryFormat,
+} from '@opentelemetry/types';
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
 import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
 import { NoopSpan } from './NoopSpan';
@@ -34,7 +40,7 @@ export class NoopTracer implements Tracer {
     return NOOP_SPAN;
   }
 
-  // @todo
+  // @todo: dependency on https://github.com/open-telemetry/opentelemetry-js/pull/100, Use new return type.
   withSpan<T extends (...args: unknown[]) => unknown>(
     span: Span,
     fn: T
@@ -45,10 +51,13 @@ export class NoopTracer implements Tracer {
   // By default does nothing
   recordSpanData(span: Span): void {}
 
-  getBinaryFormat(): unknown {
+  // By default does nothing
+  getBinaryFormat(): BinaryFormat {
     return NOOP_BINARY_FORMAT;
   }
 
+  // @todo: Use new interface https://github.com/open-telemetry/opentelemetry-js/pull/70
+  // By default does nothing
   getHttpTextFormat(): Propagator {
     return NOOP_HTTP_TEXT_FORMAT;
   }
