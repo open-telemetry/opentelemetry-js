@@ -80,6 +80,9 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.0.1"
+    "@types/uuid": "^3.4.5",
+    "@opentelemetry/types": "^0.0.1",
+    "@opentelemetry/scope-base": "^0.0.1",
+    "uuid": "^3.3.2"
   }
 }

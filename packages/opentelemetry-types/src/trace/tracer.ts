@@ -15,9 +15,13 @@
  */
 
 import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
+import { BinaryFormat } from '../context/propagation/BinaryFormat';
+import { Attributes } from './attributes';
+import { Sampler } from './Sampler';
+import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
-import { BinaryFormat } from '../context/propagation/BinaryFormat';
+import { Logger } from '../common/Logger';
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
@@ -49,9 +53,11 @@ export interface Tracer {
    * Executes the function given by fn within the context provided by Span
    *
    * @param span The span that provides the context
-   * @param fn The function to be eexcuted inside the provided context
+   * @param fn The function to be executed inside the provided context
+   * @example
+   * tracer.withSpan(span, function() { ... });
    */
-  withSpan<T extends (...args: unknown[]) => unknown>(
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
     fn: T
   ): ReturnType<T>;
@@ -87,4 +93,29 @@ export interface Tracer {
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
    */
   getHttpTextFormat(): HttpTextFormat;
+}
+
+/**
+ * TracerConfig provides an interface for configuring a Tracer.
+ */
+export interface TracerConfig {
+  /**
+   * User provided logger.
+   */
+  logger?: Logger;
+  /**
+   * Attributed that will be applied on every span created by Tracer.
+   * Useful to add infrastructure and environment information to your spans.
+   */
+  defaultAttributes?: Attributes;
+
+  /**
+   * Scope manager keeps context across in-process operations.
+   */
+  scopeManager?: ScopeManager;
+
+  /**
+   * Sampler determinates if a span should be recorded or should be a NoopSpan.
+   */
+  sampler?: Sampler;
 }
