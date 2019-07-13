@@ -31,13 +31,13 @@ import { BasicTracerConfig } from '../src/types';
 export class BasicTracer implements types.Tracer {
   static INVALID_ID = '0';
 
-  private defaultAttributes: types.Attributes;
-  private logger: types.Logger;
-  private sampler: types.Sampler;
+  private _defaultAttributes: types.Attributes;
+  private _logger: types.Logger;
+  private _sampler: types.Sampler;
   // TODO: change type to "ScopeManager"
   // TODO: discuss default ScopeManager (undefined, NoopScopeManager etc.)
   // TODO: discuss behaviour without scope manager / with NoopScopeManager: log, throw, swallow etc.
-  private scopeManager?: BaseScopeManager;
+  private _scopeManager?: BaseScopeManager;
 
   // TODO: consume invalid span context from `SpanContext.INVALID`
   static defaultSpan = new NoopSpan({
@@ -51,10 +51,10 @@ export class BasicTracer implements types.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig = {}) {
-    this.sampler = config.sampler || NEVER_SAMPLER;
-    this.scopeManager = config.scopeManager;
-    this.defaultAttributes = config.defaultAttributes || {};
-    this.logger = config.logger || new NoopLogger();
+    this._sampler = config.sampler || NEVER_SAMPLER;
+    this._scopeManager = config.scopeManager;
+    this._defaultAttributes = config.defaultAttributes || {};
+    this._logger = config.logger || new NoopLogger();
   }
 
   /**
@@ -80,7 +80,7 @@ export class BasicTracer implements types.Tracer {
     }
 
     // make sampling decision
-    if (!this.sampler.shouldSample(parentSpanContext)) {
+    if (!this._sampler.shouldSample(parentSpanContext)) {
       return BasicTracer.defaultSpan;
     }
 
@@ -97,7 +97,7 @@ export class BasicTracer implements types.Tracer {
     });
 
     // Set default attributes
-    span.setAttributes(this.defaultAttributes);
+    span.setAttributes(this._defaultAttributes);
 
     return span;
   }
@@ -107,15 +107,15 @@ export class BasicTracer implements types.Tracer {
    */
   getCurrentSpan(): types.Span {
     // Return with defaultSpan if no scope manager provided.
-    if (!this.scopeManager) {
-      this.logger.warn(
+    if (!this._scopeManager) {
+      this._logger.warn(
         'getCurrentSpan() returns an invalid default span without a scopeManager'
       );
       return BasicTracer.defaultSpan;
     }
 
     // Get the current Span from the context.
-    return this.scopeManager.active() as types.Span;
+    return this._scopeManager.active() as types.Span;
   }
 
   /**
@@ -125,13 +125,13 @@ export class BasicTracer implements types.Tracer {
     span: types.Span,
     fn: T
   ): ReturnType<T> {
-    if (!this.scopeManager) {
-      this.logger.warn('withSpan(...) has no effect without a scopeManager');
+    if (!this._scopeManager) {
+      this._logger.warn('withSpan(...) has no effect without a scopeManager');
       return fn();
     }
 
     // Set given span to context.
-    return this.scopeManager.with(span, fn);
+    return this._scopeManager.with(span, fn);
   }
 
   /**
