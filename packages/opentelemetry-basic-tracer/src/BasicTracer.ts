@@ -34,6 +34,9 @@ export class BasicTracer implements types.Tracer {
   private defaultAttributes: types.Attributes;
   private logger: types.Logger;
   private sampler: types.Sampler;
+  // TODO: change type to "ScopeManager"
+  // TODO: discuss default ScopeManager (undefined, NoopScopeManager etc.)
+  // TODO: discuss behaviour without scope manager / with NoopScopeManager: log, throw, swallow etc.
   private scopeManager?: BaseScopeManager;
 
   // TODO: consume invalid span context from `SpanContext.INVALID`
