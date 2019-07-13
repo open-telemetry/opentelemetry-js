@@ -16,6 +16,7 @@
 
 import * as types from '@opentelemetry/types';
 import { randomSpanId, randomTraceId } from '../platform';
+import { isValid } from './spancontext-utils';
 
 /**
  * This class represents a span.
@@ -46,12 +47,14 @@ export class Span implements types.Span {
     this._name = _spanName;
     this._kind = _options.kind || types.SpanKind.INTERNAL;
     this._spanId = randomSpanId();
-    if (_options.parent) {
-      const spanContext = this._getSpanContext(_options.parent);
+    const spanContext = this._getSpanContext(_options.parent);
+    if (spanContext && isValid(spanContext)) {
+      // New child span.
       this._traceId = spanContext.traceId;
       this._parentId = spanContext.spanId;
       this._traceState = spanContext.traceState;
     } else {
+      // This is a root span so no remote or local parent.
       this._traceId = randomTraceId();
     }
     this._startTime = _options.startTime || performance.now();
@@ -74,44 +77,52 @@ export class Span implements types.Span {
   }
 
   setAttribute(key: string, value: unknown): this {
-    this.setAttributes({ key: value });
+    if (this._isSpanEnded()) return this;
+
+    try {
+      // If the value is a typeof object it has to be JSON.stringify-able
+      const serializedValue =
+        typeof value === 'object' ? JSON.stringify(value) : value;
+      this._attributes[key] = serializedValue;
+    } catch (e) {
+      // @todo: log error
+    }
     return this;
   }
 
   setAttributes(attributes: types.Attributes): this {
-    if (this._ended) return this;
     Object.keys(attributes).forEach(key => {
-      this._attributes[key] = attributes[key];
+      this.setAttribute(key, attributes[key]);
     });
     return this;
   }
 
   addEvent(name: string, attributes?: types.Attributes): this {
-    if (this._ended) return this;
+    if (this._isSpanEnded()) return this;
     this._events.push({ name, attributes });
     return this;
   }
 
   addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
-    if (this._ended) return this;
+    if (this._isSpanEnded()) return this;
     this._links.push({ spanContext, attributes });
     return this;
   }
 
   setStatus(status: types.Status): this {
-    if (this._ended) return this;
+    if (this._isSpanEnded()) return this;
     this._status = status;
     return this;
   }
 
   updateName(name: string): this {
-    if (this._ended) return this;
+    if (this._isSpanEnded()) return this;
     this._name = name;
     return this;
   }
 
   end(endTime?: number): void {
-    if (this._ended) return;
+    if (this._isSpanEnded()) return;
     this._ended = true;
     const finishTime = endTime || performance.now();
     this._duration = finishTime - this._startTime;
@@ -136,12 +147,21 @@ export class Span implements types.Span {
   }
 
   private _getSpanContext(
-    parent: types.Span | types.SpanContext
-  ): types.SpanContext {
+    parent: types.Span | types.SpanContext | undefined
+  ): types.SpanContext | undefined {
+    if (!parent) return undefined;
+
     // parent is a SpanContext
     if (typeof (parent as types.SpanContext).traceId) {
       return parent as types.SpanContext;
     }
     return (parent as Span).context();
+  }
+
+  private _isSpanEnded(): boolean {
+    if (this._ended) {
+      // @todo: log a warning
+    }
+    return this._ended;
   }
 }
