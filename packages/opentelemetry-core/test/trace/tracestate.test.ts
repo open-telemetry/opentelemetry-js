@@ -79,9 +79,23 @@ describe('TraceState', () => {
       assert.deepStrictEqual(state.serialize(), 'a=1,c=3');
     });
 
-    it('must parse states that only have a single value with an equal sign', () => {
+    it('must skip states that only have a single value with an equal sign', () => {
       const state = new TraceState('a=1=');
-      assert.deepStrictEqual(state.get('a'), '1=');
+      assert.deepStrictEqual(state.get('a'), undefined);
+    });
+
+    it('must successfully parse valid state keys', () => {
+      const state = new TraceState('a-b=1,c/d=2,p*q=3,x_y=4');
+      assert.deepStrictEqual(state.get('a-b'), '1');
+      assert.deepStrictEqual(state.get('c/d'), '2');
+      assert.deepStrictEqual(state.get('p*q'), '3');
+      assert.deepStrictEqual(state.get('x_y'), '4');
+    });
+
+    it('must successfully parse valid state value with spaces in between', () => {
+      const state = new TraceState('a=1,foo=bar baz');
+      assert.deepStrictEqual(state.get('foo'), 'bar baz');
+      assert.deepStrictEqual(state.serialize(), 'a=1,foo=bar baz');
     });
   });
 });
