@@ -1,4 +1,4 @@
-OpenTelemetry ContextManager API
+OpenTelemetry Base Scope Manager
 ======================================================
 
 TODO

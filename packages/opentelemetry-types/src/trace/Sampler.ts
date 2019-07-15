@@ -23,11 +23,6 @@ import { SpanContext } from './span_context';
  */
 export interface Sampler {
   /**
-   * A string that uniquely describes the sampling behavior of this instance.
-   */
-  readonly description: string;
-
-  /**
    * Checks whether span needs to be created and tracked.
    *
    * TODO: Consider to add required arguments https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sampling-api.md#shouldsample
@@ -36,4 +31,7 @@ export interface Sampler {
    * @returns whether span should be sampled or not.
    */
   shouldSample(parentContext?: SpanContext): boolean;
+
+  /** Returns the sampler name or short description with the configuration. */
+  toString(): string;
 }
