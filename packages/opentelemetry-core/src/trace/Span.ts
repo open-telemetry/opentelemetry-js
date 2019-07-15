@@ -17,6 +17,7 @@
 import * as types from '@opentelemetry/types';
 import { randomSpanId, randomTraceId } from '../platform';
 import { isValid } from './spancontext-utils';
+import { performance } from 'perf_hooks';
 
 /**
  * This class represents a span.
@@ -26,14 +27,11 @@ export class Span implements types.Span {
   private _spanId: string;
   private _parentId?: string;
   private _traceState?: types.TraceState;
-  private _name: string;
   private _kind: types.SpanKind;
   private _attributes: types.Attributes = {};
   private _links: types.Link[] = [];
   private _events: types.Event[] = [];
-  private _status: types.Status = {
-    code: types.CanonicalCode.OK,
-  };
+  private _status: types.Status = types.DEFAULT_STATUS_OK;
   private _ended = false;
   private _startTime: number;
   private _duration = 0;
@@ -41,10 +39,9 @@ export class Span implements types.Span {
   /** Constructs a new Span instance. */
   constructor(
     readonly _parentTracer: types.Tracer,
-    readonly _spanName: string,
+    private _spanName: string,
     readonly _options: types.SpanOptions
   ) {
-    this._name = _spanName;
     this._kind = _options.kind || types.SpanKind.INTERNAL;
     this._spanId = randomSpanId();
     const spanContext = this._getSpanContext(_options.parent);
@@ -70,6 +67,7 @@ export class Span implements types.Span {
       spanId: this._spanId,
       traceOptions: types.TraceOptions.SAMPLED,
     };
+
     if (this._traceState) {
       spanContext.traceState = this._traceState;
     }
@@ -117,7 +115,7 @@ export class Span implements types.Span {
 
   updateName(name: string): this {
     if (this._isSpanEnded()) return this;
-    this._name = name;
+    this._spanName = name;
     return this;
   }
 
@@ -138,7 +136,7 @@ export class Span implements types.Span {
       traceId: this._traceId,
       spanId: this._spanId,
       parentId: this._parentId,
-      name: this._name,
+      name: this._spanName,
       kind: this._kind,
       status: this._status,
       duration: this._duration,

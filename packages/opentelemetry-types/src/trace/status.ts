@@ -163,3 +163,7 @@ export enum CanonicalCode {
    */
   UNAUTHENTICATED = 16,
 }
+
+export const DEFAULT_STATUS_OK = {
+  code: CanonicalCode.OK,
+};
