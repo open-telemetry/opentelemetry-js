@@ -66,7 +66,6 @@ export class TraceState implements types.TraceState {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
-      .slice(0, MAX_TRACE_STATE_ITEMS)
       .reverse()
       .reduce((agg: Map<string, string>, part: string) => {
         const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
@@ -81,6 +80,15 @@ export class TraceState implements types.TraceState {
         }
         return agg;
       }, new Map());
+
+    // Because of the reverse() requirement, trunc must be done after map is created
+    if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
+      this._internalState = new Map(
+        Array.from(this._internalState.entries())
+          .reverse()
+          .slice(0, MAX_TRACE_STATE_ITEMS)
+      );
+    }
   }
 
   private _keys(): string[] {
