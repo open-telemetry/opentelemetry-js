@@ -24,8 +24,9 @@ import {
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
 import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
 import { NoopSpan } from './NoopSpan';
+import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
-export const NOOP_SPAN = new NoopSpan({ traceId: '', spanId: '' });
+export const NOOP_SPAN = new NoopSpan(INVALID_SPAN_CONTEXT);
 
 /**
  * No-op implementations of {@link Tracer}.
