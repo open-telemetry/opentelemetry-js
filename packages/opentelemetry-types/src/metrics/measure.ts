@@ -27,7 +27,7 @@ export interface MeasureOptions {
   unit?: string;
 
   // Type of the Measure. Default type is DOUBLE.
-  type?: MeasureType,
+  type?: MeasureType;
 }
 
 export interface Measure {

@@ -34,7 +34,10 @@ export interface Meter {
   createMeasure(name: string, options?: MeasureOptions): Measure;
 
   // Creates a new counter metric.
-  createCounter(name: string, options?: MetricOptions): Metric<CounterTimeseries>;
+  createCounter(
+    name: string,
+    options?: MetricOptions
+  ): Metric<CounterTimeseries>;
 
   // TODO: Measurements can have a long or double type. However, it looks like
   // the metric timeseries API (according to spec) accepts values instead of
@@ -50,4 +53,3 @@ export interface Meter {
   // Record a set of raw measurements.
   record(measurements: Measurement[], options?: RecordOptions): void;
 }
-
