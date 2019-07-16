@@ -16,7 +16,7 @@
 
 export * from './common/Logger';
 export * from './context/propagation/BinaryFormat';
-export * from './context/propagation/Propagator';
+export * from './context/propagation/HttpTextFormat';
 export * from './distributed_context/DistributedContext';
 export * from './distributed_context/EntryValue';
 export * from './resources/Resource';
