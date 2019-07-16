@@ -16,62 +16,59 @@
 
 import * as types from '@opentelemetry/types';
 import { randomSpanId, randomTraceId } from '../platform';
-import { isValid } from './spancontext-utils';
+import { isValid, INVALID_SPAN_CONTEXT } from './spancontext-utils';
 import { performance } from 'perf_hooks';
+import { TraceOptions } from '@opentelemetry/types';
 
 /**
  * This class represents a span.
  */
 export class Span implements types.Span {
-  private _traceId: string;
-  private _spanId: string;
+  private _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT;
+  private _tracer: types.Tracer;
+  private _name: string;
   private _parentId?: string;
-  private _traceState?: types.TraceState;
   private _kind: types.SpanKind;
   private _attributes: types.Attributes = {};
   private _links: types.Link[] = [];
   private _events: types.Event[] = [];
   private _status: types.Status = types.DEFAULT_STATUS_OK;
+  private _isRecordingEvents: boolean;
   private _ended = false;
   private _startTime: number;
   private _duration = 0;
 
   /** Constructs a new Span instance. */
   constructor(
-    readonly _parentTracer: types.Tracer,
-    private _spanName: string,
-    readonly _options: types.SpanOptions
+    parentTracer: types.Tracer,
+    spanName: string,
+    options: types.SpanOptions
   ) {
-    this._kind = _options.kind || types.SpanKind.INTERNAL;
-    this._spanId = randomSpanId();
-    const spanContext = this._getSpanContext(_options.parent);
-    if (spanContext && isValid(spanContext)) {
+    this._tracer = parentTracer;
+    this._name = spanName;
+    this._spanContext.spanId = randomSpanId();
+    this._spanContext.traceOptions = TraceOptions.SAMPLED;
+    const parentSpanContext = this._getParentSpanContext(options.parent);
+    if (parentSpanContext && isValid(parentSpanContext)) {
       // New child span.
-      this._traceId = spanContext.traceId;
-      this._parentId = spanContext.spanId;
-      this._traceState = spanContext.traceState;
+      this._spanContext.traceId = parentSpanContext.traceId;
+      this._spanContext.traceState = parentSpanContext.traceState;
+      this._parentId = parentSpanContext.spanId;
     } else {
       // This is a root span so no remote or local parent.
-      this._traceId = randomTraceId();
+      this._spanContext.traceId = randomTraceId();
     }
-    this._startTime = _options.startTime || performance.now();
+    this._kind = options.kind || types.SpanKind.INTERNAL;
+    this._isRecordingEvents = options.isRecordingEvents || false;
+    this._startTime = options.startTime || performance.now();
   }
 
   tracer(): types.Tracer {
-    return this._parentTracer;
+    return this._tracer;
   }
 
   context(): types.SpanContext {
-    const spanContext: types.SpanContext = {
-      traceId: this._traceId,
-      spanId: this._spanId,
-      traceOptions: types.TraceOptions.SAMPLED,
-    };
-
-    if (this._traceState) {
-      spanContext.traceState = this._traceState;
-    }
-    return spanContext;
+    return this._spanContext;
   }
 
   setAttribute(key: string, value: unknown): this {
@@ -115,7 +112,7 @@ export class Span implements types.Span {
 
   updateName(name: string): this {
     if (this._isSpanEnded()) return this;
-    this._spanName = name;
+    this._name = name;
     return this;
   }
 
@@ -128,15 +125,15 @@ export class Span implements types.Span {
   }
 
   isRecordingEvents(): boolean {
-    return this._options.isRecordingEvents || false;
+    return this._isRecordingEvents;
   }
 
   toString() {
     const json = JSON.stringify({
-      traceId: this._traceId,
-      spanId: this._spanId,
+      traceId: this._spanContext.traceId,
+      spanId: this._spanContext.spanId,
       parentId: this._parentId,
-      name: this._spanName,
+      name: this._name,
       kind: this._kind,
       status: this._status,
       duration: this._duration,
@@ -144,7 +141,7 @@ export class Span implements types.Span {
     return `Span${json}`;
   }
 
-  private _getSpanContext(
+  private _getParentSpanContext(
     parent: types.Span | types.SpanContext | undefined
   ): types.SpanContext | undefined {
     if (!parent) return undefined;
