@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-import { Propagator, SpanContext } from '@opentelemetry/types';
+import { HttpTextFormat, SpanContext } from '@opentelemetry/types';
 
 /**
- * No-op implementations of {@link Propagator}.
- *
- * @todo: Change Propagator to HttpTextFormat based on https://github.com/open-telemetry/opentelemetry-js/pull/70
+ * No-op implementations of {@link HttpTextFormat}.
  */
-class NoopHttpTextFormat implements Propagator {
+class NoopHttpTextFormat implements HttpTextFormat {
   // By default does nothing
   inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
   // By default does nothing

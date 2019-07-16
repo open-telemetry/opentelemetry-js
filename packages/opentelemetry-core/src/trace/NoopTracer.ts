@@ -18,7 +18,7 @@ import {
   Tracer,
   SpanOptions,
   Span,
-  Propagator,
+  HttpTextFormat,
   BinaryFormat,
 } from '@opentelemetry/types';
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
@@ -57,9 +57,8 @@ export class NoopTracer implements Tracer {
     return NOOP_BINARY_FORMAT;
   }
 
-  // @todo: Use new interface https://github.com/open-telemetry/opentelemetry-js/pull/70
   // By default does nothing
-  getHttpTextFormat(): Propagator {
+  getHttpTextFormat(): HttpTextFormat {
     return NOOP_HTTP_TEXT_FORMAT;
   }
 }
