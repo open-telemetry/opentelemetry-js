@@ -14,5 +14,29 @@
  * limitations under the License.
  */
 
-export * from './types';
-export * from './NoopScopeManager';
+import * as types from './types';
+
+export class NoopScopeManager implements types.ScopeManager {
+  active(): unknown {
+    return null;
+  }
+
+  with<T extends (...args: unknown[]) => ReturnType<T>>(
+    scope: unknown,
+    fn: T
+  ): ReturnType<T> {
+    return fn();
+  }
+
+  bind<T>(target: T, scope?: unknown): T {
+    return target;
+  }
+
+  enable(): this {
+    return this;
+  }
+
+  disable(): this {
+    return this;
+  }
+}
