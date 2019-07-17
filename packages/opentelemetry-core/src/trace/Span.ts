@@ -73,15 +73,7 @@ export class Span implements types.Span {
 
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
-
-    try {
-      // If the value is a typeof object it has to be JSON.stringify-able
-      const serializedValue =
-        typeof value === 'object' ? JSON.stringify(value) : value;
-      this._attributes[key] = serializedValue;
-    } catch (e) {
-      // @todo: log error
-    }
+    this._attributes[key] = value;
     return this;
   }
 
