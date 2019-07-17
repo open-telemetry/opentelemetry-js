@@ -27,6 +27,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
+    "gts": "^1.0.0",
     "lerna": "^3.13.4",
     "typescript": "^3.4.5"
   }
