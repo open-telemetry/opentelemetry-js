@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,7 +14,22 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/HttpTraceContext';
-export * from './resources/Resource';
-export * from './trace/NoopSpan';
-export * from './trace/NoopTracer';
+import { SpanContext, BinaryFormat } from '@opentelemetry/types';
+
+/**
+ * No-op implementations of {@link BinaryFormat}.
+ */
+class NoopBinaryFormat implements BinaryFormat {
+  private readonly _buff = new ArrayBuffer(0);
+  // By default does nothing
+  toBytes(spanContext: SpanContext): ArrayBuffer {
+    return this._buff;
+  }
+
+  // By default does nothing
+  fromBytes(buf: ArrayBuffer): SpanContext | null {
+    return null;
+  }
+}
+
+export const NOOP_BINARY_FORMAT = new NoopBinaryFormat();

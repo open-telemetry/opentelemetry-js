@@ -1,0 +1,64 @@
+/**
+ * Copyright 2019, OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import {
+  Tracer,
+  SpanOptions,
+  Span,
+  HttpTextFormat,
+  BinaryFormat,
+} from '@opentelemetry/types';
+import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
+import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
+import { NoopSpan } from './NoopSpan';
+import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
+
+export const NOOP_SPAN = new NoopSpan(INVALID_SPAN_CONTEXT);
+
+/**
+ * No-op implementations of {@link Tracer}.
+ */
+export class NoopTracer implements Tracer {
+  getCurrentSpan(): Span {
+    return NOOP_SPAN;
+  }
+
+  // startSpan starts a noop span.
+  startSpan(name: string, options?: SpanOptions): Span {
+    return NOOP_SPAN;
+  }
+
+  // @todo: dependency on https://github.com/open-telemetry/opentelemetry-js/pull/100, Use new return type.
+  withSpan<T extends (...args: unknown[]) => unknown>(
+    span: Span,
+    fn: T
+  ): ReturnType<T> {
+    throw new Error('Method not implemented.');
+  }
+
+  // By default does nothing
+  recordSpanData(span: Span): void {}
+
+  // By default does nothing
+  getBinaryFormat(): BinaryFormat {
+    return NOOP_BINARY_FORMAT;
+  }
+
+  // By default does nothing
+  getHttpTextFormat(): HttpTextFormat {
+    return NOOP_HTTP_TEXT_FORMAT;
+  }
+}
