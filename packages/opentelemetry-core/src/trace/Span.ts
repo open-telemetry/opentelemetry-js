@@ -33,7 +33,6 @@ export class Span implements types.Span {
   private _links: types.Link[] = [];
   private _events: types.Event[] = [];
   private _status: types.Status = types.DEFAULT_STATUS_OK;
-  private _isRecordingEvents: boolean;
   private _ended = false;
   private _startTime: number;
   private _duration = 0;
@@ -59,7 +58,6 @@ export class Span implements types.Span {
       this._spanContext.traceId = randomTraceId();
     }
     this._kind = options.kind || types.SpanKind.INTERNAL;
-    this._isRecordingEvents = options.isRecordingEvents || false;
     this._startTime = options.startTime || performance.now();
   }
 
@@ -117,7 +115,7 @@ export class Span implements types.Span {
   }
 
   isRecordingEvents(): boolean {
-    return this._isRecordingEvents;
+    return true;
   }
 
   toString() {
@@ -139,7 +137,7 @@ export class Span implements types.Span {
     if (!parent) return undefined;
 
     // parent is a SpanContext
-    if (typeof (parent as types.SpanContext).traceId) {
+    if ((parent as types.SpanContext).traceId) {
       return parent as types.SpanContext;
     }
     return (parent as Span).context();

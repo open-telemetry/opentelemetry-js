@@ -72,7 +72,7 @@ describe('Span', () => {
     assert.strictEqual(context.traceOptions, spanContext.traceOptions);
     assert.strictEqual(context.traceState, undefined);
     assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-    assert.ok(!span.isRecordingEvents());
+    assert.ok(span.isRecordingEvents());
   });
 
   it('should return true when isRecordingEvents:true', () => {
