@@ -65,10 +65,7 @@ export class BasicTracer implements types.Tracer {
     let parentSpanContext: types.SpanContext | undefined;
 
     // parent is a SpanContext
-    if (
-      options.parent &&
-      typeof (options.parent as types.SpanContext).traceId
-    ) {
+    if (options.parent && (options.parent as types.SpanContext).traceId) {
       parentSpanContext = options.parent as types.SpanContext;
     }
     // parent is a Span
