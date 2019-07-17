@@ -16,12 +16,32 @@
 
 import * as assert from 'assert';
 import { BasicTracer } from '../src/BasicTracer';
-import { ALWAYS_SAMPLER, NEVER_SAMPLER, NoopLogger } from '@opentelemetry/core';
+import {
+  BinaryTraceContext,
+  HttpTraceContext,
+  ALWAYS_SAMPLER,
+  NEVER_SAMPLER,
+  NoopLogger,
+} from '@opentelemetry/core';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
     it('should construct an instance without options', () => {
       const tracer = new BasicTracer();
+      assert.ok(tracer instanceof BasicTracer);
+    });
+
+    it('should construct an instance with binary format', () => {
+      const tracer = new BasicTracer({
+        binaryFormat: new BinaryTraceContext(),
+      });
+      assert.ok(tracer instanceof BasicTracer);
+    });
+
+    it('should construct an instance with http text format', () => {
+      const tracer = new BasicTracer({
+        httpTextFormat: new HttpTraceContext(),
+      });
       assert.ok(tracer instanceof BasicTracer);
     });
 
@@ -101,10 +121,16 @@ describe('BasicTracer', () => {
   });
 
   describe('#getBinaryFormat', () => {
-    it('should get binary formatter');
+    it('should get default binary formatter', () => {
+      const tracer = new BasicTracer();
+      assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
+    });
   });
 
   describe('#getHttpTextFormat', () => {
-    it('should get HTTP text formatter');
+    it('should get default HTTP text formatter', () => {
+      const tracer = new BasicTracer();
+      assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
+    });
   });
 });

@@ -14,17 +14,24 @@
  * limitations under the License.
  */
 
-import { BaseScopeManager } from '@opentelemetry/scope-base';
-import { Attributes, Sampler, Logger } from '@opentelemetry/types';
+import { ScopeManager } from '@opentelemetry/scope-base';
+import {
+  Attributes,
+  BinaryFormat,
+  HttpTextFormat,
+  Logger,
+  Sampler,
+} from '@opentelemetry/types';
 
 /**
  * BasicTracerConfig provides an interface for configuring a Basic Tracer.
  */
 export interface BasicTracerConfig {
   /**
-   * User provided logger.
+   * Binary formatter which can serialize/deserialize Spans.
    */
-  logger?: Logger;
+  binaryFormat?: BinaryFormat;
+
   /**
    * Attributed that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.
@@ -32,12 +39,22 @@ export interface BasicTracerConfig {
   defaultAttributes?: Attributes;
 
   /**
-   * Scope manager keeps context across in-process operations.
+   * HTTP text formatter which can inject/extract Spans.
    */
-  scopeManager?: BaseScopeManager;
+  httpTextFormat?: HttpTextFormat;
+
+  /**
+   * User provided logger.
+   */
+  logger?: Logger;
 
   /**
    * Sampler determinates if a span should be recorded or should be a NoopSpan.
    */
   sampler?: Sampler;
+
+  /**
+   * Scope manager keeps context across in-process operations.
+   */
+  scopeManager?: ScopeManager;
 }

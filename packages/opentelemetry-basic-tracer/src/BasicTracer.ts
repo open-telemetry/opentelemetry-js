@@ -15,8 +15,10 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { BaseScopeManager } from '@opentelemetry/scope-base';
+import { ScopeManager } from '@opentelemetry/scope-base';
 import {
+  BinaryTraceContext,
+  HttpTraceContext,
   NoopLogger,
   NoopSpan,
   randomSpanId,
@@ -33,11 +35,12 @@ export class BasicTracer implements types.Tracer {
 
   private _defaultAttributes: types.Attributes;
   private _logger: types.Logger;
+  private _binaryFormat: types.BinaryFormat;
+  private _httpTextFormat: types.HttpTextFormat;
   private _sampler: types.Sampler;
-  // TODO: change type to "ScopeManager"
   // TODO: discuss default ScopeManager (undefined, NoopScopeManager etc.)
   // TODO: discuss behaviour without scope manager / with NoopScopeManager: log, throw, swallow etc.
-  private _scopeManager?: BaseScopeManager;
+  private _scopeManager?: ScopeManager;
 
   // TODO: consume invalid span context from `SpanContext.INVALID`
   static defaultSpan = new NoopSpan({
@@ -51,10 +54,12 @@ export class BasicTracer implements types.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig = {}) {
+    this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
+    this._defaultAttributes = config.defaultAttributes || {};
+    this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
+    this._logger = config.logger || new NoopLogger();
     this._sampler = config.sampler || NEVER_SAMPLER;
     this._scopeManager = config.scopeManager;
-    this._defaultAttributes = config.defaultAttributes || {};
-    this._logger = config.logger || new NoopLogger();
   }
 
   /**
@@ -142,15 +147,13 @@ export class BasicTracer implements types.Tracer {
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
   getBinaryFormat(): unknown {
-    // TODO: get binary format form propagation
-    throw new Error('Method not implemented.');
+    return this._binaryFormat;
   }
 
   /**
    * Returns the HTTP text format interface which can inject/extract Spans.
    */
   getHttpTextFormat(): unknown {
-    // TODO: get binary format form propagation
-    throw new Error('Method not implemented.');
+    return this._httpTextFormat;
   }
 }

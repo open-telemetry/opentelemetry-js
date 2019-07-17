@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export * from './common/NoopLogger';
 export * from './context/propagation/BinaryTraceContext';
 export * from './context/propagation/HttpTraceContext';
 export * from './common/NoopLogger';
