@@ -36,6 +36,7 @@ describe('Span', () => {
   it('should create a Span instance', () => {
     const span = new Span(tracer, name, { kind: SpanKind.SERVER });
     assert.ok(span instanceof Span);
+    assert.strictEqual(span.tracer(), tracer);
   });
 
   it('should get the span context of span', () => {
@@ -83,5 +84,15 @@ describe('Span', () => {
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
     });
+  });
+
+  it('should return toString', () => {
+    const span = new Span(tracer, name, { kind: SpanKind.SERVER });
+    const context = span.context();
+
+    assert.strictEqual(
+      span.toString(),
+      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","name":"${name}","kind":1,"status":{"code":0},"duration":0}`
+    );
   });
 });
