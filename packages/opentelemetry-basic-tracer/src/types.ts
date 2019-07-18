@@ -56,5 +56,5 @@ export interface BasicTracerConfig {
   /**
    * Scope manager keeps context across in-process operations.
    */
-  scopeManager?: ScopeManager;
+  scopeManager: ScopeManager;
 }

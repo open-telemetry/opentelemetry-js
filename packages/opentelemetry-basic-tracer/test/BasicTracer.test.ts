@@ -23,17 +23,21 @@ import {
   NEVER_SAMPLER,
   NoopLogger,
 } from '@opentelemetry/core';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
-    it('should construct an instance without options', () => {
-      const tracer = new BasicTracer();
+    it('should construct an instance with required only options', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with binary format', () => {
       const tracer = new BasicTracer({
         binaryFormat: new BinaryTraceContext(),
+        scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
@@ -41,21 +45,26 @@ describe('BasicTracer', () => {
     it('should construct an instance with http text format', () => {
       const tracer = new BasicTracer({
         httpTextFormat: new HttpTraceContext(),
+        scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with logger', () => {
-      const tracer = new BasicTracer({ logger: new NoopLogger() });
+      const tracer = new BasicTracer({
+        logger: new NoopLogger(),
+        scopeManager: new NoopScopeManager(),
+      });
       assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with sampler', () => {
-      const tracer = new BasicTracer({ sampler: ALWAYS_SAMPLER });
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        sampler: ALWAYS_SAMPLER,
+      });
       assert.ok(tracer instanceof BasicTracer);
     });
-
-    it('should construct an instance with scope manager');
 
     it('should construct an instance with propagation');
 
@@ -65,6 +74,7 @@ describe('BasicTracer', () => {
           region: 'eu-west',
           asg: 'my-asg',
         },
+        scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
@@ -72,19 +82,26 @@ describe('BasicTracer', () => {
 
   describe('#startSpan', () => {
     it('should start a span with name only', () => {
-      const tracer = new BasicTracer();
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       const span = tracer.startSpan('my-span');
       assert.ok(span);
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new BasicTracer();
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
     });
 
     it('should return a default span with no sampling', () => {
-      const tracer = new BasicTracer({ sampler: NEVER_SAMPLER });
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
       const span = tracer.startSpan('my-span');
       assert.deepStrictEqual(span, BasicTracer.defaultSpan);
     });
@@ -95,25 +112,25 @@ describe('BasicTracer', () => {
   });
 
   describe('#getCurrentSpan', () => {
-    it('should return default span without scope manager', () => {
-      const tracer = new BasicTracer();
+    it('should return null with NoopScopeManager', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       const currentSpan = tracer.getCurrentSpan();
-      assert.deepStrictEqual(currentSpan, BasicTracer.defaultSpan);
+      assert.deepStrictEqual(currentSpan, null);
     });
-
-    it('should return a span with scope manager');
   });
 
   describe('#withSpan', () => {
-    it('should run scope without scope manager', done => {
-      const tracer = new BasicTracer();
+    it('should run scope with NoopScopeManager scope manager', done => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         return done();
       });
     });
-
-    it('should run and set scope with scope manager');
   });
 
   describe('#recordSpanData', () => {
@@ -122,14 +139,18 @@ describe('BasicTracer', () => {
 
   describe('#getBinaryFormat', () => {
     it('should get default binary formatter', () => {
-      const tracer = new BasicTracer();
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
     });
   });
 
   describe('#getHttpTextFormat', () => {
     it('should get default HTTP text formatter', () => {
-      const tracer = new BasicTracer();
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
     });
   });

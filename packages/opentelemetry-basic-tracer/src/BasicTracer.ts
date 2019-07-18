@@ -26,6 +26,7 @@ import {
   NEVER_SAMPLER,
 } from '@opentelemetry/core';
 import { BasicTracerConfig } from '../src/types';
+import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
 
 /**
  * This class represents a basic tracer.
@@ -38,9 +39,7 @@ export class BasicTracer implements types.Tracer {
   private _binaryFormat: types.BinaryFormat;
   private _httpTextFormat: types.HttpTextFormat;
   private _sampler: types.Sampler;
-  // TODO: discuss default ScopeManager (undefined, NoopScopeManager etc.)
-  // TODO: discuss behaviour without scope manager / with NoopScopeManager: log, throw, swallow etc.
-  private _scopeManager?: ScopeManager;
+  private _scopeManager: ScopeManager;
 
   // TODO: consume invalid span context from `SpanContext.INVALID`
   static defaultSpan = new NoopSpan({
@@ -53,7 +52,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig = {}) {
+  constructor(config: BasicTracerConfig) {
     this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
     this._defaultAttributes = config.defaultAttributes || {};
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
@@ -108,14 +107,6 @@ export class BasicTracer implements types.Tracer {
    * Returns the current Span from the current context.
    */
   getCurrentSpan(): types.Span {
-    // Return with defaultSpan if no scope manager provided.
-    if (!this._scopeManager) {
-      this._logger.warn(
-        'getCurrentSpan() returns an invalid default span without a scopeManager'
-      );
-      return BasicTracer.defaultSpan;
-    }
-
     // Get the current Span from the context.
     return this._scopeManager.active() as types.Span;
   }
@@ -127,11 +118,6 @@ export class BasicTracer implements types.Tracer {
     span: types.Span,
     fn: T
   ): ReturnType<T> {
-    if (!this._scopeManager) {
-      this._logger.warn('withSpan(...) has no effect without a scopeManager');
-      return fn();
-    }
-
     // Set given span to context.
     return this._scopeManager.with(span, fn);
   }
@@ -146,14 +132,14 @@ export class BasicTracer implements types.Tracer {
   /**
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
-  getBinaryFormat(): unknown {
+  getBinaryFormat(): BinaryFormat {
     return this._binaryFormat;
   }
 
   /**
    * Returns the HTTP text format interface which can inject/extract Spans.
    */
-  getHttpTextFormat(): unknown {
+  getHttpTextFormat(): HttpTextFormat {
     return this._httpTextFormat;
   }
 }
