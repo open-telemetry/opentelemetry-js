@@ -18,37 +18,11 @@ import * as assert from 'assert';
 import { Span } from '../../src/trace/Span';
 import {
   SpanKind,
-  Tracer,
   SpanContext,
   TraceOptions,
   CanonicalCode,
-  SpanOptions,
 } from '@opentelemetry/types';
-
-// @todo: remove after https://github.com/open-telemetry/opentelemetry-js/pull/99/
-class NoopTracer implements Tracer {
-  getCurrentSpan(): Span {
-    throw new Error('Method not implemented.');
-  }
-  startSpan(name: string, options?: SpanOptions | undefined): Span {
-    throw new Error('Method not implemented.');
-  }
-  withSpan<T extends (...args: unknown[]) => unknown>(
-    span: Span,
-    fn: T
-  ): ReturnType<T> {
-    throw new Error('Method not implemented.');
-  }
-  recordSpanData(span: Span): void {
-    throw new Error('Method not implemented.');
-  }
-  getBinaryFormat(): unknown {
-    throw new Error('Method not implemented.');
-  }
-  getHttpTextFormat(): unknown {
-    throw new Error('Method not implemented.');
-  }
-}
+import { NoopTracer } from '../../src';
 
 describe('Span', () => {
   const tracer = new NoopTracer();
