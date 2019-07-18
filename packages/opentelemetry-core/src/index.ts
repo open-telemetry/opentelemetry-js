@@ -22,3 +22,4 @@ export * from './resources/Resource';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/sampler/ProbabilitySampler';
+export * from './trace/spancontext-utils';

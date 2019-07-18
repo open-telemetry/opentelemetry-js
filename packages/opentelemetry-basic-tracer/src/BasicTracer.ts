@@ -19,10 +19,10 @@ import { ScopeManager } from '@opentelemetry/scope-base';
 import {
   BinaryTraceContext,
   HttpTraceContext,
-  NoopLogger,
   NoopSpan,
   randomSpanId,
   randomTraceId,
+  INVALID_SPAN_CONTEXT,
   NEVER_SAMPLER,
 } from '@opentelemetry/core';
 import { BasicTracerConfig } from '../src/types';
@@ -32,22 +32,13 @@ import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
  * This class represents a basic tracer.
  */
 export class BasicTracer implements types.Tracer {
-  static INVALID_ID = '0';
+  static defaultSpan = new NoopSpan(INVALID_SPAN_CONTEXT);
 
   private _defaultAttributes: types.Attributes;
-  private _logger: types.Logger;
   private _binaryFormat: types.BinaryFormat;
   private _httpTextFormat: types.HttpTextFormat;
   private _sampler: types.Sampler;
   private _scopeManager: ScopeManager;
-
-  // TODO: consume invalid span context from `SpanContext.INVALID`
-  static defaultSpan = new NoopSpan({
-    traceId: BasicTracer.INVALID_ID,
-    // TODO: consume invalid `spanId` from `Span.INVALID`
-    spanId: '0',
-    traceOptions: types.TraceOptions.UNSAMPLED,
-  });
 
   /**
    * Constructs a new Tracer instance.
@@ -56,7 +47,6 @@ export class BasicTracer implements types.Tracer {
     this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
     this._defaultAttributes = config.defaultAttributes || {};
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
-    this._logger = config.logger || new NoopLogger();
     this._sampler = config.sampler || NEVER_SAMPLER;
     this._scopeManager = config.scopeManager;
   }
