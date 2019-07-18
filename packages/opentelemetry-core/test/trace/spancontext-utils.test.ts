@@ -18,11 +18,6 @@ import * as assert from 'assert';
 import * as context from '../../src/trace/spancontext-utils';
 
 describe('spancontext-utils', () => {
-  it('should validate invalid values', () => {
-    assert.strictEqual(context.INVALID_SPANID, '0');
-    assert.strictEqual(context.INVALID_TRACEID, '0');
-  });
-
   it('should return true for valid spancontext', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
