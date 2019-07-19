@@ -20,7 +20,8 @@ import { Tracer } from '../tracer';
 export interface Plugin {
   /**
    * Method that enables the instrumentation patch.
-   * @param moduleExports nodejs module exports from the module to patch
+   * @param moduleExports The value of the `module.exports` property that would
+   *     normally be exposed by the required module. ex: `http`, `https` etc.
    * @param tracer a tracer instance
    */
   enable<T>(moduleExports: T, tracer: Tracer): T;
