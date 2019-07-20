@@ -72,6 +72,8 @@ export class BasicTracer implements types.Tracer {
 
     // make sampling decision
     if (!this._sampler.shouldSample(parentSpanContext)) {
+      // TODO: propagate SpanContext, for more information see
+      // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
       return BasicTracer.defaultSpan;
     }
 
