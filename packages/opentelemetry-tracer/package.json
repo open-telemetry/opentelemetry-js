@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/automatic-tracer",
+  "name": "@opentelemetry/tracer",
   "version": "0.0.1",
   "description": "OpenTelemetry Automatic Tracer",
   "main": "build/src/index.js",
