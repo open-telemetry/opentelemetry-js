@@ -1,0 +1,57 @@
+{
+  "name": "@opentelemetry/tracer",
+  "version": "0.0.1",
+  "description": "OpenTelemetry Automatic Tracer",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "c8 ts-mocha -p tsconfig.json test/**/*.ts",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "clean": "rimraf build/*",
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "posttest": "yarn run check"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^12.0.10",
+    "c8": "^5.0.1",
+    "codecov": "^3.1.0",
+    "gts": "^1.0.0",
+    "mocha": "^6.1.0",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.0.0",
+    "typescript": "^3.4.5"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.0.1",
+    "@opentelemetry/context-async-hooks": "^0.0.1",
+    "@opentelemetry/scope-base": "^0.0.1",
+    "@opentelemetry/types": "^0.0.1"
+  }
+}
