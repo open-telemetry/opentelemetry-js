@@ -20,7 +20,6 @@ import { NoopTracer } from './NoopTracer';
 const noopTracer = new NoopTracer();
 let _globalTracer: types.Tracer | null = null;
 
-/* tslint:disable:no-any */
 export class GlobalTracerDelegate implements types.Tracer {
   getCurrentSpan(): types.Span {
     const tracer = _globalTracer || noopTracer;
