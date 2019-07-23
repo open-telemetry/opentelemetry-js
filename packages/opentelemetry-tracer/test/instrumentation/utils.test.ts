@@ -24,8 +24,8 @@ const TEST_MODULES: Array<{
   version: string | null;
 }> = [
   {
-    name: 'small-number',
-    version: '10.2.0',
+    name: 'simple-module',
+    version: '0.0.1',
   },
   {
     name: 'nonexistent-module',

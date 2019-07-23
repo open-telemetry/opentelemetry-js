@@ -31,6 +31,7 @@ export function defaultPackageName(moduleName: string): string {
 
 /**
  * Gets the package version.
+ * @param logger The logger to use.
  * @param [basedir] The base directory.
  */
 export function getPackageVersion(

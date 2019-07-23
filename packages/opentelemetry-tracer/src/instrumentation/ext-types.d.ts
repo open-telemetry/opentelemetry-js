@@ -14,10 +14,15 @@
  * limitations under the License.
  */
 
-/** General purpose constants. */
-export const constants = {
-  /** opentelemetry scope */
-  OPENTELEMETRY_SCOPE: '@opentelemetry',
-  /** Default prefix for instrumentation modules */
-  DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX: 'instrumentation',
-};
+declare module 'require-in-the-middle' {
+    namespace hook {
+      type Options = {
+        internals?: boolean;
+      };
+      type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
+    }
+    function hook(modules: string[]|null, options: hook.Options|null, onRequire: hook.OnRequireFn): void;
+    function hook(modules: string[]|null, onRequire: hook.OnRequireFn): void;
+    function hook(onRequire: hook.OnRequireFn): void;
+    export = hook;
+  }

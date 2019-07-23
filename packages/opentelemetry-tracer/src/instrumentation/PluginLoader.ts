@@ -18,15 +18,15 @@ import { Tracer, Logger, Plugin } from '@opentelemetry/types';
 import * as utils from './utils';
 import * as hook from 'require-in-the-middle';
 
-export interface PluginNames {
-  [pluginName: string]: string;
-}
-
 // States for the Plugin Loader
 export enum HookState {
-  NO_HOOK,
-  ACTIVATED,
-  DEACTIVATED,
+  UNINITIALIZED,
+  ENABLED,
+  DISABLED,
+}
+
+interface PluginNames {
+  [pluginName: string]: string;
 }
 
 /**
@@ -41,50 +41,52 @@ export class PluginLoader {
    * A field that tracks whether the require-in-the-middle hook has been loaded
    * for the first time, as well as whether the hook body is activated or not.
    */
-  private _hookState = HookState.NO_HOOK;
+  private _hookState = HookState.UNINITIALIZED;
 
   /** Constructs a new PluginLoader instance. */
   constructor(readonly tracer: Tracer, readonly logger: Logger) {}
 
+  get state(): HookState {
+    return this._hookState;
+  }
+
+  get plugins(): Plugin[] {
+    return this._plugins;
+  }
+
   /**
-   * Returns a PluginNames object, build from a string array of target modules
-   * names, using the defaultPackageName.
-   * @param modulesToPatch A list of modules to patch.
+   * Loads a list of plugins. Each plugin module should implement the core
+   * {@link Plugin} interface and export an instance named as 'plugin'. This
+   * function will attach a hook to be called the first time the module is
+   * loaded.
+   * @param modulesToPatch A list of plugins.
    */
-  patch(modulesToPatch: string[]) {
-    const plugins = modulesToPatch.reduce(
-      (plugins: PluginNames, moduleName: string) => {
-        plugins[moduleName] = utils.defaultPackageName(moduleName);
-        return plugins;
-      },
-      {} as PluginNames
-    );
-    this._loadPlugins(plugins);
-  }
-
-  unpatch() {
-    this._unloadPlugins();
-    this._plugins = [];
-    this._hookState = HookState.DEACTIVATED;
-  }
-
-  private _loadPlugins(pluginList: PluginNames) {
-    if (this._hookState === HookState.NO_HOOK) {
-      const modulesToHook = Object.keys(pluginList);
+  loadPlugins(modulesToPatch: string[]): PluginLoader {
+    if (this._hookState === HookState.UNINITIALIZED) {
+      const plugins = modulesToPatch.reduce(
+        (plugins: PluginNames, moduleName: string) => {
+          plugins[moduleName] = utils.defaultPackageName(moduleName);
+          return plugins;
+        },
+        {} as PluginNames
+      );
+      const modulesToHook = Object.keys(plugins);
       // Do not hook require when no module is provided. In this case it is
       // not necessary. With skipping this step we lower our footprint in
       // customer applications and require-in-the-middle won't show up in CPU
       // frames.
       if (modulesToHook.length === 0) {
-        this._hookState = HookState.DEACTIVATED;
-        return;
+        this._hookState = HookState.DISABLED;
+        return this;
       }
 
-      hook(modulesToHook, (exports, name, basedir) => {
-        if (this._hookState !== HookState.ACTIVATED) return exports;
+      // Enable the require hook.
+      hook(modulesToHook, (exports, name, baseDir) => {
+        if (this._hookState !== HookState.ENABLED) return exports;
 
-        const moduleName = pluginList[name];
-        const version = utils.getPackageVersion(this.logger, basedir as string);
+        const moduleName = plugins[name];
+        // Get the module version.
+        const version = utils.getPackageVersion(this.logger, baseDir as string);
         this.logger.info(
           `PluginLoader#loadPlugins: trying loading ${name}.${version}`
         );
@@ -98,6 +100,7 @@ export class PluginLoader {
         try {
           const plugin: Plugin = require(moduleName).plugin;
           this._plugins.push(plugin);
+          // Enable each supported plugin.
           return plugin.enable(exports, this.tracer);
         } catch (e) {
           this.logger.error(
@@ -106,15 +109,29 @@ export class PluginLoader {
           return exports;
         }
       });
+      this._hookState = HookState.ENABLED;
+    } else if (this._hookState === HookState.DISABLED) {
+      throw new Error(
+        'PluginLoader#loadPlugins: Currently cannot re-enable plugin loader.'
+      );
+    } else {
+      throw new Error(
+        'PluginLoader#loadPlugins: Plugin loader already enabled.'
+      );
     }
-    this._hookState = HookState.ACTIVATED;
+    return this;
   }
 
   /** Unloads plugins. */
-  private _unloadPlugins() {
-    for (const plugin of this._plugins) {
-      plugin.disable();
+  unloadPlugins(): PluginLoader {
+    if (this._hookState === HookState.ENABLED) {
+      for (const plugin of this._plugins) {
+        plugin.disable();
+      }
+      this._plugins = [];
+      this._hookState = HookState.DISABLED;
     }
+    return this;
   }
 
   /**
