@@ -20,13 +20,10 @@ import {
   HookState,
 } from '../../src/instrumentation/PluginLoader';
 import { NoopTracer, NoopLogger } from '@opentelemetry/core';
+import * as path from 'path';
 
-const INSTALLED_PLUGINS_PATH = `${__dirname}/node_modules`;
+const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
 const TEST_MODULES = ['simple-module', 'nonexistent-module', 'http'];
-
-const clearRequireCache = () => {
-  Object.keys(require.cache).forEach(key => delete require.cache[key]);
-};
 
 describe('PluginLoader', () => {
   const tracer = new NoopTracer();
@@ -38,59 +35,88 @@ describe('PluginLoader', () => {
   });
 
   afterEach(() => {
-    clearRequireCache();
+    // clear require cache
+    Object.keys(require.cache).forEach(key => delete require.cache[key]);
   });
 
-  it('sanity check', () => {
-    // Ensure that module fixtures contain values that we expect.
-    const simpleModule = require(TEST_MODULES[0]);
-    assert.strictEqual(simpleModule.name(), TEST_MODULES[0]);
-    assert.strictEqual(simpleModule.value(), 0);
-    assert.throws(() => require(TEST_MODULES[1]));
+  describe('state()', () => {
+    it('returns UNINITIALIZED when first called', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader.state, HookState.UNINITIALIZED);
+    });
+
+    it('transitions from UNINITIALIZED to ENABLED', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      pluginLoader.loadPlugins([TEST_MODULES[0]]);
+      assert.strictEqual(pluginLoader.state, HookState.ENABLED);
+      pluginLoader.unloadPlugins();
+    });
+
+    it('transitions from ENABLED to DISABLED', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      pluginLoader.loadPlugins([TEST_MODULES[0]]).unloadPlugins();
+      assert.strictEqual(pluginLoader.state, HookState.DISABLED);
+    });
+
+    it('throws if hook state is already ENABLED', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      pluginLoader.loadPlugins([TEST_MODULES[0]]);
+      assert.throws(() => pluginLoader.loadPlugins([TEST_MODULES[0]]));
+      pluginLoader.unloadPlugins();
+    });
   });
 
-  it('returns UNINITIALIZED when first called', () => {
-    const pluginLoader = new PluginLoader(tracer, logger);
-    assert.strictEqual(pluginLoader.state, HookState.UNINITIALIZED);
+  describe('loadPlugins()', () => {
+    it('sanity check', () => {
+      // Ensure that module fixtures contain values that we expect.
+      const simpleModule = require(TEST_MODULES[0]);
+      assert.strictEqual(simpleModule.name(), TEST_MODULES[0]);
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.throws(() => require(TEST_MODULES[1]));
+    });
+
+    it('should load a plugin and patch the target modules', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader.plugins.length, 0);
+      pluginLoader.loadPlugins(['simple-module']);
+      // The hook is only called the first time the module is loaded.
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader.plugins.length, 1);
+      assert.strictEqual(simpleModule.value(), 1);
+      assert.strictEqual(simpleModule.name(), 'patched-simple-module');
+      pluginLoader.unloadPlugins();
+    });
+
+    it('should not load a non existing plugin', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader.plugins.length, 0);
+      pluginLoader.loadPlugins(['nonexistent-module']);
+      assert.strictEqual(pluginLoader.plugins.length, 0);
+      pluginLoader.unloadPlugins();
+    });
+
+    it(`doesn't patch modules for which plugins aren't specified`, () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      pluginLoader.loadPlugins([]);
+      assert.strictEqual(require('simple-module').value(), 0);
+      pluginLoader.unloadPlugins();
+    });
   });
 
-  it('transitions from UNINITIALIZED to ENABLED', () => {
-    const pluginLoader = new PluginLoader(tracer, logger);
-    pluginLoader.loadPlugins([TEST_MODULES[0]]);
-    assert.strictEqual(pluginLoader.state, HookState.ENABLED);
-    pluginLoader.unloadPlugins();
-  });
-
-  it('transitions from ENABLED to DISABLED', () => {
-    const pluginLoader = new PluginLoader(tracer, logger);
-    pluginLoader.loadPlugins([TEST_MODULES[0]]).unloadPlugins();
-    assert.strictEqual(pluginLoader.state, HookState.DISABLED);
-  });
-
-  it('throws if hook state is already ENABLED', () => {
-    const pluginLoader = new PluginLoader(tracer, logger);
-    pluginLoader.loadPlugins([TEST_MODULES[0]]);
-    assert.throws(() => pluginLoader.loadPlugins([TEST_MODULES[0]]));
-    pluginLoader.unloadPlugins();
-  });
-
-  it('patches modules when enabled', () => {
-    const pluginLoader = new PluginLoader(tracer, console);
-    assert.strictEqual(pluginLoader.plugins.length, 0);
-    pluginLoader.loadPlugins(['simple-module']);
-    // The hook is only called the first time the module is loaded.
-    const simpleModule = require('simple-module');
-    assert.strictEqual(pluginLoader.plugins.length, 1);
-    assert.strictEqual(simpleModule.value(), 1);
-    assert.strictEqual(simpleModule.name(), 'patched-simple-module');
-    pluginLoader.unloadPlugins();
-  });
-
-  it('should not load a non existing plugin', () => {
-    const pluginLoader = new PluginLoader(tracer, console);
-    assert.strictEqual(pluginLoader.plugins.length, 0);
-    pluginLoader.loadPlugins(['nonexistent-module']);
-    assert.strictEqual(pluginLoader.plugins.length, 0);
-    pluginLoader.unloadPlugins();
+  describe('unloadPlugins()', () => {
+    it('should unload the plugins and unpatch the target module when unloads', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader.plugins.length, 0);
+      pluginLoader.loadPlugins(['simple-module']);
+      // The hook is only called the first time the module is loaded.
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader.plugins.length, 1);
+      assert.strictEqual(simpleModule.value(), 1);
+      assert.strictEqual(simpleModule.name(), 'patched-simple-module');
+      pluginLoader.unloadPlugins();
+      assert.strictEqual(pluginLoader.plugins.length, 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+      assert.strictEqual(simpleModule.value(), 0);
+    });
   });
 });
