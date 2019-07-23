@@ -51,7 +51,6 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
-    "@opentelemetry/scope-base": "^0.0.1",
-    "shimmer": "^1.2.1"
+    "@opentelemetry/scope-base": "^0.0.1"
   }
 }

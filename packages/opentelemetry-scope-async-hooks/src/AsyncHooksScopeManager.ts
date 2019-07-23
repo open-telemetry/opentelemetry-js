@@ -17,14 +17,24 @@
 import { ScopeManager } from '@opentelemetry/scope-base';
 import * as asyncHooks from 'async_hooks';
 import { EventEmitter } from 'events';
-import * as shimmer from 'shimmer';
 
-const EVENT_EMITTER_METHODS: Array<keyof EventEmitter> = [
-  'addListener',
-  'on',
-  'once',
-  'prependListener',
-  'prependOnceListener',
+type Func<T> = (...args: unknown[]) => T;
+
+type PatchedEventEmitter = {
+  /**
+   * Store a map for each event of all original listener and their "patched"
+   * version so when the listener is removed by the user, we remove the
+   * correspoding "patched" function.
+   */
+  __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
+} & EventEmitter;
+
+const ADD_LISTENER_METHODS = [
+  'addListener' as 'addListener',
+  'on' as 'on',
+  'once' as 'once',
+  'prependListener' as 'prependListener',
+  'prependOnceListener' as 'prependOnceListener',
 ];
 
 export class AsyncHooksScopeManager implements ScopeManager {
@@ -115,16 +125,91 @@ export class AsyncHooksScopeManager implements ScopeManager {
     target: T,
     scope?: unknown
   ): T {
-    const scopeManager = this;
-    EVENT_EMITTER_METHODS.forEach(methodName => {
-      if (target[methodName] === undefined) return;
-      shimmer.wrap(target as EventEmitter, methodName, (original: Function) => {
-        return function(this: {}, event: string, cb: Function) {
-          return original.call(this, event, scopeManager.bind(cb, scope));
-        };
-      });
+    const ee = (target as unknown) as PatchedEventEmitter;
+    // patch methods that add a listener to propagate scope
+    ADD_LISTENER_METHODS.forEach(methodName => {
+      ee[methodName] = this._patchEEAddListener(ee, ee[methodName], scope);
     });
+
+    // patch methods that remove a listener
+    ee.removeListener = this._patchEERemoveListener(ee, ee.removeListener);
+    ee.off = this._patchEERemoveListener(ee, ee.off);
+    // patch method that remove all listeners
+    ee.removeAllListeners = this._patchEERemoteAllListeners(
+      ee,
+      ee.removeAllListeners
+    );
+
     return target;
+  }
+
+  /**
+   * Patch methods that remove a given listener so that we match the "patched"
+   * version of that listener (the one that propagate context).
+   * @param ee EventEmitter instance
+   * @param original reference to the patched method
+   */
+  private _patchEERemoveListener(ee: PatchedEventEmitter, original: Function) {
+    return function(this: {}, event: string, listener: Func<void>) {
+      if (
+        ee.__ot_listeners === undefined ||
+        ee.__ot_listeners[event] === undefined
+      ) {
+        return original.call(this, event, listener);
+      }
+      const events = ee.__ot_listeners[event];
+      const patchedListener = events.get(listener);
+      return original.call(this, event, patchedListener || listener);
+    };
+  }
+
+  /**
+   * Patch methods that remove all listeners so we remove our
+   * internal references for a given event.
+   * @param ee EventEmitter instance
+   * @param original reference to the patched method
+   */
+  private _patchEERemoteAllListeners(
+    ee: PatchedEventEmitter,
+    original: Function
+  ) {
+    return function(this: {}, event: string) {
+      if (
+        ee.__ot_listeners === undefined ||
+        ee.__ot_listeners[event] === undefined
+      ) {
+        return original.call(this, event);
+      }
+      delete ee.__ot_listeners[event];
+      return original.call(this, event);
+    };
+  }
+
+  /**
+   * Patch methods on an event emitter instance that can add listeners so we
+   * can force them to propagate a given context.
+   * @param ee EventEmitter instance
+   * @param original reference to the patched method
+   * @param [scope] scope to propagate when calling listeners
+   */
+  private _patchEEAddListener(
+    ee: PatchedEventEmitter,
+    original: Function,
+    scope?: unknown
+  ) {
+    const scopeManager = this;
+    return function(this: {}, event: string, listener: Func<void>) {
+      if (ee.__ot_listeners === undefined) ee.__ot_listeners = {};
+      let listeners = ee.__ot_listeners[event];
+      if (listeners === undefined) {
+        listeners = new WeakMap();
+        ee.__ot_listeners[event] = listeners;
+      }
+      const patchedListener = scopeManager.bind(listener, scope);
+      // store a weak reference of the user listener to ours
+      listeners.set(listener, patchedListener);
+      return original.call(this, event, patchedListener);
+    };
   }
 
   /**
