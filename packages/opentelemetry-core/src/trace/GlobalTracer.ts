@@ -48,13 +48,13 @@ export class GlobalTracerDelegate implements types.Tracer {
     return tracer.recordSpanData.apply(tracer, arguments as any);
   }
 
-  getBinaryFormat(): unknown {
+  getBinaryFormat(): types.BinaryFormat {
     const tracer = _globalTracer || noopTracer;
     // tslint:disable-next-line:no-any
     return tracer.getBinaryFormat.apply(tracer, arguments as any);
   }
 
-  getHttpTextFormat(): unknown {
+  getHttpTextFormat(): types.HttpTextFormat {
     const tracer = _globalTracer || noopTracer;
     // tslint:disable-next-line:no-any
     return tracer.getHttpTextFormat.apply(tracer, arguments as any);
