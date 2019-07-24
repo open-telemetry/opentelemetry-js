@@ -24,13 +24,13 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   enable(moduleExports: T, tracer: Tracer): T {
     this.moduleExports = moduleExports;
     this.tracer = tracer;
-    return this.applyPatch();
+    return this.patch();
   }
 
   disable(): void {
-    this.applyUnpatch();
+    this.unpatch();
   }
 
-  protected abstract applyPatch(): T;
-  protected abstract applyUnpatch(): void;
+  protected abstract patch(): T;
+  protected abstract unpatch(): void;
 }
