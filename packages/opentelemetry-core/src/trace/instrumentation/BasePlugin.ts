@@ -21,7 +21,11 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected moduleExports!: T;
   protected tracer!: Tracer;
 
-  enable(moduleExports: T, tracer: Tracer): T {
+  enable(
+    moduleExports: T,
+    tracer: Tracer,
+    config?: { [key: string]: unknown }
+  ): T {
     this.moduleExports = moduleExports;
     this.tracer = tracer;
     return this.patch();

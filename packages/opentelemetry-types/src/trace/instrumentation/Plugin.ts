@@ -22,9 +22,14 @@ export interface Plugin<T> {
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
-   * @param tracer a tracer instance
+   * @param tracer a tracer instance.
+   * @param [config] an object to configure the plugin.
    */
-  enable(moduleExports: T, tracer: Tracer): T;
+  enable(
+    moduleExports: T,
+    tracer: Tracer,
+    config?: { [key: string]: unknown }
+  ): T;
 
   /** Method to disable the instrumentation  */
   disable(): void;
