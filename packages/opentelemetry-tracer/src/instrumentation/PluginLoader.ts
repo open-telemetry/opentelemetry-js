@@ -29,6 +29,9 @@ interface PluginNames {
   [pluginName: string]: string;
 }
 
+// tslint:disable-next-line:no-any
+export type PluginType = Array<Plugin<any>>;
+
 /**
  * The PluginLoader class can load instrumentation plugins that
  * use a patch mechanism to enable automatic tracing for
@@ -36,7 +39,7 @@ interface PluginNames {
  */
 export class PluginLoader {
   /** A list of loaded plugins. */
-  private _plugins: Plugin[] = [];
+  private _plugins: PluginType = [];
   /**
    * A field that tracks whether the require-in-the-middle hook has been loaded
    * for the first time, as well as whether the hook body is activated or not.
@@ -50,7 +53,7 @@ export class PluginLoader {
     return this._hookState;
   }
 
-  get plugins(): Plugin[] {
+  get plugins(): PluginType {
     return this._plugins;
   }
 
@@ -98,7 +101,8 @@ export class PluginLoader {
 
         // Expecting a plugin from module;
         try {
-          const plugin: Plugin = require(moduleName).plugin;
+          // tslint:disable-next-line:no-any
+          const plugin: Plugin<any> = require(moduleName).plugin;
           this._plugins.push(plugin);
           // Enable each supported plugin.
           return plugin.enable(exports, this.tracer);
