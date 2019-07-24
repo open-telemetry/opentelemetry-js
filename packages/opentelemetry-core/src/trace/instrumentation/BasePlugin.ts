@@ -14,18 +14,23 @@
  * limitations under the License.
  */
 
-import { Tracer } from '../tracer';
+import { Tracer, Plugin } from '@opentelemetry/types';
 
-/** Interface Plugin to apply patch. */
-export interface Plugin<T> {
-  /**
-   * Method that enables the instrumentation patch.
-   * @param moduleExports The value of the `module.exports` property that would
-   *     normally be exposed by the required module. ex: `http`, `https` etc.
-   * @param tracer a tracer instance
-   */
-  enable(moduleExports: T, tracer: Tracer): T;
+/** This class represent the base to patch plugin. */
+export abstract class BasePlugin<T> implements Plugin<T> {
+  protected moduleExports!: T;
+  protected tracer!: Tracer;
 
-  /** Method to disable the instrumentation  */
-  disable(): void;
+  enable(moduleExports: T, tracer: Tracer): T {
+    this.moduleExports = moduleExports;
+    this.tracer = tracer;
+    return this.applyPatch();
+  }
+
+  disable(): void {
+    this.applyUnpatch();
+  }
+
+  protected abstract applyPatch(): T;
+  protected abstract applyUnpatch(): void;
 }
