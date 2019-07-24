@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
+import { BinaryFormat } from '../context/propagation/BinaryFormat';
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
@@ -73,10 +75,8 @@ export interface Tracer {
    * Context binary format ({@link BinaryFormat}). For more details see
    * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
    * binary protocol</a>.
-   *
-   * @todo: Change return type once BinaryFormat is available
    */
-  getBinaryFormat(): unknown;
+  getBinaryFormat(): BinaryFormat;
 
   /**
    * Returns the {@link HttpTextFormat} interface which can inject/extract
@@ -85,8 +85,6 @@ export interface Tracer {
    * If no tracer implementation is provided, this defaults to the W3C Trace
    * Context HTTP text format ({@link HttpTraceContext}). For more details see
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
-   *
-   * @todo: Change return type once HttpTextFormat is available
    */
-  getHttpTextFormat(): unknown;
+  getHttpTextFormat(): HttpTextFormat;
 }

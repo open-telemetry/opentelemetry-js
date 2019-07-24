@@ -5,7 +5,7 @@ This package provides TypeScript interfaces and enums for the OpenTelemetry core
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more about OpenTelemetry Node: <https://github.com/open-telemetry/opentelemetry-node>
+- For more about OpenTelemetry JS: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
 
 ## License
