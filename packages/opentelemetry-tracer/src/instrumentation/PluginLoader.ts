@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Tracer, Logger, Plugin } from '@opentelemetry/types';
-import * as utils from './utils';
+import { Logger, Plugin, Tracer } from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
+import * as utils from './utils';
 
 // States for the Plugin Loader
 export enum HookState {
@@ -64,7 +64,7 @@ export class PluginLoader {
    * loaded.
    * @param modulesToPatch A list of plugins.
    */
-  loadPlugins(modulesToPatch: string[]): PluginLoader {
+  load(modulesToPatch: string[]): PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
       const plugins = modulesToPatch.reduce(
         (plugins: PluginNames, moduleName: string) => {
@@ -91,12 +91,12 @@ export class PluginLoader {
         // Get the module version.
         const version = utils.getPackageVersion(this.logger, baseDir as string);
         this.logger.info(
-          `PluginLoader#loadPlugins: trying loading ${name}.${version}`
+          `PluginLoader#load: trying loading ${name}.${version}`
         );
         if (!version) return exports;
 
         this.logger.debug(
-          `PluginLoader#loadPlugins: applying patch to ${name}@${version} using ${moduleName} module`
+          `PluginLoader#load: applying patch to ${name}@${version} using ${moduleName} module`
         );
 
         // Expecting a plugin from module;
@@ -108,26 +108,24 @@ export class PluginLoader {
           return plugin.enable(exports, this.tracer);
         } catch (e) {
           this.logger.error(
-            `PluginLoader#loadPlugins: could not load plugin ${moduleName} of module ${name}. Error: ${e.message}`
+            `PluginLoader#load: could not load plugin ${moduleName} of module ${name}. Error: ${e.message}`
           );
           return exports;
         }
       });
       this._hookState = HookState.ENABLED;
     } else if (this._hookState === HookState.DISABLED) {
-      throw new Error(
-        'PluginLoader#loadPlugins: Currently cannot re-enable plugin loader.'
+      this.logger.error(
+        'PluginLoader#load: Currently cannot re-enable plugin loader.'
       );
     } else {
-      throw new Error(
-        'PluginLoader#loadPlugins: Plugin loader already enabled.'
-      );
+      this.logger.error('PluginLoader#load: Plugin loader already enabled.');
     }
     return this;
   }
 
   /** Unloads plugins. */
-  unloadPlugins(): PluginLoader {
+  unload(): PluginLoader {
     if (this._hookState === HookState.ENABLED) {
       for (const plugin of this._plugins) {
         plugin.disable();

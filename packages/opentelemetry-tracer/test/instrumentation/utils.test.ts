@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import * as utils from '../../src/instrumentation/utils';
 import { NoopLogger } from '@opentelemetry/core';
+import * as assert from 'assert';
+import * as path from 'path';
+import * as utils from '../../src/instrumentation/utils';
 
-const INSTALLED_PLUGINS_PATH = `${__dirname}/node_modules`;
-const TEST_MODULES: Array<{
-  name: string;
-  version: string | null;
-}> = [
+const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
+const TEST_MODULES: Array<{ name: string; version: string | null }> = [
   {
     name: 'simple-module',
     version: '0.0.1',
