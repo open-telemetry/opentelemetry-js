@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/tracer",
+  "name": "@opentelemetry/node-tracer",
   "version": "0.0.1",
-  "description": "OpenTelemetry Automatic Tracer",
+  "description": "OpenTelemetry Automatic Node Tracer",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
