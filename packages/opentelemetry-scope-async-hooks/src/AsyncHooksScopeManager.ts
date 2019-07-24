@@ -126,11 +126,13 @@ export class AsyncHooksScopeManager implements ScopeManager {
     scope?: unknown
   ): T {
     const ee = (target as unknown) as PatchedEventEmitter;
+    if (ee.__ot_listeners !== undefined) return target;
+    ee.__ot_listeners = {};
+
     // patch methods that add a listener to propagate scope
     ADD_LISTENER_METHODS.forEach(methodName => {
       ee[methodName] = this._patchEEAddListener(ee, ee[methodName], scope);
     });
-
     // patch methods that remove a listener
     ee.removeListener = this._patchEERemoveListener(ee, ee.removeListener);
     ee.off = this._patchEERemoveListener(ee, ee.off);
