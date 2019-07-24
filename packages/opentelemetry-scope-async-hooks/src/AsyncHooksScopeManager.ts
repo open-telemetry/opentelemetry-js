@@ -80,6 +80,8 @@ export class AsyncHooksScopeManager implements ScopeManager {
       return this._bindEventEmitter(target, scope);
     } else if (typeof target === 'function') {
       return this._bindFunction(target, scope);
+    } else if (target instanceof Promise) {
+      return this._bindPromise(target, scope);
     }
     return target;
   }
@@ -142,6 +144,28 @@ export class AsyncHooksScopeManager implements ScopeManager {
       ee.removeAllListeners
     );
 
+    return target;
+  }
+
+  private _bindPromise<T extends Promise<unknown>>(
+    target: T,
+    scope?: unknown
+  ): T {
+    const scopeManager = this;
+    const then = target.then;
+    target.then = function(this: {}) {
+      const args = new Array(arguments.length);
+      for (let i = 0; i < args.length; i++) {
+        args[i] = scopeManager.bind(arguments[i], scope);
+      }
+      /**
+       * Forced to remove compilation error here, the type of Promise
+       * is impossible(?) to reproduce when modifying it.
+       */
+      // tslint:disable-next-line:ban-ts-ignore
+      // @ts-ignore
+      return then.apply(this, args);
+    };
     return target;
   }
 

@@ -231,4 +231,60 @@ describe('AsyncHooksScopeManager', () => {
       patchedEe.emit('test');
     });
   });
+
+  describe('.bind(promise)', () => {
+    it('should return the same target (when enabled)', () => {
+      const promise = Promise.resolve();
+      assert.deepStrictEqual(scopeManager.bind(promise), promise);
+    });
+
+    it('should return the scope (when enabled)', done => {
+      const scope = { a: 3 };
+      const promise = Promise.resolve();
+      scopeManager.bind(promise, scope);
+      promise.then(() => {
+        assert.deepStrictEqual(scopeManager.active(), scope);
+        return done();
+      });
+    });
+
+    it('should return the scope (when disabled)', done => {
+      scopeManager.disable();
+      const scope = { a: 3 };
+      const promise = Promise.resolve();
+      scopeManager.bind(promise, scope);
+      promise.then(() => {
+        assert.deepStrictEqual(scopeManager.active(), scope);
+        scopeManager.enable();
+        return done();
+      });
+    });
+
+    it('should not return the scope (when disabled + async op)', done => {
+      scopeManager.disable();
+      const scope = { a: 3 };
+      const promise = Promise.resolve();
+      scopeManager.bind(promise, scope);
+      promise.then(() => {
+        setImmediate(() => {
+          assert.deepStrictEqual(scopeManager.active(), null);
+          scopeManager.enable();
+          return done();
+        });
+      });
+    });
+
+    it('should return the scope (when enabled + async op)', done => {
+      const scope = { a: 3 };
+      const promise = Promise.resolve();
+      scopeManager.bind(promise, scope);
+      promise.then(() => {
+        setImmediate(() => {
+          assert.deepStrictEqual(scopeManager.active(), scope);
+          scopeManager.enable();
+          return done();
+        });
+      });
+    });
+  });
 });
