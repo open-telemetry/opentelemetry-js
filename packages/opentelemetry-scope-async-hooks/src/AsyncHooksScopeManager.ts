@@ -18,19 +18,19 @@ import { ScopeManager } from '@opentelemetry/scope-base';
 import * as asyncHooks from 'async_hooks';
 
 export class AsyncHooksScopeManager implements ScopeManager {
-  private asyncHook: asyncHooks.AsyncHook;
-  private scopes: { [uid: number]: unknown } = Object.create(null);
+  private _asyncHook: asyncHooks.AsyncHook;
+  private _scopes: { [uid: number]: unknown } = Object.create(null);
 
   constructor() {
-    this.asyncHook = asyncHooks.createHook({
-      init: this.init.bind(this),
-      destroy: this.destroy.bind(this),
-      promiseResolve: this.destroy.bind(this),
+    this._asyncHook = asyncHooks.createHook({
+      init: this._init.bind(this),
+      destroy: this._destroy.bind(this),
+      promiseResolve: this._destroy.bind(this),
     });
   }
 
   active(): unknown {
-    return this.scopes[asyncHooks.executionAsyncId()] || null;
+    return this._scopes[asyncHooks.executionAsyncId()] || null;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
@@ -38,22 +38,24 @@ export class AsyncHooksScopeManager implements ScopeManager {
     fn: T
   ): ReturnType<T> {
     const uid = asyncHooks.executionAsyncId();
-    const oldScope = this.scopes[uid] || null;
-    this.scopes[uid] = scope;
+    const oldScope = this._scopes[uid];
+    this._scopes[uid] = scope;
     try {
-      const res = fn();
-      this.scopes[uid] = oldScope;
-      return res;
+      return fn();
     } catch (err) {
-      // restore old scope even if the function throw
-      this.scopes[uid] = oldScope;
       throw err;
+    } finally {
+      if (oldScope === undefined) {
+        this._destroy(uid);
+      } else {
+        this._scopes[uid] = oldScope;
+      }
     }
   }
 
   bind<T>(target: T, scope?: unknown): T {
     // if no specific scope to propagate is given, we use the current one
-    if (!scope) {
+    if (scope === undefined) {
       scope = this.active();
     }
     if (typeof target === 'function') {
@@ -63,13 +65,13 @@ export class AsyncHooksScopeManager implements ScopeManager {
   }
 
   enable(): this {
-    this.asyncHook.enable();
+    this._asyncHook.enable();
     return this;
   }
 
   disable(): this {
-    this.asyncHook.disable();
-    this.scopes = {};
+    this._asyncHook.disable();
+    this._scopes = {};
     return this;
   }
 
@@ -97,8 +99,8 @@ export class AsyncHooksScopeManager implements ScopeManager {
    * scope as the current one if it exist.
    * @param uid id of the async scope
    */
-  private init(uid: number) {
-    this.scopes[uid] = this.scopes[asyncHooks.executionAsyncId()];
+  private _init(uid: number) {
+    this._scopes[uid] = this._scopes[asyncHooks.executionAsyncId()];
   }
 
   /**
@@ -106,7 +108,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
    * remove its attached scope.
    * @param uid uid of the async scope
    */
-  private destroy(uid: number) {
-    delete this.scopes[uid];
+  private _destroy(uid: number) {
+    delete this._scopes[uid];
   }
 }
