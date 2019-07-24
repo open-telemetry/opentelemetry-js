@@ -8,7 +8,7 @@ This module provides automatic tracing for Node.js applications.
 ## Installation
 
 ```
-npm install --save @opentelemetry/node-tracer`
+npm install --save @opentelemetry/node-tracer
 ```
 
 ## Usage
