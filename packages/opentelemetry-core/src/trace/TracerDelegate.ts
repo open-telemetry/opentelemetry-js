@@ -24,14 +24,29 @@ import { NoopTracer } from './NoopTracer';
 // to be changed/disabled during runtime without needing to change reference
 // to the global tracer
 export class TracerDelegate implements types.Tracer {
-  private readonly _tracer: types.Tracer;
+  private readonly _userTracer: types.Tracer | null;
+  private readonly _fallbackTracer: types.Tracer;
+  private _tracer: types.Tracer;
 
   // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
   constructor(tracer?: types.Tracer | null, fallbackTracer?: types.Tracer) {
-    this._tracer = tracer || fallbackTracer || new NoopTracer();
+    this._userTracer = tracer || null;
+    this._fallbackTracer = fallbackTracer || new NoopTracer();
+    this._tracer = this._userTracer || this._fallbackTracer; // equivalent to this.start()
   }
 
+  // Begin using the user provided tracer. Stop always falling back to fallback tracer
+  start(): void {
+    this._tracer = this._userTracer || this._fallbackTracer;
+  }
+
+  // Stop the delegate from using the provided tracer. Begin to use the fallback tracer
+  stop(): void {
+    this._tracer = this._fallbackTracer;
+  }
+
+  // Tracer implementation
   getCurrentSpan(): types.Span {
     // tslint:disable-next-line:no-any
     return this._tracer.getCurrentSpan.apply(this._tracer, arguments as any);

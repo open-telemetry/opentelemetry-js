@@ -66,13 +66,52 @@ describe('TracerDelegate', () => {
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
     });
 
-    class DummyTracer extends NoopTracer {
-      spyCounter = 0;
+    describe('#start/stop()', () => {
+      it('should use the fallback tracer when stop is called', () => {
+        const dummyTracerUser = new DummyTracer();
+        const dummyTracerFallback = new DummyTracer();
+        const tracerDelegate = new TracerDelegate(
+          dummyTracerUser,
+          dummyTracerFallback
+        );
 
-      startSpan(name: string, options?: types.SpanOptions | undefined) {
-        this.spyCounter = this.spyCounter + 1;
-        return new NoopSpan(spanContext);
-      }
-    }
+        tracerDelegate.stop();
+        tracerDelegate.startSpan('fallback');
+        assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
+        assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
+      });
+
+      it('should use the user tracer when start is called', () => {
+        const dummyTracerUser = new DummyTracer();
+        const dummyTracerFallback = new DummyTracer();
+        const tracerDelegate = new TracerDelegate(
+          dummyTracerUser,
+          dummyTracerFallback
+        );
+
+        tracerDelegate.stop();
+        tracerDelegate.startSpan('fallback');
+        assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
+        assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
+
+        tracerDelegate.start();
+        tracerDelegate.startSpan('user');
+        assert.deepStrictEqual(dummyTracerUser.spyCounter, 1);
+        assert.deepStrictEqual(
+          dummyTracerFallback.spyCounter,
+          1,
+          'Only user tracer counter is incremented'
+        );
+      });
+    });
   });
+
+  class DummyTracer extends NoopTracer {
+    spyCounter = 0;
+
+    startSpan(name: string, options?: types.SpanOptions | undefined) {
+      this.spyCounter = this.spyCounter + 1;
+      return new NoopSpan(spanContext);
+    }
+  }
 });
