@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { GlobalTracerDelegate } from './GlobalTracer';
+import { GlobalTracerDelegate } from './GlobalTracerDelegate';
 
 const globalTracerDelegate = new GlobalTracerDelegate();
 

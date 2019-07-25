@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
-import { GlobalTracerDelegate } from '../../src/trace/GlobalTracer';
+import { GlobalTracerDelegate } from '../../src/trace/GlobalTracerDelegate';
 import { NoopTracer, NoopSpan } from '../../src';
 import { TraceOptions } from '@opentelemetry/types';
 
