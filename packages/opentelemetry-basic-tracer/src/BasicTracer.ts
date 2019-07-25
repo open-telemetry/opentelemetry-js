@@ -23,7 +23,7 @@ import {
   randomSpanId,
   randomTraceId,
   INVALID_SPAN_CONTEXT,
-  NEVER_SAMPLER,
+  ALWAYS_SAMPLER,
 } from '@opentelemetry/core';
 import { BasicTracerConfig } from '../src/types';
 import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
@@ -47,7 +47,7 @@ export class BasicTracer implements types.Tracer {
     this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
     this._defaultAttributes = config.defaultAttributes || {};
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
-    this._sampler = config.sampler || NEVER_SAMPLER;
+    this._sampler = config.sampler || ALWAYS_SAMPLER;
     this._scopeManager = config.scopeManager;
   }
 
