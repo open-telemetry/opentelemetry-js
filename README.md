@@ -2,7 +2,7 @@
 [![Gitter chat][node-gitter-image]][node-gitter-url]
 [![CircleCI][circleci-image]][circleci-url]
 [![Coverage Status][codecov-image]][codecov-url]
-[![Apache License][license-image]]
+[![Apache License][license-image]][license-image]
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and

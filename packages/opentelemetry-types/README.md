@@ -1,6 +1,6 @@
 # OpenTelemetry Types
 [![Gitter chat][gitter-image]][gitter-url]
-[![Apache License][license-image]]
+[![Apache License][license-image]][license-image]
 
 This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser.
 

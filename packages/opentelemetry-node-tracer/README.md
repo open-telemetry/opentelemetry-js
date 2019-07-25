@@ -1,6 +1,6 @@
 # OpenTelemetry Node Tracer SDK
 [![Gitter chat][gitter-image]][gitter-url]
-[![Apache License][license-image]]
+[![Apache License][license-image]][license-image]
 
 This module provides automatic tracing for Node.js applications.
 
