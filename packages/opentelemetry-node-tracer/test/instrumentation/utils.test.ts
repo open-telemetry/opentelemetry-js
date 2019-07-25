@@ -46,11 +46,11 @@ describe('Instrumentation#utils', () => {
     it('should return package name with default scope and a prefix', () => {
       assert.strictEqual(
         utils.defaultPackageName('http'),
-        '@opentelemetry/instrumentation-http'
+        '@opentelemetry/plugin-http'
       );
       assert.strictEqual(
         utils.defaultPackageName('simple-module'),
-        '@opentelemetry/instrumentation-simple-module'
+        '@opentelemetry/plugin-simple-module'
       );
     });
   });
