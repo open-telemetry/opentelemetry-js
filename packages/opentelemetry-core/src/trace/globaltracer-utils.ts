@@ -23,7 +23,7 @@ let globalTracerDelegate = new TracerDelegate();
  * Set the current global tracer. Returns the initialized global tracer
  */
 export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
-  return globalTracerDelegate = new TracerDelegate(tracer);
+  return (globalTracerDelegate = new TracerDelegate(tracer));
 }
 
 /**
