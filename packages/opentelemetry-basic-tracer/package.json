@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/tracer",
+  "name": "@opentelemetry/basic-tracer",
   "version": "0.0.1",
-  "description": "OpenTelemetry Automatic Tracer",
+  "description": "OpenTelemetry Basic Tracer",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
-    "@types/node": "^12.0.10",
+    "@types/node": "^10.12.12",
     "c8": "^5.0.1",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
@@ -50,7 +50,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/context-async-hooks": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",
     "@opentelemetry/types": "^0.0.1"
   }

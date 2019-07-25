@@ -14,11 +14,4 @@
  * limitations under the License.
  */
 
-export * from './common/NoopLogger';
-export * from './context/propagation/BinaryTraceContext';
-export * from './context/propagation/HttpTraceContext';
-export * from './resources/Resource';
-export * from './trace/globaltracer-utils';
-export * from './trace/NoopSpan';
-export * from './trace/NoopTracer';
-export * from './trace/TracerDelegate';
+export * from './AsyncHooksScopeManager';
