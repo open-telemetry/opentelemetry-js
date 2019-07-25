@@ -18,16 +18,16 @@ import { Tracer, Plugin } from '@opentelemetry/types';
 
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
-  protected moduleExports!: T;
-  protected tracer!: Tracer;
+  protected _moduleExports!: T;
+  protected _tracer!: Tracer;
 
   enable(
     moduleExports: T,
     tracer: Tracer,
     config?: { [key: string]: unknown }
   ): T {
-    this.moduleExports = moduleExports;
-    this.tracer = tracer;
+    this._moduleExports = moduleExports;
+    this._tracer = tracer;
     return this.patch();
   }
 
