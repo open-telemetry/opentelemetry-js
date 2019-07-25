@@ -1,7 +1,7 @@
 # OpenTelemetry Basic Tracer SDK
 [![Gitter chat][gitter-image]][gitter-url]
 [![dependencies][dependencies-image]][dependencies-url]
-[![devDependencies][devDependencies-image]][devdependencies-url]
+[![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
 This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser.
