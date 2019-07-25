@@ -87,12 +87,15 @@ describe('Span', () => {
   });
 
   it('should return toString', () => {
-    const span = new Span(tracer, name, { kind: SpanKind.SERVER });
+    const span = new Span(tracer, name, {
+      kind: SpanKind.SERVER,
+      startTime: 100,
+    });
     const context = span.context();
 
     assert.strictEqual(
       span.toString(),
-      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","name":"${name}","kind":1,"status":{"code":0},"duration":0}`
+      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","name":"${name}","kind":1,"status":{"code":0},"startTime":100,"finishTime":0}`
     );
   });
 });
