@@ -28,17 +28,17 @@ import { TraceOptions } from '@opentelemetry/types';
  * This class represents a span.
  */
 export class Span implements types.Span {
-  private _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT;
-  private _tracer: types.Tracer;
-  private _name: string;
-  private _parentId?: string;
-  private _kind: types.SpanKind;
-  private _attributes: types.Attributes = {};
-  private _links: types.Link[] = [];
-  private _events: types.Event[] = [];
+  private readonly _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT;
+  private readonly _tracer: types.Tracer;
+  private readonly _parentId?: string;
+  private readonly _kind: types.SpanKind;
+  private readonly _attributes: types.Attributes = {};
+  private readonly _links: types.Link[] = [];
+  private readonly _events: types.Event[] = [];
   private _status: types.Status = {
     code: types.CanonicalCode.OK,
   };
+  private _name: string;
   private _ended = false;
   private _startTime: number;
   private _duration = 0;
