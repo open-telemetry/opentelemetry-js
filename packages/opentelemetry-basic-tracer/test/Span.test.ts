@@ -15,14 +15,14 @@
  */
 
 import * as assert from 'assert';
-import { Span } from '../../src/trace/Span';
+import { Span } from '../src/Span';
 import {
   SpanKind,
   SpanContext,
   TraceOptions,
   CanonicalCode,
 } from '@opentelemetry/types';
-import { NoopTracer } from '../../src';
+import { NoopTracer } from '@opentelemetry/core';
 
 describe('Span', () => {
   const tracer = new NoopTracer();

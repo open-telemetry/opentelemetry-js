@@ -15,8 +15,12 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { randomSpanId, randomTraceId } from '../platform';
-import { isValid, INVALID_SPAN_CONTEXT } from './spancontext-utils';
+import {
+  randomSpanId,
+  randomTraceId,
+  INVALID_SPAN_CONTEXT,
+  isValid,
+} from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 import { TraceOptions } from '@opentelemetry/types';
 
@@ -32,7 +36,9 @@ export class Span implements types.Span {
   private _attributes: types.Attributes = {};
   private _links: types.Link[] = [];
   private _events: types.Event[] = [];
-  private _status: types.Status = types.DEFAULT_STATUS_OK;
+  private _status: types.Status = {
+    code: types.CanonicalCode.OK,
+  };
   private _ended = false;
   private _startTime: number;
   private _duration = 0;
