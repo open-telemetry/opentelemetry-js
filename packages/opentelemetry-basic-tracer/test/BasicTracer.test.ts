@@ -66,8 +66,6 @@ describe('BasicTracer', () => {
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with propagation');
-
     it('should construct an instance with default attributes', () => {
       const tracer = new BasicTracer({
         defaultAttributes: {
@@ -106,8 +104,10 @@ describe('BasicTracer', () => {
       assert.deepStrictEqual(span, BasicTracer.defaultSpan);
     });
 
+    // @todo: implement
     it('should start a Span with always sampling');
 
+    // @todo: implement
     it('should set default attributes on span');
   });
 
@@ -134,6 +134,7 @@ describe('BasicTracer', () => {
   });
 
   describe('#recordSpanData', () => {
+    // @todo: implement
     it('should call exporters with span data');
   });
 

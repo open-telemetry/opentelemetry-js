@@ -16,9 +16,6 @@
 
 import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
 import { BinaryFormat } from '../context/propagation/BinaryFormat';
-import { Attributes } from './attributes';
-import { Sampler } from './Sampler';
-import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
@@ -92,25 +89,4 @@ export interface Tracer {
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
    */
   getHttpTextFormat(): HttpTextFormat;
-}
-
-/**
- * TracerConfig provides an interface for configuring a Tracer.
- */
-export interface TracerConfig {
-  /**
-   * Attributed that will be applied on every span created by Tracer.
-   * Useful to add infrastructure and environment information to your spans.
-   */
-  defaultAttributes?: Attributes;
-
-  /**
-   * Scope manager keeps context across in-process operations.
-   */
-  scopeManager?: ScopeManager;
-
-  /**
-   * Sampler determinates if a span should be recorded or should be a NoopSpan.
-   */
-  sampler?: Sampler;
 }
