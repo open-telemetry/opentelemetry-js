@@ -24,56 +24,44 @@ import { NoopTracer } from './NoopTracer';
 // to be changed/disabled during runtime without needing to change reference
 // to the global tracer
 export class TracerDelegate implements types.Tracer {
-  private _tracer: types.Tracer | null;
-  private readonly _fallbackTracer: types.Tracer;
+  private readonly _tracer: types.Tracer;
 
   // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
-  constructor(fallbackTracer?: types.Tracer) {
-    this._tracer = null;
-    this._fallbackTracer = fallbackTracer || new NoopTracer();
-  }
-
-  set tracer(tracer: types.Tracer | null) {
-    this._tracer = tracer;
+  constructor(tracer?: types.Tracer | null, fallbackTracer?: types.Tracer) {
+    this._tracer = tracer || fallbackTracer || new NoopTracer();
   }
 
   getCurrentSpan(): types.Span {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.getCurrentSpan.apply(tracer, arguments as any);
+    return this._tracer.getCurrentSpan.apply(this._tracer, arguments as any);
   }
 
   startSpan(name: string, options?: types.SpanOptions | undefined): types.Span {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.startSpan.apply(tracer, arguments as any);
+    return this._tracer.startSpan.apply(this._tracer, arguments as any);
   }
 
   withSpan<T extends (...args: unknown[]) => unknown>(
     span: types.Span,
     fn: T
   ): ReturnType<T> {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.withSpan.apply(tracer, arguments as any) as ReturnType<T>;
+    return this._tracer.withSpan.apply(this._tracer, arguments as any) as ReturnType<T>;
   }
 
   recordSpanData(span: types.Span): void {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.recordSpanData.apply(tracer, arguments as any);
+    return this._tracer.recordSpanData.apply(this._tracer, arguments as any);
   }
 
   getBinaryFormat(): types.BinaryFormat {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.getBinaryFormat.apply(tracer, arguments as any);
+    return this._tracer.getBinaryFormat.apply(this._tracer, arguments as any);
   }
 
   getHttpTextFormat(): types.HttpTextFormat {
-    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
-    return tracer.getHttpTextFormat.apply(tracer, arguments as any);
+    return this._tracer.getHttpTextFormat.apply(this._tracer, arguments as any);
   }
 }

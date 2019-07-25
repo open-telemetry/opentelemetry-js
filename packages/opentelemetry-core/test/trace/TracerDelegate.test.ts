@@ -60,8 +60,7 @@ describe('TracerDelegate', () => {
 
     it('should use user provided tracer if provided', () => {
       const dummyTracer = new DummyTracer();
-      const tracerDelegate = new TracerDelegate();
-      tracerDelegate.tracer = dummyTracer;
+      const tracerDelegate = new TracerDelegate(dummyTracer);
 
       tracerDelegate.startSpan('foo');
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
