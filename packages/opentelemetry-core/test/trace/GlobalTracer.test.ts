@@ -52,7 +52,7 @@ describe('GlobalTracerDelegate', () => {
 
     it('should allow fallback tracer to be set', () => {
       const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate(null, dummyTracer);
+      const tracerDelegate = new GlobalTracerDelegate(dummyTracer);
 
       tracerDelegate.startSpan('foo');
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
@@ -60,10 +60,8 @@ describe('GlobalTracerDelegate', () => {
 
     it('should use user provided tracer if provided', () => {
       const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate(
-        dummyTracer,
-        new NoopTracer()
-      );
+      const tracerDelegate = new GlobalTracerDelegate();
+      tracerDelegate.tracer = dummyTracer;
 
       tracerDelegate.startSpan('foo');
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);

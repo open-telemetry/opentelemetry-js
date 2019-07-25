@@ -29,8 +29,8 @@ export class GlobalTracerDelegate implements types.Tracer {
 
   // Wrap a tracer with a GlobalTracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
-  constructor(tracer?: types.Tracer | null, fallbackTracer?: types.Tracer) {
-    this._tracer = tracer || null;
+  constructor(fallbackTracer?: types.Tracer) {
+    this._tracer = null;
     this._fallbackTracer = fallbackTracer || new NoopTracer();
   }
 
