@@ -17,5 +17,6 @@
 export * from './context/propagation/HttpTraceContext';
 export * from './resources/Resource';
 export * from './trace/GlobalTracer';
+export * from './trace/globaltracer-utils';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';

@@ -16,11 +16,14 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
-import { GlobalTracerDelegate } from '../../src/trace/GlobalTracer';
+import {
+  getTracer,
+  initGlobalTracer,
+} from '../../src/trace/globaltracer-utils';
 import { NoopTracer, NoopSpan } from '../../src';
 import { TraceOptions } from '@opentelemetry/types';
 
-describe('GlobalTracerDelegate', () => {
+describe('globaltracer-utils', () => {
   const functions = [
     'getCurrentSpan',
     'startSpan',
@@ -29,16 +32,28 @@ describe('GlobalTracerDelegate', () => {
     'getBinaryFormat',
     'getHttpTextFormat',
   ];
-  const spanContext = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
-    traceOptions: TraceOptions.UNSAMPLED,
-  };
 
-  describe('#constructor(...)', () => {
-    it('should not crash with default constructor', () => {
+  it('should expose a tracer via getTracer', () => {
+    const tracer = getTracer();
+    assert.ok(tracer);
+    assert.strictEqual(typeof tracer, 'object');
+  });
+
+  describe('GlobalTracer', () => {
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceOptions: TraceOptions.UNSAMPLED,
+    };
+    const dummySpan = new NoopSpan(spanContext);
+
+    afterEach(() => {
+      initGlobalTracer(new NoopTracer());
+    });
+
+    it('should not crash', () => {
       functions.forEach(fn => {
-        const tracer = new GlobalTracerDelegate();
+        const tracer = getTracer();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -50,31 +65,18 @@ describe('GlobalTracerDelegate', () => {
       });
     });
 
-    it('should allow fallback tracer to be set', () => {
-      const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate(null, dummyTracer);
-
-      tracerDelegate.startSpan('foo');
-      assert.deepStrictEqual(dummyTracer.spyCounter, 1);
+    it('should use the global tracer', () => {
+      const tracer = initGlobalTracer(new TestTracer());
+      const span = tracer.startSpan('test');
+      assert.deepStrictEqual(span, dummySpan);
     });
 
-    it('should use user provided tracer if provided', () => {
-      const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate(
-        dummyTracer,
-        new NoopTracer()
-      );
-
-      tracerDelegate.startSpan('foo');
-      assert.deepStrictEqual(dummyTracer.spyCounter, 1);
-    });
-
-    class DummyTracer extends NoopTracer {
-      spyCounter = 0;
-
-      startSpan(name: string, options?: types.SpanOptions | undefined) {
-        this.spyCounter = this.spyCounter + 1;
-        return new NoopSpan(spanContext);
+    class TestTracer extends NoopTracer {
+      startSpan(
+        name: string,
+        options?: types.SpanOptions | undefined
+      ): types.Span {
+        return dummySpan;
       }
     }
   });

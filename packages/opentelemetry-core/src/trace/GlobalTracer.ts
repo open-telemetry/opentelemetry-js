@@ -17,18 +17,35 @@
 import * as types from '@opentelemetry/types';
 import { NoopTracer } from './NoopTracer';
 
-const noopTracer = new NoopTracer();
-let _globalTracer: types.Tracer | null = null;
-
+// Acts a bridge to the global tracer that can be safely called before the
+// global tracer is initialized. The purpose of the delegation is to avoid the
+// sometimes nearly intractible initialization order problems that can arise in
+// applications with a complex set of dependencies. Also allows for the tracer
+// to be changed/disabled during runtime without needing to change reference
+// to the global tracer
 export class GlobalTracerDelegate implements types.Tracer {
+  private _tracer: types.Tracer | null;
+  private readonly _fallbackTracer: types.Tracer;
+
+  // Wrap a tracer with a GlobalTracerDelegate. Provided tracer becomes the default
+  // fallback tracer for when a global tracer has not been initialized
+  constructor(tracer?: types.Tracer | null, fallbackTracer?: types.Tracer) {
+    this._tracer = tracer || null;
+    this._fallbackTracer = fallbackTracer || new NoopTracer();
+  }
+
+  set tracer(tracer: types.Tracer | null) {
+    this._tracer = tracer;
+  }
+
   getCurrentSpan(): types.Span {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.getCurrentSpan.apply(tracer, arguments as any);
   }
 
   startSpan(name: string, options?: types.SpanOptions | undefined): types.Span {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.startSpan.apply(tracer, arguments as any);
   }
@@ -37,43 +54,26 @@ export class GlobalTracerDelegate implements types.Tracer {
     span: types.Span,
     fn: T
   ): ReturnType<T> {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.withSpan.apply(tracer, arguments as any) as ReturnType<T>;
   }
 
   recordSpanData(span: types.Span): void {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.recordSpanData.apply(tracer, arguments as any);
   }
 
   getBinaryFormat(): types.BinaryFormat {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.getBinaryFormat.apply(tracer, arguments as any);
   }
 
   getHttpTextFormat(): types.HttpTextFormat {
-    const tracer = _globalTracer || noopTracer;
+    const tracer = this._tracer || this._fallbackTracer;
     // tslint:disable-next-line:no-any
     return tracer.getHttpTextFormat.apply(tracer, arguments as any);
   }
-}
-
-const globalTracerDelegate = new GlobalTracerDelegate();
-
-/**
- * Set the current global tracer
- */
-export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
-  return (_globalTracer = tracer);
-}
-
-/**
- * Returns the global tracer
- */
-export function getTracer(): types.Tracer {
-  // Return the global tracer delegate
-  return globalTracerDelegate;
 }
