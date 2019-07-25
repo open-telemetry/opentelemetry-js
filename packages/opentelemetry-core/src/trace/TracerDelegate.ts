@@ -24,62 +24,77 @@ import { NoopTracer } from './NoopTracer';
 // to be changed/disabled during runtime without needing to change reference
 // to the global tracer
 export class TracerDelegate implements types.Tracer {
-  private readonly _userTracer: types.Tracer | null;
-  private readonly _fallbackTracer: types.Tracer;
-  private _tracer: types.Tracer;
+  private _currentTracer: types.Tracer;
 
   // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
-  constructor(tracer?: types.Tracer | null, fallbackTracer?: types.Tracer) {
-    this._userTracer = tracer || null;
-    this._fallbackTracer = fallbackTracer || new NoopTracer();
-    this._tracer = this._userTracer || this._fallbackTracer; // equivalent to this.start()
+  constructor(
+    private readonly tracer: types.Tracer | null = null,
+    private readonly fallbackTracer: types.Tracer = new NoopTracer()
+  ) {
+    this._currentTracer = tracer || fallbackTracer; // equivalent to this.start()
   }
 
   // Begin using the user provided tracer. Stop always falling back to fallback tracer
   start(): void {
-    this._tracer = this._userTracer || this._fallbackTracer;
+    this._currentTracer = this.tracer || this.fallbackTracer;
   }
 
   // Stop the delegate from using the provided tracer. Begin to use the fallback tracer
   stop(): void {
-    this._tracer = this._fallbackTracer;
+    this._currentTracer = this.fallbackTracer;
   }
 
-  // Tracer implementation
+  // -- Tracer interface implementation below -- //
+
   getCurrentSpan(): types.Span {
-    // tslint:disable-next-line:no-any
-    return this._tracer.getCurrentSpan.apply(this._tracer, arguments as any);
+    return this._currentTracer.getCurrentSpan.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
   }
 
   startSpan(name: string, options?: types.SpanOptions | undefined): types.Span {
-    // tslint:disable-next-line:no-any
-    return this._tracer.startSpan.apply(this._tracer, arguments as any);
+    return this._currentTracer.startSpan.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
   }
 
   withSpan<T extends (...args: unknown[]) => unknown>(
     span: types.Span,
     fn: T
   ): ReturnType<T> {
-    return this._tracer.withSpan.apply(
-      this._tracer,
+    return this._currentTracer.withSpan.apply(
+      this._currentTracer,
       // tslint:disable-next-line:no-any
       arguments as any
     ) as ReturnType<T>;
   }
 
   recordSpanData(span: types.Span): void {
-    // tslint:disable-next-line:no-any
-    return this._tracer.recordSpanData.apply(this._tracer, arguments as any);
+    return this._currentTracer.recordSpanData.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
   }
 
   getBinaryFormat(): types.BinaryFormat {
-    // tslint:disable-next-line:no-any
-    return this._tracer.getBinaryFormat.apply(this._tracer, arguments as any);
+    return this._currentTracer.getBinaryFormat.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
   }
 
   getHttpTextFormat(): types.HttpTextFormat {
-    // tslint:disable-next-line:no-any
-    return this._tracer.getHttpTextFormat.apply(this._tracer, arguments as any);
+    return this._currentTracer.getHttpTextFormat.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
   }
 }
