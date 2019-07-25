@@ -47,7 +47,10 @@ export class TracerDelegate implements types.Tracer {
     fn: T
   ): ReturnType<T> {
     // tslint:disable-next-line:no-any
-    return this._tracer.withSpan.apply(this._tracer, arguments as any) as ReturnType<T>;
+    return this._tracer.withSpan.apply(
+      this._tracer,
+      arguments as any
+    ) as ReturnType<T>;
   }
 
   recordSpanData(span: types.Span): void {
