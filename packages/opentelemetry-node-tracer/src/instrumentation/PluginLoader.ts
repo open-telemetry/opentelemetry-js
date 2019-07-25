@@ -93,6 +93,9 @@ export class PluginLoader {
         this.logger.info(
           `PluginLoader#load: trying loading ${name}.${version}`
         );
+
+        // @todo (issues/132): Check if version and supportedVersions are
+        // satisfied
         if (!version) return exports;
 
         this.logger.debug(
