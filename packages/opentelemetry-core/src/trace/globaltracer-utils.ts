@@ -15,16 +15,16 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { GlobalTracerDelegate } from './GlobalTracerDelegate';
+import { TracerDelegate } from './TracerDelegate';
 
-const globalTracerDelegate = new GlobalTracerDelegate();
+const TracerDelegate = new TracerDelegate();
 
 /**
  * Set the current global tracer. Returns the initialized global tracer
  */
 export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
-  globalTracerDelegate.tracer = tracer;
-  return globalTracerDelegate;
+  TracerDelegate.tracer = tracer;
+  return TracerDelegate;
 }
 
 /**
@@ -32,5 +32,5 @@ export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
  */
 export function getTracer(): types.Tracer {
   // Return the global tracer delegate
-  return globalTracerDelegate;
+  return TracerDelegate;
 }

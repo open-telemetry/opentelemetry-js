@@ -23,11 +23,11 @@ import { NoopTracer } from './NoopTracer';
 // applications with a complex set of dependencies. Also allows for the tracer
 // to be changed/disabled during runtime without needing to change reference
 // to the global tracer
-export class GlobalTracerDelegate implements types.Tracer {
+export class TracerDelegate implements types.Tracer {
   private _tracer: types.Tracer | null;
   private readonly _fallbackTracer: types.Tracer;
 
-  // Wrap a tracer with a GlobalTracerDelegate. Provided tracer becomes the default
+  // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
   constructor(fallbackTracer?: types.Tracer) {
     this._tracer = null;

@@ -16,11 +16,11 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
-import { GlobalTracerDelegate } from '../../src/trace/GlobalTracerDelegate';
+import { TracerDelegate } from '../../src/trace/TracerDelegate';
 import { NoopTracer, NoopSpan } from '../../src';
 import { TraceOptions } from '@opentelemetry/types';
 
-describe('GlobalTracerDelegate', () => {
+describe('TracerDelegate', () => {
   const functions = [
     'getCurrentSpan',
     'startSpan',
@@ -38,7 +38,7 @@ describe('GlobalTracerDelegate', () => {
   describe('#constructor(...)', () => {
     it('should not crash with default constructor', () => {
       functions.forEach(fn => {
-        const tracer = new GlobalTracerDelegate();
+        const tracer = new TracerDelegate();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -52,7 +52,7 @@ describe('GlobalTracerDelegate', () => {
 
     it('should allow fallback tracer to be set', () => {
       const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate(dummyTracer);
+      const tracerDelegate = new TracerDelegate(dummyTracer);
 
       tracerDelegate.startSpan('foo');
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
@@ -60,7 +60,7 @@ describe('GlobalTracerDelegate', () => {
 
     it('should use user provided tracer if provided', () => {
       const dummyTracer = new DummyTracer();
-      const tracerDelegate = new GlobalTracerDelegate();
+      const tracerDelegate = new TracerDelegate();
       tracerDelegate.tracer = dummyTracer;
 
       tracerDelegate.startSpan('foo');
