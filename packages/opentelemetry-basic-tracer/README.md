@@ -1,8 +1,10 @@
 # OpenTelemetry Basic Tracer SDK
+[![Gitter chat][gitter-image]][gitter-url]
+[![Apache License][license-image]][license-image]
 
 This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser.
 
-For automatic insturmentation see the
+For automatic instrumentation see the
 [@opentelemetry/node-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-tracer) package.
 
 ## Installation
@@ -31,3 +33,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat

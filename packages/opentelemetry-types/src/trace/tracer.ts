@@ -15,9 +15,9 @@
  */
 
 import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
+import { BinaryFormat } from '../context/propagation/BinaryFormat';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
-import { BinaryFormat } from '../context/propagation/BinaryFormat';
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
@@ -49,9 +49,11 @@ export interface Tracer {
    * Executes the function given by fn within the context provided by Span
    *
    * @param span The span that provides the context
-   * @param fn The function to be eexcuted inside the provided context
+   * @param fn The function to be executed inside the provided context
+   * @example
+   * tracer.withSpan(span, function() { ... });
    */
-  withSpan<T extends (...args: unknown[]) => unknown>(
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
     fn: T
   ): ReturnType<T>;

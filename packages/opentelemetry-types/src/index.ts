@@ -33,3 +33,4 @@ export * from './trace/status';
 export * from './trace/tracer';
 export * from './trace/trace_options';
 export * from './trace/trace_state';
+export * from './trace/tracer';
