@@ -22,6 +22,7 @@ export * from './distributed_context/EntryValue';
 export * from './resources/Resource';
 export * from './trace/attributes';
 export * from './trace/Event';
+export * from './trace/instrumentation/Plugin';
 export * from './trace/link';
 export * from './trace/Sampler';
 export * from './trace/span';
