@@ -35,6 +35,17 @@
     "LICENSE",
     "README.md"
   ],
+  "c8": {
+    "extension": [
+      ".ts"
+    ],
+    "exclude": [
+      "**/*.d.ts",
+      "build/**/**/*.js",
+      "src/index.ts"
+    ],
+    "all": true
+  },
   "publishConfig": {
     "access": "public"
   },
