@@ -24,7 +24,9 @@ import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
  * propagation.
  */
 export class NoopSpan implements types.Span {
-  constructor(private readonly _spanContext: SpanContext) {}
+  constructor(
+    private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
+  ) {}
 
   // Returns a SpanContext.
   context(): types.SpanContext {
@@ -70,4 +72,4 @@ export class NoopSpan implements types.Span {
   }
 }
 
-export const NOOP_SPAN_INSTANCE = new NoopSpan(INVALID_SPAN_CONTEXT);
+export const NOOP_SPAN_INSTANCE = new NoopSpan();
