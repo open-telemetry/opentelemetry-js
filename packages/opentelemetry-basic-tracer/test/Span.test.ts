@@ -95,7 +95,7 @@ describe('Span', () => {
 
     assert.strictEqual(
       span.toString(),
-      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","name":"${name}","kind":1,"status":{"code":0},"startTime":100,"finishTime":0}`
+      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","name":"${name}","kind":1,"status":{"code":0},"startTime":100,"endTime":0}`
     );
   });
 });

@@ -41,7 +41,7 @@ export class Span implements types.Span {
   private _name: string;
   private _ended = false;
   private _startTime: number;
-  private _finishTime = 0;
+  private _endTime = 0;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -115,7 +115,7 @@ export class Span implements types.Span {
   end(endTime?: number): void {
     if (this._isSpanEnded()) return;
     this._ended = true;
-    this._finishTime = endTime || performance.now();
+    this._endTime = endTime || performance.now();
     // @todo: record or export the span
   }
 
@@ -132,7 +132,7 @@ export class Span implements types.Span {
       kind: this._kind,
       status: this._status,
       startTime: this._startTime,
-      finishTime: this._finishTime,
+      endTime: this._endTime,
     });
     return `Span${json}`;
   }
