@@ -15,15 +15,15 @@
  */
 
 import * as assert from 'assert';
-import { NodeTracer } from '../src/NodeTracer';
 import {
+  ALWAYS_SAMPLER,
   BinaryTraceContext,
   HttpTraceContext,
-  ALWAYS_SAMPLER,
   NEVER_SAMPLER,
   NoopLogger,
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { NodeTracer } from '../src/NodeTracer';
 
 describe('NodeTracer', () => {
   describe('constructor', () => {
@@ -78,7 +78,7 @@ describe('NodeTracer', () => {
     });
   });
 
-  describe('startSpan', () => {
+  describe('.startSpan()', () => {
     it('should start a span with name only', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
@@ -111,7 +111,7 @@ describe('NodeTracer', () => {
     it('should set default attributes on span');
   });
 
-  describe('getCurrentSpan', () => {
+  describe('.getCurrentSpan()', () => {
     it('should return null with AsyncHooksScopeManager when no span started', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
@@ -120,7 +120,7 @@ describe('NodeTracer', () => {
     });
   });
 
-  describe('withSpan', () => {
+  describe('.withSpan()', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
@@ -156,7 +156,7 @@ describe('NodeTracer', () => {
     });
   });
 
-  describe('recordSpanData', () => {
+  describe('.recordSpanData()', () => {
     // @todo: implement
     it('should call exporters with span data');
   });
@@ -170,7 +170,7 @@ describe('NodeTracer', () => {
     });
   });
 
-  describe('getHttpTextFormat', () => {
+  describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
