@@ -72,4 +72,4 @@ export class NoopSpan implements types.Span {
   }
 }
 
-export const NOOP_SPAN_INSTANCE = new NoopSpan();
+export const NOOP_SPAN = new NoopSpan();

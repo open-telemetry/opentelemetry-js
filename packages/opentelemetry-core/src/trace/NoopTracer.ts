@@ -23,19 +23,19 @@ import {
 } from '@opentelemetry/types';
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
 import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
-import { NOOP_SPAN_INSTANCE } from './NoopSpan';
+import { NOOP_SPAN } from './NoopSpan';
 
 /**
  * No-op implementations of {@link Tracer}.
  */
 export class NoopTracer implements Tracer {
   getCurrentSpan(): Span {
-    return NOOP_SPAN_INSTANCE;
+    return NOOP_SPAN;
   }
 
   // startSpan starts a noop span.
   startSpan(name: string, options?: SpanOptions): Span {
-    return NOOP_SPAN_INSTANCE;
+    return NOOP_SPAN;
   }
 
   // @todo: dependency on https://github.com/open-telemetry/opentelemetry-js/pull/100, Use new return type.
