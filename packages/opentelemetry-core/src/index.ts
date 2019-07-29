@@ -20,6 +20,7 @@ export * from './context/propagation/HttpTraceContext';
 export * from './platform';
 export * from './resources/Resource';
 export * from './trace/globaltracer-utils';
+export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/sampler/ProbabilitySampler';
