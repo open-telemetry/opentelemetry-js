@@ -21,6 +21,7 @@ import {
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
+  NOOP_SPAN,
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
@@ -101,7 +102,7 @@ describe('NodeTracer', () => {
         scopeManager: new AsyncHooksScopeManager(),
       });
       const span = tracer.startSpan('my-span');
-      assert.deepStrictEqual(span, NodeTracer.defaultSpan);
+      assert.deepStrictEqual(span, NOOP_SPAN);
     });
 
     // @todo: implement
@@ -128,9 +129,9 @@ describe('NodeTracer', () => {
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
+        return done();
       });
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
-      done();
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
@@ -148,11 +149,12 @@ describe('NodeTracer', () => {
             span1.context().traceId,
             span.context().traceId
           );
+          return done();
         });
       });
       // when span ended.
+      // @todo: below check is not running.
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
-      done();
     });
   });
 
