@@ -38,12 +38,11 @@ export class NoopTracer implements Tracer {
     return NOOP_SPAN;
   }
 
-  // @todo: dependency on https://github.com/open-telemetry/opentelemetry-js/pull/100, Use new return type.
-  withSpan<T extends (...args: unknown[]) => unknown>(
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
     fn: T
   ): ReturnType<T> {
-    throw new Error('Method not implemented.');
+    return fn();
   }
 
   // By default does nothing

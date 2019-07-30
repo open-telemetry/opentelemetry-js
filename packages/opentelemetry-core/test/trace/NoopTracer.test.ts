@@ -20,7 +20,7 @@ import { NOOP_SPAN } from '../../src/trace/NoopSpan';
 import { SpanKind } from '@opentelemetry/types';
 
 describe('NoopTracer', () => {
-  it('does not crash', () => {
+  it('should not crash', () => {
     const spanContext = { traceId: '', spanId: '' };
     const tracer = new NoopTracer();
 
@@ -49,9 +49,12 @@ describe('NoopTracer', () => {
     assert.ok(binaryFormat);
     assert.ok(binaryFormat.toBytes(spanContext), typeof ArrayBuffer);
     assert.deepStrictEqual(binaryFormat.fromBytes(new ArrayBuffer(0)), null);
+  });
 
-    assert.throws(() => {
-      tracer.withSpan(NOOP_SPAN, () => {});
+  it('should not crash when .withSpan()', done => {
+    const tracer = new NoopTracer();
+    tracer.withSpan(NOOP_SPAN, () => {
+      return done();
     });
   });
 });
