@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import { AsyncHooksScopeManager } from '../src';
+import { EventEmitter } from 'events';
 
 describe('AsyncHooksScopeManager', () => {
   let scopeManager: AsyncHooksScopeManager;
@@ -153,6 +154,107 @@ describe('AsyncHooksScopeManager', () => {
         }, 100);
       }, scope);
       fn();
+    });
+  });
+
+  describe('.bind(event-emitter)', () => {
+    it('should return the same target (when enabled)', () => {
+      const ee = new EventEmitter();
+      assert.deepStrictEqual(scopeManager.bind(ee), ee);
+    });
+
+    it('should return the same target (when disabled)', () => {
+      const ee = new EventEmitter();
+      scopeManager.disable();
+      assert.deepStrictEqual(scopeManager.bind(ee), ee);
+      scopeManager.enable();
+    });
+
+    it('should return current scope and removeListener (when enabled)', done => {
+      const ee = new EventEmitter();
+      const scope = { a: 2 };
+      const patchedEe = scopeManager.bind(ee, scope);
+      const handler = () => {
+        assert.deepStrictEqual(scopeManager.active(), scope);
+        patchedEe.removeListener('test', handler);
+        assert.strictEqual(patchedEe.listeners('test').length, 0);
+        return done();
+      };
+      patchedEe.on('test', handler);
+      assert.strictEqual(patchedEe.listeners('test').length, 1);
+      patchedEe.emit('test');
+    });
+
+    it('should return current scope and removeAllListener (when enabled)', done => {
+      const ee = new EventEmitter();
+      const scope = { a: 2 };
+      const patchedEe = scopeManager.bind(ee, scope);
+      const handler = () => {
+        assert.deepStrictEqual(scopeManager.active(), scope);
+        patchedEe.removeAllListeners('test');
+        assert.strictEqual(patchedEe.listeners('test').length, 0);
+        return done();
+      };
+      patchedEe.on('test', handler);
+      assert.strictEqual(patchedEe.listeners('test').length, 1);
+      patchedEe.emit('test');
+    });
+
+    /**
+     * Even if asynchooks is disabled, the scope propagation will
+     * still works but it might be lost after any async op.
+     */
+    it('should return scope (when disabled)', done => {
+      scopeManager.disable();
+      const ee = new EventEmitter();
+      const scope = { a: 2 };
+      const patchedEe = scopeManager.bind(ee, scope);
+      const handler = () => {
+        assert.deepStrictEqual(scopeManager.active(), scope);
+        patchedEe.removeListener('test', handler);
+        assert.strictEqual(patchedEe.listeners('test').length, 0);
+        scopeManager.enable();
+        return done();
+      };
+      patchedEe.on('test', handler);
+      assert.strictEqual(patchedEe.listeners('test').length, 1);
+      patchedEe.emit('test');
+    });
+
+    it('should not return current scope (when disabled + async op)', done => {
+      scopeManager.disable();
+      const ee = new EventEmitter();
+      const scope = { a: 3 };
+      const patchedEe = scopeManager.bind(ee, scope);
+      const handler = () => {
+        setImmediate(() => {
+          assert.deepStrictEqual(scopeManager.active(), null);
+          patchedEe.removeAllListeners('test');
+          assert.strictEqual(patchedEe.listeners('test').length, 0);
+          return done();
+        });
+      };
+      patchedEe.on('test', handler);
+      assert.strictEqual(patchedEe.listeners('test').length, 1);
+      patchedEe.emit('test');
+    });
+
+    it('should return current scope (when enabled + async op)', done => {
+      scopeManager.enable();
+      const ee = new EventEmitter();
+      const scope = { a: 3 };
+      const patchedEe = scopeManager.bind(ee, scope);
+      const handler = () => {
+        setImmediate(() => {
+          assert.deepStrictEqual(scopeManager.active(), scope);
+          patchedEe.removeAllListeners('test');
+          assert.strictEqual(patchedEe.listeners('test').length, 0);
+          return done();
+        });
+      };
+      patchedEe.on('test', handler);
+      assert.strictEqual(patchedEe.listeners('test').length, 1);
+      patchedEe.emit('test');
     });
   });
 });
