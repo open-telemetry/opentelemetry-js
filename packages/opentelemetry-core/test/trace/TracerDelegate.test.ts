@@ -35,7 +35,7 @@ describe('TracerDelegate', () => {
     traceOptions: TraceOptions.UNSAMPLED,
   };
 
-  describe('#constructor(...)', () => {
+  describe('constructor', () => {
     it('should not crash with default constructor', () => {
       functions.forEach(fn => {
         const tracer = new TracerDelegate();
@@ -66,7 +66,7 @@ describe('TracerDelegate', () => {
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
     });
 
-    describe('#start/stop()', () => {
+    describe('.start/stop()', () => {
       it('should use the fallback tracer when stop is called', () => {
         const dummyTracerUser = new DummyTracer();
         const dummyTracerFallback = new DummyTracer();
