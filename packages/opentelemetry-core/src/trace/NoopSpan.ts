@@ -16,14 +16,17 @@
 
 import * as types from '@opentelemetry/types';
 import { SpanContext } from '@opentelemetry/types';
+import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span
- * implementation is available. All operations are no-op except context
+ * implementation is available. All operations are no-op including context
  * propagation.
  */
 export class NoopSpan implements types.Span {
-  constructor(private readonly _spanContext: SpanContext) {}
+  constructor(
+    private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
+  ) {}
 
   // Returns a SpanContext.
   context(): types.SpanContext {
@@ -68,3 +71,5 @@ export class NoopSpan implements types.Span {
     return false;
   }
 }
+
+export const NOOP_SPAN = new NoopSpan();

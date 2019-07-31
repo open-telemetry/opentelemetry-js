@@ -22,7 +22,7 @@ import {
   NoopSpan,
   randomSpanId,
   randomTraceId,
-  INVALID_SPAN_CONTEXT,
+  NOOP_SPAN,
   ALWAYS_SAMPLER,
 } from '@opentelemetry/core';
 import { BasicTracerConfig } from '../src/types';
@@ -32,13 +32,11 @@ import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
  * This class represents a basic tracer.
  */
 export class BasicTracer implements types.Tracer {
-  static defaultSpan = new NoopSpan(INVALID_SPAN_CONTEXT);
-
-  private _defaultAttributes: types.Attributes;
-  private _binaryFormat: types.BinaryFormat;
-  private _httpTextFormat: types.HttpTextFormat;
-  private _sampler: types.Sampler;
-  private _scopeManager: ScopeManager;
+  private readonly _defaultAttributes: types.Attributes;
+  private readonly _binaryFormat: types.BinaryFormat;
+  private readonly _httpTextFormat: types.HttpTextFormat;
+  private readonly _sampler: types.Sampler;
+  private readonly _scopeManager: ScopeManager;
 
   /**
    * Constructs a new Tracer instance.
@@ -74,7 +72,7 @@ export class BasicTracer implements types.Tracer {
     if (!this._sampler.shouldSample(parentSpanContext)) {
       // TODO: propagate SpanContext, for more information see
       // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
-      return BasicTracer.defaultSpan;
+      return NOOP_SPAN;
     }
 
     // span context
