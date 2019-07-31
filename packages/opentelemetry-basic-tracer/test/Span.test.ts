@@ -22,11 +22,29 @@ import {
   TraceOptions,
   SpanContext,
 } from '@opentelemetry/types';
-import { NoopTracer, NoopLogger } from '@opentelemetry/core';
+import { SpanExporter, ReadableSpan, BasicTracer } from '../src';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { NoopLogger } from '@opentelemetry/core';
+import { SimpleSampledSpanProcessor } from '../src/export/SimpleSampledSpanProcessor';
+
+class TestExporter implements SpanExporter {
+  spanDataList: ReadableSpan[] = [];
+  export(spans: ReadableSpan[]): void {
+    this.spanDataList.push(...spans);
+  }
+
+  shutdown(): void {
+    this.spanDataList = [];
+  }
+}
 
 describe('Span', () => {
-  const tracer = new NoopTracer();
+  const tracer = new BasicTracer({
+    scopeManager: new NoopScopeManager(),
+  });
   const logger = new NoopLogger();
+  const exporter = new TestExporter();
+  const spanProcessor = new SimpleSampledSpanProcessor([exporter]);
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -34,15 +52,33 @@ describe('Span', () => {
     traceOptions: TraceOptions.SAMPLED,
   };
 
+  afterEach(() => {
+    exporter.shutdown();
+  });
+
   it('should create a Span instance', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.SERVER,
+      spanProcessor
+    );
     assert.ok(span instanceof Span);
     assert.strictEqual(span.tracer(), tracer);
     span.end();
   });
 
   it('should get the span context of span', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     const context = span.context();
     assert.strictEqual(context.traceId, spanContext.traceId);
     assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
@@ -53,13 +89,27 @@ describe('Span', () => {
   });
 
   it('should return true when isRecordingEvents:true', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     assert.ok(span.isRecordingEvents());
     span.end();
   });
 
   it('should set an attribute', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
 
     ['String', 'Number', 'Boolean'].map(attType => {
       span.setAttribute('testKey' + attType, 'testValue' + attType);
@@ -69,7 +119,14 @@ describe('Span', () => {
   });
 
   it('should set an event', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     span.addEvent('sent');
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     span.end();
@@ -81,14 +138,28 @@ describe('Span', () => {
       spanId: '5e0c63257de34c92',
       traceOptions: TraceOptions.SAMPLED,
     };
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     span.addLink(spanContext);
     span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
     span.end();
   });
 
   it('should set an error status', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -104,6 +175,7 @@ describe('Span', () => {
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
+      spanProcessor,
       parentId
     );
 
@@ -126,7 +198,8 @@ describe('Span', () => {
       logger,
       'my-span',
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      spanProcessor
     );
     span.setAttribute('attr1', 'value1');
     let readableSpan = span.toReadableSpan();
@@ -155,7 +228,8 @@ describe('Span', () => {
       logger,
       'my-span',
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      spanProcessor
     );
     span.addLink(spanContext);
     let readableSpan = span.toReadableSpan();
@@ -198,7 +272,8 @@ describe('Span', () => {
       logger,
       'my-span',
       spanContext,
-      SpanKind.CLIENT
+      SpanKind.CLIENT,
+      spanProcessor
     );
     span.addEvent('sent');
     let readableSpan = span.toReadableSpan();
@@ -232,7 +307,14 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(
+      tracer,
+      logger,
+      name,
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -244,5 +326,27 @@ describe('Span', () => {
     );
     assert.strictEqual(readableSpan.status.message, 'This is an error');
     span.end();
+  });
+
+  it('should export the span after end', () => {
+    const span = new Span(
+      tracer,
+      logger,
+      'my-span',
+      spanContext,
+      SpanKind.CLIENT,
+      spanProcessor
+    );
+    assert.strictEqual(exporter.spanDataList.length, 0);
+    span.end();
+    assert.strictEqual(exporter.spanDataList.length, 1);
+    const [spanData] = exporter.spanDataList;
+    assert.strictEqual(spanData.name, 'my-span');
+    assert.strictEqual(spanData.kind, SpanKind.INTERNAL);
+    assert.strictEqual(spanData.parentSpanId, spanContext.spanId);
+    assert.strictEqual(spanData.spanContext.traceId, spanContext.traceId);
+    assert.deepStrictEqual(spanData.status, {
+      code: CanonicalCode.OK,
+    });
   });
 });

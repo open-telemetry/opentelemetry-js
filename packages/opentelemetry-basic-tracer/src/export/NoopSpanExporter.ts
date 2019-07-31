@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-export * from './export/ExportResult';
-export * from './export/ReadableSpan';
-export * from './export/SpanExporter';
-export * from './export/SpanProcessor';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+import { SpanExporter } from './SpanExporter';
+import { ReadableSpan } from './ReadableSpan';
+
+export class NoopSpanExporter implements SpanExporter {
+  // By default does nothing
+  export(spans: ReadableSpan[]): void {}
+
+  // By default does nothing
+  shutdown(): void {}
+}

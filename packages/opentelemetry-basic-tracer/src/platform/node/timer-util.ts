@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-export * from './export/ExportResult';
-export * from './export/ReadableSpan';
-export * from './export/SpanExporter';
-export * from './export/SpanProcessor';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+/**
+ * When called, the active Timeout object will not require the Node.js event
+ * loop to remain active.
+ */
+export function unrefTimer(timer: NodeJS.Timeout): void {
+  timer.unref();
+}

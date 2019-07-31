@@ -14,10 +14,5 @@
  * limitations under the License.
  */
 
-export * from './export/ExportResult';
-export * from './export/ReadableSpan';
-export * from './export/SpanExporter';
-export * from './export/SpanProcessor';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+/** This is Node specific, does nothing in case of browser */
+export function unrefTimer(timer: number): void {}

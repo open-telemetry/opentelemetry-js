@@ -31,9 +31,12 @@ import {
   TraceOptions,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
+import { BatchSampledSpanProcessor } from './export/BatchSampledSpanProcessor';
+import { SpanProcessor } from './export/SpanProcessor';
+import { Config } from './types';
+import { SpanExporter } from './export/SpanExporter';
 
 /**
  * This class represents a basic tracer.
@@ -42,20 +45,28 @@ export class BasicTracer implements types.Tracer {
   private readonly _defaultAttributes: types.Attributes;
   private readonly _binaryFormat: types.BinaryFormat;
   private readonly _httpTextFormat: types.HttpTextFormat;
+  private readonly _logger: Logger;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
-  private readonly _logger: Logger;
+  private readonly _exporters: SpanExporter[] = [];
+  private readonly _spanProcessor: SpanProcessor;
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
+  constructor(config: Config) {
     this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
     this._defaultAttributes = config.defaultAttributes || {};
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
+    this._logger = config.logger || new NoopLogger();
     this._sampler = config.sampler || ALWAYS_SAMPLER;
     this._scopeManager = config.scopeManager;
     this._logger = config.logger || new NoopLogger();
+    this._spanProcessor = new BatchSampledSpanProcessor(this._exporters, {
+      bufferSize: config.bufferSize,
+      bufferTimeout: config.bufferTimeout,
+      logger: this._logger,
+    });
   }
 
   /**
@@ -93,6 +104,7 @@ export class BasicTracer implements types.Tracer {
       name,
       spanContext,
       options.kind || types.SpanKind.INTERNAL,
+      this._spanProcessor,
       parentContext ? parentContext.spanId : undefined,
       options.startTime
     );
@@ -156,5 +168,24 @@ export class BasicTracer implements types.Tracer {
       return (parent as Span).context();
     }
     return undefined;
+  }
+
+  /**
+   * Registers the span exporter.
+   * @param exporter The span exporter.
+   */
+  registerExporter(exporter: SpanExporter) {
+    this._exporters.push(exporter);
+  }
+
+  /**
+   * Unregisters the span exporter.
+   * @param exporter The span exporter.
+   */
+  unregisterExporter(exporter: SpanExporter) {
+    const index = this._exporters.indexOf(exporter, 0);
+    if (index > -1) {
+      this._exporters.splice(index, 1);
+    }
   }
 }

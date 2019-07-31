@@ -58,3 +58,15 @@ export interface BasicTracerConfig {
    */
   scopeManager: ScopeManager;
 }
+
+/** Interface configuration for a buffer. */
+export interface BufferConfig {
+  /** Maximum size of a buffer. */
+  bufferSize?: number;
+  /** Max time for a buffer can wait before being sent */
+  bufferTimeout?: number;
+  /** A logger object  */
+  logger?: Logger;
+}
+
+export declare type Config = BasicTracerConfig & BufferConfig;
