@@ -17,6 +17,7 @@
 import * as types from '@opentelemetry/types';
 import { performance } from 'perf_hooks';
 import { SpanKind, SpanContext } from '@opentelemetry/types';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /**
  * This class represents a span.
@@ -108,6 +109,22 @@ export class Span implements types.Span {
 
   isRecordingEvents(): boolean {
     return true;
+  }
+
+  toReadableSpan(): ReadableSpan {
+    return {
+      name: this._name,
+      traceId: this._spanContext.traceId,
+      spanId: this._spanContext.spanId,
+      parentSpanId: this._parentId,
+      kind: this._kind,
+      startTime: this._startTime,
+      endTime: this._endTime,
+      status: this._status,
+      attributes: this._attributes,
+      links: this._links,
+      events: this._events,
+    };
   }
 
   toString() {

@@ -14,9 +14,24 @@
  * limitations under the License.
  */
 
-export * from './export/ExportResult';
-export * from './export/ReadableSpan';
-export * from './export/SpanExporter';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+import {
+  SpanKind,
+  Status,
+  Attributes,
+  Link,
+  Event,
+} from '@opentelemetry/types';
+
+export interface ReadableSpan {
+  readonly name: string;
+  readonly kind: SpanKind;
+  readonly traceId: string;
+  readonly spanId: string;
+  readonly parentSpanId?: string;
+  readonly startTime: number;
+  readonly endTime: number;
+  readonly status: Status;
+  readonly attributes: Attributes;
+  readonly links: Link[];
+  readonly events: Event[];
+}
