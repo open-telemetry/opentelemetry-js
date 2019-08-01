@@ -15,18 +15,16 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { ScopeManager } from '@opentelemetry/scope-base';
 import {
+  ALWAYS_SAMPLER,
   BinaryTraceContext,
   HttpTraceContext,
-  NoopSpan,
-  randomSpanId,
-  randomTraceId,
   NOOP_SPAN,
-  ALWAYS_SAMPLER,
 } from '@opentelemetry/core';
-import { BasicTracerConfig } from '../src/types';
 import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
+import { BasicTracerConfig } from '../src/types';
+import { ScopeManager } from '@opentelemetry/scope-base';
+import { Span } from './Span';
 
 /**
  * This class represents a basic tracer.
@@ -54,20 +52,7 @@ export class BasicTracer implements types.Tracer {
    * decision.
    */
   startSpan(name: string, options: types.SpanOptions = {}): types.Span {
-    let parentSpanContext: types.SpanContext | undefined;
-
-    // parent is a SpanContext
-    if (options.parent && (options.parent as types.SpanContext).traceId) {
-      parentSpanContext = options.parent as types.SpanContext;
-    }
-    // parent is a Span
-    if (
-      options.parent &&
-      typeof (options.parent as types.Span).context === 'function'
-    ) {
-      parentSpanContext = (options.parent as types.Span).context();
-    }
-
+    const parentSpanContext = this._getParentSpanContext(options.parent);
     // make sampling decision
     if (!this._sampler.shouldSample(parentSpanContext)) {
       // TODO: propagate SpanContext, for more information see
@@ -75,21 +60,13 @@ export class BasicTracer implements types.Tracer {
       return NOOP_SPAN;
     }
 
-    // span context
-    const traceId = parentSpanContext
-      ? parentSpanContext.traceId
-      : randomTraceId();
-    const spanId = randomSpanId();
-
-    // TODO: create a real Span
-    const span = new NoopSpan({
-      traceId,
-      spanId,
+    const spanOptions = Object.assign({}, options, {
+      parent: parentSpanContext,
     });
+    const span = new Span(this, name, spanOptions);
 
     // Set default attributes
     span.setAttributes(this._defaultAttributes);
-
     return span;
   }
 
@@ -131,5 +108,21 @@ export class BasicTracer implements types.Tracer {
    */
   getHttpTextFormat(): HttpTextFormat {
     return this._httpTextFormat;
+  }
+
+  private _getParentSpanContext(
+    parent: types.Span | types.SpanContext | undefined
+  ): types.SpanContext | undefined {
+    if (!parent) return undefined;
+
+    // parent is a SpanContext
+    if ((parent as types.SpanContext).traceId) {
+      return parent as types.SpanContext;
+    }
+
+    if (typeof (parent as types.Span).context === 'function') {
+      return (parent as Span).context();
+    }
+    return undefined;
   }
 }

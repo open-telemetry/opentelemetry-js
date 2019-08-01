@@ -15,16 +15,17 @@
  */
 
 import * as assert from 'assert';
-import { BasicTracer } from '../src/BasicTracer';
 import {
+  ALWAYS_SAMPLER,
   BinaryTraceContext,
   HttpTraceContext,
-  ALWAYS_SAMPLER,
   NEVER_SAMPLER,
-  NoopLogger,
   NOOP_SPAN,
+  NoopLogger,
 } from '@opentelemetry/core';
+import { BasicTracer } from '../src/BasicTracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { Span } from '../src/Span';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
@@ -79,13 +80,14 @@ describe('BasicTracer', () => {
     });
   });
 
-  describe('#startSpan', () => {
+  describe('.startSpan()', () => {
     it('should start a span with name only', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span);
+      assert.ok(span instanceof Span);
     });
 
     it('should start a span with name and options', () => {
@@ -94,6 +96,7 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
+      assert.ok(span instanceof Span);
     });
 
     it('should return a default span with no sampling', () => {
@@ -112,7 +115,7 @@ describe('BasicTracer', () => {
     it('should set default attributes on span');
   });
 
-  describe('#getCurrentSpan', () => {
+  describe('.getCurrentSpan()', () => {
     it('should return null with NoopScopeManager', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
@@ -122,7 +125,7 @@ describe('BasicTracer', () => {
     });
   });
 
-  describe('#withSpan', () => {
+  describe('.withSpan()', () => {
     it('should run scope with NoopScopeManager scope manager', done => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
@@ -134,12 +137,12 @@ describe('BasicTracer', () => {
     });
   });
 
-  describe('#recordSpanData', () => {
+  describe('.recordSpanData()', () => {
     // @todo: implement
     it('should call exporters with span data');
   });
 
-  describe('#getBinaryFormat', () => {
+  describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
@@ -148,7 +151,7 @@ describe('BasicTracer', () => {
     });
   });
 
-  describe('#getHttpTextFormat', () => {
+  describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
