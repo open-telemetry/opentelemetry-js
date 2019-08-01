@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides [async-hooks][async-hooks-doc] based scope manager which is used internally by OpenTelemetry plugins to propagate specific scope between function calls and async operations. It only target NodeJS since async-hooks is only available there.
+This package provides [async-hooks][async-hooks-doc] based scope manager which is used internally by OpenTelemetry plugins to propagate specific scope between function calls and async operations. It only targets NodeJS since async-hooks is only available there.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

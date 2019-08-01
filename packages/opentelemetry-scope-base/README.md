@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides the ScopeManager interface (which is used the different implementations) and no-op implementation (which is used internally when no scope propagation is defined). It's intended for use both on the server and in the browser.
+This package provides the ScopeManager interface (which is used by concrete implementations) and a no-op implementation (which is used internally when no scope propagation is defined). It's intended for use both on the server and in the browser.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
