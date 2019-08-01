@@ -60,8 +60,10 @@ export class BasicTracer implements types.Tracer {
       return NOOP_SPAN;
     }
 
-    options.parent = parentSpanContext;
-    const span = new Span(this, name, options);
+    const spanOptions = Object.assign({}, options, {
+      parent: parentSpanContext,
+    });
+    const span = new Span(this, name, spanOptions);
 
     // Set default attributes
     span.setAttributes(this._defaultAttributes);
