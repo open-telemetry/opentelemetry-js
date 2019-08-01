@@ -49,14 +49,6 @@ export class PluginLoader {
   /** Constructs a new PluginLoader instance. */
   constructor(readonly tracer: Tracer, readonly logger: Logger) {}
 
-  get state(): HookState {
-    return this._hookState;
-  }
-
-  get plugins(): PluginType {
-    return this._plugins;
-  }
-
   /**
    * Loads a list of plugins. Each plugin module should implement the core
    * {@link Plugin} interface and export an instance named as 'plugin'. This
