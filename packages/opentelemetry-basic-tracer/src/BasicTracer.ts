@@ -20,6 +20,8 @@ import {
   BinaryTraceContext,
   HttpTraceContext,
   NOOP_SPAN,
+  randomTraceId,
+  isValid,
 } from '@opentelemetry/core';
 import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
 import { BasicTracerConfig } from '../src/types';
@@ -60,11 +62,28 @@ export class BasicTracer implements types.Tracer {
       return NOOP_SPAN;
     }
 
-    const spanOptions = Object.assign({}, options, {
-      parent: parentSpanContext,
-    });
-    const span = new Span(this, name, spanOptions);
+    let traceId;
+    let parentSpanId;
+    let traceState;
+    if (!parentSpanContext || !isValid(parentSpanContext)) {
+      // New root span.
+      traceId = randomTraceId();
+    } else {
+      // New child span.
+      traceId = parentSpanContext.traceId;
+      parentSpanId = parentSpanContext.spanId;
+      traceState = parentSpanContext.traceState;
+    }
 
+    const span = new Span(
+      this,
+      name,
+      traceId,
+      options.kind || types.SpanKind.INTERNAL,
+      parentSpanId,
+      traceState,
+      options.startTime
+    );
     // Set default attributes
     span.setAttributes(this._defaultAttributes);
     return span;
@@ -92,6 +111,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Records a SpanData.
    */
+  /* c8 ignore next 3 */
   recordSpanData(span: types.Span): void {
     // TODO: notify exporter
   }
