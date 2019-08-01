@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.12",
+    "@types/node": "^12.6.8",
     "@types/webpack-env": "1.13.9",
     "c8": "^5.0.1",
     "codecov": "^3.1.0",
