@@ -1,0 +1,11 @@
+{
+  "extension": [
+    ".ts"
+  ],
+  "exclude": [
+    "**/*.d.ts",
+    "build/**/**/*.js",
+    "src/index.ts"
+  ],
+  "all": true
+}
