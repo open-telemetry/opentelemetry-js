@@ -63,7 +63,7 @@ export class TracerDelegate implements types.Tracer {
     );
   }
 
-  withSpan<T extends (...args: unknown[]) => unknown>(
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: types.Span,
     fn: T
   ): ReturnType<T> {
@@ -71,7 +71,7 @@ export class TracerDelegate implements types.Tracer {
       this._currentTracer,
       // tslint:disable-next-line:no-any
       arguments as any
-    ) as ReturnType<T>;
+    );
   }
 
   recordSpanData(span: types.Span): void {
