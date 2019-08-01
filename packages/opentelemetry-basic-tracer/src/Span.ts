@@ -128,16 +128,7 @@ export class Span implements types.Span {
   }
 
   toString() {
-    const json = JSON.stringify({
-      traceId: this._spanContext.traceId,
-      spanId: this._spanContext.spanId,
-      parentId: this._parentId,
-      name: this._name,
-      kind: this._kind,
-      status: this._status,
-      startTime: this._startTime,
-      endTime: this._endTime,
-    });
+    const json = JSON.stringify(this.toReadableSpan());
     return `Span${json}`;
   }
 

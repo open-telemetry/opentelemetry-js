@@ -106,7 +106,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan', () => {
-    const span = new Span(tracer, 'my-span', { parent: spanContext });
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
 
     const readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.name, 'my-span');
@@ -122,7 +122,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with attributes', () => {
-    const span = new Span(tracer, 'my-span', { parent: spanContext });
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.setAttribute('attr1', 'value1');
     let readableSpan = span.toReadableSpan();
     assert.deepStrictEqual(readableSpan.attributes, { attr1: 'value1' });
@@ -145,7 +145,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
-    const span = new Span(tracer, 'my-span', { parent: spanContext });
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
     let readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.links.length, 1);
@@ -182,7 +182,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with events', () => {
-    const span = new Span(tracer, 'my-span', { parent: spanContext });
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.addEvent('sent');
     let readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.events.length, 1);
@@ -220,7 +220,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(tracer, name, {});
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
