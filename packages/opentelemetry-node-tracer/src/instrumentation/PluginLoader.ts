@@ -29,6 +29,11 @@ interface PluginNames {
   [pluginName: string]: string;
 }
 
+interface PluginConfig {
+  // TODO: Consider to add configuration options
+  [pluginName: string]: boolean;
+}
+
 // tslint:disable-next-line:no-any
 export type PluginType = Array<Plugin<any>>;
 
@@ -54,13 +59,15 @@ export class PluginLoader {
    * {@link Plugin} interface and export an instance named as 'plugin'. This
    * function will attach a hook to be called the first time the module is
    * loaded.
-   * @param modulesToPatch A list of plugins.
+   * @param pluginConfig an object to configure the plugin.
    */
-  load(modulesToPatch: string[]): PluginLoader {
+  load(pluginConfig: PluginConfig): PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
-      const plugins = modulesToPatch.reduce(
+      const plugins = Object.keys(pluginConfig).reduce(
         (plugins: PluginNames, moduleName: string) => {
-          plugins[moduleName] = utils.defaultPackageName(moduleName);
+          if (pluginConfig[moduleName]) {
+            plugins[moduleName] = utils.defaultPackageName(moduleName);
+          }
           return plugins;
         },
         {} as PluginNames
