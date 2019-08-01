@@ -8,6 +8,7 @@
   "scripts": {
     "test": "c8 ts-mocha -p tsconfig.json test/**/*.ts",
     "tdd": "yarn test -- --watch-extensions ts --watch",
+    "codecov": "c8 report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
@@ -49,6 +50,7 @@
     "typescript": "^3.4.5"
   },
   "dependencies": {
+    "@opentelemetry/basic-tracer": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",

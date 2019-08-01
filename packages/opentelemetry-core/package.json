@@ -42,21 +42,6 @@
     "LICENSE",
     "README.md"
   ],
-  "c8": {
-    "extension": [
-      ".ts"
-    ],
-    "exclude": [
-      "**/*.d.ts",
-      "build/**/**/*.js",
-      "karma.conf.js",
-      "src/index.ts",
-      "src/platform/browser/*.ts",
-      "test/index-webpack.ts",
-      "webpack/*.js"
-    ],
-    "all": true
-  },
   "publishConfig": {
     "access": "public"
   },

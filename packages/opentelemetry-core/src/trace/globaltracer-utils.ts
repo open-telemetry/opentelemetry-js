@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+import * as types from '@opentelemetry/types';
+import { TracerDelegate } from './TracerDelegate';
+
+let globalTracerDelegate = new TracerDelegate();
+
+/**
+ * Set the current global tracer. Returns the initialized global tracer
+ */
+export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
+  return (globalTracerDelegate = new TracerDelegate(tracer));
+}
+
+/**
+ * Returns the global tracer
+ */
+export function getTracer(): types.Tracer {
+  // Return the global tracer delegate
+  return globalTracerDelegate;
+}

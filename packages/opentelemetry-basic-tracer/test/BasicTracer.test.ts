@@ -22,6 +22,7 @@ import {
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
   NoopLogger,
+  NOOP_SPAN,
 } from '@opentelemetry/core';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 
@@ -101,7 +102,7 @@ describe('BasicTracer', () => {
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span');
-      assert.deepStrictEqual(span, BasicTracer.defaultSpan);
+      assert.deepStrictEqual(span, NOOP_SPAN);
     });
 
     // @todo: implement

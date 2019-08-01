@@ -8,6 +8,7 @@
   "scripts": {
     "test": "c8 ts-mocha -p tsconfig.json test/**/*.ts",
     "tdd": "yarn test -- --watch-extensions ts --watch",
+    "codecov": "c8 report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
