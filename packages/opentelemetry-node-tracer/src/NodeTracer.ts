@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+
+/**
+ * This class represents a node tracer with `async_hooks` module.
+ */
+export class NodeTracer extends BasicTracer {
+  /**
+   * Constructs a new Tracer instance.
+   */
+  constructor(config: BasicTracerConfig) {
+    super(
+      Object.assign({}, { scopeManager: new AsyncHooksScopeManager() }, config)
+    );
+
+    // @todo: Integrate Plugin Loader (pull/126).
+  }
+}
