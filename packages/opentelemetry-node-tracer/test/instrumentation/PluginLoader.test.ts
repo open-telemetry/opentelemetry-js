@@ -20,6 +20,7 @@ import * as path from 'path';
 import {
   HookState,
   PluginLoader,
+  searchPathForTest,
 } from '../../src/instrumentation/PluginLoader';
 
 const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
@@ -31,7 +32,7 @@ describe('PluginLoader', () => {
 
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
-    PluginLoader.searchPathForTest = INSTALLED_PLUGINS_PATH;
+    searchPathForTest(INSTALLED_PLUGINS_PATH);
   });
 
   afterEach(() => {
