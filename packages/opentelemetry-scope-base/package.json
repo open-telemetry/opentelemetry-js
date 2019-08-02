@@ -6,14 +6,13 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "c8 ts-mocha -p tsconfig.json test/**/*.ts",
+    "test:node": "c8 ts-mocha -p tsconfig.json test/**/*.ts",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "codecov": "c8 report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix",
-    "posttest": "yarn run check"
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",
