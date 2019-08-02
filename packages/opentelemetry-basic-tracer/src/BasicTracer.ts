@@ -54,7 +54,7 @@ export class BasicTracer implements types.Tracer {
    * decision.
    */
   startSpan(name: string, options: types.SpanOptions = {}): types.Span {
-    const parentSpanContext = this._getParentSpanContext(options.parent);
+    let parentSpanContext = this._getParentSpanContext(options.parent);
     // make sampling decision
     if (!this._sampler.shouldSample(parentSpanContext)) {
       // TODO: propagate SpanContext, for more information see
@@ -62,26 +62,16 @@ export class BasicTracer implements types.Tracer {
       return NOOP_SPAN;
     }
 
-    let traceId;
-    let parentSpanId;
-    let traceState;
     if (!parentSpanContext || !isValid(parentSpanContext)) {
       // New root span.
-      traceId = randomTraceId();
-    } else {
-      // New child span.
-      traceId = parentSpanContext.traceId;
-      parentSpanId = parentSpanContext.spanId;
-      traceState = parentSpanContext.traceState;
+      parentSpanContext = { traceId: randomTraceId(), spanId: '' };
     }
 
     const span = new Span(
       this,
       name,
-      traceId,
+      parentSpanContext,
       options.kind || types.SpanKind.INTERNAL,
-      parentSpanId,
-      traceState,
       options.startTime
     );
     // Set default attributes
