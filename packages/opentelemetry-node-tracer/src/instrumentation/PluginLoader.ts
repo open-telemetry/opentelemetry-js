@@ -59,7 +59,8 @@ export class PluginLoader {
    * {@link Plugin} interface and export an instance named as 'plugin'. This
    * function will attach a hook to be called the first time the module is
    * loaded.
-   * @param pluginConfig an object to configure the plugin.
+   * @param pluginConfig an object whose keys are plugin names and whose
+   *     boolean values indicate whether to enable the plugin.
    */
   load(pluginConfig: PluginConfig): PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
