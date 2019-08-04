@@ -14,4 +14,17 @@
  * limitations under the License.
  */
 
- export * from './NodeTracer';
+import { Span } from '@opentelemetry/types';
+import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
+
+export type IgnoreMatcher<T> = string | RegExp | ((url: string, request: T) => boolean);
+
+export interface HttpCustomAttributeFunction {
+  (span: Span, request: ClientRequest | IncomingMessage, response: IncomingMessage | ServerResponse): void;
+}
+
+export interface HttpPluginConfig {
+  ignoreIncomingPaths?: Array<IgnoreMatcher<IncomingMessage>>;
+  ignoreOutgoingUrls?: Array<IgnoreMatcher<ClientRequest>>;
+  applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+}
