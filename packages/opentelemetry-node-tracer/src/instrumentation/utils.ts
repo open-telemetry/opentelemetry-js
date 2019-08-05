@@ -17,7 +17,7 @@
 import { Logger } from '@opentelemetry/types';
 import * as path from 'path';
 import * as semver from 'semver';
-import { constants } from './constants';
+import * as constants from './constants';
 
 /**
  * Gets the default package name for a target module. The default package

@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-/** General purpose constants. */
-export const constants = {
-  /** opentelemetry scope */
-  OPENTELEMETRY_SCOPE: '@opentelemetry',
-  /** Default prefix for instrumentation modules */
-  DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX: 'plugin',
-};
+/** opentelemetry scope */
+export const OPENTELEMETRY_SCOPE = '@opentelemetry';
+
+/** Default prefix for instrumentation modules */
+export const DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX = 'plugin';
