@@ -17,7 +17,8 @@
 import { Tracer } from '../tracer';
 
 /** Interface Plugin to apply patch. */
-export interface Plugin<T> {
+// tslint:disable-next-line:no-any
+export interface Plugin<T = any> {
   /**
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would

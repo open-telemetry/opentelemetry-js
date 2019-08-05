@@ -40,10 +40,13 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/shimmer": "^1.0.1",
+    "@types/semver": "^6.0.1",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
+    "shimmer": "^1.2.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
     "typescript": "^3.4.5"
@@ -53,6 +56,8 @@
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/types": "^0.0.1",
+    "require-in-the-middle": "^4.0.0",
+    "semver": "^6.2.0"
   }
 }
