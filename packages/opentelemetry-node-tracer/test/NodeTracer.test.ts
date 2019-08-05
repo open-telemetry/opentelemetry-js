@@ -21,16 +21,17 @@ import {
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
-  NOOP_SPAN,
+  NOOP_SPAN
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
+import { EventEmitter } from 'events';
 
 describe('NodeTracer', () => {
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -38,7 +39,7 @@ describe('NodeTracer', () => {
     it('should construct an instance with binary format', () => {
       const tracer = new NodeTracer({
         binaryFormat: new BinaryTraceContext(),
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -46,7 +47,7 @@ describe('NodeTracer', () => {
     it('should construct an instance with http text format', () => {
       const tracer = new NodeTracer({
         httpTextFormat: new HttpTraceContext(),
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -54,7 +55,7 @@ describe('NodeTracer', () => {
     it('should construct an instance with logger', () => {
       const tracer = new NodeTracer({
         logger: new NoopLogger(),
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -62,7 +63,7 @@ describe('NodeTracer', () => {
     it('should construct an instance with sampler', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
-        sampler: ALWAYS_SAMPLER,
+        sampler: ALWAYS_SAMPLER
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -71,9 +72,9 @@ describe('NodeTracer', () => {
       const tracer = new NodeTracer({
         defaultAttributes: {
           region: 'eu-west',
-          asg: 'my-asg',
+          asg: 'my-asg'
         },
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -82,7 +83,7 @@ describe('NodeTracer', () => {
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span);
@@ -90,7 +91,7 @@ describe('NodeTracer', () => {
 
     it('should start a span with name and options', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
@@ -99,7 +100,7 @@ describe('NodeTracer', () => {
     it('should return a default span with no sampling', () => {
       const tracer = new NodeTracer({
         sampler: NEVER_SAMPLER,
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       const span = tracer.startSpan('my-span');
       assert.deepStrictEqual(span, NOOP_SPAN);
@@ -115,7 +116,7 @@ describe('NodeTracer', () => {
   describe('.getCurrentSpan()', () => {
     it('should return null with AsyncHooksScopeManager when no span started', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
     });
@@ -124,7 +125,7 @@ describe('NodeTracer', () => {
   describe('.withSpan()', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
@@ -136,7 +137,7 @@ describe('NodeTracer', () => {
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
@@ -145,10 +146,7 @@ describe('NodeTracer', () => {
         const span1 = tracer.startSpan('my-span1', { parent: span });
         tracer.withSpan(span1, () => {
           assert.deepStrictEqual(tracer.getCurrentSpan(), span1);
-          assert.deepStrictEqual(
-            span1.context().traceId,
-            span.context().traceId
-          );
+          assert.deepStrictEqual(span1.context().traceId, span.context().traceId);
           return done();
         });
       });
@@ -181,7 +179,7 @@ describe('NodeTracer', () => {
   describe('getBinaryFormat', () => {
     it('should get default binary formatter', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
     });
@@ -190,9 +188,45 @@ describe('NodeTracer', () => {
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
+        scopeManager: new AsyncHooksScopeManager()
       });
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
     });
+  });
+  describe('.wrapEmitter()', () => {
+    it('should not throw', () => {
+      const tracer = new NodeTracer({
+        scopeManager: new AsyncHooksScopeManager()
+      });
+      tracer.wrapEmitter({} as EventEmitter);
+    });
+    // TODO: uncomment once https://github.com/open-telemetry/opentelemetry-js/pull/146 is merged
+    // it('should get current Span', (done) => {
+    //   const tracer = new NodeTracer({
+    //     scopeManager: new AsyncHooksScopeManager(),
+    //   });
+
+    //   const span = tracer.startSpan('my-span');
+    //   class FakeEventEmitter extends EventEmitter {
+    //     constructor() {
+    //       super()
+    //     }
+    //     test() {
+    //       this.emit('event');
+    //     }
+    //   }
+
+    //   tracer.withSpan(span, () => {
+    //     const fake = new FakeEventEmitter();
+    //     tracer.wrapEmitter(fake);
+    //     fake.on('event', () => {
+    //       setTimeout(() => {
+    //         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
+    //         done();
+    //       }, 100);
+    //     });
+    //     fake.test();
+    //   });
+    // });
   });
 });
