@@ -26,35 +26,33 @@ import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
 
 class DummyPropagation implements HttpTextFormat {
-  extract(headers: any): SpanContext {
+  extract(format: string, carrier: unknown): SpanContext {
     return { traceId: 'dummy-trace-id', spanId: 'dummy-span-id' };
   }
 
-  inject(spanContext: SpanContext, format: string, headers: any): void {
+  inject(spanContext: SpanContext, format: string, headers: http.IncomingHttpHeaders): void {
     headers['x-dummy-trace-id'] = spanContext.traceId || 'undefined';
     headers['x-dummy-span-id'] = spanContext.spanId || 'undefined';
   }
 }
 
 describe('HttpPlugin', () => {
-
   let server: http.Server;
   let serverPort = 0;
 
   describe('enable()', () => {
-
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
     const tracer = new NodeTracer({
       scopeManager,
       logger,
-      httpTextFormat,
+      httpTextFormat
     });
     before(() => {
       plugin.enable(
         http,
-        tracer,
+        tracer
         // {
         //   ignoreIncomingPaths: [
         //     '/ignored/string',

@@ -42,22 +42,21 @@ const httpRequest = {
         });
       });
     });
-  },
+  }
 };
 
 class DummyPropagation implements HttpTextFormat {
-  extract(headers: any): SpanContext {
+  extract(headers: unknown): SpanContext {
     return { traceId: 'dummy-trace-id', spanId: 'dummy-span-id' };
   }
 
-  inject(spanContext: SpanContext, format: string, headers: any): void {
+  inject(spanContext: SpanContext, format: string, headers: http.IncomingHttpHeaders): void {
     headers['x-dummy-trace-id'] = spanContext.traceId || 'undefined';
     headers['x-dummy-span-id'] = spanContext.spanId || 'undefined';
   }
 }
 
 describe('HttpPlugin', () => {
-
   let server: http.Server;
   let serverPort = 0;
 
@@ -68,13 +67,10 @@ describe('HttpPlugin', () => {
     const tracer = new NodeTracer({
       scopeManager,
       logger,
-      httpTextFormat,
+      httpTextFormat
     });
     before(() => {
-      plugin.enable(
-        http,
-        tracer
-      );
+      plugin.enable(http, tracer);
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
@@ -89,7 +85,6 @@ describe('HttpPlugin', () => {
       nock.cleanAll();
       tracer.startSpan = sinon.spy();
       tracer.withSpan = sinon.spy();
-      tracer.wrapEmitter = sinon.spy();
       tracer.recordSpanData = sinon.spy();
     });
 
@@ -111,7 +106,6 @@ describe('HttpPlugin', () => {
         await httpRequest.get(options).then(result => {
           assert.strictEqual((tracer.startSpan as sinon.SinonSpy).called, false);
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
-          assert.strictEqual((tracer.wrapEmitter as sinon.SinonSpy).called, false);
           assert.strictEqual((tracer.recordSpanData as sinon.SinonSpy).called, false);
         });
       });

@@ -18,12 +18,13 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CanonicalCode } from '@opentelemetry/types';
 import { HttpPlugin } from '../src/http';
+import { RequestOptions } from 'https';
+import { IgnoreMatcher } from '../src/types';
 
-describe.only('Static HttpPlugin methods', () => {
+describe('Static HttpPlugin methods', () => {
   describe('parseResponseStatus()', () => {
-
     it('should return UNKNOWN code by default', () => {
-      const status = HttpPlugin.parseResponseStatus(undefined as any);
+      const status = HttpPlugin.parseResponseStatus((undefined as unknown) as number);
       assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
     });
 
@@ -44,24 +45,22 @@ describe.only('Static HttpPlugin methods', () => {
   describe('hasExpectHeader()', () => {
     it('should throw if no option', () => {
       try {
-        HttpPlugin.hasExpectHeader(undefined as any);
-        assert.fail()
+        HttpPlugin.hasExpectHeader('' as RequestOptions);
+        assert.fail();
       } catch (ignore) {}
     });
 
     it('should not throw if no headers', () => {
-      const result = HttpPlugin.hasExpectHeader({} as any);
+      const result = HttpPlugin.hasExpectHeader({} as RequestOptions);
       assert.strictEqual(result, false);
     });
 
     it('should return true on Expect', () => {
-      const result = HttpPlugin.hasExpectHeader({ headers: { Expect: {} } } as any);
+      const result = HttpPlugin.hasExpectHeader({ headers: { Expect: 1 } } as RequestOptions);
       assert.strictEqual(result, true);
     });
-
   });
   describe('isSatisfyPattern()', () => {
-
     it('string pattern', () => {
       const answer1 = HttpPlugin.isSatisfyPattern('/test/1', {}, '/test/1');
       assert.strictEqual(answer1, true);
@@ -77,26 +76,31 @@ describe.only('Static HttpPlugin methods', () => {
     });
 
     it('should throw if type is unknown', () => {
-
       try {
-        HttpPlugin.isSatisfyPattern('/TeSt/1', {}, true as any);
-        assert.fail()
+        HttpPlugin.isSatisfyPattern('/TeSt/1', {}, (true as unknown) as IgnoreMatcher<{}>);
+        assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);
       }
     });
 
-
     it('function pattern', () => {
-      const answer1 = HttpPlugin.isSatisfyPattern('/test/home', { headers: {}}, (url: string, req: { headers: any }) => req.headers && url === '/test/home');
+      const answer1 = HttpPlugin.isSatisfyPattern(
+        '/test/home',
+        { headers: {} },
+        (url: string, req: { headers: unknown }) => req.headers && url === '/test/home'
+      );
       assert.strictEqual(answer1, true);
-      const answer2 = HttpPlugin.isSatisfyPattern('/test/home', { headers: {}}, (url: string, req: { headers: any }) => url !== '/test/home');
+      const answer2 = HttpPlugin.isSatisfyPattern(
+        '/test/home',
+        { headers: {} },
+        (url: string, req: { headers: unknown }) => url !== '/test/home'
+      );
       assert.strictEqual(answer2, false);
     });
   });
 
   describe('isIgnored()', () => {
-
     beforeEach(() => {
       HttpPlugin.isSatisfyPattern = sinon.spy();
     });

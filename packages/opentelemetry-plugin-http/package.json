@@ -44,6 +44,7 @@
     "@types/semver": "^6.0.1",
     "@types/shimmer": "^1.0.1",
     "@types/sinon":"^7.0.13",
+    "@types/nock": "^10.0.3",
     "codecov": "^3.5.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
@@ -59,8 +60,6 @@
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/node-tracer": "^0.0.1",
     "@opentelemetry/types": "^0.0.1",
-    "@types/nock": "^10.0.3",
-    "nock": "^10.0.6",
     "semver": "^6.3.0",
     "shimmer": "^1.2.1"
   }

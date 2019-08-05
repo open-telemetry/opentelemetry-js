@@ -25,7 +25,6 @@ import {
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
-import { EventEmitter } from 'events';
 
 describe('NodeTracer', () => {
   describe('constructor', () => {

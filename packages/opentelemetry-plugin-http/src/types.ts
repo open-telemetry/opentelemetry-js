@@ -15,9 +15,20 @@
  */
 
 import { Span } from '@opentelemetry/types';
-import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
+import { ClientRequest, IncomingMessage, ServerResponse, request, get } from 'http';
+import * as http from 'http';
 
 export type IgnoreMatcher<T> = string | RegExp | ((url: string, request: T) => boolean);
+export type HttpCallback = (res: IncomingMessage) => void;
+export type RequestFunction = typeof request;
+export type GetFunction = typeof get;
+export type Http = typeof http;
+/* tslint:disable-next-line:no-any */
+export type Func<T> = (...args: any[]) => T;
+export type ResponseEndArgs =
+  | [((() => void) | undefined)?]
+  | [unknown, ((() => void) | undefined)?]
+  | [unknown, string, ((() => void) | undefined)?];
 
 export interface HttpCustomAttributeFunction {
   (span: Span, request: ClientRequest | IncomingMessage, response: IncomingMessage | ServerResponse): void;

@@ -17,23 +17,11 @@
 import { BasePlugin, NoopLogger, isValid } from '@opentelemetry/core';
 import { CanonicalCode, Span, SpanKind, SpanOptions, Logger, Status } from '@opentelemetry/types';
 import { NodeTracer } from '@opentelemetry/node-tracer';
-import { ClientRequest, IncomingMessage, request, get, RequestOptions, ServerResponse } from 'http';
-import * as http from 'http';
+import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import { HttpPluginConfig, IgnoreMatcher } from './types';
-
-export type HttpCallback = (res: IncomingMessage) => void;
-export type RequestFunction = typeof request;
-export type GetFunction = typeof get;
-export type Http = typeof http;
-
-/**
- * Default type for functions
- * @TODO: export this to types package
- */
-type Func<T> = (...args: any[]) => T;
+import { HttpPluginConfig, IgnoreMatcher, Http, Func, HttpCallback, ResponseEndArgs } from './types';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -261,7 +249,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       propagation.inject(span.context(), HttpPlugin.PROPAGATION_FORMAT, options.headers);
 
       request.on('response', (response: IncomingMessage) => {
-        plugin._tracer.wrapEmitter(response);
+        plugin._tracer.scopeManager.bind(response);
         plugin._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           plugin._logger.debug('outgoingRequest on end()');
@@ -303,12 +291,11 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  private incomingRequestFunction(original: (event: string) => boolean, plugin: HttpPlugin) {
-    return function incomingRequest(event: string, ...args: unknown[]): boolean {
+  private incomingRequestFunction(original: (event: string, ...args: unknown[]) => boolean, plugin: HttpPlugin) {
+    return function incomingRequest(this: {}, event: string, ...args: unknown[]): boolean {
       // Only traces request events
       if (event !== 'request') {
-        // @ts-ignore @TODO: remove ts-ignore and find how to type this
-        return original.apply(this, arguments);
+        return original.apply(this, [event, ...args]);
       }
 
       const request = args[0] as IncomingMessage;
@@ -318,8 +305,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (HttpPlugin.isIgnored(path, request, plugin.options.ignoreIncomingPaths)) {
-        // @ts-ignore @TODO: remove ts-ignore and find how to type this
-        return original.apply(this, arguments);
+        return original.apply(this, [event, ...args]);
       }
 
       const propagation = plugin._tracer.getHttpTextFormat();
@@ -336,17 +322,17 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const rootSpan = plugin._tracer.startSpan(path, spanOptions);
       return plugin._tracer.withSpan(rootSpan, () => {
-        plugin._tracer.wrapEmitter(request);
-        plugin._tracer.wrapEmitter(response);
+        plugin._tracer.scopeManager.bind(request);
+        plugin._tracer.scopeManager.bind(response);
 
         // Wraps end (inspired by:
         // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
         const originalEnd = response.end;
-
-        response.end = function(this: ServerResponse) {
+        response.end = function(this: ServerResponse, ...args: ResponseEndArgs) {
           response.end = originalEnd;
-          // @ts-ignore @TODO: remove ts-ignore and find how to type this
-          const returned = response.end.apply(this, arguments);
+          // Cannot pass args of type ResponseEndArgs, Expected 1-2 arguments, but got 1 or more.
+          // tslint:disable-next-line:no-any
+          const returned = response.end.apply(this, arguments as any);
           const requestUrl = request.url ? url.parse(request.url) : null;
           const host = headers.host || 'localhost';
           const userAgent = (headers['user-agent'] || headers['User-Agent']) as string;
@@ -372,16 +358,18 @@ export class HttpPlugin extends BasePlugin<Http> {
           rootSpan.end();
           return returned;
         };
-        // @ts-ignore @TODO: remove ts-ignore and find how to type this, arguments
-        return original.apply(this, arguments);
+        return original.apply(this, [event, ...args]);
       });
     };
   }
 
   private outgoingRequestFunction(original: Func<ClientRequest>, plugin: HttpPlugin): Func<ClientRequest> {
-    return function outgoingRequest(options: RequestOptions | string, callback?: HttpCallback): ClientRequest {
+    return function outgoingRequest(
+      this: {},
+      options: RequestOptions | string,
+      callback?: HttpCallback
+    ): ClientRequest {
       if (!options) {
-        // @ts-ignore @TODO: remove ts-ignore and find how to type this
         return original.apply(this, [options, callback]);
       }
 
@@ -404,14 +392,13 @@ export class HttpPlugin extends BasePlugin<Http> {
           origin = `${options.protocol || 'http:'}//${options.host}`;
         } catch (ignore) {}
       }
-      // @ts-ignore @TODO: remove ts-ignore and find how to type this
       const request: ClientRequest = original.apply(this, [options, callback]);
 
       if (HttpPlugin.isIgnored(origin + pathname, request, plugin.options.ignoreOutgoingUrls)) {
         return request;
       }
 
-      plugin._tracer.wrapEmitter(request);
+      plugin._tracer.scopeManager.bind(request);
 
       if (!method) {
         method = 'GET';
