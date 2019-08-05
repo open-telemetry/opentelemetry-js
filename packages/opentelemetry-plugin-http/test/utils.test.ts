@@ -17,27 +17,27 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CanonicalCode } from '@opentelemetry/types';
-import { HttpPlugin } from '../src/http';
 import { RequestOptions } from 'https';
 import { IgnoreMatcher } from '../src/types';
+import { Utils } from '../src/utils';
 
-describe('Static HttpPlugin methods', () => {
+describe('Utils', () => {
   describe('parseResponseStatus()', () => {
     it('should return UNKNOWN code by default', () => {
-      const status = HttpPlugin.parseResponseStatus((undefined as unknown) as number);
+      const status = Utils.parseResponseStatus((undefined as unknown) as number);
       assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
     });
 
     it('should return OK for Success HTTP status code', () => {
       for (let index = 200; index < 400; index++) {
-        const status = HttpPlugin.parseResponseStatus(index);
+        const status = Utils.parseResponseStatus(index);
         assert.deepStrictEqual(status, { code: CanonicalCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
       for (let index = 400; index <= 504; index++) {
-        const status = HttpPlugin.parseResponseStatus(index);
+        const status = Utils.parseResponseStatus(index);
         assert.notStrictEqual(status.code, CanonicalCode.OK);
       }
     });
@@ -45,39 +45,39 @@ describe('Static HttpPlugin methods', () => {
   describe('hasExpectHeader()', () => {
     it('should throw if no option', () => {
       try {
-        HttpPlugin.hasExpectHeader('' as RequestOptions);
+        Utils.hasExpectHeader('' as RequestOptions);
         assert.fail();
       } catch (ignore) {}
     });
 
     it('should not throw if no headers', () => {
-      const result = HttpPlugin.hasExpectHeader({} as RequestOptions);
+      const result = Utils.hasExpectHeader({} as RequestOptions);
       assert.strictEqual(result, false);
     });
 
     it('should return true on Expect', () => {
-      const result = HttpPlugin.hasExpectHeader({ headers: { Expect: 1 } } as RequestOptions);
+      const result = Utils.hasExpectHeader({ headers: { Expect: 1 } } as RequestOptions);
       assert.strictEqual(result, true);
     });
   });
   describe('isSatisfyPattern()', () => {
     it('string pattern', () => {
-      const answer1 = HttpPlugin.isSatisfyPattern('/test/1', {}, '/test/1');
+      const answer1 = Utils.isSatisfyPattern('/test/1', {}, '/test/1');
       assert.strictEqual(answer1, true);
-      const answer2 = HttpPlugin.isSatisfyPattern('/test/1', {}, '/test/11');
+      const answer2 = Utils.isSatisfyPattern('/test/1', {}, '/test/11');
       assert.strictEqual(answer2, false);
     });
 
     it('regex pattern', () => {
-      const answer1 = HttpPlugin.isSatisfyPattern('/TeSt/1', {}, /\/test/i);
+      const answer1 = Utils.isSatisfyPattern('/TeSt/1', {}, /\/test/i);
       assert.strictEqual(answer1, true);
-      const answer2 = HttpPlugin.isSatisfyPattern('/2/tEst/1', {}, /\/test/);
+      const answer2 = Utils.isSatisfyPattern('/2/tEst/1', {}, /\/test/);
       assert.strictEqual(answer2, false);
     });
 
     it('should throw if type is unknown', () => {
       try {
-        HttpPlugin.isSatisfyPattern('/TeSt/1', {}, (true as unknown) as IgnoreMatcher<{}>);
+        Utils.isSatisfyPattern('/TeSt/1', {}, (true as unknown) as IgnoreMatcher<{}>);
         assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);
@@ -85,13 +85,13 @@ describe('Static HttpPlugin methods', () => {
     });
 
     it('function pattern', () => {
-      const answer1 = HttpPlugin.isSatisfyPattern(
+      const answer1 = Utils.isSatisfyPattern(
         '/test/home',
         { headers: {} },
         (url: string, req: { headers: unknown }) => req.headers && url === '/test/home'
       );
       assert.strictEqual(answer1, true);
-      const answer2 = HttpPlugin.isSatisfyPattern(
+      const answer2 = Utils.isSatisfyPattern(
         '/test/home',
         { headers: {} },
         (url: string, req: { headers: unknown }) => url !== '/test/home'
@@ -102,7 +102,7 @@ describe('Static HttpPlugin methods', () => {
 
   describe('isIgnored()', () => {
     beforeEach(() => {
-      HttpPlugin.isSatisfyPattern = sinon.spy();
+      Utils.isSatisfyPattern = sinon.spy();
     });
 
     afterEach(() => {
@@ -110,29 +110,29 @@ describe('Static HttpPlugin methods', () => {
     });
 
     it('should call isSatisfyPattern, n match', () => {
-      const answer1 = HttpPlugin.isIgnored('/test/1', {}, ['/test/11']);
+      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
       assert.strictEqual(answer1, false);
-      assert.strictEqual((HttpPlugin.isSatisfyPattern as sinon.SinonSpy).callCount, 1);
+      assert.strictEqual((Utils.isSatisfyPattern as sinon.SinonSpy).callCount, 1);
     });
 
     it('should call isSatisfyPattern, match', () => {
-      const answer1 = HttpPlugin.isIgnored('/test/1', {}, ['/test/11']);
+      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
       assert.strictEqual(answer1, false);
-      assert.strictEqual((HttpPlugin.isSatisfyPattern as sinon.SinonSpy).callCount, 1);
+      assert.strictEqual((Utils.isSatisfyPattern as sinon.SinonSpy).callCount, 1);
     });
 
     it('should not call isSatisfyPattern', () => {
-      HttpPlugin.isIgnored('/test/1', {}, []);
-      assert.strictEqual((HttpPlugin.isSatisfyPattern as sinon.SinonSpy).callCount, 0);
+      Utils.isIgnored('/test/1', {}, []);
+      assert.strictEqual((Utils.isSatisfyPattern as sinon.SinonSpy).callCount, 0);
     });
 
     it('should return false on empty list', () => {
-      const answer1 = HttpPlugin.isIgnored('/test/1', {}, []);
+      const answer1 = Utils.isIgnored('/test/1', {}, []);
       assert.strictEqual(answer1, false);
     });
 
     it('should not throw and return false when list is undefined', () => {
-      const answer2 = HttpPlugin.isIgnored('/test/1', {}, undefined);
+      const answer2 = Utils.isIgnored('/test/1', {}, undefined);
       assert.strictEqual(answer2, false);
     });
   });
