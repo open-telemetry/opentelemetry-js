@@ -28,48 +28,53 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { Span } from '../src/Span';
 
 describe('BasicTracer', () => {
-  describe('constructor', () => {
-    it('should construct an instance with required only options', () => {
-      const tracer = new BasicTracer({
+  let tracer: BasicTracer;
+  beforeEach(() => {
+    tracer = new BasicTracer();
+  });
+
+  describe('start', () => {
+    it('should start an instance with required only options', () => {
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with binary format', () => {
-      const tracer = new BasicTracer({
+    it('should start an instance with binary format', () => {
+      tracer.start({
         binaryFormat: new BinaryTraceContext(),
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with http text format', () => {
-      const tracer = new BasicTracer({
+    it('should start an instance with http text format', () => {
+      tracer.start({
         httpTextFormat: new HttpTraceContext(),
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with logger', () => {
-      const tracer = new BasicTracer({
+    it('should start an instance with logger', () => {
+      tracer.start({
         logger: new NoopLogger(),
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with sampler', () => {
-      const tracer = new BasicTracer({
+    it('should start an instance with sampler', () => {
+      tracer.start({
         scopeManager: new NoopScopeManager(),
         sampler: ALWAYS_SAMPLER,
       });
       assert.ok(tracer instanceof BasicTracer);
     });
 
-    it('should construct an instance with default attributes', () => {
-      const tracer = new BasicTracer({
+    it('should start an instance with default attributes', () => {
+      tracer.start({
         defaultAttributes: {
           region: 'eu-west',
           asg: 'my-asg',
@@ -82,7 +87,7 @@ describe('BasicTracer', () => {
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span');
@@ -91,7 +96,7 @@ describe('BasicTracer', () => {
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span', {});
@@ -100,7 +105,7 @@ describe('BasicTracer', () => {
     });
 
     it('should return a default span with no sampling', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
       });
@@ -117,7 +122,7 @@ describe('BasicTracer', () => {
 
   describe('.getCurrentSpan()', () => {
     it('should return null with NoopScopeManager', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       const currentSpan = tracer.getCurrentSpan();
@@ -127,7 +132,7 @@ describe('BasicTracer', () => {
 
   describe('.withSpan()', () => {
     it('should run scope with NoopScopeManager scope manager', done => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span');
@@ -144,7 +149,7 @@ describe('BasicTracer', () => {
 
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
@@ -153,7 +158,7 @@ describe('BasicTracer', () => {
 
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
-      const tracer = new BasicTracer({
+      tracer.start({
         scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);

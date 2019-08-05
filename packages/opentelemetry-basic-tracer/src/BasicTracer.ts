@@ -20,32 +20,50 @@ import {
   BinaryTraceContext,
   HttpTraceContext,
   NOOP_SPAN,
+  NoopLogger,
 } from '@opentelemetry/core';
-import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
+import {
+  BinaryFormat,
+  HttpTextFormat,
+  Tracer,
+  Logger,
+} from '@opentelemetry/types';
 import { BasicTracerConfig } from '../src/types';
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { ScopeManager, NoopScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 
 /**
  * This class represents a basic tracer.
  */
 export class BasicTracer implements types.Tracer {
-  private readonly _defaultAttributes: types.Attributes;
-  private readonly _binaryFormat: types.BinaryFormat;
-  private readonly _httpTextFormat: types.HttpTextFormat;
-  private readonly _sampler: types.Sampler;
-  private readonly _scopeManager: ScopeManager;
+  private _defaultAttributes: types.Attributes = {};
+  private _binaryFormat!: types.BinaryFormat;
+  private _httpTextFormat!: types.HttpTextFormat;
+  private _logger!: Logger;
+  private _sampler: types.Sampler = ALWAYS_SAMPLER;
+  private _scopeManager: ScopeManager = new NoopScopeManager();
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
+  constructor() {}
+
+  /**
+   * Starts tracing.
+   * @param config A configuration object to start tracer.
+   * @returns The started tracer instance.
+   */
+  start(config: BasicTracerConfig): Tracer {
     this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
     this._defaultAttributes = config.defaultAttributes || {};
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
+    this._logger = config.logger || new NoopLogger();
     this._sampler = config.sampler || ALWAYS_SAMPLER;
     this._scopeManager = config.scopeManager;
+    return this;
   }
+
+  stop() {}
 
   /**
    * Starts a new Span or returns the default NoopSpan based on the sampling
@@ -57,6 +75,7 @@ export class BasicTracer implements types.Tracer {
     if (!this._sampler.shouldSample(parentSpanContext)) {
       // TODO: propagate SpanContext, for more information see
       // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
+      this._logger.debug('Sampling is off, starting no recording span');
       return NOOP_SPAN;
     }
 

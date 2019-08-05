@@ -16,19 +16,48 @@
 
 import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { PluginLoader } from './instrumentation/PluginLoader';
+import { Tracer } from '@opentelemetry/types';
+import { NoopLogger } from '@opentelemetry/core';
+
+const DEFAULT_INSTRUMENTATION_MODULES = {
+  http: false, // TODO: change to true after pull/161
+  grpc: false,
+};
 
 /**
  * This class represents a node tracer with `async_hooks` module.
  */
 export class NodeTracer extends BasicTracer {
+  private _pluginLoader!: PluginLoader;
+
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
-    super(
+  constructor() {
+    super();
+  }
+
+  /**
+   * Starts tracing.
+   * @param config A configuration object to start tracer.
+   * @returns The started tracer instance.
+   */
+  start(config: BasicTracerConfig): Tracer {
+    super.start(
       Object.assign({}, { scopeManager: new AsyncHooksScopeManager() }, config)
     );
+    this._pluginLoader = new PluginLoader(
+      this,
+      config.logger || new NoopLogger()
+    );
+    // TODO: allow overriding default instrumented modules
+    this._pluginLoader.load(DEFAULT_INSTRUMENTATION_MODULES);
+    return this;
+  }
 
-    // @todo: Integrate Plugin Loader (pull/126).
+  stop() {
+    super.stop();
+    this._pluginLoader.unload();
   }
 }
