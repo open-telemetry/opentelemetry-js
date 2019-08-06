@@ -9,6 +9,7 @@
     "postinstall": "yarn run bootstrap",
     "compile": "lerna run compile",
     "test": "lerna run test",
+    "test:browser": "lerna run test:browser",
     "bootstrap": "lerna bootstrap",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
