@@ -13,5 +13,5 @@ export enum Attributes {
   ATTRIBUTE_HTTP_STATUS_CODE = 'http.status_code',
   // NOT ON OFFICIAL SPEC
   ATTRIBUTE_HTTP_ERROR_NAME = 'http.error_name',
-  ATTRIBUTE_HTTP_ERROR_MESSAGE = 'http.error_message'
+  ATTRIBUTE_HTTP_ERROR_MESSAGE = 'http.error_message',
 }

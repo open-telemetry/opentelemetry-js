@@ -30,7 +30,11 @@ class DummyPropagation implements HttpTextFormat {
     return { traceId: 'dummy-trace-id', spanId: 'dummy-span-id' };
   }
 
-  inject(spanContext: SpanContext, format: string, headers: http.IncomingHttpHeaders): void {
+  inject(
+    spanContext: SpanContext,
+    format: string,
+    headers: http.IncomingHttpHeaders
+  ): void {
     headers['x-dummy-trace-id'] = spanContext.traceId || 'undefined';
     headers['x-dummy-span-id'] = spanContext.spanId || 'undefined';
   }
@@ -47,7 +51,7 @@ describe('HttpPlugin', () => {
     const tracer = new NodeTracer({
       scopeManager,
       logger,
-      httpTextFormat
+      httpTextFormat,
     });
     before(() => {
       plugin.enable(

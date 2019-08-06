@@ -118,7 +118,10 @@ export class BasicTracer implements types.Tracer {
   /**
    * Enters the scope of code where the given Span is in the current context.
    */
-  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(span: types.Span, fn: T): ReturnType<T> {
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
+    span: types.Span,
+    fn: T
+  ): ReturnType<T> {
     // Set given span to context.
     return this._scopeManager.with(span, fn);
   }
@@ -152,7 +155,9 @@ export class BasicTracer implements types.Tracer {
     return this._httpTextFormat;
   }
 
-  private _getParentSpanContext(parent: types.Span | types.SpanContext | undefined): types.SpanContext | undefined {
+  private _getParentSpanContext(
+    parent: types.Span | types.SpanContext | undefined
+  ): types.SpanContext | undefined {
     if (!parent) return undefined;
 
     // parent is a SpanContext

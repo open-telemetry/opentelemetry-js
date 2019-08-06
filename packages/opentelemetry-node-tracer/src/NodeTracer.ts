@@ -25,7 +25,9 @@ export class NodeTracer extends BasicTracer {
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig) {
-    super(Object.assign({}, { scopeManager: new AsyncHooksScopeManager() }, config));
+    super(
+      Object.assign({}, { scopeManager: new AsyncHooksScopeManager() }, config)
+    );
 
     // @todo: Integrate Plugin Loader (pull/126).
   }

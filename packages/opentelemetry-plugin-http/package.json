@@ -38,20 +38,19 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@types/mocha": "^5.2.7",
     "@types/nock": "^10.0.3",
     "@types/node": "^12.6.9",
     "@types/semver": "^6.0.1",
     "@types/shimmer": "^1.0.1",
     "@types/sinon":"^7.0.13",
+    "@opentelemetry/scope-async-hooks": "^0.0.1",
     "codecov": "^3.5.0",
-    "gts": "^1.1.0",
+    "gts": "^1.0.0",
     "mocha": "^6.2.0",
+    "nock": "^10.0.6",
     "nyc": "^14.1.1",
     "sinon": "^7.3.2",
-    "c8": "^5.0.1",
-    "nock": "^10.0.6",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"

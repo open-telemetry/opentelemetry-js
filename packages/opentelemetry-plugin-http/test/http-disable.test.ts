@@ -42,7 +42,7 @@ const httpRequest = {
         });
       });
     });
-  }
+  },
 };
 
 class DummyPropagation implements HttpTextFormat {
@@ -50,7 +50,11 @@ class DummyPropagation implements HttpTextFormat {
     return { traceId: 'dummy-trace-id', spanId: 'dummy-span-id' };
   }
 
-  inject(spanContext: SpanContext, format: string, headers: http.IncomingHttpHeaders): void {
+  inject(
+    spanContext: SpanContext,
+    format: string,
+    headers: http.IncomingHttpHeaders
+  ): void {
     headers['x-dummy-trace-id'] = spanContext.traceId || 'undefined';
     headers['x-dummy-span-id'] = spanContext.spanId || 'undefined';
   }
@@ -67,7 +71,7 @@ describe('HttpPlugin', () => {
     const tracer = new NodeTracer({
       scopeManager,
       logger,
-      httpTextFormat
+      httpTextFormat,
     });
     before(() => {
       plugin.enable(http, tracer);
@@ -104,9 +108,15 @@ describe('HttpPlugin', () => {
         const options = { host: 'localhost', path: testPath, port: serverPort };
 
         await httpRequest.get(options).then(result => {
-          assert.strictEqual((tracer.startSpan as sinon.SinonSpy).called, false);
+          assert.strictEqual(
+            (tracer.startSpan as sinon.SinonSpy).called,
+            false
+          );
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
-          assert.strictEqual((tracer.recordSpanData as sinon.SinonSpy).called, false);
+          assert.strictEqual(
+            (tracer.recordSpanData as sinon.SinonSpy).called,
+            false
+          );
         });
       });
     });

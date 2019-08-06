@@ -1,7 +1,7 @@
 import { Status, CanonicalCode, Span } from '@opentelemetry/types';
 import { RequestOptions, IncomingMessage, ClientRequest } from 'http';
 import { IgnoreMatcher } from './types';
-import { Attributes } from './enums/Attributes';
+import { Attributes } from './enums/attributes';
 import * as url from 'url';
 
 /**
@@ -45,7 +45,10 @@ export class Utils {
    * @param options Options for http.request.
    */
   static hasExpectHeader(options: RequestOptions | url.URL): boolean {
-    return !!((options as RequestOptions).headers && (options as RequestOptions).headers!.Expect);
+    return !!(
+      (options as RequestOptions).headers &&
+      (options as RequestOptions).headers!.Expect
+    );
   }
 
   /**
@@ -54,7 +57,11 @@ export class Utils {
    * @param obj obj to inspect
    * @param pattern Match pattern
    */
-  static isSatisfyPattern<T>(constant: string, obj: T, pattern: IgnoreMatcher<T>): boolean {
+  static isSatisfyPattern<T>(
+    constant: string,
+    obj: T,
+    pattern: IgnoreMatcher<T>
+  ): boolean {
     if (typeof pattern === 'string') {
       return pattern === constant;
     } else if (pattern instanceof RegExp) {
@@ -72,7 +79,11 @@ export class Utils {
    * @param obj obj to inspect
    * @param list List of ignore patterns
    */
-  static isIgnored<T>(constant: string, obj: T, list?: Array<IgnoreMatcher<T>>): boolean {
+  static isIgnored<T>(
+    constant: string,
+    obj: T,
+    list?: Array<IgnoreMatcher<T>>
+  ): boolean {
     if (!list) {
       // No ignored urls - trace everything
       return false;
@@ -97,12 +108,14 @@ export class Utils {
       span.setAttributes({
         [Attributes.ATTRIBUTE_ERROR]: true,
         [Attributes.ATTRIBUTE_HTTP_ERROR_NAME]: error.name,
-        [Attributes.ATTRIBUTE_HTTP_ERROR_MESSAGE]: error.message
+        [Attributes.ATTRIBUTE_HTTP_ERROR_MESSAGE]: error.message,
       });
 
       let status: Status;
       if ((obj as IncomingMessage).statusCode) {
-        status = Utils.parseResponseStatus((obj as IncomingMessage).statusCode!);
+        status = Utils.parseResponseStatus(
+          (obj as IncomingMessage).statusCode!
+        );
       } else {
         status = { code: CanonicalCode.UNKNOWN };
       }

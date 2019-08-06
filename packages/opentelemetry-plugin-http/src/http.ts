@@ -17,11 +17,23 @@
 import { BasePlugin, NoopLogger, isValid } from '@opentelemetry/core';
 import { Span, SpanKind, SpanOptions, Logger } from '@opentelemetry/types';
 import { NodeTracer } from '@opentelemetry/node-tracer';
-import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
+import {
+  ClientRequest,
+  IncomingMessage,
+  request,
+  RequestOptions,
+  ServerResponse,
+} from 'http';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import { HttpPluginConfig, Http, Func, HttpCallback, ResponseEndArgs } from './types';
+import {
+  HttpPluginConfig,
+  Http,
+  Func,
+  HttpCallback,
+  ResponseEndArgs,
+} from './types';
 import { Format } from './enums/format';
 import { Attributes } from './enums/attributes';
 import { Utils } from './utils';
@@ -45,20 +57,43 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   /** Patches HTTP incoming and outcoming request functions. */
   protected patch() {
-    this._logger.debug('applying patch to %s@%s', this.moduleName, this.version);
+    this._logger.debug(
+      'applying patch to %s@%s',
+      this.moduleName,
+      this.version
+    );
 
-    shimmer.wrap(this._moduleExports, 'request', this._getPatchOutgoingRequestFunction());
+    shimmer.wrap(
+      this._moduleExports,
+      'request',
+      this._getPatchOutgoingRequestFunction()
+    );
 
     // In Node 8-10, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.wrap(this._moduleExports, 'get', this._getPatchOutgoingGetFunction());
+      shimmer.wrap(
+        this._moduleExports,
+        'get',
+        this._getPatchOutgoingGetFunction()
+      );
     }
 
-    if (this._moduleExports && this._moduleExports.Server && this._moduleExports.Server.prototype) {
-      shimmer.wrap(this._moduleExports.Server.prototype, 'emit', this._getPatchIncomingRequestFunction());
+    if (
+      this._moduleExports &&
+      this._moduleExports.Server &&
+      this._moduleExports.Server.prototype
+    ) {
+      shimmer.wrap(
+        this._moduleExports.Server.prototype,
+        'emit',
+        this._getPatchIncomingRequestFunction()
+      );
     } else {
-      this._logger.error('Could not apply patch to %s.emit. Interface is not as expected.', this.moduleName);
+      this._logger.error(
+        'Could not apply patch to %s.emit. Interface is not as expected.',
+        this.moduleName
+      );
     }
 
     return this._moduleExports;
@@ -70,7 +105,11 @@ export class HttpPlugin extends BasePlugin<Http> {
     if (semver.satisfies(this.version, '>=8.0.0')) {
       shimmer.unwrap(this._moduleExports, 'get');
     }
-    if (this._moduleExports && this._moduleExports.Server && this._moduleExports.Server.prototype) {
+    if (
+      this._moduleExports &&
+      this._moduleExports.Server &&
+      this._moduleExports.Server.prototype
+    ) {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'emit');
     }
   }
@@ -106,7 +145,10 @@ export class HttpPlugin extends BasePlugin<Http> {
       // simply follow the latter. Ref:
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
-      return function outgoingGetRequest(options: string | RequestOptions | URL, callback?: HttpCallback) {
+      return function outgoingGetRequest(
+        options: string | RequestOptions | URL,
+        callback?: HttpCallback
+      ) {
         const req = request(options, callback);
         req.end();
         return req;
@@ -120,7 +162,10 @@ export class HttpPlugin extends BasePlugin<Http> {
    * @param request The original request object.
    * @param options The arguments to the original function.
    */
-  private getMakeRequestTraceFunction(request: ClientRequest, options: RequestOptions): Func<ClientRequest> {
+  private getMakeRequestTraceFunction(
+    request: ClientRequest,
+    options: RequestOptions
+  ): Func<ClientRequest> {
     return (span: Span): ClientRequest => {
       this._logger.debug('makeRequestTrace');
 
@@ -145,15 +190,19 @@ export class HttpPlugin extends BasePlugin<Http> {
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
-          const method = response.method ? response.method.toUpperCase() : 'GET';
+          const method = response.method
+            ? response.method.toUpperCase()
+            : 'GET';
           const headers = options.headers;
-          const userAgent = headers ? headers['user-agent'] || headers['User-Agent'] : null;
+          const userAgent = headers
+            ? headers['user-agent'] || headers['User-Agent']
+            : null;
 
           const host = options.hostname || options.host || 'localhost';
           span.setAttributes({
             ATTRIBUTE_HTTP_HOST: host,
             ATTRIBUTE_HTTP_METHOD: method,
-            ATTRIBUTE_HTTP_PATH: options.path || '/'
+            ATTRIBUTE_HTTP_PATH: options.path || '/',
           });
 
           if (userAgent) {
@@ -161,7 +210,10 @@ export class HttpPlugin extends BasePlugin<Http> {
           }
           if (response.statusCode) {
             span
-              .setAttribute(Attributes.ATTRIBUTE_HTTP_STATUS_CODE, response.statusCode.toString())
+              .setAttribute(
+                Attributes.ATTRIBUTE_HTTP_STATUS_CODE,
+                response.statusCode.toString()
+              )
               .setStatus(Utils.parseResponseStatus(response.statusCode));
           }
 
@@ -181,9 +233,15 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  private incomingRequestFunction(original: (event: string, ...args: unknown[]) => boolean) {
+  private incomingRequestFunction(
+    original: (event: string, ...args: unknown[]) => boolean
+  ) {
     const plugin = this;
-    return function incomingRequest(this: {}, event: string, ...args: unknown[]): boolean {
+    return function incomingRequest(
+      this: {},
+      event: string,
+      ...args: unknown[]
+    ): boolean {
       // Only traces request events
       if (event !== 'request') {
         return original.apply(this, [event, ...args]);
@@ -203,7 +261,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const headers = request.headers;
 
       const spanOptions: SpanOptions = {
-        kind: SpanKind.SERVER
+        kind: SpanKind.SERVER,
       };
 
       const spanContext = propagation.extract(Format.HTTP, headers);
@@ -219,7 +277,10 @@ export class HttpPlugin extends BasePlugin<Http> {
         // Wraps end (inspired by:
         // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
         const originalEnd = response.end;
-        response.end = function(this: ServerResponse, ...args: ResponseEndArgs) {
+        response.end = function(
+          this: ServerResponse,
+          ...args: ResponseEndArgs
+        ) {
           response.end = originalEnd;
           // Cannot pass args of type ResponseEndArgs,
           // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
@@ -227,26 +288,46 @@ export class HttpPlugin extends BasePlugin<Http> {
           const returned = response.end.apply(this, arguments as any);
           const requestUrl = request.url ? url.parse(request.url) : null;
           const host = headers.host || 'localhost';
-          const userAgent = (headers['user-agent'] || headers['User-Agent']) as string;
+          const userAgent = (headers['user-agent'] ||
+            headers['User-Agent']) as string;
 
           rootSpan
-            .setAttribute(Attributes.ATTRIBUTE_HTTP_HOST, host.replace(/^(.*)(\:[0-9]{1,5})/, '$1'))
+            .setAttribute(
+              Attributes.ATTRIBUTE_HTTP_HOST,
+              host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
+            )
             .setAttribute(Attributes.ATTRIBUTE_HTTP_METHOD, method);
 
           if (requestUrl) {
             rootSpan
-              .setAttribute(Attributes.ATTRIBUTE_HTTP_PATH, requestUrl.pathname || '/')
-              .setAttribute(Attributes.ATTRIBUTE_HTTP_ROUTE, requestUrl.path || '/');
+              .setAttribute(
+                Attributes.ATTRIBUTE_HTTP_PATH,
+                requestUrl.pathname || '/'
+              )
+              .setAttribute(
+                Attributes.ATTRIBUTE_HTTP_ROUTE,
+                requestUrl.path || '/'
+              );
           }
           if (userAgent) {
-            rootSpan.setAttribute(Attributes.ATTRIBUTE_HTTP_USER_AGENT, userAgent);
+            rootSpan.setAttribute(
+              Attributes.ATTRIBUTE_HTTP_USER_AGENT,
+              userAgent
+            );
           }
           rootSpan
-            .setAttribute(Attributes.ATTRIBUTE_HTTP_STATUS_CODE, response.statusCode.toString())
+            .setAttribute(
+              Attributes.ATTRIBUTE_HTTP_STATUS_CODE,
+              response.statusCode.toString()
+            )
             .setStatus(Utils.parseResponseStatus(response.statusCode));
 
           if (plugin.options.applyCustomAttributesOnSpan) {
-            plugin.options.applyCustomAttributesOnSpan(rootSpan, request, response);
+            plugin.options.applyCustomAttributesOnSpan(
+              rootSpan,
+              request,
+              response
+            );
           }
 
           rootSpan.end();
@@ -257,7 +338,9 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  private outgoingRequestFunction(original: Func<ClientRequest>): Func<ClientRequest> {
+  private outgoingRequestFunction(
+    original: Func<ClientRequest>
+  ): Func<ClientRequest> {
     const plugin = this;
     return function outgoingRequest(
       this: {},
@@ -286,7 +369,13 @@ export class HttpPlugin extends BasePlugin<Http> {
         } catch (ignore) {}
       }
       const request: ClientRequest = original.apply(this, [options, callback]);
-      if (Utils.isIgnored(origin + pathname, request, plugin.options.ignoreOutgoingUrls)) {
+      if (
+        Utils.isIgnored(
+          origin + pathname,
+          request,
+          plugin.options.ignoreOutgoingUrls
+        )
+      ) {
         return request;
       }
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
@@ -296,7 +385,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const method = options.method ? options.method.toUpperCase() : 'GET';
       const operationName = `${method} ${pathname}`;
       const spanOptions = {
-        kind: SpanKind.CLIENT
+        kind: SpanKind.CLIENT,
       };
       const currentSpan = plugin._tracer.getCurrentSpan();
       // Checks if this outgoing request is part of an operation by checking
@@ -306,12 +395,15 @@ export class HttpPlugin extends BasePlugin<Http> {
       if (!currentSpan) {
         plugin._logger.debug('outgoingRequest starting a root span');
         const rootSpan = plugin._tracer.startSpan(operationName, spanOptions);
-        return plugin._tracer.withSpan(rootSpan, plugin.getMakeRequestTraceFunction(request, options));
+        return plugin._tracer.withSpan(
+          rootSpan,
+          plugin.getMakeRequestTraceFunction(request, options)
+        );
       } else {
         plugin._logger.debug('outgoingRequest starting a child span');
         const span = plugin._tracer.startSpan(operationName, {
           kind: spanOptions.kind,
-          parent: currentSpan
+          parent: currentSpan,
         });
         return plugin.getMakeRequestTraceFunction(request, options)(span);
       }
