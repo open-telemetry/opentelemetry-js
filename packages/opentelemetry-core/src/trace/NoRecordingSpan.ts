@@ -19,7 +19,7 @@ import { SpanContext } from '@opentelemetry/types';
 import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
 
 /**
- * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-p
+ * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-op
  * except context propagation.
  */
 export class NoRecordingSpan extends NoopSpan {
