@@ -55,7 +55,7 @@ export class TracerDelegate implements types.Tracer {
     );
   }
 
-  startSpan(name: string, options?: types.SpanOptions | undefined): types.Span {
+  startSpan(name: string, options?: types.SpanOptions): types.Span {
     return this._currentTracer.startSpan.apply(
       this._currentTracer,
       // tslint:disable-next-line:no-any
