@@ -1,3 +1,19 @@
+/**
+ * Copyright 2019, OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { Status, CanonicalCode, Span } from '@opentelemetry/types';
 import { RequestOptions, IncomingMessage, ClientRequest } from 'http';
 import { IgnoreMatcher } from './types';
@@ -106,9 +122,9 @@ export class Utils {
   static setSpanOnError(span: Span, obj: IncomingMessage | ClientRequest) {
     obj.on('error', error => {
       span.setAttributes({
-        [Attributes.ATTRIBUTE_ERROR]: true,
-        [Attributes.ATTRIBUTE_HTTP_ERROR_NAME]: error.name,
-        [Attributes.ATTRIBUTE_HTTP_ERROR_MESSAGE]: error.message,
+        [Attributes.ERROR]: true,
+        [Attributes.HTTP_ERROR_NAME]: error.name,
+        [Attributes.HTTP_ERROR_MESSAGE]: error.message,
       });
 
       let status: Status;
@@ -125,5 +141,36 @@ export class Utils {
       span.setStatus(status);
       span.end();
     });
+  }
+
+  /**
+   * Makes sure options is an url object
+   * return an object with default value and parsed options
+   * @param options for the request
+   */
+  static getRequestInfo(options: RequestOptions | string) {
+    let pathname = '/';
+    let origin = '';
+    let optionsParsed: url.URL | url.UrlWithStringQuery | RequestOptions;
+    if (typeof options === 'string') {
+      optionsParsed = url.parse(options);
+      pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
+      origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host}`;
+    } else {
+      optionsParsed = options;
+      try {
+        pathname = (options as url.URL).pathname;
+        if (!pathname && options.path) {
+          pathname = url.parse(options.path).pathname || '/';
+        }
+        origin = `${options.protocol || 'http:'}//${options.host}`;
+      } catch (ignore) {}
+    }
+    // some packages return method in lowercase..
+    // ensure upperCase for consistency
+    let method = (optionsParsed as RequestOptions).method;
+    method = method ? method.toUpperCase() : 'GET';
+
+    return { origin, pathname, method, optionsParsed };
   }
 }

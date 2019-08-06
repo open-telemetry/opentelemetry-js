@@ -48,7 +48,6 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected readonly _logger!: Logger;
   protected readonly _tracer!: NodeTracer;
 
-  /** Constructs a new HttpPlugin instance. */
   constructor(public moduleName: string, public version: string) {
     super();
     // TODO: remove this once a logger will be passed
@@ -164,15 +163,11 @@ export class HttpPlugin extends BasePlugin<Http> {
    */
   private getMakeRequestTraceFunction(
     request: ClientRequest,
-    options: RequestOptions
+    options: RequestOptions,
+    span: Span
   ): Func<ClientRequest> {
-    return (span: Span): ClientRequest => {
+    return (): ClientRequest => {
       this._logger.debug('makeRequestTrace');
-
-      if (!span) {
-        this._logger.debug('makeRequestTrace span is null');
-        return request;
-      }
 
       const propagation = this._tracer.getHttpTextFormat();
       // If outgoing request headers contain the "Expect" header, the returned
@@ -200,18 +195,19 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           const host = options.hostname || options.host || 'localhost';
           span.setAttributes({
-            ATTRIBUTE_HTTP_HOST: host,
-            ATTRIBUTE_HTTP_METHOD: method,
-            ATTRIBUTE_HTTP_PATH: options.path || '/',
+            [Attributes.HTTP_HOST]: host,
+            [Attributes.HTTP_METHOD]: method,
+            [Attributes.HTTP_PATH]: options.path || '/',
           });
 
           if (userAgent) {
-            span.setAttribute(Attributes.ATTRIBUTE_HTTP_USER_AGENT, userAgent);
+            span.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
           }
+
           if (response.statusCode) {
             span
               .setAttribute(
-                Attributes.ATTRIBUTE_HTTP_STATUS_CODE,
+                Attributes.HTTP_STATUS_CODE,
                 response.statusCode.toString()
               )
               .setStatus(Utils.parseResponseStatus(response.statusCode));
@@ -251,6 +247,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const response = args[1] as ServerResponse;
       const path = request.url ? url.parse(request.url).pathname || '' : '';
       const method = request.method || 'GET';
+
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (Utils.isIgnored(path, request, plugin.options.ignoreIncomingPaths)) {
@@ -259,7 +256,6 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const propagation = plugin._tracer.getHttpTextFormat();
       const headers = request.headers;
-
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
       };
@@ -291,33 +287,25 @@ export class HttpPlugin extends BasePlugin<Http> {
           const userAgent = (headers['user-agent'] ||
             headers['User-Agent']) as string;
 
-          rootSpan
-            .setAttribute(
-              Attributes.ATTRIBUTE_HTTP_HOST,
-              host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
-            )
-            .setAttribute(Attributes.ATTRIBUTE_HTTP_METHOD, method);
+          rootSpan.setAttributes({
+            [Attributes.HTTP_HOST]: host.replace(/^(.*)(\:[0-9]{1,5})/, '$1'),
+            [Attributes.HTTP_METHOD]: method,
+          });
 
           if (requestUrl) {
-            rootSpan
-              .setAttribute(
-                Attributes.ATTRIBUTE_HTTP_PATH,
-                requestUrl.pathname || '/'
-              )
-              .setAttribute(
-                Attributes.ATTRIBUTE_HTTP_ROUTE,
-                requestUrl.path || '/'
-              );
+            rootSpan.setAttributes({
+              [Attributes.HTTP_PATH]: requestUrl.pathname || '/',
+              [Attributes.HTTP_ROUTE]: requestUrl.path || '/',
+            });
           }
+
           if (userAgent) {
-            rootSpan.setAttribute(
-              Attributes.ATTRIBUTE_HTTP_USER_AGENT,
-              userAgent
-            );
+            rootSpan.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
           }
+
           rootSpan
             .setAttribute(
-              Attributes.ATTRIBUTE_HTTP_STATUS_CODE,
+              Attributes.HTTP_STATUS_CODE,
               response.statusCode.toString()
             )
             .setStatus(Utils.parseResponseStatus(response.statusCode));
@@ -351,24 +339,14 @@ export class HttpPlugin extends BasePlugin<Http> {
         return original.apply(this, [options, callback]);
       }
 
-      // Makes sure the url is an url object
-      let pathname;
-      let origin = '';
-      if (typeof options === 'string') {
-        const parsedUrl = url.parse(options);
-        options = parsedUrl;
-        pathname = parsedUrl.pathname || '';
-        origin = `${parsedUrl.protocol || 'http:'}//${parsedUrl.host}`;
-      } else {
-        try {
-          pathname = (options as url.URL).pathname;
-          if (!pathname) {
-            pathname = options.path ? url.parse(options.path).pathname : '';
-          }
-          origin = `${options.protocol || 'http:'}//${options.host}`;
-        } catch (ignore) {}
-      }
-      const request: ClientRequest = original.apply(this, [options, callback]);
+      const { origin, pathname, method, optionsParsed } = Utils.getRequestInfo(
+        options
+      );
+      const request: ClientRequest = original.apply(this, [
+        optionsParsed,
+        callback,
+      ]);
+
       if (
         Utils.isIgnored(
           origin + pathname,
@@ -378,11 +356,10 @@ export class HttpPlugin extends BasePlugin<Http> {
       ) {
         return request;
       }
+
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
       plugin._tracer.wrapEmitter(request);
-      // some packages return method in lowercase..
-      // ensure upperCase for consistency
-      const method = options.method ? options.method.toUpperCase() : 'GET';
+
       const operationName = `${method} ${pathname}`;
       const spanOptions = {
         kind: SpanKind.CLIENT,
@@ -397,7 +374,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         const rootSpan = plugin._tracer.startSpan(operationName, spanOptions);
         return plugin._tracer.withSpan(
           rootSpan,
-          plugin.getMakeRequestTraceFunction(request, options)
+          plugin.getMakeRequestTraceFunction(request, optionsParsed, rootSpan)
         );
       } else {
         plugin._logger.debug('outgoingRequest starting a child span');
@@ -405,10 +382,14 @@ export class HttpPlugin extends BasePlugin<Http> {
           kind: spanOptions.kind,
           parent: currentSpan,
         });
-        return plugin.getMakeRequestTraceFunction(request, options)(span);
+        return plugin.getMakeRequestTraceFunction(
+          request,
+          optionsParsed,
+          span
+        )();
       }
     };
   }
 }
 
-export const plugin = new HttpPlugin('http', '8.0.0');
+export const plugin = new HttpPlugin('http', process.versions.node);
