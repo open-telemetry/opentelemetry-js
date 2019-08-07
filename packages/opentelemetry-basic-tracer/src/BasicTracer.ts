@@ -22,8 +22,13 @@ import {
   NOOP_SPAN,
   randomTraceId,
   isValid,
+  randomSpanId,
 } from '@opentelemetry/core';
-import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
+import {
+  BinaryFormat,
+  HttpTextFormat,
+  TraceOptions,
+} from '@opentelemetry/types';
 import { BasicTracerConfig } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
@@ -54,24 +59,37 @@ export class BasicTracer implements types.Tracer {
    * decision.
    */
   startSpan(name: string, options: types.SpanOptions = {}): types.Span {
-    let parentSpanContext = this._getParentSpanContext(options.parent);
+    const parentContext = this._getParentSpanContext(options.parent);
     // make sampling decision
-    if (!this._sampler.shouldSample(parentSpanContext)) {
+    const samplingDecision = this._sampler.shouldSample(parentContext);
+    const spanId = randomSpanId();
+    let traceId;
+    let traceState;
+    if (!parentContext || !isValid(parentContext)) {
+      // New root span.
+      traceId = randomTraceId();
+    } else {
+      // New child span.
+      traceId = parentContext.traceId;
+      traceState = parentContext.traceState;
+    }
+    const traceOptions = samplingDecision
+      ? TraceOptions.SAMPLED
+      : TraceOptions.UNSAMPLED;
+    const spanContext = { traceId, spanId, traceOptions, traceState };
+
+    if (!samplingDecision) {
       // TODO: propagate SpanContext, for more information see
       // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
       return NOOP_SPAN;
     }
 
-    if (!parentSpanContext || !isValid(parentSpanContext)) {
-      // New root span.
-      parentSpanContext = { traceId: randomTraceId(), spanId: '' };
-    }
-
     const span = new Span(
       this,
       name,
-      parentSpanContext,
+      spanContext,
       options.kind || types.SpanKind.INTERNAL,
+      parentContext ? parentContext.spanId : undefined,
       options.startTime
     );
     // Set default attributes

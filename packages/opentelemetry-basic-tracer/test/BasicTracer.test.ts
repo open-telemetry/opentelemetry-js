@@ -125,6 +125,19 @@ describe('BasicTracer', () => {
       assert.deepStrictEqual(context.traceState, state);
     });
 
+    it('should start a span with name and parent span', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      const childSpan = tracer.startSpan('child-span', {
+        parent: span,
+      });
+      const context = childSpan.context();
+      assert.strictEqual(context.traceId, span.context().traceId);
+      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+    });
+
     it('should start a span with name and with invalid spancontext', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),

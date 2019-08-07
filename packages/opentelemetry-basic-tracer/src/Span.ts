@@ -15,9 +15,8 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { randomSpanId } from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
-import { TraceOptions, SpanKind, SpanContext } from '@opentelemetry/types';
+import { SpanKind, SpanContext } from '@opentelemetry/types';
 
 /**
  * This class represents a span.
@@ -42,19 +41,15 @@ export class Span implements types.Span {
   constructor(
     parentTracer: types.Tracer,
     spanName: string,
-    parentSpanContext: SpanContext,
+    spanContext: SpanContext,
     kind: SpanKind,
+    parentSpanId?: string,
     startTime?: number
   ) {
     this._tracer = parentTracer;
     this._name = spanName;
-    this._spanContext = {
-      traceId: parentSpanContext.traceId,
-      spanId: randomSpanId(),
-      traceOptions: TraceOptions.SAMPLED,
-      traceState: parentSpanContext.traceState,
-    };
-    this._parentId = parentSpanContext.spanId;
+    this._spanContext = spanContext;
+    this._parentId = parentSpanId;
     this._kind = kind;
     this._startTime = startTime || performance.now();
   }
