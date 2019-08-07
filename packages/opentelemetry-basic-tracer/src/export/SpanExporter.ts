@@ -14,7 +14,23 @@
  * limitations under the License.
  */
 
-export * from './export/SpanExporter';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+import { Span } from '../Span';
+
+/**
+ * An interface that allows different tracing services to export recorded data
+ * for sampled spans in their own format.
+ *
+ * To export data this MUST be register to the Tracer SDK using a optional
+ * config.
+ */
+export interface SpanExporter {
+  /**
+   * Called to export sampled {@link Span}s.
+   * @param spans the list of sampled Spans to be exported.
+   */
+  // @todo: change to ReadableSpan when available (pull/150)
+  export(spans: Span[]): void;
+
+  /** Stops the exporter. */
+  shutdown(): void;
+}
