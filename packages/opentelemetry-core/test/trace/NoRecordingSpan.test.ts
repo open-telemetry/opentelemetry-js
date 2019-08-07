@@ -1,5 +1,3 @@
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
-
 /**
  * Copyright 2019, OpenTelemetry Authors
  *
@@ -16,21 +14,20 @@ import { SpanContext, TraceOptions } from '@opentelemetry/types';
  * limitations under the License.
  */
 
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
-export const INVALID_SPAN_CONTEXT: SpanContext = {
-  traceId: INVALID_TRACEID,
-  spanId: INVALID_SPANID,
-  traceOptions: TraceOptions.UNSAMPLED,
-};
+import * as assert from 'assert';
+import { NoRecordingSpan } from '../../src/trace/NoRecordingSpan';
+import { TraceOptions } from '@opentelemetry/types';
 
-/**
- * Returns true if this {@link SpanContext} is valid.
- * @return true if this {@link SpanContext} is valid.
- */
-export function isValid(spanContext: SpanContext): boolean {
-  return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
-  );
-}
+describe('NoRecordingSpan', () => {
+  it('propagates span contexts', () => {
+    const spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceOptions: TraceOptions.UNSAMPLED,
+    };
+
+    const span = new NoRecordingSpan(spanContext);
+    assert.strictEqual(span.context(), spanContext);
+    span.end();
+  });
+});
