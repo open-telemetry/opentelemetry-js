@@ -20,8 +20,15 @@ import {
   BinaryTraceContext,
   HttpTraceContext,
   NOOP_SPAN,
+  randomTraceId,
+  isValid,
+  randomSpanId,
 } from '@opentelemetry/core';
-import { BinaryFormat, HttpTextFormat } from '@opentelemetry/types';
+import {
+  BinaryFormat,
+  HttpTextFormat,
+  TraceOptions,
+} from '@opentelemetry/types';
 import { BasicTracerConfig } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
@@ -52,19 +59,39 @@ export class BasicTracer implements types.Tracer {
    * decision.
    */
   startSpan(name: string, options: types.SpanOptions = {}): types.Span {
-    const parentSpanContext = this._getParentSpanContext(options.parent);
+    const parentContext = this._getParentSpanContext(options.parent);
     // make sampling decision
-    if (!this._sampler.shouldSample(parentSpanContext)) {
+    const samplingDecision = this._sampler.shouldSample(parentContext);
+    const spanId = randomSpanId();
+    let traceId;
+    let traceState;
+    if (!parentContext || !isValid(parentContext)) {
+      // New root span.
+      traceId = randomTraceId();
+    } else {
+      // New child span.
+      traceId = parentContext.traceId;
+      traceState = parentContext.traceState;
+    }
+    const traceOptions = samplingDecision
+      ? TraceOptions.SAMPLED
+      : TraceOptions.UNSAMPLED;
+    const spanContext = { traceId, spanId, traceOptions, traceState };
+
+    if (!samplingDecision) {
       // TODO: propagate SpanContext, for more information see
       // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
       return NOOP_SPAN;
     }
 
-    const spanOptions = Object.assign({}, options, {
-      parent: parentSpanContext,
-    });
-    const span = new Span(this, name, spanOptions);
-
+    const span = new Span(
+      this,
+      name,
+      spanContext,
+      options.kind || types.SpanKind.INTERNAL,
+      parentContext ? parentContext.spanId : undefined,
+      options.startTime
+    );
     // Set default attributes
     span.setAttributes(this._defaultAttributes);
     return span;
@@ -92,6 +119,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Records a SpanData.
    */
+  /* c8 ignore next 3 */
   recordSpanData(span: types.Span): void {
     // TODO: notify exporter
   }
