@@ -22,10 +22,12 @@ import {
   NEVER_SAMPLER,
   NOOP_SPAN,
   NoopLogger,
+  TraceState,
 } from '@opentelemetry/core';
 import { BasicTracer } from '../src/BasicTracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { Span } from '../src/Span';
+import { TraceOptions } from '@opentelemetry/types';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
@@ -97,6 +99,58 @@ describe('BasicTracer', () => {
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
       assert.ok(span instanceof Span);
+      const context = span.context();
+      assert.ok(context.traceId.match(/[a-f0-9]{32}/));
+      assert.ok(context.spanId.match(/[a-f0-9]{16}/));
+      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.deepStrictEqual(context.traceState, undefined);
+    });
+
+    it('should start a span with name and parent spancontext', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const state = new TraceState('a=1,b=2');
+      const span = tracer.startSpan('my-span', {
+        parent: {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceState: state,
+        },
+      });
+      assert.ok(span instanceof Span);
+      const context = span.context();
+      assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
+      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.deepStrictEqual(context.traceState, state);
+    });
+
+    it('should start a span with name and parent span', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      const childSpan = tracer.startSpan('child-span', {
+        parent: span,
+      });
+      const context = childSpan.context();
+      assert.strictEqual(context.traceId, span.context().traceId);
+      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+    });
+
+    it('should start a span with name and with invalid spancontext', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', {
+        parent: { traceId: '0', spanId: '0' },
+      });
+      assert.ok(span instanceof Span);
+      const context = span.context();
+      assert.ok(context.traceId.match(/[a-f0-9]{32}/));
+      assert.ok(context.spanId.match(/[a-f0-9]{16}/));
+      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.deepStrictEqual(context.traceState, undefined);
     });
 
     it('should return a default span with no sampling', () => {
