@@ -19,10 +19,10 @@ import {
   ALWAYS_SAMPLER,
   BinaryTraceContext,
   HttpTraceContext,
-  NOOP_SPAN,
   randomTraceId,
   isValid,
   randomSpanId,
+  NoRecordingSpan,
 } from '@opentelemetry/core';
 import {
   BinaryFormat,
@@ -79,9 +79,7 @@ export class BasicTracer implements types.Tracer {
     const spanContext = { traceId, spanId, traceOptions, traceState };
 
     if (!samplingDecision) {
-      // TODO: propagate SpanContext, for more information see
-      // https://github.com/open-telemetry/opentelemetry-js/pull/99#issuecomment-513325536
-      return NOOP_SPAN;
+      return new NoRecordingSpan(spanContext);
     }
 
     const span = new Span(

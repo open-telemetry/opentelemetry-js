@@ -20,9 +20,9 @@ import {
   BinaryTraceContext,
   HttpTraceContext,
   NEVER_SAMPLER,
-  NOOP_SPAN,
   NoopLogger,
   TraceState,
+  NoRecordingSpan,
 } from '@opentelemetry/core';
 import { BasicTracer } from '../src/BasicTracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
@@ -153,13 +153,18 @@ describe('BasicTracer', () => {
       assert.deepStrictEqual(context.traceState, undefined);
     });
 
-    it('should return a default span with no sampling', () => {
+    it('should return a no recording span when never sampling', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span');
-      assert.deepStrictEqual(span, NOOP_SPAN);
+      assert.ok(span instanceof NoRecordingSpan);
+      const context = span.context();
+      assert.ok(context.traceId.match(/[a-f0-9]{32}/));
+      assert.ok(context.spanId.match(/[a-f0-9]{16}/));
+      assert.strictEqual(context.traceOptions, TraceOptions.UNSAMPLED);
+      assert.deepStrictEqual(context.traceState, undefined);
     });
 
     // @todo: implement
