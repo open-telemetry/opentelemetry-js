@@ -15,20 +15,14 @@
  */
 
 import * as types from '@opentelemetry/types';
-import {
-  randomSpanId,
-  randomTraceId,
-  INVALID_SPAN_CONTEXT,
-  isValid,
-} from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
-import { TraceOptions } from '@opentelemetry/types';
+import { SpanKind, SpanContext } from '@opentelemetry/types';
 
 /**
  * This class represents a span.
  */
 export class Span implements types.Span {
-  private readonly _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT;
+  private readonly _spanContext: types.SpanContext;
   private readonly _tracer: types.Tracer;
   private readonly _parentId?: string;
   private readonly _kind: types.SpanKind;
@@ -47,24 +41,17 @@ export class Span implements types.Span {
   constructor(
     parentTracer: types.Tracer,
     spanName: string,
-    options: types.SpanOptions
+    spanContext: SpanContext,
+    kind: SpanKind,
+    parentSpanId?: string,
+    startTime?: number
   ) {
     this._tracer = parentTracer;
     this._name = spanName;
-    this._spanContext.spanId = randomSpanId();
-    this._spanContext.traceOptions = TraceOptions.SAMPLED;
-    const parentSpanContext = this._getParentSpanContext(options.parent);
-    if (parentSpanContext && isValid(parentSpanContext)) {
-      // New child span.
-      this._spanContext.traceId = parentSpanContext.traceId;
-      this._spanContext.traceState = parentSpanContext.traceState;
-      this._parentId = parentSpanContext.spanId;
-    } else {
-      // This is a root span so no remote or local parent.
-      this._spanContext.traceId = randomTraceId();
-    }
-    this._kind = options.kind || types.SpanKind.INTERNAL;
-    this._startTime = options.startTime || performance.now();
+    this._spanContext = spanContext;
+    this._parentId = parentSpanId;
+    this._kind = kind;
+    this._startTime = startTime || performance.now();
   }
 
   tracer(): types.Tracer {
@@ -135,18 +122,6 @@ export class Span implements types.Span {
       endTime: this._endTime,
     });
     return `Span${json}`;
-  }
-
-  private _getParentSpanContext(
-    parent: types.Span | types.SpanContext | undefined
-  ): types.SpanContext | undefined {
-    if (!parent) return undefined;
-
-    // parent is a SpanContext
-    if ((parent as types.SpanContext).traceId) {
-      return parent as types.SpanContext;
-    }
-    return (parent as Span).context();
   }
 
   private _isSpanEnded(): boolean {
