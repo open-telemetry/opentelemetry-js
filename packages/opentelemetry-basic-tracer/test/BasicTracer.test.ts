@@ -167,6 +167,50 @@ describe('BasicTracer', () => {
       assert.deepStrictEqual(context.traceState, undefined);
     });
 
+    it('Should create real span when not sampled but recording events true', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), true);
+    });
+
+    it('Should not create real span when not sampled and recording events  false', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: false });
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), false);
+    });
+
+    it('Should not create real span when not sampled and no recording events configured', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), false);
+    });
+
+    it('Should create real span when sampled and recording events true', () => {
+      const tracer = new BasicTracer({
+        sampler: ALWAYS_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), true);
+    });
+
     // @todo: implement
     it('should start a Span with always sampling');
 

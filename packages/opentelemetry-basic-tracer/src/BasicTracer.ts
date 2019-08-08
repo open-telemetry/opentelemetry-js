@@ -77,8 +77,8 @@ export class BasicTracer implements types.Tracer {
       ? TraceOptions.SAMPLED
       : TraceOptions.UNSAMPLED;
     const spanContext = { traceId, spanId, traceOptions, traceState };
-
-    if (!samplingDecision) {
+    const recordEvents = options.isRecordingEvents || false;
+    if (!recordEvents && !samplingDecision) {
       return new NoRecordingSpan(spanContext);
     }
 
