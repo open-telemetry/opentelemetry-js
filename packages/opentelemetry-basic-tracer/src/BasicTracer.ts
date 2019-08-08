@@ -23,11 +23,13 @@ import {
   isValid,
   randomSpanId,
   NoRecordingSpan,
+  NoopLogger,
 } from '@opentelemetry/core';
 import {
   BinaryFormat,
   HttpTextFormat,
   TraceOptions,
+  Logger,
 } from '@opentelemetry/types';
 import { BasicTracerConfig } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
@@ -42,6 +44,7 @@ export class BasicTracer implements types.Tracer {
   private readonly _httpTextFormat: types.HttpTextFormat;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
+  private readonly _logger: Logger;
 
   /**
    * Constructs a new Tracer instance.
@@ -52,6 +55,7 @@ export class BasicTracer implements types.Tracer {
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
     this._sampler = config.sampler || ALWAYS_SAMPLER;
     this._scopeManager = config.scopeManager;
+    this._logger = config.logger || new NoopLogger();
   }
 
   /**
@@ -79,11 +83,13 @@ export class BasicTracer implements types.Tracer {
     const spanContext = { traceId, spanId, traceOptions, traceState };
     const recordEvents = options.isRecordingEvents || false;
     if (!recordEvents && !samplingDecision) {
+      this._logger.debug('Sampling is off, starting no recording span');
       return new NoRecordingSpan(spanContext);
     }
 
     const span = new Span(
       this,
+      this._logger,
       name,
       spanContext,
       options.kind || types.SpanKind.INTERNAL,
