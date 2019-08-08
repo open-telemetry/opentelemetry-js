@@ -82,6 +82,14 @@ export class TracerDelegate implements types.Tracer {
     );
   }
 
+  wrapEmitter(emitter: unknown): void {
+    this._currentTracer.wrapEmitter.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    );
+  }
+
   recordSpanData(span: types.Span): void {
     return this._currentTracer.recordSpanData.apply(
       this._currentTracer,

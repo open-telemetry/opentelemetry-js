@@ -19,15 +19,18 @@
  * https://github.com/open-telemetry/opentelemetry-specification/blob/master/work_in_progress/opencensus/HTTP.md#attributes
  */
 export enum Attributes {
-  HTTP_HOST = 'http.host',
+  HTTP_HOSTNAME = 'http.hostname',
   // NOT ON OFFICIAL SPEC
   ERROR = 'error',
+  COMPONENT = 'component',
   HTTP_METHOD = 'http.method',
   HTTP_PATH = 'http.path',
   HTTP_ROUTE = 'http.route',
-  HTTP_USER_AGENT = 'http.user_agent',
+  HTTP_URL = 'http.url',
   HTTP_STATUS_CODE = 'http.status_code',
+  HTTP_STATUS_TEXT = 'http.status_text',
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME = 'http.error_name',
   HTTP_ERROR_MESSAGE = 'http.error_message',
+  HTTP_USER_AGENT = 'http.user_agent',
 }

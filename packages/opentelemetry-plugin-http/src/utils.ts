@@ -15,8 +15,13 @@
  */
 
 import { Status, CanonicalCode, Span } from '@opentelemetry/types';
-import { RequestOptions, IncomingMessage, ClientRequest } from 'http';
-import { IgnoreMatcher } from './types';
+import {
+  RequestOptions,
+  IncomingMessage,
+  ClientRequest,
+  IncomingHttpHeaders,
+} from 'http';
+import { IgnoreMatcher, ParsedRequestOptions } from './types';
 import { Attributes } from './enums/attributes';
 import * as url from 'url';
 
@@ -24,6 +29,22 @@ import * as url from 'url';
  * Utility class
  */
 export class Utils {
+  /**
+   * return an absolute url
+   */
+  static getUrlFromIncomingRequest(
+    requestUrl: url.UrlWithStringQuery | null,
+    headers: IncomingHttpHeaders
+  ): string {
+    if (!requestUrl) {
+      return `http://${headers.host || 'localhost'}/`;
+    }
+
+    return requestUrl.href && requestUrl.href.startsWith('http')
+      ? `${requestUrl.protocol}//${requestUrl.hostname}${requestUrl.pathname}`
+      : `${requestUrl.protocol || 'http:'}//${headers.host ||
+          'localhost'}${requestUrl.pathname || '/'}`;
+  }
   /**
    * Parse status code from HTTP response.
    */
@@ -73,7 +94,7 @@ export class Utils {
    * @param obj obj to inspect
    * @param pattern Match pattern
    */
-  static isSatisfyPattern<T>(
+  static satisfiesPattern<T>(
     constant: string,
     obj: T,
     pattern: IgnoreMatcher<T>
@@ -106,7 +127,7 @@ export class Utils {
     }
 
     for (const pattern of list) {
-      if (Utils.isSatisfyPattern(constant, obj, pattern)) {
+      if (Utils.satisfiesPattern(constant, obj, pattern)) {
         return true;
       }
     }
@@ -172,5 +193,22 @@ export class Utils {
     method = method ? method.toUpperCase() : 'GET';
 
     return { origin, pathname, method, optionsParsed };
+  }
+
+  static getIncomingOptions(options: ParsedRequestOptions) {
+    // If outgoing request headers contain the "Expect" header, the returned
+    // ClientRequest will throw an error if any new headers are added.
+    // So we need to clone the options object to be able to inject new
+    // header.
+    if (Utils.hasExpectHeader(options)) {
+      const safeOptions = Object.assign({}, options);
+      safeOptions.headers = Object.assign({}, options.headers);
+      return safeOptions;
+    }
+
+    if (!options.headers) {
+      options.headers = {};
+    }
+    return options;
   }
 }

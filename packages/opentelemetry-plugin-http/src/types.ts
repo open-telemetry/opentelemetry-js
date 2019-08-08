@@ -15,6 +15,7 @@
  */
 
 import { Span } from '@opentelemetry/types';
+import * as url from 'url';
 import {
   ClientRequest,
   IncomingMessage,
@@ -31,6 +32,9 @@ export type IgnoreMatcher<T> =
 export type HttpCallback = (res: IncomingMessage) => void;
 export type RequestFunction = typeof request;
 export type GetFunction = typeof get;
+export type ParsedRequestOptions =
+  | http.RequestOptions & Partial<url.UrlWithParsedQuery>
+  | http.RequestOptions;
 export type Http = typeof http;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;

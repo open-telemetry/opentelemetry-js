@@ -15,8 +15,13 @@
  */
 
 import { BasePlugin, NoopLogger, isValid } from '@opentelemetry/core';
-import { Span, SpanKind, SpanOptions, Logger } from '@opentelemetry/types';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import {
+  Span,
+  SpanKind,
+  SpanOptions,
+  Logger,
+  Tracer,
+} from '@opentelemetry/types';
 import {
   ClientRequest,
   IncomingMessage,
@@ -33,20 +38,27 @@ import {
   Func,
   HttpCallback,
   ResponseEndArgs,
+  ParsedRequestOptions,
 } from './types';
 import { Format } from './enums/format';
 import { Attributes } from './enums/attributes';
 import { Utils } from './utils';
+import { SpanFactory } from './models/spanFactory';
 
 /**
  * Http instrumentation plugin for Opentelemetry
  */
 export class HttpPlugin extends BasePlugin<Http> {
+  static readonly component = 'http';
   options!: HttpPluginConfig;
 
   // TODO: BasePlugin should pass the logger or when we enable the plugin
-  protected readonly _logger!: Logger;
-  protected readonly _tracer!: NodeTracer;
+  protected _logger!: Logger;
+  protected readonly _tracer!: Tracer;
+  /**
+   * Used to create span with default attributes
+   */
+  protected _spanFactory!: SpanFactory;
 
   constructor(public moduleName: string, public version: string) {
     super();
@@ -56,6 +68,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   /** Patches HTTP incoming and outcoming request functions. */
   protected patch() {
+    this._spanFactory = new SpanFactory(this._tracer, HttpPlugin.component);
     this._logger.debug(
       'applying patch to %s@%s',
       this.moduleName,
@@ -117,7 +130,7 @@ export class HttpPlugin extends BasePlugin<Http> {
    * Creates spans for incoming requests, restoring spans' context if applied.
    */
   protected _getPatchIncomingRequestFunction() {
-    return (original: (event: string) => boolean) => {
+    return (original: (event: string, ...args: unknown[]) => boolean) => {
       return this.incomingRequestFunction(original);
     };
   }
@@ -163,41 +176,40 @@ export class HttpPlugin extends BasePlugin<Http> {
    */
   private getMakeRequestTraceFunction(
     request: ClientRequest,
-    options: RequestOptions,
+    options: ParsedRequestOptions,
     span: Span
   ): Func<ClientRequest> {
     return (): ClientRequest => {
       this._logger.debug('makeRequestTrace');
 
       const propagation = this._tracer.getHttpTextFormat();
-      // If outgoing request headers contain the "Expect" header, the returned
-      // ClientRequest will throw an error if any new headers are added.
-      // So we need to clone the options object to be able to inject new
-      // header.
-      if (Utils.hasExpectHeader(options)) {
-        options = Object.assign({}, options);
-        options.headers = Object.assign({}, options.headers);
-      }
-      propagation.inject(span.context(), Format.HTTP, options.headers);
+      const opts = Utils.getIncomingOptions(options);
+
+      propagation.inject(span.context(), Format.HTTP, opts.headers);
 
       request.on('response', (response: IncomingMessage) => {
         this._tracer.wrapEmitter(response);
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
+
+          // TODO: create utils methods
           const method = response.method
             ? response.method.toUpperCase()
             : 'GET';
-          const headers = options.headers;
+          const headers = opts.headers;
           const userAgent = headers
             ? headers['user-agent'] || headers['User-Agent']
             : null;
 
-          const host = options.hostname || options.host || 'localhost';
+          const host = opts.hostname || opts.host || 'localhost';
           span.setAttributes({
-            [Attributes.HTTP_HOST]: host,
+            [Attributes.HTTP_URL]: `${opts.protocol}//${opts.hostname}${
+              (opts as url.UrlWithParsedQuery).pathname
+            }`,
+            [Attributes.HTTP_HOSTNAME]: host,
             [Attributes.HTTP_METHOD]: method,
-            [Attributes.HTTP_PATH]: options.path || '/',
+            [Attributes.HTTP_PATH]: opts.path || '/',
           });
 
           if (userAgent) {
@@ -206,10 +218,10 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           if (response.statusCode) {
             span
-              .setAttribute(
-                Attributes.HTTP_STATUS_CODE,
-                response.statusCode.toString()
-              )
+              .setAttributes({
+                [Attributes.HTTP_STATUS_CODE]: response.statusCode,
+                [Attributes.HTTP_STATUS_TEXT]: response.statusMessage,
+              })
               .setStatus(Utils.parseResponseStatus(response.statusCode));
           }
 
@@ -245,7 +257,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const request = args[0] as IncomingMessage;
       const response = args[1] as ServerResponse;
-      const path = request.url ? url.parse(request.url).pathname || '' : '';
+      const path = request.url ? url.parse(request.url).pathname || '/' : '/';
       const method = request.method || 'GET';
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
@@ -265,8 +277,12 @@ export class HttpPlugin extends BasePlugin<Http> {
         spanOptions.parent = spanContext;
       }
 
-      const rootSpan = plugin._tracer.startSpan(path, spanOptions);
-      return plugin._tracer.withSpan(rootSpan, () => {
+      const span = plugin._spanFactory.createInstance(
+        `${method} ${path}`,
+        spanOptions
+      );
+
+      return plugin._tracer.withSpan(span, () => {
         plugin._tracer.wrapEmitter(request);
         plugin._tracer.wrapEmitter(response);
 
@@ -283,42 +299,44 @@ export class HttpPlugin extends BasePlugin<Http> {
           // tslint:disable-next-line:no-any
           const returned = response.end.apply(this, arguments as any);
           const requestUrl = request.url ? url.parse(request.url) : null;
-          const host = headers.host || 'localhost';
+          const hostname = headers.host
+            ? headers.host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
+            : 'localhost';
           const userAgent = (headers['user-agent'] ||
             headers['User-Agent']) as string;
 
-          rootSpan.setAttributes({
-            [Attributes.HTTP_HOST]: host.replace(/^(.*)(\:[0-9]{1,5})/, '$1'),
+          span.setAttributes({
+            [Attributes.HTTP_URL]: Utils.getUrlFromIncomingRequest(
+              requestUrl,
+              headers
+            ),
+            [Attributes.HTTP_HOSTNAME]: hostname,
             [Attributes.HTTP_METHOD]: method,
           });
 
           if (requestUrl) {
-            rootSpan.setAttributes({
+            span.setAttributes({
               [Attributes.HTTP_PATH]: requestUrl.pathname || '/',
               [Attributes.HTTP_ROUTE]: requestUrl.path || '/',
             });
           }
 
           if (userAgent) {
-            rootSpan.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
+            span.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
           }
 
-          rootSpan
-            .setAttribute(
-              Attributes.HTTP_STATUS_CODE,
-              response.statusCode.toString()
-            )
+          span
+            .setAttributes({
+              [Attributes.HTTP_STATUS_CODE]: response.statusCode,
+              [Attributes.HTTP_STATUS_TEXT]: response.statusMessage,
+            })
             .setStatus(Utils.parseResponseStatus(response.statusCode));
 
           if (plugin.options.applyCustomAttributesOnSpan) {
-            plugin.options.applyCustomAttributesOnSpan(
-              rootSpan,
-              request,
-              response
-            );
+            plugin.options.applyCustomAttributesOnSpan(span, request, response);
           }
 
-          rootSpan.end();
+          span.end();
           return returned;
         };
         return original.apply(this, [event, ...args]);
@@ -366,19 +384,22 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
       const currentSpan = plugin._tracer.getCurrentSpan();
       // Checks if this outgoing request is part of an operation by checking
-      // if there is a current root span, if so, we create a child span. In
-      // case there is no root span, this means that the outgoing request is
-      // the first operation, therefore we create a root span.
+      // if there is a current span, if so, we create a child span. In
+      // case there is no active span, this means that the outgoing request is
+      // the first operation, therefore we create a span and call withSpan method.
       if (!currentSpan) {
-        plugin._logger.debug('outgoingRequest starting a root span');
-        const rootSpan = plugin._tracer.startSpan(operationName, spanOptions);
+        plugin._logger.debug('outgoingRequest starting a span without context');
+        const span = plugin._spanFactory.createInstance(
+          operationName,
+          spanOptions
+        );
         return plugin._tracer.withSpan(
-          rootSpan,
-          plugin.getMakeRequestTraceFunction(request, optionsParsed, rootSpan)
+          span,
+          plugin.getMakeRequestTraceFunction(request, optionsParsed, span)
         );
       } else {
         plugin._logger.debug('outgoingRequest starting a child span');
-        const span = plugin._tracer.startSpan(operationName, {
+        const span = plugin._spanFactory.createInstance(operationName, {
           kind: spanOptions.kind,
           parent: currentSpan,
         });

@@ -31,17 +31,4 @@ export class NodeTracer extends BasicTracer {
 
     // @todo: Integrate Plugin Loader (pull/126).
   }
-  /**
-   * Binds the trace context to the given event emitter.
-   * This is necessary in order to create child spans correctly in event
-   * handlers.
-   * @param emitter An event emitter whose handlers should have
-   *     the trace context binded to them.
-   */
-  wrapEmitter(emitter: NodeJS.EventEmitter): void {
-    if (!this._scopeManager.active()) {
-      return;
-    }
-    this._scopeManager.bind(emitter);
-  }
 }
