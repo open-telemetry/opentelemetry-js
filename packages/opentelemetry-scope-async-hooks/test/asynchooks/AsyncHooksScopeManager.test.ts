@@ -77,11 +77,11 @@ describe('AsyncHooksScopeManager', () => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
       scopeManager.with(scope1, () => {
-        assert.equal(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), 'scope1');
         scopeManager.with(scope2, () => {
-          assert.equal(scopeManager.active(), 'scope2');
+          assert.strictEqual(scopeManager.active(), 'scope2');
         });
-        assert.equal(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), 'scope1');
         return done();
       });
     });
