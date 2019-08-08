@@ -137,33 +137,36 @@ describe('Utils', () => {
   });
 
   describe('isIgnored()', () => {
+    let satisfiesPatternSpy: sinon.SinonSpy;
     beforeEach(() => {
-      Utils.satisfiesPattern = sinon.spy();
+      satisfiesPatternSpy = sinon.spy(Utils, 'satisfiesPattern');
     });
 
     afterEach(() => {
       sinon.restore();
     });
 
-    it('should call isSatisfyPattern, n match', () => {
-      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
-      assert.strictEqual(answer1, false);
+    it('should call satisfiesPattern', () => {
+      Utils.isIgnored('/test/1', {}, ['/test/11']);
       assert.strictEqual(
         (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
         1
       );
     });
 
-    it('should call isSatisfyPattern, match', () => {
-      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
-      );
+    it('should call satisfiesPattern, match', () => {
+      satisfiesPatternSpy.restore();
+      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/1']);
+      assert.strictEqual(answer1, true);
     });
 
-    it('should not call isSatisfyPattern', () => {
+    it('should call satisfiesPattern, no match', () => {
+      satisfiesPatternSpy.restore();
+      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
+      assert.strictEqual(answer1, false);
+    });
+
+    it('should not call satisfiesPattern', () => {
       Utils.isIgnored('/test/1', {}, []);
       assert.strictEqual(
         (Utils.satisfiesPattern as sinon.SinonSpy).callCount,

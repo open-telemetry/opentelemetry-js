@@ -280,7 +280,7 @@ describe('HttpPlugin', () => {
       });
     }
 
-    it('should create a rootSpan for GET requests and add propagation headers', async () => {
+    it('should create a span for GET requests and add propagation headers', async () => {
       nock.enableNetConnect();
       const spans = audit.processSpans();
       assert.strictEqual(spans.length, 0);
