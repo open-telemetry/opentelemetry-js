@@ -15,6 +15,7 @@
  */
 
 import { Span } from '../Span';
+import { ExportResult } from './ExportResult';
 
 /**
  * An interface that allows different tracing services to export recorded data
@@ -29,7 +30,7 @@ export interface SpanExporter {
    * @param spans the list of sampled Spans to be exported.
    */
   // @todo: change to ReadableSpan when available (pull/150)
-  export(spans: Span[]): void;
+  export(spans: Span[], resultCallback: (result: ExportResult) => void): void;
 
   /** Stops the exporter. */
   shutdown(): void;
