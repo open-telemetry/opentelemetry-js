@@ -20,13 +20,13 @@ import {
   Attributes,
   Link,
   Event,
+  SpanContext,
 } from '@opentelemetry/types';
 
 export interface ReadableSpan {
   readonly name: string;
   readonly kind: SpanKind;
-  readonly traceId: string;
-  readonly spanId: string;
+  readonly spanContext: SpanContext;
   readonly parentSpanId?: string;
   readonly startTime: number;
   readonly endTime: number;

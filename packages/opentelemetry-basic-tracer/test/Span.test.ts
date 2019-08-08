@@ -88,23 +88,6 @@ describe('Span', () => {
     });
   });
 
-  it('should return toString', () => {
-    const parentId = '5c1c63257de34c67';
-    const span = new Span(
-      tracer,
-      name,
-      spanContext,
-      SpanKind.SERVER,
-      parentId,
-      100
-    );
-    const context = span.context();
-    assert.strictEqual(
-      span.toString(),
-      `Span{"name":"${name}","traceId":"${context.traceId}","spanId":"${context.spanId}","parentSpanId":"${parentId}","kind":1,"startTime":100,"endTime":0,"status":{"code":0},"attributes":{},"links":[],"events":[]}`
-    );
-  });
-
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
     const span = new Span(
@@ -119,7 +102,7 @@ describe('Span', () => {
     assert.strictEqual(readableSpan.name, 'my-span');
     assert.strictEqual(readableSpan.kind, SpanKind.INTERNAL);
     assert.strictEqual(readableSpan.parentSpanId, parentId);
-    assert.strictEqual(readableSpan.traceId, spanContext.traceId);
+    assert.strictEqual(readableSpan.spanContext.traceId, spanContext.traceId);
     assert.deepStrictEqual(readableSpan.status, {
       code: CanonicalCode.OK,
     });
