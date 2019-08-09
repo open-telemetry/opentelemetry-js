@@ -23,6 +23,8 @@ import { ReadableSpan } from './export/ReadableSpan';
  */
 export class Span implements types.Span, ReadableSpan {
   private readonly _tracer: types.Tracer;
+  // Below properties are included to implement ReadableSpan for export
+  // purposes but are not intended to be written-to directly.
   readonly spanContext: types.SpanContext;
   readonly kind: types.SpanKind;
   readonly parentSpanId?: string;
