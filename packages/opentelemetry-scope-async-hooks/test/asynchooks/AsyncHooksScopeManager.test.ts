@@ -68,7 +68,7 @@ describe('AsyncHooksScopeManager', () => {
       });
     });
 
-    it('it should rethrow errors', done => {
+    it('should rethrow errors', done => {
       assert.throws(() => {
         scopeManager.with(null, () => {
           throw new Error('This should be rethrown');
