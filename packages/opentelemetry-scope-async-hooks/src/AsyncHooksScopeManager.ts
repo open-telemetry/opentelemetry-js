@@ -87,7 +87,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
       value: target.length,
     });
     /**
-     * It isnt possible to tell Typescript that contextWrapper is the same as T
+     * It isn't possible to tell Typescript that contextWrapper is the same as T
      * so we forced to cast as any here.
      */
     // tslint:disable-next-line:no-any

@@ -19,7 +19,7 @@ import { NoopTracer } from './NoopTracer';
 
 // Acts a bridge to the global tracer that can be safely called before the
 // global tracer is initialized. The purpose of the delegation is to avoid the
-// sometimes nearly intractible initialization order problems that can arise in
+// sometimes nearly intractable initialization order problems that can arise in
 // applications with a complex set of dependencies. Also allows for the tracer
 // to be changed/disabled during runtime without needing to change reference
 // to the global tracer
