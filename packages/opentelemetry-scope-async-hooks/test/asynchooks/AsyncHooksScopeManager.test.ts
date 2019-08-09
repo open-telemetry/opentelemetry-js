@@ -20,9 +20,13 @@ import { AsyncHooksScopeManager } from '../../src';
 describe('AsyncHooksScopeManager', () => {
   let scopeManager: AsyncHooksScopeManager;
 
+  beforeEach(() => {
+    scopeManager = new AsyncHooksScopeManager();
+    scopeManager.enable();
+  });
+
   afterEach(() => {
     scopeManager.disable();
-    scopeManager.enable();
   });
 
   describe('.enable()', () => {
