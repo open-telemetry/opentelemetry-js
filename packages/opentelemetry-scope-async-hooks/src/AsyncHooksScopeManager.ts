@@ -77,8 +77,8 @@ export class AsyncHooksScopeManager implements ScopeManager {
 
   private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
-    const contextWrapper = function(this: {}) {
-      return manager.with(scope, () => target.apply(this, arguments));
+    const contextWrapper = function(this: {}, ...args: unknown[]) {
+      return manager.with(scope, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
       enumerable: false,
