@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export * from './export/ExportResult';
-export * from './export/SpanExporter';
-export * from './types';
-export * from './BasicTracer';
-export * from './Span';
+export enum ExportResult {
+  Success,
+  FailedNonRetryable,
+  FailedRetryable,
+}
