@@ -36,9 +36,9 @@ import {
   HttpPluginConfig,
   Http,
   Func,
-  HttpCallback,
   ResponseEndArgs,
   ParsedRequestOptions,
+  HttpRequestArgs,
 } from './types';
 import { Format } from './enums/format';
 import { Attributes } from './enums/attributes';
@@ -157,13 +157,12 @@ export class HttpPlugin extends BasePlugin<Http> {
       // simply follow the latter. Ref:
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
-      return function outgoingGetRequest(
-        options: string | RequestOptions | URL,
-        callback?: HttpCallback
-      ) {
-        const req = request(options, callback);
+      return function outgoingGetRequest<
+        T extends RequestOptions | string | URL
+      >(options: T, ...args: HttpRequestArgs) {
+        const req = request(options, ...args);
         req.end();
-        return req;
+        return req as ClientRequest;
       };
     };
   }
@@ -204,9 +203,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           const host = opts.hostname || opts.host || 'localhost';
           span.setAttributes({
-            [Attributes.HTTP_URL]: `${opts.protocol}//${opts.hostname}${
-              (opts as url.UrlWithParsedQuery).pathname
-            }`,
+            [Attributes.HTTP_URL]: `${opts.protocol}//${opts.hostname}${opts.path}`,
             [Attributes.HTTP_HOSTNAME]: host,
             [Attributes.HTTP_METHOD]: method,
             [Attributes.HTTP_PATH]: opts.path || '/',
@@ -257,12 +254,16 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const request = args[0] as IncomingMessage;
       const response = args[1] as ServerResponse;
-      const path = request.url ? url.parse(request.url).pathname || '/' : '/';
+      const pathname = request.url
+        ? url.parse(request.url).pathname || '/'
+        : '/';
       const method = request.method || 'GET';
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
-      if (Utils.isIgnored(path, request, plugin.options.ignoreIncomingPaths)) {
+      if (
+        Utils.isIgnored(pathname, request, plugin.options.ignoreIncomingPaths)
+      ) {
         return original.apply(this, [event, ...args]);
       }
 
@@ -278,7 +279,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       const span = plugin._spanFactory.createInstance(
-        `${method} ${path}`,
+        `${method} ${pathname}`,
         spanOptions
       );
 
@@ -316,8 +317,8 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           if (requestUrl) {
             span.setAttributes({
-              [Attributes.HTTP_PATH]: requestUrl.pathname || '/',
-              [Attributes.HTTP_ROUTE]: requestUrl.path || '/',
+              [Attributes.HTTP_PATH]: requestUrl.path || '/',
+              [Attributes.HTTP_ROUTE]: requestUrl.pathname || '/',
             });
           }
 
@@ -351,10 +352,10 @@ export class HttpPlugin extends BasePlugin<Http> {
     return function outgoingRequest(
       this: {},
       options: RequestOptions | string,
-      callback?: HttpCallback
+      ...args: unknown[]
     ): ClientRequest {
       if (!options) {
-        return original.apply(this, [options, callback]);
+        return original.apply(this, [options, ...args]);
       }
 
       const { origin, pathname, method, optionsParsed } = Utils.getRequestInfo(
@@ -362,7 +363,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       );
       const request: ClientRequest = original.apply(this, [
         optionsParsed,
-        callback,
+        ...args,
       ]);
 
       if (

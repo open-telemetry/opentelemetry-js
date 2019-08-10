@@ -50,11 +50,7 @@ function doNock(
     .reply(httpCode, respBody);
 }
 
-export const customAttributeFunction = (
-  span: Span,
-  request: http.ClientRequest | http.IncomingMessage,
-  response: http.IncomingMessage | http.ServerResponse
-): void => {
+export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
@@ -107,9 +103,10 @@ describe('HttpPlugin', () => {
 
     after(() => {
       server.close();
+      plugin.disable();
     });
 
-    it('should generate valid span (client side and server side)', done => {
+    it('should generate valid spans (client side and server side)', done => {
       httpRequest
         .get(`http://${hostname}:${serverPort}${pathname}`)
         .then(result => {
@@ -138,12 +135,14 @@ describe('HttpPlugin', () => {
     for (let i = 0; i < httpErrorCodes.length; i++) {
       it(`should test span for GET requests with http error ${httpErrorCodes[i]}`, async () => {
         const testPath = '/outgoing/rootSpan/1';
+
         doNock(
           hostname,
           testPath,
           httpErrorCodes[i],
           httpErrorCodes[i].toString()
         );
+
         const isReset = audit.processSpans().length === 0;
         assert.ok(isReset);
         await httpRequest
@@ -280,7 +279,7 @@ describe('HttpPlugin', () => {
       });
     }
 
-    it('should create a span for GET requests and add propagation headers', async () => {
+    it('should create a rootSpan for GET requests and add propagation headers', async () => {
       nock.enableNetConnect();
       const spans = audit.processSpans();
       assert.strictEqual(spans.length, 0);

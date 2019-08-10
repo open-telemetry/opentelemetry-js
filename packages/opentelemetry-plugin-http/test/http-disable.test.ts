@@ -74,6 +74,9 @@ describe('HttpPlugin', () => {
       httpTextFormat,
     });
     before(() => {
+      nock.cleanAll();
+      nock.enableNetConnect();
+
       plugin.enable(http, tracer);
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
@@ -86,14 +89,12 @@ describe('HttpPlugin', () => {
     });
 
     beforeEach(() => {
-      nock.cleanAll();
       tracer.startSpan = sinon.spy();
       tracer.withSpan = sinon.spy();
       tracer.recordSpanData = sinon.spy();
     });
 
     afterEach(() => {
-      nock.cleanAll();
       sinon.restore();
     });
 

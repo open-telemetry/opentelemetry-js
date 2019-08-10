@@ -32,6 +32,15 @@ export type IgnoreMatcher<T> =
 export type HttpCallback = (res: IncomingMessage) => void;
 export type RequestFunction = typeof request;
 export type GetFunction = typeof get;
+
+export type HttpCallbackOptional = HttpCallback | undefined;
+
+// from node 10+
+export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
+  HttpCallback;
+
+export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
+
 export type ParsedRequestOptions =
   | http.RequestOptions & Partial<url.UrlWithParsedQuery>
   | http.RequestOptions;

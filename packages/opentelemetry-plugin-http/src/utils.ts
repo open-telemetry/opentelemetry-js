@@ -41,9 +41,9 @@ export class Utils {
     }
 
     return requestUrl.href && requestUrl.href.startsWith('http')
-      ? `${requestUrl.protocol}//${requestUrl.hostname}${requestUrl.pathname}`
+      ? `${requestUrl.protocol}//${requestUrl.hostname}${requestUrl.path}`
       : `${requestUrl.protocol || 'http:'}//${headers.host ||
-          'localhost'}${requestUrl.pathname || '/'}`;
+          'localhost'}${requestUrl.path || '/'}`;
   }
   /**
    * Parse status code from HTTP response.
