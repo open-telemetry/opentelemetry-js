@@ -22,7 +22,7 @@ import {
   IncomingHttpHeaders,
 } from 'http';
 import { IgnoreMatcher, ParsedRequestOptions } from './types';
-import { Attributes } from './enums/attributes';
+import { AttributeNames } from './enums/attributeNames';
 import * as url from 'url';
 
 /**
@@ -143,9 +143,9 @@ export class Utils {
   static setSpanOnError(span: Span, obj: IncomingMessage | ClientRequest) {
     obj.on('error', error => {
       span.setAttributes({
-        [Attributes.ERROR]: true,
-        [Attributes.HTTP_ERROR_NAME]: error.name,
-        [Attributes.HTTP_ERROR_MESSAGE]: error.message,
+        [AttributeNames.ERROR]: true,
+        [AttributeNames.HTTP_ERROR_NAME]: error.name,
+        [AttributeNames.HTTP_ERROR_MESSAGE]: error.message,
       });
 
       let status: Status;

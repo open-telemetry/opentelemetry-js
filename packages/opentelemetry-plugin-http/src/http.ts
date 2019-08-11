@@ -21,6 +21,7 @@ import {
   SpanOptions,
   Logger,
   Tracer,
+  Attributes,
 } from '@opentelemetry/types';
 import {
   ClientRequest,
@@ -41,9 +42,8 @@ import {
   HttpRequestArgs,
 } from './types';
 import { Format } from './enums/format';
-import { Attributes } from './enums/attributes';
+import { AttributeNames } from './enums/attributeNames';
 import { Utils } from './utils';
-import { SpanFactory } from './models/spanFactory';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -51,24 +51,18 @@ import { SpanFactory } from './models/spanFactory';
 export class HttpPlugin extends BasePlugin<Http> {
   static readonly component = 'http';
   options!: HttpPluginConfig;
-
-  // TODO: BasePlugin should pass the logger or when we enable the plugin
   protected _logger!: Logger;
   protected readonly _tracer!: Tracer;
-  /**
-   * Used to create span with default attributes
-   */
-  protected _spanFactory!: SpanFactory;
 
   constructor(public moduleName: string, public version: string) {
     super();
     // TODO: remove this once a logger will be passed
+    // https://github.com/open-telemetry/opentelemetry-js/issues/193
     this._logger = new NoopLogger();
   }
 
   /** Patches HTTP incoming and outcoming request functions. */
   protected patch() {
-    this._spanFactory = new SpanFactory(this._tracer, HttpPlugin.component);
     this._logger.debug(
       'applying patch to %s@%s',
       this.moduleName,
@@ -131,7 +125,7 @@ export class HttpPlugin extends BasePlugin<Http> {
    */
   protected _getPatchIncomingRequestFunction() {
     return (original: (event: string, ...args: unknown[]) => boolean) => {
-      return this.incomingRequestFunction(original);
+      return this._incomingRequestFunction(original);
     };
   }
 
@@ -141,7 +135,7 @@ export class HttpPlugin extends BasePlugin<Http> {
    */
   protected _getPatchOutgoingRequestFunction() {
     return (original: Func<ClientRequest>): Func<ClientRequest> => {
-      return this.outgoingRequestFunction(original);
+      return this._outgoingRequestFunction(original);
     };
   }
 
@@ -172,14 +166,15 @@ export class HttpPlugin extends BasePlugin<Http> {
    * span when the response is finished.
    * @param request The original request object.
    * @param options The arguments to the original function.
+   * @param span representing the current operation
    */
-  private getMakeRequestTraceFunction(
+  private _getMakeRequestTraceFunction(
     request: ClientRequest,
     options: ParsedRequestOptions,
     span: Span
   ): Func<ClientRequest> {
     return (): ClientRequest => {
-      this._logger.debug('makeRequestTrace');
+      this._logger.debug('makeRequestTrace by injecting context into header');
 
       const propagation = this._tracer.getHttpTextFormat();
       const opts = Utils.getIncomingOptions(options);
@@ -202,25 +197,26 @@ export class HttpPlugin extends BasePlugin<Http> {
             : null;
 
           const host = opts.hostname || opts.host || 'localhost';
-          span.setAttributes({
-            [Attributes.HTTP_URL]: `${opts.protocol}//${opts.hostname}${opts.path}`,
-            [Attributes.HTTP_HOSTNAME]: host,
-            [Attributes.HTTP_METHOD]: method,
-            [Attributes.HTTP_PATH]: opts.path || '/',
-          });
+
+          const attributes: Attributes = {
+            [AttributeNames.HTTP_URL]: `${opts.protocol}//${opts.hostname}${opts.path}`,
+            [AttributeNames.HTTP_HOSTNAME]: host,
+            [AttributeNames.HTTP_METHOD]: method,
+            [AttributeNames.HTTP_PATH]: opts.path || '/',
+          };
 
           if (userAgent) {
-            span.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
+            attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
           }
 
           if (response.statusCode) {
-            span
-              .setAttributes({
-                [Attributes.HTTP_STATUS_CODE]: response.statusCode,
-                [Attributes.HTTP_STATUS_TEXT]: response.statusMessage,
-              })
-              .setStatus(Utils.parseResponseStatus(response.statusCode));
+            attributes[AttributeNames.HTTP_STATUS_CODE] = response.statusCode;
+            attributes[AttributeNames.HTTP_STATUS_TEXT] =
+              response.statusMessage;
+            span.setStatus(Utils.parseResponseStatus(response.statusCode));
           }
+
+          span.setAttributes(attributes);
 
           if (this.options.applyCustomAttributesOnSpan) {
             this.options.applyCustomAttributesOnSpan(span, request, response);
@@ -238,7 +234,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  private incomingRequestFunction(
+  private _incomingRequestFunction(
     original: (event: string, ...args: unknown[]) => boolean
   ) {
     const plugin = this;
@@ -278,10 +274,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         spanOptions.parent = spanContext;
       }
 
-      const span = plugin._spanFactory.createInstance(
-        `${method} ${pathname}`,
-        spanOptions
-      );
+      const span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
         plugin._tracer.wrapEmitter(request);
@@ -306,31 +299,28 @@ export class HttpPlugin extends BasePlugin<Http> {
           const userAgent = (headers['user-agent'] ||
             headers['User-Agent']) as string;
 
-          span.setAttributes({
-            [Attributes.HTTP_URL]: Utils.getUrlFromIncomingRequest(
+          const attributes: Attributes = {
+            [AttributeNames.HTTP_URL]: Utils.getUrlFromIncomingRequest(
               requestUrl,
               headers
             ),
-            [Attributes.HTTP_HOSTNAME]: hostname,
-            [Attributes.HTTP_METHOD]: method,
-          });
+            [AttributeNames.HTTP_HOSTNAME]: hostname,
+            [AttributeNames.HTTP_METHOD]: method,
+            [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
+            [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
+          };
 
           if (requestUrl) {
-            span.setAttributes({
-              [Attributes.HTTP_PATH]: requestUrl.path || '/',
-              [Attributes.HTTP_ROUTE]: requestUrl.pathname || '/',
-            });
+            attributes[AttributeNames.HTTP_PATH] = requestUrl.path || '/';
+            attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
           }
 
           if (userAgent) {
-            span.setAttribute(Attributes.HTTP_USER_AGENT, userAgent);
+            attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
           }
 
           span
-            .setAttributes({
-              [Attributes.HTTP_STATUS_CODE]: response.statusCode,
-              [Attributes.HTTP_STATUS_TEXT]: response.statusMessage,
-            })
+            .setAttributes(attributes)
             .setStatus(Utils.parseResponseStatus(response.statusCode));
 
           if (plugin.options.applyCustomAttributesOnSpan) {
@@ -345,7 +335,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  private outgoingRequestFunction(
+  private _outgoingRequestFunction(
     original: Func<ClientRequest>
   ): Func<ClientRequest> {
     const plugin = this;
@@ -390,21 +380,18 @@ export class HttpPlugin extends BasePlugin<Http> {
       // the first operation, therefore we create a span and call withSpan method.
       if (!currentSpan) {
         plugin._logger.debug('outgoingRequest starting a span without context');
-        const span = plugin._spanFactory.createInstance(
-          operationName,
-          spanOptions
-        );
+        const span = plugin._startHttpSpan(operationName, spanOptions);
         return plugin._tracer.withSpan(
           span,
-          plugin.getMakeRequestTraceFunction(request, optionsParsed, span)
+          plugin._getMakeRequestTraceFunction(request, optionsParsed, span)
         );
       } else {
         plugin._logger.debug('outgoingRequest starting a child span');
-        const span = plugin._spanFactory.createInstance(operationName, {
+        const span = plugin._startHttpSpan(operationName, {
           kind: spanOptions.kind,
           parent: currentSpan,
         });
-        return plugin.getMakeRequestTraceFunction(
+        return plugin._getMakeRequestTraceFunction(
           request,
           optionsParsed,
           span
@@ -412,6 +399,15 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
     };
   }
+
+  private _startHttpSpan(name: string, options: SpanOptions) {
+    return this._tracer
+      .startSpan(name, options)
+      .setAttribute(AttributeNames.COMPONENT, HttpPlugin.component);
+  }
 }
 
-export const plugin = new HttpPlugin('http', process.versions.node);
+export const plugin = new HttpPlugin(
+  HttpPlugin.component,
+  process.versions.node
+);

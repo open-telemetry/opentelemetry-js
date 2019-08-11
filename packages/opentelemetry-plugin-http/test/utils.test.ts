@@ -17,10 +17,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode } from '@opentelemetry/types';
+import { CanonicalCode, Attributes } from '@opentelemetry/types';
 import { RequestOptions } from 'https';
 import { IgnoreMatcher } from '../src/types';
 import { Utils } from '../src/utils';
+import * as http from 'http';
 
 describe('Utils', () => {
   describe('parseResponseStatus()', () => {
@@ -179,6 +180,44 @@ describe('Utils', () => {
     it('should not throw and return false when list is undefined', () => {
       const answer2 = Utils.isIgnored('/test/1', {}, undefined);
       assert.strictEqual(answer2, false);
+    });
+  });
+
+  describe('getUrlFromIncomingRequest()', () => {
+    it('should return absolute url with localhost', () => {
+      const path = '/test/1';
+      const result = Utils.getUrlFromIncomingRequest(url.parse(path), {});
+      assert.strictEqual(result, `http://localhost${path}`);
+    });
+    it('should return absolute url', () => {
+      const absUrl = 'http://www.google/test/1?query=1';
+      const result = Utils.getUrlFromIncomingRequest(url.parse(absUrl), {});
+      assert.strictEqual(result, absUrl);
+    });
+    it('should return default url', () => {
+      const result = Utils.getUrlFromIncomingRequest(null, {});
+      assert.strictEqual(result, 'http://localhost/');
+    });
+  });
+  describe('setSpanOnError()', () => {
+    it('should call span methods when we get an error event', done => {
+      /* tslint:disable-next-line:no-any */
+      const span: any = {
+        setAttributes: (obj: Attributes) => {},
+        setStatus: (status: unknown) => {},
+        end: () => {},
+      };
+      sinon.spy(span, 'setAttributes');
+      sinon.spy(span, 'setStatus');
+      sinon.spy(span, 'end');
+      const req = http.get('http://noop');
+      Utils.setSpanOnError(span, req);
+      req.on('error', () => {
+        assert.strictEqual(span.setAttributes.callCount, 1);
+        assert.strictEqual(span.setStatus.callCount, 1);
+        assert.strictEqual(span.end.callCount, 1);
+        done();
+      });
     });
   });
 });

@@ -1,7 +1,23 @@
+/**
+ * Copyright 2019, OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
-import { Attributes } from '../../src/enums/attributes';
+import { AttributeNames } from '../../src/enums/attributeNames';
 import { HttpPlugin } from '../../src/http';
 import { Utils } from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
@@ -28,27 +44,27 @@ export const assertSpan = (
     `${validations.httpMethod} ${validations.pathname}`
   );
   assert.strictEqual(
-    span.attributes[Attributes.COMPONENT],
+    span.attributes[AttributeNames.COMPONENT],
     HttpPlugin.component
   );
   assert.strictEqual(
-    span.attributes[Attributes.HTTP_ERROR_MESSAGE],
+    span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[Attributes.HTTP_HOSTNAME],
+    span.attributes[AttributeNames.HTTP_HOSTNAME],
     validations.hostname
   );
   assert.strictEqual(
-    span.attributes[Attributes.HTTP_METHOD],
+    span.attributes[AttributeNames.HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[Attributes.HTTP_PATH],
+    span.attributes[AttributeNames.HTTP_PATH],
     validations.path || validations.pathname
   );
   assert.strictEqual(
-    span.attributes[Attributes.HTTP_STATUS_CODE],
+    span.attributes[AttributeNames.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
   assert.strictEqual(span.ended, true);
@@ -66,7 +82,7 @@ export const assertSpan = (
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
       assert.strictEqual(
-        span.attributes[Attributes.HTTP_USER_AGENT],
+        span.attributes[AttributeNames.HTTP_USER_AGENT],
         userAgent
       );
     }
