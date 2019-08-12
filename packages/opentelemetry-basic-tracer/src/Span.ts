@@ -79,7 +79,7 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({ name, attributes, time: Date.now() });
+    this.events.push({ name, attributes, time: performance.now() });
     return this;
   }
 
