@@ -30,7 +30,7 @@ export * from './trace/SpanOptions';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/status';
+export * from './trace/TimedEvent';
 export * from './trace/tracer';
 export * from './trace/trace_options';
 export * from './trace/trace_state';
-export * from './trace/tracer';
