@@ -88,20 +88,138 @@ describe('Span', () => {
     });
   });
 
-  it('should return toString', () => {
+  it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
     const span = new Span(
       tracer,
-      name,
+      'my-span',
       spanContext,
-      SpanKind.SERVER,
-      parentId,
-      100
+      SpanKind.INTERNAL,
+      parentId
     );
-    const context = span.context();
+
+    const readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.name, 'my-span');
+    assert.strictEqual(readableSpan.kind, SpanKind.INTERNAL);
+    assert.strictEqual(readableSpan.parentSpanId, parentId);
+    assert.strictEqual(readableSpan.spanContext.traceId, spanContext.traceId);
+    assert.deepStrictEqual(readableSpan.status, {
+      code: CanonicalCode.OK,
+    });
+    assert.deepStrictEqual(readableSpan.attributes, {});
+    assert.deepStrictEqual(readableSpan.links, []);
+    assert.deepStrictEqual(readableSpan.events, []);
+  });
+
+  it('should return ReadableSpan with attributes', () => {
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
+    span.setAttribute('attr1', 'value1');
+    let readableSpan = span.toReadableSpan();
+    assert.deepStrictEqual(readableSpan.attributes, { attr1: 'value1' });
+
+    span.setAttributes({ attr2: 123, attr1: false });
+    readableSpan = span.toReadableSpan();
+    assert.deepStrictEqual(readableSpan.attributes, {
+      attr1: false,
+      attr2: 123,
+    });
+
+    span.end();
+    // shouldn't add new attribute
+    span.setAttribute('attr3', 'value3');
+    readableSpan = span.toReadableSpan();
+    assert.deepStrictEqual(readableSpan.attributes, {
+      attr1: false,
+      attr2: 123,
+    });
+  });
+
+  it('should return ReadableSpan with links', () => {
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
+    span.addLink(spanContext);
+    let readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.links.length, 1);
+    assert.deepStrictEqual(readableSpan.links, [
+      {
+        attributes: undefined,
+        spanContext: {
+          spanId: '6e0c63257de34c92',
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          traceOptions: 1,
+        },
+      },
+    ]);
+
+    span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
+    readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.links.length, 2);
+    assert.deepStrictEqual(readableSpan.links, [
+      {
+        attributes: undefined,
+        spanContext,
+      },
+      {
+        attributes: { attr1: 'value', attr2: 123, attr3: true },
+        spanContext,
+      },
+    ]);
+
+    span.end();
+    // shouldn't add new link
+    span.addLink(spanContext);
+    readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.links.length, 2);
+  });
+
+  it('should return ReadableSpan with events', () => {
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
+    span.addEvent('sent');
+    let readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.events.length, 1);
+    assert.deepStrictEqual(readableSpan.events, [
+      {
+        attributes: undefined,
+        name: 'sent',
+      },
+    ]);
+
+    span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
+    readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.events.length, 2);
+    assert.deepStrictEqual(readableSpan.events, [
+      {
+        attributes: undefined,
+        name: 'sent',
+      },
+      {
+        attributes: {
+          attr1: 'value',
+          attr2: 123,
+          attr3: true,
+        },
+        name: 'rev',
+      },
+    ]);
+
+    span.end();
+    // shouldn't add new event
+    span.addEvent('sent');
+    assert.strictEqual(readableSpan.events.length, 2);
+    readableSpan = span.toReadableSpan();
+    assert.strictEqual(readableSpan.events.length, 2);
+  });
+
+  it('should return ReadableSpan with new status', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    span.setStatus({
+      code: CanonicalCode.PERMISSION_DENIED,
+      message: 'This is an error',
+    });
+    const readableSpan = span.toReadableSpan();
     assert.strictEqual(
-      span.toString(),
-      `Span{"traceId":"${context.traceId}","spanId":"${context.spanId}","parentId":"${parentId}","name":"${name}","kind":1,"status":{"code":0},"startTime":100,"endTime":0}`
+      readableSpan.status.code,
+      CanonicalCode.PERMISSION_DENIED
     );
+    assert.strictEqual(readableSpan.status.message, 'This is an error');
   });
 });
