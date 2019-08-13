@@ -16,42 +16,44 @@
 
 import * as types from '@opentelemetry/types';
 import { performance } from 'perf_hooks';
-import { SpanKind, SpanContext } from '@opentelemetry/types';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /**
  * This class represents a span.
  */
-export class Span implements types.Span {
-  private readonly _spanContext: types.SpanContext;
+export class Span implements types.Span, ReadableSpan {
   private readonly _tracer: types.Tracer;
-  private readonly _parentId?: string;
-  private readonly _kind: types.SpanKind;
-  private readonly _attributes: types.Attributes = {};
-  private readonly _links: types.Link[] = [];
-  private readonly _events: types.Event[] = [];
-  private _status: types.Status = {
+  // Below properties are included to implement ReadableSpan for export
+  // purposes but are not intended to be written-to directly.
+  readonly spanContext: types.SpanContext;
+  readonly kind: types.SpanKind;
+  readonly parentSpanId?: string;
+  readonly attributes: types.Attributes = {};
+  readonly links: types.Link[] = [];
+  readonly events: types.Event[] = [];
+  readonly startTime: number;
+  name: string;
+  status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  private _name: string;
+  endTime = 0;
   private _ended = false;
-  private _startTime: number;
-  private _endTime = 0;
 
   /** Constructs a new Span instance. */
   constructor(
     parentTracer: types.Tracer,
     spanName: string,
-    spanContext: SpanContext,
-    kind: SpanKind,
+    spanContext: types.SpanContext,
+    kind: types.SpanKind,
     parentSpanId?: string,
     startTime?: number
   ) {
     this._tracer = parentTracer;
-    this._name = spanName;
-    this._spanContext = spanContext;
-    this._parentId = parentSpanId;
-    this._kind = kind;
-    this._startTime = startTime || performance.now();
+    this.name = spanName;
+    this.spanContext = spanContext;
+    this.parentSpanId = parentSpanId;
+    this.kind = kind;
+    this.startTime = startTime || performance.now();
   }
 
   tracer(): types.Tracer {
@@ -59,12 +61,12 @@ export class Span implements types.Span {
   }
 
   context(): types.SpanContext {
-    return this._spanContext;
+    return this.spanContext;
   }
 
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
-    this._attributes[key] = value;
+    this.attributes[key] = value;
     return this;
   }
 
@@ -77,32 +79,32 @@ export class Span implements types.Span {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this._events.push({ name, attributes });
+    this.events.push({ name, attributes });
     return this;
   }
 
   addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this._links.push({ spanContext, attributes });
+    this.links.push({ spanContext, attributes });
     return this;
   }
 
   setStatus(status: types.Status): this {
     if (this._isSpanEnded()) return this;
-    this._status = status;
+    this.status = status;
     return this;
   }
 
   updateName(name: string): this {
     if (this._isSpanEnded()) return this;
-    this._name = name;
+    this.name = name;
     return this;
   }
 
   end(endTime?: number): void {
     if (this._isSpanEnded()) return;
     this._ended = true;
-    this._endTime = endTime || performance.now();
+    this.endTime = endTime || performance.now();
     // @todo: record or export the span
   }
 
@@ -110,18 +112,8 @@ export class Span implements types.Span {
     return true;
   }
 
-  toString() {
-    const json = JSON.stringify({
-      traceId: this._spanContext.traceId,
-      spanId: this._spanContext.spanId,
-      parentId: this._parentId,
-      name: this._name,
-      kind: this._kind,
-      status: this._status,
-      startTime: this._startTime,
-      endTime: this._endTime,
-    });
-    return `Span${json}`;
+  toReadableSpan(): ReadableSpan {
+    return this;
   }
 
   private _isSpanEnded(): boolean {

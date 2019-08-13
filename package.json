@@ -14,6 +14,8 @@
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
     "check": "lerna run check",
+    "predocs-test": "yarn docs",
+    "docs-test": "lerna run docs-test",
     "docs": "lerna run docs"
   },
   "repository": "open-telemetry/opentelemetry-js",
