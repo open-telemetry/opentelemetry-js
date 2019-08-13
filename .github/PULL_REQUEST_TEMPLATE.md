@@ -15,7 +15,7 @@ Before creating a pull request, please make sure:
 
 ## Which problem is this PR solving?
 
-- Fixes #
+-
 
 ## Short description of the changes
 
