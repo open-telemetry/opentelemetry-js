@@ -49,7 +49,7 @@ export interface BasicTracerConfig {
   logger?: Logger;
 
   /**
-   * Sampler determinates if a span should be recorded or should be a NoopSpan.
+   * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
   sampler?: Sampler;
 
