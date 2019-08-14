@@ -45,6 +45,10 @@ export class NoopTracer implements Tracer {
     return fn();
   }
 
+  bind<T>(target: T, span?: Span): T {
+    return target;
+  }
+
   // By default does nothing
   recordSpanData(span: Span): void {}
 

@@ -47,12 +47,20 @@ export class TracerDelegate implements types.Tracer {
 
   // -- Tracer interface implementation below -- //
 
-  getCurrentSpan(): types.Span {
+  getCurrentSpan(): types.Span | null {
     return this._currentTracer.getCurrentSpan.apply(
       this._currentTracer,
       // tslint:disable-next-line:no-any
       arguments as any
     );
+  }
+
+  bind<T>(target: T, span?: types.Span): T {
+    return (this._currentTracer.bind.apply(
+      this._currentTracer,
+      // tslint:disable-next-line:no-any
+      arguments as any
+    ) as unknown) as T;
   }
 
   startSpan(name: string, options?: types.SpanOptions): types.Span {

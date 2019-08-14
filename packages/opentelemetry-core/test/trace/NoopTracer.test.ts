@@ -57,4 +57,13 @@ describe('NoopTracer', () => {
       return done();
     });
   });
+
+  it('should not crash when .bind()', done => {
+    const tracer = new NoopTracer();
+    const fn = () => {
+      return done();
+    };
+    const patchedFn = tracer.bind(fn, NOOP_SPAN);
+    return patchedFn();
+  });
 });

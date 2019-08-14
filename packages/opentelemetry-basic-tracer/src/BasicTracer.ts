@@ -103,10 +103,17 @@ export class BasicTracer implements types.Tracer {
 
   /**
    * Returns the current Span from the current context.
+   *
+   * If there is no Span associated with the current context, null is returned.
    */
-  getCurrentSpan(): types.Span {
-    // Get the current Span from the context.
-    return this._scopeManager.active() as types.Span;
+  getCurrentSpan(): types.Span | null {
+    // Get the current Span from the context or null if none found.
+    const current = this._scopeManager.active();
+    if (current === null || current === undefined) {
+      return null;
+    } else {
+      return current as types.Span;
+    }
   }
 
   /**
@@ -118,6 +125,13 @@ export class BasicTracer implements types.Tracer {
   ): ReturnType<T> {
     // Set given span to context.
     return this._scopeManager.with(span, fn);
+  }
+
+  /**
+   * Bind a span (or the current one) to the target's scope
+   */
+  bind<T>(target: T, span?: types.Span): T {
+    return this._scopeManager.bind(target, span);
   }
 
   /**
