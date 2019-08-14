@@ -38,10 +38,12 @@ export class Span implements types.Span, ReadableSpan {
   };
   endTime = 0;
   private _ended = false;
+  private readonly _logger: types.Logger;
 
   /** Constructs a new Span instance. */
   constructor(
     parentTracer: types.Tracer,
+    logger: types.Logger,
     spanName: string,
     spanContext: types.SpanContext,
     kind: types.SpanKind,
@@ -54,6 +56,7 @@ export class Span implements types.Span, ReadableSpan {
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.startTime = startTime || performance.now();
+    this._logger = logger;
   }
 
   tracer(): types.Tracer {
@@ -102,7 +105,10 @@ export class Span implements types.Span, ReadableSpan {
   }
 
   end(endTime?: number): void {
-    if (this._isSpanEnded()) return;
+    if (this._isSpanEnded()) {
+      this._logger.error('You can only call end() on a span once.');
+      return;
+    }
     this._ended = true;
     this.endTime = endTime || performance.now();
     // @todo: record or export the span
@@ -118,7 +124,11 @@ export class Span implements types.Span, ReadableSpan {
 
   private _isSpanEnded(): boolean {
     if (this._ended) {
-      // @todo: log a warning
+      this._logger.warn(
+        'Can not execute the operation on ended Span {traceId: %s, spanId: %s}',
+        this.spanContext.traceId,
+        this.spanContext.spanId
+      );
     }
     return this._ended;
   }
