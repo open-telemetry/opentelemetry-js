@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopScopeManager } from '../../src';
+import { NoopScopeManager } from '../src';
 
 describe('NoopScopeManager', () => {
   let scopeManager: NoopScopeManager;

@@ -39,7 +39,7 @@ describe('PluginLoader', () => {
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
   });
 
-  describe('state()', () => {
+  describe('.state()', () => {
     it('returns UNINITIALIZED when first called', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_hookState'], HookState.UNINITIALIZED);
@@ -59,7 +59,7 @@ describe('PluginLoader', () => {
     });
   });
 
-  describe('load()', () => {
+  describe('.load()', () => {
     it('sanity check', () => {
       // Ensure that module fixtures contain values that we expect.
       const simpleModule = require('simple-module');
@@ -107,7 +107,7 @@ describe('PluginLoader', () => {
     });
   });
 
-  describe('unload()', () => {
+  describe('.unload()', () => {
     it('should unload the plugins and unpatch the target module when unloads', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
