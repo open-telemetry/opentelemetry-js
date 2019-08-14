@@ -104,6 +104,7 @@ describe('BasicTracer', () => {
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
       assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
       assert.deepStrictEqual(context.traceState, undefined);
+      span.end();
     });
 
     it('should start a span with name and parent spancontext', () => {
@@ -123,6 +124,7 @@ describe('BasicTracer', () => {
       assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
       assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
       assert.deepStrictEqual(context.traceState, state);
+      span.end();
     });
 
     it('should start a span with name and parent span', () => {
@@ -136,6 +138,8 @@ describe('BasicTracer', () => {
       const context = childSpan.context();
       assert.strictEqual(context.traceId, span.context().traceId);
       assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      span.end();
+      childSpan.end();
     });
 
     it('should start a span with name and with invalid spancontext', () => {
@@ -165,6 +169,51 @@ describe('BasicTracer', () => {
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
       assert.strictEqual(context.traceOptions, TraceOptions.UNSAMPLED);
       assert.deepStrictEqual(context.traceState, undefined);
+      span.end();
+    });
+
+    it('Should create real span when not sampled but recording events true', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), true);
+    });
+
+    it('Should not create real span when not sampled and recording events  false', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: false });
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), false);
+    });
+
+    it('Should not create real span when not sampled and no recording events configured', () => {
+      const tracer = new BasicTracer({
+        sampler: NEVER_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), false);
+    });
+
+    it('Should create real span when sampled and recording events true', () => {
+      const tracer = new BasicTracer({
+        sampler: ALWAYS_SAMPLER,
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), true);
     });
 
     // @todo: implement

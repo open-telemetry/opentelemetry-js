@@ -54,6 +54,17 @@ jobs:
       - run:
           name: Check code style and linting
           command: yarn run check
+  docs:
+    docker:
+      - image: node
+    steps:
+      - checkout
+      - run:
+          name: Install modules and dependencies.
+          command: yarn install
+      - run:
+          name: Docs tests
+          command: yarn docs-test
   node8:
     docker:
       - image: node:8
@@ -80,6 +91,7 @@ workflows:
   build:
     jobs:
       - lint
+      - docs
       - node8
       - node10
       - node11

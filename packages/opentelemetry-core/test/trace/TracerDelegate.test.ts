@@ -65,44 +65,44 @@ describe('TracerDelegate', () => {
       tracerDelegate.startSpan('foo');
       assert.deepStrictEqual(dummyTracer.spyCounter, 1);
     });
+  });
 
-    describe('.start/stop()', () => {
-      it('should use the fallback tracer when stop is called', () => {
-        const dummyTracerUser = new DummyTracer();
-        const dummyTracerFallback = new DummyTracer();
-        const tracerDelegate = new TracerDelegate(
-          dummyTracerUser,
-          dummyTracerFallback
-        );
+  describe('.start/.stop()', () => {
+    it('should use the fallback tracer when stop is called', () => {
+      const dummyTracerUser = new DummyTracer();
+      const dummyTracerFallback = new DummyTracer();
+      const tracerDelegate = new TracerDelegate(
+        dummyTracerUser,
+        dummyTracerFallback
+      );
 
-        tracerDelegate.stop();
-        tracerDelegate.startSpan('fallback');
-        assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
-        assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
-      });
+      tracerDelegate.stop();
+      tracerDelegate.startSpan('fallback');
+      assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
+      assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
+    });
 
-      it('should use the user tracer when start is called', () => {
-        const dummyTracerUser = new DummyTracer();
-        const dummyTracerFallback = new DummyTracer();
-        const tracerDelegate = new TracerDelegate(
-          dummyTracerUser,
-          dummyTracerFallback
-        );
+    it('should use the user tracer when start is called', () => {
+      const dummyTracerUser = new DummyTracer();
+      const dummyTracerFallback = new DummyTracer();
+      const tracerDelegate = new TracerDelegate(
+        dummyTracerUser,
+        dummyTracerFallback
+      );
 
-        tracerDelegate.stop();
-        tracerDelegate.startSpan('fallback');
-        assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
-        assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
+      tracerDelegate.stop();
+      tracerDelegate.startSpan('fallback');
+      assert.deepStrictEqual(dummyTracerUser.spyCounter, 0);
+      assert.deepStrictEqual(dummyTracerFallback.spyCounter, 1);
 
-        tracerDelegate.start();
-        tracerDelegate.startSpan('user');
-        assert.deepStrictEqual(dummyTracerUser.spyCounter, 1);
-        assert.deepStrictEqual(
-          dummyTracerFallback.spyCounter,
-          1,
-          'Only user tracer counter is incremented'
-        );
-      });
+      tracerDelegate.start();
+      tracerDelegate.startSpan('user');
+      assert.deepStrictEqual(dummyTracerUser.spyCounter, 1);
+      assert.deepStrictEqual(
+        dummyTracerFallback.spyCounter,
+        1,
+        'Only user tracer counter is incremented'
+      );
     });
   });
 

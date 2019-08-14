@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Span } from '../Span';
 import { ExportResult } from './ExportResult';
+import { ReadableSpan } from './ReadableSpan';
 
 /**
  * An interface that allows different tracing services to export recorded data
@@ -26,11 +26,13 @@ import { ExportResult } from './ExportResult';
  */
 export interface SpanExporter {
   /**
-   * Called to export sampled {@link Span}s.
+   * Called to export sampled {@link ReadableSpan}s.
    * @param spans the list of sampled Spans to be exported.
    */
-  // @todo: change to ReadableSpan when available (pull/150)
-  export(spans: Span[], resultCallback: (result: ExportResult) => void): void;
+  export(
+    spans: ReadableSpan[],
+    resultCallback: (result: ExportResult) => void
+  ): void;
 
   /** Stops the exporter. */
   shutdown(): void;

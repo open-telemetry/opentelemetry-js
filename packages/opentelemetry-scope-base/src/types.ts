@@ -23,7 +23,7 @@ export interface ScopeManager {
   /**
    * Run the fn callback with object set as the current active scope
    * @param scope Any object to set as the current active scope
-   * @param fn A callback to be imediately run within a specific scope
+   * @param fn A callback to be immediately run within a specific scope
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     scope: unknown,
@@ -33,7 +33,7 @@ export interface ScopeManager {
   /**
    * Bind an object as the current scope (or a specific one)
    * @param target Any object to which a scope need to be set
-   * @param [scope] Optionaly specify the scope which you want to assign
+   * @param [scope] Optionally specify the scope which you want to assign
    */
   bind<T>(target: T, scope?: unknown): T;
 
