@@ -30,7 +30,7 @@ export class Span implements types.Span, ReadableSpan {
   readonly parentSpanId?: string;
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
-  readonly events: types.Event[] = [];
+  readonly events: types.TimedEvent[] = [];
   readonly startTime: number;
   name: string;
   status: types.Status = {
@@ -82,7 +82,7 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({ name, attributes });
+    this.events.push({ name, attributes, time: performance.now() });
     return this;
   }
 

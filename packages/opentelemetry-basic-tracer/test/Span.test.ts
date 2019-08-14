@@ -203,30 +203,25 @@ describe('Span', () => {
     span.addEvent('sent');
     let readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.events.length, 1);
-    assert.deepStrictEqual(readableSpan.events, [
-      {
-        attributes: undefined,
-        name: 'sent',
-      },
-    ]);
+    const [event] = readableSpan.events;
+    assert.deepStrictEqual(event.name, 'sent');
+    assert.ok(!event.attributes);
+    assert.ok(event.time > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.events.length, 2);
-    assert.deepStrictEqual(readableSpan.events, [
-      {
-        attributes: undefined,
-        name: 'sent',
-      },
-      {
-        attributes: {
-          attr1: 'value',
-          attr2: 123,
-          attr3: true,
-        },
-        name: 'rev',
-      },
-    ]);
+    const [event1, event2] = readableSpan.events;
+    assert.deepStrictEqual(event1.name, 'sent');
+    assert.ok(!event1.attributes);
+    assert.ok(event1.time > 0);
+    assert.deepStrictEqual(event2.name, 'rev');
+    assert.deepStrictEqual(event2.attributes, {
+      attr1: 'value',
+      attr2: 123,
+      attr3: true,
+    });
+    assert.ok(event2.time > 0);
 
     span.end();
     // shouldn't add new event

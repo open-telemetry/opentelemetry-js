@@ -19,8 +19,8 @@ import {
   Status,
   Attributes,
   Link,
-  Event,
   SpanContext,
+  TimedEvent,
 } from '@opentelemetry/types';
 
 export interface ReadableSpan {
@@ -33,5 +33,5 @@ export interface ReadableSpan {
   readonly status: Status;
   readonly attributes: Attributes;
   readonly links: Link[];
-  readonly events: Event[];
+  readonly events: TimedEvent[];
 }
