@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('TraceState', () => {
-  describe('serialize', () => {
+  describe('.serialize()', () => {
     it('returns serialize string', () => {
       const state = new TraceState('a=1,b=2');
       assert.deepStrictEqual(state.serialize(), 'a=1,b=2');
@@ -52,7 +52,7 @@ describe('TraceState', () => {
     });
   });
 
-  describe('parse', () => {
+  describe('.parse()', () => {
     it('must successfully parse valid state value', () => {
       const state = new TraceState(
         'vendorname2=opaqueValue2,vendorname1=opaqueValue1'

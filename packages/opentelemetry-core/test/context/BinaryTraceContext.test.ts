@@ -114,7 +114,7 @@ describe('BinaryTraceContext', () => {
     },
   ];
 
-  describe('toBytes', () => {
+  describe('.toBytes()', () => {
     testCases.forEach(
       testCase =>
         testCase.structured &&
@@ -127,7 +127,7 @@ describe('BinaryTraceContext', () => {
     );
   });
 
-  describe('fromBytes', () => {
+  describe('.fromBytes()', () => {
     testCases.forEach(testCase =>
       it(`should deserialize ${testCase.description}`, () => {
         assert.deepStrictEqual(

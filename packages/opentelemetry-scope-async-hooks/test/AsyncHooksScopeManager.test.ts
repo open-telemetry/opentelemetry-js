@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { AsyncHooksScopeManager } from '../../src';
+import { AsyncHooksScopeManager } from '../src';
 
 describe('AsyncHooksScopeManager', () => {
   let scopeManager: AsyncHooksScopeManager;
