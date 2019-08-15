@@ -240,8 +240,24 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
+        assert.deepStrictEqual(tracer.getCurrentSpan(), null);
         return done();
       });
+    });
+  });
+
+  describe('.bind()', () => {
+    it('should bind scope with NoopScopeManager scope manager', done => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      const fn = () => {
+        assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+        return done();
+      };
+      const patchedFn = tracer.bind(fn, span);
+      return patchedFn();
     });
   });
 

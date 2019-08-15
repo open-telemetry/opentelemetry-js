@@ -30,12 +30,11 @@ export interface Tracer {
   /**
    * Returns the current Span from the current context if available.
    *
-   * If there is no Span associated with the current context, a default Span
-   * with invalid SpanContext is returned.
+   * If there is no Span associated with the current context, null is returned.
    *
    * @returns Span The currently active Span
    */
-  getCurrentSpan(): Span;
+  getCurrentSpan(): Span | null;
 
   /**
    * Starts a new {@link Span}.
@@ -57,6 +56,14 @@ export interface Tracer {
     span: Span,
     fn: T
   ): ReturnType<T>;
+
+  /**
+   * Bind a span as the target's scope or propagate the current one.
+   *
+   * @param target Any object to which a scope need to be set
+   * @param [span] Optionally specify the span which you want to assign
+   */
+  bind<T>(target: T, span?: Span): T;
 
   /**
    * Send a pre-populated span object to the exporter.

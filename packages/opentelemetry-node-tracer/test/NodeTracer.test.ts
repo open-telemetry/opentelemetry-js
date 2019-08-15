@@ -158,6 +158,21 @@ describe('NodeTracer', () => {
     });
   });
 
+  describe('.bind()', () => {
+    it('should bind scope with AsyncHooksScopeManager scope manager', done => {
+      const tracer = new NodeTracer({
+        scopeManager: new AsyncHooksScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      const fn = () => {
+        assert.deepStrictEqual(tracer.getCurrentSpan(), span);
+        return done();
+      };
+      const patchedFn = tracer.bind(fn, span);
+      return patchedFn();
+    });
+  });
+
   describe('.recordSpanData()', () => {
     // @todo: implement
     it('should call exporters with span data');
