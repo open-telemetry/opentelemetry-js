@@ -96,16 +96,4 @@ export interface Tracer {
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
    */
   getHttpTextFormat(): HttpTextFormat;
-
-  /**
-   * Binds the trace context to the given event emitter.
-   * This is necessary in order to create child spans correctly in event
-   * handlers.
-   * @todo: Pending API discussion. Revisit if we should simply expose scopeManager instead of exposing methods through the tracer.
-   * Also Should we replace unknown by EventEmitter ?
-   * ref: https://github.com/Gozala/events
-   * @param emitter An event emitter whose handlers should have
-   *     the trace context binded to them.
-   */
-  wrapEmitter(emitter: unknown): void;
 }

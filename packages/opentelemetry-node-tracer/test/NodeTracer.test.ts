@@ -25,7 +25,6 @@ import {
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
-import { EventEmitter } from 'events';
 
 describe('NodeTracer', () => {
   describe('constructor', () => {
@@ -195,41 +194,5 @@ describe('NodeTracer', () => {
       });
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
     });
-  });
-  describe('.wrapEmitter()', () => {
-    it('should not throw', () => {
-      const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
-      });
-      tracer.wrapEmitter({} as EventEmitter);
-    });
-    // TODO: uncomment once https://github.com/open-telemetry/opentelemetry-js/pull/146 is merged
-    // it('should get current Span', (done) => {
-    //   const tracer = new NodeTracer({
-    //     scopeManager: new AsyncHooksScopeManager(),
-    //   });
-
-    //   const span = tracer.startSpan('my-span');
-    //   class FakeEventEmitter extends EventEmitter {
-    //     constructor() {
-    //       super()
-    //     }
-    //     test() {
-    //       this.emit('event');
-    //     }
-    //   }
-
-    //   tracer.withSpan(span, () => {
-    //     const fake = new FakeEventEmitter();
-    //     tracer.wrapEmitter(fake);
-    //     fake.on('event', () => {
-    //       setTimeout(() => {
-    //         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
-    //         done();
-    //       }, 100);
-    //     });
-    //     fake.test();
-    //   });
-    // });
   });
 });

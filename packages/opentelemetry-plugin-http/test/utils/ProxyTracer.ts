@@ -30,7 +30,7 @@ export class ProxyTracer implements Tracer {
   constructor(tracer: Tracer, public audit: SpanAuditProcessor) {
     this._tracer = tracer;
   }
-  getCurrentSpan(): Span {
+  getCurrentSpan(): Span | null {
     return this._tracer.getCurrentSpan();
   }
   startSpan(name: string, options?: SpanOptions | undefined): Span {
@@ -51,7 +51,7 @@ export class ProxyTracer implements Tracer {
   getHttpTextFormat(): HttpTextFormat {
     return this._tracer.getHttpTextFormat();
   }
-  wrapEmitter(emitter: unknown): void {
-    this._tracer.wrapEmitter(emitter);
+  bind<T>(target: T, span?: Span | undefined): T {
+    return this._tracer.bind(target);
   }
 }

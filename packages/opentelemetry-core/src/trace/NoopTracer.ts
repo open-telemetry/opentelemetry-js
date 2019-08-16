@@ -61,7 +61,4 @@ export class NoopTracer implements Tracer {
   getHttpTextFormat(): HttpTextFormat {
     return NOOP_HTTP_TEXT_FORMAT;
   }
-
-  // By default does nothing
-  wrapEmitter(emitter: unknown): void {}
 }

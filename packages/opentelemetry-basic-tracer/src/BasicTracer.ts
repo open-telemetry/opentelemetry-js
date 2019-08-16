@@ -125,15 +125,6 @@ export class BasicTracer implements types.Tracer {
     // Set given span to context.
     return this._scopeManager.with(span, fn);
   }
-  /**
-   * Binds the trace context to the given event emitter
-   */
-  wrapEmitter(emitter: NodeJS.EventEmitter): void {
-    if (!this._scopeManager.active()) {
-      return;
-    }
-    this._scopeManager.bind(emitter);
-  }
 
   /**
    * Bind a span (or the current one) to the target's scope

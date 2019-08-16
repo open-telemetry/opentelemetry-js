@@ -182,7 +182,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       propagation.inject(span.context(), Format.HTTP, opts.headers);
 
       request.on('response', (response: IncomingMessage) => {
-        this._tracer.wrapEmitter(response);
+        this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
         response.on('end', () => {
           this._logger.debug('outgoingRequest on end()');
@@ -277,8 +277,8 @@ export class HttpPlugin extends BasePlugin<Http> {
       const span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
-        plugin._tracer.wrapEmitter(request);
-        plugin._tracer.wrapEmitter(response);
+        plugin._tracer.bind(request);
+        plugin._tracer.bind(response);
 
         // Wraps end (inspired by:
         // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
@@ -367,7 +367,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-      plugin._tracer.wrapEmitter(request);
+      plugin._tracer.bind(request);
 
       const operationName = `${method} ${pathname}`;
       const spanOptions = {
