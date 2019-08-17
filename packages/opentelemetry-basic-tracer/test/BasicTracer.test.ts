@@ -142,6 +142,17 @@ describe('BasicTracer', () => {
       childSpan.end();
     });
 
+    it('should start a span with name and with invalid parent span', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', {
+        parent: 'invalid-parent',
+      });
+      assert.deepStrictEqual(span.parentSpanId, undefined)
+      assert.ok(span instanceof Span);
+    })
+
     it('should start a span with name and with invalid spancontext', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
@@ -172,7 +183,7 @@ describe('BasicTracer', () => {
       span.end();
     });
 
-    it('Should create real span when not sampled but recording events true', () => {
+    it('should create real span when not sampled but recording events true', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
@@ -183,7 +194,7 @@ describe('BasicTracer', () => {
       assert.strictEqual(span.isRecordingEvents(), true);
     });
 
-    it('Should not create real span when not sampled and recording events  false', () => {
+    it('should not create real span when not sampled and recording events  false', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
@@ -194,7 +205,7 @@ describe('BasicTracer', () => {
       assert.strictEqual(span.isRecordingEvents(), false);
     });
 
-    it('Should not create real span when not sampled and no recording events configured', () => {
+    it('should not create real span when not sampled and no recording events configured', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
@@ -205,7 +216,7 @@ describe('BasicTracer', () => {
       assert.strictEqual(span.isRecordingEvents(), false);
     });
 
-    it('Should create real span when sampled and recording events true', () => {
+    it('should create real span when sampled and recording events true', () => {
       const tracer = new BasicTracer({
         sampler: ALWAYS_SAMPLER,
         scopeManager: new NoopScopeManager(),
@@ -216,11 +227,18 @@ describe('BasicTracer', () => {
       assert.strictEqual(span.isRecordingEvents(), true);
     });
 
-    // @todo: implement
-    it('should start a Span with always sampling');
-
-    // @todo: implement
-    it('should set default attributes on span');
+    it('should set default attributes on span', () => {
+      const defaultAttributes = {
+        foo: 'bar',
+      };
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        defaultAttributes,
+      });
+      const span = tracer.startSpan('my-span');
+      assert.ok(span instanceof Span);
+      assert.deepStrictEqual(span.attributes, defaultAttributes);
+    });
   });
 
   describe('.getCurrentSpan()', () => {
@@ -231,6 +249,15 @@ describe('BasicTracer', () => {
       const currentSpan = tracer.getCurrentSpan();
       assert.deepStrictEqual(currentSpan, null);
     });
+
+    it('should return current span when it exists', () => {
+      const tracer = new BasicTracer({
+        scopeManager: {
+          active: () => 'foo'
+        },
+      });
+        assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
+    })
   });
 
   describe('.withSpan()', () => {
