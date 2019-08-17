@@ -45,6 +45,24 @@ describe('Span', () => {
     span.end();
   });
 
+  it('should have startTime > Date.now()', () => {
+    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    assert.ok(span.startTime > Date.now());
+  });
+
+  it('should have endTime > Date.now()', () => {
+    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(span.endTime >= span.startTime);
+    assert.ok(span.endTime > Date.now());
+  });
+
+  it('should have event.time > Date.now()', () => {
+    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    span.addEvent('my-event');
+    assert.ok(span.events[0].time > Date.now());
+  });
+
   it('should get the span context of span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();

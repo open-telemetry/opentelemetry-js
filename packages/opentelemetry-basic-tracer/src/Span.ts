@@ -55,7 +55,7 @@ export class Span implements types.Span, ReadableSpan {
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = startTime || performance.now();
+    this.startTime = startTime || Span._now();
     this._logger = parentTracer.logger;
   }
 
@@ -82,7 +82,11 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({ name, attributes, time: performance.now() });
+    this.events.push({
+      name,
+      attributes,
+      time: Span._now(),
+    });
     return this;
   }
 
@@ -110,7 +114,7 @@ export class Span implements types.Span, ReadableSpan {
       return;
     }
     this._ended = true;
-    this.endTime = endTime || performance.now();
+    this.endTime = endTime || Span._now();
     // @todo: record or export the span
   }
 
@@ -131,5 +135,10 @@ export class Span implements types.Span, ReadableSpan {
       );
     }
     return this._ended;
+  }
+
+  private static _now(): number {
+    // performance.now() is relative from process start.
+    return performance.timeOrigin + performance.now();
   }
 }
