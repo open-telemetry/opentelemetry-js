@@ -24,10 +24,10 @@ import {
   TraceState,
   NoRecordingSpan,
 } from '@opentelemetry/core';
-import { BasicTracer } from '../src/BasicTracer';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { Span } from '../src/Span';
 import { TraceOptions } from '@opentelemetry/types';
+import { BasicTracer } from '../src/BasicTracer';
+import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
+import { Span } from '../src/Span';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
@@ -147,11 +147,10 @@ describe('BasicTracer', () => {
         scopeManager: new NoopScopeManager(),
       });
       const span = tracer.startSpan('my-span', {
-        parent: 'invalid-parent',
-      });
-      assert.deepStrictEqual(span.parentSpanId, undefined)
-      assert.ok(span instanceof Span);
-    })
+        parent: ('invalid-parent' as unknown) as undefined,
+      }) as Span;
+      assert.deepStrictEqual(span.parentSpanId, undefined);
+    });
 
     it('should start a span with name and with invalid spancontext', () => {
       const tracer = new BasicTracer({
@@ -235,7 +234,8 @@ describe('BasicTracer', () => {
         scopeManager: new NoopScopeManager(),
         defaultAttributes,
       });
-      const span = tracer.startSpan('my-span');
+
+      const span = tracer.startSpan('my-span') as Span;
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
@@ -253,11 +253,11 @@ describe('BasicTracer', () => {
     it('should return current span when it exists', () => {
       const tracer = new BasicTracer({
         scopeManager: {
-          active: () => 'foo'
-        },
+          active: () => 'foo',
+        } as ScopeManager,
       });
-        assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
-    })
+      assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
+    });
   });
 
   describe('.withSpan()', () => {

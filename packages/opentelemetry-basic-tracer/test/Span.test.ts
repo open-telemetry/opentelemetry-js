@@ -250,23 +250,23 @@ describe('Span', () => {
       code: CanonicalCode.OK,
       message: 'OK',
     });
-    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED)
+    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
   });
 
   it('should only end a span once', () => {
     const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
     span.end(1234);
     span.end(4567);
-    assert.strictEqual(span.endTime, 1234)
-  })
+    assert.strictEqual(span.endTime, 1234);
+  });
 
   it('should update name', () => {
     const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
-    span.updateName('foo-span')
+    span.updateName('foo-span');
     span.end();
 
     // shouldn't update name
-    span.updateName('bar-span')
-    assert.strictEqual(span.name, 'foo-span')
-  })
+    span.updateName('bar-span');
+    assert.strictEqual(span.name, 'foo-span');
+  });
 });
