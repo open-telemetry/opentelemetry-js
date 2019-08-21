@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
+export * from './common/types';
 export * from './context/propagation/BinaryTraceContext';
 export * from './context/propagation/HttpTraceContext';
 export * from './platform';
@@ -28,8 +30,3 @@ export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/spancontext-utils';
 export * from './trace/TracerDelegate';
 export * from './trace/TraceState';
-export * from './common/types';
-
-// logger
-import * as logger from './common/ConsoleLogger';
-export { logger };

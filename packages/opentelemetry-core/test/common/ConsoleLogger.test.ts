@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import * as logger from '../../src/common/ConsoleLogger';
+import { ConsoleLogger } from '../../src/common/ConsoleLogger';
 import { LogLevel } from '../../src/common/types';
 
 describe('ConsoleLogger', () => {
@@ -23,33 +23,33 @@ describe('ConsoleLogger', () => {
   const origInfo = console.info;
   const origWarn = console.warn;
   const origError = console.error;
-  let debugCalled = false;
-  let infoCalled = false;
-  let warnCalled = false;
-  let errorCalled = false;
+  let debugCalledArgs: unknown;
+  let infoCalledArgs: unknown;
+  let warnCalledArgs: unknown;
+  let errorCalledArgs: unknown;
 
   beforeEach(() => {
     // mock
-    console.debug = () => {
-      debugCalled = true;
+    console.debug = (...args: unknown[]) => {
+      debugCalledArgs = args;
     };
-    console.info = () => {
-      infoCalled = true;
+    console.info = (...args: unknown[]) => {
+      infoCalledArgs = args;
     };
-    console.warn = () => {
-      warnCalled = true;
+    console.warn = (...args: unknown[]) => {
+      warnCalledArgs = args;
     };
-    console.error = () => {
-      errorCalled = true;
+    console.error = (...args: unknown[]) => {
+      errorCalledArgs = args;
     };
   });
 
   afterEach(() => {
     // restore
-    debugCalled = false;
-    infoCalled = false;
-    warnCalled = false;
-    errorCalled = false;
+    debugCalledArgs = null;
+    infoCalledArgs = null;
+    warnCalledArgs = null;
+    errorCalledArgs = null;
     console.debug = origDebug;
     console.info = origInfo;
     console.warn = origWarn;
@@ -58,63 +58,63 @@ describe('ConsoleLogger', () => {
 
   describe('constructor', () => {
     it('should log with default level', () => {
-      const consoleLogger = logger.logger();
-      consoleLogger.error('error called');
-      assert.ok(errorCalled);
-      consoleLogger.warn('warn called');
-      assert.ok(warnCalled);
-      consoleLogger.info('info called');
-      assert.ok(infoCalled);
-      consoleLogger.debug('debug called');
-      assert.ok(debugCalled);
+      const consoleLogger = new ConsoleLogger();
+      consoleLogger.error('error called %s', 'param1');
+      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
     });
 
     it('should log with debug', () => {
-      const consoleLogger = logger.logger(LogLevel.DEBUG);
+      const consoleLogger = new ConsoleLogger(LogLevel.DEBUG);
       consoleLogger.error('error called');
-      assert.ok(errorCalled);
-      consoleLogger.warn('warn called');
-      assert.ok(warnCalled);
-      consoleLogger.info('info called');
-      assert.ok(infoCalled);
-      consoleLogger.debug('debug called');
-      assert.ok(debugCalled);
+      assert.deepStrictEqual(errorCalledArgs, ['error called']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
     });
 
     it('should log with info', () => {
-      const consoleLogger = logger.logger(LogLevel.INFO);
-      consoleLogger.error('error called');
-      assert.ok(errorCalled);
-      consoleLogger.warn('warn called');
-      assert.ok(warnCalled);
-      consoleLogger.info('info called');
-      assert.ok(infoCalled);
-      consoleLogger.debug('debug not called');
-      assert.ok(!debugCalled);
+      const consoleLogger = new ConsoleLogger(LogLevel.INFO);
+      consoleLogger.error('error called %s', 'param1');
+      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.strictEqual(debugCalledArgs, null);
     });
 
     it('should log with warn', () => {
-      const consoleLogger = logger.logger(LogLevel.WARN);
-      consoleLogger.error('error called');
-      assert.ok(errorCalled);
-      consoleLogger.warn('warn called');
-      assert.ok(warnCalled);
-      consoleLogger.info('info not called');
-      assert.ok(!infoCalled);
-      consoleLogger.debug('debug not called');
-      assert.ok(!debugCalled);
+      const consoleLogger = new ConsoleLogger(LogLevel.WARN);
+      consoleLogger.error('error called %s', 'param1');
+      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.strictEqual(infoCalledArgs, null);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.strictEqual(debugCalledArgs, null);
     });
 
     it('should log with error', () => {
-      const consoleLogger = logger.logger(LogLevel.ERROR);
-      consoleLogger.error('error called');
-      assert.ok(errorCalled);
-      consoleLogger.warn('warn not called');
-      assert.ok(!warnCalled);
-      consoleLogger.info('info not called');
-      assert.ok(!infoCalled);
-      consoleLogger.debug('debug not called');
-      assert.ok(!debugCalled);
+      const consoleLogger = new ConsoleLogger(LogLevel.ERROR);
+      consoleLogger.error('error called %s', 'param1');
+      assert.deepStrictEqual(errorCalledArgs, ['error called %s', 'param1']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.strictEqual(warnCalledArgs, null);
+      consoleLogger.info('info called %s', 'param1');
+      assert.strictEqual(infoCalledArgs, null);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.strictEqual(debugCalledArgs, null);
     });
   });
 });

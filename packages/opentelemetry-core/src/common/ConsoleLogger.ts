@@ -17,26 +17,26 @@
 import { Logger } from '@opentelemetry/types';
 import { LogLevel } from './types';
 
-class ConsoleLogger implements Logger {
+export class ConsoleLogger implements Logger {
   constructor(level: LogLevel = LogLevel.DEBUG) {
     if (level >= LogLevel.DEBUG) {
       this.debug = (...args) => {
-        console.debug(args);
+        console.debug(...args);
       };
     }
     if (level >= LogLevel.INFO) {
       this.info = (...args) => {
-        console.info(args);
+        console.info(...args);
       };
     }
     if (level >= LogLevel.WARN) {
       this.warn = (...args) => {
-        console.warn(args);
+        console.warn(...args);
       };
     }
     if (level >= LogLevel.ERROR) {
       this.error = (...args) => {
-        console.error(args);
+        console.error(...args);
       };
     }
   }
@@ -49,14 +49,3 @@ class ConsoleLogger implements Logger {
 
   info(message: string, ...args: unknown[]) {}
 }
-
-/**
- * Function logger exported to others classes. Inspired by:
- * https://github.com/cainus/logdriver/blob/bba1761737ca72f04d6b445629848538d038484a/index.js#L50
- * @param level A log level
- */
-const logger = (level?: LogLevel): Logger => {
-  return new ConsoleLogger(level);
-};
-
-export { logger };
