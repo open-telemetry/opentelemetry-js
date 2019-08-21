@@ -1,5 +1,21 @@
+/*!
+ * Copyright 2019, OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 /**
- * Copyright 2018, OpenCensus Authors
+ * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,14 +33,8 @@
 // mongodb.Server type is deprecated so every use trigger a lint error
 /* tslint:disable:deprecation */
 
-import { BasePlugin, NoopLogger } from '@opentelemetry/core';
-import {
-  Span,
-  SpanKind,
-  Logger,
-  Tracer,
-  CanonicalCode,
-} from '@opentelemetry/types';
+import { BasePlugin } from '@opentelemetry/core';
+import { Span, SpanKind, CanonicalCode } from '@opentelemetry/types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 
@@ -37,18 +47,15 @@ interface MongoInternalCommand {
   ismaster: boolean;
 }
 
-/** MongoDB instrumentation plugin for Opencensus */
+/** MongoDB instrumentation plugin for OpenTelemetry */
 export class MongoDBPlugin extends BasePlugin<MongoDB> {
-  private readonly SERVER_FNS = ['insert', 'update', 'remove', 'auth'];
-  private readonly CURSOR_FNS_FIRST = ['_find', '_getmore'];
-  protected _logger!: Logger;
-  protected readonly _tracer!: Tracer;
+  private readonly _SERVER_METHODS = ['insert', 'update', 'remove', 'command'];
+  private readonly _CURSOR_METHODS = ['_next', 'next'];
 
-  constructor(public moduleName: string) {
+  protected readonly _supportedVersions = ['>=2 <3'];
+
+  constructor(readonly moduleName: string) {
     super();
-    // TODO: remove this once a logger will be passed
-    // https://github.com/open-telemetry/opentelemetry-js/issues/193
-    this._logger = new NoopLogger();
   }
 
   /**
@@ -58,35 +65,29 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
     this._logger.debug('Patched MongoDB');
 
     if (this._moduleExports.Server) {
-      this._logger.debug('patching mongodb-core.Server.prototype.command');
-      shimmer.wrap(
-        this._moduleExports.Server.prototype,
-        'command' as never,
-        // tslint:disable-next-line:no-any
-        this.getPatchCommand() as any
-      );
-      this._logger.debug(
-        'patching mongodb-core.Server.prototype functions:',
-        this.SERVER_FNS
-      );
-      shimmer.massWrap(
-        [this._moduleExports.Server.prototype],
-        this.SERVER_FNS as never[],
-        // tslint:disable-next-line:no-any
-        this.getPatchQuery() as any
-      );
+      for (const fn of this._SERVER_METHODS) {
+        this._logger.debug(`patching mongodb-core.Server.prototype.${fn}`);
+        shimmer.wrap(
+          this._moduleExports.Server.prototype,
+          // Forced to ignore due to incomplete typings
+          // tslint:disable-next-line:ban-ts-ignore
+          // @ts-ignore
+          fn,
+          this._getPatchCommand(fn)
+        );
+      }
     }
 
     if (this._moduleExports.Cursor) {
       this._logger.debug(
         'patching mongodb-core.Cursor.prototype functions:',
-        this.CURSOR_FNS_FIRST
+        this._CURSOR_METHODS
       );
       shimmer.massWrap(
         [this._moduleExports.Cursor.prototype],
-        this.CURSOR_FNS_FIRST as never[],
+        this._CURSOR_METHODS as never[],
         // tslint:disable-next-line:no-any
-        this.getPatchCursor() as any
+        this._getPatchCursor() as any
       );
     }
 
@@ -95,18 +96,17 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
 
   /** Unpatches all MongoDB patched functions. */
   unpatch(): void {
-    shimmer.unwrap(this._moduleExports.Server.prototype, 'command' as never);
     shimmer.massUnwrap([this._moduleExports.Server.prototype], this
-      .SERVER_FNS as never[]);
+      ._SERVER_METHODS as never[]);
     shimmer.massUnwrap([this._moduleExports.Cursor.prototype], this
-      .CURSOR_FNS_FIRST as never[]);
+      ._CURSOR_METHODS as never[]);
   }
 
   /** Creates spans for Command operations */
-  private getPatchCommand() {
+  private _getPatchCommand(operationName: string) {
     const plugin = this;
     return (original: Func<mongodb.Server>) => {
-      return function(
+      return function patchedServerCommand(
         this: mongodb.Server,
         ns: string,
         command: MongoInternalCommand,
@@ -114,40 +114,40 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
         callback: Func<unknown>
       ): mongodb.Server {
         const currentSpan = plugin._tracer.getCurrentSpan();
-        if (currentSpan === null) {
-          return original.apply(this, (arguments as unknown) as unknown[]);
-        }
+        // @ts-ignore
         const resultHandler =
           typeof options === 'function' ? options : callback;
-        if (typeof resultHandler !== 'function') {
-          return original.apply(this, (arguments as unknown) as unknown[]);
-        }
-        if (typeof command !== 'object') {
+        if (
+          currentSpan === null ||
+          typeof resultHandler !== 'function' ||
+          typeof command !== 'object'
+        ) {
           return original.apply(this, (arguments as unknown) as unknown[]);
         }
         let type: string;
-        if (command.createIndexes) {
+        if (command.createIndexes !== undefined) {
           type = 'createIndexes';
-        } else if (command.findandmodify) {
+        } else if (command.findandmodify !== undefined) {
           type = 'findAndModify';
-        } else if (command.ismaster) {
+        } else if (command.ismaster !== undefined) {
           type = 'isMaster';
-        } else if (command.count) {
+        } else if (command.count !== undefined) {
           type = 'count';
         } else {
-          type = 'command';
+          type = operationName;
         }
 
-        const span = plugin._tracer.startSpan(`${ns}.${type}`, {
+        const span = plugin._tracer.startSpan(`mongodb.${type}`, {
           parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
+        span.setAttribute('db', ns);
         if (typeof options === 'function') {
           return original.call(
             this,
             ns,
             command,
-            plugin.patchEnd(span, options as Func<unknown>)
+            plugin._patchEnd(span, options as Func<unknown>)
           );
         } else {
           return original.call(
@@ -155,51 +155,7 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
             ns,
             command,
             options,
-            plugin.patchEnd(span, callback)
-          );
-        }
-      };
-    };
-  }
-
-  /** Creates spans for Query operations */
-  private getPatchQuery() {
-    const plugin = this;
-    return (original: Func<mongodb.Server>) => {
-      return function(
-        this: mongodb.Server,
-        ns: string,
-        command: MongoInternalCommand,
-        options: {},
-        callback: Func<unknown>
-      ): mongodb.Server {
-        const currentSpan = plugin._tracer.getCurrentSpan();
-        if (currentSpan === null) {
-          return original.apply(this, (arguments as unknown) as unknown[]);
-        }
-        const resultHandler =
-          typeof options === 'function' ? options : callback;
-        if (typeof resultHandler !== 'function') {
-          return original.apply(this, (arguments as unknown) as unknown[]);
-        }
-        const span = plugin._tracer.startSpan(`${ns}.query`, {
-          kind: SpanKind.CLIENT,
-          parent: currentSpan,
-        });
-        if (typeof options === 'function') {
-          return original.call(
-            this,
-            ns,
-            command,
-            plugin.patchEnd(span, options as Func<unknown>)
-          );
-        } else {
-          return original.call(
-            this,
-            ns,
-            command,
-            options,
-            plugin.patchEnd(span, callback)
+            plugin._patchEnd(span, callback)
           );
         }
       };
@@ -207,26 +163,24 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
   }
 
   /** Creates spans for Cursor operations */
-  private getPatchCursor() {
+  private _getPatchCursor() {
     const plugin = this;
     return (original: Func<mongodb.Cursor>) => {
-      return function(
+      return function patchedCursorCommand(
         this: { ns: string },
         ...args: unknown[]
       ): mongodb.Cursor {
         const currentSpan = plugin._tracer.getCurrentSpan();
-        if (currentSpan === null) {
-          return original.apply(this, (arguments as unknown) as unknown[]);
-        }
         const resultHandler = args[0] as Func<unknown> | undefined;
-        if (resultHandler === undefined) {
+        if (currentSpan === null || resultHandler === undefined) {
           return original.apply(this, (arguments as unknown) as unknown[]);
         }
-        const span = plugin._tracer.startSpan(`${this.ns}.cursor`, {
+        const span = plugin._tracer.startSpan(`mongodb.cursor`, {
           parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
-        return original.call(this, plugin.patchEnd(span, resultHandler));
+
+        return original.call(this, plugin._patchEnd(span, resultHandler));
       };
     };
   }
@@ -236,7 +190,7 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
    * @param span The created span to end.
    * @param resultHandler A callback function.
    */
-  patchEnd(span: Span, resultHandler: Func<unknown>): Function {
+  private _patchEnd(span: Span, resultHandler: Func<unknown>): Function {
     return function patchedEnd(this: {}, ...args: unknown[]) {
       const error = args[0];
       if (error instanceof Error) {
@@ -251,5 +205,4 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
   }
 }
 
-const plugin = new MongoDBPlugin('mongodb');
-export { plugin };
+export const plugin = new MongoDBPlugin('mongodb-core');
