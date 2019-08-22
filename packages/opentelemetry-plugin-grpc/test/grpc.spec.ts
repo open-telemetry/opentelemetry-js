@@ -319,12 +319,16 @@ describe('GrpcPlugin', () => {
     },
   ];
 
-  const runTest = function(self: any, method: typeof methodList[0], checkSpans = true) {
-    it(`should ${checkSpans ? 'do' : 'not'}: create a rootSpan for client and a childSpan for server - ${method.description}`, async function() {
+  const runTest = (method: typeof methodList[0], checkSpans = true) => {
+    it(`should ${
+      checkSpans ? 'do' : 'not'
+    }: create a rootSpan for client and a childSpan for server - ${
+      method.description
+    }`, async () => {
       const args = [client, method.request];
       // tslint:disable-next-line:no-any
       await (method.method as any)
-        .apply(self, args)
+        .apply({}, args)
         .then((result: TestRequestResponse | TestRequestResponse[]) => {
           assert.ok(
             checkEqual(result)(method.result),
@@ -345,7 +349,7 @@ describe('GrpcPlugin', () => {
           }
         });
     });
-  }
+  };
 
   describe('enable()', () => {
     const scopeManager = new AsyncHooksScopeManager();
@@ -379,8 +383,8 @@ describe('GrpcPlugin', () => {
     });
 
     methodList.map(method => {
-      describe(`Test automatic tracing for grpc remote method ${method.description}`, function() {
-        runTest(this, method);
+      describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
+        runTest(method);
       });
     });
   });
@@ -414,8 +418,8 @@ describe('GrpcPlugin', () => {
     });
 
     methodList.map(method => {
-      describe(`Test automatic tracing for grpc remote method ${method.description}`, function() {
-        runTest(this, method, false);
+      describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
+        runTest(method, false);
       });
     });
   });

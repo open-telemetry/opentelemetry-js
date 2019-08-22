@@ -67,7 +67,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // TODO: Remove this once issue is resolved
     // https://github.com/open-telemetry/opentelemetry-js/issues/193
     this._logger = new NoopLogger();
-    this.internalFilesExports = this.loadInternalFiles();
+    this.internalFilesExports = this._loadInternalFiles();
   }
 
   // TODO: Delete if moving internal file loaders to BasePlugin
@@ -82,7 +82,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   /**
    * Load internal files according to version range
    */
-  private loadInternalFiles(): ModuleExportsMapping {
+  private _loadInternalFiles(): ModuleExportsMapping {
     let result: ModuleExportsMapping = {};
     if (this.internalFileList) {
       this._logger.debug('loadInternalFiles %o', this.internalFileList);
@@ -97,7 +97,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               this.internalFileList
             );
           }
-          result = this.loadInternalModuleFiles(
+          result = this._loadInternalModuleFiles(
             this.internalFileList[versionRange],
             basedir
           );
@@ -117,7 +117,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   /**
    * Load internal files from a module and set internalFilesExports
    */
-  private loadInternalModuleFiles(
+  private _loadInternalModuleFiles(
     extraModulesList: ModuleNameToFilePath,
     basedir: string
   ): ModuleExportsMapping {
@@ -156,7 +156,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         this._moduleExports.Server.prototype,
         'register',
         // tslint:disable-next-line:no-any
-        this.patchServer() as any
+        this._patchServer() as any
       );
     }
 
@@ -166,7 +166,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       shimmer.wrap(
         grpcClientModule,
         'makeClientConstructor',
-        this.patchClient()
+        this._patchClient()
       );
     }
 
@@ -188,7 +188,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
   }
 
-  private getSpanContext(metadata: grpcModule.Metadata): SpanContext | null {
+  private static _toSpanStatus(status: number): Status {
+    return { code: status };
+  }
+
+  private _getSpanContext(metadata: grpcModule.Metadata): SpanContext | null {
     const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer;
     // Entry doesn't exist
     if (!metadataValue) {
@@ -202,7 +206,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return spanContext;
   }
 
-  private setSpanContext(
+  private _setSpanContext(
     metadata: grpcModule.Metadata,
     spanContext: SpanContext
   ): void {
@@ -213,7 +217,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     metadata.set(GRPC_TRACE_KEY, buffer);
   }
 
-  private patchServer() {
+  private _patchServer() {
     return (originalRegister: typeof grpcModule.Server.prototype.register) => {
       const plugin = this;
       plugin._logger.debug('patched gRPC server');
@@ -247,7 +251,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                 kind: SpanKind.SERVER,
               };
 
-              const parentSpan = plugin.getSpanContext(call.metadata);
+              const parentSpan = plugin._getSpanContext(call.metadata);
               if (parentSpan) {
                 spanOptions.parent = parentSpan;
               }
@@ -299,10 +303,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return originalResult;
       };
     };
-  }
-
-  private static _toSpanStatus(status: number): Status {
-    return { code: status };
   }
 
   private _clientStreamAndUnaryHandler<RequestType, ResponseType>(
@@ -397,7 +397,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return (original as any).call(self, call);
   }
 
-  private patchClient() {
+  private _patchClient() {
     const plugin = this;
     return (original: typeof grpcModule.makeGenericClientConstructor) => {
       plugin._logger.debug('patching client');
@@ -420,7 +420,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     };
   }
 
-  _getPatchedClientMethods() {
+  private _getPatchedClientMethods() {
     const plugin = this;
     return (original: GrpcClientFunc) => {
       plugin._logger.debug('patch all client methods');
@@ -440,7 +440,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               parent: currentSpan,
             })
             .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-          return plugin._tracer.withSpan(span, plugin.makeGrpcClientRemoteCall(
+          return plugin._tracer.withSpan(span, plugin._makeGrpcClientRemoteCall(
             original,
             args,
             this,
@@ -453,7 +453,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               kind: SpanKind.CLIENT,
             })
             .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-          return plugin.makeGrpcClientRemoteCall(original, args, this, plugin)(
+          return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
             span
           );
         }
@@ -464,7 +464,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   /**
    * This method handels the client remote call
    */
-  private makeGrpcClientRemoteCall(
+  private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
     // tslint:disable-next-line:no-any
     args: any[],
@@ -514,7 +514,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return original.apply(self, args);
       }
 
-      const metadata = this.getMetadata(original, args);
+      const metadata = this._getMetadata(original, args);
       // if unary or clientStream
       if (!original.responseStream) {
         const callbackFuncIndex = findIndex(args, arg => {
@@ -533,7 +533,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       span.setAttribute(GrpcPlugin.ATTRIBUTE_GRPC_METHOD, original.path);
       span.setAttribute(GrpcPlugin.ATTRIBUTE_GRPC_KIND, SpanKind.CLIENT);
 
-      this.setSpanContext(metadata, span.context());
+      this._setSpanContext(metadata, span.context());
       const call = (original.apply(
         self,
         args
@@ -573,7 +573,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     };
   }
 
-  private getMetadata(
+  private _getMetadata(
     original: GrpcClientFunc,
     // tslint:disable-next-line:no-any
     args: any[]
