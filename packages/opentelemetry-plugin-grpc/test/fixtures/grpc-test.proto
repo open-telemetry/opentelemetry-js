@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pkg_test;
+
+service GrpcTester {
+  rpc UnaryMethod (TestRequest) returns (TestReply) {}
+  rpc ClientStreamMethod (stream TestRequest) returns (TestReply) {}
+  rpc ServerStreamMethod (TestRequest) returns (stream TestReply) {}
+  rpc BidiStreamMethod (stream TestRequest) returns (stream TestReply) {}
+}
+
+message TestRequest {
+  int32 num = 1;
+}
+
+message TestReply {
+  int32 num = 1;
+}
