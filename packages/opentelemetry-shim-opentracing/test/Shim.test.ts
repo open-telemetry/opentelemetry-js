@@ -60,7 +60,7 @@ describe('OpenTracing Shim', () => {
       it('injects/extracts Binary carriers', () => {
         /* const carrier = new Array(); */
         /* shimTracer.inject(context, opentracing.FORMAT_BINARY, carrier); */
-        /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, carrier); */
+        /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, { buffer: new Uint8Array(carrier)}); */
         /* assert.strictEqual(context.toSpanId(), extractedContext.toSpanId()) */
       });
     });

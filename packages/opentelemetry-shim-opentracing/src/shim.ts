@@ -106,10 +106,18 @@ export class TracerShim extends opentracing.Tracer {
         this._tracer
           .getHttpTextFormat()
           .inject(opentelemSpanContext, format, carrier);
-        break;
+        return;
       case opentracing.FORMAT_BINARY:
-        const bytes = this._tracer.getBinaryFormat().toBytes();
-        break;
+        // Hmm this is a case where opentracing allowing different types of byte
+        // carriers makes things a little bit tricky.
+        /* const bytes = this._tracer.getBinaryFormat().toBytes(opentelemSpanContext); */
+        /* if (carrier instanceof Array) { */
+        /*   carrier.concat(bytes); */
+        /* } */
+        /* if (carrier instanceof TypedArray) { */
+        /*   carrier.set(bytes, 0); */
+        /* } */
+        return;
       default:
     }
   }
@@ -123,8 +131,13 @@ export class TracerShim extends opentracing.Tracer {
           .extract(format, carrier);
         return new SpanContextShim(context);
       case opentracing.FORMAT_BINARY:
-        //TODO
-        break;
+        /* if (!carrier.buffer) { */
+        /*   return; */
+        /* } */
+        /* this._tracer */
+        /*   .getBinaryFormat() */
+        /*   .fromBytes(new Uint8Array(carrier.buffer)); */
+        /* return new SpanContextShim(null); */
       default:
     }
   }
@@ -167,6 +180,7 @@ export class SpanShim extends opentracing.Span {
   addTags(keyValueMap: { [key: string]: unknown }): this {
     this._span.setAttributes(keyValueMap);
   }
+
   setTag(key: string, value: unknown): this {
     this._span.setAttribute(key, value);
   }
@@ -174,6 +188,7 @@ export class SpanShim extends opentracing.Span {
   getBaggageItem(key: string): string | undefined {
     // TODO: this should go into the context.
   }
+
   setBaggageItem(key: string, value: string): this {
     // TODO: this should go into the context.
   }
