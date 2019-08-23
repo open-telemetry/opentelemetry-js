@@ -27,25 +27,34 @@ describe('OpenTracing Shim', () => {
       it('injects/extracts a span object', () => {
         const carrier: { [key: string]: unknown } = {};
         shimTracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, carrier);
-        const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
-      })
+        const extractedContext = shimTracer.extract(
+          opentracing.FORMAT_HTTP_HEADERS,
+          carrier
+        );
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
+      });
 
       it('injects/extracts HTTP carriers', () => {
         const carrier: { [key: string]: unknown } = {};
         shimTracer.inject(context, opentracing.FORMAT_HTTP_HEADERS, carrier);
-        const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
+        const extractedContext = shimTracer.extract(
+          opentracing.FORMAT_HTTP_HEADERS,
+          carrier
+        );
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
       });
 
       it('injects/extracts TextMap carriers', () => {
         const carrier: { [key: string]: unknown } = {};
         shimTracer.inject(context, opentracing.FORMAT_TEXT_MAP, carrier);
-        const extractedContext = shimTracer.extract(opentracing.FORMAT_TEXT_MAP, carrier);
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
+        const extractedContext = shimTracer.extract(
+          opentracing.FORMAT_TEXT_MAP,
+          carrier
+        );
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
       });
 
       it('injects/extracts Binary carriers', () => {
@@ -53,33 +62,46 @@ describe('OpenTracing Shim', () => {
         /* shimTracer.inject(context, opentracing.FORMAT_BINARY, carrier); */
         /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, carrier); */
         /* assert.strictEqual(context.toSpanId(), extractedContext.toSpanId()) */
-      })
-    })
+      });
+    });
 
     it('creates parent/child relationship using a span object', () => {
       const childSpan = shimTracer.startSpan('other-span', { childOf: span });
       assert.strictEqual(childSpan.getSpan().parentSpanId, context.toSpanId());
-      assert.strictEqual(childSpan.context().toTraceId(), span.context().toTraceId())
-    })
+      assert.strictEqual(
+        childSpan.context().toTraceId(),
+        span.context().toTraceId()
+      );
+    });
     it('creates parent/child relationship using a context object', () => {
-      const childSpan = shimTracer.startSpan('other-span', { childOf: context});
+      const childSpan = shimTracer.startSpan('other-span', {
+        childOf: context,
+      });
       assert.strictEqual(childSpan.getSpan().parentSpanId, context.toSpanId());
-      assert.strictEqual(childSpan.context().toTraceId(), span.context().toTraceId());
-    })
+      assert.strictEqual(
+        childSpan.context().toTraceId(),
+        span.context().toTraceId()
+      );
+    });
 
     it('translates span options correctly', () => {
       const opentracingOptions: opentracing.SpanOptions = {
         startTime: 123,
-        tags: {key: 'value', count: 1},
-        references: [ new opentracing.Reference(opentracing.FOLLOWS_FROM, context) ],
+        tags: { key: 'value', count: 1 },
+        references: [
+          new opentracing.Reference(opentracing.FOLLOWS_FROM, context),
+        ],
       };
       span = shimTracer.startSpan('my-span', opentracingOptions);
       /* console.log(span.getSpan().links); */
       /* assert.strictEqual(span.getSpan().links.length, 1) */
-      assert.strictEqual(span.getSpan().startTime, opentracingOptions.startTime)
+      assert.strictEqual(
+        span.getSpan().startTime,
+        opentracingOptions.startTime
+      );
       /* assert.strictEqual(span.getSpan().attributes, opentracingOptions.tags) */
-    })
-  })
+    });
+  });
 
   describe('SpanContextShim', () => {
     it('returns the correct context', () => {
@@ -87,8 +109,8 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(shim.getSpanContext(), INVALID_SPAN_CONTEXT);
       assert.strictEqual(shim.toTraceId(), INVALID_SPAN_CONTEXT.traceId);
       assert.strictEqual(shim.toSpanId(), INVALID_SPAN_CONTEXT.spanId);
-    })
-  })
+    });
+  });
 
   describe('span', () => {
     let span: ShimTracer;
@@ -126,7 +148,6 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(otSpan.events[0].name, 'some log');
       assert.strictEqual(otSpan.events[0].attributes, payload);
     });
-
 
     it('updates the name', () => {
       assert.strictEqual(otSpan.name, 'my-span');

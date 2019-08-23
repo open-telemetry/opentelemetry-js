@@ -17,10 +17,12 @@
 import * as types from '@opentelemetry/types';
 import * as opentracing from 'opentracing';
 
-function translateReferences(references:opentracing.Reference[]): types.Link[] {
-  let links: types.Link[] = [];
-  for (let reference of references) {
-    const context  = reference.referencedContext();
+function translateReferences(
+  references: opentracing.Reference[]
+): types.Link[] {
+  const links: types.Link[] = [];
+  for (const reference of references) {
+    const context = reference.referencedContext();
     if (context instanceof SpanContextShim) {
       // TODO: what to do about reference.type
       links.push({ spanContext: context.getSpanContext() });
@@ -63,7 +65,7 @@ export class SpanContextShim extends opentracing.SpanContext {
     return this._spanContext;
   }
 
-  toTraceId(): string{
+  toTraceId(): string {
     return this._spanContext.traceId;
   }
 
@@ -74,7 +76,7 @@ export class SpanContextShim extends opentracing.SpanContext {
 
 export class TracerShim extends opentracing.Tracer {
   constructor(tracer: types.Tracer) {
-    super()
+    super();
     this._tracer = tracer;
   }
 
@@ -101,7 +103,9 @@ export class TracerShim extends opentracing.Tracer {
     switch (format) {
       case opentracing.FORMAT_TEXT_MAP:
       case opentracing.FORMAT_HTTP_HEADERS:
-        this._tracer.getHttpTextFormat().inject(opentelemSpanContext, format, carrier);
+        this._tracer
+          .getHttpTextFormat()
+          .inject(opentelemSpanContext, format, carrier);
         break;
       case opentracing.FORMAT_BINARY:
         const bytes = this._tracer.getBinaryFormat().toBytes();
