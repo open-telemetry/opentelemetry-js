@@ -2,7 +2,7 @@ import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
 import * as opentracing from 'opentracing';
 import { Tracer } from 'opentracing';
-import { BasicTracer } from '@opentelemetry/basic-tracer';
+import { BasicTracer, Span } from '@opentelemetry/basic-tracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/Shim';
 import { INVALID_SPAN_CONTEXT } from '@opentelemetry/core';
@@ -23,35 +23,37 @@ describe('OpenTracing Shim', () => {
       context = span.context();
     });
 
-    it('injects/extracts a span object', () => {
-      const carrier: { [key: string]: unknown } = {};
-      shimTracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, carrier);
-      const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
-      assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-      assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
-    })
+    describe('propagation', () => {
+      it('injects/extracts a span object', () => {
+        const carrier: { [key: string]: unknown } = {};
+        shimTracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, carrier);
+        const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
+      })
 
-    it('injects/extracts HTTP carriers', () => {
-      const carrier: { [key: string]: unknown } = {};
-      shimTracer.inject(context, opentracing.FORMAT_HTTP_HEADERS, carrier);
-      const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
-      assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-      assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
-    });
+      it('injects/extracts HTTP carriers', () => {
+        const carrier: { [key: string]: unknown } = {};
+        shimTracer.inject(context, opentracing.FORMAT_HTTP_HEADERS, carrier);
+        const extractedContext = shimTracer.extract(opentracing.FORMAT_HTTP_HEADERS, carrier);
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
+      });
 
-    it('injects/extracts TextMap carriers', () => {
-      const carrier: { [key: string]: unknown } = {};
-      shimTracer.inject(context, opentracing.FORMAT_TEXT_MAP, carrier);
-      const extractedContext = shimTracer.extract(opentracing.FORMAT_TEXT_MAP, carrier);
-      assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
-      assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
-    });
+      it('injects/extracts TextMap carriers', () => {
+        const carrier: { [key: string]: unknown } = {};
+        shimTracer.inject(context, opentracing.FORMAT_TEXT_MAP, carrier);
+        const extractedContext = shimTracer.extract(opentracing.FORMAT_TEXT_MAP, carrier);
+        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId())
+        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId())
+      });
 
-    it('injects/extracts Binary carriers', () => {
-      /* const carrier = new Array(); */
-      /* shimTracer.inject(context, opentracing.FORMAT_BINARY, carrier); */
-      /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, carrier); */
-      /* assert.strictEqual(context.toSpanId(), extractedContext.toSpanId()) */
+      it('injects/extracts Binary carriers', () => {
+        /* const carrier = new Array(); */
+        /* shimTracer.inject(context, opentracing.FORMAT_BINARY, carrier); */
+        /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, carrier); */
+        /* assert.strictEqual(context.toSpanId(), extractedContext.toSpanId()) */
+      })
     })
 
     it('creates parent/child relationship using a span object', () => {
@@ -65,6 +67,18 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(childSpan.context().toTraceId(), span.context().toTraceId());
     })
 
+    it('translates span options correctly', () => {
+      const opentracingOptions: opentracing.SpanOptions = {
+        startTime: 123,
+        tags: {key: 'value', count: 1},
+        references: [ new opentracing.Reference(opentracing.FOLLOWS_FROM, context) ],
+      };
+      span = shimTracer.startSpan('my-span', opentracingOptions);
+      /* console.log(span.getSpan().links); */
+      /* assert.strictEqual(span.getSpan().links.length, 1) */
+      assert.strictEqual(span.getSpan().startTime, opentracingOptions.startTime)
+      /* assert.strictEqual(span.getSpan().attributes, opentracingOptions.tags) */
+    })
   })
 
   describe('SpanContextShim', () => {
@@ -112,6 +126,7 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(otSpan.events[0].name, 'some log');
       assert.strictEqual(otSpan.events[0].attributes, payload);
     });
+
 
     it('updates the name', () => {
       assert.strictEqual(otSpan.name, 'my-span');

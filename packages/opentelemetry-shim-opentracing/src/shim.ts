@@ -19,9 +19,11 @@ import * as opentracing from 'opentracing';
 
 function translateReferences(references:opentracing.Reference[]): types.Link[] {
   let links: types.Link[] = [];
-  for (reference in references) {
-    if (reference.referencedContext() instanceof SpanContextShim) {
-      links.push({ spanContext: reference.referencedContext().getSpanContext() });
+  for (let reference of references) {
+    const context  = reference.referencedContext();
+    if (context instanceof SpanContextShim) {
+      // TODO: what to do about reference.type
+      links.push({ spanContext: context.getSpanContext() });
     }
   }
   return links;
