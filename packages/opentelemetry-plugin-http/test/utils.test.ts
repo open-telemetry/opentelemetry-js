@@ -18,7 +18,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import { CanonicalCode, Attributes } from '@opentelemetry/types';
-import { RequestOptions } from 'https';
 import { IgnoreMatcher } from '../src/types';
 import { Utils } from '../src/utils';
 import * as http from 'http';
@@ -49,31 +48,31 @@ describe('Utils', () => {
   describe('hasExpectHeader()', () => {
     it('should throw if no option', () => {
       try {
-        Utils.hasExpectHeader('' as RequestOptions);
+        Utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
       } catch (ignore) {}
     });
 
     it('should not throw if no headers', () => {
-      const result = Utils.hasExpectHeader({} as RequestOptions);
+      const result = Utils.hasExpectHeader({} as http.RequestOptions);
       assert.strictEqual(result, false);
     });
 
     it('should return true on Expect', () => {
       const result = Utils.hasExpectHeader({
         headers: { Expect: 1 },
-      } as RequestOptions);
+      } as http.RequestOptions);
       assert.strictEqual(result, true);
     });
   });
 
-  describe('getIncomingOptions()', () => {
+  describe('getOutgoingOptions()', () => {
     it('should get options object', () => {
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
         url.parse('http://google.fr/')
       );
-      const result = Utils.getIncomingOptions(options);
+      const result = Utils.getOutgoingOptions(options);
       assert.strictEqual(result.hostname, 'google.fr');
       assert.strictEqual(result.headers!.Expect, options.headers.Expect);
       assert.strictEqual(result.protocol, 'http:');
@@ -94,26 +93,22 @@ describe('Utils', () => {
 
   describe('satisfiesPattern()', () => {
     it('string pattern', () => {
-      const answer1 = Utils.satisfiesPattern('/test/1', {}, '/test/1');
+      const answer1 = Utils.satisfiesPattern('/test/1', '/test/1');
       assert.strictEqual(answer1, true);
-      const answer2 = Utils.satisfiesPattern('/test/1', {}, '/test/11');
+      const answer2 = Utils.satisfiesPattern('/test/1', '/test/11');
       assert.strictEqual(answer2, false);
     });
 
     it('regex pattern', () => {
-      const answer1 = Utils.satisfiesPattern('/TeSt/1', {}, /\/test/i);
+      const answer1 = Utils.satisfiesPattern('/TeSt/1', /\/test/i);
       assert.strictEqual(answer1, true);
-      const answer2 = Utils.satisfiesPattern('/2/tEst/1', {}, /\/test/);
+      const answer2 = Utils.satisfiesPattern('/2/tEst/1', /\/test/);
       assert.strictEqual(answer2, false);
     });
 
     it('should throw if type is unknown', () => {
       try {
-        Utils.satisfiesPattern(
-          '/TeSt/1',
-          {},
-          (true as unknown) as IgnoreMatcher<{}>
-        );
+        Utils.satisfiesPattern('/TeSt/1', (true as unknown) as IgnoreMatcher);
         assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);
@@ -123,15 +118,12 @@ describe('Utils', () => {
     it('function pattern', () => {
       const answer1 = Utils.satisfiesPattern(
         '/test/home',
-        { headers: {} },
-        (url: string, req: { headers: unknown }) =>
-          req.headers && url === '/test/home'
+        (url: string) => url === '/test/home'
       );
       assert.strictEqual(answer1, true);
       const answer2 = Utils.satisfiesPattern(
         '/test/home',
-        { headers: {} },
-        (url: string, req: { headers: unknown }) => url !== '/test/home'
+        (url: string) => url !== '/test/home'
       );
       assert.strictEqual(answer2, false);
     });
@@ -147,7 +139,7 @@ describe('Utils', () => {
     });
 
     it('should call isSatisfyPattern, n match', () => {
-      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
+      const answer1 = Utils.isIgnored('/test/1', ['/test/11']);
       assert.strictEqual(answer1, false);
       assert.strictEqual(
         (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
@@ -156,7 +148,7 @@ describe('Utils', () => {
     });
 
     it('should call isSatisfyPattern, match', () => {
-      const answer1 = Utils.isIgnored('/test/1', {}, ['/test/11']);
+      const answer1 = Utils.isIgnored('/test/1', ['/test/11']);
       assert.strictEqual(answer1, false);
       assert.strictEqual(
         (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
@@ -165,7 +157,7 @@ describe('Utils', () => {
     });
 
     it('should not call isSatisfyPattern', () => {
-      Utils.isIgnored('/test/1', {}, []);
+      Utils.isIgnored('/test/1', []);
       assert.strictEqual(
         (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
         0
@@ -173,12 +165,12 @@ describe('Utils', () => {
     });
 
     it('should return false on empty list', () => {
-      const answer1 = Utils.isIgnored('/test/1', {}, []);
+      const answer1 = Utils.isIgnored('/test/1', []);
       assert.strictEqual(answer1, false);
     });
 
     it('should not throw and return false when list is undefined', () => {
-      const answer2 = Utils.isIgnored('/test/1', {}, undefined);
+      const answer2 = Utils.isIgnored('/test/1', undefined);
       assert.strictEqual(answer2, false);
     });
   });

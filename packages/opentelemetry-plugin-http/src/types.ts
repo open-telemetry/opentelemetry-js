@@ -25,13 +25,14 @@ import {
 } from 'http';
 import * as http from 'http';
 
-export type IgnoreMatcher<T> =
-  | string
-  | RegExp
-  | ((url: string, request: T) => boolean);
+export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
 export type RequestFunction = typeof request;
 export type GetFunction = typeof get;
+
+export interface HeaderSetter {
+  setHeader: (name: string, value: string) => void;
+}
 
 export type HttpCallbackOptional = HttpCallback | undefined;
 
@@ -61,7 +62,7 @@ export interface HttpCustomAttributeFunction {
 }
 
 export interface HttpPluginConfig {
-  ignoreIncomingPaths?: Array<IgnoreMatcher<IncomingMessage>>;
-  ignoreOutgoingUrls?: Array<IgnoreMatcher<ClientRequest>>;
+  ignoreIncomingPaths?: IgnoreMatcher[];
+  ignoreOutgoingUrls?: IgnoreMatcher[];
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
 }

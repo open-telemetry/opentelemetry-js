@@ -49,8 +49,11 @@ export const httpRequest = {
           resolve({
             data,
             statusCode: res.statusCode,
-            /* tslint:disable-next-line:no-any */
-            reqHeaders: (res.req as any)._headers,
+            /* tslint:disable:no-any */
+            reqHeaders: (res.req as any).getHeaders
+              ? (res.req as any).getHeaders()
+              : (res.req as any)._headers,
+            /* tslint:enable:no-any */
             resHeaders: res.headers,
             method: res.req.method,
           });

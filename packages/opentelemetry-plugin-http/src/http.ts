@@ -40,6 +40,7 @@ import {
   ResponseEndArgs,
   ParsedRequestOptions,
   HttpRequestArgs,
+  HeaderSetter,
 } from './types';
 import { Format } from './enums/format';
 import { AttributeNames } from './enums/attributeNames';
@@ -54,11 +55,14 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _logger!: Logger;
   protected readonly _tracer!: Tracer;
 
-  constructor(public moduleName: string, public version: string) {
+  constructor(readonly moduleName: string, readonly version: string) {
     super();
     // TODO: remove this once a logger will be passed
     // https://github.com/open-telemetry/opentelemetry-js/issues/193
     this._logger = new NoopLogger();
+    // TODO: remove this once options will be passed
+    // see https://github.com/open-telemetry/opentelemetry-js/issues/210
+    this.options = {};
   }
 
   /** Patches HTTP incoming and outcoming request functions. */
@@ -176,56 +180,52 @@ export class HttpPlugin extends BasePlugin<Http> {
     return (): ClientRequest => {
       this._logger.debug('makeRequestTrace by injecting context into header');
 
-      const propagation = this._tracer.getHttpTextFormat();
-      const opts = Utils.getIncomingOptions(options);
+      request.on(
+        'response',
+        (response: IncomingMessage & { req?: { method?: string } }) => {
+          this._tracer.bind(response);
+          this._logger.debug('outgoingRequest on response()');
+          response.on('end', () => {
+            this._logger.debug('outgoingRequest on end()');
 
-      propagation.inject(span.context(), Format.HTTP, opts.headers);
+            const method =
+              response.req && response.req.method
+                ? response.req.method.toUpperCase()
+                : 'GET';
+            const headers = options.headers;
+            const userAgent = headers ? headers['user-agent'] : null;
 
-      request.on('response', (response: IncomingMessage) => {
-        this._tracer.bind(response);
-        this._logger.debug('outgoingRequest on response()');
-        response.on('end', () => {
-          this._logger.debug('outgoingRequest on end()');
+            const host = options.hostname || options.host || 'localhost';
 
-          // TODO: create utils methods
-          const method = response.method
-            ? response.method.toUpperCase()
-            : 'GET';
-          const headers = opts.headers;
-          const userAgent = headers
-            ? headers['user-agent'] || headers['User-Agent']
-            : null;
+            const attributes: Attributes = {
+              [AttributeNames.HTTP_URL]: `${options.protocol}//${options.hostname}${options.path}`,
+              [AttributeNames.HTTP_HOSTNAME]: host,
+              [AttributeNames.HTTP_METHOD]: method,
+              [AttributeNames.HTTP_PATH]: options.path || '/',
+            };
 
-          const host = opts.hostname || opts.host || 'localhost';
+            if (userAgent) {
+              attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
+            }
 
-          const attributes: Attributes = {
-            [AttributeNames.HTTP_URL]: `${opts.protocol}//${opts.hostname}${opts.path}`,
-            [AttributeNames.HTTP_HOSTNAME]: host,
-            [AttributeNames.HTTP_METHOD]: method,
-            [AttributeNames.HTTP_PATH]: opts.path || '/',
-          };
+            if (response.statusCode) {
+              attributes[AttributeNames.HTTP_STATUS_CODE] = response.statusCode;
+              attributes[AttributeNames.HTTP_STATUS_TEXT] =
+                response.statusMessage;
+              span.setStatus(Utils.parseResponseStatus(response.statusCode));
+            }
 
-          if (userAgent) {
-            attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
-          }
+            span.setAttributes(attributes);
 
-          if (response.statusCode) {
-            attributes[AttributeNames.HTTP_STATUS_CODE] = response.statusCode;
-            attributes[AttributeNames.HTTP_STATUS_TEXT] =
-              response.statusMessage;
-            span.setStatus(Utils.parseResponseStatus(response.statusCode));
-          }
+            if (this.options.applyCustomAttributesOnSpan) {
+              this.options.applyCustomAttributesOnSpan(span, request, response);
+            }
 
-          span.setAttributes(attributes);
-
-          if (this.options.applyCustomAttributesOnSpan) {
-            this.options.applyCustomAttributesOnSpan(span, request, response);
-          }
-
-          span.end();
-        });
-        Utils.setSpanOnError(span, response);
-      });
+            span.end();
+          });
+          Utils.setSpanOnError(span, response);
+        }
+      );
 
       Utils.setSpanOnError(span, request);
 
@@ -257,9 +257,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
-      if (
-        Utils.isIgnored(pathname, request, plugin.options.ignoreIncomingPaths)
-      ) {
+      if (Utils.isIgnored(pathname, plugin.options.ignoreIncomingPaths)) {
         return original.apply(this, [event, ...args]);
       }
 
@@ -296,8 +294,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const hostname = headers.host
             ? headers.host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
             : 'localhost';
-          const userAgent = (headers['user-agent'] ||
-            headers['User-Agent']) as string;
+          const userAgent = headers['user-agent'] as string;
 
           const attributes: Attributes = {
             [AttributeNames.HTTP_URL]: Utils.getUrlFromIncomingRequest(
@@ -349,53 +346,79 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       const { origin, pathname, method, optionsParsed } = Utils.getRequestInfo(
-        options
+        options,
+        typeof args[0] === 'object' && typeof options === 'string'
+          ? (args.shift() as RequestOptions)
+          : undefined
       );
-      const request: ClientRequest = original.apply(this, [
-        optionsParsed,
-        ...args,
-      ]);
+      options = optionsParsed;
 
       if (
-        Utils.isIgnored(
-          origin + pathname,
-          request,
-          plugin.options.ignoreOutgoingUrls
-        )
+        Utils.isIgnored(origin + pathname, plugin.options.ignoreOutgoingUrls)
       ) {
-        return request;
+        return original.apply(this, [options, ...args]);
+      }
+
+      const currentSpan = plugin._tracer.getCurrentSpan();
+      const operationName = `${method} ${pathname}`;
+      const spanOptions: SpanOptions = {
+        kind: SpanKind.CLIENT,
+        parent: currentSpan ? currentSpan : undefined,
+      };
+
+      const span = plugin._startHttpSpan(operationName, spanOptions);
+
+      const propagation = plugin._tracer.getHttpTextFormat();
+      let setter: HeaderSetter;
+      const hasExpectHeader = Utils.hasExpectHeader(options as RequestOptions);
+
+      if (hasExpectHeader) {
+        setter = {
+          setHeader(name: string, value: string) {
+            // If outgoing request headers contain the "Expect" header, the
+            // returned ClientRequest will throw an error if any new headers are
+            // added. We need to set the header directly in the headers object
+            // which has been cloned earlier.
+            (options as RequestOptions).headers![name] = value;
+          },
+        };
+        // If outgoing request headers contain the "Expect" header
+        // We must propagate before headers are sent
+        // which is the case when "Expect" header is present and original.apply is called
+        propagation.inject(span.context(), Format.HTTP, setter);
+      }
+
+      const request: ClientRequest = original.apply(this, [options, ...args]);
+
+      if (!hasExpectHeader) {
+        setter = {
+          setHeader(name: string, value: string) {
+            // The returned ClientRequest will throw an error if any new headers are
+            // added when headers are already sent
+            if (!request.headersSent) {
+              request.setHeader(name, value);
+            }
+          },
+        };
+        propagation.inject(span.context(), Format.HTTP, setter);
       }
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
       plugin._tracer.bind(request);
 
-      const operationName = `${method} ${pathname}`;
-      const spanOptions = {
-        kind: SpanKind.CLIENT,
-      };
-      const currentSpan = plugin._tracer.getCurrentSpan();
       // Checks if this outgoing request is part of an operation by checking
       // if there is a current span, if so, we create a child span. In
       // case there is no active span, this means that the outgoing request is
       // the first operation, therefore we create a span and call withSpan method.
       if (!currentSpan) {
         plugin._logger.debug('outgoingRequest starting a span without context');
-        const span = plugin._startHttpSpan(operationName, spanOptions);
         return plugin._tracer.withSpan(
           span,
-          plugin._getMakeRequestTraceFunction(request, optionsParsed, span)
+          plugin._getMakeRequestTraceFunction(request, options, span)
         );
       } else {
         plugin._logger.debug('outgoingRequest starting a child span');
-        const span = plugin._startHttpSpan(operationName, {
-          kind: spanOptions.kind,
-          parent: currentSpan,
-        });
-        return plugin._getMakeRequestTraceFunction(
-          request,
-          optionsParsed,
-          span
-        )();
+        return plugin._getMakeRequestTraceFunction(request, options, span)();
       }
     };
   }

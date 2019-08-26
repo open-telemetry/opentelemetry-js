@@ -84,7 +84,8 @@ export class Utils {
   static hasExpectHeader(options: RequestOptions | url.URL): boolean {
     return !!(
       (options as RequestOptions).headers &&
-      (options as RequestOptions).headers!.Expect
+      ((options as RequestOptions).headers!.Expect ||
+        (options as RequestOptions).headers!.expect)
     );
   }
 
@@ -96,15 +97,14 @@ export class Utils {
    */
   static satisfiesPattern<T>(
     constant: string,
-    obj: T,
-    pattern: IgnoreMatcher<T>
+    pattern: IgnoreMatcher
   ): boolean {
     if (typeof pattern === 'string') {
       return pattern === constant;
     } else if (pattern instanceof RegExp) {
       return pattern.test(constant);
     } else if (typeof pattern === 'function') {
-      return pattern(constant, obj);
+      return pattern(constant);
     } else {
       throw new TypeError('Pattern is in unsupported datatype');
     }
@@ -116,18 +116,14 @@ export class Utils {
    * @param obj obj to inspect
    * @param list List of ignore patterns
    */
-  static isIgnored<T>(
-    constant: string,
-    obj: T,
-    list?: Array<IgnoreMatcher<T>>
-  ): boolean {
+  static isIgnored(constant: string, list?: IgnoreMatcher[]): boolean {
     if (!list) {
       // No ignored urls - trace everything
       return false;
     }
 
     for (const pattern of list) {
-      if (Utils.satisfiesPattern(constant, obj, pattern)) {
+      if (Utils.satisfiesPattern(constant, pattern)) {
         return true;
       }
     }
@@ -169,7 +165,10 @@ export class Utils {
    * return an object with default value and parsed options
    * @param options for the request
    */
-  static getRequestInfo(options: RequestOptions | string) {
+  static getRequestInfo(
+    options: RequestOptions | string,
+    extraOptions?: RequestOptions
+  ) {
     let pathname = '/';
     let origin = '';
     let optionsParsed: url.URL | url.UrlWithStringQuery | RequestOptions;
@@ -177,6 +176,9 @@ export class Utils {
       optionsParsed = url.parse(options);
       pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
       origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host}`;
+      if (extraOptions !== undefined) {
+        Object.assign(optionsParsed, extraOptions);
+      }
     } else {
       optionsParsed = options;
       try {
@@ -184,8 +186,15 @@ export class Utils {
         if (!pathname && options.path) {
           pathname = url.parse(options.path).pathname || '/';
         }
-        origin = `${options.protocol || 'http:'}//${options.host}`;
+        origin = `${options.protocol || 'http:'}//${options.host ||
+          `${options.hostname}:${options.port}`}`;
       } catch (ignore) {}
+    }
+    if (Utils.hasExpectHeader(optionsParsed)) {
+      (optionsParsed as RequestOptions).headers = Object.assign(
+        {},
+        (optionsParsed as RequestOptions).headers
+      );
     }
     // some packages return method in lowercase..
     // ensure upperCase for consistency
@@ -195,7 +204,7 @@ export class Utils {
     return { origin, pathname, method, optionsParsed };
   }
 
-  static getIncomingOptions(options: ParsedRequestOptions) {
+  static getOutgoingOptions(options: ParsedRequestOptions) {
     // If outgoing request headers contain the "Expect" header, the returned
     // ClientRequest will throw an error if any new headers are added.
     // So we need to clone the options object to be able to inject new
