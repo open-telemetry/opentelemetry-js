@@ -17,6 +17,7 @@
 import * as types from '@opentelemetry/types';
 import { performance } from 'perf_hooks';
 import { ReadableSpan } from './export/ReadableSpan';
+import { BasicTracer } from './BasicTracer';
 
 /**
  * This class represents a span.
@@ -42,8 +43,7 @@ export class Span implements types.Span, ReadableSpan {
 
   /** Constructs a new Span instance. */
   constructor(
-    parentTracer: types.Tracer,
-    logger: types.Logger,
+    parentTracer: BasicTracer,
     spanName: string,
     spanContext: types.SpanContext,
     kind: types.SpanKind,
@@ -56,7 +56,7 @@ export class Span implements types.Span, ReadableSpan {
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.startTime = startTime || performance.now();
-    this._logger = logger;
+    this._logger = parentTracer.logger;
   }
 
   tracer(): types.Tracer {
