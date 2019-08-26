@@ -25,18 +25,18 @@ import { Span } from '../Span';
  *
  * Only spans that are sampled are converted.
  */
-export class SimpleSampledSpanProcessor implements SpanProcessor {
-  constructor(private readonly exporter: SpanExporter) {}
+export class SimpleSpanProcessor implements SpanProcessor {
+  constructor(private readonly _exporter: SpanExporter) {}
 
   // does nothing.
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
     if (span.context().traceOptions !== TraceOptions.SAMPLED) return;
-    this.exporter.export([span.toReadableSpan()], () => {});
+    this._exporter.export([span.toReadableSpan()], () => {});
   }
 
   shutdown(): void {
-    this.exporter.shutdown();
+    this._exporter.shutdown();
   }
 }

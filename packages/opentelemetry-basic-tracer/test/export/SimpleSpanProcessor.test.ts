@@ -15,12 +15,12 @@
  */
 
 import * as assert from 'assert';
-import { SimpleSampledSpanProcessor } from '../../src/export/SimpleSampledSpanProcessor';
-import { NoopTracer, NoopLogger } from '@opentelemetry/core';
-import { Span } from '../../src';
+import { SimpleSpanProcessor } from '../../src/export/SimpleSpanProcessor';
+import { Span, BasicTracer } from '../../src';
 import { SpanExporter } from '../../src/export/SpanExporter';
 import { ReadableSpan } from '../../src/export/ReadableSpan';
 import { SpanContext, SpanKind, TraceOptions } from '@opentelemetry/types';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 class TestExporter implements SpanExporter {
   spansDataList: ReadableSpan[] = [];
@@ -33,33 +33,28 @@ class TestExporter implements SpanExporter {
   }
 }
 
-describe('SimpleSampledSpanProcessor', () => {
-  const tracer = new NoopTracer();
-  const logger = new NoopLogger();
+describe('SimpleSpanProcessor', () => {
+  const tracer = new BasicTracer({
+    scopeManager: new NoopScopeManager(),
+  });
   const exporter = new TestExporter();
 
   describe('constructor', () => {
-    it('should create a SimpleSampledSpanProcessor instance', () => {
-      const processor = new SimpleSampledSpanProcessor(exporter);
-      assert.ok(processor instanceof SimpleSampledSpanProcessor);
+    it('should create a SimpleSpanProcessor instance', () => {
+      const processor = new SimpleSpanProcessor(exporter);
+      assert.ok(processor instanceof SimpleSpanProcessor);
     });
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should handle span started and ended when SAMPLED', () => {
-      const processor = new SimpleSampledSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
         traceOptions: TraceOptions.SAMPLED,
       };
-      const span = new Span(
-        tracer,
-        logger,
-        'span-name',
-        spanContext,
-        SpanKind.CLIENT
-      );
+      const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);
       assert.strictEqual(exporter.spansDataList.length, 0);
 
@@ -71,19 +66,13 @@ describe('SimpleSampledSpanProcessor', () => {
     });
 
     it('should handle span started and ended when UNSAMPLED', () => {
-      const processor = new SimpleSampledSpanProcessor(exporter);
+      const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
         traceOptions: TraceOptions.UNSAMPLED,
       };
-      const span = new Span(
-        tracer,
-        logger,
-        'span-name',
-        spanContext,
-        SpanKind.CLIENT
-      );
+      const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);
       assert.strictEqual(exporter.spansDataList.length, 0);
 
