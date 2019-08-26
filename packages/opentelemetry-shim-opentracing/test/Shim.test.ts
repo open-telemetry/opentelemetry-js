@@ -93,13 +93,15 @@ describe('OpenTracing Shim', () => {
         ],
       };
       span = shimTracer.startSpan('my-span', opentracingOptions);
-      /* console.log(span.getSpan().links); */
-      /* assert.strictEqual(span.getSpan().links.length, 1) */
+      assert.strictEqual(span.getSpan().links.length, 1);
       assert.strictEqual(
         span.getSpan().startTime,
         opentracingOptions.startTime
       );
-      /* assert.strictEqual(span.getSpan().attributes, opentracingOptions.tags) */
+      assert.deepStrictEqual(
+        span.getSpan().attributes,
+        opentracingOptions.tags
+      );
     });
   });
 
@@ -132,7 +134,6 @@ describe('OpenTracing Shim', () => {
       span.addTags({ hello: 'stars', from: 'earth' });
       assert.strictEqual(otSpan.attributes.hello, 'stars');
       assert.strictEqual(otSpan.attributes.from, 'earth');
-      span.finish();
     });
 
     it('logs KV pairs', () => {

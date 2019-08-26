@@ -35,13 +35,8 @@ function translateSpanOptions(
   options: opentracing.SpanOptions
 ): types.SpanOptions {
   const opts: types.SpanOptions = {
-    attributes: options.tags,
     startTime: options.startTime,
   };
-
-  if (options.references) {
-    opts.links = translateReferences(options.references);
-  }
 
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
@@ -84,10 +79,19 @@ export class TracerShim extends opentracing.Tracer {
     name: string,
     options?: opentracing.SpanOptions = {}
   ): opentracing.Span {
-    return new SpanShim(
-      this,
-      this._tracer.startSpan(name, translateSpanOptions(options))
-    );
+    const span = this._tracer.startSpan(name, translateSpanOptions(options));
+
+    if (options.tags) {
+      span.setAttributes(options.tags);
+    }
+    if (options.references) {
+      const links = translateReferences(options.references);
+      for (const link of links) {
+        span.addLink(link);
+      }
+    }
+
+    return new SpanShim(this, span);
   }
 
   _inject(
@@ -131,13 +135,13 @@ export class TracerShim extends opentracing.Tracer {
           .extract(format, carrier);
         return new SpanContextShim(context);
       case opentracing.FORMAT_BINARY:
-        /* if (!carrier.buffer) { */
-        /*   return; */
-        /* } */
-        /* this._tracer */
-        /*   .getBinaryFormat() */
-        /*   .fromBytes(new Uint8Array(carrier.buffer)); */
-        /* return new SpanContextShim(null); */
+      /* if (!carrier.buffer) { */
+      /*   return; */
+      /* } */
+      /* this._tracer */
+      /*   .getBinaryFormat() */
+      /*   .fromBytes(new Uint8Array(carrier.buffer)); */
+      /* return new SpanContextShim(null); */
       default:
     }
   }
@@ -156,7 +160,6 @@ export class SpanShim extends opentracing.Span {
   }
 
   tracer(): opentracing.Tracer {
-    // https://github.com/open-telemetry/opentelemetry-specification/issues/21
     return this._tracerShim;
   }
 
@@ -166,7 +169,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   finish(finishTime?: number): void {
-    this._span.end();
+    this._span.end(finishTime);
   }
 
   logEvent(eventName: string, payload: unknown): void {
