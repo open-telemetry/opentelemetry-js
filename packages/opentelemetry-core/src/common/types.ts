@@ -14,4 +14,10 @@
  * limitations under the License.
  */
 
-export * from './NodeTracer';
+/** Defines a log levels. */
+export enum LogLevel {
+  ERROR,
+  WARN,
+  INFO,
+  DEBUG,
+}
