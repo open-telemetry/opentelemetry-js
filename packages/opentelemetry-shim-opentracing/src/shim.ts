@@ -70,6 +70,7 @@ export class SpanContextShim extends opentracing.SpanContext {
 }
 
 export class TracerShim extends opentracing.Tracer {
+  private _tracer: types.Tracer;
   constructor(tracer: types.Tracer) {
     super();
     this._tracer = tracer;
@@ -148,6 +149,12 @@ export class TracerShim extends opentracing.Tracer {
 }
 
 export class SpanShim extends opentracing.Span {
+  // _span is the original OpenTelemetry span that we are wrapping with
+  // an opentracing interface.
+  private _span: type.Span;
+  private _contextShim: SpanContextShim;
+  private _tracerShim: TracerShim;
+
   constructor(tracerShim: TracerShim, span: types.Span) {
     super();
     this._span = span;
@@ -169,6 +176,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   finish(finishTime?: number): void {
+    console.log(finishTime);
     this._span.end(finishTime);
   }
 
@@ -189,11 +197,11 @@ export class SpanShim extends opentracing.Span {
   }
 
   getBaggageItem(key: string): string | undefined {
-    // TODO: this should go into the context.
+    // TODO: should this go into the context?
   }
 
   setBaggageItem(key: string, value: string): this {
-    // TODO: this should go into the context.
+    // TODO: should this go into the context?
   }
 
   getSpan(): types.Span {

@@ -6,6 +6,7 @@ import { BasicTracer, Span } from '@opentelemetry/basic-tracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/Shim';
 import { INVALID_SPAN_CONTEXT } from '@opentelemetry/core';
+import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
   const tracer = new BasicTracer({
@@ -115,16 +116,12 @@ describe('OpenTracing Shim', () => {
   });
 
   describe('span', () => {
-    let span: ShimTracer;
+    let span: ShimSpan;
     let otSpan: types.Span;
 
     beforeEach(() => {
       span = shimTracer.startSpan('my-span', { edf: 100 });
       otSpan = (span as SpanShim).getSpan();
-    });
-
-    afterEach(() => {
-      span.finish();
     });
 
     it('sets tags', () => {
@@ -154,6 +151,12 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(otSpan.name, 'my-span');
       span.setOperationName('your-span');
       assert.strictEqual(otSpan.name, 'your-span');
+    });
+
+    it('sets explicit end timestamp', () => {
+      const now = performance.now();
+      span.finish(now);
+      assert.strictEqual(otSpan.endTime, now);
     });
 
     it('can set and retrieve baggage', () => {
