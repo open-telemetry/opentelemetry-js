@@ -176,7 +176,6 @@ export class SpanShim extends opentracing.Span {
   }
 
   finish(finishTime?: number): void {
-    console.log(finishTime);
     this._span.end(finishTime);
   }
 
