@@ -20,3 +20,4 @@ export * from './export/SpanExporter';
 export * from './types';
 export * from './BasicTracer';
 export * from './Span';
+export * from './SpanProcessor';
