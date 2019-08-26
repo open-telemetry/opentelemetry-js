@@ -23,7 +23,7 @@ import {
   isValid,
   randomSpanId,
   NoRecordingSpan,
-  NoopLogger,
+  ConsoleLogger,
 } from '@opentelemetry/core';
 import {
   BinaryFormat,
@@ -55,7 +55,7 @@ export class BasicTracer implements types.Tracer {
     this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
     this._sampler = config.sampler || ALWAYS_SAMPLER;
     this._scopeManager = config.scopeManager;
-    this._logger = config.logger || new NoopLogger();
+    this._logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
   /**

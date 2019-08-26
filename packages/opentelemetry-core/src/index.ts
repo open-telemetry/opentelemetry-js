@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
+export * from './common/types';
 export * from './context/propagation/BinaryTraceContext';
 export * from './context/propagation/HttpTraceContext';
 export * from './platform';
