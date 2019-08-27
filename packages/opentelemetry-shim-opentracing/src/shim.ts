@@ -262,6 +262,7 @@ export class SpanShim extends opentracing.Span {
       (value === true || value === 'true')
     ) {
       this._span.setStatus(CanonicalCode.UNKNOWN);
+      return this;
     }
 
     this._span.setAttribute(key, value);
