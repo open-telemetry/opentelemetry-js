@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
-import { HeaderSetter } from '../../src/types';
 // import * as http from 'http';
 
 export class DummyPropagation implements HttpTextFormat {
@@ -29,9 +28,9 @@ export class DummyPropagation implements HttpTextFormat {
   inject(
     spanContext: SpanContext,
     format: string,
-    headers: HeaderSetter
+    headers: { [custom: string]: string }
   ): void {
-    headers.setHeader(DummyPropagation.TRACE_CONTEXT_KEY, spanContext.traceId);
-    headers.setHeader(DummyPropagation.SPAN_CONTEXT_KEY, spanContext.spanId);
+    headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
+    headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
   }
 }

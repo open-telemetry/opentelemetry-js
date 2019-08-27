@@ -172,6 +172,7 @@ export class Utils {
     let pathname = '/';
     let origin = '';
     let optionsParsed: url.URL | url.UrlWithStringQuery | RequestOptions;
+
     if (typeof options === 'string') {
       optionsParsed = url.parse(options);
       pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
@@ -190,11 +191,14 @@ export class Utils {
           `${options.hostname}:${options.port}`}`;
       } catch (ignore) {}
     }
+
     if (Utils.hasExpectHeader(optionsParsed)) {
       (optionsParsed as RequestOptions).headers = Object.assign(
         {},
         (optionsParsed as RequestOptions).headers
       );
+    } else if (!(optionsParsed as RequestOptions).headers) {
+      (optionsParsed as RequestOptions).headers = {};
     }
     // some packages return method in lowercase..
     // ensure upperCase for consistency

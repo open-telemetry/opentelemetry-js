@@ -40,7 +40,6 @@ import {
   ResponseEndArgs,
   ParsedRequestOptions,
   HttpRequestArgs,
-  HeaderSetter,
 } from './types';
 import { Format } from './enums/format';
 import { AttributeNames } from './enums/attributeNames';
@@ -367,41 +366,11 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       const span = plugin._startHttpSpan(operationName, spanOptions);
-
-      const propagation = plugin._tracer.getHttpTextFormat();
-      let setter: HeaderSetter;
-      const hasExpectHeader = Utils.hasExpectHeader(options as RequestOptions);
-
-      if (hasExpectHeader) {
-        setter = {
-          setHeader(name: string, value: string) {
-            // If outgoing request headers contain the "Expect" header, the
-            // returned ClientRequest will throw an error if any new headers are
-            // added. We need to set the header directly in the headers object
-            // which has been cloned earlier.
-            (options as RequestOptions).headers![name] = value;
-          },
-        };
-        // If outgoing request headers contain the "Expect" header
-        // We must propagate before headers are sent
-        // which is the case when "Expect" header is present and original.apply is called
-        propagation.inject(span.context(), Format.HTTP, setter);
-      }
+      plugin._tracer
+        .getHttpTextFormat()
+        .inject(span.context(), Format.HTTP, options.headers);
 
       const request: ClientRequest = original.apply(this, [options, ...args]);
-
-      if (!hasExpectHeader) {
-        setter = {
-          setHeader(name: string, value: string) {
-            // The returned ClientRequest will throw an error if any new headers are
-            // added when headers are already sent
-            if (!request.headersSent) {
-              request.setHeader(name, value);
-            }
-          },
-        };
-        propagation.inject(span.context(), Format.HTTP, setter);
-      }
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
       plugin._tracer.bind(request);

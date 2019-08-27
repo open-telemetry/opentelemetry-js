@@ -30,10 +30,6 @@ export type HttpCallback = (res: IncomingMessage) => void;
 export type RequestFunction = typeof request;
 export type GetFunction = typeof get;
 
-export interface HeaderSetter {
-  setHeader: (name: string, value: string) => void;
-}
-
 export type HttpCallbackOptional = HttpCallback | undefined;
 
 // from node 10+
