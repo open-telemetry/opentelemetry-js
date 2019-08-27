@@ -38,6 +38,7 @@ function translateSpanOptions(
     startTime: options.startTime,
   };
 
+  // because there's no `Links` in SpanOptions, we set them in `TracerShim.startSpan()`
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
       opts.parent = (options.childOf as SpanShim).getSpan();
@@ -48,29 +49,46 @@ function translateSpanOptions(
   return opts;
 }
 
+/**
+ * SpanContextShim wraps a {@link types.SpanContext} and implements the
+ * OpenTracing span context API.
+ */
 export class SpanContextShim extends opentracing.SpanContext {
-  private _spanContext: types.SpanContext;
+  private readonly _spanContext: types.SpanContext;
 
   constructor(spanContext: types.SpanContext) {
     super();
     this._spanContext = spanContext;
   }
 
+  /**
+   * Returns the underlying {@link types.SpanContext}
+   */
   getSpanContext(): types.SpanContext {
     return this._spanContext;
   }
 
+  /**
+   * Returns the trace ID as a string.
+   */
   toTraceId(): string {
     return this._spanContext.traceId;
   }
 
+  /**
+   * Returns the span ID as a string.
+   */
   toSpanId(): string {
     return this._spanContext.spanId;
   }
 }
 
+/**
+ * TracerShim wraps a {@link types.Tracer} and implements the
+ * OpenTracing span context API.
+ */
 export class TracerShim extends opentracing.Tracer {
-  private _tracer: types.Tracer;
+  private readonly _tracer: types.Tracer;
   constructor(tracer: types.Tracer) {
     super();
     this._tracer = tracer;
@@ -85,6 +103,7 @@ export class TracerShim extends opentracing.Tracer {
     if (options.tags) {
       span.setAttributes(options.tags);
     }
+
     if (options.references) {
       const links = translateReferences(options.references);
       for (const link of links) {
@@ -148,12 +167,17 @@ export class TracerShim extends opentracing.Tracer {
   }
 }
 
+/**
+ * SpanShim wraps an {@link types.Span} and implements the OpenTracing Span API
+ * around it.
+ * @todo: Out of band baggage propagation is not currently supported.
+ */
 export class SpanShim extends opentracing.Span {
   // _span is the original OpenTelemetry span that we are wrapping with
   // an opentracing interface.
-  private _span: type.Span;
-  private _contextShim: SpanContextShim;
-  private _tracerShim: TracerShim;
+  private readonly _span: type.Span;
+  private readonly _contextShim: SpanContextShim;
+  private readonly _tracerShim: TracerShim;
 
   constructor(tracerShim: TracerShim, span: types.Span) {
     super();
@@ -162,37 +186,86 @@ export class SpanShim extends opentracing.Span {
     this._tracerShim = tracerShim;
   }
 
+  /**
+   * Get a reference to the Span's context.
+   *
+   * @returns a {@link SpanContextShim} containing the underlying context.
+   */
   context(): opentracing.SpanContext {
     return this._contextShim;
   }
 
+  /**
+   * Returns the {@link opentracing.Tracer} that created the span.
+   */
   tracer(): opentracing.Tracer {
     return this._tracerShim;
   }
 
+  /**
+   * Updates tthe underlying span's name.
+   *
+   * @param name the Span name.
+   */
   setOperationName(name: string): this {
     this._span.updateName(name);
     return this;
   }
 
+  /**
+   * Finishes the span. Once the span is finished, no new updates can be applied
+   * to the span.
+   *
+   * @param finishTime An optional timestamp to explicitly set the span's end time.
+   */
   finish(finishTime?: number): void {
     this._span.end(finishTime);
   }
 
-  logEvent(eventName: string, payload: unknown): void {
+  /**
+   * Logs an event with an optional payload.
+   * @param eventName name of the event.
+   * @param payload an arbitrary object to be attached to the event.
+   */
+  logEvent(eventName: string, payload?: unknown): void {
     this._span.addEvent(eventName, payload);
   }
 
+  /**
+   * Logs a set of key value pairs. Since OpenTelemetry only supports events,
+   * the KV pairs are used as attributes on an event named "log".
+   */
   log(keyValuePairs: { [key: string]: unknown }, timestamp?: number): this {
-    this._span.addEvent('event', keyValuePairs);
+    // @todo: Handle timestamp
+    this._span.addEvent('log', keyValuePairs);
+    return this;
   }
 
+  /**
+   * Adds a set of tags to the span.
+   * @param keyValueMap set of KV pairs representing tags
+   */
   addTags(keyValueMap: { [key: string]: unknown }): this {
     this._span.setAttributes(keyValueMap);
+    return this;
   }
 
+  /**
+   * Set a tag on the span, updating the value if the key is already present
+   * on the span.
+   * @param key key for the tag
+   * @param value value for the tag
+   */
   setTag(key: string, value: unknown): this {
+    if (
+      key === opentracing.Tags.ERROR &&
+      (value === true || value === 'true')
+    ) {
+      this._span.setStatus(CanonicalCode.UNKNOWN);
+    }
+
     this._span.setAttribute(key, value);
+    return this;
   }
 
   getBaggageItem(key: string): string | undefined {
@@ -201,8 +274,13 @@ export class SpanShim extends opentracing.Span {
 
   setBaggageItem(key: string, value: string): this {
     // TODO: should this go into the context?
+    return this;
   }
 
+  /*
+   * getSpan returns the underlying {@links types.Span} that the shim
+   * is wrapping.
+   */
   getSpan(): types.Span {
     return this._span;
   }
