@@ -46,13 +46,14 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.SAMPLED);
     });
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceOptions: TraceOptions.SAMPLED,
+        traceOptions: TraceOptions.UNSAMPLED,
         traceState: new TraceState('foo=bar,baz=qux'),
       };
 
@@ -62,6 +63,7 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.UNSAMPLED);
     });
 
     it('should not inject empty spancontext', () => {
@@ -72,6 +74,21 @@ describe('B3Format', () => {
       b3Format.inject(emptySpanContext, 'B3Format', carrier);
       assert.deepStrictEqual(carrier[X_B3_TRACE_ID], undefined);
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], undefined);
+    });
+
+    it('should handle absense of sampling decision', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+      };
+
+      b3Format.inject(spanContext, 'B3Format', carrier);
+      assert.deepStrictEqual(
+        carrier[X_B3_TRACE_ID],
+        'd4cda95b652f4a1592b449d5929fda1b'
+      );
+      assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.SAMPLED);
     });
   });
 
@@ -98,6 +115,32 @@ describe('B3Format', () => {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
         traceOptions: TraceOptions.SAMPLED,
+      });
+    });
+
+    it('should extract context of a sampled span from carrier when sampled is mentioned as boolean true flag', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_SAMPLED] = true;
+      const extractedSpanContext = b3Format.extract('B3Format', carrier);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        traceOptions: TraceOptions.SAMPLED,
+      });
+    });
+
+    it('should extract context of a sampled span from carrier when sampled is mentioned as boolean false flag', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_SAMPLED] = false;
+      const extractedSpanContext = b3Format.extract('B3Format', carrier);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        traceOptions: TraceOptions.UNSAMPLED,
       });
     });
 
