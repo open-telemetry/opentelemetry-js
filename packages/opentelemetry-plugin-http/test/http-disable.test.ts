@@ -20,45 +20,12 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../src/http';
-import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '@opentelemetry/node-tracer';
 import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
-
-const httpRequest = {
-  get: (options: {} | string) => {
-    return new Promise((resolve, reject) => {
-      return http.get(options, resp => {
-        let data = '';
-        resp.on('data', chunk => {
-          data += chunk;
-        });
-        resp.on('end', () => {
-          resolve(data);
-        });
-        resp.on('error', err => {
-          reject(err);
-        });
-      });
-    });
-  },
-};
-
-class DummyPropagation implements HttpTextFormat {
-  extract(headers: unknown): SpanContext {
-    return { traceId: 'dummy-trace-id', spanId: 'dummy-span-id' };
-  }
-
-  inject(
-    spanContext: SpanContext,
-    format: string,
-    headers: http.IncomingHttpHeaders
-  ): void {
-    headers['x-dummy-trace-id'] = spanContext.traceId || 'undefined';
-    headers['x-dummy-span-id'] = spanContext.spanId || 'undefined';
-  }
-}
+import { DummyPropagation } from './utils/DummyPropagation';
+import { httpRequest } from './utils/httpRequest';
 
 describe('HttpPlugin', () => {
   let server: http.Server;

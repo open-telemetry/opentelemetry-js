@@ -293,7 +293,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const hostname = headers.host
             ? headers.host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
             : 'localhost';
-          const userAgent = headers['user-agent'] as string;
+          const userAgent = headers['user-agent'];
 
           const attributes: Attributes = {
             [AttributeNames.HTTP_URL]: Utils.getUrlFromIncomingRequest(

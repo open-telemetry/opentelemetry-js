@@ -21,7 +21,7 @@ import {
   ClientRequest,
   IncomingHttpHeaders,
 } from 'http';
-import { IgnoreMatcher, ParsedRequestOptions } from './types';
+import { IgnoreMatcher } from './types';
 import { AttributeNames } from './enums/attributeNames';
 import * as url from 'url';
 
@@ -82,11 +82,12 @@ export class Utils {
    * @param options Options for http.request.
    */
   static hasExpectHeader(options: RequestOptions | url.URL): boolean {
-    return !!(
-      (options as RequestOptions).headers &&
-      ((options as RequestOptions).headers!.Expect ||
-        (options as RequestOptions).headers!.expect)
-    );
+    if (typeof (options as RequestOptions).headers !== 'object') {
+      return false;
+    }
+
+    const keys = Object.keys((options as RequestOptions).headers!);
+    return !!keys.find(key => key.toLowerCase() === 'expect');
   }
 
   /**
@@ -206,22 +207,5 @@ export class Utils {
     method = method ? method.toUpperCase() : 'GET';
 
     return { origin, pathname, method, optionsParsed };
-  }
-
-  static getOutgoingOptions(options: ParsedRequestOptions) {
-    // If outgoing request headers contain the "Expect" header, the returned
-    // ClientRequest will throw an error if any new headers are added.
-    // So we need to clone the options object to be able to inject new
-    // header.
-    if (Utils.hasExpectHeader(options)) {
-      const safeOptions = Object.assign({}, options);
-      safeOptions.headers = Object.assign({}, options.headers);
-      return safeOptions;
-    }
-
-    if (!options.headers) {
-      options.headers = {};
-    }
-    return options;
   }
 }

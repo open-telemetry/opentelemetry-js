@@ -58,26 +58,13 @@ describe('Utils', () => {
       assert.strictEqual(result, false);
     });
 
-    it('should return true on Expect', () => {
-      const result = Utils.hasExpectHeader({
-        headers: { Expect: 1 },
-      } as http.RequestOptions);
-      assert.strictEqual(result, true);
-    });
-  });
-
-  describe('getOutgoingOptions()', () => {
-    it('should get options object', () => {
-      const options = Object.assign(
-        { headers: { Expect: '100-continue' } },
-        url.parse('http://google.fr/')
-      );
-      const result = Utils.getOutgoingOptions(options);
-      assert.strictEqual(result.hostname, 'google.fr');
-      assert.strictEqual(result.headers!.Expect, options.headers.Expect);
-      assert.strictEqual(result.protocol, 'http:');
-      assert.strictEqual(result.path, '/');
-      assert.strictEqual((result as url.URL).pathname, '/');
+    it('should return true on Expect (no case sensitive)', () => {
+      for (const headers of [{ Expect: 1 }, { expect: 1 }, { ExPect: 1 }]) {
+        const result = Utils.hasExpectHeader({
+          headers,
+        } as http.RequestOptions);
+        assert.strictEqual(result, true);
+      }
     });
   });
 
