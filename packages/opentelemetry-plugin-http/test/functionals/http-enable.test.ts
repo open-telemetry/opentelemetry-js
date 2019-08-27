@@ -15,18 +15,17 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { SpanKind, Span } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
-import { HttpPlugin, plugin } from '../src/http';
-import { assertSpan } from './utils/assertSpan';
-import { DummyPropagation } from './utils/DummyPropagation';
-import { httpRequest } from './utils/httpRequest';
-import { ProxyTracer } from './utils/ProxyTracer';
-import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
+import { HttpPlugin, plugin } from '../../src/http';
+import { assertSpan } from '../utils/assertSpan';
+import { DummyPropagation } from '../utils/DummyPropagation';
+import { httpRequest } from '../utils/httpRequest';
+import { TracerTest } from '../utils/TracerTest';
+import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
 import * as url from 'url';
 
 let server: http.Server;
@@ -71,12 +70,14 @@ describe('HttpPlugin', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const realTracer = new NodeTracer({
-      scopeManager,
-      logger,
-      httpTextFormat,
-    });
-    const tracer = new ProxyTracer(realTracer, audit);
+    const tracer = new TracerTest(
+      {
+        scopeManager,
+        logger,
+        httpTextFormat,
+      },
+      audit
+    );
     beforeEach(() => {
       audit.reset();
     });
@@ -124,8 +125,6 @@ describe('HttpPlugin', () => {
           };
 
           assert.strictEqual(spans.length, 2);
-          assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-          assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
           assertSpan(incomingSpan, SpanKind.SERVER, validations);
           assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
           done();
@@ -350,8 +349,6 @@ describe('HttpPlugin', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
         };
-        assert.ok(result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-        assert.ok(result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
         assertSpan(span, SpanKind.CLIENT, validations);
       });
       nock.disableNetConnect();

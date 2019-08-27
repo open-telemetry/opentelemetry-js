@@ -18,8 +18,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
 import { CanonicalCode, Attributes } from '@opentelemetry/types';
-import { IgnoreMatcher } from '../src/types';
-import { Utils } from '../src/utils';
+import { IgnoreMatcher } from '../../src/types';
+import { Utils } from '../../src/utils';
 import * as http from 'http';
 
 describe('Utils', () => {

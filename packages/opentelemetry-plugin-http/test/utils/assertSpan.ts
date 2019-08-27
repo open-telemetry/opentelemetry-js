@@ -21,10 +21,10 @@ import { AttributeNames } from '../../src/enums/attributeNames';
 import { HttpPlugin } from '../../src/http';
 import { Utils } from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { SpanAudit } from './SpanAudit';
+import { ReadableSpan } from '@opentelemetry/basic-tracer';
 
 export const assertSpan = (
-  span: SpanAudit,
+  span: ReadableSpan,
   kind: SpanKind,
   validations: {
     httpStatusCode: number;
@@ -67,7 +67,7 @@ export const assertSpan = (
     span.attributes[AttributeNames.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
-  assert.strictEqual(span.ended, true);
+  assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
   assert.deepStrictEqual(
@@ -90,5 +90,8 @@ export const assertSpan = (
 
   if (span.kind === SpanKind.SERVER) {
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
+  } else if (validations.reqHeaders) {
+    assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
+    assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
   }
 };

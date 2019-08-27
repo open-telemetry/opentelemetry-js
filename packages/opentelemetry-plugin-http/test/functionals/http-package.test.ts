@@ -15,22 +15,22 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { SpanKind, Span } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
-import { plugin } from '../src/http';
-import { assertSpan } from './utils/assertSpan';
-import { DummyPropagation } from './utils/DummyPropagation';
-import { ProxyTracer } from './utils/ProxyTracer';
-import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
+import { plugin } from '../../src/http';
+import { assertSpan } from '../utils/assertSpan';
+import { DummyPropagation } from '../utils/DummyPropagation';
+import { TracerTest } from '../utils/TracerTest';
+import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
 import * as url from 'url';
 import axios, { AxiosResponse } from 'axios';
 import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
+import * as path from 'path';
 
 const audit = new SpanAuditProcessor();
 
@@ -43,12 +43,15 @@ describe('Packages', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const realTracer = new NodeTracer({
-      scopeManager,
-      logger,
-      httpTextFormat,
-    });
-    const tracer = new ProxyTracer(realTracer, audit);
+
+    const tracer = new TracerTest(
+      {
+        scopeManager,
+        logger,
+        httpTextFormat,
+      },
+      audit
+    );
     beforeEach(() => {
       audit.reset();
     });
@@ -81,7 +84,7 @@ describe('Packages', () => {
           nock.cleanAll();
           nock.enableNetConnect();
         } else {
-          nock.load(__dirname + '/fixtures/google.json');
+          nock.load(path.join(__dirname, '../', '/fixtures/google.json'));
         }
 
         const urlparsed = url.parse(

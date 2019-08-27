@@ -19,13 +19,13 @@ import * as http from 'http';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 
-import { plugin } from '../src/http';
+import { plugin } from '../../src/http';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '@opentelemetry/node-tracer';
 import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
-import { DummyPropagation } from './utils/DummyPropagation';
-import { httpRequest } from './utils/httpRequest';
+import { DummyPropagation } from '../utils/DummyPropagation';
+import { httpRequest } from '../utils/httpRequest';
 
 describe('HttpPlugin', () => {
   let server: http.Server;
