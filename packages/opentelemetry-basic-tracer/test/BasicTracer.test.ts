@@ -70,6 +70,59 @@ describe('BasicTracer', () => {
       assert.ok(tracer instanceof BasicTracer);
     });
 
+    it('should construct an instance with default trace params', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
+        numberOfAttributesPerSpan: 32,
+        numberOfEventsPerSpan: 128,
+        numberOfLinksPerSpan: 32,
+      });
+    });
+
+    it('should construct an instance with customized numberOfAttributesPerSpan trace params', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        traceParams: {
+          numberOfAttributesPerSpan: 100,
+        },
+      });
+      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
+        numberOfAttributesPerSpan: 100,
+        numberOfEventsPerSpan: 128,
+        numberOfLinksPerSpan: 32,
+      });
+    });
+
+    it('should construct an instance with customized numberOfEventsPerSpan trace params', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        traceParams: {
+          numberOfEventsPerSpan: 300,
+        },
+      });
+      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
+        numberOfAttributesPerSpan: 32,
+        numberOfEventsPerSpan: 300,
+        numberOfLinksPerSpan: 32,
+      });
+    });
+
+    it('should construct an instance with customized numberOfLinksPerSpan trace params', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        traceParams: {
+          numberOfLinksPerSpan: 10,
+        },
+      });
+      assert.deepStrictEqual(tracer.getActiveTraceParams(), {
+        numberOfAttributesPerSpan: 32,
+        numberOfEventsPerSpan: 128,
+        numberOfLinksPerSpan: 10,
+      });
+    });
+
     it('should construct an instance with default attributes', () => {
       const tracer = new BasicTracer({
         defaultAttributes: {

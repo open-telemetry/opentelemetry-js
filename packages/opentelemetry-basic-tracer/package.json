@@ -38,6 +38,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/extend": "^3.0.0",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
     "codecov": "^3.1.0",
@@ -51,6 +52,7 @@
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/types": "^0.0.1",
+    "extend": "^3.0.2"
   }
 }
