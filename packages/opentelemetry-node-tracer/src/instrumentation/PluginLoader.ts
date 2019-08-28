@@ -103,7 +103,7 @@ export class PluginLoader {
           const plugin: Plugin = require(moduleName).plugin;
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer);
+          return plugin.enable(exports, this.tracer, this.logger);
         } catch (e) {
           this.logger.error(
             `PluginLoader#load: could not load plugin ${moduleName} of module ${name}. Error: ${e.message}`
