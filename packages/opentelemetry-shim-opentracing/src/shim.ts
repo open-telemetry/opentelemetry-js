@@ -24,8 +24,10 @@ function translateReferences(
   for (const reference of references) {
     const context = reference.referencedContext();
     if (context instanceof SpanContextShim) {
-      // TODO: what to do about reference.type
-      links.push({ spanContext: context.getSpanContext() });
+      links.push({
+        spanContext: (context as SpanContextShim).getSpanContext(),
+        attributes: { 'span.kind': reference.type },
+      });
     }
   }
   return links;
@@ -96,7 +98,7 @@ export class TracerShim extends opentracing.Tracer {
 
   startSpan(
     name: string,
-    options?: opentracing.SpanOptions = {}
+    options: opentracing.SpanOptions = {}
   ): opentracing.Span {
     const span = this._tracer.startSpan(name, translateSpanOptions(options));
 
@@ -107,7 +109,7 @@ export class TracerShim extends opentracing.Tracer {
     if (options.references) {
       const links = translateReferences(options.references);
       for (const link of links) {
-        span.addLink(link);
+        span.addLink(link.spanContext, link.attributes);
       }
     }
 
@@ -119,14 +121,11 @@ export class TracerShim extends opentracing.Tracer {
     format: string,
     carrier: unknown
   ): void {
-    if (!spanContext instanceof SpanContextShim) {
-      return;
-    }
-
     const opentelemSpanContext: types.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     switch (format) {
-      case opentracing.FORMAT_TEXT_MAP:
+      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
+      case opentracing.FORMAT_TEXT_MAP:
         this._tracer
           .getHttpTextFormat()
           .inject(opentelemSpanContext, format, carrier);
@@ -146,24 +145,30 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  _extract(format: string, carrier: unknown): SpanContext | null {
+  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     switch (format) {
-      case opentracing.FORMAT_TEXT_MAP:
+      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
+      case opentracing.FORMAT_TEXT_MAP:
         const context = this._tracer
           .getHttpTextFormat()
           .extract(format, carrier);
+        if (!context) {
+          return null;
+        }
         return new SpanContextShim(context);
       case opentracing.FORMAT_BINARY:
-      /* if (!carrier.buffer) { */
-      /*   return; */
-      /* } */
-      /* this._tracer */
-      /*   .getBinaryFormat() */
-      /*   .fromBytes(new Uint8Array(carrier.buffer)); */
-      /* return new SpanContextShim(null); */
+        /* if (!carrier.buffer) { */
+        /*   return; */
+        /* } */
+        /* this._tracer */
+        /*   .getBinaryFormat() */
+        /*   .fromBytes(new Uint8Array(carrier.buffer)); */
+        /* return new SpanContextShim(null); */
+        return null;
       default:
     }
+    return null;
   }
 }
 
@@ -175,7 +180,7 @@ export class TracerShim extends opentracing.Tracer {
 export class SpanShim extends opentracing.Span {
   // _span is the original OpenTelemetry span that we are wrapping with
   // an opentracing interface.
-  private readonly _span: type.Span;
+  private readonly _span: types.Span;
   private readonly _contextShim: SpanContextShim;
   private readonly _tracerShim: TracerShim;
 
@@ -228,7 +233,11 @@ export class SpanShim extends opentracing.Span {
    * @param payload an arbitrary object to be attached to the event.
    */
   logEvent(eventName: string, payload?: unknown): void {
-    this._span.addEvent(eventName, payload);
+    let attrs: types.Attributes = {};
+    if (payload) {
+      attrs = { payload };
+    }
+    this._span.addEvent(eventName, attrs);
   }
 
   /**
@@ -261,7 +270,7 @@ export class SpanShim extends opentracing.Span {
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')
     ) {
-      this._span.setStatus(CanonicalCode.UNKNOWN);
+      this._span.setStatus({ code: types.CanonicalCode.UNKNOWN });
       return this;
     }
 
@@ -271,6 +280,7 @@ export class SpanShim extends opentracing.Span {
 
   getBaggageItem(key: string): string | undefined {
     // TODO: should this go into the context?
+    return undefined;
   }
 
   setBaggageItem(key: string, value: string): this {

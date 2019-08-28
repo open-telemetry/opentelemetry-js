@@ -33,10 +33,12 @@ describe('OpenTracing Shim', () => {
 
   describe('TracerShim', () => {
     let span: opentracing.Span;
+    let spanShim: SpanShim;
     let context: opentracing.SpanContext;
 
     beforeEach(() => {
       span = shimTracer.startSpan('my-span');
+      spanShim = span as SpanShim;
       context = span.context();
     });
 
@@ -83,7 +85,9 @@ describe('OpenTracing Shim', () => {
     });
 
     it('creates parent/child relationship using a span object', () => {
-      const childSpan = shimTracer.startSpan('other-span', { childOf: span });
+      const childSpan = shimTracer.startSpan('other-span', {
+        childOf: span,
+      }) as SpanShim;
       assert.strictEqual(childSpan.getSpan().parentSpanId, context.toSpanId());
       assert.strictEqual(
         childSpan.context().toTraceId(),
@@ -110,7 +114,7 @@ describe('OpenTracing Shim', () => {
         ],
       };
       span = shimTracer.startSpan('my-span', opentracingOptions);
-      assert.strictEqual(span.getSpan().links.length, 1);
+      assert.strictEqual((span.getSpan() as Span).links.length, 1);
       assert.strictEqual(
         span.getSpan().startTime,
         opentracingOptions.startTime
@@ -132,12 +136,12 @@ describe('OpenTracing Shim', () => {
   });
 
   describe('span', () => {
-    let span: ShimSpan;
-    let otSpan: types.Span;
+    let span: SpanShim;
+    let otSpan: Span;
 
     beforeEach(() => {
-      span = shimTracer.startSpan('my-span', { edf: 100 });
-      otSpan = (span as SpanShim).getSpan();
+      span = shimTracer.startSpan('my-span', { startTime: 100 }) as SpanShim;
+      otSpan = (span as SpanShim).getSpan() as Span;
     });
 
     it('sets tags', () => {
@@ -160,7 +164,7 @@ describe('OpenTracing Shim', () => {
       const payload = { user: 'payload', request: 1 };
       span.logEvent('some log', payload);
       assert.strictEqual(otSpan.events[0].name, 'some log');
-      assert.strictEqual(otSpan.events[0].attributes, payload);
+      assert.deepStrictEqual(otSpan.events[0].attributes, { payload: payload });
     });
 
     it('updates the name', () => {
