@@ -83,7 +83,7 @@ describe('HttpPlugin', () => {
     });
 
     before(() => {
-      plugin.enable(http, tracer);
+      plugin.enable(http, tracer, tracer.logger);
       const ignoreConfig = [
         `http://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,

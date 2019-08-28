@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-import { BasePlugin, NoopLogger, isValid } from '@opentelemetry/core';
-import {
-  Span,
-  SpanKind,
-  SpanOptions,
-  Logger,
-  Tracer,
-  Attributes,
-} from '@opentelemetry/types';
+import { BasePlugin, isValid } from '@opentelemetry/core';
+import { Span, SpanKind, SpanOptions, Attributes } from '@opentelemetry/types';
 import {
   ClientRequest,
   IncomingMessage,
@@ -51,14 +44,9 @@ import { Utils } from './utils';
 export class HttpPlugin extends BasePlugin<Http> {
   static readonly component = 'http';
   options!: HttpPluginConfig;
-  protected _logger!: Logger;
-  protected readonly _tracer!: Tracer;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
-    // TODO: remove this once a logger will be passed
-    // https://github.com/open-telemetry/opentelemetry-js/issues/193
-    this._logger = new NoopLogger();
     // TODO: remove this once options will be passed
     // see https://github.com/open-telemetry/opentelemetry-js/issues/210
     this.options = {};

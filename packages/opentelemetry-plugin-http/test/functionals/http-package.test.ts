@@ -57,7 +57,7 @@ describe('Packages', () => {
     });
 
     before(() => {
-      plugin.enable(http, tracer);
+      plugin.enable(http, tracer, tracer.logger);
     });
 
     after(() => {

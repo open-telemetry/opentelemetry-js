@@ -44,7 +44,7 @@ describe('HttpPlugin', () => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable(http, tracer);
+      plugin.enable(http, tracer, tracer.logger);
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
