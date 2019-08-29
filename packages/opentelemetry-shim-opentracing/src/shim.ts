@@ -289,7 +289,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   /*
-   * getSpan returns the underlying {@links types.Span} that the shim
+   * Returns the underlying {@link types.Span} that the shim
    * is wrapping.
    */
   getSpan(): types.Span {
