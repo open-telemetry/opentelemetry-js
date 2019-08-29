@@ -87,7 +87,10 @@ describe('OpenTracing Shim', () => {
       const childSpan = shimTracer.startSpan('other-span', {
         childOf: span,
       }) as SpanShim;
-      assert.strictEqual((childSpan.getSpan() as Span).parentSpanId, context.toSpanId());
+      assert.strictEqual(
+        (childSpan.getSpan() as Span).parentSpanId,
+        context.toSpanId()
+      );
       assert.strictEqual(
         childSpan.context().toTraceId(),
         span.context().toTraceId()
@@ -98,7 +101,10 @@ describe('OpenTracing Shim', () => {
       const childSpan = shimTracer.startSpan('other-span', {
         childOf: context,
       }) as SpanShim;
-      assert.strictEqual((childSpan.getSpan() as Span).parentSpanId, context.toSpanId());
+      assert.strictEqual(
+        (childSpan.getSpan() as Span).parentSpanId,
+        context.toSpanId()
+      );
       assert.strictEqual(
         childSpan.context().toTraceId(),
         span.context().toTraceId()
@@ -109,23 +115,15 @@ describe('OpenTracing Shim', () => {
       const opentracingOptions: opentracing.SpanOptions = {
         startTime: 123,
         tags: { key: 'value', count: 1 },
-        references: [
-          opentracing.followsFrom(context),
-        ],
+        references: [opentracing.followsFrom(context)],
       };
       span = shimTracer.startSpan('my-span', opentracingOptions);
 
       const otSpan = (span as SpanShim).getSpan() as Span;
 
       assert.strictEqual(otSpan.links.length, 1);
-      assert.strictEqual(
-        otSpan.startTime,
-        opentracingOptions.startTime
-      );
-      assert.deepStrictEqual(
-        otSpan.attributes,
-        opentracingOptions.tags
-      );
+      assert.strictEqual(otSpan.startTime, opentracingOptions.startTime);
+      assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
     });
   });
 
@@ -167,7 +165,7 @@ describe('OpenTracing Shim', () => {
       const payload = { user: 'payload', request: 1 };
       span.logEvent('some log', payload);
       assert.strictEqual(otSpan.events[0].name, 'some log');
-      assert.deepStrictEqual(otSpan.events[0].attributes, { payload: payload });
+      assert.deepStrictEqual(otSpan.events[0].attributes, { payload });
     });
 
     it('updates the name', () => {
