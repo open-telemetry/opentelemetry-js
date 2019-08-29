@@ -88,7 +88,7 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.SAMPLED);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], undefined);
     });
   });
 

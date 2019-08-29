@@ -52,12 +52,10 @@ export class B3Format implements HttpTextFormat {
       carrier[X_B3_TRACE_ID] = spanContext.traceId;
       carrier[X_B3_SPAN_ID] = spanContext.spanId;
 
-      if (spanContext.traceOptions === undefined) {
-        carrier[X_B3_SAMPLED] = TraceOptions.SAMPLED;
-      } else {
-        carrier[X_B3_SAMPLED] = Number(
-          spanContext.traceOptions || TraceOptions.UNSAMPLED
-        );
+      // We set the header only if there is an existing sampling decision.
+      // Otherwise we will omit it => Absent.
+      if (spanContext.traceOptions !== undefined) {
+        carrier[X_B3_SAMPLED] = Number(spanContext.traceOptions);
       }
     }
   }
