@@ -192,7 +192,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   /**
-   * Get a reference to the Span's context.
+   * Returns a reference to the Span's context.
    *
    * @returns a {@link SpanContextShim} containing the underlying context.
    */
