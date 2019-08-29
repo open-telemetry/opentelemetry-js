@@ -22,7 +22,7 @@ import {
 import * as jaegerTypes from './types';
 import { ConsoleLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { toJaegerSpan } from './transform';
+import { spanToThrift } from './transform';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -64,11 +64,15 @@ export class JaegerExporter implements SpanExporter {
     spans: ReadableSpan[],
     done?: (result: ExportResult) => void
   ) {
-    const jaegerSpans = spans.map(span => toJaegerSpan(span));
-    this._sender.append
-    return this._send(jaegerSpans, (result: ExportResult) => {
-      if (done) {
-        return done(result);
+    const thriftSpan = spans.map(span => spanToThrift(span));
+
+    this._sender.append(thriftSpan, (numSpans: number, err?: string) => {
+      if (err) {
+        this._logger.error(`failed to append span: ${err}`);
+        if (done) return done(ExportResult.FailedNonRetryable);
+      } else {
+        this._logger.debug('successful append for : %s', numSpans);
+        if (done) return done(ExportResult.Success);
       }
     });
   }

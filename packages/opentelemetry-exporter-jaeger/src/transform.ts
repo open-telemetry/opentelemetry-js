@@ -25,47 +25,43 @@ import {
   ThriftUtils,
   Utils,
   ThriftReference,
+  TagValue,
 } from './types';
 
 const MICROS_PER_MILLI = 1000;
 
 /**
- * Translate OpenTelemetry ReadableSpan to JaegerSpan format
+ * Translate OpenTelemetry ReadableSpan to Jaeger Thrift Span
  * @param span Span to be translated
  */
-export function toJaegerSpan(span: ReadableSpan): ThriftSpan {
-  const tags: Tag[] = [];
-  // @todo: use .map
-  Object.keys(span.attributes).forEach(key => {
-    tags.push({ key, value: String(span.attributes[key]) });
-  });
-
-  const logs: Log[] = [];
-  // @todo: use .map
-  span.events.forEach(event => {
-    logs.push({
-      timestamp: event.time,
-      fields: [{ key: 'message.id', value: event.name }],
-    });
-  });
-
-  const parentSpan: string | Buffer = span.parentSpanId
+export function spanToThrift(span: ReadableSpan): ThriftSpan {
+  const traceIdHigh = span.spanContext.traceId.slice(0, 16);
+  const traceIdLow = span.spanContext.traceId.slice(16);
+  const parentSpan = span.parentSpanId
     ? Utils.encodeInt64(span.parentSpanId)
     : ThriftUtils.emptyBuffer;
 
-  const traceId = span.spanContext.traceId;
-  const high = traceId.slice(0, 16);
-  const low = traceId.slice(16);
+  const tags = Object.keys(span.attributes).map(
+    (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
+  );
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
+
+  const logs = span.events.map(
+    (event): Log => ({
+      timestamp: event.time,
+      fields: [{ key: 'message.id', value: event.name }],
+      // @todo: decide what to do with event attributes
+    })
+  );
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
   return {
-    traceIdLow: Utils.encodeInt64(low),
-    traceIdHigh: Utils.encodeInt64(high),
+    traceIdLow: Utils.encodeInt64(traceIdLow),
+    traceIdHigh: Utils.encodeInt64(traceIdHigh),
     spanId: Utils.encodeInt64(span.spanContext.spanId),
     parentSpanId: parentSpan,
     operationName: span.name,
-    references: getThriftReference(span.links),
+    references: spanLinksToThriftRefs(span.links),
     flags: span.spanContext.traceOptions || 0x1,
     startTime: Utils.encodeInt64(span.startTime * MICROS_PER_MILLI),
     duration: Utils.encodeInt64(
@@ -76,7 +72,8 @@ export function toJaegerSpan(span: ReadableSpan): ThriftSpan {
   };
 }
 
-function getThriftReference(links: Link[]): ThriftReference[] {
+/** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
+function spanLinksToThriftRefs(links: Link[]): ThriftReference[] {
   return links
     .map((link): ThriftReference | null => {
       // @todo: decide how to handle type, OT Link doesn't have type
@@ -91,4 +88,15 @@ function getThriftReference(links: Link[]): ThriftReference[] {
       return { traceIdLow, traceIdHigh, spanId, refType };
     })
     .filter(ref => !!ref) as ThriftReference[];
+}
+
+/** Translate OpenTelemetry attribute value to Jaeger TagValue. */
+function toTagValue(value: unknown): TagValue {
+  const valueType = typeof value;
+  if (valueType === 'boolean') {
+    return value as boolean;
+  } else if (valueType === 'number') {
+    return value as number;
+  }
+  return String(value);
 }
