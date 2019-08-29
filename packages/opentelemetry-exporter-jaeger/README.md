@@ -50,7 +50,22 @@ npm install --save @opentelemetry/exporter-jaeger
 ```
 
 ## Usage
-> TODO
+
+Install the exporter on your application and pass the options, it must contain a service name.
+
+```
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+
+const options = {
+  serviceName: 'my-service',
+  tags: [], // optional
+  host: 'localhost', // optional
+  port: 6832, // optional
+  maxPacketSize: 65000 // optional
+}
+const exporter = new JaegerExporter(options);
+```
+> TODO : add how to register the exporter.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

@@ -23,9 +23,9 @@ export interface ExporterConfig {
   logger?: types.Logger;
   serviceName: string;
   tags?: Tag[];
-  host?: string;
-  port?: number;
-  maxPacketSize?: number;
+  host?: string; // default: 'localhost'
+  port?: number; // default: 6832
+  maxPacketSize?: number; // default: 65000
 }
 
 // tslint:disable-next-line:variable-name

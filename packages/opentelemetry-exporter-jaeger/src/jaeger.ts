@@ -30,7 +30,7 @@ import { spanToThrift } from './transform';
 export class JaegerExporter implements SpanExporter {
   private readonly _logger: types.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
-  private readonly _sender: typeof jaegerTypes.UDPSender;
+  private _sender: typeof jaegerTypes.UDPSender;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new ConsoleLogger();
@@ -65,15 +65,15 @@ export class JaegerExporter implements SpanExporter {
     done?: (result: ExportResult) => void
   ) {
     const thriftSpan = spans.map(span => spanToThrift(span));
-
-    this._sender.append(thriftSpan, (numSpans: number, err?: string) => {
-      if (err) {
-        this._logger.error(`failed to append span: ${err}`);
-        if (done) return done(ExportResult.FailedNonRetryable);
-      } else {
-        this._logger.debug('successful append for : %s', numSpans);
-        if (done) return done(ExportResult.Success);
-      }
-    });
+    for (const span of thriftSpan) {
+      this._sender.append(span, (numSpans: number, err?: string) => {
+        if (err) {
+          this._logger.error(`failed to append span: ${err}`);
+          if (done) return done(ExportResult.FailedNonRetryable);
+        }
+      });
+    }
+    this._logger.debug('successful append for : %s', thriftSpan.length);
+    if (done) return done(ExportResult.Success);
   }
 }
