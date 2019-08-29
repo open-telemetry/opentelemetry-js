@@ -208,7 +208,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   /**
-   * Updates tthe underlying span's name.
+   * Updates the underlying span's name.
    *
    * @param name the Span name.
    */
