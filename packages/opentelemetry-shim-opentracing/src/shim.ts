@@ -260,7 +260,7 @@ export class SpanShim extends opentracing.Span {
   }
 
   /**
-   * Set a tag on the span, updating the value if the key is already present
+   * Sets a tag on the span, updating the value if the key is already present
    * on the span.
    * @param key key for the tag
    * @param value value for the tag
