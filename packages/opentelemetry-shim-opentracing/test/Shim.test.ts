@@ -15,12 +15,10 @@
  */
 
 import * as assert from 'assert';
-import * as types from '@opentelemetry/types';
 import * as opentracing from 'opentracing';
-import { Tracer } from 'opentracing';
 import { BasicTracer, Span } from '@opentelemetry/basic-tracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { TracerShim, SpanShim, SpanContextShim } from '../src/Shim';
+import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
 import { INVALID_SPAN_CONTEXT } from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 
@@ -33,12 +31,10 @@ describe('OpenTracing Shim', () => {
 
   describe('TracerShim', () => {
     let span: opentracing.Span;
-    let spanShim: SpanShim;
     let context: opentracing.SpanContext;
 
     beforeEach(() => {
       span = shimTracer.startSpan('my-span');
-      spanShim = span as SpanShim;
       context = span.context();
     });
 
@@ -50,8 +46,9 @@ describe('OpenTracing Shim', () => {
           opentracing.FORMAT_HTTP_HEADERS,
           carrier
         );
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
+        assert.ok(extractedContext !== null);
+        assert.strictEqual(context.toTraceId(), extractedContext!.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext!.toSpanId());
       });
 
       it('injects/extracts HTTP carriers', () => {
@@ -61,8 +58,9 @@ describe('OpenTracing Shim', () => {
           opentracing.FORMAT_HTTP_HEADERS,
           carrier
         );
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
+        assert.ok(extractedContext !== null);
+        assert.strictEqual(context.toTraceId(), extractedContext!.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext!.toSpanId());
       });
 
       it('injects/extracts TextMap carriers', () => {
@@ -72,8 +70,9 @@ describe('OpenTracing Shim', () => {
           opentracing.FORMAT_TEXT_MAP,
           carrier
         );
-        assert.strictEqual(context.toTraceId(), extractedContext.toTraceId());
-        assert.strictEqual(context.toSpanId(), extractedContext.toSpanId());
+        assert.ok(extractedContext !== null);
+        assert.strictEqual(context.toTraceId(), extractedContext!.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext!.toSpanId());
       });
 
       it('injects/extracts Binary carriers', () => {
@@ -88,17 +87,18 @@ describe('OpenTracing Shim', () => {
       const childSpan = shimTracer.startSpan('other-span', {
         childOf: span,
       }) as SpanShim;
-      assert.strictEqual(childSpan.getSpan().parentSpanId, context.toSpanId());
+      assert.strictEqual((childSpan.getSpan() as Span).parentSpanId, context.toSpanId());
       assert.strictEqual(
         childSpan.context().toTraceId(),
         span.context().toTraceId()
       );
     });
+
     it('creates parent/child relationship using a context object', () => {
       const childSpan = shimTracer.startSpan('other-span', {
         childOf: context,
-      });
-      assert.strictEqual(childSpan.getSpan().parentSpanId, context.toSpanId());
+      }) as SpanShim;
+      assert.strictEqual((childSpan.getSpan() as Span).parentSpanId, context.toSpanId());
       assert.strictEqual(
         childSpan.context().toTraceId(),
         span.context().toTraceId()
@@ -110,17 +110,20 @@ describe('OpenTracing Shim', () => {
         startTime: 123,
         tags: { key: 'value', count: 1 },
         references: [
-          new opentracing.Reference(opentracing.FOLLOWS_FROM, context),
+          opentracing.followsFrom(context),
         ],
       };
       span = shimTracer.startSpan('my-span', opentracingOptions);
-      assert.strictEqual((span.getSpan() as Span).links.length, 1);
+
+      const otSpan = (span as SpanShim).getSpan() as Span;
+
+      assert.strictEqual(otSpan.links.length, 1);
       assert.strictEqual(
-        span.getSpan().startTime,
+        otSpan.startTime,
         opentracingOptions.startTime
       );
       assert.deepStrictEqual(
-        span.getSpan().attributes,
+        otSpan.attributes,
         opentracingOptions.tags
       );
     });
