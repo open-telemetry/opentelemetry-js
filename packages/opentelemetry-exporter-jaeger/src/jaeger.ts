@@ -20,7 +20,7 @@ import {
   ExportResult,
 } from '@opentelemetry/basic-tracer';
 import * as jaegerTypes from './types';
-import { ConsoleLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { spanToThrift } from './transform';
 
@@ -33,7 +33,7 @@ export class JaegerExporter implements SpanExporter {
   private _sender: typeof jaegerTypes.UDPSender;
 
   constructor(config: jaegerTypes.ExporterConfig) {
-    this._logger = config.logger || new ConsoleLogger();
+    this._logger = config.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = config.tags || [];
 
     this._sender = new jaegerTypes.UDPSender(config);
