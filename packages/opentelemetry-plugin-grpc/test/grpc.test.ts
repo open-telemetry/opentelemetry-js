@@ -22,9 +22,10 @@ import * as grpc from 'grpc';
 import { GrpcPlugin, plugin } from '../src';
 import { SendUnaryDataCallback } from '../src/grpc-types';
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind, Tracer } from '@opentelemetry/types';
 import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
 import { ProxyTracer } from './utils/ProxyTracer';
+import { SpanAudit } from './utils/SpanAudit';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
 const audit = new SpanAuditProcessor();
@@ -338,7 +339,10 @@ describe('GrpcPlugin', () => {
           if (checkSpans) {
             const incomingSpan = spans[1];
             const outgoingSpan = spans[0];
-            const validations = {};
+            const validations = {
+              name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+              status: grpc.status.OK,
+            };
 
             assert.strictEqual(spans.length, 2);
             assertSpan(incomingSpan, SpanKind.SERVER, validations);
@@ -348,6 +352,103 @@ describe('GrpcPlugin', () => {
             assert.strictEqual(spans.length, 0);
           }
         });
+    });
+  };
+
+  const insertError = (
+    request: TestRequestResponse | TestRequestResponse[]
+  ) => (code: number) =>
+    request instanceof Array
+      ? request.splice(0, 0, { num: code }) && request.slice(0, request.length)
+      : { num: code };
+
+  const runErrorTest = (
+    method: typeof methodList[0],
+    key: string,
+    errorCode: number,
+    tracer: Tracer
+  ) => {
+    it(`should raise an error for client/server rootSpans: method=${method.methodName}, status=${key}`, async () => {
+      const expectEmpty = audit.processSpans();
+      assert.strictEqual(expectEmpty.length, 0);
+
+      const errRequest =
+        method.request instanceof Array
+          ? method.request.slice(0, method.request.length)
+          : method.request;
+      const args = [client, insertError(errRequest)(errorCode)];
+
+      // tslint:disable-next-line:no-any
+      await (method.method as any)
+        .apply({}, args)
+        .then(() => {
+          assert.ok(false);
+        })
+        .catch((err: grpc.ServiceError) => {
+          const spans = audit.processSpans();
+          assert.strictEqual(spans.length, 2, 'Expect 2 ended spans');
+
+          const validations = {
+            name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+            status: errorCode,
+          };
+          const clientRoot = spans[0];
+          const serverRoot = spans[1];
+          assertSpan(serverRoot, SpanKind.SERVER, validations);
+          assertSpan(clientRoot, SpanKind.CLIENT, validations);
+          assertPropagation(serverRoot, clientRoot);
+        });
+    });
+
+    it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = ${key}`, () => {
+      const expectEmpty = audit.processSpans();
+      assert.strictEqual(expectEmpty.length, 0);
+
+      let serverSpan: SpanAudit;
+      const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      return tracer.withSpan(span, async () => {
+        const rootSpan = tracer.getCurrentSpan();
+        if (!rootSpan) {
+          assert.ok(false);
+          return; // return so typechecking passes for rootSpan.end()
+        }
+        assert.deepStrictEqual(rootSpan, span);
+
+        const errRequest =
+          method.request instanceof Array
+            ? method.request.slice(0, method.request.length)
+            : method.request;
+        const args = [client, insertError(errRequest)(errorCode)];
+
+        // tslint:disable-next-line:no-any
+        await (method.method as any)
+          .apply({}, args)
+          .then(() => {
+            assert.ok(false);
+          })
+          .catch((err: grpc.ServiceError) => {
+            // Assert
+            const spans = audit.processSpans();
+            assert.strictEqual(spans.length, 3);
+            const clientSpan = spans[1];
+            serverSpan = spans[2];
+            const validations = {
+              name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+              status: errorCode,
+            };
+            assertSpan(serverSpan, SpanKind.SERVER, validations);
+            assertSpan(clientSpan, SpanKind.CLIENT, validations);
+            assertPropagation(serverSpan, clientSpan);
+            assert.strictEqual(
+              rootSpan.context().traceId,
+              serverSpan.spanContext.traceId
+            );
+            assert.strictEqual(
+              rootSpan.context().spanId,
+              clientSpan.parentSpanId
+            );
+          });
+      });
     });
   };
 
@@ -366,7 +467,7 @@ describe('GrpcPlugin', () => {
     before(() => {
       plugin.enable(grpc, tracer);
       plugin.options = {
-        // TODO
+        // TODO: add plugin options here once supported
       };
 
       const proto = grpc.load(PROTO_PATH).pkg_test;
@@ -385,6 +486,18 @@ describe('GrpcPlugin', () => {
     methodList.map(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
         runTest(method);
+      });
+    });
+
+    methodList.map(method => {
+      describe(`Test error raising for grpc remote ${method.description}`, () => {
+        Object.keys(grpc.status).map((statusKey: string) => {
+          // tslint:disable-next-line:no-any
+          const errorCode = Number(grpc.status[statusKey as any]);
+          if (errorCode > grpc.status.OK) {
+            runErrorTest(method, statusKey, errorCode, tracer);
+          }
+        });
       });
     });
   });

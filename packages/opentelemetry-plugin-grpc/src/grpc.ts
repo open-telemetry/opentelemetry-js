@@ -25,7 +25,7 @@ import {
   CanonicalCode,
   SpanContext,
 } from '@opentelemetry/types';
-import { AttributeNames } from './enums/attributeNames';
+import { GrpcAttributeNames } from './enums/grpcAttributeNames';
 import {
   grpc,
   ModuleExportsMapping,
@@ -51,11 +51,6 @@ let grpcClientModule: any;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
-  static readonly ATTRIBUTE_GRPC_KIND = 'grpc.kind'; // SERVER or CLIENT
-  static readonly ATTRIBUTE_GRPC_METHOD = 'grpc.method';
-  static readonly ATTRIBUTE_GRPC_STATUS_CODE = 'grpc.status_code';
-  static readonly ATTRIBUTE_GRPC_ERROR_NAME = 'grpc.error_name';
-  static readonly ATTRIBUTE_GRPC_ERROR_MESSAGE = 'grpc.error_message';
 
   options!: GrpcPluginOptions;
   protected readonly _moduleExports!: grpc;
@@ -198,12 +193,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     if (!metadataValue) {
       return null;
     }
-    const spanContext = this._tracer.getBinaryFormat().fromBytes(metadataValue);
-    // Value is malformed
-    if (!spanContext) {
-      return null;
-    }
-    return spanContext;
+    return this._tracer.getBinaryFormat().fromBytes(metadataValue);
   }
 
   private _setSpanContext(
@@ -247,14 +237,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               const self = this;
 
               const spanName = `grpc.${name.replace('/', '')}`;
+              const parentSpan = plugin._getSpanContext(call.metadata);
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
+                parent: parentSpan || undefined,
               };
 
-              const parentSpan = plugin._getSpanContext(call.metadata);
-              if (parentSpan) {
-                spanOptions.parent = parentSpan;
-              }
               plugin._logger.debug(
                 'patch func: %s',
                 JSON.stringify(spanOptions)
@@ -262,14 +250,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
               const span = plugin._tracer
                 .startSpan(spanName, spanOptions)
-                .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-
-              if (spanOptions.kind) {
-                span.setAttribute(
-                  GrpcPlugin.ATTRIBUTE_GRPC_KIND,
-                  spanOptions.kind
-                );
-              }
+                .setAttributes({
+                  [GrpcAttributeNames.GRPC_KIND]: spanOptions.kind,
+                  [GrpcAttributeNames.COMPONENT]: GrpcPlugin.component,
+                });
 
               plugin._tracer.withSpan(span, () => {
                 switch (type) {
@@ -325,22 +309,22 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       if (err) {
         if (err.code) {
           span.setStatus({
-            code: CanonicalCode.ABORTED,
+            code: GrpcPlugin._grpcStatusCodeToCanonicalCode(err.code),
             message: err.message,
           });
           span.setAttribute(
-            GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
+            GrpcAttributeNames.GRPC_STATUS_CODE,
             err.code.toString()
           );
         }
         span.setAttributes({
-          [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_NAME]: err.name,
-          [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_MESSAGE]: err.message,
+          [GrpcAttributeNames.GRPC_ERROR_NAME]: err.name,
+          [GrpcAttributeNames.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: CanonicalCode.OK });
         span.setAttribute(
-          GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
+          GrpcAttributeNames.GRPC_STATUS_CODE,
           grpcModule.status.OK.toString()
         );
       }
@@ -374,7 +358,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call.on('finish', () => {
       span.setStatus(GrpcPlugin._toSpanStatus(call.status.code));
       span.setAttribute(
-        GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
+        GrpcAttributeNames.GRPC_STATUS_CODE,
         call.status.code.toString()
       );
 
@@ -386,9 +370,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     });
 
     call.on('error', (err: grpcModule.ServiceError) => {
+      span.addEvent('finished with error');
       span.setAttributes({
-        [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_NAME]: err.name,
-        [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_MESSAGE]: err.message,
+        [GrpcAttributeNames.GRPC_ERROR_NAME]: err.name,
+        [GrpcAttributeNames.GRPC_ERROR_MESSAGE]: err.message,
       });
       endSpan();
     });
@@ -427,42 +412,22 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function clientMethodTrace(this: grpcModule.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
-        // Checks if this remote function call is part of an operation by
-        // checking if there is a current root span, if so, we create a child
-        // span. In case there is no root span, this means that the remote
-        // function call is the first operation, therefore we create a root
-        // span.
         const currentSpan = plugin._tracer.getCurrentSpan();
-        if (currentSpan) {
-          const span = plugin._tracer
-            .startSpan(name, {
-              kind: SpanKind.CLIENT,
-              parent: currentSpan,
-            })
-            .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-          return plugin._tracer.withSpan(span, plugin._makeGrpcClientRemoteCall(
-            original,
-            args,
-            this,
-            plugin
-            // tslint:disable-next-line:no-any
-          ) as any);
-        } else {
-          const span = plugin._tracer
-            .startSpan(name, {
-              kind: SpanKind.CLIENT,
-            })
-            .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-          return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
-            span
-          );
-        }
+        const span = plugin._tracer
+          .startSpan(name, {
+            kind: SpanKind.CLIENT,
+            parent: currentSpan || undefined,
+          })
+          .setAttribute(GrpcAttributeNames.COMPONENT, GrpcPlugin.component);
+        return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
+          span
+        );
       };
     };
   }
 
   /**
-   * This method handels the client remote call
+   * This method handles the client remote call
    */
   private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
@@ -486,19 +451,18 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           if (err.code) {
             span.setStatus(GrpcPlugin._toSpanStatus(err.code));
             span.setAttribute(
-              GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
+              GrpcAttributeNames.GRPC_STATUS_CODE,
               err.code.toString()
             );
           }
-          span.setAttribute(GrpcPlugin.ATTRIBUTE_GRPC_ERROR_NAME, err.name);
-          span.setAttribute(
-            GrpcPlugin.ATTRIBUTE_GRPC_ERROR_MESSAGE,
-            err.message
-          );
+          span.setAttributes({
+            [GrpcAttributeNames.GRPC_ERROR_NAME]: err.name,
+            [GrpcAttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+          });
         } else {
           span.setStatus({ code: CanonicalCode.OK });
           span.setAttribute(
-            GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
+            GrpcAttributeNames.GRPC_STATUS_CODE,
             grpcModule.status.OK.toString()
           );
         }
@@ -506,10 +470,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         span.end();
         callback(err, res);
       };
-      return plugin._tracer.bind!(wrappedFn);
+      return plugin._tracer.bind(wrappedFn);
     }
 
-    return (span: Span & unknown) => {
+    return (span: Span) => {
       if (!span) {
         return original.apply(self, args);
       }
@@ -530,15 +494,13 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       }
 
       span.addEvent('sent');
-      span.setAttribute(GrpcPlugin.ATTRIBUTE_GRPC_METHOD, original.path);
-      span.setAttribute(GrpcPlugin.ATTRIBUTE_GRPC_KIND, SpanKind.CLIENT);
+      span.setAttributes({
+        [GrpcAttributeNames.GRPC_METHOD]: original.path,
+        [GrpcAttributeNames.GRPC_KIND]: SpanKind.CLIENT,
+      });
 
       this._setSpanContext(metadata, span.context());
-      const call = (original.apply(
-        self,
-        args
-      ) as unknown) as events.EventEmitter;
-      plugin._tracer.bind(call);
+      const call = original.apply(self, args);
 
       // if server stream or bidi
       if (original.responseStream) {
@@ -551,23 +513,33 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             spanEnded = true;
           }
         };
-        call.on('error', (err: grpcModule.ServiceError) => {
-          span.setStatus({ code: CanonicalCode.ABORTED, message: err.message });
-          span.setAttributes({
-            [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_NAME]: err.name,
-            [GrpcPlugin.ATTRIBUTE_GRPC_ERROR_MESSAGE]: err.message,
-          });
-          endSpan();
-        });
+        plugin._tracer.bind(call);
+        ((call as unknown) as events.EventEmitter).on(
+          'error',
+          (err: grpcModule.ServiceError) => {
+            span.setStatus({
+              code: GrpcPlugin._grpcStatusCodeToCanonicalCode(err.code),
+              message: err.message,
+            });
+            span.setAttributes({
+              [GrpcAttributeNames.GRPC_ERROR_NAME]: err.name,
+              [GrpcAttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+            });
+            endSpan();
+          }
+        );
 
-        call.on('status', (status: Status) => {
-          span.setStatus({ code: CanonicalCode.OK });
-          span.setAttribute(
-            GrpcPlugin.ATTRIBUTE_GRPC_STATUS_CODE,
-            status.code.toString()
-          );
-          endSpan();
-        });
+        ((call as unknown) as events.EventEmitter).on(
+          'status',
+          (status: Status) => {
+            span.setStatus({ code: CanonicalCode.OK });
+            span.setAttribute(
+              GrpcAttributeNames.GRPC_STATUS_CODE,
+              status.code.toString()
+            );
+            endSpan();
+          }
+        );
       }
       return call;
     };
@@ -616,6 +588,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       metadata = args[metadataIndex];
     }
     return metadata;
+  }
+
+  /**
+   * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
+   * @param status
+   */
+  private static _grpcStatusCodeToCanonicalCode(
+    status?: grpcModule.status
+  ): CanonicalCode {
+    if (status !== 0 && !status) {
+      return CanonicalCode.UNKNOWN;
+    }
+    return status as number;
   }
 }
 
