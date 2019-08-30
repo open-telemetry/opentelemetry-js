@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { BasePlugin } from '@opentelemetry/core';
 import {
   Tracer,
-  Logger,
   SpanKind,
   SpanOptions,
   Span,
@@ -54,14 +53,13 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   options!: GrpcPluginOptions;
   protected readonly _moduleExports!: grpc;
-  protected readonly _logger!: Logger;
   protected readonly _tracer!: Tracer;
 
   constructor(public moduleName: string, public version: string) {
     super();
-    // TODO: Remove this once issue is resolved
-    // https://github.com/open-telemetry/opentelemetry-js/issues/193
-    this._logger = new NoopLogger();
+    // TODO: remove this once options will be passed
+    // see https://github.com/open-telemetry/opentelemetry-js/issues/210
+    this.options = {};
     this.internalFilesExports = this._loadInternalFiles();
   }
 

@@ -465,7 +465,7 @@ describe('GrpcPlugin', () => {
     });
 
     before(() => {
-      plugin.enable(grpc, tracer);
+      plugin.enable(grpc, tracer, logger);
       plugin.options = {
         // TODO: add plugin options here once supported
       };
@@ -515,7 +515,7 @@ describe('GrpcPlugin', () => {
     });
 
     before(() => {
-      plugin.enable(grpc, tracer);
+      plugin.enable(grpc, tracer, logger);
       plugin.disable();
 
       const proto = grpc.load(PROTO_PATH).pkg_test;
