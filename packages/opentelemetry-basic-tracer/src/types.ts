@@ -22,6 +22,7 @@ import {
   Logger,
   Sampler,
 } from '@opentelemetry/types';
+import { LogLevel } from '@opentelemetry/core';
 
 /**
  * BasicTracerConfig provides an interface for configuring a Basic Tracer.
@@ -47,6 +48,9 @@ export interface BasicTracerConfig {
    * User provided logger.
    */
   logger?: Logger;
+
+  /** level of logger.  */
+  logLevel?: LogLevel;
 
   /**
    * Sampler determines if a span should be recorded or should be a NoopSpan.

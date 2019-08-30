@@ -15,6 +15,7 @@
  */
 
 import { Tracer } from '../tracer';
+import { Logger } from '../../common/Logger';
 
 /** Interface Plugin to apply patch. */
 // tslint:disable-next-line:no-any
@@ -24,11 +25,13 @@ export interface Plugin<T = any> {
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
    * @param tracer a tracer instance.
+   * @param logger a logger instance.
    * @param [config] an object to configure the plugin.
    */
   enable(
     moduleExports: T,
     tracer: Tracer,
+    logger: Logger,
     config?: { [key: string]: unknown }
   ): T;
 

@@ -22,11 +22,13 @@ import {
   TraceOptions,
   SpanContext,
 } from '@opentelemetry/types';
-import { NoopTracer, NoopLogger } from '@opentelemetry/core';
+import { BasicTracer } from '../src';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 describe('Span', () => {
-  const tracer = new NoopTracer();
-  const logger = new NoopLogger();
+  const tracer = new BasicTracer({
+    scopeManager: new NoopScopeManager(),
+  });
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -35,14 +37,14 @@ describe('Span', () => {
   };
 
   it('should create a Span instance', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     assert.ok(span instanceof Span);
     assert.strictEqual(span.tracer(), tracer);
     span.end();
   });
 
   it('should get the span context of span', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();
     assert.strictEqual(context.traceId, spanContext.traceId);
     assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
@@ -53,13 +55,13 @@ describe('Span', () => {
   });
 
   it('should return true when isRecordingEvents:true', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     assert.ok(span.isRecordingEvents());
     span.end();
   });
 
   it('should set an attribute', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
 
     ['String', 'Number', 'Boolean'].map(attType => {
       span.setAttribute('testKey' + attType, 'testValue' + attType);
@@ -69,7 +71,7 @@ describe('Span', () => {
   });
 
   it('should set an event', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addEvent('sent');
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     span.end();
@@ -81,14 +83,14 @@ describe('Span', () => {
       spanId: '5e0c63257de34c92',
       traceOptions: TraceOptions.SAMPLED,
     };
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
     span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
     span.end();
   });
 
   it('should set an error status', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -100,7 +102,6 @@ describe('Span', () => {
     const parentId = '5c1c63257de34c67';
     const span = new Span(
       tracer,
-      logger,
       'my-span',
       spanContext,
       SpanKind.INTERNAL,
@@ -121,13 +122,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with attributes', () => {
-    const span = new Span(
-      tracer,
-      logger,
-      'my-span',
-      spanContext,
-      SpanKind.CLIENT
-    );
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.setAttribute('attr1', 'value1');
     let readableSpan = span.toReadableSpan();
     assert.deepStrictEqual(readableSpan.attributes, { attr1: 'value1' });
@@ -150,13 +145,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
-    const span = new Span(
-      tracer,
-      logger,
-      'my-span',
-      spanContext,
-      SpanKind.CLIENT
-    );
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
     let readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.links.length, 1);
@@ -193,13 +182,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with events', () => {
-    const span = new Span(
-      tracer,
-      logger,
-      'my-span',
-      spanContext,
-      SpanKind.CLIENT
-    );
+    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.addEvent('sent');
     let readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.events.length, 1);
@@ -232,7 +215,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with new status', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.CLIENT);
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.setStatus({
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
@@ -254,14 +237,14 @@ describe('Span', () => {
   });
 
   it('should only end a span once', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.end(1234);
     span.end(4567);
     assert.strictEqual(span.endTime, 1234);
   });
 
   it('should update name', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.updateName('foo-span');
     span.end();
 
