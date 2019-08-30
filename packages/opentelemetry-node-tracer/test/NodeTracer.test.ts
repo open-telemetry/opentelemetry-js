@@ -26,6 +26,11 @@ import {
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
 
+const sleep = (time: number) =>
+  new Promise(resolve => {
+    return setTimeout(resolve, time);
+  });
+
 describe('NodeTracer', () => {
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
@@ -154,6 +159,22 @@ describe('NodeTracer', () => {
       });
       // when span ended.
       // @todo: below check is not running.
+      assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+    });
+
+    it('should find correct scope with promises', done => {
+      const tracer = new NodeTracer({
+        scopeManager: new AsyncHooksScopeManager(),
+      });
+      const span = tracer.startSpan('my-span');
+      tracer.withSpan(span, async () => {
+        for (let i = 0; i < 3; i++) {
+          await sleep(5).then(() => {
+            assert.deepStrictEqual(tracer.getCurrentSpan(), span);
+          });
+        }
+        return done();
+      });
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
     });
   });
