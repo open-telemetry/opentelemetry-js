@@ -17,7 +17,7 @@
 import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
-import { AttributeNames } from '../../src/enums/attributeNames';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin } from '../../src/http';
 import { Utils } from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';

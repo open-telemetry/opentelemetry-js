@@ -26,6 +26,7 @@ import { httpRequest } from '../utils/httpRequest';
 import { TracerTest } from '../utils/TracerTest';
 import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
 import * as url from 'url';
+import { Utils } from '../utils/Utils';
 
 const serverPort = 12345;
 const hostname = 'localhost';
@@ -37,6 +38,22 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('HttpPlugin Integration tests', () => {
   describe('enable()', () => {
+    before(function(done) {
+      // mandatory
+      if (process.env.CI) {
+        done();
+        return;
+      }
+
+      Utils.checkInternet(isConnected => {
+        if (!isConnected) {
+          this.skip();
+          // don't disturbe people
+        }
+        done();
+      });
+    });
+
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
@@ -134,7 +151,13 @@ describe('HttpPlugin Integration tests', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
         };
-        assertSpan(span, SpanKind.CLIENT, validations);
+        try {
+          assertSpan(span, SpanKind.CLIENT, validations);
+        } catch (error) {
+          // temporary redirect is also correct
+          validations.httpStatusCode = 307;
+          assertSpan(span, SpanKind.CLIENT, validations);
+        }
       });
     });
     for (const headers of [

@@ -34,8 +34,8 @@ import {
   ParsedRequestOptions,
   HttpRequestArgs,
 } from './types';
-import { Format } from './enums/format';
-import { AttributeNames } from './enums/attributeNames';
+import { Format } from './enums/Format';
+import { AttributeNames } from './enums/AttributeNames';
 import { Utils } from './utils';
 
 /**

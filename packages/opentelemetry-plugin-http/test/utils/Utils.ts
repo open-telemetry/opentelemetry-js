@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-// Should we export this to the types package in order to expose all values ?
-export enum Format {
-  HTTP = 'HttpTraceContext',
+import * as dns from 'dns';
+
+export class Utils {
+  static checkInternet(cb: (isConnected: boolean) => void) {
+    dns.lookup('google.com', err => {
+      if (err && err.code === 'ENOTFOUND') {
+        cb(false);
+      } else {
+        cb(true);
+      }
+    });
+  }
 }

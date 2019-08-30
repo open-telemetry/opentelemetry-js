@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-export * from './http';
-export * from './types';
-export * from './utils';
-export * from './enums/AttributeNames';
-export * from './enums/Format';
+export enum Format {
+  HTTP = 'HttpTraceContext',
+}

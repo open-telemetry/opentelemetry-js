@@ -20,8 +20,6 @@
  */
 export enum AttributeNames {
   HTTP_HOSTNAME = 'http.hostname',
-  // NOT ON OFFICIAL SPEC
-  ERROR = 'error',
   COMPONENT = 'component',
   HTTP_METHOD = 'http.method',
   HTTP_PATH = 'http.path',

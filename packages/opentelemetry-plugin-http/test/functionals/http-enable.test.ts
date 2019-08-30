@@ -26,7 +26,6 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { TracerTest } from '../utils/TracerTest';
 import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
-import * as url from 'url';
 
 let server: http.Server;
 const serverPort = 12345;
@@ -277,128 +276,6 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
         await httpRequest.get(`${protocol}://${hostname}${testPath}`);
         assert.strictEqual(spans.length, 0);
-      });
-    }
-
-    it('should create a rootSpan for GET requests and add propagation headers', async () => {
-      nock.enableNetConnect();
-      const spans = audit.processSpans();
-      assert.strictEqual(spans.length, 0);
-      await httpRequest.get(`http://google.fr/?query=test`).then(result => {
-        const spans = audit.processSpans();
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf('GET /') >= 0);
-
-        const span = spans[0];
-        const validations = {
-          hostname: 'google.fr',
-          httpStatusCode: result.statusCode!,
-          httpMethod: 'GET',
-          pathname: '/',
-          path: '/?query=test',
-          resHeaders: result.resHeaders,
-          reqHeaders: result.reqHeaders,
-        };
-        assertSpan(span, SpanKind.CLIENT, validations);
-      });
-      nock.disableNetConnect();
-    });
-
-    it('custom attributes should show up on client spans', async () => {
-      nock.enableNetConnect();
-
-      await httpRequest.get(`http://google.fr/`).then(result => {
-        const spans = audit.processSpans();
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf('GET /') >= 0);
-
-        const span = spans[0];
-        const validations = {
-          hostname: 'google.fr',
-          httpStatusCode: result.statusCode!,
-          httpMethod: 'GET',
-          pathname: '/',
-          resHeaders: result.resHeaders,
-          reqHeaders: result.reqHeaders,
-        };
-        assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
-        assertSpan(span, SpanKind.CLIENT, validations);
-      });
-      nock.disableNetConnect();
-    });
-
-    it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
-      nock.enableNetConnect();
-      const spans = audit.processSpans();
-      assert.strictEqual(spans.length, 0);
-      const options = Object.assign(
-        { headers: { Expect: '100-continue' } },
-        url.parse('http://google.fr/')
-      );
-      await httpRequest.get(options).then(result => {
-        const spans = audit.processSpans();
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf('GET /') >= 0);
-
-        const span = spans[0];
-        const validations = {
-          hostname: 'google.fr',
-          httpStatusCode: 301,
-          httpMethod: 'GET',
-          pathname: '/',
-          resHeaders: result.resHeaders,
-          reqHeaders: result.reqHeaders,
-        };
-        assertSpan(span, SpanKind.CLIENT, validations);
-      });
-      nock.disableNetConnect();
-    });
-    for (const headers of [
-      { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
-      { 'user-agent': 'http-plugin-test' },
-    ]) {
-      it(`should create a span for GET requests and add propagation when using the following signature: http.get(url, options, callback) and following headers: ${JSON.stringify(
-        headers
-      )}`, done => {
-        nock.enableNetConnect();
-        const spans = audit.processSpans();
-        assert.strictEqual(spans.length, 0);
-        const options = { headers };
-        http.get('http://google.fr/', options, (resp: http.IncomingMessage) => {
-          const res = (resp as unknown) as http.IncomingMessage & {
-            req: http.IncomingMessage;
-          };
-          let data = '';
-          resp.on('data', chunk => {
-            data += chunk;
-          });
-          resp.on('end', () => {
-            const spans = audit.processSpans();
-            assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].name.indexOf('GET /') >= 0);
-            const validations = {
-              hostname: 'google.fr',
-              httpStatusCode: 301,
-              httpMethod: 'GET',
-              pathname: '/',
-              resHeaders: resp.headers,
-              /* tslint:disable:no-any */
-              reqHeaders: (res.req as any).getHeaders
-                ? (res.req as any).getHeaders()
-                : (res.req as any)._headers,
-              /* tslint:enable:no-any */
-            };
-            assert.ok(data);
-            assert.ok(
-              validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]
-            );
-            assert.ok(
-              validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]
-            );
-            done();
-          });
-        });
-        nock.disableNetConnect();
       });
     }
   });

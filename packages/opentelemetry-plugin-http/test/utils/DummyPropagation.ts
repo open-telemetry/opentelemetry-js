@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
-// import * as http from 'http';
 
 export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
