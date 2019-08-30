@@ -1,6 +1,6 @@
 #####################################################
 #
-# List of approvers for OpenTelemetry Node SDK
+# List of approvers for OpenTelemetry JS SDK
 #
 #####################################################
 #
@@ -12,4 +12,4 @@
 #  https://help.github.com/en/articles/about-code-owners
 #
 
-* @iredelmeier @danielkhan @mayurkale22 @rochdev @bg451
+* @iredelmeier @danielkhan @mayurkale22 @rochdev @bg451 @OlivierAlbertini @vmarchaud @markwolff
