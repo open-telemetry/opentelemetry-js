@@ -88,8 +88,8 @@ describe('transform', () => {
         thriftSpan.startTime,
         Utils.encodeInt64(readableSpan.startTime * 1000)
       );
-      assert.strictEqual(thriftSpan.tags.length, 3);
-      const [tag1, tag2, tag3] = thriftSpan.tags;
+      assert.strictEqual(thriftSpan.tags.length, 4);
+      const [tag1, tag2, tag3, tag4] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);
@@ -99,6 +99,9 @@ describe('transform', () => {
       assert.strictEqual(tag3.key, 'testNum');
       assert.strictEqual(tag3.vType, 'DOUBLE');
       assert.strictEqual(tag3.vDouble, 3.142);
+      assert.strictEqual(tag4.key, 'status.code');
+      assert.strictEqual(tag4.vType, 'DOUBLE');
+      assert.strictEqual(tag4.vDouble, 0);
       assert.strictEqual(thriftSpan.references.length, 0);
 
       assert.strictEqual(thriftSpan.logs.length, 1);
@@ -118,6 +121,7 @@ describe('transform', () => {
         endTime: 1566156729709 + 2000,
         status: {
           code: types.CanonicalCode.DATA_LOSS,
+          message: 'data loss',
         },
         attributes: {},
         links: [],
@@ -143,7 +147,17 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.parentSpanId, ThriftUtils.emptyBuffer);
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.strictEqual(thriftSpan.references.length, 0);
-      assert.strictEqual(thriftSpan.tags.length, 0);
+      assert.strictEqual(thriftSpan.tags.length, 3);
+      const [tag1, tag2, tag3] = thriftSpan.tags;
+      assert.strictEqual(tag1.key, 'status.code');
+      assert.strictEqual(tag1.vType, 'DOUBLE');
+      assert.strictEqual(tag1.vDouble, 15);
+      assert.strictEqual(tag2.key, 'status.message');
+      assert.strictEqual(tag2.vType, 'STRING');
+      assert.strictEqual(tag2.vStr, 'data loss');
+      assert.strictEqual(tag3.key, 'error');
+      assert.strictEqual(tag3.vType, 'BOOL');
+      assert.strictEqual(tag3.vBool, true);
       assert.strictEqual(thriftSpan.logs.length, 0);
     });
   });

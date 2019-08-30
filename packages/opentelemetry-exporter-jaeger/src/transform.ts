@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Link } from '@opentelemetry/types';
+import { Link, CanonicalCode } from '@opentelemetry/types';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
 import {
   ThriftSpan,
@@ -44,6 +44,15 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   const tags = Object.keys(span.attributes).map(
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
   );
+  tags.push({ key: 'status.code', value: span.status.code });
+  if (span.status.message) {
+    tags.push({ key: 'status.message', value: span.status.message });
+  }
+  // Ensure that if Status.Code is not OK, that we set the "error" tag on the
+  // Jaeger span.
+  if (span.status.code !== CanonicalCode.OK) {
+    tags.push({ key: 'error', value: true });
+  }
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
   const logs = span.events.map(
