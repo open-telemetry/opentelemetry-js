@@ -171,7 +171,7 @@ describe('BasicTracer', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
-        logger: new NoopLogger()
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
@@ -198,7 +198,7 @@ describe('BasicTracer', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
-        logger: new NoopLogger()
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span', { isRecordingEvents: false });
       assert.ok(span instanceof NoRecordingSpan);
@@ -210,7 +210,7 @@ describe('BasicTracer', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new NoopScopeManager(),
-        logger: new NoopLogger()
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
