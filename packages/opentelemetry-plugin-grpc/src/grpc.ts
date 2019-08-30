@@ -60,13 +60,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // TODO: remove this once options will be passed
     // see https://github.com/open-telemetry/opentelemetry-js/issues/210
     this.options = {};
-    this.internalFilesExports = this._loadInternalFiles();
   }
 
   // TODO: Delete if moving internal file loaders to BasePlugin
   // --- Note: Incorrectly ordered: Begin internal file loader --- //
   // tslint:disable-next-line:no-any
-  protected internalFilesExports: { [key: string]: any };
+  protected internalFilesExports: { [key: string]: any } | undefined;
   protected readonly internalFileList: ModuleExportsMapping = {
     '0.13 - 1.6': { client: 'src/node/src/client.js' },
     '^1.7': { client: 'src/client.js' },
@@ -138,6 +137,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   // --- End of internal file loader stuff --- //
 
   protected patch(): typeof grpcModule {
+    if (!this.internalFilesExports) {
+      this.internalFilesExports = this._loadInternalFiles();
+    }
     this._logger.debug(
       'applying patch to %s@%s',
       this.moduleName,
