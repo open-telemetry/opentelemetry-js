@@ -75,8 +75,10 @@ export const assertSpan = (
     Utils.parseResponseStatus(validations.httpStatusCode)
   );
 
-  assert.ok(span.startTime < span.endTime);
-  assert.ok(span.endTime > 0);
+  assert.ok(
+    span.startTime[0] + span.startTime[1] < span.endTime[0] + span.endTime[1]
+  );
+  assert.ok(span.endTime[0] > 0);
 
   if (validations.reqHeaders) {
     const userAgent = validations.reqHeaders['user-agent'];

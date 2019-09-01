@@ -64,7 +64,7 @@ export class NoopSpan implements types.Span {
   }
 
   // By default does nothing
-  end(endTime?: number): void {}
+  end(endTime?: types.TimeInput): void {}
 
   // isRecordingEvents always returns false for noopSpan.
   isRecordingEvents(): boolean {

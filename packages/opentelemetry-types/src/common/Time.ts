@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-import {
-  SpanKind,
-  Status,
-  Attributes,
-  HrTime,
-  Link,
-  SpanContext,
-  TimedEvent
-} from '@opentelemetry/types';
+/** High resolution HrTime: [milliseconds: number, nanoseconds: number] */
+export type HrTime = [number, number];
 
-export interface ReadableSpan {
-  readonly name: string;
-  readonly kind: SpanKind;
-  readonly spanContext: SpanContext;
-  readonly parentSpanId?: string;
-  readonly startTime: HrTime;
-  readonly endTime: HrTime;
-  readonly status: Status;
-  readonly attributes: Attributes;
-  readonly links: Link[];
-  readonly events: TimedEvent[];
-  readonly duration: HrTime;
-}
+/**
+ * Defines TimeInput.
+ *
+ * hrtime, expoch milliseconds, performance.now() or Date
+ */
+export type TimeInput = HrTime | number | Date;

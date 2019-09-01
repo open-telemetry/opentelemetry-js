@@ -15,6 +15,8 @@
  */
 
 import * as assert from 'assert';
+import { performance } from 'perf_hooks';
+import * as sinon from 'sinon';
 import { Span } from '../src/Span';
 import {
   SpanKind,
@@ -46,21 +48,27 @@ describe('Span', () => {
   });
 
   it('should have startTime > Date.now()', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
-    assert.ok(span.startTime > Date.now());
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    assert.ok(span.startTime[0] + span.startTime[1] > performance.timeOrigin);
   });
 
   it('should have endTime > Date.now()', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.end();
-    assert.ok(span.endTime >= span.startTime);
-    assert.ok(span.endTime > Date.now());
+    assert.ok(span.endTime[0] >= span.startTime[0]);
+    assert.ok(span.endTime[0] + span.endTime[1] > performance.timeOrigin);
+  });
+
+  it('should have a duration', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(span.duration[0] + span.duration[1] >= 0);
   });
 
   it('should have event.time > Date.now()', () => {
-    const span = new Span(tracer, logger, name, spanContext, SpanKind.SERVER);
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.addEvent('my-event');
-    assert.ok(span.events[0].time > Date.now());
+    assert.ok(span.events[0].time[0] + span.events[0].time[1] > Date.now());
   });
 
   it('should get the span context of span', () => {
@@ -209,7 +217,7 @@ describe('Span', () => {
     const [event] = readableSpan.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.ok(!event.attributes);
-    assert.ok(event.time > 0);
+    assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     readableSpan = span.toReadableSpan();
@@ -217,14 +225,14 @@ describe('Span', () => {
     const [event1, event2] = readableSpan.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.ok(!event1.attributes);
-    assert.ok(event1.time > 0);
+    assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
       attr1: 'value',
       attr2: 123,
       attr3: true,
     });
-    assert.ok(event2.time > 0);
+    assert.ok(event2.time[0] > 0);
 
     span.end();
     // shouldn't add new event
@@ -258,9 +266,10 @@ describe('Span', () => {
 
   it('should only end a span once', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    span.end(1234);
-    span.end(4567);
-    assert.strictEqual(span.endTime, 1234);
+    const endTime = Date.now();
+    span.end(endTime);
+    span.end(endTime + 10);
+    assert.deepEqual(span.endTime, [endTime, 0]);
   });
 
   it('should update name', () => {
@@ -272,4 +281,60 @@ describe('Span', () => {
     span.updateName('bar-span');
     assert.strictEqual(span.name, 'foo-span');
   });
+
+  describe('time', () => {
+    let sandbox: sinon.SinonSandbox;
+
+    beforeEach(() => {
+      sandbox = sinon.createSandbox();
+    });
+
+    afterEach(() => {
+      sandbox.restore();
+    })
+
+    it('should convert Date endTime', () => {
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+      const endTime = new Date();
+      span.end(endTime);
+      assert.deepEqual(span.endTime, [endTime.getTime(), 0]);
+    });
+
+    it('should convert epoch milliseconds endTime', () => {
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+      const endTime = Date.now();
+      span.end(endTime);
+      assert.deepEqual(span.endTime, [endTime, 0]);
+    });
+
+    it('should convert performance.now() endTime', () => {
+      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
+
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+      const endTime = 11.90000000000;
+      span.end(endTime);
+
+      assert.deepEqual(span.endTime, [123, 4000000000]);
+    });
+
+    it('should passthrough hrtime endTime', () => {
+      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
+
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+      const endTime = process.hrtime();
+      span.end(endTime);
+
+      assert.deepEqual(span.endTime, endTime);
+    });
+
+    it('should use default endTime', () => {
+      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
+      sandbox.stub(performance, 'now').callsFake(() => 11.90000000000);
+
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+      span.end();
+
+      assert.deepEqual(span.endTime, [123, 4000000000]);
+    });
+  })
 });

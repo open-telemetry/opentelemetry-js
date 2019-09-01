@@ -106,28 +106,26 @@ describe('HttpPlugin', () => {
       plugin.disable();
     });
 
-    it('should generate valid spans (client side and server side)', done => {
-      httpRequest
-        .get(`http://${hostname}:${serverPort}${pathname}`)
-        .then(result => {
-          const spans = audit.processSpans();
-          const outgoingSpan = spans[0];
-          const incomingSpan = spans[1];
+    it('should generate valid spans (client side and server side)', async () => {
+      const result = await httpRequest.get(
+        `http://${hostname}:${serverPort}${pathname}`
+      );
+      const spans = audit.processSpans();
+      const outgoingSpan = spans[0];
+      const incomingSpan = spans[1];
 
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: result.method!,
-            pathname,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
+      const validations = {
+        hostname,
+        httpStatusCode: result.statusCode!,
+        httpMethod: result.method!,
+        pathname,
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+      };
 
-          assert.strictEqual(spans.length, 2);
-          assertSpan(incomingSpan, SpanKind.SERVER, validations);
-          assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
-          done();
-        });
+      assert.strictEqual(spans.length, 2);
+      assertSpan(incomingSpan, SpanKind.SERVER, validations);
+      assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
     const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
@@ -145,24 +143,23 @@ describe('HttpPlugin', () => {
 
         const isReset = audit.processSpans().length === 0;
         assert.ok(isReset);
-        await httpRequest
-          .get(`${protocol}://${hostname}${testPath}`)
-          .then(result => {
-            const spans = audit.processSpans();
-            assert.strictEqual(result.data, httpErrorCodes[i].toString());
-            assert.strictEqual(spans.length, 1);
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}${testPath}`
+        );
+        const spans = audit.processSpans();
+        assert.strictEqual(result.data, httpErrorCodes[i].toString());
+        assert.strictEqual(spans.length, 1);
 
-            const validations = {
-              hostname,
-              httpStatusCode: result.statusCode!,
-              httpMethod: 'GET',
-              pathname: testPath,
-              resHeaders: result.resHeaders,
-              reqHeaders: result.reqHeaders,
-            };
+        const validations = {
+          hostname,
+          httpStatusCode: result.statusCode!,
+          httpMethod: 'GET',
+          pathname: testPath,
+          resHeaders: result.resHeaders,
+          reqHeaders: result.reqHeaders,
+        };
 
-            assertSpan(spans[0], SpanKind.CLIENT, validations);
-          });
+        assertSpan(spans[0], SpanKind.CLIENT, validations);
       });
     }
 
@@ -172,30 +169,33 @@ describe('HttpPlugin', () => {
       const name = 'TestRootSpan';
       const span = tracer.startSpan(name);
       tracer.withSpan(span, () => {
-        httpRequest.get(`${protocol}://${hostname}${testPath}`).then(result => {
-          const spans = audit.processSpans();
-          assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
-          assert.strictEqual(spans.length, 2);
-          assert.ok(spans[1].name.indexOf(testPath) >= 0);
-          assert.strictEqual(
-            spans[1].spanContext.traceId,
-            spans[0].spanContext.traceId
-          );
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: 'GET',
-            pathname: testPath,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
-          assertSpan(spans[1], SpanKind.CLIENT, validations);
-          assert.notStrictEqual(
-            spans[1].spanContext.spanId,
-            spans[0].spanContext.spanId
-          );
-          done();
-        });
+        httpRequest
+          .get(`${protocol}://${hostname}${testPath}`)
+          .then(result => {
+            const spans = audit.processSpans();
+            assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
+            assert.strictEqual(spans.length, 2);
+            assert.ok(spans[1].name.indexOf(testPath) >= 0);
+            assert.strictEqual(
+              spans[1].spanContext.traceId,
+              spans[0].spanContext.traceId
+            );
+            const validations = {
+              hostname,
+              httpStatusCode: result.statusCode!,
+              httpMethod: 'GET',
+              pathname: testPath,
+              resHeaders: result.resHeaders,
+              reqHeaders: result.reqHeaders,
+            };
+            assertSpan(spans[1], SpanKind.CLIENT, validations);
+            assert.notStrictEqual(
+              spans[1].spanContext.spanId,
+              spans[0].spanContext.spanId
+            );
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -236,7 +236,8 @@ describe('HttpPlugin', () => {
                 spans[0].spanContext.spanId
               );
               done();
-            });
+            })
+            .catch(done);
         });
       });
     }

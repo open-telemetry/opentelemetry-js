@@ -32,13 +32,14 @@ export class Span implements types.Span, ReadableSpan {
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
-  readonly startTime: number;
+  readonly startTime: types.HrTime;
   name: string;
   status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  endTime = 0;
+  endTime:types.HrTime = [0, 0];
   private _ended = false;
+  private _duration: types.HrTime;
   private readonly _logger: types.Logger;
 
   /** Constructs a new Span instance. */
@@ -48,14 +49,14 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
-    startTime?: number
+    startTime?: types.TimeInput
   ) {
     this._tracer = parentTracer;
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = startTime || Span._now();
+    this.startTime = Span._getHrTime(startTime);
     this._logger = parentTracer.logger;
   }
 
@@ -85,7 +86,7 @@ export class Span implements types.Span, ReadableSpan {
     this.events.push({
       name,
       attributes,
-      time: Span._now(),
+      time: Span._hrtime(),
     });
     return this;
   }
@@ -108,13 +109,13 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime?: number): void {
+  end(endTime?: types.TimeInput): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = endTime || Span._now();
+    this.endTime = Span._getHrTime(endTime);
     // @todo: record or export the span
   }
 
@@ -124,6 +125,25 @@ export class Span implements types.Span, ReadableSpan {
 
   toReadableSpan(): ReadableSpan {
     return this;
+  }
+
+  get duration(): types.HrTime {
+    if (this._duration !== undefined) {
+      return this._duration;
+    }
+
+    let millis = this.startTime[0] - this.endTime[0];
+    let nanos = this.startTime[1] - this.endTime[1];
+
+    // overflow
+    if (nanos < 0) {
+      millis -= 1;
+      // negate
+      nanos += 1e9;
+    }
+
+    this._duration = [millis, nanos];
+    return this._duration;
   }
 
   private _isSpanEnded(): boolean {
@@ -137,8 +157,44 @@ export class Span implements types.Span, ReadableSpan {
     return this._ended;
   }
 
-  private static _now(): number {
-    // performance.now() is relative from process start.
-    return performance.timeOrigin + performance.now();
+  private static _numberToHrtime(time: number): types.HrTime {
+    const millis = Math.trunc(time)
+    const nanos = Number((time - millis).toFixed(2)) * 1e+10;
+    return [millis, nanos];
+  }
+
+  private static _getHrTime(time?: types.TimeInput): types.HrTime {
+    if (Array.isArray(time)) {
+      return time;
+    } else if (typeof time === 'number') {
+      // Must be a performance.now() if it's smaller than process start time.
+      if (time < performance.timeOrigin) {
+        return Span._hrtime(time);
+      }
+      // epoch milliseconds or performance.timeOrigin
+      else {
+        return Span._numberToHrtime(time);
+      }
+    } else if (time instanceof Date) {
+      return [time.getTime(), 0];
+    } else {
+      return Span._hrtime();
+    }
+  }
+
+  private static _hrtime(performanceNow?: number): types.HrTime {
+    const timeOrigin = Span._numberToHrtime(performance.timeOrigin);
+    const now = Span._numberToHrtime(performanceNow || performance.now());
+
+    let millis = timeOrigin[0] + now[0];
+    let nanos = timeOrigin[1] + now[1];
+
+    // Nanoseconds
+    if (nanos > 1e+10) {
+      nanos -= 1e+10;
+      millis += 1;
+    }
+
+    return [millis, nanos];
   }
 }

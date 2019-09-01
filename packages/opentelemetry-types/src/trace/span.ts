@@ -17,6 +17,7 @@
 import { Attributes } from './attributes';
 import { SpanContext } from './span_context';
 import { Status } from './status';
+import { TimeInput } from '../common/Time';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -99,11 +100,11 @@ export interface Span {
    * Do not return `this`. The Span generally should not be used after it
    * is ended so chaining is not desired in this context.
    *
-   * @param [endTime] the timestamp to set as Span's end time. If not provided,
+   * @param [endTime] the time to set as Span's end time. If not provided,
    *     use the current time as the span's end time.
    *     TODO (Add timestamp format): https://github.com/open-telemetry/opentelemetry-js/issues/19
    */
-  end(endTime?: number): void;
+  end(endTime?: TimeInput): void;
 
   /**
    * Returns the flag whether this span will be recorded.
