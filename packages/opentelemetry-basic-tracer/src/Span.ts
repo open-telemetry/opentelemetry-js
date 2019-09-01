@@ -56,7 +56,7 @@ export class Span implements types.Span, ReadableSpan {
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = Span._getHrTime(startTime);
+    this.startTime = Span._toHrTime(startTime);
     this._logger = parentTracer.logger;
   }
 
@@ -115,7 +115,7 @@ export class Span implements types.Span, ReadableSpan {
       return;
     }
     this._ended = true;
-    this.endTime = Span._getHrTime(endTime);
+    this.endTime = Span._toHrTime(endTime);
     // @todo: record or export the span
   }
 
@@ -157,13 +157,15 @@ export class Span implements types.Span, ReadableSpan {
     return this._ended;
   }
 
+  // Converts a number to HrTime
   private static _numberToHrtime(time: number): types.HrTime {
     const millis = Math.trunc(time)
     const nanos = Number((time - millis).toFixed(2)) * 1e+10;
     return [millis, nanos];
   }
 
-  private static _getHrTime(time?: types.TimeInput): types.HrTime {
+  // Converts a TimeInput to an HrTime, defaults to _hrtime().
+  private static _toHrTime(time?: types.TimeInput): types.HrTime {
     if (Array.isArray(time)) {
       return time;
     } else if (typeof time === 'number') {
@@ -182,6 +184,7 @@ export class Span implements types.Span, ReadableSpan {
     }
   }
 
+  // Returns an hrtime calculated via performance component.
   private static _hrtime(performanceNow?: number): types.HrTime {
     const timeOrigin = Span._numberToHrtime(performance.timeOrigin);
     const now = Span._numberToHrtime(performanceNow || performance.now());
