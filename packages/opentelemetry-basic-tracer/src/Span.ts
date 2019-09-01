@@ -39,7 +39,7 @@ export class Span implements types.Span, ReadableSpan {
   };
   endTime:types.HrTime = [0, 0];
   private _ended = false;
-  private _duration: types.HrTime;
+  private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
 
   /** Constructs a new Span instance. */
@@ -128,7 +128,7 @@ export class Span implements types.Span, ReadableSpan {
   }
 
   get duration(): types.HrTime {
-    if (this._duration !== undefined) {
+    if (this._duration[0] !== -1) {
       return this._duration;
     }
 
