@@ -317,14 +317,14 @@ describe('Span', () => {
       assert.deepEqual(span.endTime, [123, 4000000000]);
     });
 
-    it('should passthrough hrtime endTime', () => {
+    it('should convert hrtime endTime', () => {
       sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
 
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime = process.hrtime();
+      const endTime:[number, number] = [3138971, 245466222];
       span.end(endTime);
 
-      assert.deepEqual(span.endTime, endTime);
+      assert.deepEqual(span.endTime, [3138971245, 466222]);
     });
 
     it('should use default endTime', () => {

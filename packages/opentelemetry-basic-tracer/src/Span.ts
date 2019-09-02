@@ -86,7 +86,7 @@ export class Span implements types.Span, ReadableSpan {
     this.events.push({
       name,
       attributes,
-      time: Span._hrtime(),
+      time: Span._processNowToHrtime(),
     });
     return this;
   }
@@ -160,18 +160,22 @@ export class Span implements types.Span, ReadableSpan {
   // Converts a number to HrTime
   private static _numberToHrtime(time: number): types.HrTime {
     const millis = Math.trunc(time)
-    const nanos = Number((time - millis).toFixed(2)) * 1e+10;
+    const nanos = Number((time - millis).toFixed(10)) * 1e10;
     return [millis, nanos];
   }
 
   // Converts a TimeInput to an HrTime, defaults to _hrtime().
   private static _toHrTime(time?: types.TimeInput): types.HrTime {
     if (Array.isArray(time)) {
-      return time;
+      // convert seconds to millis
+      const millis = time[0] * 1000 + Number(String(time[1]).substring(0, 3));
+      // chop millis
+      const nanos = Number(String(time[1]).substring(3));
+      return [millis, nanos];
     } else if (typeof time === 'number') {
       // Must be a performance.now() if it's smaller than process start time.
       if (time < performance.timeOrigin) {
-        return Span._hrtime(time);
+        return Span._processNowToHrtime(time);
       }
       // epoch milliseconds or performance.timeOrigin
       else {
@@ -180,12 +184,12 @@ export class Span implements types.Span, ReadableSpan {
     } else if (time instanceof Date) {
       return [time.getTime(), 0];
     } else {
-      return Span._hrtime();
+      return Span._processNowToHrtime();
     }
   }
 
   // Returns an hrtime calculated via performance component.
-  private static _hrtime(performanceNow?: number): types.HrTime {
+  private static _processNowToHrtime(performanceNow?: number): types.HrTime {
     const timeOrigin = Span._numberToHrtime(performance.timeOrigin);
     const now = Span._numberToHrtime(performanceNow || performance.now());
 
