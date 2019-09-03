@@ -31,8 +31,7 @@ import {
 import { BasicTracerConfig, TraceParams } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
-import { defaultConfig } from './config';
-import * as extend from 'extend';
+import { mergeConfig } from './utility';
 
 /**
  * This class represents a basic tracer.
@@ -50,14 +49,14 @@ export class BasicTracer implements types.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig) {
-    const localConfig = extend(true, {}, defaultConfig, config);
+    const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;
     this._httpTextFormat = localConfig.httpTextFormat;
     this._sampler = localConfig.sampler;
     this._scopeManager = localConfig.scopeManager;
     this._traceParams = localConfig.traceParams;
-    this.logger = localConfig.logger || new ConsoleLogger(localConfig.logLevel);
+    this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
   /**
