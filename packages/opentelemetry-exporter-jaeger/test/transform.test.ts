@@ -106,10 +106,14 @@ describe('transform', () => {
 
       assert.strictEqual(thriftSpan.logs.length, 1);
       const [log1] = thriftSpan.logs;
-      assert.strictEqual(log1.fields.length, 1);
-      assert.strictEqual(log1.fields[0].key, 'message.id');
-      assert.strictEqual(log1.fields[0].vType, 'STRING');
-      assert.strictEqual(log1.fields[0].vStr, 'something happened');
+      assert.strictEqual(log1.fields.length, 2);
+      const [field1, field2] = log1.fields;
+      assert.strictEqual(field1.key, 'message.id');
+      assert.strictEqual(field1.vType, 'STRING');
+      assert.strictEqual(field1.vStr, 'something happened');
+      assert.strictEqual(field2.key, 'error');
+      assert.strictEqual(field2.vType, 'BOOL');
+      assert.strictEqual(field2.vBool, true);
     });
 
     it('should convert an OpenTelemetry span to a Thrift when links, events and attributes are empty', () => {
