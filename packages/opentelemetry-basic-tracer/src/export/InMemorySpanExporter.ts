@@ -19,12 +19,12 @@ import { ReadableSpan } from './ReadableSpan';
 import { ExportResult } from './ExportResult';
 
 /**
- * This class can be used for testing purposes. It saves the exported spans
- * in a list in memory that can be retrieve using the `getFinishedSpans`
+ * This class can be used for testing purposes. It stores the exported spans
+ * in a list in memory that can be retrieve using the `getFinishedSpans()`
  * method.
  */
 export class InMemorySpanExporter implements SpanExporter {
-  private _finishedSpan: ReadableSpan[] = [];
+  private _finishedSpans: ReadableSpan[] = [];
   private _stopped = false;
 
   export(
@@ -32,20 +32,20 @@ export class InMemorySpanExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ): void {
     if (this._stopped) return resultCallback(ExportResult.FailedNonRetryable);
-    this._finishedSpan.push(...spans);
+    this._finishedSpans.push(...spans);
     return resultCallback(ExportResult.Success);
   }
 
   shutdown(): void {
     this._stopped = true;
-    this._finishedSpan = [];
+    this._finishedSpans = [];
   }
 
   reset() {
-    this._finishedSpan = [];
+    this._finishedSpans = [];
   }
 
   getFinishedSpans(): ReadableSpan[] {
-    return this._finishedSpan;
+    return this._finishedSpans;
   }
 }

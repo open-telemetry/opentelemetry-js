@@ -22,7 +22,6 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
   onStart(span: Span): void {}
-
   onEnd(span: Span): void {
     this.spans.push(span);
   }
