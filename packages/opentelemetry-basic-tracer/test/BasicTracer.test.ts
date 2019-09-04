@@ -107,7 +107,7 @@ describe('BasicTracer', () => {
       span.end();
     });
 
-    it('should start a span with defaultAttributes and spanoptions', () => {
+    it('should start a span with defaultAttributes and spanoptions->attributes', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
         defaultAttributes: { foo: 'bar' },
@@ -115,7 +115,28 @@ describe('BasicTracer', () => {
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
-      assert.strictEqual(span.attributes, { bar: 'bar', foo: 'foo' });
+      assert.deepStrictEqual(span.attributes, { bar: 'bar', foo: 'foo' });
+      span.end();
+    });
+
+    it('should start a span with defaultAttributes and undefined spanoptions->attributes', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        defaultAttributes: { foo: 'bar' },
+      });
+      const span = tracer.startSpan('my-span', {}) as Span;
+      assert.deepStrictEqual(span.attributes, { foo: 'bar' });
+      span.end();
+    });
+
+    it('should start a span with spanoptions->attributes', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+      });
+      const span = tracer.startSpan('my-span', {
+        attributes: { foo: 'foo', bar: 'bar' },
+      }) as Span;
+      assert.deepStrictEqual(span.attributes, { foo: 'foo', bar: 'bar' });
       span.end();
     });
 
