@@ -16,7 +16,6 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import {
-  Tracer,
   SpanKind,
   SpanOptions,
   Span,
@@ -24,7 +23,7 @@ import {
   CanonicalCode,
   SpanContext,
 } from '@opentelemetry/types';
-import { GrpcAttributeNames } from './enums/grpcAttributeNames';
+import { GrpcAttributeNames } from './enums/AttributeNames';
 import {
   grpc,
   ModuleExportsMapping,
@@ -48,12 +47,27 @@ export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 // tslint:disable-next-line:no-any
 let grpcClientModule: any;
 
+/**
+ * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
+ * @param status
+ */
+const _grpcStatusCodeToCanonicalCode = (
+  status?: grpcModule.status
+): CanonicalCode => {
+  if (status !== 0 && !status) {
+    return CanonicalCode.UNKNOWN;
+  }
+  return status as number;
+};
+
+const _grpcStatusCodeToSpanStatus = (status: number): Status => {
+  return { code: status };
+};
+
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
 
   options!: GrpcPluginOptions;
-  protected readonly _moduleExports!: grpc;
-  protected readonly _tracer!: Tracer;
 
   constructor(public moduleName: string, public version: string) {
     super();
@@ -183,10 +197,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
   }
 
-  private static _toSpanStatus(status: number): Status {
-    return { code: status };
-  }
-
   private _getSpanContext(metadata: grpcModule.Metadata): SpanContext | null {
     const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer;
     // Entry doesn't exist
@@ -309,7 +319,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       if (err) {
         if (err.code) {
           span.setStatus({
-            code: GrpcPlugin._grpcStatusCodeToCanonicalCode(err.code),
+            code: _grpcStatusCodeToCanonicalCode(err.code),
             message: err.message,
           });
           span.setAttribute(
@@ -356,7 +366,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     plugin._tracer.bind(call);
     call.on('finish', () => {
-      span.setStatus(GrpcPlugin._toSpanStatus(call.status.code));
+      span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
         GrpcAttributeNames.GRPC_STATUS_CODE,
         call.status.code.toString()
@@ -449,7 +459,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       const wrappedFn = (err: grpcModule.ServiceError, res: any) => {
         if (err) {
           if (err.code) {
-            span.setStatus(GrpcPlugin._toSpanStatus(err.code));
+            span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
             span.setAttribute(
               GrpcAttributeNames.GRPC_STATUS_CODE,
               err.code.toString()
@@ -518,7 +528,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           'error',
           (err: grpcModule.ServiceError) => {
             span.setStatus({
-              code: GrpcPlugin._grpcStatusCodeToCanonicalCode(err.code),
+              code: _grpcStatusCodeToCanonicalCode(err.code),
               message: err.message,
             });
             span.setAttributes({
@@ -588,19 +598,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       metadata = args[metadataIndex];
     }
     return metadata;
-  }
-
-  /**
-   * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
-   * @param status
-   */
-  private static _grpcStatusCodeToCanonicalCode(
-    status?: grpcModule.status
-  ): CanonicalCode {
-    if (status !== 0 && !status) {
-      return CanonicalCode.UNKNOWN;
-    }
-    return status as number;
   }
 }
 

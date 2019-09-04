@@ -16,7 +16,7 @@
 
 import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
-import { GrpcAttributeNames } from '../../src/enums/grpcAttributeNames';
+import { GrpcAttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import { SpanAudit } from './SpanAudit';
 import * as grpc from 'grpc';
