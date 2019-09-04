@@ -16,7 +16,7 @@
 
 import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
-import { GrpcAttributeNames } from '../../src/enums/AttributeNames';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import { SpanAudit } from './SpanAudit';
 import * as grpc from 'grpc';
@@ -31,7 +31,7 @@ export const assertSpan = (
   assert.strictEqual(span.kind, kind);
 
   assert.strictEqual(
-    span.attributes[GrpcAttributeNames.COMPONENT],
+    span.attributes[AttributeNames.COMPONENT],
     GrpcPlugin.component
   );
   assert.strictEqual(span.ended, true);

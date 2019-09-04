@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export enum GrpcAttributeNames {
+export enum AttributeNames {
   COMPONENT = 'component',
   GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
   GRPC_METHOD = 'grpc.method',

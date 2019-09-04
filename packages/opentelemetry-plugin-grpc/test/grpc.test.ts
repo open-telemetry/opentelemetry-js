@@ -20,7 +20,7 @@ import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import * as assert from 'assert';
 import * as grpc from 'grpc';
 import { GrpcPlugin, plugin } from '../src';
-import { SendUnaryDataCallback } from '../src/grpc-types';
+import { SendUnaryDataCallback } from '../src/types';
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { SpanKind, Tracer } from '@opentelemetry/types';
 import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
