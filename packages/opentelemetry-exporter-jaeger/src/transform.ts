@@ -29,6 +29,7 @@ import {
 } from './types';
 
 const MICROS_PER_MILLI = 1000;
+const DEFAULT_FLAGS = 0x1;
 
 /**
  * Translate OpenTelemetry ReadableSpan to Jaeger Thrift Span
@@ -71,7 +72,7 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     parentSpanId: parentSpan,
     operationName: span.name,
     references: spanLinksToThriftRefs(span.links),
-    flags: span.spanContext.traceOptions || 0x1,
+    flags: span.spanContext.traceOptions || DEFAULT_FLAGS,
     startTime: Utils.encodeInt64(span.startTime * MICROS_PER_MILLI),
     duration: Utils.encodeInt64(
       Math.round((span.endTime - span.startTime) * MICROS_PER_MILLI)
