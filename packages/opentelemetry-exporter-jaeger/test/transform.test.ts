@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
 import * as types from '@opentelemetry/types';
-import { ThriftUtils, Utils } from '../src/types';
+import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 
 describe('transform', () => {
   const spanContext = {
@@ -163,6 +163,45 @@ describe('transform', () => {
       assert.strictEqual(tag3.vType, 'BOOL');
       assert.strictEqual(tag3.vBool, true);
       assert.strictEqual(thriftSpan.logs.length, 0);
+    });
+
+    it('should convert an OpenTelemetry span to a Thrift with ThriftReference', () => {
+      const readableSpan: ReadableSpan = {
+        name: 'my-span',
+        kind: types.SpanKind.INTERNAL,
+        spanContext,
+        startTime: 1566156729709,
+        endTime: 1566156729709 + 2000,
+        status: {
+          code: types.CanonicalCode.OK,
+        },
+        attributes: {},
+        parentSpanId: '3e0c63257de34c92',
+        links: [
+          {
+            spanContext: {
+              traceId: 'a4cda95b652f4a1592b449d5929fda1b',
+              spanId: '3e0c63257de34c92',
+            },
+          },
+        ],
+        events: [],
+      };
+
+      const thriftSpan = spanToThrift(readableSpan);
+      const result = ThriftUtils._thrift.Span.rw.toBuffer(thriftSpan);
+      assert.strictEqual(result.err, null);
+      assert.deepStrictEqual(thriftSpan.operationName, 'my-span');
+      assert.deepStrictEqual(
+        thriftSpan.parentSpanId.toString('hex'),
+        '3e0c63257de34c92'
+      );
+      assert.strictEqual(thriftSpan.references.length, 1);
+      const [ref1] = thriftSpan.references;
+      assert.strictEqual(ref1.traceIdLow.toString('hex'), '92b449d5929fda1b');
+      assert.strictEqual(ref1.traceIdHigh.toString('hex'), 'a4cda95b652f4a15');
+      assert.strictEqual(ref1.spanId.toString('hex'), '3e0c63257de34c92');
+      assert.strictEqual(ref1.refType, ThriftReferenceType.CHILD_OF);
     });
   });
 });
