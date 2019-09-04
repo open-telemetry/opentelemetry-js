@@ -320,7 +320,11 @@ describe('GrpcPlugin', () => {
     },
   ];
 
-  const runTest = (method: typeof methodList[0], checkSpans = true) => {
+  const runTest = (
+    method: typeof methodList[0],
+    tracer: Tracer,
+    checkSpans = true
+  ) => {
     it(`should ${
       checkSpans ? 'do' : 'not'
     }: create a rootSpan for client and a childSpan for server - ${
@@ -352,6 +356,60 @@ describe('GrpcPlugin', () => {
             assert.strictEqual(spans.length, 0);
           }
         });
+    });
+
+    it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, () => {
+      const expectEmpty = audit.processSpans();
+      assert.strictEqual(expectEmpty.length, 0);
+
+      let serverSpan: SpanAudit;
+      const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      return tracer.withSpan(span, async () => {
+        const rootSpan = tracer.getCurrentSpan();
+        if (!rootSpan) {
+          assert.ok(false);
+          return; // return so typechecking passes for rootSpan.end()
+        }
+        assert.deepStrictEqual(rootSpan, span);
+
+        const args = [client, method.request];
+        // tslint:disable-next-line:no-any
+        await (method.method as any)
+          .apply({}, args)
+          .then(() => {
+            // Assert
+            const spans = audit.processSpans();
+            if (checkSpans) {
+              assert.strictEqual(spans.length, 3);
+              const clientSpan = spans[1];
+              serverSpan = spans[2];
+              const validations = {
+                name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+                status: grpc.status.OK,
+              };
+              assertSpan(serverSpan, SpanKind.SERVER, validations);
+              assertSpan(clientSpan, SpanKind.CLIENT, validations);
+              assertPropagation(serverSpan, clientSpan);
+              assert.strictEqual(
+                rootSpan.context().traceId,
+                serverSpan.spanContext.traceId
+              );
+              assert.strictEqual(
+                rootSpan.context().spanId,
+                clientSpan.parentSpanId
+              );
+            } else {
+              assert.strictEqual(
+                spans.length,
+                1,
+                'should only contain root span'
+              );
+            }
+          })
+          .catch((err: grpc.ServiceError) => {
+            assert.ok(false, err);
+          });
+      });
     });
   };
 
@@ -485,7 +543,7 @@ describe('GrpcPlugin', () => {
 
     methodList.map(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
-        runTest(method);
+        runTest(method, tracer);
       });
     });
 
@@ -532,7 +590,7 @@ describe('GrpcPlugin', () => {
 
     methodList.map(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
-        runTest(method, false);
+        runTest(method, tracer, false);
       });
     });
   });
