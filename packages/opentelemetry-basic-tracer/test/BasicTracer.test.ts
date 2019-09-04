@@ -107,6 +107,18 @@ describe('BasicTracer', () => {
       span.end();
     });
 
+    it('should start a span with defaultAttributes and spanoptions', () => {
+      const tracer = new BasicTracer({
+        scopeManager: new NoopScopeManager(),
+        defaultAttributes: { foo: 'bar' },
+      });
+      const span = tracer.startSpan('my-span', {
+        attributes: { foo: 'foo', bar: 'bar' },
+      }) as Span;
+      assert.strictEqual(span.attributes, { bar: 'bar', foo: 'foo' });
+      span.end();
+    });
+
     it('should start a span with name and parent spancontext', () => {
       const tracer = new BasicTracer({
         scopeManager: new NoopScopeManager(),
