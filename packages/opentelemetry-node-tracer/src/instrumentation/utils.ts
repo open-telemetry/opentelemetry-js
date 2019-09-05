@@ -60,6 +60,19 @@ export function getPackageVersion(
   }
 }
 
+export function isSupportedVersion(
+  moduleVersion: string,
+  supportedVersions?: string[]
+) {
+  if (!Array.isArray(supportedVersions)) {
+    return true;
+  }
+
+  return supportedVersions.some(supportedVersion =>
+    semver.satisfies(moduleVersion, supportedVersion)
+  );
+}
+
 /**
  * Adds a search path for plugin modules. Intended for testing purposes only.
  * @param searchPath The path to add.
