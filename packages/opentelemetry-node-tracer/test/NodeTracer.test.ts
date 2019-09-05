@@ -21,10 +21,12 @@ import {
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
-  NOOP_SPAN,
+  NoRecordingSpan,
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
+import { TraceOptions } from '@opentelemetry/types';
+import { Span } from '@opentelemetry/basic-tracer';
 
 describe('NodeTracer', () => {
   describe('constructor', () => {
@@ -83,6 +85,7 @@ describe('NodeTracer', () => {
     it('should start a span with name only', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span);
@@ -91,6 +94,7 @@ describe('NodeTracer', () => {
     it('should start a span with name and options', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
@@ -100,16 +104,30 @@ describe('NodeTracer', () => {
       const tracer = new NodeTracer({
         sampler: NEVER_SAMPLER,
         scopeManager: new AsyncHooksScopeManager(),
+        logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
-      assert.deepStrictEqual(span, NOOP_SPAN);
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.isRecordingEvents(), false);
     });
 
     // @todo: implement
     it('should start a Span with always sampling');
 
-    // @todo: implement
-    it('should set default attributes on span');
+    it('should set default attributes on span', () => {
+      const defaultAttributes = {
+        foo: 'bar',
+      };
+      const tracer = new NodeTracer({
+        scopeManager: new AsyncHooksScopeManager(),
+        defaultAttributes,
+      });
+
+      const span = tracer.startSpan('my-span') as Span;
+      assert.ok(span instanceof Span);
+      assert.deepStrictEqual(span.attributes, defaultAttributes);
+    });
   });
 
   describe('.getCurrentSpan()', () => {
@@ -178,7 +196,7 @@ describe('NodeTracer', () => {
     it('should call exporters with span data');
   });
 
-  describe('getBinaryFormat', () => {
+  describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
       const tracer = new NodeTracer({
         scopeManager: new AsyncHooksScopeManager(),
