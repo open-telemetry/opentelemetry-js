@@ -30,7 +30,7 @@ import { spanToThrift } from './transform';
 export class JaegerExporter implements SpanExporter {
   private readonly _logger: types.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
-  private _sender: typeof jaegerTypes.UDPSender;
+  private readonly _sender: typeof jaegerTypes.UDPSender;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
@@ -50,7 +50,6 @@ export class JaegerExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ): void {
     this._logger.debug('Jaeger exporter export');
-    // @todo: buffer spans (batch based on both time and max number)
     return this._sendSpans(spans, resultCallback);
   }
 

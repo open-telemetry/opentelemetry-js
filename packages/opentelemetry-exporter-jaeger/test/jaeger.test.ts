@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { JaegerExporter } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { ThriftProcess, SenderCallback, UDPSender } from '../src/types';
+import { ThriftProcess } from '../src/types';
 import { ExportResult, ReadableSpan } from '@opentelemetry/basic-tracer';
 
 describe('JaegerExporter', () => {
@@ -58,7 +58,6 @@ describe('JaegerExporter', () => {
       exporter = new JaegerExporter({
         serviceName: 'opentelemetry',
       });
-      mockUDPSender(exporter);
     });
 
     afterEach(() => {
@@ -96,46 +95,3 @@ describe('JaegerExporter', () => {
     });
   });
 });
-
-function mockUDPSender(exporter: JaegerExporter) {
-  // Get the process of the current sender and pass to the mock sender. The
-  // process is constructed and attached to the sender at exporter construction
-  // time at initialization time, so there is no way to intercept the process.
-  const process: ThriftProcess = exporter['_sender']._process;
-
-  exporter['_sender'] = new MockedUDPSender();
-  exporter['_sender'].setProcess(process);
-}
-
-class MockedUDPSender extends UDPSender {
-  // tslint:disable-next-line:no-any
-  queue: any = [];
-
-  // Holds the initialized process information. Name matches the associated
-  // UDPSender property.
-  _process: ThriftProcess = {
-    serviceName: 'opentelemetry',
-    tags: [],
-  };
-
-  setProcess(process: ThriftProcess): void {
-    this._process = process;
-  }
-
-  // tslint:disable-next-line:no-any
-  append(span: any, callback?: SenderCallback): void {
-    this.queue.push(span);
-    if (callback) {
-      callback(0);
-    }
-  }
-
-  flush(callback?: SenderCallback): void {
-    if (callback) {
-      callback(this.queue.length);
-      this.queue = [];
-    }
-  }
-
-  close(): void {}
-}
