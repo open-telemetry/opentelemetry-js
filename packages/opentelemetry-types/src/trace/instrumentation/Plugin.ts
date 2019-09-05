@@ -22,9 +22,9 @@ import { Logger } from '../../common/Logger';
 export interface Plugin<T = any> {
   /**
    * Contains all supported versions.
-   * all versions must be compatible with [semver](https://semver.org/spec/v2.0.0.html) format.
+   * All versions must be compatible with [semver](https://semver.org/spec/v2.0.0.html) format.
    * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
-   * If not defined, we will apply instrumentation for every version.
+   * If omitted, all versions of the module will be patched.
    */
   supportedVersions?: string[];
 

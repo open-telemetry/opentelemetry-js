@@ -60,11 +60,16 @@ export function getPackageVersion(
   }
 }
 
+/**
+ * Determines if a version is supported
+ * @param moduleVersion a version in [semver](https://semver.org/spec/v2.0.0.html) format.
+ * @param [supportedVersions] a list of supported versions ([semver](https://semver.org/spec/v2.0.0.html) format).
+ */
 export function isSupportedVersion(
   moduleVersion: string,
   supportedVersions?: string[]
 ) {
-  if (!Array.isArray(supportedVersions)) {
+  if (!Array.isArray(supportedVersions) || supportedVersions.length === 0) {
     return true;
   }
 

@@ -84,6 +84,7 @@ describe('Instrumentation#utils', () => {
       ['~1.0.0', '^0.1.0'],
       ['*'],
       ['>1.0.0'],
+      [],
     ].forEach(supportedVersion => {
       it(`should return true when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
         assert.strictEqual(
@@ -105,9 +106,8 @@ describe('Instrumentation#utils', () => {
     );
 
     it(`should return false when version is equal to null and supportedVersions is equal to '*'`, () => {
-      /* tslint:disable:no-any */
+      // tslint:disable-next-line:no-any
       assert.strictEqual(utils.isSupportedVersion(null as any, ['*']), false);
-      /* tslint:enable:no-any */
     });
   });
 });
