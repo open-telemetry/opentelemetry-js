@@ -18,11 +18,11 @@ import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
-import { SpanAudit } from './SpanAudit';
 import * as grpc from 'grpc';
+import { ReadableSpan } from '@opentelemetry/basic-tracer';
 
 export const assertSpan = (
-  span: SpanAudit,
+  span: ReadableSpan,
   kind: SpanKind,
   validations: { name: string; status: grpc.status }
 ) => {
@@ -34,7 +34,7 @@ export const assertSpan = (
     span.attributes[AttributeNames.COMPONENT],
     GrpcPlugin.component
   );
-  assert.strictEqual(span.ended, true);
+  assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 1);
 
@@ -52,8 +52,8 @@ export const assertSpan = (
 
 // Check if sourceSpan was propagated to targetSpan
 export const assertPropagation = (
-  incomingSpan: SpanAudit,
-  outgoingSpan: SpanAudit
+  incomingSpan: ReadableSpan,
+  outgoingSpan: ReadableSpan
 ) => {
   const targetSpanContext = incomingSpan.spanContext;
   const sourceSpanContext = outgoingSpan.spanContext;

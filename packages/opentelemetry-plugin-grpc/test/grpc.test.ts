@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import * as assert from 'assert';
-import * as grpc from 'grpc';
+import { NoopLogger } from '@opentelemetry/core';
+import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import { SpanKind, Tracer } from '@opentelemetry/types';
+
+import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { GrpcPlugin, plugin } from '../src';
 import { SendUnaryDataCallback } from '../src/types';
-import { assertSpan, assertPropagation } from './utils/assertionUtils';
-import { SpanKind, Tracer } from '@opentelemetry/types';
 import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
-import { ProxyTracer } from './utils/ProxyTracer';
-import { SpanAudit } from './utils/SpanAudit';
+import { TracerTest } from './utils/TracerTest';
+
+import * as assert from 'assert';
+import * as semver from 'semver';
+import * as grpc from 'grpc';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
 const audit = new SpanAuditProcessor();
@@ -276,7 +278,7 @@ describe('GrpcPlugin', () => {
   });
 
   it('should match version', () => {
-    assert.deepStrictEqual('1.22.2', plugin.version);
+    assert.ok(semver.satisfies(plugin.version, '^1.23.3'));
   });
 
   it('moduleName should be grpc', () => {
@@ -362,7 +364,7 @@ describe('GrpcPlugin', () => {
       const expectEmpty = audit.processSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      let serverSpan: SpanAudit;
+      let serverSpan: ReadableSpan;
       const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return tracer.withSpan(span, async () => {
         const rootSpan = tracer.getCurrentSpan();
@@ -462,7 +464,7 @@ describe('GrpcPlugin', () => {
       const expectEmpty = audit.processSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      let serverSpan: SpanAudit;
+      let serverSpan: ReadableSpan;
       const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return tracer.withSpan(span, async () => {
         const rootSpan = tracer.getCurrentSpan();
@@ -513,11 +515,7 @@ describe('GrpcPlugin', () => {
   describe('enable()', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const realTracer = new NodeTracer({
-      scopeManager,
-      logger,
-    });
-    const tracer = new ProxyTracer(realTracer, audit);
+    const tracer = new TracerTest({ scopeManager, logger }, audit);
     beforeEach(() => {
       audit.reset();
     });
@@ -563,11 +561,7 @@ describe('GrpcPlugin', () => {
   describe('disable()', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const realTracer = new NodeTracer({
-      scopeManager,
-      logger,
-    });
-    const tracer = new ProxyTracer(realTracer, audit);
+    const tracer = new TracerTest({ scopeManager, logger }, audit);
     beforeEach(() => {
       audit.reset();
     });

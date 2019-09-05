@@ -38,7 +38,7 @@ interface GrpcStatus {
 export type ServerCall =
   | typeof grpcModule.ServerUnaryCall
   | typeof grpcModule.ServerReadableStream
-  | typeof grpcModule.ServerWriteableStream
+  | typeof grpcModule.ServerWritableStream
   | typeof grpcModule.ServerDuplexStream;
 
 export type ServerCallWithMeta = ServerCall & {
