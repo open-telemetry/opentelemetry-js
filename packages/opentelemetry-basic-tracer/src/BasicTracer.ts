@@ -96,7 +96,9 @@ export class BasicTracer implements types.Tracer {
       options.startTime
     );
     // Set default attributes
-    span.setAttributes(this._defaultAttributes);
+    span.setAttributes(
+      Object.assign({}, this._defaultAttributes, options.attributes)
+    );
     return span;
   }
 
