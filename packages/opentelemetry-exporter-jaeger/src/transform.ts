@@ -47,6 +47,7 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     (name): Tag => ({ key: name, value: toTagValue(span.attributes[name]) })
   );
   tags.push({ key: 'status.code', value: span.status.code });
+  tags.push({ key: 'status.name', value: CanonicalCode[span.status.code] });
   if (span.status.message) {
     tags.push({ key: 'status.message', value: span.status.message });
   }
