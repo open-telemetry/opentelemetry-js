@@ -28,6 +28,9 @@ export interface ExporterConfig {
   maxPacketSize?: number; // default: 65000
 }
 
+// Below require is needed as jaeger-client types does not expose the thrift,
+// udp_sender, util etc. modules.
+
 // tslint:disable-next-line:variable-name
 export const UDPSender = require('jaeger-client/dist/src/reporters/udp_sender')
   .default;
