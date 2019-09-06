@@ -1,4 +1,4 @@
-/*!
+/**
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +14,10 @@
  * limitations under the License.
  */
 
-export * from './BasicTracer';
-export * from './export/ConsoleSpanExporter';
-export * from './export/BatchSpanProcessor';
-export * from './export/ExportResult';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './types';
+/**
+ * When called, the active Timeout object will not require the Node.js event
+ * loop to remain active.
+ */
+export function unrefTimer(timer: NodeJS.Timeout): void {
+  timer.unref();
+}

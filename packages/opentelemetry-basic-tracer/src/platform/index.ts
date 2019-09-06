@@ -1,11 +1,11 @@
-/*!
+/**
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-export * from './BasicTracer';
-export * from './export/ConsoleSpanExporter';
-export * from './export/BatchSpanProcessor';
-export * from './export/ExportResult';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './types';
+// Use the node platform by default. The "browser" field of package.json is used
+// to override this file to use `./browser/index.ts` when packaged with
+// webpack, Rollup, etc.
+export * from './node';
