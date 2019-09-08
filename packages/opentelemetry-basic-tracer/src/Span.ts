@@ -137,7 +137,8 @@ export class Span implements types.Span, ReadableSpan {
     if (this._duration[0] < 0) {
       this._logger.warn(
         'Inconsistent start and end time, startTime > endTime',
-        this.startTime, this.endTime
+        this.startTime,
+        this.endTime
       );
     }
 

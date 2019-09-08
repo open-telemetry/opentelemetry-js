@@ -25,7 +25,11 @@ import {
 } from '@opentelemetry/types';
 import { BasicTracer } from '../src';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { hrTimeToNanoseconds, NoopLogger } from '@opentelemetry/core';
+import {
+  hrTimeToNanoseconds,
+  hrTimeToMilliseconds,
+  NoopLogger,
+} from '@opentelemetry/core';
 
 describe('Span', () => {
   const tracer = new BasicTracer({
@@ -48,21 +52,20 @@ describe('Span', () => {
 
   it('should have valid startTime', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    assert.ok(span.startTime[0] + span.startTime[1] > performance.timeOrigin);
+    assert.ok(hrTimeToMilliseconds(span.startTime) > performance.timeOrigin);
   });
 
   it('should have valid endTime', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.end();
-    assert.ok(span.endTime[0] >= span.startTime[0]);
     assert.ok(
-      span.endTime[0] + span.endTime[1] > span.startTime[0] + span.startTime[1],
+      hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
       'end time must be bigger than start time'
     );
 
     assert.ok(
-      span.endTime[0] + span.endTime[1] > performance.timeOrigin,
-      'end time is bigger than process start time'
+      hrTimeToMilliseconds(span.endTime) > performance.timeOrigin,
+      'end time must be bigger than time origin'
     );
   });
 
@@ -75,7 +78,9 @@ describe('Span', () => {
   it('should have valid event.time', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.addEvent('my-event');
-    assert.ok(span.events[0].time[0] + span.events[0].time[1] > performance.timeOrigin);
+    assert.ok(
+      hrTimeToMilliseconds(span.events[0].time) > performance.timeOrigin
+    );
   });
 
   it('should get the span context of span', () => {
