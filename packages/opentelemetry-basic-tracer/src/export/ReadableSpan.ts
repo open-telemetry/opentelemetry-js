@@ -21,7 +21,7 @@ import {
   HrTime,
   Link,
   SpanContext,
-  TimedEvent
+  TimedEvent,
 } from '@opentelemetry/types';
 
 export interface ReadableSpan {

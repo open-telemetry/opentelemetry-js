@@ -19,6 +19,9 @@ import { performance } from 'perf_hooks';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 
+const NANOSECOND_DIGITS = 9;
+const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
+
 /**
  * This class represents a span.
  */
@@ -37,7 +40,7 @@ export class Span implements types.Span, ReadableSpan {
   status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  endTime:types.HrTime = [0, 0];
+  endTime: types.HrTime = [0, 0];
   private _ended = false;
   private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
@@ -86,7 +89,7 @@ export class Span implements types.Span, ReadableSpan {
     this.events.push({
       name,
       attributes,
-      time: Span._processNowToHrtime(),
+      time: Span._hrtime(),
     });
     return this;
   }
@@ -132,17 +135,17 @@ export class Span implements types.Span, ReadableSpan {
       return this._duration;
     }
 
-    let millis = this.startTime[0] - this.endTime[0];
+    let seconds = this.startTime[0] - this.endTime[0];
     let nanos = this.startTime[1] - this.endTime[1];
 
     // overflow
     if (nanos < 0) {
-      millis -= 1;
+      seconds -= 1;
       // negate
-      nanos += 1e9;
+      nanos += SECOND_TO_NANOSECONDS;
     }
 
-    this._duration = [millis, nanos];
+    this._duration = [seconds, nanos];
     return this._duration;
   }
 
@@ -159,23 +162,24 @@ export class Span implements types.Span, ReadableSpan {
 
   // Converts a number to HrTime
   private static _numberToHrtime(time: number): types.HrTime {
-    const millis = Math.trunc(time)
-    const nanos = Number((time - millis).toFixed(10)) * 1e10;
-    return [millis, nanos];
+    // Decimals only.
+    const seconds = Math.trunc(time);
+    // Round sub-nanosecond accuracy to nanosecond.
+    const nanos =
+      Number((time - seconds).toFixed(NANOSECOND_DIGITS)) *
+      SECOND_TO_NANOSECONDS;
+    return [seconds, nanos];
   }
 
   // Converts a TimeInput to an HrTime, defaults to _hrtime().
   private static _toHrTime(time?: types.TimeInput): types.HrTime {
+    // process.hrtime
     if (Array.isArray(time)) {
-      // convert seconds to millis
-      const millis = time[0] * 1000 + Number(String(time[1]).substring(0, 3));
-      // chop millis
-      const nanos = Number(String(time[1]).substring(3));
-      return [millis, nanos];
+      return time;
     } else if (typeof time === 'number') {
       // Must be a performance.now() if it's smaller than process start time.
       if (time < performance.timeOrigin) {
-        return Span._processNowToHrtime(time);
+        return Span._hrtime(time);
       }
       // epoch milliseconds or performance.timeOrigin
       else {
@@ -184,24 +188,24 @@ export class Span implements types.Span, ReadableSpan {
     } else if (time instanceof Date) {
       return [time.getTime(), 0];
     } else {
-      return Span._processNowToHrtime();
+      return Span._hrtime();
     }
   }
 
   // Returns an hrtime calculated via performance component.
-  private static _processNowToHrtime(performanceNow?: number): types.HrTime {
+  private static _hrtime(performanceNow?: number): types.HrTime {
     const timeOrigin = Span._numberToHrtime(performance.timeOrigin);
     const now = Span._numberToHrtime(performanceNow || performance.now());
 
-    let millis = timeOrigin[0] + now[0];
+    let seconds = timeOrigin[0] + now[0];
     let nanos = timeOrigin[1] + now[1];
 
     // Nanoseconds
-    if (nanos > 1e+10) {
-      nanos -= 1e+10;
-      millis += 1;
+    if (nanos > SECOND_TO_NANOSECONDS) {
+      nanos -= SECOND_TO_NANOSECONDS;
+      seconds += 1;
     }
 
-    return [millis, nanos];
+    return [seconds, nanos];
   }
 }

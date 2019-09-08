@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-/** High resolution HrTime: [milliseconds: number, nanoseconds: number] */
+/** High resolution HrTime: [seconds: number, nanoseconds: number] */
 export type HrTime = [number, number];
 
 /**

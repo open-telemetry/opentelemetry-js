@@ -269,7 +269,7 @@ describe('Span', () => {
     const endTime = Date.now();
     span.end(endTime);
     span.end(endTime + 10);
-    assert.deepEqual(span.endTime, [endTime, 0]);
+    assert.deepStrictEqual(span.endTime, [endTime, 0]);
   });
 
   it('should update name', () => {
@@ -291,50 +291,50 @@ describe('Span', () => {
 
     afterEach(() => {
       sandbox.restore();
-    })
+    });
 
     it('should convert Date endTime', () => {
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
       const endTime = new Date();
       span.end(endTime);
-      assert.deepEqual(span.endTime, [endTime.getTime(), 0]);
+      assert.deepStrictEqual(span.endTime, [endTime.getTime(), 0]);
     });
 
     it('should convert epoch milliseconds endTime', () => {
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
       const endTime = Date.now();
       span.end(endTime);
-      assert.deepEqual(span.endTime, [endTime, 0]);
+      assert.deepStrictEqual(span.endTime, [endTime, 0]);
     });
 
     it('should convert performance.now() endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
+      sandbox.stub(performance, 'timeOrigin').value(111.5);
 
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime = 11.90000000000;
+      const endTime = 11.9;
       span.end(endTime);
 
-      assert.deepEqual(span.endTime, [123, 4000000000]);
+      assert.deepStrictEqual(span.endTime, [123, 400000000]);
     });
 
-    it('should convert hrtime endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
+    it('should not convert hrtime endTime', () => {
+      sandbox.stub(performance, 'timeOrigin').value(111.5);
 
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime:[number, number] = [3138971, 245466222];
+      const endTime: [number, number] = [3138971, 245466222];
       span.end(endTime);
 
-      assert.deepEqual(span.endTime, [3138971245, 466222]);
+      assert.deepStrictEqual(span.endTime, endTime);
     });
 
     it('should use default endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.50000000000);
-      sandbox.stub(performance, 'now').callsFake(() => 11.90000000000);
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
 
       const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
       span.end();
 
-      assert.deepEqual(span.endTime, [123, 4000000000]);
+      assert.deepStrictEqual(span.endTime, [22, 800000000]);
     });
-  })
+  });
 });
