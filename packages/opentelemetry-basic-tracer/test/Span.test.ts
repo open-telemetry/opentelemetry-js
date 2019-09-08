@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import { performance } from 'perf_hooks';
-import * as sinon from 'sinon';
 import { Span } from '../src/Span';
 import {
   SpanKind,
@@ -280,61 +279,5 @@ describe('Span', () => {
     // shouldn't update name
     span.updateName('bar-span');
     assert.strictEqual(span.name, 'foo-span');
-  });
-
-  describe('time', () => {
-    let sandbox: sinon.SinonSandbox;
-
-    beforeEach(() => {
-      sandbox = sinon.createSandbox();
-    });
-
-    afterEach(() => {
-      sandbox.restore();
-    });
-
-    it('should convert Date endTime', () => {
-      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime = new Date();
-      span.end(endTime);
-      assert.deepStrictEqual(span.endTime, [endTime.getTime(), 0]);
-    });
-
-    it('should convert epoch milliseconds endTime', () => {
-      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime = Date.now();
-      span.end(endTime);
-      assert.deepStrictEqual(span.endTime, [endTime, 0]);
-    });
-
-    it('should convert performance.now() endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.5);
-
-      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime = 11.9;
-      span.end(endTime);
-
-      assert.deepStrictEqual(span.endTime, [123, 400000000]);
-    });
-
-    it('should not convert hrtime endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.5);
-
-      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      const endTime: [number, number] = [3138971, 245466222];
-      span.end(endTime);
-
-      assert.deepStrictEqual(span.endTime, endTime);
-    });
-
-    it('should use default endTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(11.5);
-      sandbox.stub(performance, 'now').callsFake(() => 11.3);
-
-      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-      span.end();
-
-      assert.deepStrictEqual(span.endTime, [22, 800000000]);
-    });
   });
 });

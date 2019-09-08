@@ -15,12 +15,9 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
-
-const NANOSECOND_DIGITS = 9;
-const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
 
 /**
  * This class represents a span.
@@ -59,7 +56,7 @@ export class Span implements types.Span, ReadableSpan {
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = Span._toHrTime(startTime);
+    this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
   }
 
@@ -89,7 +86,7 @@ export class Span implements types.Span, ReadableSpan {
     this.events.push({
       name,
       attributes,
-      time: Span._hrtime(),
+      time: hrTime(),
     });
     return this;
   }
@@ -118,7 +115,7 @@ export class Span implements types.Span, ReadableSpan {
       return;
     }
     this._ended = true;
-    this.endTime = Span._toHrTime(endTime);
+    this.endTime = timeInputToHrTime(endTime);
     // @todo: record or export the span
   }
 
@@ -135,17 +132,7 @@ export class Span implements types.Span, ReadableSpan {
       return this._duration;
     }
 
-    let seconds = this.startTime[0] - this.endTime[0];
-    let nanos = this.startTime[1] - this.endTime[1];
-
-    // overflow
-    if (nanos < 0) {
-      seconds -= 1;
-      // negate
-      nanos += SECOND_TO_NANOSECONDS;
-    }
-
-    this._duration = [seconds, nanos];
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
     return this._duration;
   }
 
@@ -158,54 +145,5 @@ export class Span implements types.Span, ReadableSpan {
       );
     }
     return this._ended;
-  }
-
-  // Converts a number to HrTime
-  private static _numberToHrtime(time: number): types.HrTime {
-    // Decimals only.
-    const seconds = Math.trunc(time);
-    // Round sub-nanosecond accuracy to nanosecond.
-    const nanos =
-      Number((time - seconds).toFixed(NANOSECOND_DIGITS)) *
-      SECOND_TO_NANOSECONDS;
-    return [seconds, nanos];
-  }
-
-  // Converts a TimeInput to an HrTime, defaults to _hrtime().
-  private static _toHrTime(time?: types.TimeInput): types.HrTime {
-    // process.hrtime
-    if (Array.isArray(time)) {
-      return time;
-    } else if (typeof time === 'number') {
-      // Must be a performance.now() if it's smaller than process start time.
-      if (time < performance.timeOrigin) {
-        return Span._hrtime(time);
-      }
-      // epoch milliseconds or performance.timeOrigin
-      else {
-        return Span._numberToHrtime(time);
-      }
-    } else if (time instanceof Date) {
-      return [time.getTime(), 0];
-    } else {
-      return Span._hrtime();
-    }
-  }
-
-  // Returns an hrtime calculated via performance component.
-  private static _hrtime(performanceNow?: number): types.HrTime {
-    const timeOrigin = Span._numberToHrtime(performance.timeOrigin);
-    const now = Span._numberToHrtime(performanceNow || performance.now());
-
-    let seconds = timeOrigin[0] + now[0];
-    let nanos = timeOrigin[1] + now[1];
-
-    // Nanoseconds
-    if (nanos > SECOND_TO_NANOSECONDS) {
-      nanos -= SECOND_TO_NANOSECONDS;
-      seconds += 1;
-    }
-
-    return [seconds, nanos];
   }
 }
