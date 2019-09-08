@@ -90,8 +90,6 @@ export class PluginLoader {
           `PluginLoader#load: trying loading ${name}.${version}`
         );
 
-        // @todo (issues/132): Check if version and supportedVersions are
-        // satisfied
         if (!version) return exports;
 
         this.logger.debug(
@@ -101,6 +99,11 @@ export class PluginLoader {
         // Expecting a plugin from module;
         try {
           const plugin: Plugin = require(moduleName).plugin;
+
+          if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
+            return exports;
+          }
+
           this._plugins.push(plugin);
           // Enable each supported plugin.
           return plugin.enable(exports, this.tracer, this.logger);

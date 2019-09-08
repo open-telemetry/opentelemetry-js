@@ -69,4 +69,45 @@ describe('Instrumentation#utils', () => {
       });
     });
   });
+  describe('isSupportedVersion', () => {
+    const version = '1.0.1';
+
+    it('should return true when supportedVersions is not defined', () => {
+      assert.strictEqual(utils.isSupportedVersion('1.0.0', undefined), true);
+    });
+
+    [
+      ['1.X'],
+      [version],
+      ['1.X.X', '3.X.X'],
+      ['^1.0.0'],
+      ['~1.0.0', '^0.1.0'],
+      ['*'],
+      ['>1.0.0'],
+      [],
+    ].forEach(supportedVersion => {
+      it(`should return true when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
+        assert.strictEqual(
+          utils.isSupportedVersion(version, supportedVersion),
+          true
+        );
+      });
+    });
+
+    [['0.X'], ['0.0.1'], ['0.X.X'], ['^0.1.0'], ['1.0.0'], ['<1.0.0']].forEach(
+      supportedVersion => {
+        it(`should return false when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
+          assert.strictEqual(
+            utils.isSupportedVersion(version, supportedVersion),
+            false
+          );
+        });
+      }
+    );
+
+    it(`should return false when version is equal to null and supportedVersions is equal to '*'`, () => {
+      // tslint:disable-next-line:no-any
+      assert.strictEqual(utils.isSupportedVersion(null as any, ['*']), false);
+    });
+  });
 });

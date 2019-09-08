@@ -21,6 +21,7 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
+  supportedVersions?: string[];
 
   enable(
     moduleExports: T,
