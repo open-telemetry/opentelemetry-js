@@ -49,7 +49,7 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
-    startTime?: types.TimeInput
+    startTime: types.TimeInput = hrTime()
   ) {
     this._tracer = parentTracer;
     this.name = spanName;
@@ -109,7 +109,7 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime?: types.TimeInput): void {
+  end(endTime: types.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
@@ -133,6 +133,14 @@ export class Span implements types.Span, ReadableSpan {
     }
 
     this._duration = hrTimeDuration(this.startTime, this.endTime);
+
+    if (this._duration[0] < 0) {
+      this._logger.warn(
+        'Inconsistent start and end time, startTime > endTime',
+        this.startTime, this.endTime
+      );
+    }
+
     return this._duration;
   }
 

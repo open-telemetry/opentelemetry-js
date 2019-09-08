@@ -48,7 +48,7 @@ export function hrTime(performanceNow?: number): types.HrTime {
 }
 
 // Converts a TimeInput to an HrTime, defaults to _hrtime().
-export function timeInputToHrTime(time?: types.TimeInput): types.HrTime {
+export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
   // process.hrtime
   if (Array.isArray(time)) {
     return time;
@@ -64,7 +64,7 @@ export function timeInputToHrTime(time?: types.TimeInput): types.HrTime {
   } else if (time instanceof Date) {
     return [time.getTime(), 0];
   } else {
-    return hrTime();
+    throw TypeError('Invalid input type');
   }
 }
 
@@ -84,4 +84,16 @@ export function hrTimeDuration(
   }
 
   return [seconds, nanos];
+}
+
+// Convert hrTime to nanoseconds.
+export function hrTimeToNanoseconds(hrTime: types.HrTime): number {
+  const nanos = hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
+  return nanos;
+}
+
+// Convert hrTime to milliseconds.
+export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
+  const nanos = Math.round(hrTime[0] * 1000 + hrTime[1] / 1e6);
+  return nanos;
 }

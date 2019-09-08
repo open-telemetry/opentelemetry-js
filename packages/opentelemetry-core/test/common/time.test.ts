@@ -22,6 +22,8 @@ import {
   hrTime,
   timeInputToHrTime,
   hrTimeDuration,
+  hrTimeToNanoseconds,
+  hrTimeToMilliseconds,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -91,14 +93,6 @@ describe('time', () => {
 
       assert.deepStrictEqual(timeInput, output);
     });
-
-    it('should use default hrTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(11.5);
-      sandbox.stub(performance, 'now').callsFake(() => 11.3);
-
-      const output = timeInputToHrTime();
-      assert.deepStrictEqual(output, [22, 800000000]);
-    });
   });
 
   describe('#hrTimeDuration', () => {
@@ -116,6 +110,20 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
+    });
+  });
+
+  describe('#hrTimeToNanoseconds', () => {
+    it('should return nanoseconds', () => {
+      const output = hrTimeToNanoseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200000000);
+    });
+  });
+
+  describe('#hrTimeToMilliseconds', () => {
+    it('should return milliseconds', () => {
+      const output = hrTimeToMilliseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200);
     });
   });
 });
