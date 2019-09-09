@@ -16,21 +16,23 @@
 
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import {
+  BasicTracer,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/basic-tracer';
 import { SpanKind, Tracer } from '@opentelemetry/types';
 
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { GrpcPlugin, plugin } from '../src';
 import { SendUnaryDataCallback } from '../src/types';
-import { SpanAuditProcessor } from './utils/SpanAuditProcessor';
-import { TracerTest } from './utils/TracerTest';
 
 import * as assert from 'assert';
 import * as semver from 'semver';
 import * as grpc from 'grpc';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
-const audit = new SpanAuditProcessor();
+const memoryExporter = new InMemorySpanExporter();
 
 type GrpcModule = typeof grpc;
 const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
@@ -341,10 +343,10 @@ describe('GrpcPlugin', () => {
             checkEqual(result)(method.result),
             'gRPC call returns correct values'
           );
-          const spans = audit.processSpans();
+          const spans = memoryExporter.getFinishedSpans();
           if (checkSpans) {
-            const incomingSpan = spans[1];
-            const outgoingSpan = spans[0];
+            const incomingSpan = spans[0];
+            const outgoingSpan = spans[1];
             const validations = {
               name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
               status: grpc.status.OK,
@@ -361,10 +363,9 @@ describe('GrpcPlugin', () => {
     });
 
     it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, () => {
-      const expectEmpty = audit.processSpans();
+      const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      let serverSpan: ReadableSpan;
       const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return tracer.withSpan(span, async () => {
         const rootSpan = tracer.getCurrentSpan();
@@ -380,11 +381,11 @@ describe('GrpcPlugin', () => {
           .apply({}, args)
           .then(() => {
             // Assert
-            const spans = audit.processSpans();
             if (checkSpans) {
-              assert.strictEqual(spans.length, 3);
+              const spans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(spans.length, 2);
+              const serverSpan = spans[0];
               const clientSpan = spans[1];
-              serverSpan = spans[2];
               const validations = {
                 name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
                 status: grpc.status.OK,
@@ -399,12 +400,6 @@ describe('GrpcPlugin', () => {
               assert.strictEqual(
                 rootSpan.context().spanId,
                 clientSpan.parentSpanId
-              );
-            } else {
-              assert.strictEqual(
-                spans.length,
-                1,
-                'should only contain root span'
               );
             }
           })
@@ -429,7 +424,7 @@ describe('GrpcPlugin', () => {
     tracer: Tracer
   ) => {
     it(`should raise an error for client/server rootSpans: method=${method.methodName}, status=${key}`, async () => {
-      const expectEmpty = audit.processSpans();
+      const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
       const errRequest =
@@ -445,15 +440,15 @@ describe('GrpcPlugin', () => {
           assert.ok(false);
         })
         .catch((err: grpc.ServiceError) => {
-          const spans = audit.processSpans();
+          const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 2, 'Expect 2 ended spans');
 
           const validations = {
             name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
             status: errorCode,
           };
-          const clientRoot = spans[0];
-          const serverRoot = spans[1];
+          const serverRoot = spans[0];
+          const clientRoot = spans[1];
           assertSpan(serverRoot, SpanKind.SERVER, validations);
           assertSpan(clientRoot, SpanKind.CLIENT, validations);
           assertPropagation(serverRoot, clientRoot);
@@ -461,10 +456,9 @@ describe('GrpcPlugin', () => {
     });
 
     it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = ${key}`, () => {
-      const expectEmpty = audit.processSpans();
+      const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      let serverSpan: ReadableSpan;
       const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return tracer.withSpan(span, async () => {
         const rootSpan = tracer.getCurrentSpan();
@@ -488,10 +482,10 @@ describe('GrpcPlugin', () => {
           })
           .catch((err: grpc.ServiceError) => {
             // Assert
-            const spans = audit.processSpans();
-            assert.strictEqual(spans.length, 3);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 2);
+            const serverSpan = spans[0];
             const clientSpan = spans[1];
-            serverSpan = spans[2];
             const validations = {
               name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
               status: errorCode,
@@ -515,9 +509,10 @@ describe('GrpcPlugin', () => {
   describe('enable()', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const tracer = new TracerTest({ scopeManager, logger }, audit);
+    const tracer = new BasicTracer({ scopeManager, logger });
+    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
-      audit.reset();
+      memoryExporter.reset();
     });
 
     before(() => {
@@ -561,9 +556,10 @@ describe('GrpcPlugin', () => {
   describe('disable()', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const tracer = new TracerTest({ scopeManager, logger }, audit);
+    const tracer = new BasicTracer({ scopeManager, logger });
+    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
-      audit.reset();
+      memoryExporter.reset();
     });
 
     before(() => {
