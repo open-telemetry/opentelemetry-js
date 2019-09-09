@@ -32,6 +32,9 @@ import { BasicTracerConfig, TraceParams } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
+import { SpanProcessor } from './SpanProcessor';
+import { NoopSpanProcessor } from './NoopSpanProcessor';
+import { MultiSpanProcessor } from './MultiSpanProcessor';
 
 /**
  * This class represents a basic tracer.
@@ -44,6 +47,8 @@ export class BasicTracer implements types.Tracer {
   private readonly _scopeManager: ScopeManager;
   private readonly _traceParams: TraceParams;
   readonly logger: Logger;
+  private readonly _registeredSpanProcessor: SpanProcessor[] = [];
+  activeSpanProcessor = new NoopSpanProcessor();
 
   /**
    * Constructs a new Tracer instance.
@@ -161,6 +166,17 @@ export class BasicTracer implements types.Tracer {
   /** Returns the active {@link TraceParams}. */
   getActiveTraceParams(): TraceParams {
     return this._traceParams;
+  }
+
+  /**
+   * Adds a new {@link SpanProcessor} to this tracer.
+   * @param spanProcessor the new SpanProcessor to be added.
+   */
+  addSpanProcessor(spanProcessor: SpanProcessor): void {
+    this._registeredSpanProcessor.push(spanProcessor);
+    this.activeSpanProcessor = new MultiSpanProcessor(
+      this._registeredSpanProcessor
+    );
   }
 
   private _getParentSpanContext(

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-export * from './BasicTracer';
-export * from './export/ExportResult';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './types';
+import { Span } from '@opentelemetry/types';
+import { SpanProcessor } from './SpanProcessor';
+
+/** No-op implementation of SpanProcessor */
+export class NoopSpanProcessor implements SpanProcessor {
+  onStart(span: Span): void {}
+  onEnd(span: Span): void {}
+  shutdown(): void {}
+}
