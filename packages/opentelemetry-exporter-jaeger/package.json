@@ -7,6 +7,7 @@
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
     "tdd": "yarn test -- --watch-extensions ts --watch",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
@@ -46,5 +47,9 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "@opentelemetry/core": "^0.0.1",
+    "@opentelemetry/basic-tracer": "^0.0.1",
+    "@opentelemetry/types": "^0.0.1",
+    "jaeger-client": "^3.15.0"
   }
 }
