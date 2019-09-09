@@ -62,6 +62,20 @@ const missingPathPlugins: Plugins = {
   },
 };
 
+const supportedVersionPlugins: Plugins = {
+  'supported-module': {
+    enabled: true,
+    path: '@opentelemetry/plugin-supported-module',
+  },
+};
+
+const notSupportedVersionPlugins: Plugins = {
+  'notsupported-module': {
+    enabled: true,
+    path: 'notsupported-module',
+  },
+};
+
 describe('PluginLoader', () => {
   const tracer = new NoopTracer();
   const logger = new NoopLogger();
@@ -129,7 +143,7 @@ describe('PluginLoader', () => {
     it('should not load the plugin when supported versions does not match', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load({ 'notsupported-module': true });
+      pluginLoader.load(notSupportedVersionPlugins);
       // The hook is only called the first time the module is loaded.
       require('notsupported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
@@ -139,7 +153,7 @@ describe('PluginLoader', () => {
     it('should load a plugin and patch the target modules when supported versions match', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load({ 'supported-module': true });
+      pluginLoader.load(supportedVersionPlugins);
       // The hook is only called the first time the module is loaded.
       const simpleModule = require('supported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
