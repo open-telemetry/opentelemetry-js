@@ -16,9 +16,6 @@
 
 import * as types from '@opentelemetry/types';
 import {
-  ALWAYS_SAMPLER,
-  BinaryTraceContext,
-  HttpTraceContext,
   randomTraceId,
   isValid,
   randomSpanId,
@@ -31,9 +28,10 @@ import {
   TraceOptions,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig } from '../src/types';
+import { BasicTracerConfig, TraceParams } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
+import { mergeConfig } from './utility';
 
 /**
  * This class represents a basic tracer.
@@ -44,17 +42,20 @@ export class BasicTracer implements types.Tracer {
   private readonly _httpTextFormat: types.HttpTextFormat;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
+  private readonly _traceParams: TraceParams;
   readonly logger: Logger;
 
   /**
    * Constructs a new Tracer instance.
    */
   constructor(config: BasicTracerConfig) {
-    this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
-    this._defaultAttributes = config.defaultAttributes || {};
-    this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
-    this._sampler = config.sampler || ALWAYS_SAMPLER;
-    this._scopeManager = config.scopeManager;
+    const localConfig = mergeConfig(config);
+    this._binaryFormat = localConfig.binaryFormat;
+    this._defaultAttributes = localConfig.defaultAttributes;
+    this._httpTextFormat = localConfig.httpTextFormat;
+    this._sampler = localConfig.sampler;
+    this._scopeManager = localConfig.scopeManager;
+    this._traceParams = localConfig.traceParams;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
@@ -155,6 +156,11 @@ export class BasicTracer implements types.Tracer {
    */
   getHttpTextFormat(): HttpTextFormat {
     return this._httpTextFormat;
+  }
+
+  /** Returns the active {@link TraceParams}. */
+  getActiveTraceParams(): TraceParams {
+    return this._traceParams;
   }
 
   private _getParentSpanContext(
