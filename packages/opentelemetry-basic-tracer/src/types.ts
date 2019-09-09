@@ -61,4 +61,17 @@ export interface BasicTracerConfig {
    * Scope manager keeps context across in-process operations.
    */
   scopeManager: ScopeManager;
+
+  /** Trace Parameters */
+  traceParams?: TraceParams;
+}
+
+/** Global configuration of trace service */
+export interface TraceParams {
+  /** numberOfAttributesPerSpan is number of attributes per span */
+  numberOfAttributesPerSpan?: number;
+  /** numberOfLinksPerSpan is number of links per span */
+  numberOfLinksPerSpan?: number;
+  /** numberOfEventsPerSpan is number of message events per span */
+  numberOfEventsPerSpan?: number;
 }

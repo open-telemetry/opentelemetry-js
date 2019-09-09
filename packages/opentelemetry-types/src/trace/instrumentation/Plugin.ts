@@ -21,6 +21,14 @@ import { Logger } from '../../common/Logger';
 // tslint:disable-next-line:no-any
 export interface Plugin<T = any> {
   /**
+   * Contains all supported versions.
+   * All versions must be compatible with [semver](https://semver.org/spec/v2.0.0.html) format.
+   * If the version is not supported, we won't apply instrumentation patch (see `enable` method).
+   * If omitted, all versions of the module will be patched.
+   */
+  supportedVersions?: string[];
+
+  /**
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.

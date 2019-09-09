@@ -63,8 +63,17 @@ describe('PluginLoader', () => {
     it('sanity check', () => {
       // Ensure that module fixtures contain values that we expect.
       const simpleModule = require('simple-module');
+      const simpleModule001 = require('supported-module');
+      const simpleModule100 = require('notsupported-module');
+
       assert.strictEqual(simpleModule.name(), 'simple-module');
+      assert.strictEqual(simpleModule001.name(), 'supported-module');
+      assert.strictEqual(simpleModule100.name(), 'notsupported-module');
+
       assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule001.value(), 0);
+      assert.strictEqual(simpleModule100.value(), 0);
+
       assert.throws(() => require('nonexistent-module'));
     });
 
@@ -77,6 +86,28 @@ describe('PluginLoader', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       assert.strictEqual(simpleModule.value(), 1);
       assert.strictEqual(simpleModule.name(), 'patched-simple-module');
+      pluginLoader.unload();
+    });
+    // @TODO: simplify this test once we can load module with custom path
+    it('should not load the plugin when supported versions does not match', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load({ 'notsupported-module': true });
+      // The hook is only called the first time the module is loaded.
+      require('notsupported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.unload();
+    });
+    // @TODO: simplify this test once we can load module with custom path
+    it('should load a plugin and patch the target modules when supported versions match', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load({ 'supported-module': true });
+      // The hook is only called the first time the module is loaded.
+      const simpleModule = require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(simpleModule.value(), 1);
+      assert.strictEqual(simpleModule.name(), 'patched-supported-module');
       pluginLoader.unload();
     });
 
