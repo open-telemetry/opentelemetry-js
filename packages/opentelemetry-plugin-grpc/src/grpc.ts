@@ -33,7 +33,11 @@ import {
   SendUnaryDataCallback,
   GrpcClientFunc,
 } from './types';
-import { findIndex } from './utils';
+import {
+  findIndex,
+  _grpcStatusCodeToCanonicalCode,
+  _grpcStatusCodeToSpanStatus,
+} from './utils';
 
 import * as events from 'events';
 import * as grpcModule from 'grpc';
@@ -44,25 +48,7 @@ import * as path from 'path';
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 
-// tslint:disable-next-line:no-any
-let grpcClientModule: any;
-
-/**
- * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
- * @param status
- */
-const _grpcStatusCodeToCanonicalCode = (
-  status?: grpcModule.status
-): CanonicalCode => {
-  if (status !== 0 && !status) {
-    return CanonicalCode.UNKNOWN;
-  }
-  return status as number;
-};
-
-const _grpcStatusCodeToSpanStatus = (status: number): Status => {
-  return { code: status };
-};
+let grpcClientModule: object;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
@@ -174,7 +160,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
       shimmer.wrap(
         grpcClientModule,
-        'makeClientConstructor',
+        'makeClientConstructor' as never,
         this._patchClient()
       );
     }
@@ -193,7 +179,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     if (grpcClientModule) {
-      shimmer.unwrap(grpcClientModule, 'makeClientConstructor');
+      shimmer.unwrap(grpcClientModule, 'makeClientConstructor' as never);
     }
   }
 
@@ -394,7 +380,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _patchClient() {
     const plugin = this;
-    return (original: typeof grpcModule.makeGenericClientConstructor) => {
+    return (
+      original: typeof grpcModule.makeGenericClientConstructor
+    ): never => {
       plugin._logger.debug('patching client');
       return function makeClientConstructor<ImplementationType>(
         this: typeof grpcModule.Client,
@@ -411,7 +399,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           plugin._getPatchedClientMethods() as any
         );
         return client;
-      };
+      } as never;
     };
   }
 

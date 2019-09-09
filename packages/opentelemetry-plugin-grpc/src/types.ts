@@ -44,8 +44,7 @@ export type ServerCall =
 export type ServerCallWithMeta = ServerCall & {
   metadata: grpcModule.Metadata;
   status: GrpcStatus;
-  // tslint:disable-next-line:no-any
-  request?: any;
+  request?: unknown;
 } & events.EventEmitter;
 
 export type GrpcClientFunc = typeof Function & {

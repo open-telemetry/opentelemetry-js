@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { CanonicalCode, Status } from '@opentelemetry/types';
+import * as grpcModule from 'grpc'; // For types only
+
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,
@@ -27,4 +30,21 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
     }
   }
   return -1;
+};
+
+/**
+ * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
+ * @param status
+ */
+export const _grpcStatusCodeToCanonicalCode = (
+  status?: grpcModule.status
+): CanonicalCode => {
+  if (status !== 0 && !status) {
+    return CanonicalCode.UNKNOWN;
+  }
+  return status as number;
+};
+
+export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
+  return { code: status };
 };
