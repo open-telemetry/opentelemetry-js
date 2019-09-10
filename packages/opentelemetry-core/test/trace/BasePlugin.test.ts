@@ -14,44 +14,53 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import { BasePlugin, NoopTracer, NoopLogger } from '../../src';
+import * as assert from 'assert';
 import * as path from 'path';
 
+const tracer = new NoopTracer();
+const logger = new NoopLogger();
 
 describe('BasePlugin', () => {
-    describe('internalFilesLoader', () => {
-        it('should load internally exported files', () => {
-            const plugin = new TestPlugin('test-package', '0.0.1')
-            plugin.enable(null, new NoopTracer(), new NoopLogger(), { basedir });
-            assert.ok(plugin['_internalFilesExports']);
-            assert.strictEqual(plugin['_internalFilesExports'].internal.internallyExportedFunction(), true);
-        });
-
-        it('should not load internal files which do not satisfy semver', () => {
-            const plugin = new TestPlugin('test-package', '0.0.1')
-            plugin.enable(null, new NoopTracer(), new NoopLogger(), { basedir });
-            assert.ok(plugin['_internalFilesExports']);
-            assert.strictEqual(plugin['_internalFilesExports'].expectUndefined, undefined);
-        });
+  describe('internalFilesLoader', () => {
+    it('should load internally exported files', async () => {
+      const testPackage = await import(basedir);
+      const plugin = new TestPlugin();
+      plugin.enable(testPackage, tracer, logger, { basedir });
+      assert.ok(plugin['_internalFilesExports']);
+      assert.strictEqual(
+        plugin['_internalFilesExports'].internal.internallyExportedFunction(),
+        true
+      );
+      assert.strictEqual(
+        plugin['_internalFilesExports'].expectUndefined,
+        undefined
+      );
+      assert.strictEqual(
+        (plugin['_moduleExports']!['externallyExportedFunction'] as Function)(),
+        true
+      );
     });
+  });
 });
 
-class TestPlugin extends BasePlugin<null> {
-    protected readonly _internalFilesList = {
-        '0.0.1': {
-            internal: 'foo/bar/internal.js',
-        },
-        '^1.0.0': {
-            expectUndefined: 'foo/bar/wrongVersionInternal.js'
-        },
-    }
+class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
+  readonly moduleName = 'test-package';
+  readonly version = '0.0.1';
 
-    protected patch(): null {
-        return null;
-    }
-    protected unpatch(): void {
-    }
+  protected readonly _internalFilesList = {
+    '0.0.1': {
+      internal: 'foo/bar/internal.js',
+    },
+    '^1.0.0': {
+      expectUndefined: 'foo/bar/internal.js',
+    },
+  };
+
+  protected patch(): { [key: string]: Function } {
+    return this._moduleExports;
+  }
+  protected unpatch(): void {}
 }
 
 const basedir = path.dirname(require.resolve('./fixtures/test-package'));

@@ -35,14 +35,16 @@ export interface ModuleExportsMapping {
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
   supportedVersions?: string[];
+  readonly moduleName?: string; // required for internalFilesExports
+  readonly version?: string; // required for internalFilesExports
+
+  protected basedir!: string;
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
-  protected readonly _internalFilesList?: ModuleExportsMapping
+  // tslint:disable-next-line:no-any
   protected _internalFilesExports!: { [module: string]: any };
-  protected basedir!: string;
-
-  constructor(readonly moduleName?: string, readonly version?: string) {}
+  protected readonly _internalFilesList?: ModuleExportsMapping; // required for internalFilesExports
 
   enable(
     moduleExports: T,
@@ -67,7 +69,11 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     if (this._internalFilesList) {
       this._logger.debug('loadInternalFiles %o', this._internalFilesList);
       Object.keys(this._internalFilesList).forEach(versionRange => {
-        if (this.version && this.moduleName && semver.satisfies(this.version, versionRange)) {
+        if (
+          this.version &&
+          this.moduleName &&
+          semver.satisfies(this.version, versionRange)
+        ) {
           if (Object.keys(extraModules).length > 0) {
             this._logger.warn(
               'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
@@ -77,17 +83,27 @@ export abstract class BasePlugin<T> implements Plugin<T> {
               this._internalFilesList
             );
           }
-          extraModules = this._loadInternalModuleFiles(this._internalFilesList![versionRange], this.basedir);
+          extraModules = this._loadInternalModuleFiles(
+            this._internalFilesList![versionRange],
+            this.basedir
+          );
         }
       });
     }
     if (Object.keys(extraModules)) {
-      this._logger.debug('No internal files could be loaded for %s@%s', this.moduleName, this.version);
+      this._logger.debug(
+        'No internal files could be loaded for %s@%s',
+        this.moduleName,
+        this.version
+      );
     }
     return extraModules;
   }
 
-  private _loadInternalModuleFiles(extraModulesList: ModuleNameToFilePath, basedir: string): ModuleExportsMapping {
+  private _loadInternalModuleFiles(
+    extraModulesList: ModuleNameToFilePath,
+    basedir: string
+  ): ModuleExportsMapping {
     const extraModules: ModuleExportsMapping = {};
     if (extraModulesList) {
       Object.keys(extraModulesList).forEach(moduleName => {
@@ -98,7 +114,12 @@ export abstract class BasePlugin<T> implements Plugin<T> {
             extraModulesList[moduleName]
           ));
         } catch (e) {
-          this._logger.error('Could not load internal file %s of module %s. Error: %s', path.join(basedir, extraModulesList[moduleName]), this.moduleName, e.message);
+          this._logger.error(
+            'Could not load internal file %s of module %s. Error: %s',
+            path.join(basedir, extraModulesList[moduleName]),
+            this.moduleName,
+            e.message
+          );
         }
       });
     }
