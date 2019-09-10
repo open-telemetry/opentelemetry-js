@@ -2,6 +2,7 @@
   "name": "@opentelemetry/exporter-jaeger",
   "version": "0.0.1",
   "description": "OpenTelemetry Exporter Jaeger allows user to send collected traces to Jaeger",
+  "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
