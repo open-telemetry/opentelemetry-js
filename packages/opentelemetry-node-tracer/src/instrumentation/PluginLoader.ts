@@ -26,7 +26,7 @@ export enum HookState {
 }
 
 export interface Plugins {
-  [pluginName: string]: Partial<PluginConfig>;
+  [pluginName: string]: PluginConfig;
 }
 
 /**
