@@ -17,14 +17,11 @@
 import { Plugins } from './instrumentation/PluginLoader';
 import { BasicTracerConfig } from '@opentelemetry/basic-tracer';
 
-
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
  */
 export interface NodeTracerConfig extends BasicTracerConfig {
-  /**
-   * Plugins options.
-   */
+  /** Plugins options. */
   plugins?: Plugins;
 }
 
@@ -33,7 +30,9 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   http: {
     enabled: true,
     path: '@opentelemetry/plugin-http',
-    ignoreMethods: [],
-    ignoreUrls: [],
+  },
+  grpc: {
+    enabled: true,
+    path: '@opentelemetry/plugin-grpc',
   },
 };
