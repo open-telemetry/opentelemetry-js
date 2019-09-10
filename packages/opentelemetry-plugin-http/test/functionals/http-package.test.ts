@@ -23,16 +23,16 @@ import * as nock from 'nock';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { TracerTest } from '../utils/TracerTest';
-import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
+import { TestProcessor } from '../utils/TestProcessor';
 import * as url from 'url';
 import axios, { AxiosResponse } from 'axios';
 import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
+import { NodeTracer } from '@opentelemetry/node-tracer';
 
-const audit = new SpanAuditProcessor();
+const spanProcessor = new TestProcessor();
 
 export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
@@ -44,16 +44,14 @@ describe('Packages', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const tracer = new TracerTest(
-      {
-        scopeManager,
-        logger,
-        httpTextFormat,
-      },
-      audit
-    );
+    const tracer = new NodeTracer({
+      scopeManager,
+      logger,
+      httpTextFormat,
+    });
+    tracer.addSpanProcessor(spanProcessor);
     beforeEach(() => {
-      audit.reset();
+      spanProcessor.shutdown();
     });
 
     before(() => {
@@ -101,7 +99,7 @@ describe('Packages', () => {
           const res = result as AxiosResponse<{}>;
           resHeaders = res.headers;
         }
-        const spans = audit.processSpans();
+        const spans = spanProcessor.spans;
         assert.strictEqual(spans.length, 1);
         assert.ok(spans[0].name.indexOf(`GET ${urlparsed.pathname}`) >= 0);
 

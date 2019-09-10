@@ -14,22 +14,14 @@
  * limitations under the License.
  */
 
-import { Span, ReadableSpan } from '@opentelemetry/basic-tracer';
-export class SpanAuditProcessor {
-  private _spans: Span[];
-  constructor() {
-    this._spans = [];
+import { Span, ReadableSpan, SpanProcessor } from '@opentelemetry/basic-tracer';
+export class TestProcessor implements SpanProcessor {
+  spans: ReadableSpan[] = [];
+  onStart(span: Span): void {}
+  onEnd(span: Span): void {
+    this.spans.push(span.toReadableSpan());
   }
-
-  push(span: Span) {
-    this._spans.push(span);
-  }
-
-  processSpans(): ReadableSpan[] {
-    return this._spans.map(span => span.toReadableSpan());
-  }
-
-  reset() {
-    this._spans = [];
+  shutdown(): void {
+    this.spans = [];
   }
 }

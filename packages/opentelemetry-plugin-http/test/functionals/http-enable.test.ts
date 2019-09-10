@@ -24,15 +24,15 @@ import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { TracerTest } from '../utils/TracerTest';
-import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
+import { TestProcessor } from '../utils/TestProcessor';
+import { NodeTracer } from '@opentelemetry/node-tracer';
 
 let server: http.Server;
 const serverPort = 12345;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const audit = new SpanAuditProcessor();
+const spanProcessor = new TestProcessor();
 
 function doNock(
   hostname: string,
@@ -69,22 +69,20 @@ describe('HttpPlugin', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new TracerTest(
-      {
-        scopeManager,
-        logger,
-        httpTextFormat,
-      },
-      audit
-    );
+    const tracer = new NodeTracer({
+      scopeManager,
+      logger,
+      httpTextFormat,
+    });
+    tracer.addSpanProcessor(spanProcessor);
     beforeEach(() => {
-      audit.reset();
+      spanProcessor.shutdown();
     });
 
     before(() => {
       plugin.enable(http, tracer, tracer.logger);
       const ignoreConfig = [
-        `http://${hostname}:${serverPort}/ignored/string`,
+        `http://${hostname}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
@@ -110,9 +108,9 @@ describe('HttpPlugin', () => {
       httpRequest
         .get(`http://${hostname}:${serverPort}${pathname}`)
         .then(result => {
-          const spans = audit.processSpans();
-          const outgoingSpan = spans[0];
-          const incomingSpan = spans[1];
+          const spans = spanProcessor.spans;
+          const outgoingSpan = spans[1];
+          const incomingSpan = spans[0];
 
           const validations = {
             hostname,
@@ -143,12 +141,12 @@ describe('HttpPlugin', () => {
           httpErrorCodes[i].toString()
         );
 
-        const isReset = audit.processSpans().length === 0;
+        const isReset = spanProcessor.spans.length === 0;
         assert.ok(isReset);
         await httpRequest
           .get(`${protocol}://${hostname}${testPath}`)
           .then(result => {
-            const spans = audit.processSpans();
+            const spans = spanProcessor.spans;
             assert.strictEqual(result.data, httpErrorCodes[i].toString());
             assert.strictEqual(spans.length, 1);
 
@@ -171,31 +169,35 @@ describe('HttpPlugin', () => {
       doNock(hostname, testPath, 200, 'Ok');
       const name = 'TestRootSpan';
       const span = tracer.startSpan(name);
-      tracer.withSpan(span, () => {
-        httpRequest.get(`${protocol}://${hostname}${testPath}`).then(result => {
-          const spans = audit.processSpans();
-          assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
-          assert.strictEqual(spans.length, 2);
-          assert.ok(spans[1].name.indexOf(testPath) >= 0);
-          assert.strictEqual(
-            spans[1].spanContext.traceId,
-            spans[0].spanContext.traceId
-          );
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: 'GET',
-            pathname: testPath,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
-          assertSpan(spans[1], SpanKind.CLIENT, validations);
-          assert.notStrictEqual(
-            spans[1].spanContext.spanId,
-            spans[0].spanContext.spanId
-          );
-          done();
-        });
+      return tracer.withSpan(span, () => {
+        httpRequest
+          .get(`${protocol}://${hostname}${testPath}`)
+          .then(result => {
+            span.end();
+            const spans = spanProcessor.spans;
+            assert.ok(spans[1].name.indexOf('TestRootSpan') >= 0);
+            assert.strictEqual(spans.length, 2);
+            assert.ok(spans[0].name.indexOf(testPath) >= 0);
+            assert.strictEqual(
+              spans[1].spanContext.traceId,
+              spans[0].spanContext.traceId
+            );
+            const validations = {
+              hostname,
+              httpStatusCode: result.statusCode!,
+              httpMethod: 'GET',
+              pathname: testPath,
+              resHeaders: result.resHeaders,
+              reqHeaders: result.reqHeaders,
+            };
+            assertSpan(spans[0], SpanKind.CLIENT, validations);
+            assert.notStrictEqual(
+              spans[1].spanContext.spanId,
+              spans[0].spanContext.spanId
+            );
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -214,10 +216,11 @@ describe('HttpPlugin', () => {
           httpRequest
             .get(`${protocol}://${hostname}${testPath}`)
             .then(result => {
-              const spans = audit.processSpans();
-              assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
+              span.end();
+              const spans = spanProcessor.spans;
+              assert.ok(spans[1].name.indexOf('TestRootSpan') >= 0);
               assert.strictEqual(spans.length, 2);
-              assert.ok(spans[1].name.indexOf(testPath) >= 0);
+              assert.ok(spans[0].name.indexOf(testPath) >= 0);
               assert.strictEqual(
                 spans[1].spanContext.traceId,
                 spans[0].spanContext.traceId
@@ -230,7 +233,7 @@ describe('HttpPlugin', () => {
                 resHeaders: result.resHeaders,
                 reqHeaders: result.reqHeaders,
               };
-              assertSpan(spans[1], SpanKind.CLIENT, validations);
+              assertSpan(spans[0], SpanKind.CLIENT, validations);
               assert.notStrictEqual(
                 spans[1].spanContext.spanId,
                 spans[0].spanContext.spanId
@@ -247,19 +250,19 @@ describe('HttpPlugin', () => {
     //   doNock(hostname, testPath, 200, 'Ok', num);
     //   const name = 'TestRootSpan';
     //   const span = tracer.startSpan(name);
-    //   const auditedSpan = audit.processSpans()[0];
+    //   const auditedSpan = spanProcessor.spans[0];
     //   assert.ok(auditedSpan.name.indexOf('TestRootSpan') >= 0);
     //   tracer.withSpan(span, async () => {
     //     for (let i = 0; i < num; i++) {
     //       await httpRequest.get(`${ protocol }://${ hostname }${ testPath }`).then(result => {
-    //         const spans = audit.processSpans();
+    //         const spans = spanProcessor.spans;
     //         const startChildIndex = i + 1;
     //         assert.strictEqual(spans.length, startChildIndex + 1);
     //         assert.ok(spans[startChildIndex].name.indexOf(testPath) >= 0);
     //         assert.strictEqual(auditedSpan.spanContext.traceId, spans[startChildIndex].spanContext.traceId);
     //       });
     //     }
-    //     const spans = audit.processSpans();
+    //     const spans = spanProcessor.spans;
     //     // 5 child spans ended + 1 span (root)
     //     assert.strictEqual(spans.length, 6);
     //     span.end();
@@ -272,7 +275,7 @@ describe('HttpPlugin', () => {
         const testPath = `/ignored/${ignored}`;
         doNock(hostname, testPath, 200, 'Ok');
 
-        const spans = audit.processSpans();
+        const spans = spanProcessor.spans;
         assert.strictEqual(spans.length, 0);
         await httpRequest.get(`${protocol}://${hostname}${testPath}`);
         assert.strictEqual(spans.length, 0);
