@@ -23,14 +23,17 @@ import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { TestProcessor } from '../utils/TestProcessor';
 import * as url from 'url';
 import { Utils } from '../utils/Utils';
 import { NodeTracer } from '@opentelemetry/node-tracer';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/basic-tracer';
 
 const serverPort = 12345;
 const hostname = 'localhost';
-const spanProcessor = new TestProcessor();
+const memoryExporter = new InMemorySpanExporter();
 
 export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
@@ -62,9 +65,9 @@ describe('HttpPlugin Integration tests', () => {
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(spanProcessor);
+    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
-      spanProcessor.shutdown();
+      memoryExporter.reset();
     });
 
     before(() => {
@@ -89,13 +92,12 @@ describe('HttpPlugin Integration tests', () => {
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
-      let spans = spanProcessor.spans;
+      let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
-      const result = await httpRequest.get(`http://google.fr/?query=test`);
-      spans = spanProcessor.spans;
-      assert.strictEqual(spans.length, 1);
-      assert.ok(spans[0].name.indexOf('GET /') >= 0);
 
+      const result = await httpRequest.get(`http://google.fr/?query=test`);
+
+      spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
         hostname: 'google.fr',
@@ -106,15 +108,15 @@ describe('HttpPlugin Integration tests', () => {
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
       };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
     it('custom attributes should show up on client spans', async () => {
       await httpRequest.get(`http://google.fr/`).then(result => {
-        const spans = spanProcessor.spans;
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf('GET /') >= 0);
-
+        const spans = memoryExporter.getFinishedSpans();
         const span = spans[0];
         const validations = {
           hostname: 'google.fr',
@@ -124,23 +126,23 @@ describe('HttpPlugin Integration tests', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
         };
+
+        assert.strictEqual(spans.length, 1);
+        assert.ok(span.name.indexOf('GET /') >= 0);
         assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
         assertSpan(span, SpanKind.CLIENT, validations);
       });
     });
 
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
-      const spans = spanProcessor.spans;
+      const spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
         url.parse('http://google.fr/')
       );
       await httpRequest.get(options).then(result => {
-        const spans = spanProcessor.spans;
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf('GET /') >= 0);
-
+        const spans = memoryExporter.getFinishedSpans();
         const span = spans[0];
         const validations = {
           hostname: 'google.fr',
@@ -150,6 +152,10 @@ describe('HttpPlugin Integration tests', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
         };
+
+        assert.strictEqual(spans.length, 1);
+        assert.ok(span.name.indexOf('GET /') >= 0);
+
         try {
           assertSpan(span, SpanKind.CLIENT, validations);
         } catch (error) {
@@ -175,7 +181,7 @@ describe('HttpPlugin Integration tests', () => {
           resHeaders: http.IncomingHttpHeaders;
         };
         let data = '';
-        const spans = spanProcessor.spans;
+        const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
         const options = { headers };
         const req = http.get(
@@ -207,7 +213,7 @@ describe('HttpPlugin Integration tests', () => {
         );
 
         req.once('close', () => {
-          const spans = spanProcessor.spans;
+          const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
           assert.ok(spans[0].name.indexOf('GET /') >= 0);
           assert.ok(data);
