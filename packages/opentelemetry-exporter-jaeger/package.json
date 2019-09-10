@@ -12,8 +12,7 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix",
-    "posttest": "yarn run check"
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",
