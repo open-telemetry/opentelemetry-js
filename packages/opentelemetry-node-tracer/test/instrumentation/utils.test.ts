@@ -42,19 +42,6 @@ describe('Instrumentation#utils', () => {
     utils.searchPathForTest(INSTALLED_PLUGINS_PATH);
   });
 
-  describe('defaultPackageName', () => {
-    it('should return package name with default scope and a prefix', () => {
-      assert.strictEqual(
-        utils.defaultPackageName('http'),
-        '@opentelemetry/plugin-http'
-      );
-      assert.strictEqual(
-        utils.defaultPackageName('simple-module'),
-        '@opentelemetry/plugin-simple-module'
-      );
-    });
-  });
-
   describe('getPackageVersion', () => {
     it('should handle when undefined basedir', () => {
       assert.strictEqual(utils.getPackageVersion(logger), null);
