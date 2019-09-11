@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
+import * as http from 'http';
 
 export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
-  extract(format: string, carrier: unknown): SpanContext {
+  extract(format: string, carrier: http.OutgoingHttpHeaders): SpanContext {
     return {
-      traceId: 'ca35dd5daef1401de22bcee7b7069195',
+      traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
     };
   }

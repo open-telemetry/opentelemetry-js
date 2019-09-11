@@ -31,7 +31,7 @@ export class InMemorySpanExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
-    if (this._stopped) return resultCallback(ExportResult.FailedNonRetryable);
+    if (this._stopped) return resultCallback(ExportResult.FailedNotRetryable);
     this._finishedSpans.push(...spans);
     return resultCallback(ExportResult.Success);
   }

@@ -23,16 +23,19 @@ import * as nock from 'nock';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
-import { TracerTest } from '../utils/TracerTest';
-import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
 import * as url from 'url';
 import axios, { AxiosResponse } from 'axios';
 import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
+import { NodeTracer } from '@opentelemetry/node-tracer';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/basic-tracer';
 
-const audit = new SpanAuditProcessor();
+const memoryExporter = new InMemorySpanExporter();
 
 export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
@@ -44,16 +47,14 @@ describe('Packages', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const tracer = new TracerTest(
-      {
-        scopeManager,
-        logger,
-        httpTextFormat,
-      },
-      audit
-    );
+    const tracer = new NodeTracer({
+      scopeManager,
+      logger,
+      httpTextFormat,
+    });
+    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
-      audit.reset();
+      memoryExporter.reset();
     });
 
     before(() => {
@@ -101,10 +102,7 @@ describe('Packages', () => {
           const res = result as AxiosResponse<{}>;
           resHeaders = res.headers;
         }
-        const spans = audit.processSpans();
-        assert.strictEqual(spans.length, 1);
-        assert.ok(spans[0].name.indexOf(`GET ${urlparsed.pathname}`) >= 0);
-
+        const spans = memoryExporter.getFinishedSpans();
         const span = spans[0];
         const validations = {
           hostname: urlparsed.hostname!,
@@ -114,6 +112,9 @@ describe('Packages', () => {
           path: urlparsed.path,
           resHeaders,
         };
+
+        assert.strictEqual(spans.length, 1);
+        assert.ok(span.name.indexOf(`GET ${urlparsed.pathname}`) >= 0);
 
         switch (name) {
           case 'axios':

@@ -14,6 +14,35 @@ OpenTelemetry Jaeger Trace Exporter allows the user to send collected traces to 
 - Service dependency analysis
 - Performance / latency optimization
 
+## Prerequisites
+
+Get up and running with Jaeger in your local environment.
+
+[Jaeger](https://www.jaegertracing.io/docs/1.13/) stores and queries traces exported by
+applications instrumented with OpenTelemetry. The easiest way to [start a Jaeger
+server](https://www.jaegertracing.io/docs/1.13/getting-started/) is to paste the below:
+
+```bash
+docker run -d --name jaeger \
+  -e COLLECTOR_ZIPKIN_HTTP_PORT=9411 \
+  -p 5775:5775/udp \
+  -p 6831:6831/udp \
+  -p 6832:6832/udp \
+  -p 5778:5778 \
+  -p 16686:16686 \
+  -p 14268:14268 \
+  -p 9411:9411 \
+  jaegertracing/all-in-one:1.13
+```
+
+Or run the `jaeger-all-in-one(.exe)` executable from the [binary distribution archives](https://www.jaegertracing.io/download/):
+
+```bash
+jaeger-all-in-one --collector.zipkin.http-port=9411
+```
+
+You can then navigate to http://localhost:16686 to access the Jaeger UI.
+
 ## Installation
 
 ```
@@ -21,7 +50,22 @@ npm install --save @opentelemetry/exporter-jaeger
 ```
 
 ## Usage
-> TODO
+
+Install the exporter on your application and pass the options, it must contain a service name.
+
+```
+import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
+
+const options = {
+  serviceName: 'my-service',
+  tags: [], // optional
+  host: 'localhost', // optional
+  port: 6832, // optional
+  maxPacketSize: 65000 // optional
+}
+const exporter = new JaegerExporter(options);
+```
+> TODO : add how to register the exporter.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

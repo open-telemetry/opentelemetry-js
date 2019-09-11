@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger, Plugin, Tracer } from '@opentelemetry/types';
+import { Logger, Plugin, Tracer, PluginConfig } from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 
@@ -25,13 +25,20 @@ export enum HookState {
   DISABLED,
 }
 
-interface PluginNames {
-  [pluginName: string]: string;
+export interface Plugins {
+  [pluginName: string]: PluginConfig;
 }
 
-interface PluginConfig {
-  // TODO: Consider to add configuration options
-  [pluginName: string]: boolean;
+/**
+ * Returns the Plugins object that meet the below conditions.
+ * Valid criterias: 1. It should be enabled. 2. Should have non-empty path.
+ */
+function filterPlugins(plugins: Plugins): Plugins {
+  const keys = Object.keys(plugins);
+  return keys.reduce((acc: Plugins, key: string) => {
+    if (plugins[key].enabled && plugins[key].path) acc[key] = plugins[key];
+    return acc;
+  }, {});
 }
 
 /**
@@ -55,21 +62,13 @@ export class PluginLoader {
    * {@link Plugin} interface and export an instance named as 'plugin'. This
    * function will attach a hook to be called the first time the module is
    * loaded.
-   * @param pluginConfig an object whose keys are plugin names and whose
-   *     boolean values indicate whether to enable the plugin.
+   * @param Plugins an object whose keys are plugin names and whose
+   *     {@link PluginConfig} values indicate several configuration options.
    */
-  load(pluginConfig: PluginConfig): PluginLoader {
+  load(plugins: Plugins): PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
-      const plugins = Object.keys(pluginConfig).reduce(
-        (plugins: PluginNames, moduleName: string) => {
-          if (pluginConfig[moduleName]) {
-            plugins[moduleName] = utils.defaultPackageName(moduleName);
-          }
-          return plugins;
-        },
-        {} as PluginNames
-      );
-      const modulesToHook = Object.keys(plugins);
+      const pluginsToLoad = filterPlugins(plugins);
+      const modulesToHook = Object.keys(pluginsToLoad);
       // Do not hook require when no module is provided. In this case it is
       // not necessary. With skipping this step we lower our footprint in
       // customer applications and require-in-the-middle won't show up in CPU
@@ -83,7 +82,8 @@ export class PluginLoader {
       hook(modulesToHook, (exports, name, baseDir) => {
         if (this._hookState !== HookState.ENABLED) return exports;
 
-        const moduleName = plugins[name];
+        const config = pluginsToLoad[name];
+        const modulePath = config.path!;
         // Get the module version.
         const version = utils.getPackageVersion(this.logger, baseDir as string);
         this.logger.info(
@@ -93,12 +93,12 @@ export class PluginLoader {
         if (!version) return exports;
 
         this.logger.debug(
-          `PluginLoader#load: applying patch to ${name}@${version} using ${moduleName} module`
+          `PluginLoader#load: applying patch to ${name}@${version} using ${modulePath} module`
         );
 
         // Expecting a plugin from module;
         try {
-          const plugin: Plugin = require(moduleName).plugin;
+          const plugin: Plugin = require(modulePath).plugin;
 
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
             return exports;
@@ -106,10 +106,10 @@ export class PluginLoader {
 
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer, this.logger);
+          return plugin.enable(exports, this.tracer, this.logger, config);
         } catch (e) {
           this.logger.error(
-            `PluginLoader#load: could not load plugin ${moduleName} of module ${name}. Error: ${e.message}`
+            `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`
           );
           return exports;
         }

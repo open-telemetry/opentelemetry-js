@@ -18,9 +18,28 @@ npm install --save @opentelemetry/basic-tracer
 ## Usage
 
 ```
-const opentelemetry = require('@opentelemetry/basic-tracer');
+const opentelemetry = require('@opentelemetry/core');
+const { BasicTracer } = require('@opentelemetry/basic-tracer');
+const { NoopScopeManager } = require('@opentelemetry/scope-base');
 
-// TODO: DEMONSTRATE API
+// To start a trace, you first need to initialize the Tracer.
+// NOTE: the default OpenTelemetry tracer does not record any tracing information.
+const tracer = new BasicTracer({
+  scopeManager: new NoopScopeManager()
+});
+
+// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+opentelemetry.initGlobalTracer(tracer);
+
+// To create a span in a trace, we used the global singleton tracer to start a new span.
+const span = opentelemetry.getTracer().startSpan('foo');
+
+// Create an Attributes
+span.setAttribute('key', 'value');
+
+// We must end the spans so they becomes available for exporting.
+span.end();
+
 ```
 
 ## Useful links
