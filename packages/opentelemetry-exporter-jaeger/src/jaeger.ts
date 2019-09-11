@@ -69,7 +69,7 @@ export class JaegerExporter implements SpanExporter {
         if (err) {
           // @todo: decide whether to break out the loop on first error.
           this._logger.error(`failed to append span: ${err}`);
-          if (done) return done(ExportResult.FailedNonRetryable);
+          if (done) return done(ExportResult.FailedNotRetryable);
         }
       });
     }
