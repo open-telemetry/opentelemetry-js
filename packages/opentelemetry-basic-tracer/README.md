@@ -20,13 +20,10 @@ npm install --save @opentelemetry/basic-tracer
 ```
 const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer } = require('@opentelemetry/basic-tracer');
-const { NoopScopeManager } = require('@opentelemetry/scope-base');
 
 // To start a trace, you first need to initialize the Tracer.
 // NOTE: the default OpenTelemetry tracer does not record any tracing information.
-const tracer = new BasicTracer({
-  scopeManager: new NoopScopeManager()
-});
+const tracer = new BasicTracer();
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
 opentelemetry.initGlobalTracer(tracer);

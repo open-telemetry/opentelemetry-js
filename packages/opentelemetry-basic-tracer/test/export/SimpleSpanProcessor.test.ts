@@ -20,7 +20,6 @@ import { Span, BasicTracer } from '../../src';
 import { SpanExporter } from '../../src/export/SpanExporter';
 import { ReadableSpan } from '../../src/export/ReadableSpan';
 import { SpanContext, SpanKind, TraceOptions } from '@opentelemetry/types';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 class TestExporter implements SpanExporter {
   spansDataList: ReadableSpan[] = [];
@@ -34,9 +33,7 @@ class TestExporter implements SpanExporter {
 }
 
 describe('SimpleSpanProcessor', () => {
-  const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
-  });
+  const tracer = new BasicTracer();
   const exporter = new TestExporter();
 
   describe('constructor', () => {
