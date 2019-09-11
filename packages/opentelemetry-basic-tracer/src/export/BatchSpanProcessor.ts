@@ -15,11 +15,11 @@
  */
 
 import { TraceOptions } from '@opentelemetry/types';
+import { unrefTimer } from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
 import { Span } from '../Span';
 import { ReadableSpan } from './ReadableSpan';
-import { unrefTimer } from '../platform';
 import { BufferConfig } from '../types';
 
 const DEFAULT_BUFFER_SIZE_MS = 100;
