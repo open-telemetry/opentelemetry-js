@@ -16,7 +16,7 @@
 
 import { NoopLogger } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { SpanKind, Span as ISpan } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
@@ -24,15 +24,18 @@ import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { TracerTest } from '../utils/TracerTest';
-import { SpanAuditProcessor } from '../utils/SpanAuditProcessor';
+import { NodeTracer } from '@opentelemetry/node-tracer';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/basic-tracer';
 
 let server: http.Server;
 const serverPort = 12345;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
-const audit = new SpanAuditProcessor();
+const memoryExporter = new InMemorySpanExporter();
 
 function doNock(
   hostname: string,
@@ -48,7 +51,7 @@ function doNock(
     .reply(httpCode, respBody);
 }
 
-export const customAttributeFunction = (span: Span): void => {
+export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
@@ -69,22 +72,20 @@ describe('HttpPlugin', () => {
     const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new TracerTest(
-      {
-        scopeManager,
-        logger,
-        httpTextFormat,
-      },
-      audit
-    );
+    const tracer = new NodeTracer({
+      scopeManager,
+      logger,
+      httpTextFormat,
+    });
+    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
-      audit.reset();
+      memoryExporter.reset();
     });
 
     before(() => {
       plugin.enable(http, tracer, tracer.logger);
       const ignoreConfig = [
-        `http://${hostname}:${serverPort}/ignored/string`,
+        `http://${hostname}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
@@ -110,10 +111,8 @@ describe('HttpPlugin', () => {
       httpRequest
         .get(`http://${hostname}:${serverPort}${pathname}`)
         .then(result => {
-          const spans = audit.processSpans();
-          const outgoingSpan = spans[0];
-          const incomingSpan = spans[1];
-
+          const spans = memoryExporter.getFinishedSpans();
+          const [incomingSpan, outgoingSpan] = spans;
           const validations = {
             hostname,
             httpStatusCode: result.statusCode!,
@@ -143,12 +142,14 @@ describe('HttpPlugin', () => {
           httpErrorCodes[i].toString()
         );
 
-        const isReset = audit.processSpans().length === 0;
+        const isReset = memoryExporter.getFinishedSpans().length === 0;
         assert.ok(isReset);
         await httpRequest
           .get(`${protocol}://${hostname}${testPath}`)
           .then(result => {
-            const spans = audit.processSpans();
+            const spans = memoryExporter.getFinishedSpans();
+            const reqSpan = spans[0];
+
             assert.strictEqual(result.data, httpErrorCodes[i].toString());
             assert.strictEqual(spans.length, 1);
 
@@ -161,7 +162,7 @@ describe('HttpPlugin', () => {
               reqHeaders: result.reqHeaders,
             };
 
-            assertSpan(spans[0], SpanKind.CLIENT, validations);
+            assertSpan(reqSpan, SpanKind.CLIENT, validations);
           });
       });
     }
@@ -171,31 +172,37 @@ describe('HttpPlugin', () => {
       doNock(hostname, testPath, 200, 'Ok');
       const name = 'TestRootSpan';
       const span = tracer.startSpan(name);
-      tracer.withSpan(span, () => {
-        httpRequest.get(`${protocol}://${hostname}${testPath}`).then(result => {
-          const spans = audit.processSpans();
-          assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
-          assert.strictEqual(spans.length, 2);
-          assert.ok(spans[1].name.indexOf(testPath) >= 0);
-          assert.strictEqual(
-            spans[1].spanContext.traceId,
-            spans[0].spanContext.traceId
-          );
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: 'GET',
-            pathname: testPath,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
-          assertSpan(spans[1], SpanKind.CLIENT, validations);
-          assert.notStrictEqual(
-            spans[1].spanContext.spanId,
-            spans[0].spanContext.spanId
-          );
-          done();
-        });
+      return tracer.withSpan(span, () => {
+        httpRequest
+          .get(`${protocol}://${hostname}${testPath}`)
+          .then(result => {
+            span.end();
+            const spans = memoryExporter.getFinishedSpans();
+            const [reqSpan, localSpan] = spans;
+            const validations = {
+              hostname,
+              httpStatusCode: result.statusCode!,
+              httpMethod: 'GET',
+              pathname: testPath,
+              resHeaders: result.resHeaders,
+              reqHeaders: result.reqHeaders,
+            };
+
+            assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+            assert.strictEqual(spans.length, 2);
+            assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+            assert.strictEqual(
+              localSpan.spanContext.traceId,
+              reqSpan.spanContext.traceId
+            );
+            assertSpan(reqSpan, SpanKind.CLIENT, validations);
+            assert.notStrictEqual(
+              localSpan.spanContext.spanId,
+              reqSpan.spanContext.spanId
+            );
+            done();
+          })
+          .catch(done);
       });
     });
 
@@ -214,14 +221,9 @@ describe('HttpPlugin', () => {
           httpRequest
             .get(`${protocol}://${hostname}${testPath}`)
             .then(result => {
-              const spans = audit.processSpans();
-              assert.ok(spans[0].name.indexOf('TestRootSpan') >= 0);
-              assert.strictEqual(spans.length, 2);
-              assert.ok(spans[1].name.indexOf(testPath) >= 0);
-              assert.strictEqual(
-                spans[1].spanContext.traceId,
-                spans[0].spanContext.traceId
-              );
+              span.end();
+              const spans = memoryExporter.getFinishedSpans();
+              const [reqSpan, localSpan] = spans;
               const validations = {
                 hostname,
                 httpStatusCode: result.statusCode!,
@@ -230,10 +232,18 @@ describe('HttpPlugin', () => {
                 resHeaders: result.resHeaders,
                 reqHeaders: result.reqHeaders,
               };
-              assertSpan(spans[1], SpanKind.CLIENT, validations);
+
+              assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+              assert.strictEqual(spans.length, 2);
+              assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+              assert.strictEqual(
+                localSpan.spanContext.traceId,
+                reqSpan.spanContext.traceId
+              );
+              assertSpan(reqSpan, SpanKind.CLIENT, validations);
               assert.notStrictEqual(
-                spans[1].spanContext.spanId,
-                spans[0].spanContext.spanId
+                localSpan.spanContext.spanId,
+                reqSpan.spanContext.spanId
               );
               done();
             });
@@ -241,30 +251,25 @@ describe('HttpPlugin', () => {
       });
     }
     // TODO: uncomment once https://github.com/open-telemetry/opentelemetry-js/pull/146 is merged
-    // it('should create multiple child spans for GET requests', (done) => {
+    // it.only('should create multiple child spans for GET requests', async () => {
     //   const testPath = '/outgoing/rootSpan/childs';
     //   const num = 5;
     //   doNock(hostname, testPath, 200, 'Ok', num);
     //   const name = 'TestRootSpan';
     //   const span = tracer.startSpan(name);
-    //   const auditedSpan = audit.processSpans()[0];
-    //   assert.ok(auditedSpan.name.indexOf('TestRootSpan') >= 0);
-    //   tracer.withSpan(span, async () => {
+    //   await tracer.withSpan(span, async () => {
     //     for (let i = 0; i < num; i++) {
-    //       await httpRequest.get(`${ protocol }://${ hostname }${ testPath }`).then(result => {
-    //         const spans = audit.processSpans();
-    //         const startChildIndex = i + 1;
-    //         assert.strictEqual(spans.length, startChildIndex + 1);
-    //         assert.ok(spans[startChildIndex].name.indexOf(testPath) >= 0);
-    //         assert.strictEqual(auditedSpan.spanContext.traceId, spans[startChildIndex].spanContext.traceId);
-    //       });
+    //       await httpRequest.get(`${ protocol }://${ hostname }${ testPath }`);
+    //       const spans = memoryExporter.getFinishedSpans();
+    //       assert.ok(spans[i].name.indexOf(testPath) >= 0);
+    //       assert.strictEqual((span as Span).toReadableSpan().spanContext.traceId, spans[i].spanContext.traceId);
     //     }
-    //     const spans = audit.processSpans();
+    //     span.end();
+    //     const spans = memoryExporter.getFinishedSpans();
     //     // 5 child spans ended + 1 span (root)
     //     assert.strictEqual(spans.length, 6);
-    //     span.end();
-    //     done();
     //   });
+    //   console.log('end');
     // });
 
     for (const ignored of ['string', 'function', 'regexp']) {
@@ -272,7 +277,7 @@ describe('HttpPlugin', () => {
         const testPath = `/ignored/${ignored}`;
         doNock(hostname, testPath, 200, 'Ok');
 
-        const spans = audit.processSpans();
+        const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
         await httpRequest.get(`${protocol}://${hostname}${testPath}`);
         assert.strictEqual(spans.length, 0);
