@@ -14,24 +14,26 @@
  * limitations under the License.
  */
 
-import { Tracer, Plugin, Logger } from '@opentelemetry/types';
+import { Tracer, Plugin, Logger, PluginConfig } from '@opentelemetry/types';
 
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
+  protected _config!: PluginConfig;
   supportedVersions?: string[];
 
   enable(
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: { [key: string]: unknown }
+    config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
+    if (config) this._config = config;
     return this.patch();
   }
 

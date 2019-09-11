@@ -78,13 +78,13 @@ describe('InMemorySpanExporter', () => {
     });
   });
 
-  it('should return the FailedNonRetryable result after shutdown', () => {
+  it('should return the FailedNotRetryable result after shutdown', () => {
     const exorter = new InMemorySpanExporter();
     exorter.shutdown();
 
     // after shutdown export should fail
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.FailedNonRetryable);
+      assert.strictEqual(result, ExportResult.FailedNotRetryable);
     });
   });
 });

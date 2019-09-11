@@ -40,9 +40,60 @@ export interface Plugin<T = any> {
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: { [key: string]: unknown }
+    config?: PluginConfig
   ): T;
 
   /** Method to disable the instrumentation  */
   disable(): void;
+}
+
+export interface PluginConfig {
+  /**
+   * Whether to enable the plugin.
+   * @default true
+   */
+  enabled?: boolean;
+
+  /**
+   * Path of the trace plugin to load.
+   * @default '@opentelemetry/plugin-http' in case of http.
+   */
+  path?: string;
+
+  /**
+   * Request methods that match any string in ignoreMethods will not be traced.
+   */
+  ignoreMethods?: string[];
+
+  /**
+   * URLs that partially match any regex in ignoreUrls will not be traced.
+   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
+   * also not be traced.
+   */
+  ignoreUrls?: Array<string | RegExp>;
+
+  /**
+   * List of internal files that need patch and are not exported by
+   * default.
+   */
+  internalFilesExports?: PluginInternalFiles;
+
+  /**
+   * If true, additional information about query parameters and
+   * results will be attached (as `attributes`) to spans representing
+   * database operations.
+   */
+  enhancedDatabaseReporting?: boolean;
+}
+
+export interface PluginInternalFilesVersion {
+  [pluginName: string]: string;
+}
+
+/**
+ * Each key should be the name of the module to trace, and its value
+ * a mapping of a property name to a internal plugin file name.
+ */
+export interface PluginInternalFiles {
+  [versions: string]: PluginInternalFilesVersion;
 }
