@@ -22,8 +22,8 @@ import { ReadableSpan } from './ReadableSpan';
 import { unrefTimer } from '../platform';
 import { BufferConfig } from '../types';
 
-const DEFAULT_BUFFER_SIZE = 100;
-const DEFAULT_BUFFER_TIMEOUT = 20000;
+const DEFAULT_BUFFER_SIZE_MS = 100;
+const DEFAULT_BUFFER_TIMEOUT_MS = 20000;
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
@@ -38,11 +38,11 @@ export class BatchSpanProcessor implements SpanProcessor {
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
     this._bufferSize =
-      config && config.bufferSize ? config.bufferSize : DEFAULT_BUFFER_SIZE;
+      config && config.bufferSize ? config.bufferSize : DEFAULT_BUFFER_SIZE_MS;
     this._bufferTimeout =
       config && config.bufferTimeout
         ? config.bufferTimeout
-        : DEFAULT_BUFFER_TIMEOUT;
+        : DEFAULT_BUFFER_TIMEOUT_MS;
   }
 
   // does nothing.
