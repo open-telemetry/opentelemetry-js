@@ -6,7 +6,7 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
@@ -39,7 +39,10 @@
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
+    "@types/protobufjs": "^6.0.0",
+    "@types/shimmer": "^1.0.1",
     "codecov": "^3.5.0",
+    "grpc": "^1.23.3",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
@@ -48,8 +51,12 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "@opentelemetry/basic-tracer": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/node-tracer": "^0.0.1",
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/scope-async-hooks": "^0.0.1",
+    "@opentelemetry/types": "^0.0.1",
+    "shimmer": "^1.2.1",
+    "semver": "^6.3.0"
   }
 }
