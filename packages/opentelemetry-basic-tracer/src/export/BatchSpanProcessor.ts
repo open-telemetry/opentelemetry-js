@@ -30,21 +30,19 @@ const DEFAULT_BUFFER_TIMEOUT = 20000;
  * the SDK then pushes them to the exporter pipeline.
  */
 export class BatchSpanProcessor implements SpanProcessor {
-  private readonly _bufferSize: number = DEFAULT_BUFFER_SIZE;
-  private readonly _bufferTimeout: number = DEFAULT_BUFFER_TIMEOUT;
+  private readonly _bufferSize: number;
+  private readonly _bufferTimeout: number;
   private _finishedSpans: ReadableSpan[] = [];
   private _resetTimeout = false;
   private _bufferTimeoutInProgress = false;
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
-    if (config) {
-      this._bufferSize = isNaN(Number(config.bufferSize))
-        ? DEFAULT_BUFFER_SIZE
-        : Number(config.bufferSize);
-      this._bufferTimeout = isNaN(Number(config.bufferTimeout))
-        ? DEFAULT_BUFFER_TIMEOUT
-        : Number(config.bufferTimeout);
-    }
+    this._bufferSize =
+      config && config.bufferSize ? config.bufferSize : DEFAULT_BUFFER_SIZE;
+    this._bufferTimeout =
+      config && config.bufferTimeout
+        ? config.bufferTimeout
+        : DEFAULT_BUFFER_TIMEOUT;
   }
 
   // does nothing.
