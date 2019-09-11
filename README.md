@@ -2,13 +2,14 @@
 [![Gitter chat][node-gitter-image]][node-gitter-url]
 [![CircleCI][circleci-image]][circleci-url]
 [![Coverage Status][codecov-image]][codecov-url]
+[![Apache License][license-image]][license-image]
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. Follow
 [CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
 
-We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#nodejs-sdk) for meeting details and notes.
+We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
 [circleci-image]: https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=svg
 [circleci-url]: https://circleci.com/gh/open-telemetry/opentelemetry-js
@@ -18,3 +19,4 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 [codecov-image]: https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/master/graph/badge.svg
 [codecov-url]: https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/master/
+[license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat

@@ -15,10 +15,9 @@
  */
 
 import * as types from '@opentelemetry/types';
+import { validateKey, validateValue } from '../internal/validators';
 
-// TODO validate maximum number of items
-// const MAX_TRACE_STATE_ITEMS = 32;
-
+const MAX_TRACE_STATE_ITEMS = 32;
 const MAX_TRACE_STATE_LEN = 512;
 const LIST_MEMBERS_SEPARATOR = ',';
 const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
@@ -65,18 +64,31 @@ export class TraceState implements types.TraceState {
 
   private _parse(rawTraceState: string) {
     if (rawTraceState.length > MAX_TRACE_STATE_LEN) return;
-    // TODO validate maximum number of items
     this._internalState = rawTraceState
       .split(LIST_MEMBERS_SEPARATOR)
-      .reverse()
+      .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
       .reduce((agg: Map<string, string>, part: string) => {
         const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
-          // TODO validate key/value constraints defined in the spec
-          agg.set(part.slice(0, i), part.slice(i + 1, part.length));
+          const key = part.slice(0, i);
+          const value = part.slice(i + 1, part.length);
+          if (validateKey(key) && validateValue(value)) {
+            agg.set(key, value);
+          } else {
+            // TODO: Consider to add warning log
+          }
         }
         return agg;
       }, new Map());
+
+    // Because of the reverse() requirement, trunc must be done after map is created
+    if (this._internalState.size > MAX_TRACE_STATE_ITEMS) {
+      this._internalState = new Map(
+        Array.from(this._internalState.entries())
+          .reverse() // Use reverse same as original tracestate parse chain
+          .slice(0, MAX_TRACE_STATE_ITEMS)
+      );
+    }
   }
 
   private _keys(): string[] {

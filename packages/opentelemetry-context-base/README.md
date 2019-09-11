@@ -1,4 +1,0 @@
-OpenTelemetry ContextManager API
-======================================================
-
-TODO

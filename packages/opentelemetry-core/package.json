@@ -9,18 +9,16 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "yarn test:node && yarn test:browser",
-    "test:node": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
     "test:browser": "karma start --single-run",
     "tdd": "yarn tdd:node",
     "tdd:node": "yarn test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix",
-    "posttest": "yarn run check"
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",
@@ -42,27 +40,12 @@
     "LICENSE",
     "README.md"
   ],
-  "nyc": {
-    "extension": [
-      ".ts"
-    ],
-    "exclude": [
-      "**/*.d.ts",
-      "build/**/**/*.js",
-      "karma.conf.js",
-      "src/index.ts",
-      "src/platform/browser/*.ts",
-      "test/index-webpack.ts",
-      "webpack/*.js"
-    ],
-    "all": true
-  },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
-    "@types/node": "^10.12.12",
+    "@types/node": "^12.6.8",
     "@types/webpack-env": "1.13.9",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
@@ -72,12 +55,12 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "mocha": "^6.1.0",
-    "nyc": "^14.0.0",
+    "nyc": "^14.1.1",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
-    "webpack": "^4.35.2",
-    "typescript": "^3.4.5"
+    "typescript": "^3.4.5",
+    "webpack": "^4.35.2"
   },
   "dependencies": {
     "@opentelemetry/types": "^0.0.1"

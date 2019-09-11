@@ -14,28 +14,10 @@
  * limitations under the License.
  */
 
+import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
+import { BinaryFormat } from '../context/propagation/BinaryFormat';
 import { Span } from './span';
-import { Attributes } from './attributes';
-import { SpanKind } from './span_kind';
-import { SpanContext } from './span_context';
-
-/**
- * Options needed for span creation
- *
- * @todo: Move into module of its own
- */
-export interface SpanOptions {
-  /** The SpanKind of a span */
-  kind?: SpanKind;
-  /** A spans attributes */
-  attributes?: Attributes;
-  /** Indicates that events are being recorded for a span */
-  isRecordingEvents?: boolean;
-  /** The parent span */
-  parent?: Span | SpanContext;
-  /** The start timestamp of a span */
-  startTime?: number;
-}
+import { SpanOptions } from './SpanOptions';
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
@@ -48,12 +30,11 @@ export interface Tracer {
   /**
    * Returns the current Span from the current context if available.
    *
-   * If there is no Span associated with the current context, a default Span
-   * with invalid SpanContext is returned.
+   * If there is no Span associated with the current context, null is returned.
    *
    * @returns Span The currently active Span
    */
-  getCurrentSpan(): Span;
+  getCurrentSpan(): Span | null;
 
   /**
    * Starts a new {@link Span}.
@@ -67,12 +48,22 @@ export interface Tracer {
    * Executes the function given by fn within the context provided by Span
    *
    * @param span The span that provides the context
-   * @param fn The function to be eexcuted inside the provided context
+   * @param fn The function to be executed inside the provided context
+   * @example
+   * tracer.withSpan(span, function() { ... });
    */
-  withSpan<T extends (...args: unknown[]) => unknown>(
+  withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
     fn: T
   ): ReturnType<T>;
+
+  /**
+   * Bind a span as the target's scope or propagate the current one.
+   *
+   * @param target Any object to which a scope need to be set
+   * @param [span] Optionally specify the span which you want to assign
+   */
+  bind<T>(target: T, span?: Span): T;
 
   /**
    * Send a pre-populated span object to the exporter.
@@ -93,10 +84,8 @@ export interface Tracer {
    * Context binary format ({@link BinaryFormat}). For more details see
    * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
    * binary protocol</a>.
-   *
-   * @todo: Change return type once BinaryFormat is available
    */
-  getBinaryFormat(): unknown;
+  getBinaryFormat(): BinaryFormat;
 
   /**
    * Returns the {@link HttpTextFormat} interface which can inject/extract
@@ -105,8 +94,6 @@ export interface Tracer {
    * If no tracer implementation is provided, this defaults to the W3C Trace
    * Context HTTP text format ({@link HttpTraceContext}). For more details see
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
-   *
-   * @todo: Change return type once HttpTextFormat is available
    */
-  getHttpTextFormat(): unknown;
+  getHttpTextFormat(): HttpTextFormat;
 }

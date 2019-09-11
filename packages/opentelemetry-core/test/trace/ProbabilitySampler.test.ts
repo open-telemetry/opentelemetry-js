@@ -23,7 +23,7 @@ import {
 
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
-    const sampler = new ProbabilitySampler();
+    const sampler = new ProbabilitySampler(1);
     assert.strictEqual(
       sampler.shouldSample({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -36,6 +36,7 @@ describe('ProbabilitySampler', () => {
   it('should return a always sampler for >1', () => {
     const sampler = new ProbabilitySampler(100);
     assert.strictEqual(sampler.shouldSample(), true);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
   });
 
   it('should return a never sampler for 0', () => {
@@ -52,6 +53,7 @@ describe('ProbabilitySampler', () => {
     Math.random = () => 1 / 10;
     const sampler = new ProbabilitySampler(0.2);
     assert.strictEqual(sampler.shouldSample(), true);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0.2}');
 
     Math.random = () => 5 / 10;
     assert.strictEqual(sampler.shouldSample(), false);
@@ -59,9 +61,29 @@ describe('ProbabilitySampler', () => {
 
   it('should return true for ALWAYS_SAMPLER', () => {
     assert.strictEqual(ALWAYS_SAMPLER.shouldSample(), true);
+    assert.strictEqual(ALWAYS_SAMPLER.toString(), 'ProbabilitySampler{1}');
   });
 
   it('should return false for NEVER_SAMPLER', () => {
     assert.strictEqual(NEVER_SAMPLER.shouldSample(), false);
+    assert.strictEqual(NEVER_SAMPLER.toString(), 'ProbabilitySampler{0}');
+  });
+
+  it('should handle NaN', () => {
+    const sampler = new ProbabilitySampler(NaN);
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+  });
+
+  it('should handle -NaN', () => {
+    const sampler = new ProbabilitySampler(-NaN);
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+  });
+
+  it('should handle undefined', () => {
+    const sampler = new ProbabilitySampler(undefined);
+    assert.strictEqual(sampler.shouldSample(), false);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 });

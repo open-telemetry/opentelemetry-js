@@ -17,16 +17,11 @@
 import * as assert from 'assert';
 import { NoopSpan } from '../../src/trace/NoopSpan';
 import { CanonicalCode, TraceOptions } from '@opentelemetry/types';
+import { INVALID_TRACEID, INVALID_SPANID } from '../../src';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
-    const spanContext = {
-      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-      traceOptions: TraceOptions.UNSAMPLED,
-    };
-
-    const span = new NoopSpan(spanContext);
+    const span = new NoopSpan();
     span.setAttribute('my_string_attribute', 'foo');
     span.setAttribute('my_number_attribute', 123);
     span.setAttribute('my_boolean_attribute', false);
@@ -57,7 +52,11 @@ describe('NoopSpan', () => {
     span.updateName('my-span');
 
     assert.ok(!span.isRecordingEvents());
-    assert.deepStrictEqual(span.context(), spanContext);
+    assert.deepStrictEqual(span.context(), {
+      traceId: INVALID_TRACEID,
+      spanId: INVALID_SPANID,
+      traceOptions: TraceOptions.UNSAMPLED,
+    });
     span.end();
   });
 });

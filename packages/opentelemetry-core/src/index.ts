@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
+export * from './common/ConsoleLogger';
+export * from './common/NoopLogger';
+export * from './common/types';
+export * from './context/propagation/B3Format';
+export * from './context/propagation/BinaryTraceContext';
+export * from './context/propagation/HttpTraceContext';
+export * from './platform';
 export * from './resources/Resource';
+export * from './trace/globaltracer-utils';
+export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoopSpan';
+export * from './trace/NoopTracer';
+export * from './trace/NoRecordingSpan';
+export * from './trace/sampler/ProbabilitySampler';
+export * from './trace/spancontext-utils';
+export * from './trace/TracerDelegate';
+export * from './trace/TraceState';
