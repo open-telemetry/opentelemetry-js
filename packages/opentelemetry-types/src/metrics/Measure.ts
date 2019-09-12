@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 
+import { DistributedContext } from '../distributed_context/DistributedContext';
+import { SpanContext } from '../trace/span_context';
+
 export enum MeasureType {
   DOUBLE = 0,
   LONG = 1,
 }
 
+/**
+ * Options needed for measure creation
+ */
 export interface MeasureOptions {
   // Description of the Measure.
   description?: string;
@@ -30,10 +36,20 @@ export interface MeasureOptions {
   type?: MeasureType;
 }
 
+/** Measure to report instantaneous measurement of a value. */
 export interface Measure {
-  // Creates a measurement with the supplied value.
-  createMeasurement(value: number): Measurement;
+  /**
+   * Records the given value to this measure.
+   * @param value the measurement to record.
+   * @param distContext the distContext associated with the measurements.
+   * @param spanContext the {@link SpanContext} that identifies the {@link Span}
+   *     for which the measurements are associated with.
+   */
+  record(value: number): void;
+  record(value: number, distContext: DistributedContext): void;
+  record(
+    value: number,
+    distContext: DistributedContext,
+    spanContext: SpanContext
+  ): void;
 }
-
-// Measurement describes an individual measurement
-export interface Measurement {}
