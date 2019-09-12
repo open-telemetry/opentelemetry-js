@@ -31,7 +31,7 @@ export interface Plugins {
 
 /**
  * Returns the Plugins object that meet the below conditions.
- * Valid criterias: 1. It should be enabled. 2. Should have non-empty path.
+ * Valid criteria: 1. It should be enabled. 2. Should have non-empty path.
  */
 function filterPlugins(plugins: Plugins): Plugins {
   const keys = Object.keys(plugins);

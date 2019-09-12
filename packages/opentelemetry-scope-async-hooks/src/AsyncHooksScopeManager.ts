@@ -24,7 +24,7 @@ type PatchedEventEmitter = {
   /**
    * Store a map for each event of all original listener and their "patched"
    * version so when the listener is removed by the user, we remove the
-   * correspoding "patched" function.
+   * corresponding "patched" function.
    */
   __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
 } & EventEmitter;
