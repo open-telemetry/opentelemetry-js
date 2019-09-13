@@ -20,10 +20,16 @@ import { Resource } from '../resources/Resource';
  * Options needed for metric creation
  */
 export interface MetricOptions {
-  /** The description of the Metric. */
+  /**
+   * The description of the Metric.
+   * @default ''
+   */
   description?: string;
 
-  /** The unit of the Metric values. */
+  /**
+   * The unit of the Metric values.
+   * @default '1'
+   */
   unit?: string;
 
   /** The list of label keys for the Metric. */
