@@ -7,7 +7,9 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "test:browser": "karma start --single-run",
     "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
@@ -40,13 +42,21 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/webpack-env": "1.14.0",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
+    "karma": "^4.3.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-mocha": "^1.3.0",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-webpack": "^4.0.2",
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
-    "typescript": "^3.4.5"
+    "ts-loader": "^6.1.0",
+    "typescript": "^3.4.5",
+    "webpack": "^4.40.1"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",

@@ -23,7 +23,7 @@ export * from './metrics/counter';
 export * from './metrics/gauge';
 export * from './metrics/measure';
 export * from './metrics/meter';
-export * from './metrics/metrics';
+export * from './metrics/metric';
 export * from './resources/Resource';
 export * from './trace/attributes';
 export * from './trace/Event';
