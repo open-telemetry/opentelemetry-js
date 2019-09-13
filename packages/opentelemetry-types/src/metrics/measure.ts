@@ -14,8 +14,26 @@
  * limitations under the License.
  */
 
-export enum ExportResult {
-  Success,
-  FailedNotRetryable,
-  FailedRetryable,
+export enum MeasureType {
+  DOUBLE = 0,
+  LONG = 1,
 }
+
+export interface MeasureOptions {
+  // Description of the Measure.
+  description?: string;
+
+  // Unit of the Measure.
+  unit?: string;
+
+  // Type of the Measure. Default type is DOUBLE.
+  type?: MeasureType;
+}
+
+export interface Measure {
+  // Creates a measurement with the supplied value.
+  createMeasurement(value: number): Measurement;
+}
+
+// Measurement describes an individual measurement
+export interface Measurement {}

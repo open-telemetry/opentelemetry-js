@@ -14,22 +14,10 @@
  * limitations under the License.
  */
 
-import { Span, ReadableSpan } from '@opentelemetry/basic-tracer';
-export class SpanAuditProcessor {
-  private _spans: Span[];
-  constructor() {
-    this._spans = [];
-  }
+export interface CounterTimeseries {
+  // Adds the given value to the current value. Values cannot be negative.
+  add(value: number): void;
 
-  push(span: Span) {
-    this._spans.push(span);
-  }
-
-  processSpans(): ReadableSpan[] {
-    return this._spans.map(span => span.toReadableSpan());
-  }
-
-  reset() {
-    this._spans = [];
-  }
+  // Sets the given value. Value must be larger than the current recorded value.
+  set(value: number): void;
 }

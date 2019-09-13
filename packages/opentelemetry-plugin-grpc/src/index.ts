@@ -14,8 +14,4 @@
  * limitations under the License.
  */
 
-export enum ExportResult {
-  Success,
-  FailedNotRetryable,
-  FailedRetryable,
-}
+export * from './grpc';

@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-export enum ExportResult {
-  Success,
-  FailedNotRetryable,
-  FailedRetryable,
+export interface GaugeTimeseries {
+  // Adds the given value to the current value. Values can be negative.
+  add(value: number): void;
+  // Sets the given value. Values can be negative.
+  set(value: number): void;
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Tracer, Plugin, Logger } from '@opentelemetry/types';
+import { Tracer, Plugin, Logger, PluginConfig } from '@opentelemetry/types';
 import * as semver from 'semver';
 import * as path from 'path';
 
@@ -45,18 +45,20 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   // tslint:disable-next-line:no-any
   protected _internalFilesExports!: { [module: string]: any };
   protected readonly _internalFilesList?: ModuleExportsMapping; // required for internalFilesExports
+  protected _config!: PluginConfig;
 
   enable(
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: { [key: string]: unknown }
+    config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
     if (config && config.basedir) this.basedir = config.basedir as string;
     this._internalFilesExports = this._loadInternalFiles();
+    if (config) this._config = config;
     return this.patch();
   }
 
