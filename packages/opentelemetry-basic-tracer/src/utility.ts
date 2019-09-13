@@ -20,7 +20,7 @@ import {
   DEFAULT_MAX_EVENTS_PER_SPAN,
   DEFAULT_MAX_LINKS_PER_SPAN,
 } from './config';
-import { defaultConfig } from './config';
+import { DEFAULT_CONFIG } from './config';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
@@ -28,7 +28,7 @@ import { defaultConfig } from './config';
  */
 export function mergeConfig(userConfig: BasicTracerConfig) {
   const traceParams = userConfig.traceParams;
-  const target = Object.assign({}, defaultConfig, userConfig);
+  const target = Object.assign({}, DEFAULT_CONFIG, userConfig);
 
   // the user-provided value will be used to extend the default value.
   if (traceParams) {
