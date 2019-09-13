@@ -19,6 +19,7 @@ import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
+import { TraceParams } from './types';
 
 /**
  * This class represents a span.
@@ -43,6 +44,7 @@ export class Span implements types.Span, ReadableSpan {
   private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
   private readonly _spanProcessor: SpanProcessor;
+  private readonly _traceParams: TraceParams;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -60,6 +62,7 @@ export class Span implements types.Span, ReadableSpan {
     this.kind = kind;
     this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
+    this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.activeSpanProcessor;
     this._spanProcessor.onStart(this);
   }
@@ -74,6 +77,19 @@ export class Span implements types.Span, ReadableSpan {
 
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
+
+    if (
+      Object.keys(this.attributes).length >=
+      this._traceParams.numberOfAttributesPerSpan!
+    ) {
+      const attributeKeyToDelete = Object.keys(this.attributes).shift();
+      if (attributeKeyToDelete) {
+        this._logger.warn(
+          `Dropping extra attributes : ${attributeKeyToDelete}`
+        );
+        delete this.attributes[attributeKeyToDelete];
+      }
+    }
     this.attributes[key] = value;
     return this;
   }
@@ -87,16 +103,21 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({
-      name,
-      attributes,
-      time: hrTime(),
-    });
+    if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
+      this._logger.warn('Dropping extra events.');
+      this.events.shift();
+    }
+    this.events.push({ name, attributes, time: hrTime() });
     return this;
   }
 
   addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
+
+    if (this.links.length >= this._traceParams.numberOfLinksPerSpan!) {
+      this._logger.warn('Dropping extra links.');
+      this.links.shift();
+    }
     this.links.push({ spanContext, attributes });
     return this;
   }

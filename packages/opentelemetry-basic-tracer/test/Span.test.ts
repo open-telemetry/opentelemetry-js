@@ -127,6 +127,23 @@ describe('Span', () => {
     span.end();
   });
 
+  it('should drop extra links, attributes and events', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    for (let i = 0; i < 150; i++) {
+      span.addLink(spanContext);
+      span.setAttribute('foo' + i, 'bar' + i);
+      span.addEvent('sent' + i);
+    }
+    span.end();
+
+    assert.strictEqual(span.links.length, 32);
+    assert.strictEqual(span.events.length, 128);
+    assert.strictEqual(Object.keys(span.attributes).length, 32);
+    assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
+    assert.strictEqual(span.attributes['foo0'], undefined);
+    assert.strictEqual(span.attributes['foo149'], 'bar149');
+  });
+
   it('should set an error status', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.setStatus({
