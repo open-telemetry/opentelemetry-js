@@ -14,10 +14,32 @@
  * limitations under the License.
  */
 
-export interface CounterTimeseries {
-  // Adds the given value to the current value. Values cannot be negative.
+/** A Handle for Counter Metric. */
+export interface CounterHandle {
+  /**
+   * Adds the given value to the current value. Values cannot be negative.
+   * @param value the value to add
+   */
   add(value: number): void;
 
-  // Sets the given value. Value must be larger than the current recorded value.
+  /**
+   * Sets the given value. Value must be larger than the current recorded value.
+   * @param value the new value.
+   */
+  set(value: number): void;
+}
+
+/** A Handle for Gauge Metric. */
+export interface GaugeHandle {
+  /**
+   * Adds the given value to the current value. Values can be negative.
+   * @param value the value to add.
+   */
+  add(value: number): void;
+
+  /**
+   * Sets the given value. Values can be negative.
+   * @param value the new value.
+   */
   set(value: number): void;
 }
