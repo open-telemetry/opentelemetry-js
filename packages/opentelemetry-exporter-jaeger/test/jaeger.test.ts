@@ -66,7 +66,7 @@ describe('JaegerExporter', () => {
 
     it('should skip send with empty list', () => {
       exporter.export([], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.Success);
+        assert.strictEqual(result, ExportResult.SUCCESS);
       });
     });
 
@@ -90,7 +90,7 @@ describe('JaegerExporter', () => {
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.Success);
+        assert.strictEqual(result, ExportResult.SUCCESS);
       });
     });
   });
