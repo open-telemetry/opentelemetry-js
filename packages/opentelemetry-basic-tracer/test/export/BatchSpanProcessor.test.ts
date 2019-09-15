@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -120,7 +120,7 @@ describe('BatchSpanProcessor', () => {
       setTimeout(() => {
         assert.strictEqual(exporter.spansDataList.length, 5);
         done();
-      }, defaultBufferConfig.bufferTimeout * 3);
-    }).timeout(defaultBufferConfig.bufferTimeout * 4);
+      }, defaultBufferConfig.bufferTimeout + 100);
+    }).timeout(defaultBufferConfig.bufferTimeout * 2);
   });
 });

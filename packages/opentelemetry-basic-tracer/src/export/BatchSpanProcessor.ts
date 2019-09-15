@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,8 +33,8 @@ export class BatchSpanProcessor implements SpanProcessor {
   private readonly _bufferSize: number;
   private readonly _bufferTimeout: number;
   private _finishedSpans: ReadableSpan[] = [];
-  private _resetTimeout = false;
-  private _bufferTimeoutInProgress = false;
+  private _lastSpanWrite = Date.now();
+  private _timer: NodeJS.Timeout;
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
     this._bufferSize =
@@ -43,6 +43,13 @@ export class BatchSpanProcessor implements SpanProcessor {
       config && config.bufferTimeout
         ? config.bufferTimeout
         : DEFAULT_BUFFER_TIMEOUT_MS;
+
+    this._timer = setInterval(() => {
+      if (Date.now() - this._lastSpanWrite >= this._bufferTimeout) {
+        this._flush();
+      }
+    }, this._bufferTimeout);
+    unrefTimer(this._timer);
   }
 
   // does nothing.
@@ -54,50 +61,23 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   shutdown(): void {
+    clearInterval(this._timer);
     this._exporter.shutdown();
   }
 
   /** Add a span in the buffer. */
   private _addToBuffer(span: ReadableSpan) {
+    this._lastSpanWrite = Date.now();
     this._finishedSpans.push(span);
     if (this._finishedSpans.length > this._bufferSize) {
       this._flush();
     }
-
-    if (this._bufferTimeoutInProgress) {
-      this._resetBufferTimeout();
-    } else {
-      this._setBufferTimeout();
-    }
-  }
-
-  /** Reset the buffer timeout */
-  private _resetBufferTimeout() {
-    this._resetTimeout = true;
-  }
-
-  /** Start the buffer timeout, when finished calls flush method */
-  private _setBufferTimeout() {
-    this._bufferTimeoutInProgress = true;
-
-    const timer = setTimeout(() => {
-      if (this._finishedSpans.length === 0) return;
-
-      if (this._resetTimeout) {
-        this._resetTimeout = false;
-        this._setBufferTimeout();
-      } else {
-        this._bufferTimeoutInProgress = false;
-        this._flush();
-      }
-    }, this._bufferTimeout);
-    // Don't let this timer be the only thing keeping the process alive
-    unrefTimer(timer);
   }
 
   /** Send the span data list to exporter */
   private _flush() {
     this._exporter.export(this._finishedSpans, () => {});
     this._finishedSpans = [];
+    this._lastSpanWrite = Date.now();
   }
 }
