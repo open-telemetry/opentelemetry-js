@@ -17,17 +17,6 @@
 import { Logger } from '@opentelemetry/types';
 import * as path from 'path';
 import * as semver from 'semver';
-import * as constants from './constants';
-
-/**
- * Gets the default package name for a target module. The default package
- * name uses the default scope and a default prefix.
- * @param moduleName The module name.
- * @returns The default name for the package.
- */
-export function defaultPackageName(moduleName: string): string {
-  return `${constants.OPENTELEMETRY_SCOPE}/${constants.DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX}-${moduleName}`;
-}
 
 /**
  * Gets the package version.
