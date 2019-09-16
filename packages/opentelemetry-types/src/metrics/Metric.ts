@@ -20,7 +20,6 @@ import { Resource } from '../resources/Resource';
  * Options needed for metric creation
  */
 export interface MetricOptions {
-
   /** The name of the component that reports the Metric. */
   component?: string;
 
