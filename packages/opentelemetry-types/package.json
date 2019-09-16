@@ -41,6 +41,7 @@
   "devDependencies": {
     "gts": "^1.0.0",
     "linkinator": "^1.5.0",
+    "tslint-microsoft-contrib": "^6.2.0",
     "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   }

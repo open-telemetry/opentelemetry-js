@@ -33,6 +33,7 @@
     "@commitlint/cli": "^8.1.0",
     "@commitlint/config-conventional": "^8.1.0",
     "husky": "^3.0.1",
+    "gts": "^1.0.0",
     "lerna": "^3.13.4",
     "typescript": "^3.4.5"
   },

@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,19 +40,6 @@ describe('Instrumentation#utils', () => {
 
   before(() => {
     utils.searchPathForTest(INSTALLED_PLUGINS_PATH);
-  });
-
-  describe('defaultPackageName', () => {
-    it('should return package name with default scope and a prefix', () => {
-      assert.strictEqual(
-        utils.defaultPackageName('http'),
-        '@opentelemetry/plugin-http'
-      );
-      assert.strictEqual(
-        utils.defaultPackageName('simple-module'),
-        '@opentelemetry/plugin-simple-module'
-      );
-    });
   });
 
   describe('getPackageVersion', () => {
