@@ -87,7 +87,7 @@ export class SpanContextShim extends opentracing.SpanContext {
 
 /**
  * TracerShim wraps a {@link types.Tracer} and implements the
- * OpenTracing span context API.
+ * OpenTracing tracer API.
  */
 export class TracerShim extends opentracing.Tracer {
   private readonly _tracer: types.Tracer;
@@ -131,15 +131,7 @@ export class TracerShim extends opentracing.Tracer {
           .inject(opentelemSpanContext, format, carrier);
         return;
       case opentracing.FORMAT_BINARY:
-        // Hmm this is a case where opentracing allowing different types of byte
-        // carriers makes things a little bit tricky.
-        /* const bytes = this._tracer.getBinaryFormat().toBytes(opentelemSpanContext); */
-        /* if (carrier instanceof Array) { */
-        /*   carrier.concat(bytes); */
-        /* } */
-        /* if (carrier instanceof TypedArray) { */
-        /*   carrier.set(bytes, 0); */
-        /* } */
+        // @todo: Implement binary format
         return;
       default:
     }
@@ -158,13 +150,7 @@ export class TracerShim extends opentracing.Tracer {
         }
         return new SpanContextShim(context);
       case opentracing.FORMAT_BINARY:
-        /* if (!carrier.buffer) { */
-        /*   return; */
-        /* } */
-        /* this._tracer */
-        /*   .getBinaryFormat() */
-        /*   .fromBytes(new Uint8Array(carrier.buffer)); */
-        /* return new SpanContextShim(null); */
+        // @todo: Implement binary format
         return null;
       default:
     }
