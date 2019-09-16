@@ -28,7 +28,7 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,

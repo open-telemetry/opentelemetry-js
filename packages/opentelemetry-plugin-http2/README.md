@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`http2`](http://nodejs.org/dist/latest/docs/api/http2.html).
 
 For automatic instrumentation see the
-[@opentelemetry/node-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-tracer) package.
+[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
 
 ## Installation
 

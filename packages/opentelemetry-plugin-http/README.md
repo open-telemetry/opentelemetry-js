@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html).
 
 For automatic instrumentation see the
-[@opentelemetry/node-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-tracer) package.
+[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
 
 ## Installation
 
