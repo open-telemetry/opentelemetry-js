@@ -20,6 +20,10 @@ import { Resource } from '../resources/Resource';
  * Options needed for metric creation
  */
 export interface MetricOptions {
+
+  /** The name of the component that reports the Metric. */
+  component?: string;
+
   /**
    * The description of the Metric.
    * @default ''
@@ -41,8 +45,8 @@ export interface MetricOptions {
   /** The resource the Metric is associated with. */
   resource?: Resource;
 
-  /** The name of the component that reports the Metric. */
-  component?: string;
+  /** Indicates the metric is a verbose metric that is disabled by default */
+  disabled?: boolean;
 
   /**
    * Bidirectional allows counter metrics to accept negative values.
