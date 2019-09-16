@@ -43,6 +43,24 @@ export interface MetricOptions {
 
   /** The name of the component that reports the Metric. */
   component?: string;
+
+  /**
+   * Bidirectional allows counter metrics to accept negative values.
+   * Otherwise, as false, the counter is unidirectional and rejects negative values.
+   */
+  bidirectional?: boolean;
+
+  /**
+   * Unidirectional indicates a gauge metric only ascends, indicating it is for
+   * rate calculations.
+   */
+  unidirectional?: boolean;
+
+  /**
+   * nonNegative indicates a measure is never negative, indicating it is for rate
+   * calculations.
+   */
+  nonNegative?: boolean;
 }
 
 /**
