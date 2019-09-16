@@ -28,7 +28,7 @@ export interface Meter {
   /**
    * Creates and returns a new {@link Measure}.
    * @param name the name of the metric.
-   * @param [options] the measure options.
+    * @param [options] the metric options.
    */
   createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle>;
 
