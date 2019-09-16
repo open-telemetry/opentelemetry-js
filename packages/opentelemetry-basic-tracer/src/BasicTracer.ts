@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,6 +35,7 @@ import { mergeConfig } from './utility';
 import { SpanProcessor } from './SpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
+import { DEFAULT_CONFIG } from './config';
 
 /**
  * This class represents a basic tracer.
@@ -53,7 +54,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
+  constructor(config: BasicTracerConfig = DEFAULT_CONFIG) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;

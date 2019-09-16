@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -35,7 +35,7 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  * non-primitive values (like `traceParams`), the user-provided value will be
  * used to extend the default value.
  */
-export const defaultConfig = {
+export const DEFAULT_CONFIG = {
   defaultAttributes: {},
   binaryFormat: new BinaryTraceContext(),
   httpTextFormat: new HttpTraceContext(),

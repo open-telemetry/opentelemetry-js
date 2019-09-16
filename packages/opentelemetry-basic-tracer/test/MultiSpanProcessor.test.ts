@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 import { SpanProcessor, Span, BasicTracer } from '../src';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
@@ -31,9 +30,7 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
-  const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
-  });
+  const tracer = new BasicTracer();
   const span = tracer.startSpan('one');
 
   it('should handle empty span processor', () => {
