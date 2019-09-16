@@ -26,7 +26,7 @@ describe('BasePlugin', () => {
     it('should load internally exported files', async () => {
       const testPackage = await import(basedir);
       const plugin = new TestPlugin();
-      plugin.enable(testPackage, tracer, logger, { basedir });
+      plugin.enable(testPackage, tracer, logger);
       assert.ok(plugin['_internalFilesExports']);
       assert.strictEqual(
         plugin['_internalFilesExports'].internal.internallyExportedFunction(),
@@ -47,6 +47,7 @@ describe('BasePlugin', () => {
 class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   readonly moduleName = 'test-package';
   readonly version = '0.0.1';
+  readonly _basedir = basedir;
 
   protected readonly _internalFilesList = {
     '0.0.1': {

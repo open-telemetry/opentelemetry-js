@@ -14,37 +14,23 @@
  * limitations under the License.
  */
 
-import { Tracer, Plugin, Logger, PluginConfig } from '@opentelemetry/types';
+import { Tracer, Plugin, Logger, PluginConfig, PluginInternalFiles, PluginInternalFilesVersion } from '@opentelemetry/types';
 import * as semver from 'semver';
 import * as path from 'path';
-
-/**
- * Maps a name (key) representing a internal file module and its exports
- */
-export interface ModuleNameToFilePath {
-  [moduleName: string]: string; // moduleName: path/to/file
-}
-
-/**
- * Maps a semver to a module:filepath Map
- */
-export interface ModuleExportsMapping {
-  [semver: string]: ModuleNameToFilePath;
-}
 
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
   supportedVersions?: string[];
   readonly moduleName?: string; // required for internalFilesExports
   readonly version?: string; // required for internalFilesExports
+  protected readonly _basedir?: string; // required for internalFilesExports
 
-  protected basedir!: string;
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
   // tslint:disable-next-line:no-any
-  protected _internalFilesExports!: { [module: string]: any };
-  protected readonly _internalFilesList?: ModuleExportsMapping; // required for internalFilesExports
+  protected _internalFilesExports!: { [module: string]: any }; // output for internalFilesExports
+  protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
 
   enable(
@@ -56,8 +42,7 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
-    if (config && config.basedir) this.basedir = config.basedir as string;
-    this._internalFilesExports = this._loadInternalFiles();
+    this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
     return this.patch();
   }
@@ -66,33 +51,20 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     this.unpatch();
   }
 
-  private _loadInternalFiles(): ModuleExportsMapping {
-    let extraModules: ModuleExportsMapping = {};
-    if (this._internalFilesList) {
-      this._logger.debug('loadInternalFiles %o', this._internalFilesList);
-      Object.keys(this._internalFilesList).forEach(versionRange => {
-        if (
-          this.version &&
-          this.moduleName &&
-          semver.satisfies(this.version, versionRange)
-        ) {
-          if (Object.keys(extraModules).length > 0) {
-            this._logger.warn(
-              'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
-              this.moduleName,
-              this.version,
-              versionRange,
-              this._internalFilesList
-            );
-          }
-          extraModules = this._loadInternalModuleFiles(
-            this._internalFilesList![versionRange],
-            this.basedir
-          );
-        }
-      });
+  private _loadInternalFilesExports(): PluginInternalFiles {
+    if (!this._internalFilesList) return {};
+    if (!this.version || !this.moduleName || !this._basedir) {
+      // log here because internalFilesList was provided, so internal file loading
+      // was expected to be working
+      this._logger.debug('loadInternalFiles failed because one of the required fields was missing: moduleName=%s, version=%s, basedir=%s', this.moduleName, this.version, this._basedir);
+      return {};
     }
-    if (Object.keys(extraModules)) {
+    let extraModules: PluginInternalFiles = {};
+    this._logger.debug('loadInternalFiles %o', this._internalFilesList);
+    Object.keys(this._internalFilesList).forEach(versionRange => {
+      this._loadInternalModule(versionRange, extraModules);
+    });
+    if (Object.keys(extraModules).length === 0) {
       this._logger.debug(
         'No internal files could be loaded for %s@%s',
         this.moduleName,
@@ -102,30 +74,49 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     return extraModules;
   }
 
-  private _loadInternalModuleFiles(
-    extraModulesList: ModuleNameToFilePath,
-    basedir: string
-  ): ModuleExportsMapping {
-    const extraModules: ModuleExportsMapping = {};
-    if (extraModulesList) {
-      Object.keys(extraModulesList).forEach(moduleName => {
-        try {
-          this._logger.debug('loading File %s', extraModulesList[moduleName]);
-          extraModules[moduleName] = require(path.join(
-            basedir,
-            extraModulesList[moduleName]
-          ));
-        } catch (e) {
-          this._logger.error(
-            'Could not load internal file %s of module %s. Error: %s',
-            path.join(basedir, extraModulesList[moduleName]),
-            this.moduleName,
-            e.message
-          );
-        }
-      });
+  private _loadInternalModule(versionRange: string, outExtraModules: PluginInternalFiles): void {
+    if (
+      semver.satisfies(this.version!, versionRange)
+    ) {
+      if (Object.keys(outExtraModules).length > 0) {
+        this._logger.warn(
+          'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
+          this.moduleName,
+          this.version,
+          versionRange,
+          this._internalFilesList
+        );
+      }
+      this._requireInternalFiles(
+        this._internalFilesList![versionRange],
+        this._basedir!,
+        outExtraModules
+      );
     }
-    return extraModules;
+  }
+
+  private _requireInternalFiles(
+    extraModulesList: PluginInternalFilesVersion,
+    basedir: string,
+    outExtraModules: PluginInternalFiles
+  ): void {
+    if (!extraModulesList) return;
+    Object.keys(extraModulesList).forEach(moduleName => {
+      try {
+        this._logger.debug('loading File %s', extraModulesList[moduleName]);
+        outExtraModules[moduleName] = require(path.join(
+          basedir,
+          extraModulesList[moduleName]
+        ));
+      } catch (e) {
+        this._logger.error(
+          'Could not load internal file %s of module %s. Error: %s',
+          path.join(basedir, extraModulesList[moduleName]),
+          this.moduleName,
+          e.message
+        );
+      }
+    });
   }
 
   protected abstract patch(): T;
