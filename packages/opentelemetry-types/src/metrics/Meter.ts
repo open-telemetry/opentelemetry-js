@@ -15,8 +15,7 @@
  */
 
 import { Metric, MetricOptions } from './Metric';
-import { CounterHandle, GaugeHandle } from './Handle';
-import { MeasureOptions, Measure } from './Measure';
+import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
 
 /**
  * An interface to allow the recording metrics.
@@ -31,7 +30,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the measure options.
    */
-  createMeasure(name: string, options?: MeasureOptions): Measure;
+  createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle>;
 
   /**
    * Creates a new counter metric.
