@@ -15,7 +15,7 @@
  */
 
 export enum ExportResult {
-  Success,
-  FailedNotRetryable,
-  FailedRetryable,
+  SUCCESS,
+  FAILED_NOT_RETRYABLE,
+  FAILED_RETRYABLE,
 }
