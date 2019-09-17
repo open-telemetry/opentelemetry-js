@@ -37,7 +37,10 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  public createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle> {
+  public createMeasure(
+    name: string,
+    options?: MetricOptions
+  ): Metric<MeasureHandle> {
     return NOOP_MEASURE_METRIC;
   }
 
@@ -47,7 +50,7 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Metric<CounterHandle> {
-    return NOOP_COUNTER_METRIC
+    return NOOP_COUNTER_METRIC;
   }
 
   /**
@@ -56,7 +59,7 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    */
   createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle> {
-    return NOOP_GAUGE_METRIC
+    return NOOP_GAUGE_METRIC;
   }
 }
 
@@ -99,8 +102,8 @@ export class NoopMetric<T> implements Metric {
   }
 
   setCallback(fn: () => void): void {
-    return
-  };
+    return;
+  }
 }
 
 export class NoopCounterHandle implements CounterHandle {
@@ -115,12 +118,12 @@ export class NoopGaugeHandle implements GaugeHandle {
   }
 }
 
-export class NoopMeasureHandle implements MeasureHandle{
+export class NoopMeasureHandle implements MeasureHandle {
   record(value: number): void {
     return;
   }
 
-  record(value: number, distContext: DistributedContext): void{
+  record(value: number, distContext: DistributedContext): void {
     return;
   }
 
@@ -137,7 +140,11 @@ export const NOOP_GAUGE_HANDLE = new NoopGaugeHandle();
 export const NOOP_GAUGE_METRIC = new NoopMetric<GaugeHandle>(NOOP_GAUGE_HANDLE);
 
 export const NOOP_COUNTER_HANDLE = new NoopCounterHandle();
-export const NOOP_COUNTER_METRIC = new NoopMetric<CounterHandle>(NOOP_COUNTER_HANDLE);
+export const NOOP_COUNTER_METRIC = new NoopMetric<CounterHandle>(
+  NOOP_COUNTER_HANDLE
+);
 
 export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
-export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(NOOP_MEASURE_HANDLE);
+export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
+  NOOP_MEASURE_HANDLE
+);
