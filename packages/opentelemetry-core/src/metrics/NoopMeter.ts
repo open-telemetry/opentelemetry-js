@@ -23,7 +23,7 @@ import {
   MetricOptions,
   MeasureHandle,
   SpanContext,
-} from '@opentelemtry/types';
+} from '@opentelemetry/types';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses constant

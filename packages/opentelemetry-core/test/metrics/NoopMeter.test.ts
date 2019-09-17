@@ -34,10 +34,8 @@ describe('NoopTracer', () => {
     counter.setCallback(() => {
       assert.fail('callback occurred');
     });
-    counter.getHandle().add(1);
     counter.getHandle(['val1', 'val2']).add(1);
     counter.getDefaultHandle().add(1);
-    counter.removeHandle();
     counter.removeHandle(['val1', 'val2']);
 
     // ensure the correct noop const is returned
@@ -51,8 +49,8 @@ describe('NoopTracer', () => {
 
     const measure = meter.createMeasure('some-name');
     measure.getDefaultHandle().record(1);
-    measure.getDefaultHandle().record(1, {});
-    measure.getDefaultHandle().record(1, {}, {});
+    measure.getDefaultHandle().record(1, {} as DistributedContext);
+    measure.getDefaultHandle().record(1, {} as DistributedContext, {} as SpanContext);
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
