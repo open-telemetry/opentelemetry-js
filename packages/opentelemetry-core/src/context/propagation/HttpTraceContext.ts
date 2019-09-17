@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SpanContext,
-  HttpTextFormat,
-  TraceOptions,
-} from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
 import { TraceState } from '../../trace/TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
@@ -35,7 +31,7 @@ function parse(traceParent: string): SpanContext | null {
   const parts = traceParent.split('-');
   const [version, traceId, spanId, option] = parts;
   // tslint:disable-next-line:ban Needed to parse hexadecimal.
-  const traceOptions = parseInt(option, 16);
+  const traceFlags = parseInt(option, 16);
 
   if (
     !isValidVersion(version) ||
@@ -45,7 +41,7 @@ function parse(traceParent: string): SpanContext | null {
     return null;
   }
 
-  return { traceId, spanId, traceOptions };
+  return { traceId, spanId, traceFlags };
 }
 
 function isValidVersion(version: string): boolean {
@@ -74,9 +70,7 @@ export class HttpTraceContext implements HttpTextFormat {
   ) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
-    }-0${Number(spanContext.traceOptions || TraceOptions.UNSAMPLED).toString(
-      16
-    )}`;
+    }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
 
     carrier[TRACE_PARENT_HEADER] = traceParent;
     if (spanContext.traceState) {
