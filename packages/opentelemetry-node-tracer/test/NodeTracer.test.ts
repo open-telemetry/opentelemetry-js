@@ -40,6 +40,7 @@ const INSTALLED_PLUGINS_PATH = path.join(
 );
 
 describe('NodeTracer', () => {
+  let tracer: NodeTracer;
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
   });
@@ -47,49 +48,45 @@ describe('NodeTracer', () => {
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
+    tracer.stop();
   });
 
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
 
     it('should construct an instance with binary format', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         binaryFormat: new BinaryTraceContext(),
       });
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
 
     it('should construct an instance with http text format', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         httpTextFormat: new HttpTraceContext(),
       });
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
 
     it('should construct an instance with logger', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
 
     it('should construct an instance with sampler', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         sampler: ALWAYS_SAMPLER,
       });
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
 
     it('should load user configured plugins', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
         plugins: {
           'simple-module': {
@@ -111,42 +108,38 @@ describe('NodeTracer', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       require('supported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 2);
-      tracer.stop();
     });
 
     it('should construct an instance with default attributes', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         defaultAttributes: {
           region: 'eu-west',
           asg: 'my-asg',
         },
       });
       assert.ok(tracer instanceof NodeTracer);
-      tracer.stop();
     });
   });
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span);
-      tracer.stop();
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
-      tracer.stop();
     });
 
     it('should return a default span with no sampling', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       });
@@ -154,7 +147,6 @@ describe('NodeTracer', () => {
       assert.ok(span instanceof NoRecordingSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecordingEvents(), false);
-      tracer.stop();
     });
 
     // @todo: implement
@@ -164,39 +156,36 @@ describe('NodeTracer', () => {
       const defaultAttributes = {
         foo: 'bar',
       };
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         defaultAttributes,
       });
 
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
-      tracer.stop();
     });
   });
 
   describe('.getCurrentSpan()', () => {
     it('should return null with AsyncHooksScopeManager when no span started', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
-      tracer.stop();
     });
   });
 
   describe('.withSpan()', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
         return done();
       });
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
-      tracer.stop();
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
@@ -217,7 +206,7 @@ describe('NodeTracer', () => {
     });
 
     it('should find correct scope with promises', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, async () => {
         for (let i = 0; i < 3; i++) {
@@ -251,17 +240,15 @@ describe('NodeTracer', () => {
 
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
-      tracer.stop();
     });
   });
 
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
-      tracer.stop();
     });
   });
 });
