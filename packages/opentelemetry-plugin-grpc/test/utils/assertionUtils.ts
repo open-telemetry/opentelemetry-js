@@ -60,8 +60,8 @@ export const assertPropagation = (
   assert.strictEqual(targetSpanContext.traceId, sourceSpanContext.traceId);
   assert.strictEqual(incomingSpan.parentSpanId, sourceSpanContext.spanId);
   assert.strictEqual(
-    targetSpanContext.traceOptions,
-    sourceSpanContext.traceOptions
+    targetSpanContext.traceFlags,
+    sourceSpanContext.traceFlags
   );
   assert.notStrictEqual(targetSpanContext.spanId, sourceSpanContext.spanId);
 };

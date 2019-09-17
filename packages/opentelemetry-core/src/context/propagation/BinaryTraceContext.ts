@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BinaryFormat, SpanContext, TraceOptions } from '@opentelemetry/types';
+import { BinaryFormat, SpanContext, TraceFlags } from '@opentelemetry/types';
 
 const VERSION_ID = 0;
 const TRACE_ID_FIELD_ID = 0;
@@ -69,7 +69,7 @@ export class BinaryTraceContext implements BinaryFormat {
       buf[j++] = parseInt(spanId.substr((i - SPAN_ID_OFFSET) * 2, 2), 16);
     }
     buf[j++] = TRACE_OPTION_FIELD_ID;
-    buf[j++] = Number(spanContext.traceOptions) || TraceOptions.UNSAMPLED;
+    buf[j++] = Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
     return buf;
   }
 
@@ -91,7 +91,7 @@ export class BinaryTraceContext implements BinaryFormat {
     result.spanId = toHex(
       buf.slice(SPAN_ID_OFFSET, TRACE_OPTION_FIELD_ID_OFFSET)
     );
-    result.traceOptions = buf[TRACE_OPTIONS_OFFSET];
+    result.traceFlags = buf[TRACE_OPTIONS_OFFSET];
     return result;
   }
 }

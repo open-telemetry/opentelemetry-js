@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceOptions } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/types';
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
 import { Span } from '../Span';
@@ -32,7 +32,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
-    if (span.context().traceOptions !== TraceOptions.SAMPLED) return;
+    if (span.context().traceFlags !== TraceFlags.SAMPLED) return;
     this._exporter.export([span.toReadableSpan()], () => {});
   }
 

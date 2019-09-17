@@ -19,7 +19,7 @@ import { Span } from '../src/Span';
 import {
   SpanKind,
   CanonicalCode,
-  TraceOptions,
+  TraceFlags,
   SpanContext,
 } from '@opentelemetry/types';
 import { BasicTracer } from '../src';
@@ -33,7 +33,7 @@ describe('Span', () => {
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
-    traceOptions: TraceOptions.SAMPLED,
+    traceFlags: TraceFlags.SAMPLED,
   };
 
   it('should create a Span instance', () => {
@@ -47,7 +47,7 @@ describe('Span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();
     assert.strictEqual(context.traceId, spanContext.traceId);
-    assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     assert.strictEqual(context.traceState, undefined);
     assert.ok(context.spanId.match(/[a-f0-9]{16}/));
     assert.ok(span.isRecordingEvents());
@@ -81,7 +81,7 @@ describe('Span', () => {
     const spanContext: SpanContext = {
       traceId: 'a3cda95b652f4a1592b449d5929fda1b',
       spanId: '5e0c63257de34c92',
-      traceOptions: TraceOptions.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED,
     };
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
@@ -155,7 +155,7 @@ describe('Span', () => {
         spanContext: {
           spanId: '6e0c63257de34c92',
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          traceOptions: 1,
+          traceFlags: 1,
         },
       },
     ]);

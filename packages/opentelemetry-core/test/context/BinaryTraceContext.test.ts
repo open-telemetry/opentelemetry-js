@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { BinaryTraceContext } from '../../src/context/propagation/BinaryTraceContext';
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/types';
 
 describe('BinaryTraceContext', () => {
   const binaryTraceContext = new BinaryTraceContext();
@@ -32,7 +32,7 @@ describe('BinaryTraceContext', () => {
       structured: {
         traceId: commonTraceId,
         spanId: commonSpanId,
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       },
       binary: new Uint8Array([
         0,
@@ -100,7 +100,7 @@ describe('BinaryTraceContext', () => {
         2,
         0,
       ]),
-      description: 'span context with no traceOptions',
+      description: 'span context with no traceFlags',
     },
     {
       structured: null,
@@ -134,7 +134,7 @@ describe('BinaryTraceContext', () => {
           binaryTraceContext.fromBytes(testCase.binary),
           testCase.structured &&
             Object.assign(
-              { traceOptions: TraceOptions.UNSAMPLED },
+              { traceFlags: TraceFlags.UNSAMPLED },
               testCase.structured
             )
         );
