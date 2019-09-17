@@ -21,7 +21,7 @@ import {
   X_B3_SPAN_ID,
   X_B3_SAMPLED,
 } from '../../src/context/propagation/B3Format';
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/types';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('B3Format', () => {
@@ -37,7 +37,7 @@ describe('B3Format', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       };
 
       b3Format.inject(spanContext, 'B3Format', carrier);
@@ -46,14 +46,14 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.SAMPLED);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.SAMPLED);
     });
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceOptions: TraceOptions.UNSAMPLED,
+        traceFlags: TraceFlags.UNSAMPLED,
         traceState: new TraceState('foo=bar,baz=qux'),
       };
 
@@ -63,7 +63,7 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceOptions.UNSAMPLED);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.UNSAMPLED);
     });
 
     it('should not inject empty spancontext', () => {
@@ -101,7 +101,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.UNSAMPLED,
+        traceFlags: TraceFlags.UNSAMPLED,
       });
     });
 
@@ -114,7 +114,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       });
     });
 
@@ -127,7 +127,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       });
     });
 
@@ -140,7 +140,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.UNSAMPLED,
+        traceFlags: TraceFlags.UNSAMPLED,
       });
     });
 
@@ -173,7 +173,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       });
     });
 

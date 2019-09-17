@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
 import { TracerDelegate } from '../../src/trace/TracerDelegate';
 import { NoopTracer, NoopSpan } from '../../src';
-import { TraceOptions } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/types';
 
 describe('TracerDelegate', () => {
   const functions = [
@@ -33,7 +33,7 @@ describe('TracerDelegate', () => {
   const spanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
-    traceOptions: TraceOptions.UNSAMPLED,
+    traceFlags: TraceFlags.UNSAMPLED,
   };
 
   describe('constructor', () => {

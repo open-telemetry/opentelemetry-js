@@ -25,7 +25,7 @@ import {
 import {
   BinaryFormat,
   HttpTextFormat,
-  TraceOptions,
+  TraceFlags,
   Logger,
 } from '@opentelemetry/types';
 import { BasicTracerConfig, TraceParams } from '../src/types';
@@ -84,10 +84,10 @@ export class BasicTracer implements types.Tracer {
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
     }
-    const traceOptions = samplingDecision
-      ? TraceOptions.SAMPLED
-      : TraceOptions.UNSAMPLED;
-    const spanContext = { traceId, spanId, traceOptions, traceState };
+    const traceFlags = samplingDecision
+      ? TraceFlags.SAMPLED
+      : TraceFlags.UNSAMPLED;
+    const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecordingEvents || false;
     if (!recordEvents && !samplingDecision) {
       this.logger.debug('Sampling is off, starting no recording span');

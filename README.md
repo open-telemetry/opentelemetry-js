@@ -41,6 +41,26 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 
+## Release Schedule
+
+OpenTelemetry JS is under active development. Our goal is to release an
+_alpha_ version of the library at the end of September 2019. This release isn't
+guaranteed to conform to a specific version of the specification, and future
+releases will not attempt to maintain backwards compatibility with the alpha
+release.
+
+| Component                   | Version | Target Date       |
+| --------------------------- | ------- | ----------------- |
+| Tracing API                 | Alpha   | September 30 2019 |
+| Tracing SDK                 | Alpha   | September 30 2019 |
+| Metrics API                 | Alpha   | September 30 2019 |
+| Metrics SDK                 | Alpha   | Unknown           |
+| Jaeger Trace Exporter       | Alpha   | September 30 2019 |
+| Zipkin Trace Exporter       | Alpha   | September 30 2019 |
+| Prometheus Metrics Exporter | Alpha   | Unknown           |
+| OpenTracing Bridge          | Alpha   | Unknown           |
+| OpenCensus Bridge           | Alpha   | Unknown           |
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For help or feedback on this project, join us on [gitter][node-gitter-url]

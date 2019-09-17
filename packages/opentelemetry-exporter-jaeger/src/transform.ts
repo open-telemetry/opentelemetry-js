@@ -79,7 +79,7 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
     parentSpanId: parentSpan,
     operationName: span.name,
     references: spanLinksToThriftRefs(span.links, span.parentSpanId),
-    flags: span.spanContext.traceOptions || DEFAULT_FLAGS,
+    flags: span.spanContext.traceFlags || DEFAULT_FLAGS,
     startTime: Utils.encodeInt64(span.startTime * MICROS_PER_MILLI),
     duration: Utils.encodeInt64(
       Math.round((span.endTime - span.startTime) * MICROS_PER_MILLI)
