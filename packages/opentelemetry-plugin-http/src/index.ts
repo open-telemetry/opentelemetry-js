@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-/** opentelemetry scope */
-export const OPENTELEMETRY_SCOPE = '@opentelemetry';
-
-/** Default prefix for instrumentation modules */
-export const DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX = 'plugin';
+export * from './http';
+export * from './types';
+export * from './utils';
+export * from './enums/AttributeNames';
+export * from './enums/Format';

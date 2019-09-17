@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,6 +16,17 @@
 
 import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { Plugins } from './instrumentation/PluginLoader';
+
+/**
+ * NodeTracerConfig provides an interface for configuring a Node Tracer.
+ */
+export interface NodeTracerConfig extends BasicTracerConfig {
+  /**
+   * Plugins options.
+   */
+  plugins?: Plugins;
+}
 
 /**
  * This class represents a node tracer with `async_hooks` module.
@@ -24,10 +35,12 @@ export class NodeTracer extends BasicTracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
-    super(
-      Object.assign({}, { scopeManager: new AsyncHooksScopeManager() }, config)
-    );
+  constructor(config: NodeTracerConfig) {
+    if (config.scopeManager === undefined) {
+      config.scopeManager = new AsyncHooksScopeManager();
+      config.scopeManager.enable();
+    }
+    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
 
     // @todo: Integrate Plugin Loader (pull/126).
   }

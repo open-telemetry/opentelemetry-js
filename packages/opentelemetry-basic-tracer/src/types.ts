@@ -1,11 +1,11 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,5 +60,18 @@ export interface BasicTracerConfig {
   /**
    * Scope manager keeps context across in-process operations.
    */
-  scopeManager: ScopeManager;
+  scopeManager?: ScopeManager;
+
+  /** Trace Parameters */
+  traceParams?: TraceParams;
+}
+
+/** Global configuration of trace service */
+export interface TraceParams {
+  /** numberOfAttributesPerSpan is number of attributes per span */
+  numberOfAttributesPerSpan?: number;
+  /** numberOfLinksPerSpan is number of links per span */
+  numberOfLinksPerSpan?: number;
+  /** numberOfEventsPerSpan is number of message events per span */
+  numberOfEventsPerSpan?: number;
 }

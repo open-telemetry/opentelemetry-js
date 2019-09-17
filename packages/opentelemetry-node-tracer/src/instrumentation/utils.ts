@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,17 +17,6 @@
 import { Logger } from '@opentelemetry/types';
 import * as path from 'path';
 import * as semver from 'semver';
-import * as constants from './constants';
-
-/**
- * Gets the default package name for a target module. The default package
- * name uses the default scope and a default prefix.
- * @param moduleName The module name.
- * @returns The default name for the package.
- */
-export function defaultPackageName(moduleName: string): string {
-  return `${constants.OPENTELEMETRY_SCOPE}/${constants.DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX}-${moduleName}`;
-}
 
 /**
  * Gets the package version.
@@ -58,6 +47,24 @@ export function getPackageVersion(
     );
     return null;
   }
+}
+
+/**
+ * Determines if a version is supported
+ * @param moduleVersion a version in [semver](https://semver.org/spec/v2.0.0.html) format.
+ * @param [supportedVersions] a list of supported versions ([semver](https://semver.org/spec/v2.0.0.html) format).
+ */
+export function isSupportedVersion(
+  moduleVersion: string,
+  supportedVersions?: string[]
+) {
+  if (!Array.isArray(supportedVersions) || supportedVersions.length === 0) {
+    return true;
+  }
+
+  return supportedVersions.some(supportedVersion =>
+    semver.satisfies(moduleVersion, supportedVersion)
+  );
 }
 
 /**

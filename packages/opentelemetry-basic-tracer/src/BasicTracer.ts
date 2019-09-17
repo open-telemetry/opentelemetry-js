@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +16,6 @@
 
 import * as types from '@opentelemetry/types';
 import {
-  ALWAYS_SAMPLER,
-  BinaryTraceContext,
-  HttpTraceContext,
   randomTraceId,
   isValid,
   randomSpanId,
@@ -31,9 +28,14 @@ import {
   TraceOptions,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig } from '../src/types';
+import { BasicTracerConfig, TraceParams } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
+import { mergeConfig } from './utility';
+import { SpanProcessor } from './SpanProcessor';
+import { NoopSpanProcessor } from './NoopSpanProcessor';
+import { MultiSpanProcessor } from './MultiSpanProcessor';
+import { DEFAULT_CONFIG } from './config';
 
 /**
  * This class represents a basic tracer.
@@ -44,17 +46,22 @@ export class BasicTracer implements types.Tracer {
   private readonly _httpTextFormat: types.HttpTextFormat;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
+  private readonly _traceParams: TraceParams;
   readonly logger: Logger;
+  private readonly _registeredSpanProcessor: SpanProcessor[] = [];
+  activeSpanProcessor = new NoopSpanProcessor();
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig) {
-    this._binaryFormat = config.binaryFormat || new BinaryTraceContext();
-    this._defaultAttributes = config.defaultAttributes || {};
-    this._httpTextFormat = config.httpTextFormat || new HttpTraceContext();
-    this._sampler = config.sampler || ALWAYS_SAMPLER;
-    this._scopeManager = config.scopeManager;
+  constructor(config: BasicTracerConfig = DEFAULT_CONFIG) {
+    const localConfig = mergeConfig(config);
+    this._binaryFormat = localConfig.binaryFormat;
+    this._defaultAttributes = localConfig.defaultAttributes;
+    this._httpTextFormat = localConfig.httpTextFormat;
+    this._sampler = localConfig.sampler;
+    this._scopeManager = localConfig.scopeManager;
+    this._traceParams = localConfig.traceParams;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
@@ -96,7 +103,9 @@ export class BasicTracer implements types.Tracer {
       options.startTime
     );
     // Set default attributes
-    span.setAttributes(this._defaultAttributes);
+    span.setAttributes(
+      Object.assign({}, this._defaultAttributes, options.attributes)
+    );
     return span;
   }
 
@@ -153,6 +162,22 @@ export class BasicTracer implements types.Tracer {
    */
   getHttpTextFormat(): HttpTextFormat {
     return this._httpTextFormat;
+  }
+
+  /** Returns the active {@link TraceParams}. */
+  getActiveTraceParams(): TraceParams {
+    return this._traceParams;
+  }
+
+  /**
+   * Adds a new {@link SpanProcessor} to this tracer.
+   * @param spanProcessor the new SpanProcessor to be added.
+   */
+  addSpanProcessor(spanProcessor: SpanProcessor): void {
+    this._registeredSpanProcessor.push(spanProcessor);
+    this.activeSpanProcessor = new MultiSpanProcessor(
+      this._registeredSpanProcessor
+    );
   }
 
   private _getParentSpanContext(

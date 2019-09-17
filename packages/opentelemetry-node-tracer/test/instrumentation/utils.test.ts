@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -42,19 +42,6 @@ describe('Instrumentation#utils', () => {
     utils.searchPathForTest(INSTALLED_PLUGINS_PATH);
   });
 
-  describe('defaultPackageName', () => {
-    it('should return package name with default scope and a prefix', () => {
-      assert.strictEqual(
-        utils.defaultPackageName('http'),
-        '@opentelemetry/plugin-http'
-      );
-      assert.strictEqual(
-        utils.defaultPackageName('simple-module'),
-        '@opentelemetry/plugin-simple-module'
-      );
-    });
-  });
-
   describe('getPackageVersion', () => {
     it('should handle when undefined basedir', () => {
       assert.strictEqual(utils.getPackageVersion(logger), null);
@@ -67,6 +54,47 @@ describe('Instrumentation#utils', () => {
           testCase.version
         );
       });
+    });
+  });
+  describe('isSupportedVersion', () => {
+    const version = '1.0.1';
+
+    it('should return true when supportedVersions is not defined', () => {
+      assert.strictEqual(utils.isSupportedVersion('1.0.0', undefined), true);
+    });
+
+    [
+      ['1.X'],
+      [version],
+      ['1.X.X', '3.X.X'],
+      ['^1.0.0'],
+      ['~1.0.0', '^0.1.0'],
+      ['*'],
+      ['>1.0.0'],
+      [],
+    ].forEach(supportedVersion => {
+      it(`should return true when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
+        assert.strictEqual(
+          utils.isSupportedVersion(version, supportedVersion),
+          true
+        );
+      });
+    });
+
+    [['0.X'], ['0.0.1'], ['0.X.X'], ['^0.1.0'], ['1.0.0'], ['<1.0.0']].forEach(
+      supportedVersion => {
+        it(`should return false when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
+          assert.strictEqual(
+            utils.isSupportedVersion(version, supportedVersion),
+            false
+          );
+        });
+      }
+    );
+
+    it(`should return false when version is equal to null and supportedVersions is equal to '*'`, () => {
+      // tslint:disable-next-line:no-any
+      assert.strictEqual(utils.isSupportedVersion(null as any, ['*']), false);
     });
   });
 });
