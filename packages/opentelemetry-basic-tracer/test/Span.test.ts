@@ -23,12 +23,10 @@ import {
   SpanContext,
 } from '@opentelemetry/types';
 import { BasicTracer } from '../src';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('Span', () => {
   const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
     logger: new NoopLogger(),
   });
   const name = 'span1';
