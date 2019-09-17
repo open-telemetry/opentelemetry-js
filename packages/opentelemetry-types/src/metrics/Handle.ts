@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { DistributedContext } from '../distributed_context/DistributedContext';
+import { SpanContext } from '../trace/span_context';
+
 /** A Handle for Counter Metric. */
 export interface CounterHandle {
   /**
@@ -21,25 +24,31 @@ export interface CounterHandle {
    * @param value the value to add
    */
   add(value: number): void;
-
-  /**
-   * Sets the given value. Value must be larger than the current recorded value.
-   * @param value the new value.
-   */
-  set(value: number): void;
 }
 
 /** A Handle for Gauge Metric. */
 export interface GaugeHandle {
   /**
-   * Adds the given value to the current value. Values can be negative.
-   * @param value the value to add.
-   */
-  add(value: number): void;
-
-  /**
    * Sets the given value. Values can be negative.
    * @param value the new value.
    */
   set(value: number): void;
+}
+
+/** Measure to report instantaneous measurement of a value. */
+export interface MeasureHandle {
+  /**
+   * Records the given value to this measure.
+   * @param value the measurement to record.
+   * @param distContext the distContext associated with the measurements.
+   * @param spanContext the {@link SpanContext} that identifies the {@link Span}
+   *     for which the measurements are associated with.
+   */
+  record(value: number): void;
+  record(value: number, distContext: DistributedContext): void;
+  record(
+    value: number,
+    distContext: DistributedContext,
+    spanContext: SpanContext
+  ): void;
 }
