@@ -19,7 +19,6 @@
   "keywords": [
     "opentelemetry",
     "nodejs",
-    "tracing",
     "profiling",
     "metrics",
     "stats"
