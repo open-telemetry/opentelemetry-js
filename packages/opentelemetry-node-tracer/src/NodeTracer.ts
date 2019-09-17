@@ -14,46 +14,18 @@
  * limitations under the License.
  */
 
-import { BasicTracer } from '@opentelemetry/basic-tracer';
+import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { ScopeManager } from '@opentelemetry/scope-base';
-import {
-  Attributes,
-  BinaryFormat,
-  HttpTextFormat,
-  Logger,
-  Sampler,
-} from '@opentelemetry/types';
+import { Plugins } from './instrumentation/PluginLoader';
 
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
  */
-export interface NodeTracerConfig {
+export interface NodeTracerConfig extends BasicTracerConfig {
   /**
-   * Binary formatter which can serialize/deserialize Spans.
+   * Plugins options.
    */
-  binaryFormat?: BinaryFormat;
-  /**
-   * Attributed that will be applied on every span created by Tracer.
-   * Useful to add infrastructure and environment information to your spans.
-   */
-  defaultAttributes?: Attributes;
-  /**
-   * HTTP text formatter which can inject/extract Spans.
-   */
-  httpTextFormat?: HttpTextFormat;
-  /**
-   * User provided logger.
-   */
-  logger?: Logger;
-  /**
-   * Sampler determines if a span should be recorded or should be a NoopSpan.
-   */
-  sampler?: Sampler;
-  /**
-   * Scope manager keeps context across in-process operations.
-   */
-  scopeManager?: ScopeManager;
+  plugins?: Plugins;
 }
 
 /**

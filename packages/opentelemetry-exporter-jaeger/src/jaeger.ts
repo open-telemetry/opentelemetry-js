@@ -69,13 +69,13 @@ export class JaegerExporter implements SpanExporter {
         if (err) {
           // @todo: decide whether to break out the loop on first error.
           this._logger.error(`failed to append span: ${err}`);
-          if (done) return done(ExportResult.FailedNotRetryable);
+          if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
         }
       });
     }
     // @todo: We should wait for all the callbacks of the append calls to
     // complete before it calls done with success.
     this._logger.debug('successful append for : %s', thriftSpan.length);
-    if (done) return done(ExportResult.Success);
+    if (done) return done(ExportResult.SUCCESS);
   }
 }

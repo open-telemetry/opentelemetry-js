@@ -61,6 +61,7 @@
     "nyc": "^14.1.1",
     "sinon": "^7.3.2",
     "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-consistent-codestyle":"^1.15.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.3"
