@@ -37,7 +37,7 @@ export const httpRequest = {
           })
         : options;
     return new Promise((resolve, reject) => {
-      return http.get(_options, (resp: http.IncomingMessage) => {
+      const req = http.get(_options, (resp: http.IncomingMessage) => {
         const res = (resp as unknown) as http.IncomingMessage & {
           req: http.IncomingMessage;
         };
@@ -62,6 +62,10 @@ export const httpRequest = {
           reject(err);
         });
       });
+      req.on('error', err => {
+        reject(err);
+      });
+      return req;
     });
   },
 };

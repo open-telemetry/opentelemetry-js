@@ -15,7 +15,13 @@
  */
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
-import { Span, SpanKind, SpanOptions, Attributes } from '@opentelemetry/types';
+import {
+  Span,
+  SpanKind,
+  SpanOptions,
+  Attributes,
+  CanonicalCode,
+} from '@opentelemetry/types';
 import {
   ClientRequest,
   IncomingMessage,
@@ -314,7 +320,20 @@ export class HttpPlugin extends BasePlugin<Http> {
           span.end();
           return returned;
         };
-        return original.apply(this, [event, ...args]);
+        try {
+          return original.apply(this, [event, ...args]);
+        } catch (error) {
+          const message = error.message;
+          span
+            .setAttributes({
+              [AttributeNames.HTTP_ERROR_NAME]: error.name,
+              [AttributeNames.HTTP_ERROR_MESSAGE]: message,
+            })
+            .setStatus({ code: CanonicalCode.UNKNOWN, message })
+            .end();
+
+          throw error;
+        }
       });
     };
   }
@@ -328,7 +347,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       options: RequestOptions | string,
       ...args: unknown[]
     ): ClientRequest {
-      if (!options) {
+      if (!Utils.isValidOptionsType(options)) {
         return original.apply(this, [options, ...args]);
       }
 

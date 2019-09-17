@@ -199,4 +199,21 @@ describe('Utils', () => {
       });
     });
   });
+
+  describe('isValidOptionsType()', () => {
+    ['', false, true, 1, 0, []].forEach(options => {
+      it(`should return false with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), false);
+      });
+    });
+    for (const options of ['url', url.parse('http://url.com'), {}]) {
+      it(`should return true with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), true);
+      });
+    }
+  });
 });

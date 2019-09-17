@@ -172,7 +172,6 @@ export class Utils {
     let pathname = '/';
     let origin = '';
     let optionsParsed: url.URL | url.UrlWithStringQuery | RequestOptions;
-
     if (typeof options === 'string') {
       optionsParsed = url.parse(options);
       pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
@@ -181,15 +180,13 @@ export class Utils {
         Object.assign(optionsParsed, extraOptions);
       }
     } else {
-      optionsParsed = options;
-      try {
-        pathname = (options as url.URL).pathname;
-        if (!pathname && options.path) {
-          pathname = url.parse(options.path).pathname || '/';
-        }
-        origin = `${options.protocol || 'http:'}//${options.host ||
-          `${options.hostname}:${options.port}`}`;
-      } catch (ignore) {}
+      optionsParsed = options as RequestOptions;
+      pathname = (options as url.URL).pathname;
+      if (!pathname && optionsParsed.path) {
+        pathname = url.parse(optionsParsed.path).pathname || '/';
+      }
+      origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host ||
+        `${optionsParsed.hostname}:${optionsParsed.port}`}`;
     }
 
     if (Utils.hasExpectHeader(optionsParsed)) {
@@ -206,5 +203,14 @@ export class Utils {
     method = method ? method.toUpperCase() : 'GET';
 
     return { origin, pathname, method, optionsParsed };
+  }
+
+  /**
+   * Makes sure options is of type string or object
+   * @param options for the request
+   */
+  static isValidOptionsType(options: unknown): boolean {
+    const type = options && typeof options;
+    return type === 'string' || (type === 'object' && !Array.isArray(options));
   }
 }

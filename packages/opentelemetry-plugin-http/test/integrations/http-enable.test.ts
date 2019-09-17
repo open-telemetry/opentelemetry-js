@@ -30,7 +30,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
 
-const serverPort = 12345;
+const serverPort = 32345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
@@ -112,55 +112,54 @@ describe('HttpPlugin Integration tests', () => {
     });
 
     it('custom attributes should show up on client spans', async () => {
-      await httpRequest.get(`http://google.fr/`).then(result => {
-        const spans = memoryExporter.getFinishedSpans();
-        const span = spans[0];
-        const validations = {
-          hostname: 'google.fr',
-          httpStatusCode: result.statusCode!,
-          httpMethod: 'GET',
-          pathname: '/',
-          resHeaders: result.resHeaders,
-          reqHeaders: result.reqHeaders,
-        };
+      const result = await httpRequest.get(`http://google.fr/`);
+      const spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+      };
 
-        assert.strictEqual(spans.length, 1);
-        assert.ok(span.name.indexOf('GET /') >= 0);
-        assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
-        assertSpan(span, SpanKind.CLIENT, validations);
-      });
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assert.strictEqual(span.attributes['span kind'], SpanKind.CLIENT);
+      assertSpan(span, SpanKind.CLIENT, validations);
     });
 
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
-      const spans = memoryExporter.getFinishedSpans();
+      let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
         url.parse('http://google.fr/')
       );
-      await httpRequest.get(options).then(result => {
-        const spans = memoryExporter.getFinishedSpans();
-        const span = spans[0];
-        const validations = {
-          hostname: 'google.fr',
-          httpStatusCode: 301,
-          httpMethod: 'GET',
-          pathname: '/',
-          resHeaders: result.resHeaders,
-          reqHeaders: result.reqHeaders,
-        };
 
-        assert.strictEqual(spans.length, 1);
-        assert.ok(span.name.indexOf('GET /') >= 0);
+      const result = await httpRequest.get(options);
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: 301,
+        httpMethod: 'GET',
+        pathname: '/',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+      };
 
-        try {
-          assertSpan(span, SpanKind.CLIENT, validations);
-        } catch (error) {
-          // temporary redirect is also correct
-          validations.httpStatusCode = 307;
-          assertSpan(span, SpanKind.CLIENT, validations);
-        }
-      });
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+
+      try {
+        assertSpan(span, SpanKind.CLIENT, validations);
+      } catch (error) {
+        // temporary redirect is also correct
+        validations.httpStatusCode = 307;
+        assertSpan(span, SpanKind.CLIENT, validations);
+      }
     });
     for (const headers of [
       { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
