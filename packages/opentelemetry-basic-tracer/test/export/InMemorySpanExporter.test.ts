@@ -21,13 +21,10 @@ import {
   BasicTracer,
   ExportResult,
 } from '../../src';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
-  const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
-  });
+  const tracer = new BasicTracer();
   tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   afterEach(() => {
