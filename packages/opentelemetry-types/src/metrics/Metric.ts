@@ -44,24 +44,30 @@ export interface MetricOptions {
   /** The resource the Metric is associated with. */
   resource?: Resource;
 
-  /** Indicates the metric is a verbose metric that is disabled by default */
+  /**
+   * Indicates the metric is a verbose metric that is disabled by default
+   * @default false
+   */
   disabled?: boolean;
 
   /**
    * Bidirectional allows counter metrics to accept negative values.
    * Otherwise, as false, the counter is unidirectional and rejects negative values.
+   * @default false
    */
   bidirectional?: boolean;
 
   /**
    * Unidirectional indicates a gauge metric only ascends, indicating it is for
    * rate calculations.
+   * @default false
    */
   unidirectional?: boolean;
 
   /**
    * nonNegative indicates a measure is never negative, indicating it is for rate
    * calculations.
+   * @default false
    */
   nonNegative?: boolean;
 }
