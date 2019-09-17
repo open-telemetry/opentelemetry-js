@@ -6,6 +6,7 @@
 
 OpenTelemetry Exporter Prometheus provides a metrics endpoint for Prometheus.
 
+**Work in progress**
 
 ## License
 
