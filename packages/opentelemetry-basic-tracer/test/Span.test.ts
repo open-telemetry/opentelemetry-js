@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import { performance } from 'perf_hooks';
 import { Span } from '../src/Span';
 import {
   SpanKind,
@@ -23,7 +24,11 @@ import {
   SpanContext,
 } from '@opentelemetry/types';
 import { BasicTracer } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  hrTimeToNanoseconds,
+  hrTimeToMilliseconds,
+  NoopLogger,
+} from '@opentelemetry/core';
 
 describe('Span', () => {
   const tracer = new BasicTracer({
@@ -41,6 +46,39 @@ describe('Span', () => {
     assert.ok(span instanceof Span);
     assert.strictEqual(span.tracer(), tracer);
     span.end();
+  });
+
+  it('should have valid startTime', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    assert.ok(hrTimeToMilliseconds(span.startTime) > performance.timeOrigin);
+  });
+
+  it('should have valid endTime', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(
+      hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
+      'end time must be bigger than start time'
+    );
+
+    assert.ok(
+      hrTimeToMilliseconds(span.endTime) > performance.timeOrigin,
+      'end time must be bigger than time origin'
+    );
+  });
+
+  it('should have a duration', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
+  });
+
+  it('should have valid event.time', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.addEvent('my-event');
+    assert.ok(
+      hrTimeToMilliseconds(span.events[0].time) > performance.timeOrigin
+    );
   });
 
   it('should get the span context of span', () => {
@@ -189,7 +227,7 @@ describe('Span', () => {
     const [event] = readableSpan.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.ok(!event.attributes);
-    assert.ok(event.time > 0);
+    assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     readableSpan = span.toReadableSpan();
@@ -197,14 +235,14 @@ describe('Span', () => {
     const [event1, event2] = readableSpan.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.ok(!event1.attributes);
-    assert.ok(event1.time > 0);
+    assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
       attr1: 'value',
       attr2: 123,
       attr3: true,
     });
-    assert.ok(event2.time > 0);
+    assert.ok(event2.time[0] > 0);
 
     span.end();
     // shouldn't add new event
@@ -238,9 +276,10 @@ describe('Span', () => {
 
   it('should only end a span once', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    span.end(1234);
-    span.end(4567);
-    assert.strictEqual(span.endTime, 1234);
+    const endTime = Date.now();
+    span.end(endTime);
+    span.end(endTime + 10);
+    assert.deepStrictEqual(span.endTime, [endTime, 0]);
   });
 
   it('should update name', () => {

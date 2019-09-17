@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -33,13 +33,14 @@ export class Span implements types.Span, ReadableSpan {
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
-  readonly startTime: number;
+  readonly startTime: types.HrTime;
   name: string;
   status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  endTime = 0;
+  endTime: types.HrTime = [0, 0];
   private _ended = false;
+  private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
   private readonly _spanProcessor: SpanProcessor;
 
@@ -50,14 +51,14 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
-    startTime?: number
+    startTime: types.TimeInput = hrTime()
   ) {
     this._tracer = parentTracer;
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = startTime || performance.now();
+    this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
     this._spanProcessor = parentTracer.activeSpanProcessor;
     this._spanProcessor.onStart(this);
@@ -86,7 +87,11 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({ name, attributes, time: performance.now() });
+    this.events.push({
+      name,
+      attributes,
+      time: hrTime(),
+    });
     return this;
   }
 
@@ -108,13 +113,13 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime?: number): void {
+  end(endTime: types.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = endTime || performance.now();
+    this.endTime = timeInputToHrTime(endTime);
     this._spanProcessor.onEnd(this);
   }
 
@@ -124,6 +129,24 @@ export class Span implements types.Span, ReadableSpan {
 
   toReadableSpan(): ReadableSpan {
     return this;
+  }
+
+  get duration(): types.HrTime {
+    if (this._duration[0] !== -1) {
+      return this._duration;
+    }
+
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
+
+    if (this._duration[0] < 0) {
+      this._logger.warn(
+        'Inconsistent start and end time, startTime > endTime',
+        this.startTime,
+        this.endTime
+      );
+    }
+
+    return this._duration;
   }
 
   private _isSpanEnded(): boolean {

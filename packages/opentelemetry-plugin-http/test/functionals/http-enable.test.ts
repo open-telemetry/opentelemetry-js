@@ -107,26 +107,24 @@ describe('HttpPlugin', () => {
       plugin.disable();
     });
 
-    it('should generate valid spans (client side and server side)', done => {
-      httpRequest
-        .get(`http://${hostname}:${serverPort}${pathname}`)
-        .then(result => {
-          const spans = memoryExporter.getFinishedSpans();
-          const [incomingSpan, outgoingSpan] = spans;
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: result.method!,
-            pathname,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
+    it('should generate valid spans (client side and server side)', async () => {
+      const result = await httpRequest.get(
+        `http://${hostname}:${serverPort}${pathname}`
+      );
+      const spans = audit.processSpans();
+      const [incomingSpan, outgoingSpan] = spans;
+      const validations = {
+        hostname,
+        httpStatusCode: result.statusCode!,
+        httpMethod: result.method!,
+        pathname,
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+      };
 
-          assert.strictEqual(spans.length, 2);
-          assertSpan(incomingSpan, SpanKind.SERVER, validations);
-          assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
-          done();
-        });
+      assert.strictEqual(spans.length, 2);
+      assertSpan(incomingSpan, SpanKind.SERVER, validations);
+      assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
     const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
@@ -246,7 +244,8 @@ describe('HttpPlugin', () => {
                 reqSpan.spanContext.spanId
               );
               done();
-            });
+            })
+            .catch(done);
         });
       });
     }
