@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 
 export enum ExportResult {
-  Success,
-  FailedNonRetryable,
-  FailedRetryable,
+  SUCCESS,
+  FAILED_NOT_RETRYABLE,
+  FAILED_RETRYABLE,
 }

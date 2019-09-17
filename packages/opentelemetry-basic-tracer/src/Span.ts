@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@ import * as types from '@opentelemetry/types';
 import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
+import { SpanProcessor } from './SpanProcessor';
 
 /**
  * This class represents a span.
@@ -41,6 +42,7 @@ export class Span implements types.Span, ReadableSpan {
   private _ended = false;
   private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
+  private readonly _spanProcessor: SpanProcessor;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -58,6 +60,8 @@ export class Span implements types.Span, ReadableSpan {
     this.kind = kind;
     this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
+    this._spanProcessor = parentTracer.activeSpanProcessor;
+    this._spanProcessor.onStart(this);
   }
 
   tracer(): types.Tracer {
@@ -116,7 +120,7 @@ export class Span implements types.Span, ReadableSpan {
     }
     this._ended = true;
     this.endTime = timeInputToHrTime(endTime);
-    // @todo: record or export the span
+    this._spanProcessor.onEnd(this);
   }
 
   isRecordingEvents(): boolean {

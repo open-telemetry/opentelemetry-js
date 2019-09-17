@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-import { Span, ReadableSpan } from '@opentelemetry/basic-tracer';
-export class SpanAuditProcessor {
-  private _spans: Span[];
-  constructor() {
-    this._spans = [];
-  }
+import { Span } from '@opentelemetry/types';
+import { SpanProcessor } from './SpanProcessor';
 
-  push(span: Span) {
-    this._spans.push(span);
-  }
-
-  processSpans(): ReadableSpan[] {
-    return this._spans.map(span => span.toReadableSpan());
-  }
-
-  reset() {
-    this._spans = [];
-  }
+/** No-op implementation of SpanProcessor */
+export class NoopSpanProcessor implements SpanProcessor {
+  onStart(span: Span): void {}
+  onEnd(span: Span): void {}
+  shutdown(): void {}
 }

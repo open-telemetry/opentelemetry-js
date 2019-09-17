@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,8 +14,14 @@
  * limitations under the License.
  */
 
-/** opentelemetry scope */
-export const OPENTELEMETRY_SCOPE = '@opentelemetry';
-
-/** Default prefix for instrumentation modules */
-export const DEFAULT_PLUGIN_PACKAGE_NAME_PREFIX = 'plugin';
+/**
+ * An enumeration that represents global trace flags. These flags are
+ * propagated to all child {@link Span}. These determine features such as
+ * whether a Span should be traced. It is implemented as a bitmask.
+ */
+export enum TraceFlags {
+  /** Bit to represent whether trace is unsampled in trace flags. */
+  UNSAMPLED = 0x0,
+  /** Bit to represent whether trace is sampled in trace flags. */
+  SAMPLED = 0x1,
+}

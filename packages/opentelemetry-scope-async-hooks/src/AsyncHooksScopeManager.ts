@@ -1,11 +1,11 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,7 +24,7 @@ type PatchedEventEmitter = {
   /**
    * Store a map for each event of all original listener and their "patched"
    * version so when the listener is removed by the user, we remove the
-   * correspoding "patched" function.
+   * corresponding "patched" function.
    */
   __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
 } & EventEmitter;
