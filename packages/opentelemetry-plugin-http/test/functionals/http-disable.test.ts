@@ -20,7 +20,6 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../../src/http';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '@opentelemetry/node-tracer';
 import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
@@ -32,11 +31,9 @@ describe('HttpPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
     const tracer = new NodeTracer({
-      scopeManager,
       logger,
       httpTextFormat,
     });
