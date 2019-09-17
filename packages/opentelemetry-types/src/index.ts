@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/Propagator';
+export * from './common/Logger';
+export * from './context/propagation/BinaryFormat';
+export * from './context/propagation/HttpTextFormat';
+export * from './distributed_context/DistributedContext';
+export * from './distributed_context/EntryValue';
+export * from './metrics/Handle';
+export * from './metrics/Meter';
+export * from './metrics/Metric';
 export * from './resources/Resource';
 export * from './trace/attributes';
+export * from './trace/Event';
+export * from './trace/instrumentation/Plugin';
 export * from './trace/link';
+export * from './trace/Sampler';
 export * from './trace/span';
+export * from './trace/SpanOptions';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/status';
-export * from './trace/trace_options';
+export * from './trace/TimedEvent';
+export * from './trace/tracer';
+export * from './trace/trace_flags';
 export * from './trace/trace_state';

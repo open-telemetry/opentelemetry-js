@@ -11,6 +11,7 @@
     "compile": "tsc -p .",
     "fix": "gts fix",
     "test": "npm run compile && npm run check",
+    "docs-test": "linkinator docs/out",
     "docs": "typedoc --tsconfig tsconfig.json"
   },
   "keywords": [
@@ -39,6 +40,9 @@
   },
   "devDependencies": {
     "gts": "^1.0.0",
+    "linkinator": "^1.5.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-consistent-codestyle":"^1.15.1",
     "typedoc": "^0.14.2",
     "typescript": "^3.4.5"
   }
