@@ -15,6 +15,7 @@
  */
 
 import { SpanKind } from '@opentelemetry/types';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
@@ -75,8 +76,7 @@ export const assertSpan = (
     Utils.parseResponseStatus(validations.httpStatusCode)
   );
 
-  assert.ok(span.startTime < span.endTime);
-  assert.ok(span.endTime > 0);
+  assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
   if (validations.reqHeaders) {
     const userAgent = validations.reqHeaders['user-agent'];
