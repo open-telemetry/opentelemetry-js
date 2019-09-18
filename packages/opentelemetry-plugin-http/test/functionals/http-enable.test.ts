@@ -15,7 +15,6 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { SpanKind, Span as ISpan } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -69,11 +68,9 @@ describe('HttpPlugin', () => {
   });
 
   describe('enable()', () => {
-    const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
     const tracer = new NodeTracer({
-      scopeManager,
       logger,
       httpTextFormat,
     });
@@ -107,26 +104,24 @@ describe('HttpPlugin', () => {
       plugin.disable();
     });
 
-    it('should generate valid spans (client side and server side)', done => {
-      httpRequest
-        .get(`http://${hostname}:${serverPort}${pathname}`)
-        .then(result => {
-          const spans = memoryExporter.getFinishedSpans();
-          const [incomingSpan, outgoingSpan] = spans;
-          const validations = {
-            hostname,
-            httpStatusCode: result.statusCode!,
-            httpMethod: result.method!,
-            pathname,
-            resHeaders: result.resHeaders,
-            reqHeaders: result.reqHeaders,
-          };
+    it('should generate valid spans (client side and server side)', async () => {
+      const result = await httpRequest.get(
+        `http://${hostname}:${serverPort}${pathname}`
+      );
+      const spans = memoryExporter.getFinishedSpans();
+      const [incomingSpan, outgoingSpan] = spans;
+      const validations = {
+        hostname,
+        httpStatusCode: result.statusCode!,
+        httpMethod: result.method!,
+        pathname,
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+      };
 
-          assert.strictEqual(spans.length, 2);
-          assertSpan(incomingSpan, SpanKind.SERVER, validations);
-          assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
-          done();
-        });
+      assert.strictEqual(spans.length, 2);
+      assertSpan(incomingSpan, SpanKind.SERVER, validations);
+      assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
     const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
@@ -246,31 +241,34 @@ describe('HttpPlugin', () => {
                 reqSpan.spanContext.spanId
               );
               done();
-            });
+            })
+            .catch(done);
         });
       });
     }
-    // TODO: uncomment once https://github.com/open-telemetry/opentelemetry-js/pull/146 is merged
-    // it.only('should create multiple child spans for GET requests', async () => {
-    //   const testPath = '/outgoing/rootSpan/childs';
-    //   const num = 5;
-    //   doNock(hostname, testPath, 200, 'Ok', num);
-    //   const name = 'TestRootSpan';
-    //   const span = tracer.startSpan(name);
-    //   await tracer.withSpan(span, async () => {
-    //     for (let i = 0; i < num; i++) {
-    //       await httpRequest.get(`${ protocol }://${ hostname }${ testPath }`);
-    //       const spans = memoryExporter.getFinishedSpans();
-    //       assert.ok(spans[i].name.indexOf(testPath) >= 0);
-    //       assert.strictEqual((span as Span).toReadableSpan().spanContext.traceId, spans[i].spanContext.traceId);
-    //     }
-    //     span.end();
-    //     const spans = memoryExporter.getFinishedSpans();
-    //     // 5 child spans ended + 1 span (root)
-    //     assert.strictEqual(spans.length, 6);
-    //   });
-    //   console.log('end');
-    // });
+
+    it('should create multiple child spans for GET requests', async () => {
+      const testPath = '/outgoing/rootSpan/childs';
+      const num = 5;
+      doNock(hostname, testPath, 200, 'Ok', num);
+      const name = 'TestRootSpan';
+      const span = tracer.startSpan(name);
+      await tracer.withSpan(span, async () => {
+        for (let i = 0; i < num; i++) {
+          await httpRequest.get(`${protocol}://${hostname}${testPath}`);
+          const spans = memoryExporter.getFinishedSpans();
+          assert.ok(spans[i].name.indexOf(testPath) >= 0);
+          assert.strictEqual(
+            span.context().traceId,
+            spans[i].spanContext.traceId
+          );
+        }
+        span.end();
+        const spans = memoryExporter.getFinishedSpans();
+        // 5 child spans ended + 1 span (root)
+        assert.strictEqual(spans.length, 6);
+      });
+    });
 
     for (const ignored of ['string', 'function', 'regexp']) {
       it(`should not trace ignored requests with type ${ignored}`, async () => {

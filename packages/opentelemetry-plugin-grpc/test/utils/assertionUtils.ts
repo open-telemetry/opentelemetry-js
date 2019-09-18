@@ -20,6 +20,7 @@ import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -38,8 +39,10 @@ export const assertSpan = (
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 1);
 
-  assert.ok(span.startTime < span.endTime);
-  assert.ok(span.endTime > 0);
+  assert.ok(
+    hrTimeToMilliseconds(span.startTime) < hrTimeToMilliseconds(span.endTime)
+  );
+  assert.ok(hrTimeToMilliseconds(span.endTime) > 0);
 
   if (span.kind === SpanKind.SERVER) {
     assert.ok(span.spanContext);

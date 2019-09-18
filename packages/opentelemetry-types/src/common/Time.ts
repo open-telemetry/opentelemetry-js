@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { Event } from './Event';
-import { HrTime } from '../common/Time';
+/** High resolution HrTime: [seconds: number, nanoseconds: number] */
+export type HrTime = [number, number];
 
 /**
- * Represents a timed event.
- * A timed event is an event with a timestamp.
+ * Defines TimeInput.
+ *
+ * hrtime, expoch milliseconds, performance.now() or Date
  */
-export interface TimedEvent extends Event {
-  time: HrTime;
-}
+export type TimeInput = HrTime | number | Date;

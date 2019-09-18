@@ -14,13 +14,6 @@
  * limitations under the License.
  */
 
-import { Event } from './Event';
-import { HrTime } from '../common/Time';
+import { performance } from 'perf_hooks';
 
-/**
- * Represents a timed event.
- * A timed event is an event with a timestamp.
- */
-export interface TimedEvent extends Event {
-  time: HrTime;
-}
+export const otperformance = performance;

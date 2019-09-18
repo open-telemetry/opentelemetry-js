@@ -18,6 +18,7 @@ import {
   SpanKind,
   Status,
   Attributes,
+  HrTime,
   Link,
   SpanContext,
   TimedEvent,
@@ -28,10 +29,11 @@ export interface ReadableSpan {
   readonly kind: SpanKind;
   readonly spanContext: SpanContext;
   readonly parentSpanId?: string;
-  readonly startTime: number;
-  readonly endTime: number;
+  readonly startTime: HrTime;
+  readonly endTime: HrTime;
   readonly status: Status;
   readonly attributes: Attributes;
   readonly links: Link[];
   readonly events: TimedEvent[];
+  readonly duration: HrTime;
 }

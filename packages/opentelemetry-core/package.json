@@ -46,6 +46,7 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
@@ -56,6 +57,7 @@
     "karma-webpack": "^4.0.2",
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
+    "sinon": "^7.3.2",
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-consistent-codestyle":"^1.15.1",
     "ts-loader": "^6.0.4",

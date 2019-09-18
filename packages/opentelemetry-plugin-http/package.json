@@ -46,7 +46,6 @@
     "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.0.13",
     "@types/superagent": "^4.1.3",
-    "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",
     "@opentelemetry/basic-tracer": "^0.0.1",
     "axios": "^0.19.0",
