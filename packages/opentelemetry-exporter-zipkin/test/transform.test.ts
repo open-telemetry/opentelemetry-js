@@ -17,7 +17,11 @@
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
 import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
-import { NoopLogger, hrTimeToMilliseconds, hrTimeDuration } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  hrTimeToMilliseconds,
+  hrTimeDuration,
+} from '@opentelemetry/core';
 import {
   toZipkinSpan,
   _toZipkinTags,
@@ -29,7 +33,7 @@ import * as zipkinTypes from '../src/types';
 
 const logger = new NoopLogger();
 const tracer = new BasicTracer({
-  logger
+  logger,
 });
 const parentId = '5c1c63257de34c67';
 const spanContext: types.SpanContext = {
@@ -129,9 +133,9 @@ describe('transform', () => {
       { ot: types.SpanKind.PRODUCER, zipkin: 'PRODUCER' },
       { ot: types.SpanKind.INTERNAL, zipkin: undefined },
     ].forEach(item =>
-      it(`should map OpenTelemetry SpanKind ${types.SpanKind[item.ot]} to Zipkin ${
-        item.zipkin
-      }`, () => {
+      it(`should map OpenTelemetry SpanKind ${
+        types.SpanKind[item.ot]
+      } to Zipkin ${item.zipkin}`, () => {
         const span = new Span(tracer, 'my-span', spanContext, item.ot);
         span.end();
 
