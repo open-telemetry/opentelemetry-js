@@ -39,7 +39,10 @@ export const assertSpan = (
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 1);
 
-  //assert.ok(span.startTime < span.endTime);
+  assert.ok(
+    hrTimeToMilliseconds(span.startTime) < hrTimeToMilliseconds(span.endTime)
+  );
+  assert.ok(hrTimeToMilliseconds(span.endTime) > 0);
 
   if (span.kind === SpanKind.SERVER) {
     assert.ok(span.spanContext);
