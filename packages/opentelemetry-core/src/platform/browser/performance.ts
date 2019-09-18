@@ -14,17 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Returns the current high resolution millisecond timestamp
- */
-export function now(): number {
-  return performance.now();
-}
-
-/**
- * The timeOrigin specifies the high resolution millisecond timestamp from
- * which all performance metric durations are measured.
- */
-export function timeOrigin(): number {
-  return performance.timeOrigin;
-}
+export const otperformance = performance;
