@@ -49,16 +49,14 @@ describe('NoopMeter', () => {
     const measure = meter.createMeasure('some-name');
     measure.getDefaultHandle().record(1);
     measure.getDefaultHandle().record(1, { key: { value: 'value' } });
-    measure
-      .getDefaultHandle()
-      .record(
-        1,
-        { key: { value: 'value' } },
-        {
-          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-          spanId: '5e0c63257de34c92',
-        }
-      );
+    measure.getDefaultHandle().record(
+      1,
+      { key: { value: 'value' } },
+      {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+      }
+    );
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
