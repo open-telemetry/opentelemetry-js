@@ -79,14 +79,15 @@ describe('JaegerExporter', () => {
         name: 'my-span1',
         kind: types.SpanKind.CLIENT,
         spanContext,
-        startTime: 1566156729709,
-        endTime: 1566156729709 + 2000,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         status: {
           code: types.CanonicalCode.DATA_LOSS,
         },
         attributes: {},
         links: [],
         events: [],
+        duration: [32, 800000000],
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {

@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './performance';
+export const otperformance = performance;

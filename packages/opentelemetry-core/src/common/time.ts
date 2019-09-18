@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import { otperformance as performance } from '../platform';
 
 const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
