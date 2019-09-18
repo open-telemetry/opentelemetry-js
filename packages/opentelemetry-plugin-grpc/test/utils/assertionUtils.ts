@@ -20,7 +20,10 @@ import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
-import { hrTimeToMilliseconds, hrTimeToMicroseconds } from '@opentelemetry/core';
+import {
+  hrTimeToMilliseconds,
+  hrTimeToMicroseconds,
+} from '@opentelemetry/core';
 
 export const assertSpan = (
   span: ReadableSpan,
