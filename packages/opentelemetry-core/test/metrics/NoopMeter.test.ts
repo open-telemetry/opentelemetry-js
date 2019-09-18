@@ -15,7 +15,6 @@
  */
 
 import * as assert from 'assert';
-import { DistributedContext, SpanContext } from '@opentelemetry/types';
 import {
   NoopMeter,
   NOOP_GAUGE_HANDLE,

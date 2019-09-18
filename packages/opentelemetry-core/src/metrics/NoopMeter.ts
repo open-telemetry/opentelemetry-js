@@ -60,7 +60,7 @@ export class NoopMeter implements Meter {
   }
 }
 
-export class NoopMetric<T> implements Metric {
+export class NoopMetric<T> implements Metric<T> {
   private readonly _handle: T;
 
   constructor(handle: T) {
