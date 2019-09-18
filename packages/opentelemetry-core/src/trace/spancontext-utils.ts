@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/types';
 
 export const INVALID_SPANID = '0';
 export const INVALID_TRACEID = '0';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
-  traceOptions: TraceOptions.UNSAMPLED,
+  traceFlags: TraceFlags.UNSAMPLED,
 };
 
 /**

@@ -20,7 +20,7 @@ import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/context/propagation/HttpTraceContext';
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/types';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('HttpTraceContext', () => {
@@ -36,7 +36,7 @@ describe('HttpTraceContext', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       };
 
       httpTraceContext.inject(spanContext, 'HttpTraceContext', carrier);
@@ -51,7 +51,7 @@ describe('HttpTraceContext', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
         traceState: new TraceState('foo=bar,baz=qux'),
       };
 
@@ -76,7 +76,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       });
     });
 
@@ -106,7 +106,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       });
     });
 
@@ -139,7 +139,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
         traceState: new TraceState('foo=bar,baz=qux,quux=quuz'),
       });
     });

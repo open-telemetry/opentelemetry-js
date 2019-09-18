@@ -19,6 +19,7 @@ import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
 import * as types from '@opentelemetry/types';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 describe('transform', () => {
   const spanContext = {
@@ -32,8 +33,8 @@ describe('transform', () => {
         name: 'my-span',
         kind: types.SpanKind.INTERNAL,
         spanContext,
-        startTime: 1566156729709,
-        endTime: 1566156729709 + 2000,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         status: {
           code: types.CanonicalCode.OK,
         },
@@ -61,9 +62,10 @@ describe('transform', () => {
             attributes: {
               error: true,
             },
-            time: 1566156729709 + 100,
+            time: [1566156729, 809],
           },
         ],
+        duration: [32, 800000000],
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -86,7 +88,7 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.deepStrictEqual(
         thriftSpan.startTime,
-        Utils.encodeInt64(readableSpan.startTime * 1000)
+        Utils.encodeInt64(hrTimeToMilliseconds(readableSpan.startTime) * 1000)
       );
       assert.strictEqual(thriftSpan.tags.length, 5);
       const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
@@ -124,8 +126,8 @@ describe('transform', () => {
         name: 'my-span1',
         kind: types.SpanKind.CLIENT,
         spanContext,
-        startTime: 1566156729709,
-        endTime: 1566156729709 + 2000,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         status: {
           code: types.CanonicalCode.DATA_LOSS,
           message: 'data loss',
@@ -133,6 +135,7 @@ describe('transform', () => {
         attributes: {},
         links: [],
         events: [],
+        duration: [32, 800000000],
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -176,8 +179,8 @@ describe('transform', () => {
         name: 'my-span',
         kind: types.SpanKind.INTERNAL,
         spanContext,
-        startTime: 1566156729709,
-        endTime: 1566156729709 + 2000,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
         status: {
           code: types.CanonicalCode.OK,
         },
@@ -192,6 +195,7 @@ describe('transform', () => {
           },
         ],
         events: [],
+        duration: [32, 800000000],
       };
 
       const thriftSpan = spanToThrift(readableSpan);

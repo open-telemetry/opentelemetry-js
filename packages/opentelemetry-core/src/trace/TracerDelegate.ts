@@ -29,20 +29,20 @@ export class TracerDelegate implements types.Tracer {
   // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
   constructor(
-    private readonly tracer: types.Tracer | null = null,
-    private readonly fallbackTracer: types.Tracer = new NoopTracer()
+    private readonly _tracer: types.Tracer | null = null,
+    private readonly _fallbackTracer: types.Tracer = new NoopTracer()
   ) {
-    this._currentTracer = tracer || fallbackTracer; // equivalent to this.start()
+    this._currentTracer = _tracer || _fallbackTracer; // equivalent to this.start()
   }
 
   // Begin using the user provided tracer. Stop always falling back to fallback tracer
   start(): void {
-    this._currentTracer = this.tracer || this.fallbackTracer;
+    this._currentTracer = this._tracer || this._fallbackTracer;
   }
 
   // Stop the delegate from using the provided tracer. Begin to use the fallback tracer
   stop(): void {
-    this._currentTracer = this.fallbackTracer;
+    this._currentTracer = this._fallbackTracer;
   }
 
   // -- Tracer interface implementation below -- //

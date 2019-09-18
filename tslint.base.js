@@ -33,13 +33,13 @@ See the License for the specific language governing permissions and
 limitations under the License.`;
 
 const fileHeaderRegexStr =
-    fileHeaderTemplate
-        .replace(/[\\\/^$.*+?()[\]{}|]/g, '\\$&')  // Escape regex
-        .replace(/\n/g, '\n \\* ?')  // Per line space+asterisk, optional space
-        .replace('YEAR_PLACEHOLDER', '2\\d{3}');
+  fileHeaderTemplate
+    .replace(/[\\\/^$.*+?()[\]{}|]/g, '\\$&')  // Escape regex
+    .replace(/\n/g, '\n \\* ?')  // Per line space+asterisk, optional space
+    .replace('YEAR_PLACEHOLDER', '2\\d{3}');
 
 const fileHeaderDefault =
-    fileHeaderTemplate.replace('YEAR_PLACEHOLDER', new Date().getFullYear());
+  fileHeaderTemplate.replace('YEAR_PLACEHOLDER', new Date().getFullYear());
 
 const rules = {
   'file-header': [
@@ -50,6 +50,11 @@ const rules = {
       'default': fileHeaderDefault,
     },
   ],
+  'naming-convention': [true,
+    { 'type': 'property', 'modifiers': 'protected', 'leadingUnderscore': 'require' },
+    { 'type': 'member', 'modifiers': 'private', 'leadingUnderscore': 'require' },
+    { 'type': 'enumMember', 'format': 'UPPER_CASE' },
+  ]
 };
 
 module.exports = {

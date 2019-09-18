@@ -23,9 +23,8 @@ import {
   NoopLogger,
   NoRecordingSpan,
 } from '@opentelemetry/core';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
-import { TraceOptions } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/types';
 import { Span } from '@opentelemetry/basic-tracer';
 
 const sleep = (time: number) =>
@@ -50,7 +49,6 @@ describe('NodeTracer', () => {
     it('should construct an instance with http text format', () => {
       const tracer = new NodeTracer({
         httpTextFormat: new HttpTraceContext(),
-        scopeManager: new AsyncHooksScopeManager(),
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -104,7 +102,7 @@ describe('NodeTracer', () => {
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecordingEvents(), false);
     });
 
@@ -116,7 +114,6 @@ describe('NodeTracer', () => {
         foo: 'bar',
       };
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
         defaultAttributes,
       });
 
