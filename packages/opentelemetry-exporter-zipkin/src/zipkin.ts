@@ -126,7 +126,7 @@ export class ZipkinExporter implements SpanExporter {
   ) {
     if (zipkinSpans.length === 0) {
       this._logger.debug('Zipkin send with empty spans');
-      return done(ExportResult.Success);
+      return done(ExportResult.SUCCESS);
     }
 
     const { request } = this._reqOpts.protocol === 'http:' ? http : https;
@@ -145,20 +145,20 @@ export class ZipkinExporter implements SpanExporter {
 
         // Consider 2xx and 3xx as success.
         if (statusCode < 400) {
-          return done(ExportResult.Success);
+          return done(ExportResult.SUCCESS);
           // Consider 4xx as failed non-retriable.
         } else if (statusCode < 500) {
-          return done(ExportResult.FailedNonRetryable);
+          return done(ExportResult.FAILED_NOT_RETRYABLE);
           // Consider 5xx as failed retriable.
         } else {
-          return done(ExportResult.FailedRetryable);
+          return done(ExportResult.FAILED_RETRYABLE);
         }
       });
     });
 
     req.on('error', (err: Error) => {
       this._logger.error('Zipkin request error', err);
-      return done(ExportResult.FailedRetryable);
+      return done(ExportResult.FAILED_RETRYABLE);
     });
 
     // Issue request to remote service

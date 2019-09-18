@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import { ExportResult, ReadableSpan } from '@opentelemetry/basic-tracer';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, hrTimeToMilliseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
@@ -25,6 +25,8 @@ import * as zipkinTypes from '../src/types';
 const MICROS_PER_MILLI = 1000;
 
 function getReadableSpan() {
+  const startTime = 1566156729709;
+  const duration = 2000;
   const readableSpan: ReadableSpan = {
     name: 'my-span',
     kind: types.SpanKind.INTERNAL,
@@ -32,8 +34,9 @@ function getReadableSpan() {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
     },
-    startTime: 1566156729709,
-    endTime: 1566156729709 + 2000,
+    startTime: [startTime, 0],
+    endTime: [startTime + duration, 0],
+    duration: [duration, 0],
     status: {
       code: types.CanonicalCode.OK,
     },
@@ -109,7 +112,7 @@ describe('ZipkinExporter', () => {
       });
 
       exporter.export([], (result: ExportResult) => {
-        assert.strictEqual(result, ExportResult.Success);
+        assert.strictEqual(result, ExportResult.SUCCESS);
       });
     });
 
@@ -134,8 +137,9 @@ describe('ZipkinExporter', () => {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
         },
-        startTime,
-        endTime: startTime + duration,
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        duration: [duration, 0],
         status: {
           code: types.CanonicalCode.OK,
         },
@@ -147,7 +151,7 @@ describe('ZipkinExporter', () => {
         events: [
           {
             name: 'my-event',
-            time: startTime + 10,
+            time: [startTime + 10, 0],
             attributes: { key3: 'value3' },
           },
         ],
@@ -159,8 +163,9 @@ describe('ZipkinExporter', () => {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
         },
-        startTime,
-        endTime: startTime + duration,
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        duration: [duration, 0],
         status: {
           code: types.CanonicalCode.OK,
         },
@@ -176,7 +181,7 @@ describe('ZipkinExporter', () => {
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.Success);
+        assert.strictEqual(result, ExportResult.SUCCESS);
         assert.deepStrictEqual(requestBody, [
           // Span 1
           {
@@ -213,7 +218,7 @@ describe('ZipkinExporter', () => {
             tags: {
               'ot.status_code': 'OK',
             },
-            timestamp: Math.round(span2.startTime * MICROS_PER_MILLI),
+            timestamp: hrTimeToMilliseconds([startTime, 0]),
             traceId: span2.spanContext.traceId,
           },
         ]);
@@ -233,7 +238,7 @@ describe('ZipkinExporter', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.Success);
+        assert.strictEqual(result, ExportResult.SUCCESS);
       });
     });
 
@@ -249,7 +254,7 @@ describe('ZipkinExporter', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FailedNonRetryable);
+        assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
       });
     });
 
@@ -265,7 +270,7 @@ describe('ZipkinExporter', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FailedRetryable);
+        assert.strictEqual(result, ExportResult.FAILED_RETRYABLE);
       });
     });
 
@@ -281,7 +286,7 @@ describe('ZipkinExporter', () => {
 
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         scope.done();
-        assert.strictEqual(result, ExportResult.FailedRetryable);
+        assert.strictEqual(result, ExportResult.FAILED_RETRYABLE);
       });
     });
   });

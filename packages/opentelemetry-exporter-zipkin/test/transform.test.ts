@@ -15,9 +15,9 @@
  */
 
 import * as assert from 'assert';
-import { Span } from '@opentelemetry/basic-tracer';
-import { NoopLogger, NoopTracer } from '@opentelemetry/core';
-import { SpanKind, TraceOptions, SpanContext } from '@opentelemetry/types';
+import * as types from '@opentelemetry/types';
+import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
+import { NoopLogger, hrTimeToMilliseconds, hrTimeDuration } from '@opentelemetry/core';
 import {
   toZipkinSpan,
   _toZipkinTags,
@@ -25,18 +25,17 @@ import {
   statusCodeTagName,
   statusDescriptionTagName,
 } from '../src/transform';
-import * as types from '@opentelemetry/types';
 import * as zipkinTypes from '../src/types';
 
-const MICROS_PER_MILLI = 1000;
-
-const tracer = new NoopTracer();
 const logger = new NoopLogger();
+const tracer = new BasicTracer({
+  logger
+});
 const parentId = '5c1c63257de34c67';
-const spanContext: SpanContext = {
+const spanContext: types.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
-  traceOptions: TraceOptions.SAMPLED,
+  traceFlags: types.TraceFlags.SAMPLED,
 };
 
 describe('transform', () => {
@@ -44,10 +43,9 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Zipkin span', () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER,
+        types.SpanKind.SERVER,
         parentId
       );
       span.setAttributes({
@@ -68,11 +66,11 @@ describe('transform', () => {
         annotations: [
           {
             value: 'my-event',
-            timestamp: Math.round(span.events[0].time * MICROS_PER_MILLI),
+            timestamp: hrTimeToMilliseconds(span.events[0].time),
           },
         ],
-        duration: Math.round(
-          (span.endTime - span.startTime) * MICROS_PER_MILLI
+        duration: hrTimeToMilliseconds(
+          hrTimeDuration(span.startTime, span.endTime)
         ),
         id: span.spanContext.spanId,
         localEndpoint: {
@@ -85,17 +83,16 @@ describe('transform', () => {
           key2: 'value2',
           [statusCodeTagName]: 'OK',
         },
-        timestamp: Math.round(span.startTime * MICROS_PER_MILLI),
+        timestamp: hrTimeToMilliseconds(span.startTime),
         traceId: span.spanContext.traceId,
       });
     });
     it("should skip parentSpanId if doesn't exist", () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER
+        types.SpanKind.SERVER
       );
       span.end();
 
@@ -108,8 +105,8 @@ describe('transform', () => {
       assert.deepStrictEqual(zipkinSpan, {
         kind: 'SERVER',
         annotations: undefined,
-        duration: Math.round(
-          (span.endTime - span.startTime) * MICROS_PER_MILLI
+        duration: hrTimeToMilliseconds(
+          hrTimeDuration(span.startTime, span.endTime)
         ),
         id: span.spanContext.spanId,
         localEndpoint: {
@@ -120,22 +117,22 @@ describe('transform', () => {
         tags: {
           [statusCodeTagName]: 'OK',
         },
-        timestamp: Math.round(span.startTime * MICROS_PER_MILLI),
+        timestamp: hrTimeToMilliseconds(span.startTime),
         traceId: span.spanContext.traceId,
       });
     });
     // SpanKind mapping tests
     [
-      { ot: SpanKind.CLIENT, zipkin: 'CLIENT' },
-      { ot: SpanKind.SERVER, zipkin: 'SERVER' },
-      { ot: SpanKind.CONSUMER, zipkin: 'CONSUMER' },
-      { ot: SpanKind.PRODUCER, zipkin: 'PRODUCER' },
-      { ot: SpanKind.INTERNAL, zipkin: undefined },
+      { ot: types.SpanKind.CLIENT, zipkin: 'CLIENT' },
+      { ot: types.SpanKind.SERVER, zipkin: 'SERVER' },
+      { ot: types.SpanKind.CONSUMER, zipkin: 'CONSUMER' },
+      { ot: types.SpanKind.PRODUCER, zipkin: 'PRODUCER' },
+      { ot: types.SpanKind.INTERNAL, zipkin: undefined },
     ].forEach(item =>
-      it(`should map OpenTelemetry SpanKind ${SpanKind[item.ot]} to Zipkin ${
+      it(`should map OpenTelemetry SpanKind ${types.SpanKind[item.ot]} to Zipkin ${
         item.zipkin
       }`, () => {
-        const span = new Span(tracer, logger, 'my-span', spanContext, item.ot);
+        const span = new Span(tracer, 'my-span', spanContext, item.ot);
         span.end();
 
         const zipkinSpan = toZipkinSpan(
@@ -147,8 +144,8 @@ describe('transform', () => {
         assert.deepStrictEqual(zipkinSpan, {
           kind: item.zipkin,
           annotations: undefined,
-          duration: Math.round(
-            (span.endTime - span.startTime) * MICROS_PER_MILLI
+          duration: hrTimeToMilliseconds(
+            hrTimeDuration(span.startTime, span.endTime)
           ),
           id: span.spanContext.spanId,
           localEndpoint: {
@@ -159,7 +156,7 @@ describe('transform', () => {
           tags: {
             [statusCodeTagName]: 'OK',
           },
-          timestamp: Math.round(span.startTime * MICROS_PER_MILLI),
+          timestamp: hrTimeToMilliseconds(span.startTime),
           traceId: span.spanContext.traceId,
         });
       })
@@ -170,10 +167,9 @@ describe('transform', () => {
     it('should convert OpenTelemetry attributes to Zipkin tags', () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER,
+        types.SpanKind.SERVER,
         parentId
       );
       span.setAttributes({
@@ -196,10 +192,9 @@ describe('transform', () => {
     it('should map OpenTelemetry Status.code to a Zipkin tag', () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER,
+        types.SpanKind.SERVER,
         parentId
       );
       const status: types.Status = {
@@ -226,10 +221,9 @@ describe('transform', () => {
     it('should map OpenTelemetry Status.message to a Zipkin tag', () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER,
+        types.SpanKind.SERVER,
         parentId
       );
       const status: types.Status = {
@@ -261,10 +255,9 @@ describe('transform', () => {
     it('should convert OpenTelemetry events to Zipkin annotations', () => {
       const span = new Span(
         tracer,
-        logger,
         'my-span',
         spanContext,
-        SpanKind.SERVER,
+        types.SpanKind.SERVER,
         parentId
       );
       span.addEvent('my-event1');
@@ -274,11 +267,11 @@ describe('transform', () => {
       assert.deepStrictEqual(annotations, [
         {
           value: 'my-event1',
-          timestamp: Math.round(span.events[0].time * MICROS_PER_MILLI),
+          timestamp: hrTimeToMilliseconds(span.events[0].time),
         },
         {
           value: 'my-event2',
-          timestamp: Math.round(span.events[1].time * MICROS_PER_MILLI),
+          timestamp: hrTimeToMilliseconds(span.events[1].time),
         },
       ]);
     });
