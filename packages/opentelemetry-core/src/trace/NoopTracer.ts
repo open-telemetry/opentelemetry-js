@@ -50,9 +50,6 @@ export class NoopTracer implements Tracer {
   }
 
   // By default does nothing
-  recordSpanData(span: Span): void {}
-
-  // By default does nothing
   getBinaryFormat(): BinaryFormat {
     return NOOP_BINARY_FORMAT;
   }

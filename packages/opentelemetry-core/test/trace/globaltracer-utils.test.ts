@@ -28,7 +28,6 @@ describe('globaltracer-utils', () => {
     'getCurrentSpan',
     'startSpan',
     'withSpan',
-    'recordSpanData',
     'getBinaryFormat',
     'getHttpTextFormat',
   ];

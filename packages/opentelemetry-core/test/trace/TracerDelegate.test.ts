@@ -26,7 +26,6 @@ describe('TracerDelegate', () => {
     'startSpan',
     'withSpan',
     'bind',
-    'recordSpanData',
     'getBinaryFormat',
     'getHttpTextFormat',
   ];

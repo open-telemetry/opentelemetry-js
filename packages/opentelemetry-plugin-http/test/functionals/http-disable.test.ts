@@ -55,7 +55,6 @@ describe('HttpPlugin', () => {
     beforeEach(() => {
       tracer.startSpan = sinon.spy();
       tracer.withSpan = sinon.spy();
-      tracer.recordSpanData = sinon.spy();
     });
 
     afterEach(() => {
@@ -78,10 +77,6 @@ describe('HttpPlugin', () => {
             false
           );
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
-          assert.strictEqual(
-            (tracer.recordSpanData as sinon.SinonSpy).called,
-            false
-          );
         });
       });
     });
