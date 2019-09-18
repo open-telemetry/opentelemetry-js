@@ -65,8 +65,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   // TODO: Delete if moving internal file loaders to BasePlugin
   // --- Note: Incorrectly ordered: Begin internal file loader --- //
   // tslint:disable-next-line:no-any
-  protected internalFilesExports: { [key: string]: any } | undefined;
-  protected readonly internalFileList: ModuleExportsMapping = {
+  protected _internalFilesExports: { [key: string]: any } | undefined;
+  protected readonly _internalFileList: ModuleExportsMapping = {
     '0.13 - 1.6': { client: 'src/node/src/client.js' },
     '^1.7': { client: 'src/client.js' },
   };
@@ -76,9 +76,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
    */
   private _loadInternalFiles(): ModuleExportsMapping {
     let result: ModuleExportsMapping = {};
-    if (this.internalFileList) {
-      this._logger.debug('loadInternalFiles %o', this.internalFileList);
-      Object.keys(this.internalFileList).forEach(versionRange => {
+    if (this._internalFileList) {
+      this._logger.debug('loadInternalFiles %o', this._internalFileList);
+      Object.keys(this._internalFileList).forEach(versionRange => {
         if (semver.satisfies(this.version, versionRange)) {
           if (result) {
             this._logger.warn(
@@ -86,11 +86,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               this.moduleName,
               this.version,
               versionRange,
-              this.internalFileList
+              this._internalFileList
             );
           }
           result = this._loadInternalModuleFiles(
-            this.internalFileList[versionRange],
+            this._internalFileList[versionRange],
             basedir
           );
         }
@@ -137,8 +137,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   // --- End of internal file loader stuff --- //
 
   protected patch(): typeof grpcModule {
-    if (!this.internalFilesExports) {
-      this.internalFilesExports = this._loadInternalFiles();
+    if (!this._internalFilesExports) {
+      this._internalFilesExports = this._loadInternalFiles();
     }
     this._logger.debug(
       'applying patch to %s@%s',
@@ -155,8 +155,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       );
     }
 
-    if (this.internalFilesExports && this.internalFilesExports['client']) {
-      grpcClientModule = this.internalFilesExports['client'];
+    if (this._internalFilesExports && this._internalFilesExports['client']) {
+      grpcClientModule = this._internalFilesExports['client'];
 
       shimmer.wrap(
         grpcClientModule,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceOptions } from './trace_options';
+import { TraceFlags } from './trace_flags';
 import { TraceState } from './trace_state';
 
 /**
@@ -36,7 +36,7 @@ export interface SpanContext {
    */
   spanId: string;
   /**
-   * Trace options to propagate.
+   * Trace flags to propagate.
    *
    * It is represented as 1 byte (bitmap). Bit to represent whether trace is
    * sampled or not. When set, the least significant bit documents that the
@@ -45,7 +45,7 @@ export interface SpanContext {
    *
    * SAMPLED = 0x1 and UNSAMPLED = 0x0;
    */
-  traceOptions?: TraceOptions;
+  traceFlags?: TraceFlags;
   /**
    * Tracing-system-specific info to propagate.
    *

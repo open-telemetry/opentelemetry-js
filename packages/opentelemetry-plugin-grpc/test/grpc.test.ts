@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import {
-  BasicTracer,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
 import { SpanKind, Tracer } from '@opentelemetry/types';
+import { NodeTracer } from '@opentelemetry/node-tracer';
 
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { GrpcPlugin, plugin } from '../src';
@@ -507,9 +506,8 @@ describe('GrpcPlugin', () => {
   };
 
   describe('enable()', () => {
-    const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const tracer = new BasicTracer({ scopeManager, logger });
+    const tracer = new NodeTracer({ logger });
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
@@ -554,9 +552,8 @@ describe('GrpcPlugin', () => {
   });
 
   describe('disable()', () => {
-    const scopeManager = new AsyncHooksScopeManager();
     const logger = new NoopLogger();
-    const tracer = new BasicTracer({ scopeManager, logger });
+    const tracer = new NodeTracer({ logger });
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();

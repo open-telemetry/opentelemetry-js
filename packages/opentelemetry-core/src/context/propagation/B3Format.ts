@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  SpanContext,
-  HttpTextFormat,
-  TraceOptions,
-} from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
@@ -54,8 +50,8 @@ export class B3Format implements HttpTextFormat {
 
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
-      if (spanContext.traceOptions !== undefined) {
-        carrier[X_B3_SAMPLED] = Number(spanContext.traceOptions);
+      if (spanContext.traceFlags !== undefined) {
+        carrier[X_B3_SAMPLED] = Number(spanContext.traceFlags);
       }
     }
   }
@@ -80,8 +76,8 @@ export class B3Format implements HttpTextFormat {
       return {
         traceId,
         spanId,
-        traceOptions: isNaN(Number(options))
-          ? TraceOptions.UNSAMPLED
+        traceFlags: isNaN(Number(options))
+          ? TraceFlags.UNSAMPLED
           : Number(options),
       };
     }
