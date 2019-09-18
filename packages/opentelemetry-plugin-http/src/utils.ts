@@ -21,7 +21,7 @@ import {
   ClientRequest,
   IncomingHttpHeaders,
 } from 'http';
-import { IgnoreMatcher } from './types';
+import { IgnoreMatcher, Err } from './types';
 import { AttributeNames } from './enums/AttributeNames';
 import * as url from 'url';
 
@@ -138,26 +138,40 @@ export class Utils {
    * @param obj to subscribe on error
    */
   static setSpanOnError(span: Span, obj: IncomingMessage | ClientRequest) {
-    obj.on('error', error => {
-      span.setAttributes({
-        [AttributeNames.HTTP_ERROR_NAME]: error.name,
-        [AttributeNames.HTTP_ERROR_MESSAGE]: error.message,
-      });
-
-      let status: Status;
-      if ((obj as IncomingMessage).statusCode) {
-        status = Utils.parseResponseStatus(
-          (obj as IncomingMessage).statusCode!
-        );
-      } else {
-        status = { code: CanonicalCode.UNKNOWN };
-      }
-
-      status.message = error.message;
-
-      span.setStatus(status);
-      span.end();
+    obj.on('error', (error: Err) => {
+      Utils.setSpanWithError(span, error, obj);
     });
+  }
+
+  /**
+   * Set the span with the error passed in params
+   * @param {Error} error error that will be set to span
+   * @param {Span} span the span that need to be set
+   * @param {(IncomingMessage | ClientRequest)} [obj] used for enriching the status by checking the statusCode.
+   */
+  static setSpanWithError(
+    span: Span,
+    error: Err,
+    obj?: IncomingMessage | ClientRequest
+  ) {
+    const message = error.message;
+
+    span.setAttributes({
+      [AttributeNames.HTTP_ERROR_NAME]: error.name,
+      [AttributeNames.HTTP_ERROR_MESSAGE]: message,
+    });
+
+    let status: Status;
+    if (obj && (obj as IncomingMessage).statusCode) {
+      status = Utils.parseResponseStatus((obj as IncomingMessage).statusCode!);
+    } else {
+      status = { code: CanonicalCode.UNKNOWN };
+    }
+
+    status.message = message;
+
+    span.setStatus(status);
+    span.end();
   }
 
   /**
@@ -210,7 +224,11 @@ export class Utils {
    * @param options for the request
    */
   static isValidOptionsType(options: unknown): boolean {
-    const type = options && typeof options;
+    if (!options) {
+      return false;
+    }
+
+    const type = typeof options;
     return type === 'string' || (type === 'object' && !Array.isArray(options));
   }
 }

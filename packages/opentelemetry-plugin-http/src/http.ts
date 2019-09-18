@@ -15,13 +15,7 @@
  */
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
-import {
-  Span,
-  SpanKind,
-  SpanOptions,
-  Attributes,
-  CanonicalCode,
-} from '@opentelemetry/types';
+import { Span, SpanKind, SpanOptions, Attributes } from '@opentelemetry/types';
 import {
   ClientRequest,
   IncomingMessage,
@@ -282,7 +276,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           // Cannot pass args of type ResponseEndArgs,
           // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
           // tslint:disable-next-line:no-any
-          const returned = response.end.apply(this, arguments as any);
+          const returned = plugin._safeExecute(span, () =>
+            response.end.apply(this, arguments as any)
+          );
           const requestUrl = request.url ? url.parse(request.url) : null;
           const hostname = headers.host
             ? headers.host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
@@ -320,20 +316,10 @@ export class HttpPlugin extends BasePlugin<Http> {
           span.end();
           return returned;
         };
-        try {
-          return original.apply(this, [event, ...args]);
-        } catch (error) {
-          const message = error.message;
-          span
-            .setAttributes({
-              [AttributeNames.HTTP_ERROR_NAME]: error.name,
-              [AttributeNames.HTTP_ERROR_MESSAGE]: message,
-            })
-            .setStatus({ code: CanonicalCode.UNKNOWN, message })
-            .end();
 
-          throw error;
-        }
+        return plugin._safeExecute(span, () =>
+          original.apply(this, [event, ...args])
+        );
       });
     };
   }
@@ -377,7 +363,9 @@ export class HttpPlugin extends BasePlugin<Http> {
         .getHttpTextFormat()
         .inject(span.context(), Format.HTTP, options.headers);
 
-      const request: ClientRequest = original.apply(this, [options, ...args]);
+      const request: ClientRequest = plugin._safeExecute(span, () =>
+        original.apply(this, [options, ...args])
+      );
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
       plugin._tracer.bind(request);
@@ -403,6 +391,18 @@ export class HttpPlugin extends BasePlugin<Http> {
     return this._tracer
       .startSpan(name, options)
       .setAttribute(AttributeNames.COMPONENT, HttpPlugin.component);
+  }
+
+  private _safeExecute<T extends (...args: unknown[]) => ReturnType<T>>(
+    span: Span,
+    execute: T
+  ): ReturnType<T> {
+    try {
+      return execute();
+    } catch (error) {
+      Utils.setSpanWithError(span, error);
+      throw error;
+    }
   }
 }
 

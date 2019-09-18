@@ -311,5 +311,43 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
     }
+
+    it('should have 1 ended span when request throw on bad "options" object', () => {
+      try {
+        http.request({ protocol: 'telnet' });
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      }
+    });
+
+    it('should have 1 ended span when response.end throw an exception', async () => {
+      const testPath = '/outgoing/rootSpan/childs/1';
+      doNock(hostname, testPath, 400, 'Not Ok');
+
+      const promiseRequest = new Promise((resolve, reject) => {
+        const req = http.request(
+          `http://${hostname}${testPath}`,
+          (resp: http.IncomingMessage) => {
+            let data = '';
+            resp.on('data', chunk => {
+              data += chunk;
+            });
+            resp.on('end', () => {
+              reject(new Error(data));
+            });
+          }
+        );
+        return req.end();
+      });
+
+      try {
+        await promiseRequest;
+        assert.fail();
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      }
+    });
   });
 });
