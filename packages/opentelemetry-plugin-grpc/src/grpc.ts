@@ -66,7 +66,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   };
   protected readonly _basedir = basedir;
 
-
   protected patch(): typeof grpcModule {
     this._logger.debug(
       'applying patch to %s@%s',

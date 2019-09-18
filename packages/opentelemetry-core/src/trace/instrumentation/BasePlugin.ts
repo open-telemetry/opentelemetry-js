@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { Tracer, Plugin, Logger, PluginConfig, PluginInternalFiles, PluginInternalFilesVersion } from '@opentelemetry/types';
+import {
+  Tracer,
+  Plugin,
+  Logger,
+  PluginConfig,
+  PluginInternalFiles,
+  PluginInternalFilesVersion,
+} from '@opentelemetry/types';
 import * as semver from 'semver';
 import * as path from 'path';
 
@@ -51,12 +58,22 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     this.unpatch();
   }
 
+  /**
+   * TODO: To avoid circular dependencies, internal file loading functionality currently
+   * lives in BasePlugin. It is not meant to work in the browser and so this logic
+   * should eventually be moved somewhere else where it makes more sense.
+   */
   private _loadInternalFilesExports(): PluginInternalFiles {
     if (!this._internalFilesList) return {};
     if (!this.version || !this.moduleName || !this._basedir) {
       // log here because internalFilesList was provided, so internal file loading
       // was expected to be working
-      this._logger.debug('loadInternalFiles failed because one of the required fields was missing: moduleName=%s, version=%s, basedir=%s', this.moduleName, this.version, this._basedir);
+      this._logger.debug(
+        'loadInternalFiles failed because one of the required fields was missing: moduleName=%s, version=%s, basedir=%s',
+        this.moduleName,
+        this.version,
+        this._basedir
+      );
       return {};
     }
     let extraModules: PluginInternalFiles = {};
@@ -74,10 +91,11 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     return extraModules;
   }
 
-  private _loadInternalModule(versionRange: string, outExtraModules: PluginInternalFiles): void {
-    if (
-      semver.satisfies(this.version!, versionRange)
-    ) {
+  private _loadInternalModule(
+    versionRange: string,
+    outExtraModules: PluginInternalFiles
+  ): void {
+    if (semver.satisfies(this.version!, versionRange)) {
       if (Object.keys(outExtraModules).length > 0) {
         this._logger.warn(
           'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',

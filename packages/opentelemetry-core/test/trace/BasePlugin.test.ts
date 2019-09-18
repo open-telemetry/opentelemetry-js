@@ -23,23 +23,32 @@ const logger = new NoopLogger();
 
 describe('BasePlugin', () => {
   describe('internalFilesLoader', () => {
-    it('should load internally exported files', async () => {
-      const testPackage = await import(basedir);
+    it('should load internally exported files', () => {
+      const testPackage = require('./fixtures/test-package');
       const plugin = new TestPlugin();
-      plugin.enable(testPackage, tracer, logger);
-      assert.ok(plugin['_internalFilesExports']);
-      assert.strictEqual(
-        plugin['_internalFilesExports'].internal.internallyExportedFunction(),
-        true
-      );
-      assert.strictEqual(
-        plugin['_internalFilesExports'].expectUndefined,
-        undefined
-      );
-      assert.strictEqual(
-        (plugin['_moduleExports']!['externallyExportedFunction'] as Function)(),
-        true
-      );
+      assert.doesNotThrow(() => {
+        plugin.enable(testPackage, tracer, logger);
+      });
+
+      if (typeof process !== 'undefined' && process.release.name === 'node') {
+        assert.ok(plugin['_internalFilesExports']);
+        assert.strictEqual(
+          plugin['_internalFilesExports'].internal.internallyExportedFunction(),
+          true
+        );
+        assert.strictEqual(
+          plugin['_internalFilesExports'].expectUndefined,
+          undefined
+        );
+        assert.strictEqual(
+          (plugin['_moduleExports']![
+            'externallyExportedFunction'
+          ] as Function)(),
+          true
+        );
+      } else {
+        assert.ok(true, 'Internal file loading is not tested in the browser');
+      }
     });
   });
 });
