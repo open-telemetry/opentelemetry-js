@@ -37,10 +37,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  public createMeasure(
-    name: string,
-    options?: MetricOptions
-  ): Metric<MeasureHandle> {
+  createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle> {
     return NOOP_MEASURE_METRIC;
   }
 
@@ -119,18 +116,10 @@ export class NoopGaugeHandle implements GaugeHandle {
 }
 
 export class NoopMeasureHandle implements MeasureHandle {
-  record(value: number): void {
-    return;
-  }
-
-  record(value: number, distContext: DistributedContext): void {
-    return;
-  }
-
   record(
     value: number,
-    distContext: DistributedContext,
-    spanContext: SpanContext
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
   ): void {
     return;
   }

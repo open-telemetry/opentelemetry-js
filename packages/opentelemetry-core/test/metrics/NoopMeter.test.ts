@@ -26,7 +26,7 @@ import {
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
 
-describe('NoopTracer', () => {
+describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeter();
     const counter = meter.createCounter('some-name');
@@ -49,8 +49,17 @@ describe('NoopTracer', () => {
 
     const measure = meter.createMeasure('some-name');
     measure.getDefaultHandle().record(1);
-    measure.getDefaultHandle().record(1, {} as DistributedContext);
-    measure.getDefaultHandle().record(1, {} as DistributedContext, {} as SpanContext);
+    measure.getDefaultHandle().record(1, { key: { value: 'value' } });
+    measure
+      .getDefaultHandle()
+      .record(
+        1,
+        { key: { value: 'value' } },
+        {
+          traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+          spanId: '5e0c63257de34c92',
+        }
+      );
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
@@ -67,5 +76,18 @@ describe('NoopTracer', () => {
     assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
     assert.strictEqual(gauge.getDefaultHandle(), NOOP_GAUGE_HANDLE);
     assert.strictEqual(gauge.getHandle(['val1', 'val2']), NOOP_GAUGE_HANDLE);
+
+    const options = {
+      component: 'tests',
+      description: 'the testing package',
+      labelKeys: ['key1', 'key2'],
+    };
+
+    const measureWithOptions = meter.createMeasure('some-name', options);
+    assert.strictEqual(measureWithOptions, NOOP_MEASURE_METRIC);
+    const counterWithOptions = meter.createCounter('some-name', options);
+    assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
+    const gaugeWithOptions = meter.createGauge('some-name', options);
+    assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
   });
 });
