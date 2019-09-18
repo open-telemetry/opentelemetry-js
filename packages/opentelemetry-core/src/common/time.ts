@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import { now, timeOrigin } from '../platform';
 
 const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
@@ -32,11 +32,11 @@ function numberToHrtime(time: number): types.HrTime {
 
 // Returns an hrtime calculated via performance component.
 export function hrTime(performanceNow?: number): types.HrTime {
-  const timeOrigin = numberToHrtime(performance.timeOrigin);
-  const now = numberToHrtime(performanceNow || performance.now());
+  const currentTimeOrigin = numberToHrtime(timeOrigin());
+  const current = numberToHrtime(performanceNow || now());
 
-  let seconds = timeOrigin[0] + now[0];
-  let nanos = timeOrigin[1] + now[1];
+  let seconds = currentTimeOrigin[0] + current[0];
+  let nanos = currentTimeOrigin[1] + current[1];
 
   // Nanoseconds
   if (nanos > SECOND_TO_NANOSECONDS) {
@@ -54,7 +54,7 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
     return time;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
-    if (time < performance.timeOrigin) {
+    if (time < timeOrigin()) {
       return hrTime(time);
     }
     // epoch milliseconds or performance.timeOrigin

@@ -111,7 +111,7 @@ describe('HttpPlugin', () => {
       const result = await httpRequest.get(
         `http://${hostname}:${serverPort}${pathname}`
       );
-      const spans = audit.processSpans();
+      const spans = memoryExporter.getFinishedSpans();
       const [incomingSpan, outgoingSpan] = spans;
       const validations = {
         hostname,
