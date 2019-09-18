@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,8 +19,7 @@ import { SimpleSpanProcessor } from '../../src/export/SimpleSpanProcessor';
 import { Span, BasicTracer } from '../../src';
 import { SpanExporter } from '../../src/export/SpanExporter';
 import { ReadableSpan } from '../../src/export/ReadableSpan';
-import { SpanContext, SpanKind, TraceOptions } from '@opentelemetry/types';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
 
 class TestExporter implements SpanExporter {
   spansDataList: ReadableSpan[] = [];
@@ -34,9 +33,7 @@ class TestExporter implements SpanExporter {
 }
 
 describe('SimpleSpanProcessor', () => {
-  const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
-  });
+  const tracer = new BasicTracer();
   const exporter = new TestExporter();
 
   describe('constructor', () => {
@@ -52,7 +49,7 @@ describe('SimpleSpanProcessor', () => {
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
-        traceOptions: TraceOptions.SAMPLED,
+        traceFlags: TraceFlags.SAMPLED,
       };
       const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);
@@ -70,7 +67,7 @@ describe('SimpleSpanProcessor', () => {
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
-        traceOptions: TraceOptions.UNSAMPLED,
+        traceFlags: TraceFlags.UNSAMPLED,
       };
       const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);

@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,28 +14,21 @@
  * limitations under the License.
  */
 
-export * from './common/Logger';
-export * from './context/propagation/BinaryFormat';
-export * from './context/propagation/HttpTextFormat';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
-export * from './metrics/counter';
-export * from './metrics/gauge';
-export * from './metrics/measure';
-export * from './metrics/meter';
-export * from './metrics/metric';
+export * from './common/ConsoleLogger';
+export * from './common/NoopLogger';
+export * from './common/time';
+export * from './common/types';
+export * from './context/propagation/B3Format';
+export * from './context/propagation/BinaryTraceContext';
+export * from './context/propagation/HttpTraceContext';
+export * from './platform';
 export * from './resources/Resource';
-export * from './trace/attributes';
-export * from './trace/Event';
-export * from './trace/instrumentation/Plugin';
-export * from './trace/link';
-export * from './trace/Sampler';
-export * from './trace/span';
-export * from './trace/SpanOptions';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/TimedEvent';
-export * from './trace/tracer';
-export * from './trace/trace_options';
-export * from './trace/trace_state';
+export * from './trace/globaltracer-utils';
+export * from './trace/instrumentation/BasePlugin';
+export * from './trace/NoopSpan';
+export * from './trace/NoopTracer';
+export * from './trace/NoRecordingSpan';
+export * from './trace/sampler/ProbabilitySampler';
+export * from './trace/spancontext-utils';
+export * from './trace/TracerDelegate';
+export * from './trace/TraceState';

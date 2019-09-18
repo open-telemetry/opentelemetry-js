@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-export interface CounterTimeseries {
-  // Adds the given value to the current value. Values cannot be negative.
-  add(value: number): void;
+/** High resolution HrTime: [seconds: number, nanoseconds: number] */
+export type HrTime = [number, number];
 
-  // Sets the given value. Value must be larger than the current recorded value.
-  set(value: number): void;
-}
+/**
+ * Defines TimeInput.
+ *
+ * hrtime, expoch milliseconds, performance.now() or Date
+ */
+export type TimeInput = HrTime | number | Date;

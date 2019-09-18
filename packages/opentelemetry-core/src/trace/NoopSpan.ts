@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,7 +64,7 @@ export class NoopSpan implements types.Span {
   }
 
   // By default does nothing
-  end(endTime?: number): void {}
+  end(endTime?: types.TimeInput): void {}
 
   // isRecordingEvents always returns false for noopSpan.
   isRecordingEvents(): boolean {

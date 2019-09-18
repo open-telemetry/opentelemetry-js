@@ -1,6 +1,4 @@
-import { SpanContext, TraceOptions } from '@opentelemetry/types';
-
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,12 +14,14 @@ import { SpanContext, TraceOptions } from '@opentelemetry/types';
  * limitations under the License.
  */
 
+import { SpanContext, TraceFlags } from '@opentelemetry/types';
+
 export const INVALID_SPANID = '0';
 export const INVALID_TRACEID = '0';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
-  traceOptions: TraceOptions.UNSAMPLED,
+  traceFlags: TraceFlags.UNSAMPLED,
 };
 
 /**

@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,13 +21,10 @@ import {
   BasicTracer,
   ExportResult,
 } from '../../src';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
-  const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
-  });
+  const tracer = new BasicTracer();
   tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   afterEach(() => {
@@ -74,7 +71,7 @@ describe('InMemorySpanExporter', () => {
   it('should return the success result', () => {
     const exorter = new InMemorySpanExporter();
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.Success);
+      assert.strictEqual(result, ExportResult.SUCCESS);
     });
   });
 
@@ -84,7 +81,7 @@ describe('InMemorySpanExporter', () => {
 
     // after shutdown export should fail
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.FailedNotRetryable);
+      assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
     });
   });
 });

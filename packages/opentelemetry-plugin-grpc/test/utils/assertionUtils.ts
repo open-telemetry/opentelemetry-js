@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -60,8 +60,8 @@ export const assertPropagation = (
   assert.strictEqual(targetSpanContext.traceId, sourceSpanContext.traceId);
   assert.strictEqual(incomingSpan.parentSpanId, sourceSpanContext.spanId);
   assert.strictEqual(
-    targetSpanContext.traceOptions,
-    sourceSpanContext.traceOptions
+    targetSpanContext.traceFlags,
+    sourceSpanContext.traceFlags
   );
   assert.notStrictEqual(targetSpanContext.spanId, sourceSpanContext.spanId);
 };

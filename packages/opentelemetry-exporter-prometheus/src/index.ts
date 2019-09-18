@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,4 @@
  * limitations under the License.
  */
 
-export interface GaugeTimeseries {
-  // Adds the given value to the current value. Values can be negative.
-  add(value: number): void;
-  // Sets the given value. Values can be negative.
-  set(value: number): void;
-}
+//

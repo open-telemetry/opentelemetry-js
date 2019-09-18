@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,13 @@
  */
 
 /**
- * An enumeration that represents global trace options. These options are
+ * An enumeration that represents global trace flags. These flags are
  * propagated to all child {@link Span}. These determine features such as
  * whether a Span should be traced. It is implemented as a bitmask.
  */
-export enum TraceOptions {
-  /** Bit to represent whether trace is unsampled in trace options. */
+export enum TraceFlags {
+  /** Bit to represent whether trace is unsampled in trace flags. */
   UNSAMPLED = 0x0,
-  /** Bit to represent whether trace is sampled in trace options. */
+  /** Bit to represent whether trace is sampled in trace flags. */
   SAMPLED = 0x1,
 }
