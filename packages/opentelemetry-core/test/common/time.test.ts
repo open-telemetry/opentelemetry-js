@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { performance } from 'perf_hooks';
+import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
 import * as types from '@opentelemetry/types';
 import {
