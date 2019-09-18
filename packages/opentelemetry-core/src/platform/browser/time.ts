@@ -14,5 +14,20 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './time';
+/** Returns performance.now() or pollyfill with Date.now() */
+export function performanceNow() {
+  return window.performance ? performance.now() : Date.now();
+}
+
+let perfOriginPolyfill = 0;
+
+/** Returns performance.timeOrigin or calculated pollyfill. */
+export function performanceTimeOrigin() {
+  if (!window.performance) return 0;
+  if (performance.timeOrigin) return performance.timeOrigin;
+
+  if (!perfOriginPolyfill) {
+    perfOriginPolyfill = Date.now() - performance.now();
+  }
+  return perfOriginPolyfill;
+}

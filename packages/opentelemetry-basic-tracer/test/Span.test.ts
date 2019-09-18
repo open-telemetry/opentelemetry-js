@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
+import {hrTimeToMilliseconds, hrTimeToNanoseconds, NoopLogger,} from '@opentelemetry/core';
+import {CanonicalCode, SpanContext, SpanKind, TraceFlags,} from '@opentelemetry/types';
 import * as assert from 'assert';
-import { performance } from 'perf_hooks';
-import { Span } from '../src/Span';
-import {
-  SpanKind,
-  CanonicalCode,
-  TraceFlags,
-  SpanContext,
-} from '@opentelemetry/types';
-import { BasicTracer } from '../src';
-import {
-  hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
-  NoopLogger,
-} from '@opentelemetry/core';
+
+import {BasicTracer} from '../src';
+import {Span} from '../src/Span';
+
+/**
+ * Gets the global `performance` object in a way that works for both the
+ * browser and Node, since this test runs in both environments.
+ */
+function getPerformance() {
+  if (typeof performance !== 'undefined') return performance;
+  return require('perf_hooks').performance;
+}
 
 describe('Span', () => {
+  const perf = getPerformance();
   const tracer = new BasicTracer({
     logger: new NoopLogger(),
   });
@@ -50,21 +51,19 @@ describe('Span', () => {
 
   it('should have valid startTime', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    assert.ok(hrTimeToMilliseconds(span.startTime) > performance.timeOrigin);
+    assert.ok(hrTimeToMilliseconds(span.startTime) > perf.timeOrigin);
   });
 
   it('should have valid endTime', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.end();
     assert.ok(
-      hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
-      'end time must be bigger than start time'
-    );
+        hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
+        'end time must be bigger than start time');
 
     assert.ok(
-      hrTimeToMilliseconds(span.endTime) > performance.timeOrigin,
-      'end time must be bigger than time origin'
-    );
+        hrTimeToMilliseconds(span.endTime) > perf.timeOrigin,
+        'end time must be bigger than time origin');
   });
 
   it('should have a duration', () => {
@@ -76,9 +75,7 @@ describe('Span', () => {
   it('should have valid event.time', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.addEvent('my-event');
-    assert.ok(
-      hrTimeToMilliseconds(span.events[0].time) > performance.timeOrigin
-    );
+    assert.ok(hrTimeToMilliseconds(span.events[0].time) > perf.timeOrigin);
   });
 
   it('should get the span context of span', () => {
@@ -104,14 +101,14 @@ describe('Span', () => {
     ['String', 'Number', 'Boolean'].map(attType => {
       span.setAttribute('testKey' + attType, 'testValue' + attType);
     });
-    span.setAttribute('object', { foo: 'bar' });
+    span.setAttribute('object', {foo: 'bar'});
     span.end();
   });
 
   it('should set an event', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addEvent('sent');
-    span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
+    span.addEvent('rev', {attr1: 'value', attr2: 123, attr3: true});
     span.end();
   });
 
@@ -123,7 +120,7 @@ describe('Span', () => {
     };
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
-    span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
+    span.addLink(spanContext, {attr1: 'value', attr2: 123, attr3: true});
     span.end();
   });
 
@@ -138,13 +135,8 @@ describe('Span', () => {
 
   it('should return ReadableSpan', () => {
     const parentId = '5c1c63257de34c67';
-    const span = new Span(
-      tracer,
-      'my-span',
-      spanContext,
-      SpanKind.INTERNAL,
-      parentId
-    );
+    const span =
+        new Span(tracer, 'my-span', spanContext, SpanKind.INTERNAL, parentId);
 
     const readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.name, 'my-span');
@@ -163,9 +155,9 @@ describe('Span', () => {
     const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.setAttribute('attr1', 'value1');
     let readableSpan = span.toReadableSpan();
-    assert.deepStrictEqual(readableSpan.attributes, { attr1: 'value1' });
+    assert.deepStrictEqual(readableSpan.attributes, {attr1: 'value1'});
 
-    span.setAttributes({ attr2: 123, attr1: false });
+    span.setAttributes({attr2: 123, attr1: false});
     readableSpan = span.toReadableSpan();
     assert.deepStrictEqual(readableSpan.attributes, {
       attr1: false,
@@ -198,7 +190,7 @@ describe('Span', () => {
       },
     ]);
 
-    span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
+    span.addLink(spanContext, {attr1: 'value', attr2: 123, attr3: true});
     readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.links.length, 2);
     assert.deepStrictEqual(readableSpan.links, [
@@ -207,7 +199,7 @@ describe('Span', () => {
         spanContext,
       },
       {
-        attributes: { attr1: 'value', attr2: 123, attr3: true },
+        attributes: {attr1: 'value', attr2: 123, attr3: true},
         spanContext,
       },
     ]);
@@ -229,7 +221,7 @@ describe('Span', () => {
     assert.ok(!event.attributes);
     assert.ok(event.time[0] > 0);
 
-    span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
+    span.addEvent('rev', {attr1: 'value', attr2: 123, attr3: true});
     readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.events.length, 2);
     const [event1, event2] = readableSpan.events;
@@ -260,9 +252,7 @@ describe('Span', () => {
     });
     const readableSpan = span.toReadableSpan();
     assert.strictEqual(
-      readableSpan.status.code,
-      CanonicalCode.PERMISSION_DENIED
-    );
+        readableSpan.status.code, CanonicalCode.PERMISSION_DENIED);
     assert.strictEqual(readableSpan.status.message, 'This is an error');
     span.end();
 

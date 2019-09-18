@@ -42,7 +42,7 @@ module.exports = {
             // optimized implementations of the specific needed functionality
             // rather than bringing in (sometimes large) polyfills for the
             // corresponding Node APIs.
-            Buffer: false,
+            Buffer: true,
             __dirname: false,
             __filename: false,
             buffer: false,

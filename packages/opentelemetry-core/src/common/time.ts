@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import {performanceNow, performanceTimeOrigin} from '../platform';
 
 const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
@@ -25,15 +25,15 @@ function numberToHrtime(time: number): types.HrTime {
   // Decimals only.
   const seconds = Math.trunc(time);
   // Round sub-nanosecond accuracy to nanosecond.
-  const nanos =
-    Number((time - seconds).toFixed(NANOSECOND_DIGITS)) * SECOND_TO_NANOSECONDS;
+  const nanos = Number((time - seconds).toFixed(NANOSECOND_DIGITS)) *
+      SECOND_TO_NANOSECONDS;
   return [seconds, nanos];
 }
 
 // Returns an hrtime calculated via performance component.
-export function hrTime(performanceNow?: number): types.HrTime {
-  const timeOrigin = numberToHrtime(performance.timeOrigin);
-  const now = numberToHrtime(performanceNow || performance.now());
+export function hrTime(performanceNowTime?: number): types.HrTime {
+  const timeOrigin = numberToHrtime(performanceTimeOrigin());
+  const now = numberToHrtime(performanceNowTime || performanceNow());
 
   let seconds = timeOrigin[0] + now[0];
   let nanos = timeOrigin[1] + now[1];
@@ -54,7 +54,7 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
     return time;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
-    if (time < performance.timeOrigin) {
+    if (time < performanceTimeOrigin()) {
       return hrTime(time);
     }
     // epoch milliseconds or performance.timeOrigin
@@ -70,9 +70,7 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
 
 // Returns a duration of two hrTime.
 export function hrTimeDuration(
-  startTime: types.HrTime,
-  endTime: types.HrTime
-): types.HrTime {
+    startTime: types.HrTime, endTime: types.HrTime): types.HrTime {
   let seconds = endTime[0] - startTime[0];
   let nanos = endTime[1] - startTime[1];
 

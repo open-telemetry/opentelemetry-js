@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopScopeManager } from '../src';
+import {NoopScopeManager} from '../src/NoopScopeManager';
 
 describe('NoopScopeManager', () => {
   let scopeManager: NoopScopeManager;
@@ -44,13 +44,10 @@ describe('NoopScopeManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = { a: 1 };
+      const test = {a: 1};
       scopeManager.with(test, () => {
         assert.strictEqual(
-          scopeManager.active(),
-          null,
-          'should not have scope'
-        );
+            scopeManager.active(), null, 'should not have scope');
         return done();
       });
     });
@@ -78,13 +75,13 @@ describe('NoopScopeManager', () => {
 
   describe('.bind()', () => {
     it('should return the same target (when enabled)', () => {
-      const test = { a: 1 };
+      const test = {a: 1};
       assert.deepStrictEqual(scopeManager.bind(test), test);
     });
 
     it('should return the same target (when disabled)', () => {
       scopeManager.disable();
-      const test = { a: 1 };
+      const test = {a: 1};
       assert.deepStrictEqual(scopeManager.bind(test), test);
       scopeManager.enable();
     });

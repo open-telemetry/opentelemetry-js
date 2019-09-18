@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { performance } from 'perf_hooks';
-import * as sinon from 'sinon';
 import * as types from '@opentelemetry/types';
-import {
-  hrTime,
-  timeInputToHrTime,
-  hrTimeDuration,
-  hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
-} from '../../src/common/time';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+
+import {hrTime, hrTimeDuration, hrTimeToMilliseconds, hrTimeToNanoseconds, timeInputToHrTime,} from '../../src/common/time';
+
+/**
+ * Gets the global `performance` object in a way that works for both the
+ * browser and Node, since this test runs in both environments.
+ */
+function getPerformance() {
+  if (typeof performance !== 'undefined') return performance;
+  return require('perf_hooks').performance;
+}
 
 describe('time', () => {
   let sandbox: sinon.SinonSandbox;
+
+  const perf = getPerformance();
 
   beforeEach(() => {
     sandbox = sinon.createSandbox();
@@ -39,15 +44,15 @@ describe('time', () => {
 
   describe('#hrTime', () => {
     it('should return hrtime now', () => {
-      sandbox.stub(performance, 'timeOrigin').value(11.5);
-      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+      sandbox.stub(perf, 'timeOrigin').value(11.5);
+      sandbox.stub(perf, 'now').callsFake(() => 11.3);
 
       const output = hrTime();
       assert.deepStrictEqual(output, [22, 800000000]);
     });
 
     it('should convert performance now', () => {
-      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(perf, 'timeOrigin').value(11.5);
       const performanceNow = 11.3;
 
       const output = hrTime(performanceNow);
@@ -55,7 +60,7 @@ describe('time', () => {
     });
 
     it('should handle nanosecond overflow', () => {
-      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(perf, 'timeOrigin').value(11.5);
       const performanceNow = 11.6;
 
       const output = hrTime(performanceNow);
@@ -77,7 +82,7 @@ describe('time', () => {
     });
 
     it('should convert performance.now() hrTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.5);
+      sandbox.stub(perf, 'timeOrigin').value(111.5);
 
       const timeInput = 11.9;
       const output = timeInputToHrTime(timeInput);
@@ -86,7 +91,7 @@ describe('time', () => {
     });
 
     it('should not convert hrtime hrTime', () => {
-      sandbox.stub(performance, 'timeOrigin').value(111.5);
+      sandbox.stub(perf, 'timeOrigin').value(111.5);
 
       const timeInput: [number, number] = [3138971, 245466222];
       const output = timeInputToHrTime(timeInput);

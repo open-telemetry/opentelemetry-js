@@ -14,5 +14,12 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './time';
+import {performance} from 'perf_hooks';
+
+export function performanceNow() {
+  return performance.now();
+}
+
+export function performanceTimeOrigin() {
+  return performance.timeOrigin;
+}

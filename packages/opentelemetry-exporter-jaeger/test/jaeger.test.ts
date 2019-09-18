@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { JaegerExporter } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import {ExportResult, ReadableSpan} from '@opentelemetry/basic-tracer';
+import {NoopLogger} from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { ThriftProcess } from '../src/types';
-import { ExportResult, ReadableSpan } from '@opentelemetry/basic-tracer';
+import * as assert from 'assert';
+
+import {JaegerExporter} from '../src';
+import {ThriftProcess} from '../src/types';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
     it('should construct an exporter', () => {
-      const exporter = new JaegerExporter({ serviceName: 'opentelemetry' });
+      const exporter = new JaegerExporter({serviceName: 'opentelemetry'});
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
       const process: ThriftProcess = exporter['_sender']._process;
@@ -38,7 +39,7 @@ describe('JaegerExporter', () => {
         host: 'localhost',
         port: 8080,
         logger: new NoopLogger(),
-        tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.0.1' }],
+        tags: [{key: 'opentelemetry-exporter-jaeger', value: '0.0.1'}],
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -79,8 +80,9 @@ describe('JaegerExporter', () => {
         name: 'my-span1',
         kind: types.SpanKind.CLIENT,
         spanContext,
-        startTime: 1566156729709,
-        endTime: 1566156729709 + 2000,
+        startTime: [1566156729, 709000000],
+        endTime: [1566156729 + 2, 709000000],
+        duration: [2, 0],
         status: {
           code: types.CanonicalCode.DATA_LOSS,
         },
