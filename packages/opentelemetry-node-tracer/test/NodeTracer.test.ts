@@ -23,7 +23,6 @@ import {
   NoopLogger,
   NoRecordingSpan,
 } from '@opentelemetry/core';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { NodeTracer } from '../src/NodeTracer';
 import { TraceFlags } from '@opentelemetry/types';
 import { Span } from '@opentelemetry/basic-tracer';
@@ -50,7 +49,6 @@ describe('NodeTracer', () => {
     it('should construct an instance with http text format', () => {
       const tracer = new NodeTracer({
         httpTextFormat: new HttpTraceContext(),
-        scopeManager: new AsyncHooksScopeManager(),
       });
       assert.ok(tracer instanceof NodeTracer);
     });
@@ -116,7 +114,6 @@ describe('NodeTracer', () => {
         foo: 'bar',
       };
       const tracer = new NodeTracer({
-        scopeManager: new AsyncHooksScopeManager(),
         defaultAttributes,
       });
 
