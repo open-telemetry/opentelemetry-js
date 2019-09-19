@@ -37,7 +37,6 @@ describe('NoopTracer', () => {
       NOOP_SPAN
     );
 
-
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
     const httpTextFormat = tracer.getHttpTextFormat();
     assert.ok(httpTextFormat);
