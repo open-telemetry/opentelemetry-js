@@ -19,7 +19,7 @@ import * as opentracing from 'opentracing';
 import { BasicTracer, Span } from '@opentelemetry/basic-tracer';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
-import { INVALID_SPAN_CONTEXT } from '@opentelemetry/core';
+import { INVALID_SPAN_CONTEXT, timeInputToHrTime } from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
@@ -112,8 +112,9 @@ describe('OpenTracing Shim', () => {
     });
 
     it('translates span options correctly', () => {
+      const now = performance.now();
       const opentracingOptions: opentracing.SpanOptions = {
-        startTime: [123, 0],
+        startTime: now,
         tags: { key: 'value', count: 1 },
         references: [opentracing.followsFrom(context)],
       };
@@ -122,7 +123,7 @@ describe('OpenTracing Shim', () => {
       const otSpan = (span as SpanShim).getSpan() as Span;
 
       assert.strictEqual(otSpan.links.length, 1);
-      assert.strictEqual(otSpan.startTime, opentracingOptions.startTime);
+      assert.deepStrictEqual(otSpan.startTime, timeInputToHrTime(now));
       assert.deepStrictEqual(otSpan.attributes, opentracingOptions.tags);
     });
   });
@@ -142,7 +143,7 @@ describe('OpenTracing Shim', () => {
 
     beforeEach(() => {
       span = shimTracer.startSpan('my-span', {
-        startTime: [100, 0],
+        startTime: performance.now(),
       }) as SpanShim;
       otSpan = (span as SpanShim).getSpan() as Span;
     });
@@ -178,8 +179,8 @@ describe('OpenTracing Shim', () => {
 
     it('sets explicit end timestamp', () => {
       const now = performance.now();
-      span.finish([now, 0]);
-      assert.strictEqual(otSpan.endTime, now);
+      span.finish(now);
+      assert.deepStrictEqual(otSpan.endTime, timeInputToHrTime(now));
     });
 
     it('can set and retrieve baggage', () => {
