@@ -20,7 +20,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
 import { SpanKind, Tracer } from '@opentelemetry/types';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { GrpcPlugin, plugin } from '../src';
