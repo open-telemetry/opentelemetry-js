@@ -55,7 +55,15 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): void {
-    this._sender.close();
+    this._sender.flush((numSpans: number, err?: string) => {
+      if (err) {
+        this._logger.error(`failed to flush span: ${err}`);
+      }
+    });
+    // Sleeping 2 seconds before closing the sender's connection to ensure all spans are flushed.
+    setTimeout(() => {
+      this._sender.close();
+    }, 2000);
   }
 
   /** Transform spans and sends to Jaeger service. */
