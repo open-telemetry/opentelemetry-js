@@ -24,7 +24,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as url from 'url';
 import { Utils } from '../utils/Utils';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,

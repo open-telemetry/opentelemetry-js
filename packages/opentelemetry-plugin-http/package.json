@@ -67,7 +67,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/node-tracer": "^0.0.1",
+    "@opentelemetry/node-sdk": "^0.0.1",
     "@opentelemetry/types": "^0.0.1",
     "semver": "^6.3.0",
     "shimmer": "^1.2.1"

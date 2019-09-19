@@ -52,7 +52,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/node-tracer": "^0.0.1",
+    "@opentelemetry/node-sdk": "^0.0.1",
     "@opentelemetry/types": "^0.0.1"
   }
 }
