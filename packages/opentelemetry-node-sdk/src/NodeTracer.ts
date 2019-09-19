@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
+import { BasicTracer } from '@opentelemetry/basic-tracer';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { Plugins } from './instrumentation/PluginLoader';
-
-/**
- * NodeTracerConfig provides an interface for configuring a Node Tracer.
- */
-export interface NodeTracerConfig extends BasicTracerConfig {
-  /**
-   * Plugins options.
-   */
-  plugins?: Plugins;
-}
+import { PluginLoader } from './instrumentation/PluginLoader';
+import { NodeTracerConfig, DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
 
 /**
  * This class represents a node tracer with `async_hooks` module.
  */
 export class NodeTracer extends BasicTracer {
+  private readonly _pluginLoader: PluginLoader;
+
   /**
    * Constructs a new Tracer instance.
    */
@@ -42,6 +35,11 @@ export class NodeTracer extends BasicTracer {
     }
     super(Object.assign({}, { scopeManager: config.scopeManager }, config));
 
-    // @todo: Integrate Plugin Loader (pull/126).
+    this._pluginLoader = new PluginLoader(this, this.logger);
+    this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);
+  }
+
+  stop() {
+    this._pluginLoader.unload();
   }
 }
