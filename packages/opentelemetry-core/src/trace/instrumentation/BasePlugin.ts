@@ -59,9 +59,10 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   }
 
   /**
-   * TODO: To avoid circular dependencies, internal file loading functionality currently
+   * @TODO: To avoid circular dependencies, internal file loading functionality currently
    * lives in BasePlugin. It is not meant to work in the browser and so this logic
    * should eventually be moved somewhere else where it makes more sense.
+   * https://github.com/open-telemetry/opentelemetry-js/issues/285
    */
   private _loadInternalFilesExports(): PluginInternalFiles {
     if (!this._internalFilesList) return {};

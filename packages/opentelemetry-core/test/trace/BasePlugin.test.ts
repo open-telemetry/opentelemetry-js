@@ -30,6 +30,7 @@ describe('BasePlugin', () => {
         plugin.enable(testPackage, tracer, logger);
       });
 
+      // @TODO: https://github.com/open-telemetry/opentelemetry-js/issues/285
       if (typeof process !== 'undefined' && process.release.name === 'node') {
         assert.ok(plugin['_internalFilesExports']);
         assert.strictEqual(
