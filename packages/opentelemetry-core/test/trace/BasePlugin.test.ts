@@ -35,7 +35,8 @@ describe('BasePlugin', () => {
       if (typeof process !== 'undefined' && process.release.name === 'node') {
         assert.ok(plugin['_internalFilesExports']);
         assert.strictEqual(
-          (plugin['_internalFilesExports'].internal as typeof types).internallyExportedFunction(),
+          (plugin['_internalFilesExports']
+            .internal as typeof types).internallyExportedFunction(),
           true
         );
         assert.strictEqual(
