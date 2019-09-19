@@ -15,10 +15,11 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { performance } from 'perf_hooks';
+import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
+import { TraceParams } from './types';
 
 /**
  * This class represents a span.
@@ -33,15 +34,17 @@ export class Span implements types.Span, ReadableSpan {
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
-  readonly startTime: number;
+  readonly startTime: types.HrTime;
   name: string;
   status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  endTime = 0;
+  endTime: types.HrTime = [0, 0];
   private _ended = false;
+  private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
   private readonly _spanProcessor: SpanProcessor;
+  private readonly _traceParams: TraceParams;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -50,15 +53,16 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
-    startTime?: number
+    startTime: types.TimeInput = hrTime()
   ) {
     this._tracer = parentTracer;
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
-    this.startTime = startTime || performance.now();
+    this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
+    this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.activeSpanProcessor;
     this._spanProcessor.onStart(this);
   }
@@ -73,6 +77,19 @@ export class Span implements types.Span, ReadableSpan {
 
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
+
+    if (
+      Object.keys(this.attributes).length >=
+      this._traceParams.numberOfAttributesPerSpan!
+    ) {
+      const attributeKeyToDelete = Object.keys(this.attributes).shift();
+      if (attributeKeyToDelete) {
+        this._logger.warn(
+          `Dropping extra attributes : ${attributeKeyToDelete}`
+        );
+        delete this.attributes[attributeKeyToDelete];
+      }
+    }
     this.attributes[key] = value;
     return this;
   }
@@ -86,12 +103,21 @@ export class Span implements types.Span, ReadableSpan {
 
   addEvent(name: string, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
-    this.events.push({ name, attributes, time: performance.now() });
+    if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
+      this._logger.warn('Dropping extra events.');
+      this.events.shift();
+    }
+    this.events.push({ name, attributes, time: hrTime() });
     return this;
   }
 
   addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
     if (this._isSpanEnded()) return this;
+
+    if (this.links.length >= this._traceParams.numberOfLinksPerSpan!) {
+      this._logger.warn('Dropping extra links.');
+      this.links.shift();
+    }
     this.links.push({ spanContext, attributes });
     return this;
   }
@@ -108,13 +134,13 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime?: number): void {
+  end(endTime: types.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = endTime || performance.now();
+    this.endTime = timeInputToHrTime(endTime);
     this._spanProcessor.onEnd(this);
   }
 
@@ -124,6 +150,24 @@ export class Span implements types.Span, ReadableSpan {
 
   toReadableSpan(): ReadableSpan {
     return this;
+  }
+
+  get duration(): types.HrTime {
+    if (this._duration[0] !== -1) {
+      return this._duration;
+    }
+
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
+
+    if (this._duration[0] < 0) {
+      this._logger.warn(
+        'Inconsistent start and end time, startTime > endTime',
+        this.startTime,
+        this.endTime
+      );
+    }
+
+    return this._duration;
   }
 
   private _isSpanEnded(): boolean {

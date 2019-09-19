@@ -24,7 +24,7 @@ import {
   TraceState,
   NoRecordingSpan,
 } from '@opentelemetry/core';
-import { TraceOptions } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/types';
 import { BasicTracer } from '../src/BasicTracer';
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from '../src/Span';
@@ -150,7 +150,7 @@ describe('BasicTracer', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       assert.deepStrictEqual(context.traceState, undefined);
       span.end();
     });
@@ -197,7 +197,7 @@ describe('BasicTracer', () => {
       assert.ok(span instanceof Span);
       const context = span.context();
       assert.strictEqual(context.traceId, 'd4cda95b652f4a1592b449d5929fda1b');
-      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       assert.deepStrictEqual(context.traceState, state);
       span.end();
     });
@@ -210,7 +210,7 @@ describe('BasicTracer', () => {
       });
       const context = childSpan.context();
       assert.strictEqual(context.traceId, span.context().traceId);
-      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       span.end();
       childSpan.end();
     });
@@ -232,7 +232,7 @@ describe('BasicTracer', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
       assert.deepStrictEqual(context.traceState, undefined);
     });
 
@@ -246,7 +246,7 @@ describe('BasicTracer', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.UNSAMPLED);
       assert.deepStrictEqual(context.traceState, undefined);
       span.end();
     });
@@ -257,7 +257,7 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span', { isRecordingEvents: true });
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecordingEvents(), true);
     });
 
@@ -268,7 +268,7 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span', { isRecordingEvents: false });
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecordingEvents(), false);
     });
 
@@ -279,7 +279,7 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceOptions, TraceOptions.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecordingEvents(), false);
     });
 
@@ -290,7 +290,7 @@ describe('BasicTracer', () => {
       });
       const span = tracer.startSpan('my-span', { isRecordingEvents: true });
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceOptions, TraceOptions.SAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecordingEvents(), true);
     });
 

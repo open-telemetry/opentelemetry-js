@@ -15,7 +15,6 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { SpanKind, Span } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -29,7 +28,7 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -43,12 +42,10 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('Packages', () => {
   describe('get', () => {
-    const scopeManager = new AsyncHooksScopeManager();
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
     const tracer = new NodeTracer({
-      scopeManager,
       logger,
       httpTextFormat,
     });

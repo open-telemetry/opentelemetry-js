@@ -16,6 +16,7 @@
 
 export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
+export * from './common/time';
 export * from './common/types';
 export * from './context/propagation/B3Format';
 export * from './context/propagation/BinaryTraceContext';
@@ -31,3 +32,4 @@ export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/spancontext-utils';
 export * from './trace/TracerDelegate';
 export * from './trace/TraceState';
+export * from './metrics/NoopMeter';

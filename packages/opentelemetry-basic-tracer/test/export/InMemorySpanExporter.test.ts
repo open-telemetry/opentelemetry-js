@@ -71,7 +71,7 @@ describe('InMemorySpanExporter', () => {
   it('should return the success result', () => {
     const exorter = new InMemorySpanExporter();
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.Success);
+      assert.strictEqual(result, ExportResult.SUCCESS);
     });
   });
 
@@ -81,7 +81,7 @@ describe('InMemorySpanExporter', () => {
 
     // after shutdown export should fail
     exorter.export([], (result: ExportResult) => {
-      assert.strictEqual(result, ExportResult.FailedNotRetryable);
+      assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
     });
   });
 });

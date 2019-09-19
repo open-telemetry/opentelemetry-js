@@ -15,15 +15,20 @@
  */
 
 import * as assert from 'assert';
+import { performance } from 'perf_hooks';
 import { Span } from '../src/Span';
 import {
   SpanKind,
   CanonicalCode,
-  TraceOptions,
+  TraceFlags,
   SpanContext,
 } from '@opentelemetry/types';
 import { BasicTracer } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  hrTimeToNanoseconds,
+  hrTimeToMilliseconds,
+  NoopLogger,
+} from '@opentelemetry/core';
 
 describe('Span', () => {
   const tracer = new BasicTracer({
@@ -33,7 +38,7 @@ describe('Span', () => {
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
-    traceOptions: TraceOptions.SAMPLED,
+    traceFlags: TraceFlags.SAMPLED,
   };
 
   it('should create a Span instance', () => {
@@ -43,11 +48,44 @@ describe('Span', () => {
     span.end();
   });
 
+  it('should have valid startTime', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    assert.ok(hrTimeToMilliseconds(span.startTime) > performance.timeOrigin);
+  });
+
+  it('should have valid endTime', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(
+      hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
+      'end time must be bigger than start time'
+    );
+
+    assert.ok(
+      hrTimeToMilliseconds(span.endTime) > performance.timeOrigin,
+      'end time must be bigger than time origin'
+    );
+  });
+
+  it('should have a duration', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.end();
+    assert.ok(hrTimeToNanoseconds(span.duration) >= 0);
+  });
+
+  it('should have valid event.time', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    span.addEvent('my-event');
+    assert.ok(
+      hrTimeToMilliseconds(span.events[0].time) > performance.timeOrigin
+    );
+  });
+
   it('should get the span context of span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();
     assert.strictEqual(context.traceId, spanContext.traceId);
-    assert.strictEqual(context.traceOptions, TraceOptions.SAMPLED);
+    assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     assert.strictEqual(context.traceState, undefined);
     assert.ok(context.spanId.match(/[a-f0-9]{16}/));
     assert.ok(span.isRecordingEvents());
@@ -81,12 +119,29 @@ describe('Span', () => {
     const spanContext: SpanContext = {
       traceId: 'a3cda95b652f4a1592b449d5929fda1b',
       spanId: '5e0c63257de34c92',
-      traceOptions: TraceOptions.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED,
     };
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     span.addLink(spanContext);
     span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
     span.end();
+  });
+
+  it('should drop extra links, attributes and events', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+    for (let i = 0; i < 150; i++) {
+      span.addLink(spanContext);
+      span.setAttribute('foo' + i, 'bar' + i);
+      span.addEvent('sent' + i);
+    }
+    span.end();
+
+    assert.strictEqual(span.links.length, 32);
+    assert.strictEqual(span.events.length, 128);
+    assert.strictEqual(Object.keys(span.attributes).length, 32);
+    assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
+    assert.strictEqual(span.attributes['foo0'], undefined);
+    assert.strictEqual(span.attributes['foo149'], 'bar149');
   });
 
   it('should set an error status', () => {
@@ -155,7 +210,7 @@ describe('Span', () => {
         spanContext: {
           spanId: '6e0c63257de34c92',
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          traceOptions: 1,
+          traceFlags: 1,
         },
       },
     ]);
@@ -189,7 +244,7 @@ describe('Span', () => {
     const [event] = readableSpan.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.ok(!event.attributes);
-    assert.ok(event.time > 0);
+    assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
     readableSpan = span.toReadableSpan();
@@ -197,14 +252,14 @@ describe('Span', () => {
     const [event1, event2] = readableSpan.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.ok(!event1.attributes);
-    assert.ok(event1.time > 0);
+    assert.ok(event1.time[0] > 0);
     assert.deepStrictEqual(event2.name, 'rev');
     assert.deepStrictEqual(event2.attributes, {
       attr1: 'value',
       attr2: 123,
       attr3: true,
     });
-    assert.ok(event2.time > 0);
+    assert.ok(event2.time[0] > 0);
 
     span.end();
     // shouldn't add new event
@@ -238,9 +293,10 @@ describe('Span', () => {
 
   it('should only end a span once', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    span.end(1234);
-    span.end(4567);
-    assert.strictEqual(span.endTime, 1234);
+    const endTime = Date.now();
+    span.end(endTime);
+    span.end(endTime + 10);
+    assert.deepStrictEqual(span.endTime, [endTime, 0]);
   });
 
   it('should update name', () => {

@@ -14,14 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * An enumeration that represents global trace options. These options are
- * propagated to all child {@link Span}. These determine features such as
- * whether a Span should be traced. It is implemented as a bitmask.
- */
-export enum TraceOptions {
-  /** Bit to represent whether trace is unsampled in trace options. */
-  UNSAMPLED = 0x0,
-  /** Bit to represent whether trace is sampled in trace options. */
-  SAMPLED = 0x1,
-}
+export const otperformance = performance;

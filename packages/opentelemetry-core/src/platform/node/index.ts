@@ -15,3 +15,4 @@
  */
 
 export * from './id';
+export * from './performance';
