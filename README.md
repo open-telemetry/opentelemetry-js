@@ -25,7 +25,7 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 | Package                 | Description |
 | ----------------------- | -----------------|
 | [@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/node-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-tracer) | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
+| [@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
 
 ### Exporters
 

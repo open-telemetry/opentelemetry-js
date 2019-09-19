@@ -26,49 +26,92 @@ import {
 import { NodeTracer } from '../src/NodeTracer';
 import { TraceFlags } from '@opentelemetry/types';
 import { Span } from '@opentelemetry/basic-tracer';
+import * as path from 'path';
 
 const sleep = (time: number) =>
   new Promise(resolve => {
     return setTimeout(resolve, time);
   });
 
+const INSTALLED_PLUGINS_PATH = path.join(
+  __dirname,
+  'instrumentation',
+  'node_modules'
+);
+
 describe('NodeTracer', () => {
+  let tracer: NodeTracer;
+  before(() => {
+    module.paths.push(INSTALLED_PLUGINS_PATH);
+  });
+
+  afterEach(() => {
+    // clear require cache
+    Object.keys(require.cache).forEach(key => delete require.cache[key]);
+    tracer.stop();
+  });
+
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer instanceof NodeTracer);
     });
 
     it('should construct an instance with binary format', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         binaryFormat: new BinaryTraceContext(),
       });
       assert.ok(tracer instanceof NodeTracer);
     });
 
     it('should construct an instance with http text format', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         httpTextFormat: new HttpTraceContext(),
       });
       assert.ok(tracer instanceof NodeTracer);
     });
 
     it('should construct an instance with logger', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       assert.ok(tracer instanceof NodeTracer);
     });
 
     it('should construct an instance with sampler', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         sampler: ALWAYS_SAMPLER,
       });
       assert.ok(tracer instanceof NodeTracer);
     });
 
+    it('should load user configured plugins', () => {
+      tracer = new NodeTracer({
+        logger: new NoopLogger(),
+        plugins: {
+          'simple-module': {
+            enabled: true,
+            path: '@opentelemetry/plugin-simple-module',
+          },
+          'supported-module': {
+            enabled: true,
+            path: '@opentelemetry/plugin-supported-module',
+            enhancedDatabaseReporting: false,
+            ignoreMethods: [],
+            ignoreUrls: [],
+          },
+        },
+      });
+      const pluginLoader = tracer['_pluginLoader'];
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 2);
+    });
+
     it('should construct an instance with default attributes', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         defaultAttributes: {
           region: 'eu-west',
           asg: 'my-asg',
@@ -80,7 +123,7 @@ describe('NodeTracer', () => {
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span');
@@ -88,7 +131,7 @@ describe('NodeTracer', () => {
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         logger: new NoopLogger(),
       });
       const span = tracer.startSpan('my-span', {});
@@ -96,7 +139,7 @@ describe('NodeTracer', () => {
     });
 
     it('should return a default span with no sampling', () => {
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       });
@@ -113,7 +156,7 @@ describe('NodeTracer', () => {
       const defaultAttributes = {
         foo: 'bar',
       };
-      const tracer = new NodeTracer({
+      tracer = new NodeTracer({
         defaultAttributes,
       });
 
@@ -125,14 +168,14 @@ describe('NodeTracer', () => {
 
   describe('.getCurrentSpan()', () => {
     it('should return null with AsyncHooksScopeManager when no span started', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.deepStrictEqual(tracer.getCurrentSpan(), null);
     });
   });
 
   describe('.withSpan()', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
@@ -142,7 +185,7 @@ describe('NodeTracer', () => {
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
@@ -163,7 +206,7 @@ describe('NodeTracer', () => {
     });
 
     it('should find correct scope with promises', done => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, async () => {
         for (let i = 0; i < 3; i++) {
@@ -197,14 +240,14 @@ describe('NodeTracer', () => {
 
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
     });
   });
 
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
-      const tracer = new NodeTracer({});
+      tracer = new NodeTracer({});
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
     });
   });

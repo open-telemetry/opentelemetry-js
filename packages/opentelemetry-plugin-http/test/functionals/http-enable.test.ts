@@ -23,7 +23,7 @@ import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
