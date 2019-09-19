@@ -1,4 +1,4 @@
-/*!
+/**
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,4 +14,6 @@
  * limitations under the License.
  */
 
-export * from './zipkin';
+describe('Zipkin Exporter E2E', () => {
+  it('should report spans to Zipkin server');
+});
