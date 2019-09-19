@@ -144,9 +144,9 @@ export class Utils {
   }
 
   /**
-   * Set the span with the error passed in params
-   * @param {Error} error error that will be set to span
+   * Sets the span with the error passed in params
    * @param {Span} span the span that need to be set
+   * @param {Error} error error that will be set to span
    * @param {(IncomingMessage | ClientRequest)} [obj] used for enriching the status by checking the statusCode.
    */
   static setSpanWithError(
