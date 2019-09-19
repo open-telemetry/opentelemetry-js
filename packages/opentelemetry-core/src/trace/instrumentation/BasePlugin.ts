@@ -35,8 +35,7 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
-  // tslint:disable-next-line:no-any
-  protected _internalFilesExports!: { [module: string]: any }; // output for internalFilesExports
+  protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
 

@@ -17,6 +17,7 @@
 import { BasePlugin, NoopTracer, NoopLogger } from '../../src';
 import * as assert from 'assert';
 import * as path from 'path';
+import * as types from './fixtures/test-package/foo/bar/internal';
 
 const tracer = new NoopTracer();
 const logger = new NoopLogger();
@@ -34,7 +35,7 @@ describe('BasePlugin', () => {
       if (typeof process !== 'undefined' && process.release.name === 'node') {
         assert.ok(plugin['_internalFilesExports']);
         assert.strictEqual(
-          plugin['_internalFilesExports'].internal.internallyExportedFunction(),
+          (plugin['_internalFilesExports'].internal as typeof types).internallyExportedFunction(),
           true
         );
         assert.strictEqual(

@@ -83,7 +83,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     if (this._internalFilesExports['client']) {
-      grpcClientModule = this._internalFilesExports['client'];
+      grpcClientModule = this._internalFilesExports['client'] as object;
 
       shimmer.wrap(
         grpcClientModule,
