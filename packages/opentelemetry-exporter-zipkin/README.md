@@ -8,17 +8,6 @@ OpenTelemetry Zipkin Trace Exporter allows the user to send collected traces to 
 
 [Zipkin](https://zipkin.io/) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
 
-## Prerequisites
-
-To use [Zipkin](https://zipkin.io/) as your exporter, first, download from any of the three available options on [Quickstart](https://zipkin.io/pages/quickstart.html): through Docker, on Java or manually compiling the source code. Tests were executed running Zipkin with Java, through the following commands on terminal:
-
-```bash
-curl -sSL https://zipkin.io/quickstart.sh | bash -s
-java -jar zipkin.jar
-```
-
-Instance the exporter on your application and pass the options, it must contain a service name and, optionally, an URL. If no URL is passed, `http://localhost:9411/api/v2/spans` is used as default.
-
 ## Installation
 
 ```
@@ -32,8 +21,8 @@ Install the exporter on your application and pass the options, it must contain a
 ```
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
-// Add your zipkin url (default: http://localhost:9411/api/v2/spans)
-// and application name to the Zipkin options
+// Add your zipkin url (`http://localhost:9411/api/v2/spans` is used as
+// default) and application name to the Zipkin options
 const options = {
   url: 'your-zipkin-url',
   serviceName: 'your-application-name'
