@@ -113,7 +113,7 @@ describe('OpenTracing Shim', () => {
 
     it('translates span options correctly', () => {
       const opentracingOptions: opentracing.SpanOptions = {
-        startTime: 123,
+        startTime: [123, 0],
         tags: { key: 'value', count: 1 },
         references: [opentracing.followsFrom(context)],
       };
@@ -141,7 +141,9 @@ describe('OpenTracing Shim', () => {
     let otSpan: Span;
 
     beforeEach(() => {
-      span = shimTracer.startSpan('my-span', { startTime: 100 }) as SpanShim;
+      span = shimTracer.startSpan('my-span', {
+        startTime: [100, 0],
+      }) as SpanShim;
       otSpan = (span as SpanShim).getSpan() as Span;
     });
 
@@ -176,7 +178,7 @@ describe('OpenTracing Shim', () => {
 
     it('sets explicit end timestamp', () => {
       const now = performance.now();
-      span.finish(now);
+      span.finish([now, 0]);
       assert.strictEqual(otSpan.endTime, now);
     });
 
