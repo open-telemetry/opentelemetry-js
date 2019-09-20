@@ -23,7 +23,7 @@ import { ReadableSpan } from './ReadableSpan';
 import { BufferConfig } from '../types';
 
 const DEFAULT_BUFFER_SIZE_MS = 100;
-const DEFAULT_BUFFER_TIMEOUT_MS = 20000;
+const DEFAULT_BUFFER_TIMEOUT_MS = 20_000;
 
 /**
  * Implementation of the {@link SpanProcessor} that batches spans exported by
