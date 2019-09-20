@@ -15,11 +15,40 @@ npm install --save @opentelemetry/exporter-zipkin
 ```
 
 ## Usage
-> TODO
+
+Install the exporter on your application and pass the options, it must contain a service name.
+
+```
+const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+
+// Add your zipkin url (`http://localhost:9411/api/v2/spans` is used as
+// default) and application name to the Zipkin options
+const options = {
+  url: 'your-zipkin-url',
+  serviceName: 'your-application-name'
+}
+const exporter = new ZipkinExporter(options);
+```
+
+Now, register the exporter and start tracing.
+
+```
+tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
+```
+
+You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your own.
+
+- SimpleSpanProcessor: The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
+- BatchSpanProcessor: The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
+
+## Viewing your traces
+
+Please visit the Zipkin UI endpoint http://localhost:9411
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- For Zipkin project at https://zipkin.io/
 - For help or feedback on this project, join us on [gitter][gitter-url]
 
 ## License
