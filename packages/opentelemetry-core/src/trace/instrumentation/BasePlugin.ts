@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-import { Tracer, Plugin, Logger, PluginConfig } from '@opentelemetry/types';
+import {
+  Tracer,
+  Plugin,
+  Logger,
+  PluginConfig,
+  PluginInternalFiles,
+  PluginInternalFilesVersion,
+} from '@opentelemetry/types';
+import * as semver from 'semver';
+import * as path from 'path';
 
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
+  supportedVersions?: string[];
+  readonly moduleName?: string; // required for internalFilesExports
+  readonly version?: string; // required for internalFilesExports
+  protected readonly _basedir?: string; // required for internalFilesExports
+
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
   protected _logger!: Logger;
+  protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
+  protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
-  supportedVersions?: string[];
 
   enable(
     moduleExports: T,
@@ -33,12 +48,93 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
+    this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
     return this.patch();
   }
 
   disable(): void {
     this.unpatch();
+  }
+
+  /**
+   * @TODO: To avoid circular dependencies, internal file loading functionality currently
+   * lives in BasePlugin. It is not meant to work in the browser and so this logic
+   * should eventually be moved somewhere else where it makes more sense.
+   * https://github.com/open-telemetry/opentelemetry-js/issues/285
+   */
+  private _loadInternalFilesExports(): PluginInternalFiles {
+    if (!this._internalFilesList) return {};
+    if (!this.version || !this.moduleName || !this._basedir) {
+      // log here because internalFilesList was provided, so internal file loading
+      // was expected to be working
+      this._logger.debug(
+        'loadInternalFiles failed because one of the required fields was missing: moduleName=%s, version=%s, basedir=%s',
+        this.moduleName,
+        this.version,
+        this._basedir
+      );
+      return {};
+    }
+    let extraModules: PluginInternalFiles = {};
+    this._logger.debug('loadInternalFiles %o', this._internalFilesList);
+    Object.keys(this._internalFilesList).forEach(versionRange => {
+      this._loadInternalModule(versionRange, extraModules);
+    });
+    if (Object.keys(extraModules).length === 0) {
+      this._logger.debug(
+        'No internal files could be loaded for %s@%s',
+        this.moduleName,
+        this.version
+      );
+    }
+    return extraModules;
+  }
+
+  private _loadInternalModule(
+    versionRange: string,
+    outExtraModules: PluginInternalFiles
+  ): void {
+    if (semver.satisfies(this.version!, versionRange)) {
+      if (Object.keys(outExtraModules).length > 0) {
+        this._logger.warn(
+          'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
+          this.moduleName,
+          this.version,
+          versionRange,
+          this._internalFilesList
+        );
+      }
+      this._requireInternalFiles(
+        this._internalFilesList![versionRange],
+        this._basedir!,
+        outExtraModules
+      );
+    }
+  }
+
+  private _requireInternalFiles(
+    extraModulesList: PluginInternalFilesVersion,
+    basedir: string,
+    outExtraModules: PluginInternalFiles
+  ): void {
+    if (!extraModulesList) return;
+    Object.keys(extraModulesList).forEach(moduleName => {
+      try {
+        this._logger.debug('loading File %s', extraModulesList[moduleName]);
+        outExtraModules[moduleName] = require(path.join(
+          basedir,
+          extraModulesList[moduleName]
+        ));
+      } catch (e) {
+        this._logger.error(
+          'Could not load internal file %s of module %s. Error: %s',
+          path.join(basedir, extraModulesList[moduleName]),
+          this.moduleName,
+          e.message
+        );
+      }
+    });
   }
 
   protected abstract patch(): T;
