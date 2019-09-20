@@ -66,17 +66,6 @@ export interface Tracer {
   bind<T>(target: T, span?: Span): T;
 
   /**
-   * Send a pre-populated span object to the exporter.
-   * Sampling and recording decisions as well as other collection optimizations
-   * are the responsibility of a caller.
-   *
-   * @todo: Pending API discussion. Revisit if Span or SpanData should be passed
-   *        in here once this is sorted out.
-   * @param span Span Data to be reported to all exporters.
-   */
-  recordSpanData(span: Span): void;
-
-  /**
    * Returns the {@link BinaryFormat} interface which can serialize/deserialize
    * Spans.
    *

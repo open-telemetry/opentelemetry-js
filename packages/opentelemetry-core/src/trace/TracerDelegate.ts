@@ -82,14 +82,6 @@ export class TracerDelegate implements types.Tracer {
     );
   }
 
-  recordSpanData(span: types.Span): void {
-    return this._currentTracer.recordSpanData.apply(
-      this._currentTracer,
-      // tslint:disable-next-line:no-any
-      arguments as any
-    );
-  }
-
   getBinaryFormat(): types.BinaryFormat {
     return this._currentTracer.getBinaryFormat.apply(
       this._currentTracer,
