@@ -350,11 +350,6 @@ describe('BasicTracer', () => {
     });
   });
 
-  describe('.recordSpanData()', () => {
-    // @todo: implement
-    it('should call exporters with span data');
-  });
-
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
       const tracer = new BasicTracer();

@@ -143,14 +143,6 @@ export class BasicTracer implements types.Tracer {
   }
 
   /**
-   * Records a SpanData.
-   */
-  /* c8 ignore next 3 */
-  recordSpanData(span: types.Span): void {
-    // TODO: notify exporter
-  }
-
-  /**
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
   getBinaryFormat(): BinaryFormat {

@@ -24,6 +24,7 @@ import {
   hrTimeDuration,
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
+  hrTimeToMicroseconds,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -43,7 +44,7 @@ describe('time', () => {
       sandbox.stub(performance, 'now').callsFake(() => 11.3);
 
       const output = hrTime();
-      assert.deepStrictEqual(output, [22, 800000000]);
+      assert.deepStrictEqual(output, [0, 22800000]);
     });
 
     it('should convert performance now', () => {
@@ -51,7 +52,7 @@ describe('time', () => {
       const performanceNow = 11.3;
 
       const output = hrTime(performanceNow);
-      assert.deepStrictEqual(output, [22, 800000000]);
+      assert.deepStrictEqual(output, [0, 22800000]);
     });
 
     it('should handle nanosecond overflow', () => {
@@ -59,7 +60,7 @@ describe('time', () => {
       const performanceNow = 11.6;
 
       const output = hrTime(performanceNow);
-      assert.deepStrictEqual(output, [23, 100000000]);
+      assert.deepStrictEqual(output, [0, 23100000]);
     });
   });
 
@@ -73,7 +74,7 @@ describe('time', () => {
     it('should convert epoch milliseconds hrTime', () => {
       const timeInput = Date.now();
       const output = timeInputToHrTime(timeInput);
-      assert.deepStrictEqual(output, [timeInput, 0]);
+      assert.deepStrictEqual(output[0], Math.trunc(timeInput / 1000));
     });
 
     it('should convert performance.now() hrTime', () => {
@@ -82,7 +83,7 @@ describe('time', () => {
       const timeInput = 11.9;
       const output = timeInputToHrTime(timeInput);
 
-      assert.deepStrictEqual(output, [123, 400000000]);
+      assert.deepStrictEqual(output, [0, 123400000]);
     });
 
     it('should not convert hrtime hrTime', () => {
@@ -124,6 +125,13 @@ describe('time', () => {
     it('should return milliseconds', () => {
       const output = hrTimeToMilliseconds([1, 200000000]);
       assert.deepStrictEqual(output, 1200);
+    });
+  });
+
+  describe('#hrTimeToMicroeconds', () => {
+    it('should return microseconds', () => {
+      const output = hrTimeToMicroseconds([1, 200000000]);
+      assert.deepStrictEqual(output, 1200000);
     });
   });
 });

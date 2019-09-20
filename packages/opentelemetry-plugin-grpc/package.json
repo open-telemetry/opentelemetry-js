@@ -10,6 +10,7 @@
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
     "fix": "gts fix"
   },
@@ -55,7 +56,7 @@
   "dependencies": {
     "@opentelemetry/basic-tracer": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/node-tracer": "^0.0.1",
+    "@opentelemetry/node-sdk": "^0.0.1",
     "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/types": "^0.0.1",
     "shimmer": "^1.2.1",

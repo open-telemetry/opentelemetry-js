@@ -20,7 +20,7 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../../src/http';
-import { NodeTracer } from '@opentelemetry/node-tracer';
+import { NodeTracer } from '@opentelemetry/node-sdk';
 import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
 import { DummyPropagation } from '../utils/DummyPropagation';
@@ -55,7 +55,6 @@ describe('HttpPlugin', () => {
     beforeEach(() => {
       tracer.startSpan = sinon.spy();
       tracer.withSpan = sinon.spy();
-      tracer.recordSpanData = sinon.spy();
     });
 
     afterEach(() => {
@@ -78,10 +77,6 @@ describe('HttpPlugin', () => {
             false
           );
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
-          assert.strictEqual(
-            (tracer.recordSpanData as sinon.SinonSpy).called,
-            false
-          );
         });
       });
     });
