@@ -15,6 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
+import { NoopLogger } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 
 function translateReferences(
@@ -91,9 +92,13 @@ export class SpanContextShim extends opentracing.SpanContext {
  */
 export class TracerShim extends opentracing.Tracer {
   private readonly _tracer: types.Tracer;
-  constructor(tracer: types.Tracer) {
+  private readonly _logger: types.Logger;
+
+  constructor(tracer: types.Tracer, logger?: types.Logger) {
     super();
+
     this._tracer = tracer;
+    this._logger = logger || new NoopLogger();
   }
 
   startSpan(
@@ -131,6 +136,9 @@ export class TracerShim extends opentracing.Tracer {
           .inject(opentelemSpanContext, format, carrier);
         return;
       case opentracing.FORMAT_BINARY:
+        this._logger.warn(
+          'OpentracingShim.inject() does not support FORMAT_BINARY'
+        );
         // @todo: Implement binary format
         return;
       default:
@@ -151,6 +159,9 @@ export class TracerShim extends opentracing.Tracer {
         return new SpanContextShim(context);
       case opentracing.FORMAT_BINARY:
         // @todo: Implement binary format
+        this._logger.warn(
+          'OpentracingShim.extract() does not support FORMAT_BINARY'
+        );
         return null;
       default:
     }
