@@ -30,7 +30,7 @@ import {
 } from '@opentelemetry/basic-tracer';
 
 let server: http.Server;
-const serverPort = 12345;
+const serverPort = 22345;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
@@ -139,70 +139,67 @@ describe('HttpPlugin', () => {
 
         const isReset = memoryExporter.getFinishedSpans().length === 0;
         assert.ok(isReset);
-        await httpRequest
-          .get(`${protocol}://${hostname}${testPath}`)
-          .then(result => {
-            const spans = memoryExporter.getFinishedSpans();
-            const reqSpan = spans[0];
 
-            assert.strictEqual(result.data, httpErrorCodes[i].toString());
-            assert.strictEqual(spans.length, 1);
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}${testPath}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const reqSpan = spans[0];
 
-            const validations = {
-              hostname,
-              httpStatusCode: result.statusCode!,
-              httpMethod: 'GET',
-              pathname: testPath,
-              resHeaders: result.resHeaders,
-              reqHeaders: result.reqHeaders,
-            };
+        assert.strictEqual(result.data, httpErrorCodes[i].toString());
+        assert.strictEqual(spans.length, 1);
 
-            assertSpan(reqSpan, SpanKind.CLIENT, validations);
-          });
+        const validations = {
+          hostname,
+          httpStatusCode: result.statusCode!,
+          httpMethod: 'GET',
+          pathname: testPath,
+          resHeaders: result.resHeaders,
+          reqHeaders: result.reqHeaders,
+        };
+
+        assertSpan(reqSpan, SpanKind.CLIENT, validations);
       });
     }
 
-    it('should create a child span for GET requests', done => {
+    it('should create a child span for GET requests', async () => {
       const testPath = '/outgoing/rootSpan/childs/1';
       doNock(hostname, testPath, 200, 'Ok');
       const name = 'TestRootSpan';
       const span = tracer.startSpan(name);
-      return tracer.withSpan(span, () => {
-        httpRequest
-          .get(`${protocol}://${hostname}${testPath}`)
-          .then(result => {
-            span.end();
-            const spans = memoryExporter.getFinishedSpans();
-            const [reqSpan, localSpan] = spans;
-            const validations = {
-              hostname,
-              httpStatusCode: result.statusCode!,
-              httpMethod: 'GET',
-              pathname: testPath,
-              resHeaders: result.resHeaders,
-              reqHeaders: result.reqHeaders,
-            };
+      return tracer.withSpan(span, async () => {
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}${testPath}`
+        );
+        span.end();
+        const spans = memoryExporter.getFinishedSpans();
+        const [reqSpan, localSpan] = spans;
+        const validations = {
+          hostname,
+          httpStatusCode: result.statusCode!,
+          httpMethod: 'GET',
+          pathname: testPath,
+          resHeaders: result.resHeaders,
+          reqHeaders: result.reqHeaders,
+        };
 
-            assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
-            assert.strictEqual(spans.length, 2);
-            assert.ok(reqSpan.name.indexOf(testPath) >= 0);
-            assert.strictEqual(
-              localSpan.spanContext.traceId,
-              reqSpan.spanContext.traceId
-            );
-            assertSpan(reqSpan, SpanKind.CLIENT, validations);
-            assert.notStrictEqual(
-              localSpan.spanContext.spanId,
-              reqSpan.spanContext.spanId
-            );
-            done();
-          })
-          .catch(done);
+        assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+        assert.strictEqual(spans.length, 2);
+        assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+        assert.strictEqual(
+          localSpan.spanContext.traceId,
+          reqSpan.spanContext.traceId
+        );
+        assertSpan(reqSpan, SpanKind.CLIENT, validations);
+        assert.notStrictEqual(
+          localSpan.spanContext.spanId,
+          reqSpan.spanContext.spanId
+        );
       });
     });
 
     for (let i = 0; i < httpErrorCodes.length; i++) {
-      it(`should test a child spans for GET requests with http error ${httpErrorCodes[i]}`, done => {
+      it(`should test child spans for GET requests with http error ${httpErrorCodes[i]}`, async () => {
         const testPath = '/outgoing/rootSpan/childs/1';
         doNock(
           hostname,
@@ -212,37 +209,34 @@ describe('HttpPlugin', () => {
         );
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        tracer.withSpan(span, () => {
-          httpRequest
-            .get(`${protocol}://${hostname}${testPath}`)
-            .then(result => {
-              span.end();
-              const spans = memoryExporter.getFinishedSpans();
-              const [reqSpan, localSpan] = spans;
-              const validations = {
-                hostname,
-                httpStatusCode: result.statusCode!,
-                httpMethod: 'GET',
-                pathname: testPath,
-                resHeaders: result.resHeaders,
-                reqHeaders: result.reqHeaders,
-              };
+        return tracer.withSpan(span, async () => {
+          const result = await httpRequest.get(
+            `${protocol}://${hostname}${testPath}`
+          );
+          span.end();
+          const spans = memoryExporter.getFinishedSpans();
+          const [reqSpan, localSpan] = spans;
+          const validations = {
+            hostname,
+            httpStatusCode: result.statusCode!,
+            httpMethod: 'GET',
+            pathname: testPath,
+            resHeaders: result.resHeaders,
+            reqHeaders: result.reqHeaders,
+          };
 
-              assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
-              assert.strictEqual(spans.length, 2);
-              assert.ok(reqSpan.name.indexOf(testPath) >= 0);
-              assert.strictEqual(
-                localSpan.spanContext.traceId,
-                reqSpan.spanContext.traceId
-              );
-              assertSpan(reqSpan, SpanKind.CLIENT, validations);
-              assert.notStrictEqual(
-                localSpan.spanContext.spanId,
-                reqSpan.spanContext.spanId
-              );
-              done();
-            })
-            .catch(done);
+          assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
+          assert.strictEqual(spans.length, 2);
+          assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+          assert.strictEqual(
+            localSpan.spanContext.traceId,
+            reqSpan.spanContext.traceId
+          );
+          assertSpan(reqSpan, SpanKind.CLIENT, validations);
+          assert.notStrictEqual(
+            localSpan.spanContext.spanId,
+            reqSpan.spanContext.spanId
+          );
         });
       });
     }
@@ -281,5 +275,79 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
     }
+
+    for (const arg of ['string', '', {}, new Date()]) {
+      it(`should be tracable and not throw exception in http plugin when passing the following argument ${JSON.stringify(
+        arg
+      )}`, async () => {
+        try {
+          await httpRequest.get(arg);
+        } catch (error) {
+          // http request has been made
+          // nock throw
+          assert.ok(error.message.startsWith('Nock: No match for request'));
+        }
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      });
+    }
+
+    for (const arg of [true, 1, false, 0]) {
+      it(`should not throw exception in http plugin when passing the following argument ${JSON.stringify(
+        arg
+      )}`, async () => {
+        try {
+          // @ts-ignore
+          await httpRequest.get(arg);
+        } catch (error) {
+          // http request has been made
+          // nock throw
+          assert.ok(
+            error.stack.indexOf('/node_modules/nock/lib/intercept.js') > 0
+          );
+        }
+        const spans = memoryExporter.getFinishedSpans();
+        // for this arg with don't provide trace. We pass arg to original method (http.get)
+        assert.strictEqual(spans.length, 0);
+      });
+    }
+
+    it('should have 1 ended span when request throw on bad "options" object', () => {
+      try {
+        http.request({ protocol: 'telnet' });
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      }
+    });
+
+    it('should have 1 ended span when response.end throw an exception', async () => {
+      const testPath = '/outgoing/rootSpan/childs/1';
+      doNock(hostname, testPath, 400, 'Not Ok');
+
+      const promiseRequest = new Promise((resolve, reject) => {
+        const req = http.request(
+          `http://${hostname}${testPath}`,
+          (resp: http.IncomingMessage) => {
+            let data = '';
+            resp.on('data', chunk => {
+              data += chunk;
+            });
+            resp.on('end', () => {
+              reject(new Error(data));
+            });
+          }
+        );
+        return req.end();
+      });
+
+      try {
+        await promiseRequest;
+        assert.fail();
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+      }
+    });
   });
 });

@@ -17,10 +17,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, Attributes } from '@opentelemetry/types';
+import { CanonicalCode, Attributes, SpanKind } from '@opentelemetry/types';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import { Utils } from '../../src/utils';
 import * as http from 'http';
+import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
+import { AttributeNames } from '../../src';
 
 describe('Utils', () => {
   describe('parseResponseStatus()', () => {
@@ -198,5 +201,43 @@ describe('Utils', () => {
         done();
       });
     });
+  });
+
+  describe('setSpanWithError()', () => {
+    it('should have error attributes', () => {
+      const span = new Span(
+        new BasicTracer({
+          scopeManager: new NoopScopeManager(),
+        }),
+        'test',
+        { spanId: '', traceId: '' },
+        SpanKind.INTERNAL
+      );
+      const errorMessage = 'test error';
+      Utils.setSpanWithError(span, new Error(errorMessage));
+      const attributes = span.toReadableSpan().attributes;
+      assert.strictEqual(
+        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+        errorMessage
+      );
+      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+    });
+  });
+
+  describe('isValidOptionsType()', () => {
+    ['', false, true, 1, 0, []].forEach(options => {
+      it(`should return false with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), false);
+      });
+    });
+    for (const options of ['url', url.parse('http://url.com'), {}]) {
+      it(`should return true with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), true);
+      });
+    }
   });
 });
