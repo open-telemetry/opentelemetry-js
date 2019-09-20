@@ -42,7 +42,7 @@
     "codecov": "^3.5.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
-    "nock": "^10.0.6",
+    "nock": "^11.0.0",
     "nyc": "^14.1.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-consistent-codestyle":"^1.15.1",
