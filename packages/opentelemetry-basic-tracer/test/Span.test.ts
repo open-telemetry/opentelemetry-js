@@ -296,7 +296,7 @@ describe('Span', () => {
     const endTime = Date.now();
     span.end(endTime);
     span.end(endTime + 10);
-    assert.deepStrictEqual(span.endTime, [endTime, 0]);
+    assert.deepStrictEqual(span.endTime[0], Math.trunc(endTime / 1000));
   });
 
   it('should update name', () => {

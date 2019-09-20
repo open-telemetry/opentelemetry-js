@@ -19,7 +19,7 @@ import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
 import * as types from '@opentelemetry/types';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { hrTimeToMicroseconds } from '@opentelemetry/core';
 
 describe('transform', () => {
   const spanContext = {
@@ -88,7 +88,7 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.deepStrictEqual(
         thriftSpan.startTime,
-        Utils.encodeInt64(hrTimeToMilliseconds(readableSpan.startTime) * 1000)
+        Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
       assert.strictEqual(thriftSpan.tags.length, 5);
       const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;

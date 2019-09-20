@@ -21,12 +21,14 @@ const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
 
 // Converts a number to HrTime
-function numberToHrtime(time: number): types.HrTime {
+function numberToHrtime(epochMillis: number): types.HrTime {
+  const epochSeconds = epochMillis / 1000;
   // Decimals only.
-  const seconds = Math.trunc(time);
+  const seconds = Math.trunc(epochSeconds);
   // Round sub-nanosecond accuracy to nanosecond.
   const nanos =
-    Number((time - seconds).toFixed(NANOSECOND_DIGITS)) * SECOND_TO_NANOSECONDS;
+    Number((epochSeconds - seconds).toFixed(NANOSECOND_DIGITS)) *
+    SECOND_TO_NANOSECONDS;
   return [seconds, nanos];
 }
 
@@ -88,12 +90,15 @@ export function hrTimeDuration(
 
 // Convert hrTime to nanoseconds.
 export function hrTimeToNanoseconds(hrTime: types.HrTime): number {
-  const nanos = hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
-  return nanos;
+  return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
 }
 
 // Convert hrTime to milliseconds.
 export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
-  const nanos = Math.round(hrTime[0] * 1000 + hrTime[1] / 1e6);
-  return nanos;
+  return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
+}
+
+// Convert hrTime to microseconds.
+export function hrTimeToMicroseconds(hrTime: types.HrTime): number {
+  return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
 }
