@@ -1,0 +1,58 @@
+{
+  "name": "@opentelemetry/shim-opentracing",
+  "version": "0.0.1",
+  "description": "OpenTracing to OpenTelemetry shim",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "clean": "rimraf build/*",
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "posttest": "yarn run check"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.6.9",
+    "@opentelemetry/basic-tracer": "^0.0.1",
+    "@opentelemetry/scope-base": "^0.0.1",
+    "codecov": "^3.5.0",
+    "gts": "^1.1.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-consistent-codestyle": "^1.15.1"
+  },
+  "dependencies": {
+    "@opentelemetry/types": "^0.0.1",
+    "@opentelemetry/core": "^0.0.1",
+    "opentracing": "^0.14.4"
+  }
+}
