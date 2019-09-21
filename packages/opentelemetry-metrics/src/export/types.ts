@@ -22,9 +22,7 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import {
-  Resource,
-} from '@opentelemetry/types';
+import { Resource } from '@opentelemetry/types';
 
 export interface ReadableMetric {
   /**
@@ -145,7 +143,6 @@ export interface LabelValue {
 
 /** A timestamped measurement. */
 export interface Point {
-
   /**
    * Must be present for counter/cumulative metrics. The time when the
    * cumulative value was reset to zero. The cumulative value is over the time
@@ -159,7 +156,6 @@ export interface Point {
    * If not specified, the timestamp will be decided by the backend.
    */
   readonly timestamp: Timestamp;
-
 
   /**
    * The actual point value.

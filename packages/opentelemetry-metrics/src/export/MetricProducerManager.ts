@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 import { MetricProducer, MetricProducerManager } from './types';
 
 /**
