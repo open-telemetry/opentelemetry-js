@@ -35,6 +35,15 @@ const simplePlugins: Plugins = {
   },
 };
 
+const httpPlugins: Plugins = {
+  http: {
+    enabled: true,
+    path: '@opentelemetry/plugin-http-module',
+    ignoreMethods: [],
+    ignoreUrls: [],
+  },
+};
+
 const disablePlugins: Plugins = {
   'simple-module': {
     enabled: false,
@@ -137,6 +146,17 @@ describe('PluginLoader', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       assert.strictEqual(simpleModule.value(), 1);
       assert.strictEqual(simpleModule.name(), 'patched-simple-module');
+      pluginLoader.unload();
+    });
+
+    it('should load a plugin and patch the core module', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load(httpPlugins);
+      // The hook is only called the first time the module is loaded.
+      const httpModule = require('http');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();
     });
     // @TODO: simplify this test once we can load module with custom path

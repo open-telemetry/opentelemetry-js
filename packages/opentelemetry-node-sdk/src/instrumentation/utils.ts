@@ -21,14 +21,12 @@ import * as semver from 'semver';
 /**
  * Gets the package version.
  * @param logger The logger to use.
- * @param [basedir] The base directory.
+ * @param basedir The base directory.
  */
 export function getPackageVersion(
   logger: Logger,
-  basedir?: string
+  basedir: string
 ): string | null {
-  if (!basedir) return null;
-
   const pjsonPath = path.join(basedir, 'package.json');
   try {
     const version = require(pjsonPath).version;
