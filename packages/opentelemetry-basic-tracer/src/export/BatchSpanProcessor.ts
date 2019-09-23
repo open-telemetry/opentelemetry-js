@@ -33,7 +33,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   private readonly _bufferSize: number;
   private readonly _bufferTimeout: number;
   private _finishedSpans: ReadableSpan[] = [];
-  private _lastSpanWrite = Date.now();
+  private _lastSpanFlush = Date.now();
   private _timer: NodeJS.Timeout;
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
@@ -45,7 +45,7 @@ export class BatchSpanProcessor implements SpanProcessor {
         : DEFAULT_BUFFER_TIMEOUT_MS;
 
     this._timer = setInterval(() => {
-      if (Date.now() - this._lastSpanWrite >= this._bufferTimeout) {
+      if (Date.now() - this._lastSpanFlush >= this._bufferTimeout) {
         this._flush();
       }
     }, this._bufferTimeout);
@@ -67,7 +67,6 @@ export class BatchSpanProcessor implements SpanProcessor {
 
   /** Add a span in the buffer. */
   private _addToBuffer(span: ReadableSpan) {
-    this._lastSpanWrite = Date.now();
     this._finishedSpans.push(span);
     if (this._finishedSpans.length > this._bufferSize) {
       this._flush();
@@ -78,6 +77,6 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _flush() {
     this._exporter.export(this._finishedSpans, () => {});
     this._finishedSpans = [];
-    this._lastSpanWrite = Date.now();
+    this._lastSpanFlush = Date.now();
   }
 }
