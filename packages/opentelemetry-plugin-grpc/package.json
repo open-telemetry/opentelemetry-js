@@ -57,7 +57,6 @@
     "@opentelemetry/basic-tracer": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/node-sdk": "^0.0.1",
-    "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/types": "^0.0.1",
     "shimmer": "^1.2.1"
   }

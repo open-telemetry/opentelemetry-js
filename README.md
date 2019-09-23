@@ -41,6 +41,12 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 
+### Shims
+
+| Package                 | Description |
+| ----------------------- | -----------------|
+| [@opentelemetry/shim-opentracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing) | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
+
 ## Release Schedule
 
 OpenTelemetry JS is under active development. Our goal is to release an
@@ -58,7 +64,7 @@ release.
 | Jaeger Trace Exporter       | Alpha   | September 30 2019 |
 | Zipkin Trace Exporter       | Alpha   | September 30 2019 |
 | Prometheus Metrics Exporter | Alpha   | Unknown           |
-| OpenTracing Bridge          | Alpha   | Unknown           |
+| OpenTracing Bridge          | Alpha   | September 30 2019 |
 | OpenCensus Bridge           | Alpha   | Unknown           |
 
 ## Useful links
