@@ -26,6 +26,8 @@ export interface ExporterConfig {
   host?: string; // default: 'localhost'
   port?: number; // default: 6832
   maxPacketSize?: number; // default: 65000
+  forceFlush?: boolean; // default: true
+  flushTimeout?: number; // default: 2000
 }
 
 // Below require is needed as jaeger-client types does not expose the thrift,
