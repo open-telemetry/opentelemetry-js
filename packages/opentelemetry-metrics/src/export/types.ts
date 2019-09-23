@@ -182,7 +182,7 @@ export interface HistogramValue {
    * The sum of the values in the population. If count is zero then this field
    * must be zero.
    */
-  readonly sum: number;
+  readonly sum?: number;
 
   /**
    * Don't change bucket boundaries within a TimeSeries if your backend doesn't
