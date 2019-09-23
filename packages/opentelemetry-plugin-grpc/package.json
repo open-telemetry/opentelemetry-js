@@ -40,7 +40,6 @@
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
-    "@types/protobufjs": "^6.0.0",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.5.0",
     "grpc": "^1.23.3",
