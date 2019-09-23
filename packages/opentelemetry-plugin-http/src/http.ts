@@ -177,13 +177,17 @@ export class HttpPlugin extends BasePlugin<Http> {
               response.req && response.req.method
                 ? response.req.method.toUpperCase()
                 : 'GET';
-            const headers = options.headers;
-            const userAgent = headers ? headers['user-agent'] : null;
+            const headers = options.headers || {};
+            const userAgent = headers['user-agent'];
 
             const host = options.hostname || options.host || 'localhost';
 
             const attributes: Attributes = {
-              [AttributeNames.HTTP_URL]: `${options.protocol}//${options.hostname}${options.path}`,
+              [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+                options,
+                headers,
+                `${HttpPlugin.component}:`
+              ),
               [AttributeNames.HTTP_HOSTNAME]: host,
               [AttributeNames.HTTP_METHOD]: method,
               [AttributeNames.HTTP_PATH]: options.path || '/',
@@ -284,9 +288,10 @@ export class HttpPlugin extends BasePlugin<Http> {
           const userAgent = headers['user-agent'];
 
           const attributes: Attributes = {
-            [AttributeNames.HTTP_URL]: Utils.getUrlFromIncomingRequest(
+            [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
               requestUrl,
-              headers
+              headers,
+              `${HttpPlugin.component}:`
             ),
             [AttributeNames.HTTP_HOSTNAME]: hostname,
             [AttributeNames.HTTP_METHOD]: method,
