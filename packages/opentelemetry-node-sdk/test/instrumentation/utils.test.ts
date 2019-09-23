@@ -43,10 +43,6 @@ describe('Instrumentation#utils', () => {
   });
 
   describe('getPackageVersion', () => {
-    it('should handle when undefined basedir', () => {
-      assert.strictEqual(utils.getPackageVersion(logger), null);
-    });
-
     TEST_MODULES.forEach(testCase => {
       it(`should return ${testCase.version} for ${testCase.name}`, () => {
         assert.strictEqual(
