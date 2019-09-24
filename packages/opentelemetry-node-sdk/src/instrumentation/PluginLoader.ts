@@ -81,13 +81,22 @@ export class PluginLoader {
       // Enable the require hook.
       hook(modulesToHook, (exports, name, baseDir) => {
         if (this._hookState !== HookState.ENABLED) return exports;
-
         const config = pluginsToLoad[name];
         const modulePath = config.path!;
-        // Get the module version.
-        const version = utils.getPackageVersion(this.logger, baseDir as string);
+        let version = null;
+
+        if (!baseDir) {
+          // basedir is the directory where the module is located,
+          // or undefined for core modules.
+          // lets plugins restrict what they support for core modules (see plugin.supportedVersions)
+          version = process.versions.node;
+        } else {
+          // Get the module version.
+          version = utils.getPackageVersion(this.logger, baseDir);
+        }
+
         this.logger.info(
-          `PluginLoader#load: trying loading ${name}.${version}`
+          `PluginLoader#load: trying loading ${name}@${version}`
         );
 
         if (!version) return exports;
