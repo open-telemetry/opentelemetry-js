@@ -25,14 +25,15 @@ import { NoopTracer } from './NoopTracer';
 // to the global tracer
 export class TracerDelegate implements types.Tracer {
   private _currentTracer: types.Tracer;
+  private readonly _tracer: types.Tracer | null;
+  private readonly _fallbackTracer: types.Tracer;
 
   // Wrap a tracer with a TracerDelegate. Provided tracer becomes the default
   // fallback tracer for when a global tracer has not been initialized
-  constructor(
-    private readonly _tracer: types.Tracer | null = null,
-    private readonly _fallbackTracer: types.Tracer = new NoopTracer()
-  ) {
-    this._currentTracer = _tracer || _fallbackTracer; // equivalent to this.start()
+  constructor(tracer?: types.Tracer, fallbackTracer?: types.Tracer) {
+    this._tracer = tracer || null;
+    this._fallbackTracer = fallbackTracer || new NoopTracer();
+    this._currentTracer = this._tracer || this._fallbackTracer; // equivalent to this.start()
   }
 
   // Begin using the user provided tracer. Stop always falling back to fallback tracer
