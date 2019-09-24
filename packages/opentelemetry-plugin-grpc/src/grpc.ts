@@ -92,11 +92,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         this._patchClient()
       );
 
-      // shimmer.wrap(
-      //   this._moduleExports,
-      //   'makeGenericClientConstructor' as never,
-      //   this._patchClient()
-      // );
+      shimmer.wrap(
+        this._moduleExports,
+        'makeGenericClientConstructor' as never,
+        this._patchClient()
+      );
     }
 
     return this._moduleExports;
