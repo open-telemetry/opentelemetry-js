@@ -46,6 +46,7 @@
     "gts": "^1.0.0",
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
     "shimmer": "^1.2.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-consistent-codestyle": "^1.15.1",
