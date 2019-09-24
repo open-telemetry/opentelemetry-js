@@ -8,10 +8,10 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 
 function setupTracerAndExporters(service) {
-    let exporter;
     const options = {
         serviceName: service,
     }
+    // TODO: replace to tracer = new NodeTracer once #331 is merged and issue #332
     const tracer = new NodeTracer({
         plugins: {
             http: {
@@ -29,7 +29,8 @@ function setupTracerAndExporters(service) {
       exporter = new ZipkinExporter(options);
     } else {
       // need to shutdown exporter in order to flush spans
-      // TODO: check once PR #301 is merged
+      // TODO: with the current config we don't see spans in Jaeger UI
+      // It should be resolved in a separate PR
       exporter = new JaegerExporter(options);
     }
 
