@@ -16,7 +16,7 @@
 
 import * as types from '@opentelemetry/types';
 import { ReadableSpan } from '@opentelemetry/basic-tracer';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 
 const ZIPKIN_SPAN_KIND_MAPPING = {
@@ -47,8 +47,8 @@ export function toZipkinSpan(
     name: span.name,
     id: span.spanContext.spanId,
     kind: ZIPKIN_SPAN_KIND_MAPPING[span.kind],
-    timestamp: hrTimeToMilliseconds(span.startTime),
-    duration: hrTimeToMilliseconds(span.duration),
+    timestamp: hrTimeToMicroseconds(span.startTime),
+    duration: hrTimeToMicroseconds(span.duration),
     localEndpoint: { serviceName },
     tags: _toZipkinTags(
       span.attributes,
@@ -89,7 +89,7 @@ export function _toZipkinAnnotations(
   events: types.TimedEvent[]
 ): zipkinTypes.Annotation[] {
   return events.map(event => ({
-    timestamp: hrTimeToMilliseconds(event.time),
+    timestamp: hrTimeToMicroseconds(event.time),
     value: event.name,
   }));
 }
