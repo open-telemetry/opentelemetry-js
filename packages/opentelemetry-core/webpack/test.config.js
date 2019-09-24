@@ -17,6 +17,7 @@
 // This is the webpack configuration for browesr Karma tests.
 module.exports = {
   mode: 'development',
+  target: 'web',
   output: {filename: 'bundle.js'},
   resolve: {extensions: ['.ts', '.js']},
   devtool: 'inline-source-map',

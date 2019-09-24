@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,9 +14,18 @@
  * limitations under the License.
  */
 
-// Use the node platform by default. The "browser" field of package.json is used
-// to override this file to use `./browser/index.ts` when packaged with
-// webpack, Rollup, etc.
-export * from './node';
-// temporary - when testing opentelemetry-tracer-web or opentelemetry-basic-tracer force browser
-// export * from './browser';
+const webpackConfig = require('./webpack/test.config.js');
+
+module.exports = (config) => {
+  config.set({
+    listenAddress: 'localhost',
+    hostname: 'localhost',
+    browsers: ['ChromeHeadless'],
+    frameworks: ['mocha'],
+    reporters: ['spec'],
+    files: ['test/index-webpack.ts'],
+    preprocessors: {'test/index-webpack.ts': ['webpack']},
+    webpack: webpackConfig,
+    webpackMiddleware: {noInfo: true},
+  });
+};
