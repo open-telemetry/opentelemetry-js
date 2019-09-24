@@ -15,7 +15,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "example1": "webpack-dev-server -d --progress --colors --port 8090 --config examples/js/webpack.config.js --hot --inline --host 0.0.0.0"
   },
   "keywords": [
     "opentelemetry",
