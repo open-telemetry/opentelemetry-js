@@ -178,11 +178,13 @@ export interface HistogramValue {
    * provided.
    */
   readonly count: number;
+
   /**
-   * The sum of the values in the population. If count is zero then this field
-   * must be zero.
+   * The sum of values in this population. Optional since some systems don't
+   * expose this. If count is zero then this field must be zero or not set
+   * (if not supported).
    */
-  readonly sum: number;
+  readonly sum?: number;
 
   /**
    * Don't change bucket boundaries within a TimeSeries if your backend doesn't
@@ -203,12 +205,14 @@ export interface SummaryValue {
    * some systems don't expose this.
    */
   readonly count: number;
+
   /**
    * The total sum of recorded values since start_time. Optional since some
    * systems don't expose this. If count is zero then this field must be zero.
    * This field must be unset if the sum is not available.
    */
-  readonly sum: number;
+  readonly sum?: number;
+
   /** Values calculated over an arbitrary time window. */
   // TODO: Change it to required when Exemplar functionality will be added.
   readonly snapshot?: Snapshot;
@@ -291,7 +295,7 @@ export interface Snapshot {
    * expose this. If count is zero then this field must be zero or not set
    * (if not supported).
    */
-  readonly sum: number;
+  readonly sum?: number;
   /**
    * A list of values at different percentiles of the distribution calculated
    * from the current snapshot. The percentiles must be strictly increasing.
