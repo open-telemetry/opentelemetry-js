@@ -48,6 +48,7 @@
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
     "node-pre-gyp": "^0.12.0",
+    "rimraf": "^3.0.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "tslint-consistent-codestyle":"^1.15.1",
     "ts-mocha": "^6.0.0",
