@@ -31,10 +31,16 @@ export class JaegerExporter implements SpanExporter {
   private readonly _logger: types.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
+  private readonly _forceFlush: boolean = true;
+  private readonly _flushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = config.tags || [];
+    if (config.forceFlush !== undefined) {
+      this._forceFlush = config.forceFlush;
+    }
+    this._flushTimeout = config.flushTimeout || 2000;
 
     this._sender = new jaegerTypes.UDPSender(config);
     this._process = {
@@ -55,15 +61,18 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): void {
+    if (!this._forceFlush) return;
+    // Make an optimistic flush.
     this._sender.flush((numSpans: number, err?: string) => {
       if (err) {
         this._logger.error(`failed to flush span: ${err}`);
       }
     });
-    // Sleeping 2 seconds before closing the sender's connection to ensure all spans are flushed.
+    // Sleeping x seconds before closing the sender's connection to ensure
+    // all spans are flushed.
     setTimeout(() => {
       this._sender.close();
-    }, 2000);
+    }, this._flushTimeout);
   }
 
   /** Transform spans and sends to Jaeger service. */

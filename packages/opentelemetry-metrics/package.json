@@ -43,6 +43,7 @@
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
     "tslint-consistent-codestyle": "^1.15.1",
