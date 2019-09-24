@@ -35,14 +35,14 @@ export class StackScopeManager implements ScopeManager {
 
   private bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
-    const contextWrapper: any = function (...args: unknown[]) {
+    const contextWrapper: any = function(...args: unknown[]) {
       return manager.with(scope, () => target.apply(scope, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
       enumerable: false,
       configurable: true,
       writable: false,
-      value: target.length
+      value: target.length,
     });
     return contextWrapper as any;
   }

@@ -52,7 +52,10 @@ describe('Span', () => {
 
   it('should have valid startTime', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
-    assert.ok(hrTimeToMilliseconds(span.startTime) > hrTimeToMilliseconds(performanceTimeOrigin));
+    assert.ok(
+      hrTimeToMilliseconds(span.startTime) >
+        hrTimeToMilliseconds(performanceTimeOrigin)
+    );
   });
 
   it('should have valid endTime', () => {
@@ -64,7 +67,8 @@ describe('Span', () => {
     );
 
     assert.ok(
-      hrTimeToMilliseconds(span.endTime) > hrTimeToMilliseconds(performanceTimeOrigin),
+      hrTimeToMilliseconds(span.endTime) >
+        hrTimeToMilliseconds(performanceTimeOrigin),
       'end time must be bigger than time origin'
     );
   });
@@ -79,7 +83,8 @@ describe('Span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.addEvent('my-event');
     assert.ok(
-      hrTimeToMilliseconds(span.events[0].time) > hrTimeToMilliseconds(performanceTimeOrigin)
+      hrTimeToMilliseconds(span.events[0].time) >
+        hrTimeToMilliseconds(performanceTimeOrigin)
     );
   });
 
