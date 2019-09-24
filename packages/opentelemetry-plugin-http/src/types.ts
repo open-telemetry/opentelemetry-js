@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/types';
+import { Span, PluginConfig } from '@opentelemetry/types';
 import * as url from 'url';
 import {
   ClientRequest,
@@ -57,7 +57,7 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
-export interface HttpPluginConfig {
+export interface HttpPluginConfig extends PluginConfig {
   ignoreIncomingPaths?: IgnoreMatcher[];
   ignoreOutgoingUrls?: IgnoreMatcher[];
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;

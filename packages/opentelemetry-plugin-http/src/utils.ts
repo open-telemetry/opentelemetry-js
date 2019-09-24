@@ -20,8 +20,9 @@ import {
   IncomingMessage,
   ClientRequest,
   IncomingHttpHeaders,
+  OutgoingHttpHeaders,
 } from 'http';
-import { IgnoreMatcher, Err } from './types';
+import { IgnoreMatcher, Err, ParsedRequestOptions } from './types';
 import { AttributeNames } from './enums/AttributeNames';
 import * as url from 'url';
 
@@ -30,20 +31,30 @@ import * as url from 'url';
  */
 export class Utils {
   /**
-   * return an absolute url
+   * Get an absolute url
    */
-  static getUrlFromIncomingRequest(
-    requestUrl: url.UrlWithStringQuery | null,
-    headers: IncomingHttpHeaders
+  static getAbsoluteUrl(
+    requestUrl: ParsedRequestOptions | null,
+    headers: IncomingHttpHeaders | OutgoingHttpHeaders,
+    fallbackProtocol = 'http:'
   ): string {
-    if (!requestUrl) {
-      return `http://${headers.host || 'localhost'}/`;
+    const reqUrlObject = requestUrl || {};
+    const protocol = reqUrlObject.protocol || fallbackProtocol;
+    const port = (reqUrlObject.port || '').toString();
+    const path = reqUrlObject.path || '/';
+    let host =
+      headers.host || reqUrlObject.hostname || headers.host || 'localhost';
+
+    // if there is no port in host and there is a port
+    // it should be displayed if it's not 80 and 443 (default ports)
+    if (
+      (host as string).indexOf(':') === -1 &&
+      (port && port !== '80' && port !== '443')
+    ) {
+      host += `:${port}`;
     }
 
-    return requestUrl.href && requestUrl.href.startsWith('http')
-      ? `${requestUrl.protocol}//${requestUrl.hostname}${requestUrl.path}`
-      : `${requestUrl.protocol || 'http:'}//${headers.host ||
-          'localhost'}${requestUrl.path || '/'}`;
+    return `${protocol}//${host}${path}`;
   }
   /**
    * Parse status code from HTTP response.
