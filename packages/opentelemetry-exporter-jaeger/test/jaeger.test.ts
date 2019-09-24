@@ -50,6 +50,41 @@ describe('JaegerExporter', () => {
       assert.strictEqual(process.tags[0].vType, 'STRING');
       assert.strictEqual(process.tags[0].vStr, '0.0.1');
     });
+
+    it('should construct an exporter with forceFlush and flushTimeout', () => {
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+        forceFlush: true,
+        flushTimeout: 5000,
+      });
+      assert.ok(typeof exporter.export === 'function');
+      assert.ok(typeof exporter.shutdown === 'function');
+
+      assert.ok(exporter['_forceFlush']);
+      assert.strictEqual(exporter['_flushTimeout'], 5000);
+    });
+
+    it('should construct an exporter without forceFlush and flushTimeout', () => {
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+      });
+      assert.ok(typeof exporter.export === 'function');
+      assert.ok(typeof exporter.shutdown === 'function');
+
+      assert.ok(exporter['_forceFlush']);
+      assert.strictEqual(exporter['_flushTimeout'], 2000);
+    });
+
+    it('should construct an exporter with forceFlush = false', () => {
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+        forceFlush: false,
+      });
+      assert.ok(typeof exporter.export === 'function');
+      assert.ok(typeof exporter.shutdown === 'function');
+
+      assert.ok(!exporter['_forceFlush']);
+    });
   });
 
   describe('export', () => {
