@@ -165,20 +165,27 @@ describe('Utils', () => {
     });
   });
 
-  describe('getUrlFromIncomingRequest()', () => {
+  describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = Utils.getUrlFromIncomingRequest(url.parse(path), {});
+      const result = Utils.getAbsoluteUrl(url.parse(path), {});
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = Utils.getUrlFromIncomingRequest(url.parse(absUrl), {});
+      const result = Utils.getAbsoluteUrl(url.parse(absUrl), {});
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
-      const result = Utils.getUrlFromIncomingRequest(null, {});
+      const result = Utils.getAbsoluteUrl(null, {});
       assert.strictEqual(result, 'http://localhost/');
+    });
+    it("{ path: '/helloworld', port: 8080 } should return http://localhost:8080/helloworld", () => {
+      const result = Utils.getAbsoluteUrl(
+        { path: '/helloworld', port: 8080 },
+        {}
+      );
+      assert.strictEqual(result, 'http://localhost:8080/helloworld');
     });
   });
   describe('setSpanOnError()', () => {

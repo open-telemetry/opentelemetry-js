@@ -51,13 +51,11 @@ let grpcClientModule: object;
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
 
-  options!: GrpcPluginOptions;
+  protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
-    // TODO: remove this once options will be passed
-    // see https://github.com/open-telemetry/opentelemetry-js/issues/210
-    this.options = {};
+    this._config = {};
   }
 
   protected readonly _internalFilesList: ModuleExportsMapping = {
