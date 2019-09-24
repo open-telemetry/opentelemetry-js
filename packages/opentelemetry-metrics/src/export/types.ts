@@ -22,7 +22,7 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import { Resource } from '@opentelemetry/types';
+import { Resource, HrTime } from '@opentelemetry/types';
 
 export interface ReadableMetric {
   /**
@@ -149,13 +149,13 @@ export interface Point {
    * interval (start_timestamp, timestamp]. If not specified, the backend can
    * use the previous recorded value.
    */
-  readonly startTimestamp?: Timestamp;
+  readonly startTimestamp?: HrTime;
 
   /**
    * The moment when this point was recorded. Inclusive.
    * If not specified, the timestamp will be decided by the backend.
    */
-  readonly timestamp: Timestamp;
+  readonly timestamp: HrTime;
 
   /**
    * The actual point value.
@@ -275,7 +275,7 @@ export interface Exemplar {
    */
   readonly value: number;
   /** The observation (sampling) time of the above value. */
-  readonly timestamp: Timestamp;
+  readonly timestamp: HrTime;
   /** Contextual information about the example value. */
   readonly attachments: { [key: string]: string };
 }
@@ -311,22 +311,6 @@ export interface ValueAtPercentile {
   readonly percentile: number;
   /** The value at the given percentile of a distribution. */
   readonly value: number;
-}
-
-export interface Timestamp {
-  /**
-   * Represents seconds of UTC time since Unix epoch
-   * 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
-   * 9999-12-31T23:59:59Z inclusive.
-   */
-  seconds: number | null;
-  /**
-   * Non-negative fractions of a second at nanosecond resolution. Negative
-   * second values with fractions must still have non-negative nanos values
-   * that count forward in time. Must be from 0 to 999,999,999
-   * inclusive.
-   */
-  nanos: number | null;
 }
 
 /**
