@@ -11,7 +11,7 @@ $ npm install
 
 Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
 or
-Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/1.12/getting-started/#all-in-one)
+Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
 
 ## Run the Application
 
@@ -33,7 +33,7 @@ Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/1.12/getting-started/#a
 
 #### Zipkin UI
 `zipkin:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-id)]() (e.g http://localhost:9411/zipkin/traces/4815c3d576d930189725f1f1d1bdfcc6)
+Go to Zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-id)]() (e.g http://localhost:9411/zipkin/traces/4815c3d576d930189725f1f1d1bdfcc6)
 
 <p align="center"><img src="./images/zipkin-ui.png?raw=true"/></p>
 
@@ -55,7 +55,7 @@ Go to zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-
 #### Jaeger UI
 
 `jaeger:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to zipkin with your browser [http://localhost:16686/trace/(your-trace-id)]() (e.g http://localhost:16686/trace/4815c3d576d930189725f1f1d1bdfcc6)
+Go to Jaeger with your browser [http://localhost:16686/trace/(your-trace-id)]() (e.g http://localhost:16686/trace/4815c3d576d930189725f1f1d1bdfcc6)
 
 TODO: PUT AN IMAGE
 <p align="center"><img src="images/.png?raw=true"/></p>

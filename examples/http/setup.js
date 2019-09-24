@@ -22,22 +22,21 @@ function setupTracerAndExporters(service) {
             }
         }
     });
+    let exporter;
     if (EXPORTER.toLowerCase().startsWith('z')) {
       // need ignoreOutgoingUrls: [/spans/] to avoid infinity loops
       // TODO: manage this situation
-      const zipkinExporter = new ZipkinExporter(options);
-      exporter = new SimpleSpanProcessor(zipkinExporter);
+      exporter = new ZipkinExporter(options);
     } else {
       // need to shutdown exporter in order to flush spans
       // TODO: check once PR #301 is merged
-      const jaegerExporter = new JaegerExporter(options);
-      exporter = new SimpleSpanProcessor(jaegerExporter)
+      exporter = new JaegerExporter(options);
     }
-    
-    tracer.addSpanProcessor(exporter);
+
+    tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
     
     // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
     opentelemetry.initGlobalTracer(tracer);
 }
 
-exports.setupTracerAndExporters = setupTracerAndExporters; 
+exports.setupTracerAndExporters = setupTracerAndExporters;
