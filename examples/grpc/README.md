@@ -35,7 +35,7 @@ Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/1.12/getting-started/#a
 `zipkin:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
 Go to zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-id)]() (e.g http://localhost:9411/zipkin/traces/4815c3d576d930189725f1f1d1bdfcc6)
 
-<!-- <p align="center"><img src="./images/zipkin-ui.png?raw=true"/></p> -->
+<p align="center"><img src="https://user-images.githubusercontent.com/5515583/65533964-7a11a600-deb3-11e9-8af0-a91243db6fdc.png"/></p>
 
 ### Jaeger
 
