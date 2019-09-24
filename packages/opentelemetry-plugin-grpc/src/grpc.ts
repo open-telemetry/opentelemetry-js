@@ -27,7 +27,6 @@ import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
   ModuleExportsMapping,
-  ModuleNameToFilePath,
   GrpcPluginOptions,
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -42,7 +41,6 @@ import {
 import * as events from 'events';
 import * as grpcModule from 'grpc';
 import * as shimmer from 'shimmer';
-import * as semver from 'semver';
 import * as path from 'path';
 
 /** The metadata key under which span context is stored as a binary value. */
@@ -55,91 +53,20 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   options!: GrpcPluginOptions;
 
-  constructor(public moduleName: string, public version: string) {
+  constructor(readonly moduleName: string, readonly version: string) {
     super();
     // TODO: remove this once options will be passed
     // see https://github.com/open-telemetry/opentelemetry-js/issues/210
     this.options = {};
   }
 
-  // TODO: Delete if moving internal file loaders to BasePlugin
-  // --- Note: Incorrectly ordered: Begin internal file loader --- //
-  // tslint:disable-next-line:no-any
-  protected _internalFilesExports: { [key: string]: any } | undefined;
-  protected readonly _internalFileList: ModuleExportsMapping = {
+  protected readonly _internalFilesList: ModuleExportsMapping = {
     '0.13 - 1.6': { client: 'src/node/src/client.js' },
     '^1.7': { client: 'src/client.js' },
   };
-
-  /**
-   * Load internal files according to version range
-   */
-  private _loadInternalFiles(): ModuleExportsMapping {
-    let result: ModuleExportsMapping = {};
-    if (this._internalFileList) {
-      this._logger.debug('loadInternalFiles %o', this._internalFileList);
-      Object.keys(this._internalFileList).forEach(versionRange => {
-        if (semver.satisfies(this.version, versionRange)) {
-          if (result) {
-            this._logger.warn(
-              'Plugin for %s@%s, has overlap version range (%s) for internal files: %o',
-              this.moduleName,
-              this.version,
-              versionRange,
-              this._internalFileList
-            );
-          }
-          result = this._loadInternalModuleFiles(
-            this._internalFileList[versionRange],
-            basedir
-          );
-        }
-      });
-      if (Object.keys(result).length === 0) {
-        this._logger.debug(
-          'No internal file could be loaded for %s@%s',
-          this.moduleName,
-          this.version
-        );
-      }
-    }
-    return result;
-  }
-
-  /**
-   * Load internal files from a module and set internalFilesExports
-   */
-  private _loadInternalModuleFiles(
-    extraModulesList: ModuleNameToFilePath,
-    basedir: string
-  ): ModuleExportsMapping {
-    const extraModules: ModuleExportsMapping = {};
-    if (extraModulesList) {
-      Object.keys(extraModulesList).forEach(moduleName => {
-        try {
-          this._logger.debug('loading File %s', extraModulesList[moduleName]);
-          extraModules[moduleName] = require(path.join(
-            basedir,
-            extraModulesList[moduleName]
-          ));
-        } catch (e) {
-          this._logger.error(
-            'Could not load internal file %s of module %s. Error: %s',
-            path.join(basedir, extraModulesList[moduleName]),
-            this.moduleName,
-            e.message
-          );
-        }
-      });
-    }
-    return extraModules;
-  }
-  // --- End of internal file loader stuff --- //
+  protected readonly _basedir = basedir;
 
   protected patch(): typeof grpcModule {
-    if (!this._internalFilesExports) {
-      this._internalFilesExports = this._loadInternalFiles();
-    }
     this._logger.debug(
       'applying patch to %s@%s',
       this.moduleName,
@@ -155,8 +82,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       );
     }
 
-    if (this._internalFilesExports && this._internalFilesExports['client']) {
-      grpcClientModule = this._internalFilesExports['client'];
+    if (this._internalFilesExports['client']) {
+      grpcClientModule = this._internalFilesExports['client'] as object;
 
       shimmer.wrap(
         grpcClientModule,

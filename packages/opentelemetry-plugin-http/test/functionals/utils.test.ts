@@ -17,10 +17,13 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, Attributes } from '@opentelemetry/types';
+import { CanonicalCode, Attributes, SpanKind } from '@opentelemetry/types';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import { Utils } from '../../src/utils';
 import * as http from 'http';
+import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
+import { AttributeNames } from '../../src';
 
 describe('Utils', () => {
   describe('parseResponseStatus()', () => {
@@ -162,20 +165,27 @@ describe('Utils', () => {
     });
   });
 
-  describe('getUrlFromIncomingRequest()', () => {
+  describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = Utils.getUrlFromIncomingRequest(url.parse(path), {});
+      const result = Utils.getAbsoluteUrl(url.parse(path), {});
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = Utils.getUrlFromIncomingRequest(url.parse(absUrl), {});
+      const result = Utils.getAbsoluteUrl(url.parse(absUrl), {});
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
-      const result = Utils.getUrlFromIncomingRequest(null, {});
+      const result = Utils.getAbsoluteUrl(null, {});
       assert.strictEqual(result, 'http://localhost/');
+    });
+    it("{ path: '/helloworld', port: 8080 } should return http://localhost:8080/helloworld", () => {
+      const result = Utils.getAbsoluteUrl(
+        { path: '/helloworld', port: 8080 },
+        {}
+      );
+      assert.strictEqual(result, 'http://localhost:8080/helloworld');
     });
   });
   describe('setSpanOnError()', () => {
@@ -198,5 +208,43 @@ describe('Utils', () => {
         done();
       });
     });
+  });
+
+  describe('setSpanWithError()', () => {
+    it('should have error attributes', () => {
+      const span = new Span(
+        new BasicTracer({
+          scopeManager: new NoopScopeManager(),
+        }),
+        'test',
+        { spanId: '', traceId: '' },
+        SpanKind.INTERNAL
+      );
+      const errorMessage = 'test error';
+      Utils.setSpanWithError(span, new Error(errorMessage));
+      const attributes = span.toReadableSpan().attributes;
+      assert.strictEqual(
+        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+        errorMessage
+      );
+      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+    });
+  });
+
+  describe('isValidOptionsType()', () => {
+    ['', false, true, 1, 0, []].forEach(options => {
+      it(`should return false with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), false);
+      });
+    });
+    for (const options of ['url', url.parse('http://url.com'), {}]) {
+      it(`should return true with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        assert.strictEqual(Utils.isValidOptionsType(options), true);
+      });
+    }
   });
 });
