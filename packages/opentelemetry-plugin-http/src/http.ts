@@ -43,13 +43,11 @@ import { Utils } from './utils';
  */
 export class HttpPlugin extends BasePlugin<Http> {
   static readonly component = 'http';
-  options!: HttpPluginConfig;
+  protected _config!: HttpPluginConfig;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
-    // TODO: remove this once options will be passed
-    // see https://github.com/open-telemetry/opentelemetry-js/issues/210
-    this.options = {};
+    this._config = {};
   }
 
   /** Patches HTTP incoming and outcoming request functions. */
@@ -208,8 +206,8 @@ export class HttpPlugin extends BasePlugin<Http> {
 
             span.setAttributes(attributes);
 
-            if (this.options.applyCustomAttributesOnSpan) {
-              this.options.applyCustomAttributesOnSpan(span, request, response);
+            if (this._config.applyCustomAttributesOnSpan) {
+              this._config.applyCustomAttributesOnSpan(span, request, response);
             }
 
             span.end();
@@ -248,7 +246,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
-      if (Utils.isIgnored(pathname, plugin.options.ignoreIncomingPaths)) {
+      if (Utils.isIgnored(pathname, plugin._config.ignoreIncomingPaths)) {
         return original.apply(this, [event, ...args]);
       }
 
@@ -314,8 +312,8 @@ export class HttpPlugin extends BasePlugin<Http> {
             .setAttributes(attributes)
             .setStatus(Utils.parseResponseStatus(response.statusCode));
 
-          if (plugin.options.applyCustomAttributesOnSpan) {
-            plugin.options.applyCustomAttributesOnSpan(span, request, response);
+          if (plugin._config.applyCustomAttributesOnSpan) {
+            plugin._config.applyCustomAttributesOnSpan(span, request, response);
           }
 
           span.end();
@@ -351,7 +349,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       options = optionsParsed;
 
       if (
-        Utils.isIgnored(origin + pathname, plugin.options.ignoreOutgoingUrls)
+        Utils.isIgnored(origin + pathname, plugin._config.ignoreOutgoingUrls)
       ) {
         return original.apply(this, [options, ...args]);
       }

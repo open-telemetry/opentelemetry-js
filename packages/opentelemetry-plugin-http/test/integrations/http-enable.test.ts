@@ -29,6 +29,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
+import { HttpPluginConfig } from '../../src/types';
 
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -68,20 +69,20 @@ describe('HttpPlugin Integration tests', () => {
     });
 
     before(() => {
-      try {
-        plugin.disable();
-      } catch (e) {}
-      plugin.enable(http, tracer, tracer.logger);
       const ignoreConfig = [
         `http://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
-      plugin.options = {
+      const config: HttpPluginConfig = {
         ignoreIncomingPaths: ignoreConfig,
         ignoreOutgoingUrls: ignoreConfig,
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
+      try {
+        plugin.disable();
+      } catch (e) {}
+      plugin.enable(http, tracer, tracer.logger, config);
     });
 
     after(() => {

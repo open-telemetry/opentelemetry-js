@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, NoopTracer } from '@opentelemetry/core';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -29,6 +29,7 @@ import { SendUnaryDataCallback } from '../src/types';
 import * as assert from 'assert';
 import * as semver from 'semver';
 import * as grpc from 'grpc';
+import * as sinon from 'sinon';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
 const memoryExporter = new InMemorySpanExporter();
@@ -286,6 +287,23 @@ describe('GrpcPlugin', () => {
     assert.deepStrictEqual('grpc', plugin.moduleName);
   });
 
+  describe('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
+    const clientPatchStub = sinon.stub(
+      plugin,
+      '_getPatchedClientMethods' as never
+    );
+    after(() => {
+      clientPatchStub.restore();
+      plugin.disable();
+    });
+
+    it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
+      plugin.enable(grpc, new NoopTracer(), new NoopLogger());
+      (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
+      assert.strictEqual(clientPatchStub.callCount, 1);
+    });
+  });
+
   const requestList: TestRequestResponse[] = [{ num: 100 }, { num: 50 }];
   const resultSum = {
     num: requestList.reduce((sum, x) => {
@@ -514,10 +532,10 @@ describe('GrpcPlugin', () => {
     });
 
     before(() => {
-      plugin.enable(grpc, tracer, logger);
-      plugin.options = {
+      const config = {
         // TODO: add plugin options here once supported
       };
+      plugin.enable(grpc, tracer, logger, config);
 
       const proto = grpc.load(PROTO_PATH).pkg_test;
       server = startServer(grpc, proto);
