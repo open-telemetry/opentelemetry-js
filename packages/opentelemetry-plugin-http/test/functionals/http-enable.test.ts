@@ -125,6 +125,22 @@ describe('HttpPlugin', () => {
       assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
+    it("should not trace requests with 'x-ot-request' header", async () => {
+      const testPath = '/outgoing/do-not-trace';
+      doNock(hostname, testPath, 200, 'Ok');
+
+      const options = {
+        host: hostname,
+        path: testPath,
+        headers: { 'x-ot-request': 1 },
+      };
+
+      const result = await httpRequest.get(options);
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(result.data, 'Ok');
+      assert.strictEqual(spans.length, 0);
+    });
+
     const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
 
     for (let i = 0; i < httpErrorCodes.length; i++) {

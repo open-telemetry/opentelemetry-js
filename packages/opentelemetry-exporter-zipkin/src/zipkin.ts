@@ -56,6 +56,7 @@ export class ZipkinExporter implements SpanExporter {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-ot-request': 1,
         },
       },
       urlOpts

@@ -242,4 +242,15 @@ export class Utils {
     const type = typeof options;
     return type === 'string' || (type === 'object' && !Array.isArray(options));
   }
+
+  /**
+   * Check whether the given request should be ignored
+   * Use case: Typically, exporter `SpanExporter` can use http module to send spans.
+   * This will also generate spans (from the http-plugin) that will be sended through the exporter
+   * and here we have loop.
+   * @param {RequestOptions} options
+   */
+  static isOpenTelemetryRequest(options: RequestOptions) {
+    return options && options.headers && !!options.headers['x-ot-request'];
+  }
 }
