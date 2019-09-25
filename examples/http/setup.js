@@ -8,29 +8,15 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 
 function setupTracerAndExporters(service) {
+    let exporter;
     const options = {
         serviceName: service,
     }
-    // TODO: replace to tracer = new NodeTracer once #331 is merged and issue #332
-    const tracer = new NodeTracer({
-        plugins: {
-            http: {
-                enabled: true,
-                // if it can't find the module, put the absolute path (depending your config, since packages are not published yet)
-                path: '@opentelemetry/plugin-http',
-                ignoreOutgoingUrls: [/spans/]
-            }
-        }
-    });
-    let exporter;
+    const tracer = new NodeTracer();
+    
     if (EXPORTER.toLowerCase().startsWith('z')) {
-      // need ignoreOutgoingUrls: [/spans/] to avoid infinity loops
-      // TODO: manage this situation
       exporter = new ZipkinExporter(options);
     } else {
-      // need to shutdown exporter in order to flush spans
-      // TODO: with the current config we don't see spans in Jaeger UI
-      // It should be resolved in a separate PR
       exporter = new JaegerExporter(options);
     }
 
