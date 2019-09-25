@@ -15,6 +15,7 @@
  */
 
 export * from './BasicTracer';
+export * from './export/ConsoleSpanExporter';
 export * from './export/ExportResult';
 export * from './export/InMemorySpanExporter';
 export * from './export/ReadableSpan';
