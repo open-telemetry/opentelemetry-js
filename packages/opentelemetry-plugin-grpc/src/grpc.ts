@@ -31,6 +31,7 @@ import {
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcClientFunc,
+  GrpcInternalClientTypes,
 } from './types';
 import {
   findIndex,
@@ -46,11 +47,11 @@ import * as path from 'path';
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
 
-let grpcClientModule: object;
+let grpcClientModule: GrpcInternalClientTypes;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
-  readonly supportedVersions = ['1.23.3'];
+  readonly supportedVersions = ['^1.23.3'];
 
   options!: GrpcPluginOptions;
 
@@ -83,18 +84,24 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       );
     }
 
-    if (this._internalFilesExports['client']) {
-      grpcClientModule = this._internalFilesExports['client'] as object;
-
-      shimmer.wrap(
-        grpcClientModule,
-        'makeClientConstructor' as never,
-        this._patchClient()
-      );
-
+    // Wrap the externally exported client constructor
+    if (this._moduleExports.makeGenericClientConstructor) {
       shimmer.wrap(
         this._moduleExports,
-        'makeGenericClientConstructor' as never,
+        'makeGenericClientConstructor',
+        this._patchClient()
+      );
+    }
+
+    if (this._internalFilesExports['client']) {
+      grpcClientModule = this._internalFilesExports[
+        'client'
+      ] as GrpcInternalClientTypes;
+
+      // Wrap the internally used client constructor
+      shimmer.wrap(
+        grpcClientModule,
+        'makeClientConstructor',
         this._patchClient()
       );
     }
@@ -112,8 +119,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
     }
 
+    if (this._moduleExports.makeGenericClientConstructor) {
+      shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
+    }
+
     if (grpcClientModule) {
-      shimmer.unwrap(grpcClientModule, 'makeClientConstructor' as never);
+      shimmer.unwrap(grpcClientModule, 'makeClientConstructor');
     }
   }
 
@@ -314,9 +325,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _patchClient() {
     const plugin = this;
-    return (
-      original: typeof grpcTypes.makeGenericClientConstructor
-    ): never => {
+    return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
       plugin._logger.debug('patching client');
       return function makeClientConstructor<ImplementationType>(
         this: typeof grpcTypes.Client,

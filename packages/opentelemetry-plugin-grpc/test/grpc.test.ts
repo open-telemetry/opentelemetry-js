@@ -288,11 +288,14 @@ describe('GrpcPlugin', () => {
   });
 
   describe('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-    const clientPatchStub = sinon.stub(plugin, '_getPatchedClientMethods' as never);
+    const clientPatchStub = sinon.stub(
+      plugin,
+      '_getPatchedClientMethods' as never
+    );
     after(() => {
       clientPatchStub.restore();
       plugin.disable();
-    })
+    });
 
     it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
       plugin.enable(grpc, new NoopTracer(), new NoopLogger());
