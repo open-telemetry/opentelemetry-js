@@ -1,4 +1,4 @@
-/*!
+/**
  * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +14,5 @@
  * limitations under the License.
  */
 
-export * from './BasicTracer';
-export * from './export/ConsoleSpanExporter';
-export * from './export/BatchSpanProcessor';
-export * from './export/ExportResult';
-export * from './export/InMemorySpanExporter';
-export * from './export/ReadableSpan';
-export * from './export/SimpleSpanProcessor';
-export * from './export/SpanExporter';
-export * from './Span';
-export * from './SpanProcessor';
-export * from './types';
+/** This is Node specific, does nothing in case of browser */
+export function unrefTimer(timer: number): void {}

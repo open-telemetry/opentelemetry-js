@@ -53,7 +53,7 @@ describe('NodeTracer', () => {
 
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
-      tracer = new NodeTracer({});
+      tracer = new NodeTracer();
       assert.ok(tracer instanceof NodeTracer);
     });
 

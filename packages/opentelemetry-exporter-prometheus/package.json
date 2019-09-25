@@ -1,6 +1,7 @@
 {
   "name": "@opentelemetry/exporter-prometheus",
   "version": "0.0.1",
+  "private": true,
   "description": "OpenTelemetry Exporter Prometheus provides a metrics endpoint for Prometheus",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
