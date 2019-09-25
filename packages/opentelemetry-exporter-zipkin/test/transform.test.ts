@@ -19,7 +19,7 @@ import * as types from '@opentelemetry/types';
 import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
 import {
   NoopLogger,
-  hrTimeToMilliseconds,
+  hrTimeToMicroseconds,
   hrTimeDuration,
 } from '@opentelemetry/core';
 import {
@@ -70,10 +70,10 @@ describe('transform', () => {
         annotations: [
           {
             value: 'my-event',
-            timestamp: hrTimeToMilliseconds(span.events[0].time),
+            timestamp: hrTimeToMicroseconds(span.events[0].time),
           },
         ],
-        duration: hrTimeToMilliseconds(
+        duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
         id: span.spanContext.spanId,
@@ -87,7 +87,7 @@ describe('transform', () => {
           key2: 'value2',
           [statusCodeTagName]: 'OK',
         },
-        timestamp: hrTimeToMilliseconds(span.startTime),
+        timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
       });
     });
@@ -109,7 +109,7 @@ describe('transform', () => {
       assert.deepStrictEqual(zipkinSpan, {
         kind: 'SERVER',
         annotations: undefined,
-        duration: hrTimeToMilliseconds(
+        duration: hrTimeToMicroseconds(
           hrTimeDuration(span.startTime, span.endTime)
         ),
         id: span.spanContext.spanId,
@@ -121,7 +121,7 @@ describe('transform', () => {
         tags: {
           [statusCodeTagName]: 'OK',
         },
-        timestamp: hrTimeToMilliseconds(span.startTime),
+        timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
       });
     });
@@ -148,7 +148,7 @@ describe('transform', () => {
         assert.deepStrictEqual(zipkinSpan, {
           kind: item.zipkin,
           annotations: undefined,
-          duration: hrTimeToMilliseconds(
+          duration: hrTimeToMicroseconds(
             hrTimeDuration(span.startTime, span.endTime)
           ),
           id: span.spanContext.spanId,
@@ -160,7 +160,7 @@ describe('transform', () => {
           tags: {
             [statusCodeTagName]: 'OK',
           },
-          timestamp: hrTimeToMilliseconds(span.startTime),
+          timestamp: hrTimeToMicroseconds(span.startTime),
           traceId: span.spanContext.traceId,
         });
       })
@@ -271,11 +271,11 @@ describe('transform', () => {
       assert.deepStrictEqual(annotations, [
         {
           value: 'my-event1',
-          timestamp: hrTimeToMilliseconds(span.events[0].time),
+          timestamp: hrTimeToMicroseconds(span.events[0].time),
         },
         {
           value: 'my-event2',
-          timestamp: hrTimeToMilliseconds(span.events[1].time),
+          timestamp: hrTimeToMicroseconds(span.events[1].time),
         },
       ]);
     });

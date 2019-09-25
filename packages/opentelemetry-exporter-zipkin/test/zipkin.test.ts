@@ -17,12 +17,12 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import { ExportResult, ReadableSpan } from '@opentelemetry/basic-tracer';
-import { NoopLogger, hrTimeToMilliseconds } from '@opentelemetry/core';
+import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 
-const MICROS_PER_MILLI = 1000;
+const MICROS_PER_SECS = 1e6;
 
 function getReadableSpan() {
   const startTime = 1566156729709;
@@ -188,10 +188,10 @@ describe('ZipkinExporter', () => {
             annotations: [
               {
                 value: 'my-event',
-                timestamp: (startTime + 10) * MICROS_PER_MILLI,
+                timestamp: (startTime + 10) * MICROS_PER_SECS,
               },
             ],
-            duration: duration * MICROS_PER_MILLI,
+            duration: duration * MICROS_PER_SECS,
             id: span1.spanContext.spanId,
             localEndpoint: {
               serviceName: 'my-service',
@@ -203,12 +203,12 @@ describe('ZipkinExporter', () => {
               key2: 'value2',
               'ot.status_code': 'OK',
             },
-            timestamp: startTime * MICROS_PER_MILLI,
+            timestamp: startTime * MICROS_PER_SECS,
             traceId: span1.spanContext.traceId,
           },
           // Span 2
           {
-            duration: duration * MICROS_PER_MILLI,
+            duration: duration * MICROS_PER_SECS,
             id: span2.spanContext.spanId,
             kind: 'SERVER',
             localEndpoint: {
@@ -218,7 +218,7 @@ describe('ZipkinExporter', () => {
             tags: {
               'ot.status_code': 'OK',
             },
-            timestamp: hrTimeToMilliseconds([startTime, 0]),
+            timestamp: hrTimeToMicroseconds([startTime, 0]),
             traceId: span2.spanContext.traceId,
           },
         ]);
