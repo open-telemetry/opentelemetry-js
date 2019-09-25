@@ -22,6 +22,8 @@ import * as types from '@opentelemetry/types';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 
+const MICROS_PER_SECS = 1e6;
+
 function getReadableSpan() {
   const startTime = 1566156729709;
   const duration = 2000;
@@ -186,10 +188,10 @@ describe('ZipkinExporter', () => {
             annotations: [
               {
                 value: 'my-event',
-                timestamp: (startTime + 10) * 1e6,
+                timestamp: (startTime + 10) * MICROS_PER_SECS,
               },
             ],
-            duration: duration * 1e6,
+            duration: duration * MICROS_PER_SECS,
             id: span1.spanContext.spanId,
             localEndpoint: {
               serviceName: 'my-service',
@@ -201,12 +203,12 @@ describe('ZipkinExporter', () => {
               key2: 'value2',
               'ot.status_code': 'OK',
             },
-            timestamp: startTime * 1e6,
+            timestamp: startTime * MICROS_PER_SECS,
             traceId: span1.spanContext.traceId,
           },
           // Span 2
           {
-            duration: duration * 1e6,
+            duration: duration * MICROS_PER_SECS,
             id: span2.spanContext.spanId,
             kind: 'SERVER',
             localEndpoint: {
