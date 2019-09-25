@@ -75,3 +75,11 @@ export interface TraceParams {
   /** numberOfEventsPerSpan is number of message events per span */
   numberOfEventsPerSpan?: number;
 }
+
+/** Interface configuration for a buffer. */
+export interface BufferConfig {
+  /** Maximum size of a buffer. */
+  bufferSize?: number;
+  /** Max time for a buffer can wait before being sent */
+  bufferTimeout?: number;
+}

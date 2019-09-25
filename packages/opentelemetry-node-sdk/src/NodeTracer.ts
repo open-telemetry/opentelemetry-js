@@ -28,12 +28,12 @@ export class NodeTracer extends BasicTracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: NodeTracerConfig) {
+  constructor(config: NodeTracerConfig = {}) {
     if (config.scopeManager === undefined) {
       config.scopeManager = new AsyncHooksScopeManager();
       config.scopeManager.enable();
     }
-    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
+    super(Object.assign({ scopeManager: config.scopeManager }, config));
 
     this._pluginLoader = new PluginLoader(this, this.logger);
     this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);
