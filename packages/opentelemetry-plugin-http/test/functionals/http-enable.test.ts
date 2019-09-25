@@ -29,6 +29,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
 import { HttpPluginConfig } from '../../src';
+import { Utils } from '../../src/utils';
 
 let server: http.Server;
 const serverPort = 22345;
@@ -125,14 +126,14 @@ describe('HttpPlugin', () => {
       assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
-    it("should not trace requests with 'x-ot-request' header", async () => {
+    it(`should not trace requests with '${Utils.OT_REQUEST_HEADER}' header`, async () => {
       const testPath = '/outgoing/do-not-trace';
       doNock(hostname, testPath, 200, 'Ok');
 
       const options = {
         host: hostname,
         path: testPath,
-        headers: { 'x-ot-request': 1 },
+        headers: { [Utils.OT_REQUEST_HEADER]: 1 },
       };
 
       const result = await httpRequest.get(options);

@@ -230,6 +230,33 @@ describe('Utils', () => {
       assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
     });
   });
+  describe('isOpenTelemetryRequest()', () => {
+    [
+      {},
+      { headers: {} },
+      url.parse('http://url.com'),
+      { headers: { [Utils.OT_REQUEST_HEADER]: 0 } },
+      { headers: { [Utils.OT_REQUEST_HEADER]: false } },
+    ].forEach(options => {
+      it(`should return false with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        /* tslint:disable-next-line:no-any */
+        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), false);
+      });
+    });
+    for (const options of [
+      { headers: { [Utils.OT_REQUEST_HEADER]: 1 } },
+      { headers: { [Utils.OT_REQUEST_HEADER]: true } },
+    ]) {
+      it(`should return true with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        /* tslint:disable-next-line:no-any */
+        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), true);
+      });
+    }
+  });
 
   describe('isValidOptionsType()', () => {
     ['', false, true, 1, 0, []].forEach(options => {

@@ -30,6 +30,7 @@ import * as url from 'url';
  * Utility class
  */
 export class Utils {
+  static readonly OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
   /**
    * Get an absolute url
    */
@@ -251,6 +252,10 @@ export class Utils {
    * @param {RequestOptions} options
    */
   static isOpenTelemetryRequest(options: RequestOptions) {
-    return options && options.headers && !!options.headers['x-ot-request'];
+    return !!(
+      options &&
+      options.headers &&
+      options.headers[Utils.OT_REQUEST_HEADER]
+    );
   }
 }
