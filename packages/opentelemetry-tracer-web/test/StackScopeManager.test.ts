@@ -17,7 +17,13 @@
 import * as assert from 'assert';
 import { StackScopeManager } from '../src';
 
-describe('scopeManager', () => {
+// @ts-ignore
+if (typeof global.window === 'undefined') {
+  // @ts-ignore
+  global.window = {} as any;
+}
+
+describe('StackScopeManager', () => {
   let scopeManager: StackScopeManager;
   beforeEach(() => {
     scopeManager = new StackScopeManager();

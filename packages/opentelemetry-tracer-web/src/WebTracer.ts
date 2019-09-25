@@ -35,8 +35,8 @@ export class WebTracer extends BasicTracer {
   constructor(config: WebTracerConfig = {}) {
     if (typeof config.scopeManager === 'undefined') {
       config.scopeManager = new StackScopeManager();
-      config.scopeManager.enable();
     }
+    config.scopeManager.enable();
     super(Object.assign({}, { scopeManager: config.scopeManager }, config));
   }
 }

@@ -18,12 +18,12 @@
 module.exports = {
   mode: 'development',
   target: 'web',
-  output: {filename: 'bundle.js'},
-  resolve: {extensions: ['.ts', '.js']},
+  output: { filename: 'bundle.js' },
+  resolve: { extensions: ['.ts', '.js'] },
   devtool: 'inline-source-map',
   module: {
     rules: [
-      {test: /\.ts$/, use: 'ts-loader'},
-    ],
-  },
+      { test: /\.ts$/, use: 'ts-loader' }
+    ]
+  }
 };

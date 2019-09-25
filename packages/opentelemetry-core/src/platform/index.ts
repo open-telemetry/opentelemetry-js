@@ -18,5 +18,3 @@
 // to override this file to use `./browser/index.ts` when packaged with
 // webpack, Rollup, etc.
 export * from './node';
-// temporary - when testing opentelemetry-tracer-web or opentelemetry-basic-tracer force browser
-// export * from './browser';

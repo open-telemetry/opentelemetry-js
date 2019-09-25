@@ -4,7 +4,8 @@
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts"
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",

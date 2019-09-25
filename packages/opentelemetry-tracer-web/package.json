@@ -9,6 +9,7 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
     "test:browser": "karma start --single-run",
     "tdd": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
@@ -46,6 +47,7 @@
     "@types/node": "^12.6.8",
     "@types/webpack-env": "1.13.9",
     "@types/shimmer": "^1.0.1",
+    "@types/sinon": "^7.0.13",
     "@babel/core": "^7.6.0",
     "babel-loader": "^8.0.6",
     "codecov": "^3.1.0",
@@ -58,6 +60,7 @@
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
     "shimmer": "^1.2.0",
+    "sinon": "^7.5.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
