@@ -15,17 +15,10 @@
  */
 
 const webpackConfig = require('./webpack/test.config.js');
+const karmaBaseConfig = require('../../karma.base');
 
 module.exports = (config) => {
-  config.set({
-    listenAddress: 'localhost',
-    hostname: 'localhost',
-    browsers: ['ChromeHeadless'],
-    frameworks: ['mocha'],
-    reporters: ['spec'],
-    files: ['test/index-webpack.ts'],
-    preprocessors: {'test/index-webpack.ts': ['webpack']},
-    webpack: webpackConfig,
-    webpackMiddleware: {noInfo: true},
-  });
+  config.set(Object.assign({}, karmaBaseConfig, {
+    webpack: webpackConfig
+  }))
 };
