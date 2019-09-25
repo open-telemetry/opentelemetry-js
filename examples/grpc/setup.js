@@ -17,8 +17,7 @@ function setupTracerAndExporters(service) {
       grpc: {
         enabled: true,
         // if it can't find the module, put the absolute path since the packages are not published yet
-        path: '@opentelemetry/plugin-grpc',
-        ignoreOutgoingUrls: [/spans/]
+        path: '@opentelemetry/plugin-grpc'
       }
     }
   });

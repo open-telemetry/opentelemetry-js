@@ -13,12 +13,11 @@ const grpc = require('grpc');
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
-const DEFAULT_PORT = 50051;
+const PORT = 50051;
 const tracer = opentelemetry.getTracer();
 
 /** A function which makes requests and handles response. */
-function main(port) {
-  if (typeof port !== 'number') port = DEFAULT_PORT;
+function main() {
   // span corresponds to outgoing requests. Here, we have manually created
   // the span, which is created to track work that happens outside of the
   // request lifecycle entirely.
@@ -26,7 +25,7 @@ function main(port) {
   tracer.withSpan(span, () => {
     console.log('Client traceId ', span.context().traceId);
     const client = new services.GreeterClient(
-      `localhost:${port}`,
+      `localhost:${PORT}`,
       grpc.credentials.createInsecure()
     );
     const request = new messages.HelloRequest();

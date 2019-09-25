@@ -4,7 +4,7 @@ const opentelemetry = require('@opentelemetry/core');
 
 /**
  * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (HTTP in this case).
+ * automatic tracing for built-in plugins (gRPC in this case).
  */
 const config = require('./setup');
 config.setupTracerAndExporters('grpc-server-service');
@@ -14,16 +14,15 @@ const tracer = opentelemetry.getTracer();
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
-const DEFAULT_PORT = 50051;
+const PORT = 50051;
 
 /** Starts a gRPC server that receives requests on sample server port. */
-function startServer(port) {
+function startServer() {
   // Creates a server
-  if (typeof port !== 'number') port = DEFAULT_PORT;
   const server = new grpc.Server();
   server.addService(services.GreeterService, { sayHello: sayHello });
-  server.bind(`0.0.0.0:${port}`, grpc.ServerCredentials.createInsecure());
-  console.log(`binding server on 0.0.0.0:${port}`);
+  server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
+  console.log(`binding server on 0.0.0.0:${PORT}`);
   server.start();
 }
 
