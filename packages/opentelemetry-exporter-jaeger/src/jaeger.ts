@@ -65,7 +65,6 @@ export class JaegerExporter implements SpanExporter {
     return this._sendSpans(spans, resultCallback);
   }
 
-
   /** Shutdown exporter. */
   shutdown(): void {
     if (!this._forceFlush) return;
