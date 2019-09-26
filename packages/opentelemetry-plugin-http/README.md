@@ -17,11 +17,32 @@ npm install --save @opentelemetry/plugin-http
 
 ## Usage
 
-```
-const opentelemetry = require('@opentelemetry/plugin-http');
+OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems.
 
-// TODO: DEMONSTRATE API
+To load a specific plugin (HTTP in this case), specify it in the Node Tracer's configuration.
 ```
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer({
+  plugins: {
+    http: {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-http',
+      ignoreOutgoingUrls: [/spans/]
+    }
+  }
+});
+```
+
+To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+```
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer();
+```
+
+See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
