@@ -10,7 +10,7 @@ Note: Baggage is currently not progagated, see [issues/329](https://github.com/o
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/shim-opentracing
 ```
 
