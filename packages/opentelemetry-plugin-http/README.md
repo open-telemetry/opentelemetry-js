@@ -29,7 +29,7 @@ const tracer = new NodeTracer({
       enabled: true,
       // You may use a package name or absolute path to the file.
       path: '@opentelemetry/plugin-http',
-      ignoreOutgoingUrls: [/spans/]
+      // http plugin options
     }
   }
 });
@@ -43,6 +43,16 @@ const tracer = new NodeTracer();
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) for a short example.
+
+### Http Plugin Options
+
+Http plugin has few options available to choose from. You can set the following:
+
+| Options | Type | Description |
+| ------- | ---- | ----------- |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L52) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+| [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
+| [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
