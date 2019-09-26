@@ -28,6 +28,7 @@ export interface ExporterConfig {
   maxPacketSize?: number; // default: 65000
   forceFlush?: boolean; // default: true
   flushTimeout?: number; // default: 2000
+  flushInterval?: number; // default(ms): 5000
 }
 
 // Below require is needed as jaeger-client types does not expose the thrift,
