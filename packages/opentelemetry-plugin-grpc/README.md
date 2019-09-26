@@ -17,11 +17,32 @@ npm install --save @opentelemetry/plugin-grpc
 
 ## Usage
 
-```
-const opentelemetry = require('@opentelemetry/plugin-grpc');
+OpenTelemetry gRPC Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems when working with [gRPC](https://www.npmjs.com/package/grpc).
 
-// TODO: DEMONSTRATE API
+To load a specific plugin (**gRPC** in this case), specify it in the Node Tracer's configuration.
+```javascript
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer({
+  plugins: {
+    grpc: {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-grpc',
+    }
+  }
+});
 ```
+
+To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+```javascript
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer();
+```
+
+See [examples/grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) for a short example.
+
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
