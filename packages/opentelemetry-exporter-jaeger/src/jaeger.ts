@@ -52,13 +52,7 @@ export class JaegerExporter implements SpanExporter {
     this._sender.setProcess(this._process);
 
     const flushInterval = config.flushInterval || 5000;
-    this._timer = setInterval(() => {
-      this._sender.flush((numSpans: number, err?: string) => {
-        if (err) {
-          this._logger.error(`failed to flush ${numSpans} spans: ${err}`);
-        }
-      });
-    }, flushInterval);
+    this._timer = setInterval(this._flush, flushInterval);
     unrefTimer(this._timer);
   }
 
@@ -71,16 +65,12 @@ export class JaegerExporter implements SpanExporter {
     return this._sendSpans(spans, resultCallback);
   }
 
+
   /** Shutdown exporter. */
   shutdown(): void {
-    clearInterval(this._timer);
     if (!this._forceFlush) return;
     // Make an optimistic flush.
-    this._sender.flush((numSpans: number, err?: string) => {
-      if (err) {
-        this._logger.error(`failed to flush span: ${err}`);
-      }
-    });
+    this._flush();
     // Sleeping x seconds before closing the sender's connection to ensure
     // all spans are flushed.
     setTimeout(() => {
@@ -107,5 +97,13 @@ export class JaegerExporter implements SpanExporter {
     // complete before it calls done with success.
     this._logger.debug('successful append for : %s', thriftSpan.length);
     if (done) return done(ExportResult.SUCCESS);
+  }
+
+  private _flush(): void {
+    this._sender.flush((numSpans: number, err?: string) => {
+      if (err) {
+        this._logger.error(`failed to flush ${numSpans} spans: ${err}`);
+      }
+    });
   }
 }
