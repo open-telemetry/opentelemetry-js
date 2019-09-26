@@ -15,6 +15,9 @@ The core `PluginLoader` class is responsible for loading the instrumented plugin
 export const plugin = new HttpPlugin(...);
 ```
 
+> Example of simple module plugin created and used in the tests.
+https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-node-sdk/test/instrumentation/node_modules/%40opentelemetry/plugin-simple-module/simple-module.js
+
 After the plugin is created, it must be added in the [list of default supported plugins][DEFAULT_INSTRUMENTATION_PLUGINS].
 ```typescript
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
