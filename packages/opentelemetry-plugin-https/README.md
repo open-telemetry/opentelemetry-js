@@ -11,13 +11,13 @@ For automatic instrumentation see the
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/plugin-https
 ```
 
 ## Usage
 
-```
+```js
 const opentelemetry = require('@opentelemetry/plugin-https');
 
 // TODO: DEMONSTRATE API
