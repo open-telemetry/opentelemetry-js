@@ -21,6 +21,7 @@ import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
+import { OT_REQUEST_HEADER } from '../src/utils';
 
 const MICROS_PER_SECS = 1e6;
 
@@ -229,6 +230,26 @@ describe('ZipkinExporter', () => {
       const scope = nock('https://localhost:9411')
         .post('/api/v2/spans')
         .reply(200);
+
+      const exporter = new ZipkinExporter({
+        serviceName: 'my-service',
+        logger: new NoopLogger(),
+        url: 'https://localhost:9411/api/v2/spans',
+      });
+
+      exporter.export([getReadableSpan()], (result: ExportResult) => {
+        scope.done();
+        assert.strictEqual(result, ExportResult.SUCCESS);
+      });
+    });
+
+    it(`should send '${OT_REQUEST_HEADER}' header`, () => {
+      const scope = nock('https://localhost:9411')
+        .post('/api/v2/spans')
+        .reply(function(uri, requestBody, cb) {
+          assert.ok(this.req.headers[OT_REQUEST_HEADER]);
+          cb(null, [200, 'Ok']);
+        });
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',

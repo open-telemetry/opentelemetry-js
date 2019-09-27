@@ -31,13 +31,12 @@ import {
   statusCodeTagName,
   statusDescriptionTagName,
 } from './transform';
-
+import { OT_REQUEST_HEADER } from './utils';
 /**
  * Zipkin Exporter
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
-
   private readonly _forceFlush: boolean;
   private readonly _logger: types.Logger;
   private readonly _serviceName: string;
@@ -56,6 +55,7 @@ export class ZipkinExporter implements SpanExporter {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          [OT_REQUEST_HEADER]: 1,
         },
       },
       urlOpts

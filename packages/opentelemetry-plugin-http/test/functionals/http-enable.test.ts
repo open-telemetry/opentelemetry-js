@@ -29,6 +29,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
 import { HttpPluginConfig } from '../../src';
+import { Utils } from '../../src/utils';
 
 let server: http.Server;
 const serverPort = 22345;
@@ -123,6 +124,22 @@ describe('HttpPlugin', () => {
       assert.strictEqual(spans.length, 2);
       assertSpan(incomingSpan, SpanKind.SERVER, validations);
       assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+    });
+
+    it(`should not trace requests with '${Utils.OT_REQUEST_HEADER}' header`, async () => {
+      const testPath = '/outgoing/do-not-trace';
+      doNock(hostname, testPath, 200, 'Ok');
+
+      const options = {
+        host: hostname,
+        path: testPath,
+        headers: { [Utils.OT_REQUEST_HEADER]: 1 },
+      };
+
+      const result = await httpRequest.get(options);
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(result.data, 'Ok');
+      assert.strictEqual(spans.length, 0);
     });
 
     const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];

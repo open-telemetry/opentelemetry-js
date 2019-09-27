@@ -346,9 +346,11 @@ export class HttpPlugin extends BasePlugin<Http> {
           ? (args.shift() as RequestOptions)
           : undefined
       );
+
       options = optionsParsed;
 
       if (
+        Utils.isOpenTelemetryRequest(options) ||
         Utils.isIgnored(origin + pathname, plugin._config.ignoreOutgoingUrls)
       ) {
         return original.apply(this, [options, ...args]);
