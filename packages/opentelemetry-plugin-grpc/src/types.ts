@@ -53,6 +53,10 @@ export type GrpcClientFunc = typeof Function & {
   responseStream: boolean;
 };
 
+export type GrpcInternalClientTypes = {
+  makeClientConstructor: typeof grpcModule.makeGenericClientConstructor;
+};
+
 // TODO: Delete if moving internal file loaders to BasePlugin
 /**
  * Maps a name (key) representing a internal file module and its exports
