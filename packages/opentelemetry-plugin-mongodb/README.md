@@ -11,13 +11,13 @@ For automatic instrumentation see the
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/plugin-mongodb
 ```
 
 ## Usage
 
-```
+```js
 const opentelemetry = require('@opentelemetry/plugin-mongodb');
 
 // TODO: DEMONSTRATE API

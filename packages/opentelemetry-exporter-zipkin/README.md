@@ -10,7 +10,7 @@ OpenTelemetry Zipkin Trace Exporter allows the user to send collected traces to 
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/exporter-zipkin
 ```
 
@@ -18,7 +18,7 @@ npm install --save @opentelemetry/exporter-zipkin
 
 Install the exporter on your application and pass the options, it must contain a service name.
 
-```
+```js
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 // Add your zipkin url (`http://localhost:9411/api/v2/spans` is used as
@@ -32,7 +32,7 @@ const exporter = new ZipkinExporter(options);
 
 Now, register the exporter and start tracing.
 
-```
+```js
 tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
 ```
 
