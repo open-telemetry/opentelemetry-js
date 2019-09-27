@@ -23,6 +23,7 @@ import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { spanToThrift } from './transform';
+import { unrefTimer } from '@opentelemetry/core';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -33,6 +34,7 @@ export class JaegerExporter implements SpanExporter {
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _forceFlush: boolean = true;
   private readonly _flushTimeout: number;
+  private _timer: NodeJS.Timeout;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
@@ -48,6 +50,10 @@ export class JaegerExporter implements SpanExporter {
       tags: jaegerTypes.ThriftUtils.getThriftTags(tags),
     };
     this._sender.setProcess(this._process);
+
+    const flushInterval = config.flushInterval || 5000;
+    this._timer = setInterval(this._flush, flushInterval);
+    unrefTimer(this._timer);
   }
 
   /** Exports a list of spans to Jaeger. */
@@ -63,11 +69,7 @@ export class JaegerExporter implements SpanExporter {
   shutdown(): void {
     if (!this._forceFlush) return;
     // Make an optimistic flush.
-    this._sender.flush((numSpans: number, err?: string) => {
-      if (err) {
-        this._logger.error(`failed to flush span: ${err}`);
-      }
-    });
+    this._flush();
     // Sleeping x seconds before closing the sender's connection to ensure
     // all spans are flushed.
     setTimeout(() => {
@@ -94,5 +96,13 @@ export class JaegerExporter implements SpanExporter {
     // complete before it calls done with success.
     this._logger.debug('successful append for : %s', thriftSpan.length);
     if (done) return done(ExportResult.SUCCESS);
+  }
+
+  private _flush(): void {
+    this._sender.flush((numSpans: number, err?: string) => {
+      if (err) {
+        this._logger.error(`failed to flush ${numSpans} spans: ${err}`);
+      }
+    });
   }
 }
