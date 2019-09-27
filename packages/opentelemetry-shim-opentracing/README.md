@@ -6,6 +6,34 @@
 
 OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry
 
+Note: Baggage is currently not progagated, see [issues/329](https://github.com/open-telemetry/opentelemetry-js/issues/329).
+
+## Installation
+
+```bash
+npm install --save @opentelemetry/shim-opentracing
+```
+
+## Usage
+
+Use the TracerShim wherever you initialize your OpenTracing tracers.
+
+```javascript
+const opentracing = require('opentracing');
+
+// Old tracer initialization.
+const tracer = myOpenTracingTracer(...);
+opentracing.initGlobalTracer(tracer);
+
+// New tracer initialization.
+import { TracerShim } from '@opentelemetry/shim-opentracing';
+
+const tracer = myOpenTelemetryTracer(...)
+opentracing.initGlobalTracer(new TracerShim(tracer));
+
+```
+
+
 ## License
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
