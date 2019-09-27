@@ -11,13 +11,13 @@ For automatic instrumentation see the
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/basic-tracer
 ```
 
 ## Usage
 
-```
+```js
 const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer } = require('@opentelemetry/basic-tracer');
 
