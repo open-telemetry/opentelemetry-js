@@ -14,13 +14,13 @@ For manual instrumentation see the
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/node-sdk
 ```
 
 ## Usage
 
-```
+```js
 const opentelemetry = require('@opentelemetry/node-sdk');
 
 // TODO: DEMONSTRATE API

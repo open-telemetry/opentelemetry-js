@@ -45,7 +45,7 @@ You can then navigate to http://localhost:16686 to access the Jaeger UI.
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/exporter-jaeger
 ```
 
@@ -53,7 +53,7 @@ npm install --save @opentelemetry/exporter-jaeger
 
 Install the exporter on your application and pass the options, it must contain a service name.
 
-```
+```js
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const options = {
@@ -68,7 +68,7 @@ const exporter = new JaegerExporter(options);
 
 Now, register the exporter.
 
-```
+```js
 tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
 ```
 
