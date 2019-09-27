@@ -2,7 +2,8 @@
   "lerna": "3.13.4",
   "npmClient": "yarn",
   "packages": [
-    "packages/*"
+    "packages/*",
+    "examples/*"
   ],
   "version": "0.0.1"
 }
