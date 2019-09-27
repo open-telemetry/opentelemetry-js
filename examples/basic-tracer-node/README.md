@@ -1,7 +1,6 @@
 # Overview
 
-This example shows how to use `@opentelemetry/basic-tracer` to instrument a simple Node.js application - e.g. a batch job.
-
+This example shows how to use [@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) to instrument a simple Node.js application - e.g. a batch job.
 It supports exporting spans either to [Zipkin](https://zipkin.io) or to [Jaeger](https://www.jaegertracing.io).
 
 ## Installation
@@ -27,10 +26,15 @@ Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/
    ```
 
 #### Zipkin UI
-`zipkin:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to Zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-id)]() (e.g http://localhost:9411/zipkin/traces/4815c3d576d930189725f1f1d1bdfcc6)
+Open the Zipkin UI in your browser [http://localhost:9411/zipkin](http://localhost:9411/zipkin)
 
-<p align="center"><img src="./images/zipkin-ui.png?raw=true"/></p>
+<p align="center"><img src="./images/zipkin-ui-list.png?raw=true"/></p>
+
+Select `basic-service` under *Service Name* and click on *Find Traces*.
+
+Click on the trace to view its details.
+
+<p align="center"><img src="./images/zipkin-ui-detail.png?raw=true"/></p>
 
 ### Jaeger
 
@@ -43,14 +47,19 @@ Go to Zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-
 
 #### Jaeger UI
 
-`jaeger:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
-Go to Jaeger with your browser [http://localhost:16686/trace/(your-trace-id)]() (e.g http://localhost:16686/trace/4815c3d576d930189725f1f1d1bdfcc6)
+Open the Jaeger UI in your browser [http://localhost:16686](http://localhost:16686)
 
-<p align="center"><img src="images/jaeger-ui.png?raw=true"/></p>
+<p align="center"><img src="images/jaeger-ui-list.png?raw=true"/></p>
+
+Select `basic-service` under *Service Name* and click on *Find Traces*.
+
+Click on the trace to view its details.
+
+<p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk>
+- For more information on basic-tracer, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer>
 
 ## LICENSE
 

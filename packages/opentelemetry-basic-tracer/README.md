@@ -8,7 +8,6 @@
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
 
-
 It does **not** provide automated instrumentation of known libraries, context propagation for asynchronous invocations or distributed-context out-of-the-box.
 
 For automated instrumentation for Node.js, please see
@@ -44,7 +43,8 @@ span.setAttribute('key', 'value');
 span.end();
 ```
 
-See [examples/node-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/node-basic) for an end-to-end example, including exporting the created spans.
+## Example
+See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
