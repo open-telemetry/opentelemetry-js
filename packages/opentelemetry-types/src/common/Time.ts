@@ -20,6 +20,6 @@ export type HrTime = [number, number];
 /**
  * Defines TimeInput.
  *
- * hrtime, expoch milliseconds, performance.now() or Date
+ * hrtime, epoch milliseconds, performance.now() or Date
  */
 export type TimeInput = HrTime | number | Date;

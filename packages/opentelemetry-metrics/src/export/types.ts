@@ -16,7 +16,7 @@
 
 /**
  * This is based on
- * opencenus-node/packages/opencensus-core/src/metrics/export/types.ts
+ * opencensus-node/packages/opencensus-core/src/metrics/export/types.ts
  *
  * Proto definition:
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
