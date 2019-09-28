@@ -4,14 +4,19 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser.
+`basic-tracer` contains the foundation for all tracing SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
-For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
+
+It does **not** provide automated instrumentation of known libraries, context propagation for asynchronous invocations or distributed-context out-of-the-box.
+
+For automated instrumentation for Node.js, please see
+[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk).
 
 ## Installation
 
 ```bash
+npm install --save @opentelemetry/core
 npm install --save @opentelemetry/basic-tracer
 ```
 
@@ -36,8 +41,10 @@ span.setAttribute('key', 'value');
 
 // We must end the spans so they becomes available for exporting.
 span.end();
-
 ```
+
+## Example
+See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
