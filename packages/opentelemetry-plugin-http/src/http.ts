@@ -15,7 +15,13 @@
  */
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
-import { Span, SpanKind, SpanOptions, Attributes } from '@opentelemetry/types';
+import {
+  Span,
+  SpanKind,
+  SpanOptions,
+  Attributes,
+  CanonicalCode,
+} from '@opentelemetry/types';
 import {
   ClientRequest,
   IncomingMessage,
@@ -165,46 +171,42 @@ export class HttpPlugin extends BasePlugin<Http> {
     return (): ClientRequest => {
       this._logger.debug('makeRequestTrace by injecting context into header');
 
+      const host = options.hostname || options.host || 'localhost';
+      const method = options.method ? options.method.toUpperCase() : 'GET';
+      const headers = options.headers || {};
+      const userAgent = headers['user-agent'];
+
+      span.setAttributes({
+        [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+          options,
+          headers,
+          `${HttpPlugin.component}:`
+        ),
+        [AttributeNames.HTTP_HOSTNAME]: host,
+        [AttributeNames.HTTP_METHOD]: method,
+        [AttributeNames.HTTP_PATH]: options.path || '/',
+        [AttributeNames.HTTP_USER_AGENT]: userAgent || '',
+      });
+
       request.on(
         'response',
-        (response: IncomingMessage & { req?: { method?: string } }) => {
+        (response: IncomingMessage & { aborted?: boolean }) => {
           this._tracer.bind(response);
           this._logger.debug('outgoingRequest on response()');
           response.on('end', () => {
             this._logger.debug('outgoingRequest on end()');
-
-            const method =
-              response.req && response.req.method
-                ? response.req.method.toUpperCase()
-                : 'GET';
-            const headers = options.headers || {};
-            const userAgent = headers['user-agent'];
-
-            const host = options.hostname || options.host || 'localhost';
-
-            const attributes: Attributes = {
-              [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
-                options,
-                headers,
-                `${HttpPlugin.component}:`
-              ),
-              [AttributeNames.HTTP_HOSTNAME]: host,
-              [AttributeNames.HTTP_METHOD]: method,
-              [AttributeNames.HTTP_PATH]: options.path || '/',
-            };
-
-            if (userAgent) {
-              attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
-            }
-
             if (response.statusCode) {
-              attributes[AttributeNames.HTTP_STATUS_CODE] = response.statusCode;
-              attributes[AttributeNames.HTTP_STATUS_TEXT] =
-                response.statusMessage;
-              span.setStatus(Utils.parseResponseStatus(response.statusCode));
+              span.setAttributes({
+                [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
+                [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
+              });
             }
 
-            span.setAttributes(attributes);
+            if (response.aborted && !response.complete) {
+              span.setStatus({ code: CanonicalCode.ABORTED });
+            } else {
+              span.setStatus(Utils.parseResponseStatus(response.statusCode!));
+            }
 
             if (this._config.applyCustomAttributesOnSpan) {
               this._config.applyCustomAttributesOnSpan(span, request, response);
