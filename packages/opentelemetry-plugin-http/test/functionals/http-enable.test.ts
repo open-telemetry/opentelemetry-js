@@ -28,8 +28,8 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/basic-tracer';
-import { HttpPluginConfig } from '../../src';
 import { Utils } from '../../src/utils';
+import { HttpPluginConfig, Http } from '../../src/types';
 
 let server: http.Server;
 const serverPort = 22345;
@@ -82,18 +82,20 @@ describe('HttpPlugin', () => {
     });
 
     before(() => {
-      const ignoreConfig = [
-        `http://${hostname}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith(`/ignored/function`),
-      ];
       const config: HttpPluginConfig = {
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
+        ignoreIncomingPaths: [
+          `/ignored/string`,
+          /\/ignored\/regexp$/i,
+          (url: string) => url.endsWith(`/ignored/function`),
+        ],
+        ignoreOutgoingUrls: [
+          `http://${hostname}:${serverPort}/ignored/string`,
+          /\/ignored\/regexp$/i,
+          (url: string) => url.endsWith(`/ignored/function`),
+        ],
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
       plugin.enable(http, tracer, tracer.logger, config);
-
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
@@ -104,6 +106,18 @@ describe('HttpPlugin', () => {
     after(() => {
       server.close();
       plugin.disable();
+    });
+
+    it('http module should be patched', () => {
+      assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
+    });
+
+    it("should not patch if it's not a http module", () => {
+      const httpNotPatched = new HttpPlugin(
+        HttpPlugin.component,
+        process.versions.node
+      ).enable({} as Http, tracer, tracer.logger, {});
+      assert.strictEqual(Object.keys(httpNotPatched).length, 0);
     });
 
     it('should generate valid spans (client side and server side)', async () => {
@@ -142,7 +156,7 @@ describe('HttpPlugin', () => {
       assert.strictEqual(spans.length, 0);
     });
 
-    const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
+    const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500, 505];
 
     for (let i = 0; i < httpErrorCodes.length; i++) {
       it(`should test span for GET requests with http error ${httpErrorCodes[i]}`, async () => {
@@ -283,13 +297,13 @@ describe('HttpPlugin', () => {
     });
 
     for (const ignored of ['string', 'function', 'regexp']) {
-      it(`should not trace ignored requests with type ${ignored}`, async () => {
+      it(`should not trace ignored requests (client and server side) with type ${ignored}`, async () => {
         const testPath = `/ignored/${ignored}`;
-        doNock(hostname, testPath, 200, 'Ok');
 
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
         const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(spans.length, 0);
-        await httpRequest.get(`${protocol}://${hostname}${testPath}`);
         assert.strictEqual(spans.length, 0);
       });
     }
