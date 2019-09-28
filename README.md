@@ -4,6 +4,34 @@
 [![Coverage Status][codecov-image]][codecov-url]
 [![Apache License][license-image]][license-image]
 
+## About this project
+This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics and logs from applications.
+
+> This project is currently in Alpha stage. Its APIs can change at any time and it is not intended to be used in production scenarios!
+
+## Quick start
+To get started, see [@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) which provides auto-instrumentation for Node.js applications.
+
+## Release Schedule
+
+OpenTelemetry JS is under active development.
+This release isn't guaranteed to conform to a specific version of the specification, and future
+releases will not attempt to maintain backwards compatibility with the alpha
+release.
+
+| Component                   | Version | Target Date       |
+| --------------------------- | ------- | ----------------- |
+| Tracing API                 | Alpha   | September 30 2019 |
+| Tracing SDK                 | Alpha   | September 30 2019 |
+| Metrics API                 | Alpha   | tbd |
+| Metrics SDK                 | Alpha   | tbd           |
+| Jaeger Trace Exporter       | Alpha   | September 30 2019 |
+| Zipkin Trace Exporter       | Alpha   | September 30 2019 |
+| Prometheus Metrics Exporter | Alpha   | tbd           |
+| OpenTracing Bridge          | Alpha   | September 30 2019 |
+| OpenCensus Bridge           | Alpha   | tbd           |
+
+
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. Follow
@@ -49,25 +77,6 @@ To request automatic tracing support for a module not on this list, please [file
 | ----------------------- | -----------------|
 | [@opentelemetry/shim-opentracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing) | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
-## Release Schedule
-
-OpenTelemetry JS is under active development. Our goal is to release an
-_alpha_ version of the library at the end of September 2019. This release isn't
-guaranteed to conform to a specific version of the specification, and future
-releases will not attempt to maintain backwards compatibility with the alpha
-release.
-
-| Component                   | Version | Target Date       |
-| --------------------------- | ------- | ----------------- |
-| Tracing API                 | Alpha   | September 30 2019 |
-| Tracing SDK                 | Alpha   | September 30 2019 |
-| Metrics API                 | Alpha   | September 30 2019 |
-| Metrics SDK                 | Alpha   | Unknown           |
-| Jaeger Trace Exporter       | Alpha   | September 30 2019 |
-| Zipkin Trace Exporter       | Alpha   | September 30 2019 |
-| Prometheus Metrics Exporter | Alpha   | Unknown           |
-| OpenTracing Bridge          | Alpha   | September 30 2019 |
-| OpenCensus Bridge           | Alpha   | Unknown           |
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
