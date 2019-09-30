@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-// This is the webpack configuration for browesr Karma tests.
+const webpackNodePolyfills = require('../../../webpack.node-polyfills.js');
+
+// This is the webpack configuration for browser Karma tests.
 module.exports = {
   mode: 'development',
   target: 'web',
@@ -23,7 +25,10 @@ module.exports = {
   devtool: 'inline-source-map',
   module: {
     rules: [
-      { test: /\.ts$/, use: 'ts-loader' }
+      { test: /\.ts$/, use: 'ts-loader' },
+      // This setting configures Node polyfills for the browser that will be
+      // added to the webpack bundle for Karma tests.
+      { parser: { node: webpackNodePolyfills } }
     ]
   }
 };
