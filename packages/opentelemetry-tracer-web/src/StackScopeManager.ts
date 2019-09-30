@@ -16,24 +16,27 @@
 
 import { ScopeManager } from '@opentelemetry/scope-base';
 
+/**
+ * Stack Scope Manager for managing the state in web
+ */
 export class StackScopeManager implements ScopeManager {
-  private currentUid: number = 0;
-  private enabled = false;
+  private _currentUid: number = 0;
+  private _enabled = false;
 
-  public scopes: { [uid: number]: unknown } = Object.create(null);
-  public scopesStack: any[] = [];
+  public _scopes: { [uid: number]: unknown } = Object.create(null);
+  public _scopesStack: any[] = [];
 
   constructor() {}
 
-  private activateScope(scope: any, uid: number) {
+  private _activateScope(scope: any, uid: number) {
     if (typeof scope === 'object') {
       scope.uid = uid;
     }
-    this.scopes[uid] = scope;
-    this.scopesStack.push(scope);
+    this._scopes[uid] = scope;
+    this._scopesStack.push(scope);
   }
 
-  private bindFunction<T extends Function>(target: T, scope?: unknown): T {
+  private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
     const contextWrapper: any = function(...args: unknown[]) {
       return manager.with(scope, () => target.apply(scope, args));
@@ -47,39 +50,39 @@ export class StackScopeManager implements ScopeManager {
     return contextWrapper as any;
   }
 
-  private createNewUid(): number {
-    return (this.currentUid = this.currentUid + 1);
+  private _createNewUid(): number {
+    return (this._currentUid = this._currentUid + 1);
   }
 
-  private createRootScope(scope: any) {
-    const uid = typeof scope.uid === 'number' ? scope.uid : this.createNewUid();
-    this.activateScope(scope, uid);
+  private _createRootScope(scope: any) {
+    const uid = typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
+    this._activateScope(scope, uid);
   }
 
-  private lastScope(): unknown {
-    return this.scopesStack[this.scopesStack.length - 1] || undefined;
+  private _lastScope(): unknown {
+    return this._scopesStack[this._scopesStack.length - 1] || undefined;
   }
 
-  private removeFromStack(uid: number) {
-    const index = this.scopesStack.lastIndexOf(this.scopes[uid]);
+  private _removeFromStack(uid: number) {
+    const index = this._scopesStack.lastIndexOf(this._scopes[uid]);
     // don't remove root scope
     if (index > 0) {
-      this.scopesStack.splice(index, 1);
+      this._scopesStack.splice(index, 1);
     }
   }
 
-  private removeScope(uid: number) {
-    this.removeFromStack(uid);
-    const index = this.scopesStack.indexOf(this.scopes[uid]);
+  private _removeScope(uid: number) {
+    this._removeFromStack(uid);
+    const index = this._scopesStack.indexOf(this._scopes[uid]);
 
     // don't remove root scope
-    if (index < 0 && this.scopes[uid] !== window) {
-      delete this.scopes[uid];
+    if (index < 0 && this._scopes[uid] !== window) {
+      delete this._scopes[uid];
     }
   }
 
   active(): unknown {
-    return this.lastScope();
+    return this._lastScope();
   }
 
   bind<T>(target: T | any, scope?: unknown): T {
@@ -88,24 +91,24 @@ export class StackScopeManager implements ScopeManager {
       scope = this.active();
     }
     if (typeof target === 'function') {
-      return this.bindFunction(target, scope);
+      return this._bindFunction(target, scope);
     }
     return target;
   }
 
   disable(): this {
-    this.scopes = {};
-    this.scopesStack = [];
-    this.enabled = false;
+    this._scopes = {};
+    this._scopesStack = [];
+    this._enabled = false;
     return this;
   }
 
   enable(): this {
-    if (this.enabled) {
+    if (this._enabled) {
       return this;
     }
-    this.enabled = true;
-    this.createRootScope(window);
+    this._enabled = true;
+    this._createRootScope(window);
     return this;
   }
 
@@ -116,46 +119,15 @@ export class StackScopeManager implements ScopeManager {
     if (typeof scope === 'undefined' || scope === null) {
       scope = window;
     }
-    const uid = typeof scope.uid === 'number' ? scope.uid : this.createNewUid();
-    this.activateScope(scope, uid);
+    const uid = typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
+    this._activateScope(scope, uid);
 
     try {
       return fn.apply(scope);
     } catch (err) {
       throw err;
     } finally {
-      this.removeScope(uid);
+      this._removeScope(uid);
     }
   }
-
-  // @TODO make async
-  // private _withAsync<T extends (...args: unknown[]) => ReturnType<T>>(
-  //   scope: any,
-  //   fn: any
-  // ): Promise<T> {
-  //   const uid = typeof scope.uid === 'number' ? scope.uid : this.createNewUid();
-  //   // const oldScope = this.scopes[uid];
-  //   this.activateScope(scope, uid);
-  //
-  //   return new Promise(async (resolve, reject) => {
-  //     Promise.resolve().then(() => {
-  //       return fn.apply(scope);
-  //     }).then((result) => {
-  //       resolve(result);
-  //       this.removeScope(uid);
-  //     }).catch((e) => {
-  //       console.log('error', e);
-  //       throw e;
-  //     });
-  //   });
-  //
-  //   // try {
-  //   //   return fn.apply(scope);
-  //   // } catch (err) {
-  //   //   console.log('error', err);
-  //   //   throw err;
-  //   // } finally {
-  //   //   this.removeScope(uid);
-  //   // }
-  // }
 }
