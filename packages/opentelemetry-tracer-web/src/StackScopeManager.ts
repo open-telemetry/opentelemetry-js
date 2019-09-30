@@ -20,12 +20,30 @@ import { ScopeManager } from '@opentelemetry/scope-base';
  * Stack Scope Manager for managing the state in web
  */
 export class StackScopeManager implements ScopeManager {
+  /**
+   * the id that added to each scope to be able to identify it
+   */
   private _currentUid: number = 0;
+  /**
+   * whether the scope manager is enabled or not
+   */
   private _enabled = false;
 
+  /**
+   * keeps references for all active scopes
+   */
   public _scopes: { [uid: number]: unknown } = Object.create(null);
+  /**
+   * keeps the information of scopes so that it can be restored properly after being used
+   */
   public _scopesStack: any[] = [];
 
+  /**
+   *
+   * @param scope Scope to be activated
+   * @param uid Id if scope
+   * @private
+   */
   private _activateScope(scope: any, uid: number) {
     if (typeof scope === 'object') {
       scope.uid = uid;
@@ -34,6 +52,12 @@ export class StackScopeManager implements ScopeManager {
     this._scopesStack.push(scope);
   }
 
+  /**
+   *
+   * @param target Function to be executed within the scope
+   * @param scope
+   * @private
+   */
   private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
     const contextWrapper: any = function(...args: unknown[]) {
@@ -48,20 +72,38 @@ export class StackScopeManager implements ScopeManager {
     return contextWrapper as any;
   }
 
+  /**
+   * Creates a new id to identify the scope
+   * @private
+   */
   private _createNewUid(): number {
     return (this._currentUid = this._currentUid + 1);
   }
 
+  /**
+   * Creates a root / main scope
+   * @param scope
+   * @private
+   */
   private _createRootScope(scope: any) {
     const uid =
       typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
     this._activateScope(scope, uid);
   }
 
+  /**
+   * Returns last active scope
+   * @private
+   */
   private _lastScope(): unknown {
     return this._scopesStack[this._scopesStack.length - 1] || undefined;
   }
 
+  /**
+   * Removes scope from stack by its id
+   * @param uid Scope id
+   * @private
+   */
   private _removeFromStack(uid: number) {
     const index = this._scopesStack.lastIndexOf(this._scopes[uid]);
     // don't remove root scope
@@ -70,6 +112,11 @@ export class StackScopeManager implements ScopeManager {
     }
   }
 
+  /**
+   * Removes reference to scope and then from stack
+   * @param uid Scope id
+   * @private
+   */
   private _removeScope(uid: number) {
     this._removeFromStack(uid);
     const index = this._scopesStack.indexOf(this._scopes[uid]);
@@ -80,10 +127,18 @@ export class StackScopeManager implements ScopeManager {
     }
   }
 
+  /**
+   * Returns the active scope
+   */
   active(): unknown {
     return this._lastScope();
   }
 
+  /**
+   * Binds a the certain scope or the active one to the target function and then returns the target
+   * @param target
+   * @param scope
+   */
   bind<T>(target: T | any, scope?: unknown): T {
     // if no specific scope to propagate is given, we use the current one
     if (scope === undefined) {
@@ -95,6 +150,9 @@ export class StackScopeManager implements ScopeManager {
     return target;
   }
 
+  /**
+   * Disable the scope manager (clears the scopes)
+   */
   disable(): this {
     this._scopes = {};
     this._scopesStack = [];
@@ -102,6 +160,9 @@ export class StackScopeManager implements ScopeManager {
     return this;
   }
 
+  /**
+   * Enables the scope manager and creates a default(root) scope
+   */
   enable(): this {
     if (this._enabled) {
       return this;
@@ -111,6 +172,12 @@ export class StackScopeManager implements ScopeManager {
     return this;
   }
 
+  /**
+   * Calls the callback function [fn] with the provided [scope]. If [scope] is undefined then it will use the window.
+   * The scope will be set as active
+   * @param scope
+   * @param fn Callback function
+   */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     scope: any,
     fn: any
