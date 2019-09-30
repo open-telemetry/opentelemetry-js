@@ -18,6 +18,7 @@ import { ScopeManager } from '@opentelemetry/scope-base';
 
 /**
  * Stack Scope Manager for managing the state in web
+ * it doesn't fully support the async calls though
  */
 export class StackScopeManager implements ScopeManager {
   /**
