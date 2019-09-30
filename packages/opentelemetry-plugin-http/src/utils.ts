@@ -173,9 +173,17 @@ export class Utils {
       [AttributeNames.HTTP_ERROR_MESSAGE]: message,
     });
 
+    if (!obj) {
+      span.setStatus({ code: CanonicalCode.UNKNOWN, message });
+      span.end();
+      return;
+    }
+
     let status: Status;
-    if (obj && (obj as IncomingMessage).statusCode) {
+    if ((obj as IncomingMessage).statusCode) {
       status = Utils.parseResponseStatus((obj as IncomingMessage).statusCode!);
+    } else if ((obj as ClientRequest).aborted) {
+      status = { code: CanonicalCode.ABORTED };
     } else {
       status = { code: CanonicalCode.UNKNOWN };
     }
