@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides automatic tracing for Node.js applications.
+This module provides automatic tracing for Web applications.
 
 For manual instrumentation see the
 [@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) package.
@@ -15,13 +15,13 @@ For manual instrumentation see the
 ## Installation
 
 ```
-npm install --save @opentelemetry/node-tracer
+npm install --save @opentelemetry/tracer-web
 ```
 
 ## Usage
 
 ```
-const opentelemetry = require('@opentelemetry/node-tracer');
+const opentelemetry = require('@opentelemetry/tracer-web');
 
 // TODO: DEMONSTRATE API
 ```

@@ -15,22 +15,25 @@
  */
 
 import { BasicTracer, BasicTracerConfig } from '@opentelemetry/basic-tracer';
+import { ScopeManager } from '@opentelemetry/scope-base';
 import { StackScopeManager } from './StackScopeManager';
 /**
- * BasicTracerConfig provides an interface for configuring a Web Tracer.
+ * WebTracerConfig provides an interface for configuring a Web Tracer.
  */
-// export interface WebTracerConfig extends BasicTracerConfig {}
-
 export interface WebTracerConfig extends Partial<BasicTracerConfig> {
-  scopeManager?: StackScopeManager;
+  scopeManager?: ScopeManager;
 }
-//
+
 /**
- * This class represents a web tracer with `async_hooks` module.
+ * This class represents a web tracer with {@link StackScopeManager}
  */
 export class WebTracer extends BasicTracer {
   /**
    * Constructs a new Tracer instance.
+   */
+  /**
+   *
+   * @param {WebTracerConfig} config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
     if (typeof config.scopeManager === 'undefined') {

@@ -26,8 +26,6 @@ export class StackScopeManager implements ScopeManager {
   public _scopes: { [uid: number]: unknown } = Object.create(null);
   public _scopesStack: any[] = [];
 
-  constructor() {}
-
   private _activateScope(scope: any, uid: number) {
     if (typeof scope === 'object') {
       scope.uid = uid;
