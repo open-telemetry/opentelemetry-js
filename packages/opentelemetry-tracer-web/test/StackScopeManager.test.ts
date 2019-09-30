@@ -82,15 +82,6 @@ describe('StackScopeManager', () => {
       return done();
     });
 
-    it('should create uid for the scope', () => {
-      const scope: { a: number; __otsid?: string } = {
-        a: 1,
-      };
-      scopeManager.with(scope, () => {
-        assert.ok(typeof scope.__otsid === 'string');
-      });
-    });
-
     it('should finally restore an old scope', done => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';

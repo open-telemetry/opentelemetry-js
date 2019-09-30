@@ -16,7 +16,6 @@
 
 import { ScopeManager } from '@opentelemetry/scope-base';
 
-const UID_NAME = '__otsid'; // open telemetry scope id
 /**
  * Stack Scope Manager for managing the state in web
  */
@@ -27,10 +26,6 @@ export class StackScopeManager implements ScopeManager {
   private _enabled = false;
 
   /**
-   * keeps references for all active scopes
-   */
-  public _scopes: { [uid: string]: unknown } = Object.create(null);
-  /**
    * keeps the information of scopes so that it can be restored properly after being used
    */
   public _scopesStack: any[] = [];
@@ -38,14 +33,9 @@ export class StackScopeManager implements ScopeManager {
   /**
    *
    * @param scope Scope to be activated
-   * @param uid Id of scope
    * @private
    */
-  private _activateScope(scope: any, uid: string) {
-    if (typeof scope === 'object') {
-      scope[UID_NAME] = uid;
-    }
-    this._scopes[uid] = scope;
+  private _activateScope(scope: any) {
     this._scopesStack.push(scope);
   }
 
@@ -70,25 +60,12 @@ export class StackScopeManager implements ScopeManager {
   }
 
   /**
-   * Creates a new id to identify the scope
-   * @private
-   */
-  private _createNewUid(): string {
-    const newUid = `${Date.now()}${Math.random().toFixed(8)}`;
-    return newUid;
-  }
-
-  /**
    * Creates a root / main scope
    * @param scope
    * @private
    */
   private _createRootScope(scope: any) {
-    const uid =
-      typeof scope[UID_NAME] === 'string'
-        ? scope[UID_NAME]
-        : this._createNewUid();
-    this._activateScope(scope, uid);
+    this._activateScope(scope);
   }
 
   /**
@@ -100,30 +77,15 @@ export class StackScopeManager implements ScopeManager {
   }
 
   /**
-   * Removes scope from stack by its id
-   * @param uid Scope id
+   * Removes scope from stack
+   * @param scope
    * @private
    */
-  private _removeFromStack(uid: string) {
-    const index = this._scopesStack.lastIndexOf(this._scopes[uid]);
+  private _removeFromStack(scope: any) {
+    const index = this._scopesStack.lastIndexOf(scope);
     // don't remove root scope
     if (index > 0) {
       this._scopesStack.splice(index, 1);
-    }
-  }
-
-  /**
-   * Removes reference to scope and then from stack
-   * @param uid Scope id
-   * @private
-   */
-  private _removeScope(uid: string) {
-    this._removeFromStack(uid);
-    const index = this._scopesStack.indexOf(this._scopes[uid]);
-
-    // don't remove root scope
-    if (index < 0 && this._scopes[uid] !== window) {
-      delete this._scopes[uid];
     }
   }
 
@@ -154,7 +116,6 @@ export class StackScopeManager implements ScopeManager {
    * Disable the scope manager (clears the scopes)
    */
   disable(): this {
-    this._scopes = {};
     this._scopesStack = [];
     this._enabled = false;
     return this;
@@ -185,18 +146,14 @@ export class StackScopeManager implements ScopeManager {
     if (typeof scope === 'undefined' || scope === null) {
       scope = window;
     }
-    const uid =
-      typeof scope[UID_NAME] === 'string'
-        ? scope[UID_NAME]
-        : this._createNewUid();
-    this._activateScope(scope, uid);
+    this._activateScope(scope);
 
     try {
       return fn.apply(scope);
     } catch (err) {
       throw err;
     } finally {
-      this._removeScope(uid);
+      this._removeFromStack(scope);
     }
   }
 }
