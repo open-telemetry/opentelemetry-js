@@ -14,4 +14,10 @@
  * limitations under the License.
  */
 
-export * from './https';
+import * as https from 'https';
+
+export const setDefaultOptions = (options: https.RequestOptions) => {
+  options.protocol = options.protocol || 'https:';
+  options.port = options.port || 443;
+  options.agent = options.agent || https.globalAgent;
+};
