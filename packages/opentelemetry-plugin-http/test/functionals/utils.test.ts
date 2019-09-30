@@ -73,11 +73,19 @@ describe('Utils', () => {
 
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
-      const result = Utils.getRequestInfo('http://google.fr/');
-      assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
-      assert.strictEqual(result.optionsParsed.protocol, 'http:');
-      assert.strictEqual(result.optionsParsed.path, '/');
-      assert.strictEqual(result.pathname, '/');
+      const webUrl = 'http://google.fr/';
+      const urlParsed = url.parse(webUrl);
+      const urlParsedWithoutPathname = {
+        ...urlParsed,
+        pathname: undefined,
+      };
+      for (const param of [webUrl, urlParsed, urlParsedWithoutPathname]) {
+        const result = Utils.getRequestInfo(param);
+        assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
+        assert.strictEqual(result.optionsParsed.protocol, 'http:');
+        assert.strictEqual(result.optionsParsed.path, '/');
+        assert.strictEqual(result.pathname, '/');
+      }
     });
   });
 
@@ -212,23 +220,53 @@ describe('Utils', () => {
 
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
-      const span = new Span(
-        new BasicTracer({
-          scopeManager: new NoopScopeManager(),
-        }),
-        'test',
-        { spanId: '', traceId: '' },
-        SpanKind.INTERNAL
-      );
       const errorMessage = 'test error';
-      Utils.setSpanWithError(span, new Error(errorMessage));
-      const attributes = span.toReadableSpan().attributes;
-      assert.strictEqual(
-        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-        errorMessage
-      );
-      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      for (const obj of [undefined, { statusCode: 400 }]) {
+        const span = new Span(
+          new BasicTracer({
+            scopeManager: new NoopScopeManager(),
+          }),
+          'test',
+          { spanId: '', traceId: '' },
+          SpanKind.INTERNAL
+        );
+        /* tslint:disable-next-line:no-any */
+        Utils.setSpanWithError(span, new Error(errorMessage), obj as any);
+        const attributes = span.toReadableSpan().attributes;
+        assert.strictEqual(
+          attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+          errorMessage
+        );
+        assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      }
     });
+  });
+  describe('isOpenTelemetryRequest()', () => {
+    [
+      {},
+      { headers: {} },
+      url.parse('http://url.com'),
+      { headers: { [Utils.OT_REQUEST_HEADER]: 0 } },
+      { headers: { [Utils.OT_REQUEST_HEADER]: false } },
+    ].forEach(options => {
+      it(`should return false with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        /* tslint:disable-next-line:no-any */
+        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), false);
+      });
+    });
+    for (const options of [
+      { headers: { [Utils.OT_REQUEST_HEADER]: 1 } },
+      { headers: { [Utils.OT_REQUEST_HEADER]: true } },
+    ]) {
+      it(`should return true with the following value: ${JSON.stringify(
+        options
+      )}`, () => {
+        /* tslint:disable-next-line:no-any */
+        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), true);
+      });
+    }
   });
 
   describe('isValidOptionsType()', () => {

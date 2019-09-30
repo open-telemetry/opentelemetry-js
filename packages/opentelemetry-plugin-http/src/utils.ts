@@ -30,6 +30,7 @@ import * as url from 'url';
  * Utility class
  */
 export class Utils {
+  static readonly OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
   /**
    * Get an absolute url
    */
@@ -172,9 +173,17 @@ export class Utils {
       [AttributeNames.HTTP_ERROR_MESSAGE]: message,
     });
 
+    if (!obj) {
+      span.setStatus({ code: CanonicalCode.UNKNOWN, message });
+      span.end();
+      return;
+    }
+
     let status: Status;
-    if (obj && (obj as IncomingMessage).statusCode) {
+    if ((obj as IncomingMessage).statusCode) {
       status = Utils.parseResponseStatus((obj as IncomingMessage).statusCode!);
+    } else if ((obj as ClientRequest).aborted) {
+      status = { code: CanonicalCode.ABORTED };
     } else {
       status = { code: CanonicalCode.UNKNOWN };
     }
@@ -241,5 +250,20 @@ export class Utils {
 
     const type = typeof options;
     return type === 'string' || (type === 'object' && !Array.isArray(options));
+  }
+
+  /**
+   * Check whether the given request should be ignored
+   * Use case: Typically, exporter `SpanExporter` can use http module to send spans.
+   * This will also generate spans (from the http-plugin) that will be sended through the exporter
+   * and here we have loop.
+   * @param {RequestOptions} options
+   */
+  static isOpenTelemetryRequest(options: RequestOptions) {
+    return !!(
+      options &&
+      options.headers &&
+      options.headers[Utils.OT_REQUEST_HEADER]
+    );
   }
 }

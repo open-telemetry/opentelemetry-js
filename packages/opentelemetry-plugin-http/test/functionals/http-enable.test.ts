@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/basic-tracer';
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span as ISpan } from '@opentelemetry/types';
+import { NodeTracer } from '@opentelemetry/node-sdk';
+import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
@@ -23,12 +28,8 @@ import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { NodeTracer } from '@opentelemetry/node-sdk';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/basic-tracer';
-import { HttpPluginConfig } from '../../src';
+import { Utils } from '../../src/utils';
+import { HttpPluginConfig, Http } from '../../src/types';
 
 let server: http.Server;
 const serverPort = 22345;
@@ -81,18 +82,20 @@ describe('HttpPlugin', () => {
     });
 
     before(() => {
-      const ignoreConfig = [
-        `http://${hostname}/ignored/string`,
-        /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith(`/ignored/function`),
-      ];
       const config: HttpPluginConfig = {
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
+        ignoreIncomingPaths: [
+          `/ignored/string`,
+          /\/ignored\/regexp$/i,
+          (url: string) => url.endsWith(`/ignored/function`),
+        ],
+        ignoreOutgoingUrls: [
+          `http://${hostname}:${serverPort}/ignored/string`,
+          /\/ignored\/regexp$/i,
+          (url: string) => url.endsWith(`/ignored/function`),
+        ],
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
       plugin.enable(http, tracer, tracer.logger, config);
-
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
@@ -103,6 +106,18 @@ describe('HttpPlugin', () => {
     after(() => {
       server.close();
       plugin.disable();
+    });
+
+    it('http module should be patched', () => {
+      assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
+    });
+
+    it("should not patch if it's not a http module", () => {
+      const httpNotPatched = new HttpPlugin(
+        HttpPlugin.component,
+        process.versions.node
+      ).enable({} as Http, tracer, tracer.logger, {});
+      assert.strictEqual(Object.keys(httpNotPatched).length, 0);
     });
 
     it('should generate valid spans (client side and server side)', async () => {
@@ -125,7 +140,23 @@ describe('HttpPlugin', () => {
       assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
     });
 
-    const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500];
+    it(`should not trace requests with '${Utils.OT_REQUEST_HEADER}' header`, async () => {
+      const testPath = '/outgoing/do-not-trace';
+      doNock(hostname, testPath, 200, 'Ok');
+
+      const options = {
+        host: hostname,
+        path: testPath,
+        headers: { [Utils.OT_REQUEST_HEADER]: 1 },
+      };
+
+      const result = await httpRequest.get(options);
+      const spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(result.data, 'Ok');
+      assert.strictEqual(spans.length, 0);
+    });
+
+    const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500, 505];
 
     for (let i = 0; i < httpErrorCodes.length; i++) {
       it(`should test span for GET requests with http error ${httpErrorCodes[i]}`, async () => {
@@ -266,13 +297,13 @@ describe('HttpPlugin', () => {
     });
 
     for (const ignored of ['string', 'function', 'regexp']) {
-      it(`should not trace ignored requests with type ${ignored}`, async () => {
+      it(`should not trace ignored requests (client and server side) with type ${ignored}`, async () => {
         const testPath = `/ignored/${ignored}`;
-        doNock(hostname, testPath, 200, 'Ok');
 
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
         const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(spans.length, 0);
-        await httpRequest.get(`${protocol}://${hostname}${testPath}`);
         assert.strictEqual(spans.length, 0);
       });
     }
@@ -314,8 +345,11 @@ describe('HttpPlugin', () => {
     }
 
     it('should have 1 ended span when request throw on bad "options" object', () => {
+      nock.cleanAll();
+      nock.enableNetConnect();
       try {
         http.request({ protocol: 'telnet' });
+        assert.fail();
       } catch (error) {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 1);
@@ -348,6 +382,82 @@ describe('HttpPlugin', () => {
       } catch (error) {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 1);
+      }
+    });
+
+    it('should have 1 ended span when request is aborted', async () => {
+      nock('http://my.server.com')
+        .get('/')
+        .socketDelay(50)
+        .reply(200, '<html></html>');
+
+      const promiseRequest = new Promise((resolve, reject) => {
+        const req = http.request(
+          'http://my.server.com',
+          (resp: http.IncomingMessage) => {
+            let data = '';
+            resp.on('data', chunk => {
+              data += chunk;
+            });
+            resp.on('end', () => {
+              resolve(data);
+            });
+          }
+        );
+        req.setTimeout(10, () => {
+          req.abort();
+          reject('timeout');
+        });
+        return req.end();
+      });
+
+      try {
+        await promiseRequest;
+        assert.fail();
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        const [span] = spans;
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
+        assert.ok(Object.keys(span.attributes).length > 7);
+      }
+    });
+
+    it('should have 1 ended span when request is aborted after receiving response', async () => {
+      nock('http://my.server.com')
+        .get('/')
+        .delay({
+          body: 50,
+        })
+        .replyWithFile(200, `${process.cwd()}/package.json`);
+
+      const promiseRequest = new Promise((resolve, reject) => {
+        const req = http.request(
+          'http://my.server.com',
+          (resp: http.IncomingMessage) => {
+            let data = '';
+            resp.on('data', chunk => {
+              req.abort();
+              data += chunk;
+            });
+            resp.on('end', () => {
+              resolve(data);
+            });
+          }
+        );
+
+        return req.end();
+      });
+
+      try {
+        await promiseRequest;
+        assert.fail();
+      } catch (error) {
+        const spans = memoryExporter.getFinishedSpans();
+        const [span] = spans;
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
+        assert.ok(Object.keys(span.attributes).length > 7);
       }
     });
   });

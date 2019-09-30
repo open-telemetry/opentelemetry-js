@@ -42,6 +42,8 @@ describe('HttpPlugin', () => {
       nock.enableNetConnect();
 
       plugin.enable(http, tracer, tracer.logger);
+      // Ensure that http module is patched.
+      assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
@@ -76,6 +78,8 @@ describe('HttpPlugin', () => {
             (tracer.startSpan as sinon.SinonSpy).called,
             false
           );
+
+          assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         });
       });

@@ -11,13 +11,13 @@ For automatic instrumentation see the
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/plugin-http2
 ```
 
 ## Usage
 
-```
+```js
 const opentelemetry = require('@opentelemetry/plugin-http2');
 
 // TODO: DEMONSTRATE API

@@ -1,0 +1,38 @@
+{
+  "name": "example-basic-tracer-node",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Example of using @opentelemetry/basic-tracer in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "zipkin:basic": "cross-env EXPORTER=zipkin node ./index.js",
+    "jaeger:basic": "cross-env EXPORTER=jaeger node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.0.1",
+    "@opentelemetry/exporter-jaeger": "^0.0.1",
+    "@opentelemetry/exporter-zipkin": "^0.0.1",
+    "@opentelemetry/basic-tracer": "^0.0.1"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}

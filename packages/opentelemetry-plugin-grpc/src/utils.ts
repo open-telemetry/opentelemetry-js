@@ -15,7 +15,7 @@
  */
 
 import { CanonicalCode, Status } from '@opentelemetry/types';
-import * as grpcModule from 'grpc'; // For types only
+import * as grpcTypes from 'grpc'; // For types only
 
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
@@ -37,7 +37,7 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
  * @param status
  */
 export const _grpcStatusCodeToCanonicalCode = (
-  status?: grpcModule.status
+  status?: grpcTypes.status
 ): CanonicalCode => {
   if (status !== 0 && !status) {
     return CanonicalCode.UNKNOWN;
