@@ -82,6 +82,15 @@ describe('StackScopeManager', () => {
       return done();
     });
 
+    it('should create uid for the scope', () => {
+      const scope: { a: number; __otsid?: string } = {
+        a: 1,
+      };
+      scopeManager.with(scope, () => {
+        assert.ok(typeof scope.__otsid === 'string');
+      });
+    });
+
     it('should finally restore an old scope', done => {
       const scope1 = 'scope1';
       const scope2 = 'scope2';
@@ -106,13 +115,16 @@ describe('StackScopeManager', () => {
     it('should call the function with previously assigned scope', () => {
       class Obj {
         title: string;
+
         constructor(title: string) {
           this.title = title;
         }
+
         getTitle() {
           return this.title;
         }
       }
+
       const obj1 = new Obj('a1');
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
