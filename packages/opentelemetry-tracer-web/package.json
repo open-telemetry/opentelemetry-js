@@ -62,6 +62,7 @@
     "rimraf": "^3.0.0",
     "shimmer": "^1.2.0",
     "sinon": "^7.5.0",
+    "tslint-consistent-codestyle" : "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
