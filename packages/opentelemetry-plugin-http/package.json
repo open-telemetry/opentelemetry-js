@@ -66,7 +66,7 @@
     "tslint-consistent-codestyle": "^1.15.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
