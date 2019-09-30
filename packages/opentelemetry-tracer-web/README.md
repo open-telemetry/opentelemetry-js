@@ -7,7 +7,7 @@
 This module provides automatic tracing for Web applications.
 
 For manual instrumentation see the
-[@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) package.
+[@opentelemetry/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-web) package.
 
 ## How does automatic tracing work?
 > TODO: description

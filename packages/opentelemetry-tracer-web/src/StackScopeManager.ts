@@ -53,7 +53,8 @@ export class StackScopeManager implements ScopeManager {
   }
 
   private _createRootScope(scope: any) {
-    const uid = typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
+    const uid =
+      typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
     this._activateScope(scope, uid);
   }
 
@@ -117,7 +118,8 @@ export class StackScopeManager implements ScopeManager {
     if (typeof scope === 'undefined' || scope === null) {
       scope = window;
     }
-    const uid = typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
+    const uid =
+      typeof scope.uid === 'number' ? scope.uid : this._createNewUid();
     this._activateScope(scope, uid);
 
     try {
