@@ -55,7 +55,7 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/basic-tracer": "^0.0.1",
+    "@opentelemetry/tracer-basic": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/scope-async-hooks": "^0.0.1",
     "@opentelemetry/types": "^0.0.1",

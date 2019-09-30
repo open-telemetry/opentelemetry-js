@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasicTracer } from '@opentelemetry/basic-tracer';
+import { BasicTracer } from '@opentelemetry/tracer-basic';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { PluginLoader } from './instrumentation/PluginLoader';
 import { NodeTracerConfig, DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
