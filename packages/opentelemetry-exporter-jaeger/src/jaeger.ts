@@ -52,7 +52,7 @@ export class JaegerExporter implements SpanExporter {
     this._sender.setProcess(this._process);
 
     const flushInterval = config.flushInterval || 5000;
-    this._timer = setInterval(this._flush, flushInterval);
+    this._timer = setInterval(this._flush.bind(this), flushInterval);
     unrefTimer(this._timer);
   }
 
