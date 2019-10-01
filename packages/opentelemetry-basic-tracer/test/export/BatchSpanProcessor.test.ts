@@ -120,7 +120,7 @@ describe('BatchSpanProcessor', () => {
       setTimeout(() => {
         assert.strictEqual(exporter.spansDataList.length, 5);
         done();
-      }, defaultBufferConfig.bufferTimeout + 100);
+      }, defaultBufferConfig.bufferTimeout + 1000);
     }).timeout(defaultBufferConfig.bufferTimeout * 2);
   });
 });
