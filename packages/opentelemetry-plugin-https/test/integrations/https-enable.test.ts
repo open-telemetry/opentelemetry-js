@@ -40,7 +40,7 @@ export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
-describe('HttpPlugin Integration tests', () => {
+describe('HttpsPlugin Integration tests', () => {
   describe('enable()', () => {
     before(function(done) {
       // mandatory

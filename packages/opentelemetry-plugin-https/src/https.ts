@@ -104,7 +104,6 @@ export class HttpsPlugin extends HttpPlugin {
     ) => http.ClientRequest
   ) {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
-      // const plugin = this;
       return function httpsOutgoingRequest(
         options: https.RequestOptions | string,
         ...args: HttpRequestArgs

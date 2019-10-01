@@ -17,7 +17,7 @@
   },
   "keywords": [
     "opentelemetry",
-    "http",
+    "https",
     "tracing"
   ],
   "engines": {

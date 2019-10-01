@@ -57,7 +57,7 @@ export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
-describe('HttpPlugin', () => {
+describe('HttpsPlugin', () => {
   it('should return a plugin', () => {
     assert.ok(plugin instanceof HttpsPlugin);
   });

@@ -27,7 +27,7 @@ import { plugin } from '../../src/https';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 
-describe('HttpPlugin', () => {
+describe('HttpsPlugin', () => {
   let server: https.Server;
   let serverPort = 0;
 
