@@ -22,7 +22,7 @@ import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin } from '../../src/http';
 import { Utils } from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import { ReadableSpan } from '@opentelemetry/tracer-basic';
 
 export const assertSpan = (
   span: ReadableSpan,

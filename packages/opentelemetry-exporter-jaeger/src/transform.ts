@@ -15,7 +15,7 @@
  */
 
 import { Link, CanonicalCode } from '@opentelemetry/types';
-import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import { ReadableSpan } from '@opentelemetry/tracer-basic';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
