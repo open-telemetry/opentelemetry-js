@@ -451,11 +451,12 @@ export class HttpPlugin extends BasePlugin<Http> {
     try {
       return execute();
     } catch (error) {
-      Utils.setSpanWithError(span, error);
       if (rethrow) {
+        Utils.setSpanWithError(span, error);
         span.end();
         throw error;
       }
+      this._logger.error('caught error ', error);
     }
   }
 }

@@ -133,10 +133,6 @@ describe('HttpPlugin', () => {
           pathname,
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
-          forceStatus: {
-            code: CanonicalCode.UNKNOWN,
-            message: applyCustomAttributesOnSpanErrorMessage,
-          },
         };
 
         assert.strictEqual(spans.length, 2);
