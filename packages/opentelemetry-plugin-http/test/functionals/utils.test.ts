@@ -24,6 +24,7 @@ import { Utils } from '../../src/utils';
 import * as http from 'http';
 import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
 import { AttributeNames } from '../../src';
+import { NoopLogger } from '@opentelemetry/core';
 
 describe('Utils', () => {
   describe('parseResponseStatus()', () => {
@@ -128,12 +129,13 @@ describe('Utils', () => {
   });
 
   describe('isIgnored()', () => {
+    let satisfiesPatternStub: sinon.SinonSpy<[string, IgnoreMatcher], boolean>;
     beforeEach(() => {
-      Utils.satisfiesPattern = sinon.spy();
+      satisfiesPatternStub = sinon.spy(Utils, 'satisfiesPattern');
     });
 
     afterEach(() => {
-      sinon.restore();
+      satisfiesPatternStub.restore();
     });
 
     it('should call isSatisfyPattern, n match', () => {
@@ -145,13 +147,50 @@ describe('Utils', () => {
       );
     });
 
-    it('should call isSatisfyPattern, match', () => {
-      const answer1 = Utils.isIgnored('/test/1', ['/test/11']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
+    it('should call isSatisfyPattern, match for function', () => {
+      satisfiesPatternStub.restore();
+      const answer1 = Utils.isIgnored('/test/1', [
+        url => url.endsWith('/test/1'),
+      ]);
+      assert.strictEqual(answer1, true);
+    });
+
+    it('should not re-throw when function throws an exception', () => {
+      satisfiesPatternStub.restore();
+      const log = new NoopLogger();
+      const onException = (e: Error) => {
+        log.error('error', e);
+      };
+      for (const callback of [undefined, onException]) {
+        assert.doesNotThrow(() =>
+          Utils.isIgnored(
+            '/test/1',
+            [
+              url => {
+                throw new Error('test');
+              },
+            ],
+            callback
+          )
+        );
+      }
+    });
+
+    it('should call onException when function throws an exception', () => {
+      satisfiesPatternStub.restore();
+      const onException = sinon.spy();
+      assert.doesNotThrow(() =>
+        Utils.isIgnored(
+          '/test/1',
+          [
+            url => {
+              throw new Error('test');
+            },
+          ],
+          onException
+        )
       );
+      assert.strictEqual((onException as sinon.SinonSpy).callCount, 1);
     });
 
     it('should not call isSatisfyPattern', () => {

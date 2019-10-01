@@ -209,7 +209,16 @@ export class HttpPlugin extends BasePlugin<Http> {
             }
 
             if (this._config.applyCustomAttributesOnSpan) {
-              this._config.applyCustomAttributesOnSpan(span, request, response);
+              this._safeExecute(
+                span,
+                () =>
+                  this._config.applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
+                false
+              );
             }
 
             span.end();
@@ -248,7 +257,14 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
-      if (Utils.isIgnored(pathname, plugin._config.ignoreIncomingPaths)) {
+      if (
+        Utils.isIgnored(
+          pathname,
+          plugin._config.ignoreIncomingPaths,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+        )
+      ) {
         return original.apply(this, [event, ...args]);
       }
 
@@ -279,9 +295,11 @@ export class HttpPlugin extends BasePlugin<Http> {
           response.end = originalEnd;
           // Cannot pass args of type ResponseEndArgs,
           // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
-          // tslint:disable-next-line:no-any
-          const returned = plugin._safeExecute(span, () =>
-            response.end.apply(this, arguments as any)
+          const returned = plugin._safeExecute(
+            span,
+            // tslint:disable-next-line:no-any
+            () => response.end.apply(this, arguments as any),
+            true
           );
           const requestUrl = request.url ? url.parse(request.url) : null;
           const hostname = headers.host
@@ -315,15 +333,26 @@ export class HttpPlugin extends BasePlugin<Http> {
             .setStatus(Utils.parseResponseStatus(response.statusCode));
 
           if (plugin._config.applyCustomAttributesOnSpan) {
-            plugin._config.applyCustomAttributesOnSpan(span, request, response);
+            plugin._safeExecute(
+              span,
+              () =>
+                plugin._config.applyCustomAttributesOnSpan!(
+                  span,
+                  request,
+                  response
+                ),
+              false
+            );
           }
 
           span.end();
           return returned;
         };
 
-        return plugin._safeExecute(span, () =>
-          original.apply(this, [event, ...args])
+        return plugin._safeExecute(
+          span,
+          () => original.apply(this, [event, ...args]),
+          true
         );
       });
     };
@@ -353,7 +382,12 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       if (
         Utils.isOpenTelemetryRequest(options) ||
-        Utils.isIgnored(origin + pathname, plugin._config.ignoreOutgoingUrls)
+        Utils.isIgnored(
+          origin + pathname,
+          plugin._config.ignoreOutgoingUrls,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+        )
       ) {
         return original.apply(this, [options, ...args]);
       }
@@ -370,8 +404,10 @@ export class HttpPlugin extends BasePlugin<Http> {
         .getHttpTextFormat()
         .inject(span.context(), Format.HTTP, options.headers);
 
-      const request: ClientRequest = plugin._safeExecute(span, () =>
-        original.apply(this, [options, ...args])
+      const request: ClientRequest = plugin._safeExecute(
+        span,
+        () => original.apply(this, [options, ...args]),
+        true
       );
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
@@ -399,16 +435,28 @@ export class HttpPlugin extends BasePlugin<Http> {
       .startSpan(name, options)
       .setAttribute(AttributeNames.COMPONENT, HttpPlugin.component);
   }
-
+  private _safeExecute<
+    T extends (...args: unknown[]) => ReturnType<T>,
+    K extends boolean
+  >(
+    span: Span,
+    execute: T,
+    rethrow: K
+  ): K extends true ? ReturnType<T> : (ReturnType<T> | void);
   private _safeExecute<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
-    execute: T
-  ): ReturnType<T> {
+    execute: T,
+    rethrow: boolean
+  ): ReturnType<T> | void {
     try {
       return execute();
     } catch (error) {
-      Utils.setSpanWithError(span, error);
-      throw error;
+      if (rethrow) {
+        Utils.setSpanWithError(span, error);
+        span.end();
+        throw error;
+      }
+      this._logger.error('caught error ', error);
     }
   }
 }
