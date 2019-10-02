@@ -74,7 +74,6 @@ export class ZipkinExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ) {
     this._logger.debug('Zipkin exporter export');
-    // @todo: buffer spans (batch based on both time and max number)
     return this._sendSpans(spans, resultCallback);
   }
 
