@@ -46,9 +46,7 @@ export class HttpsPlugin extends HttpPlugin {
       this._moduleExports.Server.prototype
     ) {
       shimmer.wrap(
-        this._moduleExports &&
-          this._moduleExports.Server &&
-          this._moduleExports.Server.prototype,
+        this._moduleExports.Server.prototype,
         'emit',
         this._getPatchIncomingRequestFunction()
       );
@@ -65,6 +63,8 @@ export class HttpsPlugin extends HttpPlugin {
       this._getPatchHttpsOutgoingRequestFunction()
     );
 
+    // In Node 8-12, http.get calls a private request method, therefore we patch it
+    // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
       shimmer.wrap(
         this._moduleExports,
@@ -131,12 +131,7 @@ export class HttpsPlugin extends HttpPlugin {
       this._moduleExports.Server &&
       this._moduleExports.Server.prototype
     ) {
-      shimmer.unwrap(
-        this._moduleExports &&
-          this._moduleExports.Server &&
-          this._moduleExports.Server.prototype,
-        'emit'
-      );
+      shimmer.unwrap(this._moduleExports.Server.prototype, 'emit');
     }
     shimmer.unwrap(this._moduleExports, 'request');
     if (semver.satisfies(this.version, '>=8.0.0')) {
