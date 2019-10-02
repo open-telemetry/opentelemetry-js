@@ -17,22 +17,9 @@
 import * as assert from 'assert';
 import { BatchSpanProcessor } from '../../src/export/BatchSpanProcessor';
 import { Span, BasicTracer } from '../../src';
-import { SpanExporter } from '../../src/export/SpanExporter';
-import { ReadableSpan } from '../../src/export/ReadableSpan';
+import { InMemorySpanExporter } from '../../src/export/InMemorySpanExporter';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { NEVER_SAMPLER, ALWAYS_SAMPLER, NoopLogger } from '@opentelemetry/core';
-
-// @todo: replace TestExporter with InMemorySpanExporter (pull/234)
-class TestExporter implements SpanExporter {
-  spansDataList: ReadableSpan[] = [];
-  export(spans: ReadableSpan[]): void {
-    this.spansDataList.push(...spans);
-  }
-
-  shutdown(): void {
-    this.spansDataList = [];
-  }
-}
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracer({
@@ -61,7 +48,13 @@ describe('BatchSpanProcessor', () => {
     bufferSize: 5,
     bufferTimeout: 2000,
   };
-  const exporter = new TestExporter();
+  let exporter: InMemorySpanExporter;
+  beforeEach(() => {
+    exporter = new InMemorySpanExporter();
+  });
+  afterEach(() => {
+    exporter.reset();
+  });
 
   describe('constructor', () => {
     it('should create a BatchSpanProcessor instance', () => {
@@ -86,18 +79,18 @@ describe('BatchSpanProcessor', () => {
       for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
         processor.onStart(span);
-        assert.strictEqual(exporter.spansDataList.length, 0);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
         processor.onEnd(span);
-        assert.strictEqual(exporter.spansDataList.length, 0);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
       // Now we should start seeing the spans in exporter
       const span = createSampledSpan(`${name}_6`);
       processor.onEnd(span);
-      assert.strictEqual(exporter.spansDataList.length, 6);
+      assert.strictEqual(exporter.getFinishedSpans().length, 6);
 
       processor.shutdown();
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
     it('should not export the unsampled spans', () => {
@@ -105,7 +98,7 @@ describe('BatchSpanProcessor', () => {
       for (let i = 0; i < defaultBufferConfig.bufferSize * 2; i++) {
         const span = createUnSampledSpan(`${name}_${i}`);
         processor.onEnd(span);
-        assert.strictEqual(exporter.spansDataList.length, 0);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
     });
 
@@ -114,11 +107,11 @@ describe('BatchSpanProcessor', () => {
       for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
         processor.onEnd(span);
-        assert.strictEqual(exporter.spansDataList.length, 0);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
 
       setTimeout(() => {
-        assert.strictEqual(exporter.spansDataList.length, 5);
+        assert.strictEqual(exporter.getFinishedSpans().length, 5);
         done();
       }, defaultBufferConfig.bufferTimeout + 1000);
     }).timeout(defaultBufferConfig.bufferTimeout * 2);
