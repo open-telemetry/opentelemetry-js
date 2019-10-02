@@ -25,7 +25,7 @@ import {
 } from '@opentelemetry/core';
 import { NodeTracer } from '../src/NodeTracer';
 import { TraceFlags } from '@opentelemetry/types';
-import { Span } from '@opentelemetry/basic-tracer';
+import { Span } from '@opentelemetry/tracer-basic';
 import * as path from 'path';
 
 const sleep = (time: number) =>

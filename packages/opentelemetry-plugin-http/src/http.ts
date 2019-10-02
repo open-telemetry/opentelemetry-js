@@ -42,7 +42,7 @@ import {
 } from './types';
 import { Format } from './enums/Format';
 import { AttributeNames } from './enums/AttributeNames';
-import { Utils } from './utils';
+import * as utils from './utils';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -70,7 +70,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._getPatchOutgoingRequestFunction()
     );
 
-    // In Node 8-10, http.get calls a private request method, therefore we patch it
+    // In Node >=8, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
       shimmer.wrap(
@@ -177,7 +177,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const userAgent = headers['user-agent'];
 
       span.setAttributes({
-        [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+        [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
           options,
           headers,
           `${HttpPlugin.component}:`
@@ -205,20 +205,29 @@ export class HttpPlugin extends BasePlugin<Http> {
             if (response.aborted && !response.complete) {
               span.setStatus({ code: CanonicalCode.ABORTED });
             } else {
-              span.setStatus(Utils.parseResponseStatus(response.statusCode!));
+              span.setStatus(utils.parseResponseStatus(response.statusCode!));
             }
 
             if (this._config.applyCustomAttributesOnSpan) {
-              this._config.applyCustomAttributesOnSpan(span, request, response);
+              this._safeExecute(
+                span,
+                () =>
+                  this._config.applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
+                false
+              );
             }
 
             span.end();
           });
-          Utils.setSpanOnError(span, response);
+          utils.setSpanOnError(span, response);
         }
       );
 
-      Utils.setSpanOnError(span, request);
+      utils.setSpanOnError(span, request);
 
       this._logger.debug('makeRequestTrace return request');
       return request;
@@ -248,7 +257,14 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
-      if (Utils.isIgnored(pathname, plugin._config.ignoreIncomingPaths)) {
+      if (
+        utils.isIgnored(
+          pathname,
+          plugin._config.ignoreIncomingPaths,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+        )
+      ) {
         return original.apply(this, [event, ...args]);
       }
 
@@ -279,9 +295,11 @@ export class HttpPlugin extends BasePlugin<Http> {
           response.end = originalEnd;
           // Cannot pass args of type ResponseEndArgs,
           // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
-          // tslint:disable-next-line:no-any
-          const returned = plugin._safeExecute(span, () =>
-            response.end.apply(this, arguments as any)
+          const returned = plugin._safeExecute(
+            span,
+            // tslint:disable-next-line:no-any
+            () => response.end.apply(this, arguments as any),
+            true
           );
           const requestUrl = request.url ? url.parse(request.url) : null;
           const hostname = headers.host
@@ -290,7 +308,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const userAgent = headers['user-agent'];
 
           const attributes: Attributes = {
-            [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+            [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
               requestUrl,
               headers,
               `${HttpPlugin.component}:`
@@ -312,18 +330,29 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           span
             .setAttributes(attributes)
-            .setStatus(Utils.parseResponseStatus(response.statusCode));
+            .setStatus(utils.parseResponseStatus(response.statusCode));
 
           if (plugin._config.applyCustomAttributesOnSpan) {
-            plugin._config.applyCustomAttributesOnSpan(span, request, response);
+            plugin._safeExecute(
+              span,
+              () =>
+                plugin._config.applyCustomAttributesOnSpan!(
+                  span,
+                  request,
+                  response
+                ),
+              false
+            );
           }
 
           span.end();
           return returned;
         };
 
-        return plugin._safeExecute(span, () =>
-          original.apply(this, [event, ...args])
+        return plugin._safeExecute(
+          span,
+          () => original.apply(this, [event, ...args]),
+          true
         );
       });
     };
@@ -338,11 +367,11 @@ export class HttpPlugin extends BasePlugin<Http> {
       options: RequestOptions | string,
       ...args: unknown[]
     ): ClientRequest {
-      if (!Utils.isValidOptionsType(options)) {
+      if (!utils.isValidOptionsType(options)) {
         return original.apply(this, [options, ...args]);
       }
 
-      const { origin, pathname, method, optionsParsed } = Utils.getRequestInfo(
+      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
         options,
         typeof args[0] === 'object' && typeof options === 'string'
           ? (args.shift() as RequestOptions)
@@ -352,8 +381,13 @@ export class HttpPlugin extends BasePlugin<Http> {
       options = optionsParsed;
 
       if (
-        Utils.isOpenTelemetryRequest(options) ||
-        Utils.isIgnored(origin + pathname, plugin._config.ignoreOutgoingUrls)
+        utils.isOpenTelemetryRequest(options) ||
+        utils.isIgnored(
+          origin + pathname,
+          plugin._config.ignoreOutgoingUrls,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+        )
       ) {
         return original.apply(this, [options, ...args]);
       }
@@ -370,8 +404,10 @@ export class HttpPlugin extends BasePlugin<Http> {
         .getHttpTextFormat()
         .inject(span.context(), Format.HTTP, options.headers);
 
-      const request: ClientRequest = plugin._safeExecute(span, () =>
-        original.apply(this, [options, ...args])
+      const request: ClientRequest = plugin._safeExecute(
+        span,
+        () => original.apply(this, [options, ...args]),
+        true
       );
 
       plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
@@ -399,16 +435,28 @@ export class HttpPlugin extends BasePlugin<Http> {
       .startSpan(name, options)
       .setAttribute(AttributeNames.COMPONENT, HttpPlugin.component);
   }
-
+  private _safeExecute<
+    T extends (...args: unknown[]) => ReturnType<T>,
+    K extends boolean
+  >(
+    span: Span,
+    execute: T,
+    rethrow: K
+  ): K extends true ? ReturnType<T> : (ReturnType<T> | void);
   private _safeExecute<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
-    execute: T
-  ): ReturnType<T> {
+    execute: T,
+    rethrow: boolean
+  ): ReturnType<T> | void {
     try {
       return execute();
     } catch (error) {
-      Utils.setSpanWithError(span, error);
-      throw error;
+      if (rethrow) {
+        utils.setSpanWithError(span, error);
+        span.end();
+        throw error;
+      }
+      this._logger.error('caught error ', error);
     }
   }
 }

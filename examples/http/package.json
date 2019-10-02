@@ -33,7 +33,7 @@
     "@opentelemetry/exporter-zipkin": "^0.0.1",
     "@opentelemetry/node-sdk": "^0.0.1",
     "@opentelemetry/plugin-http": "^0.0.1",
-    "@opentelemetry/basic-tracer": "^0.0.1"
+    "@opentelemetry/tracer-basic": "^0.0.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {

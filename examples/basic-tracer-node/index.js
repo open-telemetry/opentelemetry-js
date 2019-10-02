@@ -1,5 +1,5 @@
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/basic-tracer');
+const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracer-basic');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 

@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { ReadableSpan } from '@opentelemetry/basic-tracer';
+import { ReadableSpan } from '@opentelemetry/tracer-basic';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 

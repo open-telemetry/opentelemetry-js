@@ -15,7 +15,7 @@
  */
 
 import { Plugins } from './instrumentation/PluginLoader';
-import { BasicTracerConfig } from '@opentelemetry/basic-tracer';
+import { BasicTracerConfig } from '@opentelemetry/tracer-basic';
 
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
