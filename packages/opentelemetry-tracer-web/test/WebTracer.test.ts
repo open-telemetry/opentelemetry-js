@@ -16,13 +16,14 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { BasicTracerConfig } from '@opentelemetry/tracer-basic';
 import { StackScopeManager } from '../src/StackScopeManager';
-import { WebTracer, WebTracerConfig } from '../src/WebTracer';
+import { WebTracer } from '../src/WebTracer';
 
 describe('WebTracer', () => {
   let tracer: WebTracer;
   describe('constructor', () => {
-    let defaultOptions: WebTracerConfig;
+    let defaultOptions: BasicTracerConfig;
 
     beforeEach(() => {
       defaultOptions = {
@@ -36,7 +37,7 @@ describe('WebTracer', () => {
     });
 
     it('should enable the scope manager', () => {
-      let options: WebTracerConfig;
+      let options: BasicTracerConfig;
       const scopeManager = new StackScopeManager();
       options = { scopeManager };
 
