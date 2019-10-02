@@ -27,18 +27,9 @@ export class StackScopeManager implements ScopeManager {
   private _enabled = false;
 
   /**
-   * keeps the information of scopes so that it can be restored properly after being used
+   * Keeps the reference to current scope
    */
-  public _scopesStack: any[] = [];
-
-  /**
-   *
-   * @param scope Scope to be activated
-   * @private
-   */
-  private _activateScope(scope: any) {
-    this._scopesStack.push(scope);
-  }
+  public _currentScope: any;
 
   /**
    *
@@ -61,40 +52,10 @@ export class StackScopeManager implements ScopeManager {
   }
 
   /**
-   * Creates a root / main scope
-   * @param scope
-   * @private
-   */
-  private _createRootScope(scope: any) {
-    this._activateScope(scope);
-  }
-
-  /**
-   * Returns last active scope
-   * @private
-   */
-  private _lastScope(): unknown {
-    return this._scopesStack[this._scopesStack.length - 1] || undefined;
-  }
-
-  /**
-   * Removes scope from stack
-   * @param scope
-   * @private
-   */
-  private _removeFromStack(scope: any) {
-    const index = this._scopesStack.lastIndexOf(scope);
-    // don't remove root scope
-    if (index > 0) {
-      this._scopesStack.splice(index, 1);
-    }
-  }
-
-  /**
    * Returns the active scope
    */
   active(): unknown {
-    return this._lastScope();
+    return this._currentScope;
   }
 
   /**
@@ -114,10 +75,10 @@ export class StackScopeManager implements ScopeManager {
   }
 
   /**
-   * Disable the scope manager (clears the scopes)
+   * Disable the scope manager (clears the current scope)
    */
   disable(): this {
-    this._scopesStack = [];
+    this._currentScope = undefined;
     this._enabled = false;
     return this;
   }
@@ -130,7 +91,7 @@ export class StackScopeManager implements ScopeManager {
       return this;
     }
     this._enabled = true;
-    this._createRootScope(window);
+    this._currentScope = window;
     return this;
   }
 
@@ -147,14 +108,16 @@ export class StackScopeManager implements ScopeManager {
     if (typeof scope === 'undefined' || scope === null) {
       scope = window;
     }
-    this._activateScope(scope);
+
+    const previousScope = this._currentScope;
+    this._currentScope = scope;
 
     try {
       return fn.apply(scope);
     } catch (err) {
       throw err;
     } finally {
-      this._removeFromStack(scope);
+      this._currentScope = previousScope;
     }
   }
 }
