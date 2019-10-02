@@ -25,23 +25,19 @@ import {
   NoRecordingSpan,
 } from '@opentelemetry/core';
 import { TraceFlags } from '@opentelemetry/types';
-import { BasicTracer } from '../src/BasicTracer';
+import { BasicTracer, Span } from '../src';
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
-import { Span } from '../src/Span';
 
 describe('BasicTracer', () => {
   describe('constructor', () => {
-    it('should construct an instance with required only options', () => {
-      const tracer = new BasicTracer({
-        scopeManager: new NoopScopeManager(),
-      });
+    it('should construct an instance without any options', () => {
+      const tracer = new BasicTracer();
       assert.ok(tracer instanceof BasicTracer);
     });
 
     it('should construct an instance with binary format', () => {
       const tracer = new BasicTracer({
         binaryFormat: new BinaryTraceContext(),
-        scopeManager: new NoopScopeManager(),
       });
       assert.ok(tracer instanceof BasicTracer);
     });
