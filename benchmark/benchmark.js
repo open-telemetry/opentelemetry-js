@@ -5,7 +5,7 @@ const benchmarks = require('beautify-benchmark');
 
 Benchmark.options.maxTime = 0;
 // @todo : Change it to between 50-100 or keep it random.
-Benchmark.options.minSamples = 5;
+Benchmark.options.minSamples = 10;
 
 module.exports = () => {
   const suite = new Benchmark.Suite();
