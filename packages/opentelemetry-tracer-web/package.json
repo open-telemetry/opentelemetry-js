@@ -61,13 +61,13 @@
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
-    "typescript": "^3.4.5",
+    "typescript": "^3.6.3",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/basic-tracer": "^0.0.1",
+    "@opentelemetry/tracer-basic": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/scope-base": "^0.0.1",
     "@opentelemetry/types": "^0.0.1"
