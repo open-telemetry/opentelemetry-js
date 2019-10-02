@@ -22,8 +22,9 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import { Utils } from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/basic-tracer';
+import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
 import { AttributeNames } from '../../src';
+import { NoopLogger } from '@opentelemetry/core';
 
 describe('Utils', () => {
   describe('parseResponseStatus()', () => {
@@ -73,11 +74,19 @@ describe('Utils', () => {
 
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
-      const result = Utils.getRequestInfo('http://google.fr/');
-      assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
-      assert.strictEqual(result.optionsParsed.protocol, 'http:');
-      assert.strictEqual(result.optionsParsed.path, '/');
-      assert.strictEqual(result.pathname, '/');
+      const webUrl = 'http://google.fr/';
+      const urlParsed = url.parse(webUrl);
+      const urlParsedWithoutPathname = {
+        ...urlParsed,
+        pathname: undefined,
+      };
+      for (const param of [webUrl, urlParsed, urlParsedWithoutPathname]) {
+        const result = Utils.getRequestInfo(param);
+        assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
+        assert.strictEqual(result.optionsParsed.protocol, 'http:');
+        assert.strictEqual(result.optionsParsed.path, '/');
+        assert.strictEqual(result.pathname, '/');
+      }
     });
   });
 
@@ -120,12 +129,13 @@ describe('Utils', () => {
   });
 
   describe('isIgnored()', () => {
+    let satisfiesPatternStub: sinon.SinonSpy<[string, IgnoreMatcher], boolean>;
     beforeEach(() => {
-      Utils.satisfiesPattern = sinon.spy();
+      satisfiesPatternStub = sinon.spy(Utils, 'satisfiesPattern');
     });
 
     afterEach(() => {
-      sinon.restore();
+      satisfiesPatternStub.restore();
     });
 
     it('should call isSatisfyPattern, n match', () => {
@@ -137,13 +147,50 @@ describe('Utils', () => {
       );
     });
 
-    it('should call isSatisfyPattern, match', () => {
-      const answer1 = Utils.isIgnored('/test/1', ['/test/11']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
+    it('should call isSatisfyPattern, match for function', () => {
+      satisfiesPatternStub.restore();
+      const answer1 = Utils.isIgnored('/test/1', [
+        url => url.endsWith('/test/1'),
+      ]);
+      assert.strictEqual(answer1, true);
+    });
+
+    it('should not re-throw when function throws an exception', () => {
+      satisfiesPatternStub.restore();
+      const log = new NoopLogger();
+      const onException = (e: Error) => {
+        log.error('error', e);
+      };
+      for (const callback of [undefined, onException]) {
+        assert.doesNotThrow(() =>
+          Utils.isIgnored(
+            '/test/1',
+            [
+              url => {
+                throw new Error('test');
+              },
+            ],
+            callback
+          )
+        );
+      }
+    });
+
+    it('should call onException when function throws an exception', () => {
+      satisfiesPatternStub.restore();
+      const onException = sinon.spy();
+      assert.doesNotThrow(() =>
+        Utils.isIgnored(
+          '/test/1',
+          [
+            url => {
+              throw new Error('test');
+            },
+          ],
+          onException
+        )
       );
+      assert.strictEqual((onException as sinon.SinonSpy).callCount, 1);
     });
 
     it('should not call isSatisfyPattern', () => {
@@ -212,22 +259,25 @@ describe('Utils', () => {
 
   describe('setSpanWithError()', () => {
     it('should have error attributes', () => {
-      const span = new Span(
-        new BasicTracer({
-          scopeManager: new NoopScopeManager(),
-        }),
-        'test',
-        { spanId: '', traceId: '' },
-        SpanKind.INTERNAL
-      );
       const errorMessage = 'test error';
-      Utils.setSpanWithError(span, new Error(errorMessage));
-      const attributes = span.toReadableSpan().attributes;
-      assert.strictEqual(
-        attributes[AttributeNames.HTTP_ERROR_MESSAGE],
-        errorMessage
-      );
-      assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      for (const obj of [undefined, { statusCode: 400 }]) {
+        const span = new Span(
+          new BasicTracer({
+            scopeManager: new NoopScopeManager(),
+          }),
+          'test',
+          { spanId: '', traceId: '' },
+          SpanKind.INTERNAL
+        );
+        /* tslint:disable-next-line:no-any */
+        Utils.setSpanWithError(span, new Error(errorMessage), obj as any);
+        const attributes = span.toReadableSpan().attributes;
+        assert.strictEqual(
+          attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+          errorMessage
+        );
+        assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+      }
     });
   });
   describe('isOpenTelemetryRequest()', () => {

@@ -125,19 +125,30 @@ export class Utils {
 
   /**
    * Check whether the given request is ignored by configuration
+   * It will not re-throw exceptions from `list` provided by the client
    * @param constant e.g URL of request
-   * @param obj obj to inspect
-   * @param list List of ignore patterns
+   * @param [list] List of ignore patterns
+   * @param [onException] callback for doing something when an exception has occured
    */
-  static isIgnored(constant: string, list?: IgnoreMatcher[]): boolean {
+  static isIgnored(
+    constant: string,
+    list?: IgnoreMatcher[],
+    onException?: (error: Error) => void
+  ): boolean {
     if (!list) {
       // No ignored urls - trace everything
       return false;
     }
-
-    for (const pattern of list) {
-      if (Utils.satisfiesPattern(constant, pattern)) {
-        return true;
+    // Try/catch outside the loop for failing fast
+    try {
+      for (const pattern of list) {
+        if (Utils.satisfiesPattern(constant, pattern)) {
+          return true;
+        }
+      }
+    } catch (e) {
+      if (onException) {
+        onException(e);
       }
     }
 
@@ -152,6 +163,7 @@ export class Utils {
   static setSpanOnError(span: Span, obj: IncomingMessage | ClientRequest) {
     obj.on('error', (error: Err) => {
       Utils.setSpanWithError(span, error, obj);
+      span.end();
     });
   }
 
@@ -173,9 +185,17 @@ export class Utils {
       [AttributeNames.HTTP_ERROR_MESSAGE]: message,
     });
 
+    if (!obj) {
+      span.setStatus({ code: CanonicalCode.UNKNOWN, message });
+      span.end();
+      return;
+    }
+
     let status: Status;
-    if (obj && (obj as IncomingMessage).statusCode) {
+    if ((obj as IncomingMessage).statusCode) {
       status = Utils.parseResponseStatus((obj as IncomingMessage).statusCode!);
+    } else if ((obj as ClientRequest).aborted) {
+      status = { code: CanonicalCode.ABORTED };
     } else {
       status = { code: CanonicalCode.UNKNOWN };
     }
@@ -183,7 +203,6 @@ export class Utils {
     status.message = message;
 
     span.setStatus(status);
-    span.end();
   }
 
   /**

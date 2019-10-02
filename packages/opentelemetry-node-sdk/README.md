@@ -7,7 +7,7 @@
 This module provides *automated instrumentation and tracing* for Node.js applications.
 
 For manual instrumentation see the
-[@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer) package.
+[@opentelemetry/tracer-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic) package.
 
 ## How does automated instrumentation work?
 node-sdk exposes a `NodeTracer` that will automatically hook into the module loader of Node.js.
@@ -33,7 +33,7 @@ This instrumentation code will automatically
 In short, this means that this module will use provided plugins to automatically instrument your application to produce spans and provide end-to-end tracing by just adding a few lines of code.
 
 ## Creating custom spans on top of auto-instrumentation
-Additionally to automated instrumentation, `NodeTracer` exposes the same API as [@opentelemetry/basic-tracer](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-basic-tracer), allowing creating custom spans if needed.
+Additionally to automated instrumentation, `NodeTracer` exposes the same API as [@opentelemetry/tracer-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic), allowing creating custom spans if needed.
 
 ## Installation
 

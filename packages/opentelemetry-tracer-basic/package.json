@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/basic-tracer",
+  "name": "@opentelemetry/tracer-basic",
   "version": "0.0.1",
   "description": "OpenTelemetry Basic Tracer",
   "main": "build/src/index.js",
@@ -49,7 +49,7 @@
     "tslint-consistent-codestyle": "^1.15.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
-    "typescript": "^3.4.5"
+    "typescript": "^3.6.3"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",

@@ -18,7 +18,7 @@ import {
   SpanExporter,
   ReadableSpan,
   ExportResult,
-} from '@opentelemetry/basic-tracer';
+} from '@opentelemetry/tracer-basic';
 import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
@@ -52,7 +52,7 @@ export class JaegerExporter implements SpanExporter {
     this._sender.setProcess(this._process);
 
     const flushInterval = config.flushInterval || 5000;
-    this._timer = setInterval(this._flush, flushInterval);
+    this._timer = setInterval(this._flush.bind(this), flushInterval);
     unrefTimer(this._timer);
   }
 
