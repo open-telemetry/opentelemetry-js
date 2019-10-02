@@ -3,6 +3,7 @@
   "npmClient": "yarn",
   "packages": [
     "packages/*",
+    "packages/*/examples/**/*",
     "examples/*"
   ],
   "version": "0.0.1"

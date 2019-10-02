@@ -3,9 +3,6 @@
   "version": "0.0.1",
   "description": "OpenTelemetry Automatic Web Tracer",
   "main": "build/src/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts"
-  },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
@@ -16,8 +13,7 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix",
-    "example1": "webpack-dev-server -d --progress --colors --port 8090 --config examples/js/webpack.config.js --hot --inline --host 0.0.0.0"
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",
@@ -46,7 +42,6 @@
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
     "@types/webpack-env": "1.13.9",
-    "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.0.13",
     "@babel/core": "^7.6.0",
     "babel-loader": "^8.0.6",
@@ -60,7 +55,6 @@
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
-    "shimmer": "^1.2.0",
     "sinon": "^7.5.0",
     "tslint-consistent-codestyle" : "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
@@ -70,7 +64,6 @@
     "typescript": "^3.4.5",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
-    "webpack-dev-server": "^3.8.1",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {

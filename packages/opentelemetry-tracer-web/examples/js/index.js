@@ -1,4 +1,4 @@
-import { WebTracer } from '../../src';
+import { WebTracer } from '@opentelemetry/tracer-web';
 
 import * as shimmer from 'shimmer';
 
@@ -28,6 +28,10 @@ shimmer.wrap(Tester.prototype, 'add', (originalFunction) => {
       return result;
     }
   };
+});
+
+webTracer.withSpan(span, function () {
+  console.log(this === span);
 });
 
 tester.add('foo');

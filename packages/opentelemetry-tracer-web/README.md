@@ -10,20 +10,28 @@ For manual instrumentation see the
 [@opentelemetry/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-web) package.
 
 ## How does automatic tracing work?
-> TODO: description
+> Automatic Instrumentation is in progress, manual instrumentation only supported
 
 ## Installation
 
-```
+```bash
 npm install --save @opentelemetry/tracer-web
 ```
 
 ## Usage
 
-```
-const opentelemetry = require('@opentelemetry/tracer-web');
+```js
+// Manual 
+const { WebTracer } = require('@opentelemetry/tracer-web');
+const webTracer = new WebTracer();
+const span = webTracer.startSpan('span1');
+webTracer.withSpan(span, function () {
+  // this === span
+  this.addEvent('start');
+});
+span.addEvent('middle');
+span.end();
 
-// TODO: DEMONSTRATE API
 ```
 
 ## Useful links

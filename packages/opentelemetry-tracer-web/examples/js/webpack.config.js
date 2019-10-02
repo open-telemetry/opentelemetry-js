@@ -6,10 +6,7 @@ const directory = path.resolve(__dirname);
 
 const common = {
   mode: 'development',
-  entry: {
-    example: ['babel-polyfill', `${directory}/index.js`],
-    main: [`${mainPath}/src/index.ts`]
-  },
+  entry: 'index.js',
   target: 'web',
   module: {
     rules: [
