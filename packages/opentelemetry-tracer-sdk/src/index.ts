@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './BasicTracer';
+export * from './SDKTracer';
 export * from './export/ConsoleSpanExporter';
 export * from './export/BatchSpanProcessor';
 export * from './export/ExportResult';

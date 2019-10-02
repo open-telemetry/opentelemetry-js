@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { SimpleSpanProcessor } from '../../src/export/SimpleSpanProcessor';
-import { Span, BasicTracer } from '../../src';
+import { Span, SDKTracer } from '../../src';
 import { SpanExporter } from '../../src/export/SpanExporter';
 import { ReadableSpan } from '../../src/export/ReadableSpan';
 import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
@@ -33,7 +33,7 @@ class TestExporter implements SpanExporter {
 }
 
 describe('SimpleSpanProcessor', () => {
-  const tracer = new BasicTracer();
+  const tracer = new SDKTracer();
   const exporter = new TestExporter();
 
   describe('constructor', () => {

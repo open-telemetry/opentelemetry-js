@@ -17,7 +17,7 @@
 import * as types from '@opentelemetry/types';
 import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
-import { BasicTracer } from './BasicTracer';
+import { SDKTracer } from './SDKTracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
 
@@ -48,7 +48,7 @@ export class Span implements types.Span, ReadableSpan {
 
   /** Constructs a new Span instance. */
   constructor(
-    parentTracer: BasicTracer,
+    parentTracer: SDKTracer,
     spanName: string,
     spanContext: types.SpanContext,
     kind: types.SpanKind,

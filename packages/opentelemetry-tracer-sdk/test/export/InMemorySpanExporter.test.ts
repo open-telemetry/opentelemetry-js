@@ -18,13 +18,13 @@ import * as assert from 'assert';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  BasicTracer,
+  SDKTracer,
   ExportResult,
 } from '../../src';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
-  const tracer = new BasicTracer();
+  const tracer = new SDKTracer();
   tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   afterEach(() => {

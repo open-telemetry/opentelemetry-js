@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import { Utils } from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
+import { Span, SDKTracer } from '@opentelemetry/tracer-sdk';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -262,7 +262,7 @@ describe('Utils', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracer({
+          new SDKTracer({
             scopeManager: new NoopScopeManager(),
           }),
           'test',

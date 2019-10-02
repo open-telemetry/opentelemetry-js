@@ -17,7 +17,7 @@
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracer-sdk';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node-sdk';
 import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';

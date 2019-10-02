@@ -23,7 +23,7 @@ import {
   SpanExporter,
   ReadableSpan,
   ExportResult,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracer-sdk';
 
 import * as zipkinTypes from './types';
 import {

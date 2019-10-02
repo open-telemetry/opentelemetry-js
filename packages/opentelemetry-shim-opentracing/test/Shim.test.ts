@@ -16,14 +16,14 @@
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import { BasicTracer, Span } from '@opentelemetry/tracer-basic';
+import { SDKTracer, Span } from '@opentelemetry/tracer-sdk';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
 import { INVALID_SPAN_CONTEXT, timeInputToHrTime } from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
-  const tracer = new BasicTracer({
+  const tracer = new SDKTracer({
     scopeManager: new NoopScopeManager(),
   });
   const shimTracer: opentracing.Tracer = new TracerShim(tracer);

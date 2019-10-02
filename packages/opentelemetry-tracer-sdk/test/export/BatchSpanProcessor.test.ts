@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { BatchSpanProcessor } from '../../src/export/BatchSpanProcessor';
-import { Span, BasicTracer } from '../../src';
+import { Span, SDKTracer } from '../../src';
 import { SpanExporter } from '../../src/export/SpanExporter';
 import { ReadableSpan } from '../../src/export/ReadableSpan';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
@@ -35,7 +35,7 @@ class TestExporter implements SpanExporter {
 }
 
 function createSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracer({
+  const tracer = new SDKTracer({
     scopeManager: new NoopScopeManager(),
     sampler: ALWAYS_SAMPLER,
   });
@@ -45,7 +45,7 @@ function createSampledSpan(spanName: string): Span {
 }
 
 function createUnSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracer({
+  const tracer = new SDKTracer({
     scopeManager: new NoopScopeManager(),
     sampler: NEVER_SAMPLER,
     logger: new NoopLogger(),

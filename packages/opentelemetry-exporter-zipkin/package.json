@@ -53,7 +53,7 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/tracer-basic": "^0.0.1",
+    "@opentelemetry/tracer-sdk": "^0.0.1",
     "@opentelemetry/types": "^0.0.1"
   }
 }

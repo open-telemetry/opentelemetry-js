@@ -23,7 +23,7 @@ import {
   TraceFlags,
   SpanContext,
 } from '@opentelemetry/types';
-import { BasicTracer } from '../src';
+import { SDKTracer } from '../src';
 import {
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
@@ -31,7 +31,7 @@ import {
 } from '@opentelemetry/core';
 
 describe('Span', () => {
-  const tracer = new BasicTracer({
+  const tracer = new SDKTracer({
     logger: new NoopLogger(),
   });
   const name = 'span1';

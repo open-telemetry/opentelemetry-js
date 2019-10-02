@@ -25,9 +25,9 @@ import {
 import { LogLevel } from '@opentelemetry/core';
 
 /**
- * BasicTracerConfig provides an interface for configuring a Basic Tracer.
+ * SDKTracerConfig provides an interface for configuring a Basic Tracer.
  */
-export interface BasicTracerConfig {
+export interface SDKTracerConfig {
   /**
    * Binary formatter which can serialize/deserialize Spans.
    */

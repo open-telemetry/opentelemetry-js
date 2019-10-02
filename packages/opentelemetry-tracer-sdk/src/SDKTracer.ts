@@ -28,7 +28,7 @@ import {
   TraceFlags,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig, TraceParams } from '../src/types';
+import { SDKTracerConfig, TraceParams } from '../src/types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
@@ -40,7 +40,7 @@ import { DEFAULT_CONFIG } from './config';
 /**
  * This class represents a basic tracer.
  */
-export class BasicTracer implements types.Tracer {
+export class SDKTracer implements types.Tracer {
   private readonly _defaultAttributes: types.Attributes;
   private readonly _binaryFormat: types.BinaryFormat;
   private readonly _httpTextFormat: types.HttpTextFormat;
@@ -54,7 +54,7 @@ export class BasicTracer implements types.Tracer {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig = DEFAULT_CONFIG) {
+  constructor(config: SDKTracerConfig = DEFAULT_CONFIG) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;

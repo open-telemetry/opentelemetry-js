@@ -1,5 +1,5 @@
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracer-basic');
+const { SDKTracer, SimpleSpanProcessor } = require('@opentelemetry/tracer-sdk');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
@@ -17,12 +17,12 @@ if (EXPORTER.toLowerCase().startsWith('z')) {
   exporter = new JaegerExporter(options);
 }
 
-const tracer = new BasicTracer();
+const tracer = new SDKTracer();
 
 // Configure span processor to send spans to the provided exporter
 tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+// Initialize the OpenTelemetry APIs to use the SDKTracer bindings
 opentelemetry.initGlobalTracer(tracer);
 
 // Create a span. A span must be closed.

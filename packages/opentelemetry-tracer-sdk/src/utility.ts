@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasicTracerConfig } from './types';
+import { SDKTracerConfig } from './types';
 import {
   DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
   DEFAULT_MAX_EVENTS_PER_SPAN,
@@ -26,7 +26,7 @@ import { DEFAULT_CONFIG } from './config';
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
-export function mergeConfig(userConfig: BasicTracerConfig) {
+export function mergeConfig(userConfig: SDKTracerConfig) {
   const traceParams = userConfig.traceParams;
   const target = Object.assign({}, DEFAULT_CONFIG, userConfig);
 
