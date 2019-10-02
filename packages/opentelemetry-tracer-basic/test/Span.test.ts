@@ -62,8 +62,8 @@ describe('Span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     span.end();
     assert.ok(
-      hrTimeToNanoseconds(span.endTime) > hrTimeToNanoseconds(span.startTime),
-      'end time must be bigger than start time'
+      hrTimeToNanoseconds(span.endTime) >= hrTimeToNanoseconds(span.startTime),
+      'end time must be bigger or equal start time'
     );
 
     assert.ok(
