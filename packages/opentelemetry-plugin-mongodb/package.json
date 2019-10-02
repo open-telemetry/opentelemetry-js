@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-mongodb",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "OpenTelemetry mongodb automatic instrumentation package.",
   "private": true,
   "main": "build/src/index.js",
