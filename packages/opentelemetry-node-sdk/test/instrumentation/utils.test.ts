@@ -23,7 +23,7 @@ const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
 const TEST_MODULES: Array<{ name: string; version: string | null }> = [
   {
     name: 'simple-module',
-    version: '0.0.1',
+    version: '0.1.0',
   },
   {
     name: 'nonexistent-module',
@@ -77,7 +77,7 @@ describe('Instrumentation#utils', () => {
       });
     });
 
-    [['0.X'], ['0.0.1'], ['0.X.X'], ['^0.1.0'], ['1.0.0'], ['<1.0.0']].forEach(
+    [['0.X'], ['0.1.0'], ['0.X.X'], ['^0.1.0'], ['1.0.0'], ['<1.0.0']].forEach(
       supportedVersion => {
         it(`should return false when version is equal to ${version} and supportedVersions is equal to ${supportedVersion}`, () => {
           assert.strictEqual(

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "browser": {
@@ -68,6 +68,6 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/types": "^0.1.0"
   }
 }

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracer-basic",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "OpenTelemetry Basic Tracer",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -52,8 +52,8 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.0.1",
-    "@opentelemetry/scope-base": "^0.0.1",
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/core": "^0.1.0",
+    "@opentelemetry/scope-base": "^0.1.0",
+    "@opentelemetry/types": "^0.1.0"
   }
 }

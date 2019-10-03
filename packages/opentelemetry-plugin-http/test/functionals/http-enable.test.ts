@@ -28,7 +28,7 @@ import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { Utils } from '../../src/utils';
+import * as utils from '../../src/utils';
 import { HttpPluginConfig, Http } from '../../src/types';
 
 const applyCustomAttributesOnSpanErrorMessage =
@@ -140,14 +140,14 @@ describe('HttpPlugin', () => {
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
       });
 
-      it(`should not trace requests with '${Utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [Utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [utils.OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
@@ -221,14 +221,14 @@ describe('HttpPlugin', () => {
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
       });
 
-      it(`should not trace requests with '${Utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [Utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [utils.OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
