@@ -42,7 +42,7 @@ import {
 } from './types';
 import { Format } from './enums/Format';
 import { AttributeNames } from './enums/AttributeNames';
-import { Utils } from './utils';
+import * as utils from './utils';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -70,7 +70,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._getPatchOutgoingRequestFunction()
     );
 
-    // In Node 8-10, http.get calls a private request method, therefore we patch it
+    // In Node >=8, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
       shimmer.wrap(
@@ -177,7 +177,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const userAgent = headers['user-agent'];
 
       span.setAttributes({
-        [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+        [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
           options,
           headers,
           `${HttpPlugin.component}:`
@@ -205,7 +205,7 @@ export class HttpPlugin extends BasePlugin<Http> {
             if (response.aborted && !response.complete) {
               span.setStatus({ code: CanonicalCode.ABORTED });
             } else {
-              span.setStatus(Utils.parseResponseStatus(response.statusCode!));
+              span.setStatus(utils.parseResponseStatus(response.statusCode!));
             }
 
             if (this._config.applyCustomAttributesOnSpan) {
@@ -223,11 +223,11 @@ export class HttpPlugin extends BasePlugin<Http> {
 
             span.end();
           });
-          Utils.setSpanOnError(span, response);
+          utils.setSpanOnError(span, response);
         }
       );
 
-      Utils.setSpanOnError(span, request);
+      utils.setSpanOnError(span, request);
 
       this._logger.debug('makeRequestTrace return request');
       return request;
@@ -258,7 +258,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (
-        Utils.isIgnored(
+        utils.isIgnored(
           pathname,
           plugin._config.ignoreIncomingPaths,
           (e: Error) =>
@@ -308,7 +308,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           const userAgent = headers['user-agent'];
 
           const attributes: Attributes = {
-            [AttributeNames.HTTP_URL]: Utils.getAbsoluteUrl(
+            [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
               requestUrl,
               headers,
               `${HttpPlugin.component}:`
@@ -330,7 +330,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
           span
             .setAttributes(attributes)
-            .setStatus(Utils.parseResponseStatus(response.statusCode));
+            .setStatus(utils.parseResponseStatus(response.statusCode));
 
           if (plugin._config.applyCustomAttributesOnSpan) {
             plugin._safeExecute(
@@ -367,11 +367,11 @@ export class HttpPlugin extends BasePlugin<Http> {
       options: RequestOptions | string,
       ...args: unknown[]
     ): ClientRequest {
-      if (!Utils.isValidOptionsType(options)) {
+      if (!utils.isValidOptionsType(options)) {
         return original.apply(this, [options, ...args]);
       }
 
-      const { origin, pathname, method, optionsParsed } = Utils.getRequestInfo(
+      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
         options,
         typeof args[0] === 'object' && typeof options === 'string'
           ? (args.shift() as RequestOptions)
@@ -381,8 +381,8 @@ export class HttpPlugin extends BasePlugin<Http> {
       options = optionsParsed;
 
       if (
-        Utils.isOpenTelemetryRequest(options) ||
-        Utils.isIgnored(
+        utils.isOpenTelemetryRequest(options) ||
+        utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,
           (e: Error) =>
@@ -452,7 +452,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       return execute();
     } catch (error) {
       if (rethrow) {
-        Utils.setSpanWithError(span, error);
+        utils.setSpanWithError(span, error);
         span.end();
         throw error;
       }

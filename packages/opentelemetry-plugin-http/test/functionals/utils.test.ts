@@ -20,16 +20,16 @@ import * as url from 'url';
 import { CanonicalCode, Attributes, SpanKind } from '@opentelemetry/types';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
-import { Utils } from '../../src/utils';
+import * as utils from '../../src/utils';
 import * as http from 'http';
 import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
-describe('Utils', () => {
+describe('Utility', () => {
   describe('parseResponseStatus()', () => {
     it('should return UNKNOWN code by default', () => {
-      const status = Utils.parseResponseStatus(
+      const status = utils.parseResponseStatus(
         (undefined as unknown) as number
       );
       assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
@@ -37,14 +37,14 @@ describe('Utils', () => {
 
     it('should return OK for Success HTTP status code', () => {
       for (let index = 200; index < 400; index++) {
-        const status = Utils.parseResponseStatus(index);
+        const status = utils.parseResponseStatus(index);
         assert.deepStrictEqual(status, { code: CanonicalCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
       for (let index = 400; index <= 504; index++) {
-        const status = Utils.parseResponseStatus(index);
+        const status = utils.parseResponseStatus(index);
         assert.notStrictEqual(status.code, CanonicalCode.OK);
       }
     });
@@ -52,19 +52,19 @@ describe('Utils', () => {
   describe('hasExpectHeader()', () => {
     it('should throw if no option', () => {
       try {
-        Utils.hasExpectHeader('' as http.RequestOptions);
+        utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
       } catch (ignore) {}
     });
 
     it('should not throw if no headers', () => {
-      const result = Utils.hasExpectHeader({} as http.RequestOptions);
+      const result = utils.hasExpectHeader({} as http.RequestOptions);
       assert.strictEqual(result, false);
     });
 
     it('should return true on Expect (no case sensitive)', () => {
       for (const headers of [{ Expect: 1 }, { expect: 1 }, { ExPect: 1 }]) {
-        const result = Utils.hasExpectHeader({
+        const result = utils.hasExpectHeader({
           headers,
         } as http.RequestOptions);
         assert.strictEqual(result, true);
@@ -81,7 +81,7 @@ describe('Utils', () => {
         pathname: undefined,
       };
       for (const param of [webUrl, urlParsed, urlParsedWithoutPathname]) {
-        const result = Utils.getRequestInfo(param);
+        const result = utils.getRequestInfo(param);
         assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
         assert.strictEqual(result.optionsParsed.protocol, 'http:');
         assert.strictEqual(result.optionsParsed.path, '/');
@@ -92,22 +92,22 @@ describe('Utils', () => {
 
   describe('satisfiesPattern()', () => {
     it('string pattern', () => {
-      const answer1 = Utils.satisfiesPattern('/test/1', '/test/1');
+      const answer1 = utils.satisfiesPattern('/test/1', '/test/1');
       assert.strictEqual(answer1, true);
-      const answer2 = Utils.satisfiesPattern('/test/1', '/test/11');
+      const answer2 = utils.satisfiesPattern('/test/1', '/test/11');
       assert.strictEqual(answer2, false);
     });
 
     it('regex pattern', () => {
-      const answer1 = Utils.satisfiesPattern('/TeSt/1', /\/test/i);
+      const answer1 = utils.satisfiesPattern('/TeSt/1', /\/test/i);
       assert.strictEqual(answer1, true);
-      const answer2 = Utils.satisfiesPattern('/2/tEst/1', /\/test/);
+      const answer2 = utils.satisfiesPattern('/2/tEst/1', /\/test/);
       assert.strictEqual(answer2, false);
     });
 
     it('should throw if type is unknown', () => {
       try {
-        Utils.satisfiesPattern('/TeSt/1', (true as unknown) as IgnoreMatcher);
+        utils.satisfiesPattern('/TeSt/1', (true as unknown) as IgnoreMatcher);
         assert.fail();
       } catch (error) {
         assert.strictEqual(error instanceof TypeError, true);
@@ -115,12 +115,12 @@ describe('Utils', () => {
     });
 
     it('function pattern', () => {
-      const answer1 = Utils.satisfiesPattern(
+      const answer1 = utils.satisfiesPattern(
         '/test/home',
         (url: string) => url === '/test/home'
       );
       assert.strictEqual(answer1, true);
-      const answer2 = Utils.satisfiesPattern(
+      const answer2 = utils.satisfiesPattern(
         '/test/home',
         (url: string) => url !== '/test/home'
       );
@@ -131,7 +131,7 @@ describe('Utils', () => {
   describe('isIgnored()', () => {
     let satisfiesPatternStub: sinon.SinonSpy<[string, IgnoreMatcher], boolean>;
     beforeEach(() => {
-      satisfiesPatternStub = sinon.spy(Utils, 'satisfiesPattern');
+      satisfiesPatternStub = sinon.spy(utils, 'satisfiesPattern');
     });
 
     afterEach(() => {
@@ -139,17 +139,17 @@ describe('Utils', () => {
     });
 
     it('should call isSatisfyPattern, n match', () => {
-      const answer1 = Utils.isIgnored('/test/1', ['/test/11']);
+      const answer1 = utils.isIgnored('/test/1', ['/test/11']);
       assert.strictEqual(answer1, false);
       assert.strictEqual(
-        (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
+        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
         1
       );
     });
 
     it('should call isSatisfyPattern, match for function', () => {
       satisfiesPatternStub.restore();
-      const answer1 = Utils.isIgnored('/test/1', [
+      const answer1 = utils.isIgnored('/test/1', [
         url => url.endsWith('/test/1'),
       ]);
       assert.strictEqual(answer1, true);
@@ -163,7 +163,7 @@ describe('Utils', () => {
       };
       for (const callback of [undefined, onException]) {
         assert.doesNotThrow(() =>
-          Utils.isIgnored(
+          utils.isIgnored(
             '/test/1',
             [
               url => {
@@ -180,7 +180,7 @@ describe('Utils', () => {
       satisfiesPatternStub.restore();
       const onException = sinon.spy();
       assert.doesNotThrow(() =>
-        Utils.isIgnored(
+        utils.isIgnored(
           '/test/1',
           [
             url => {
@@ -194,20 +194,20 @@ describe('Utils', () => {
     });
 
     it('should not call isSatisfyPattern', () => {
-      Utils.isIgnored('/test/1', []);
+      utils.isIgnored('/test/1', []);
       assert.strictEqual(
-        (Utils.satisfiesPattern as sinon.SinonSpy).callCount,
+        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
         0
       );
     });
 
     it('should return false on empty list', () => {
-      const answer1 = Utils.isIgnored('/test/1', []);
+      const answer1 = utils.isIgnored('/test/1', []);
       assert.strictEqual(answer1, false);
     });
 
     it('should not throw and return false when list is undefined', () => {
-      const answer2 = Utils.isIgnored('/test/1', undefined);
+      const answer2 = utils.isIgnored('/test/1', undefined);
       assert.strictEqual(answer2, false);
     });
   });
@@ -215,20 +215,20 @@ describe('Utils', () => {
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = Utils.getAbsoluteUrl(url.parse(path), {});
+      const result = utils.getAbsoluteUrl(url.parse(path), {});
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = Utils.getAbsoluteUrl(url.parse(absUrl), {});
+      const result = utils.getAbsoluteUrl(url.parse(absUrl), {});
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
-      const result = Utils.getAbsoluteUrl(null, {});
+      const result = utils.getAbsoluteUrl(null, {});
       assert.strictEqual(result, 'http://localhost/');
     });
     it("{ path: '/helloworld', port: 8080 } should return http://localhost:8080/helloworld", () => {
-      const result = Utils.getAbsoluteUrl(
+      const result = utils.getAbsoluteUrl(
         { path: '/helloworld', port: 8080 },
         {}
       );
@@ -247,7 +247,7 @@ describe('Utils', () => {
       sinon.spy(span, 'setStatus');
       sinon.spy(span, 'end');
       const req = http.get('http://noop');
-      Utils.setSpanOnError(span, req);
+      utils.setSpanOnError(span, req);
       req.on('error', () => {
         assert.strictEqual(span.setAttributes.callCount, 1);
         assert.strictEqual(span.setStatus.callCount, 1);
@@ -270,7 +270,7 @@ describe('Utils', () => {
           SpanKind.INTERNAL
         );
         /* tslint:disable-next-line:no-any */
-        Utils.setSpanWithError(span, new Error(errorMessage), obj as any);
+        utils.setSpanWithError(span, new Error(errorMessage), obj as any);
         const attributes = span.toReadableSpan().attributes;
         assert.strictEqual(
           attributes[AttributeNames.HTTP_ERROR_MESSAGE],
@@ -285,25 +285,25 @@ describe('Utils', () => {
       {},
       { headers: {} },
       url.parse('http://url.com'),
-      { headers: { [Utils.OT_REQUEST_HEADER]: 0 } },
-      { headers: { [Utils.OT_REQUEST_HEADER]: false } },
+      { headers: { [utils.OT_REQUEST_HEADER]: 0 } },
+      { headers: { [utils.OT_REQUEST_HEADER]: false } },
     ].forEach(options => {
       it(`should return false with the following value: ${JSON.stringify(
         options
       )}`, () => {
         /* tslint:disable-next-line:no-any */
-        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), false);
+        assert.strictEqual(utils.isOpenTelemetryRequest(options as any), false);
       });
     });
     for (const options of [
-      { headers: { [Utils.OT_REQUEST_HEADER]: 1 } },
-      { headers: { [Utils.OT_REQUEST_HEADER]: true } },
+      { headers: { [utils.OT_REQUEST_HEADER]: 1 } },
+      { headers: { [utils.OT_REQUEST_HEADER]: true } },
     ]) {
       it(`should return true with the following value: ${JSON.stringify(
         options
       )}`, () => {
         /* tslint:disable-next-line:no-any */
-        assert.strictEqual(Utils.isOpenTelemetryRequest(options as any), true);
+        assert.strictEqual(utils.isOpenTelemetryRequest(options as any), true);
       });
     }
   });
@@ -313,14 +313,14 @@ describe('Utils', () => {
       it(`should return false with the following value: ${JSON.stringify(
         options
       )}`, () => {
-        assert.strictEqual(Utils.isValidOptionsType(options), false);
+        assert.strictEqual(utils.isValidOptionsType(options), false);
       });
     });
     for (const options of ['url', url.parse('http://url.com'), {}]) {
       it(`should return true with the following value: ${JSON.stringify(
         options
       )}`, () => {
-        assert.strictEqual(Utils.isValidOptionsType(options), true);
+        assert.strictEqual(utils.isValidOptionsType(options), true);
       });
     }
   });
