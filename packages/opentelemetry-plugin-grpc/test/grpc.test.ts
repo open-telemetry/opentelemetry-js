@@ -189,7 +189,7 @@ function startServer(grpc: GrpcModule, proto: any) {
   }
 
   server.addService(proto.GrpcTester.service, {
-    // An error is emited every time
+    // An error is emitted every time
     // request.num <= MAX_ERROR_STATUS = (status.UNAUTHENTICATED)
     // in those cases, erro.code = request.num
 

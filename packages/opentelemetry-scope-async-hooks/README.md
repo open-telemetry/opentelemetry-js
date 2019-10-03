@@ -8,18 +8,18 @@ This package provides [async-hooks][async-hooks-doc] based scope manager which i
 
 ## What is a ScopeManager ?
 
-The definition and why they exist is available on [the readme of the socpe-base package][def-scope-manager].
+The definition and why they exist is available on [the readme of the scope-base package][def-scope-manager].
 
 ### Implementation in NodeJS
 
-NodeJS has a specific API to track async scope: [async-hooks][async-hooks-doc], it allows to track creation of new async operation and their respective parent. 
+NodeJS has a specific API to track async scope: [async-hooks][async-hooks-doc], it allows to track creation of new async operation and their respective parent.
 This package only handle storing a specific object for a given async hooks context.
 
 ### Limitations
 
 Even if the API is native to NodeJS, it doesn't cover all possible cases of scope propagation but there is a big effort from the NodeJS team to fix those. That's why we generally advise to be on the latest LTS to benefit from performance and bug fixes.
 
-There are known modules that break scope propagation ([somes of them are listed there][pkgs-that-break-ah]), so it's possible that the scope manager doesn't work with them.
+There are known modules that break scope propagation ([some of them are listed there][pkgs-that-break-ah]), so it's possible that the scope manager doesn't work with them.
 
 ### Prior arts
 

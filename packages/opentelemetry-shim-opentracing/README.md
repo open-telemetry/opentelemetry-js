@@ -6,7 +6,7 @@
 
 OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry
 
-Note: Baggage is currently not progagated, see [issues/329](https://github.com/open-telemetry/opentelemetry-js/issues/329).
+Note: Baggage is currently not propagated, see [issues/329](https://github.com/open-telemetry/opentelemetry-js/issues/329).
 
 ## Installation
 
