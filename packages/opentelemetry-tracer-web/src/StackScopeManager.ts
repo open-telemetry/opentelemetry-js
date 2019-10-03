@@ -48,7 +48,7 @@ export class StackScopeManager implements ScopeManager {
       writable: false,
       value: target.length,
     });
-    return contextWrapper as unknown as T;
+    return (contextWrapper as unknown) as T;
   }
 
   /**
@@ -102,8 +102,8 @@ export class StackScopeManager implements ScopeManager {
    * @param fn Callback function
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: any,
-    fn: any
+    scope: unknown,
+    fn: () => ReturnType<T>
   ): ReturnType<T> {
     if (typeof scope === 'undefined' || scope === null) {
       scope = window;
