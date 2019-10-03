@@ -36,7 +36,7 @@ export class Resource {
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.
    */
-  merge(other: types.Resource | null): types.Resource {
+  merge(other: Resource | null): Resource {
     if (!other || !Object.keys(other.labels).length) return this;
 
     // Labels from resource overwrite labels from other resource.
