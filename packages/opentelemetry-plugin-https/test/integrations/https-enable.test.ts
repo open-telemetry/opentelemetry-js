@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/types';
-import * as assert from 'assert';
-import * as http from 'http';
-import { plugin } from '../../src/http';
-import { assertSpan } from '../utils/assertSpan';
-import { DummyPropagation } from '../utils/DummyPropagation';
-import { httpRequest } from '../utils/httpRequest';
-import * as url from 'url';
-import * as utils from '../utils/utils';
-import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracer-basic';
-import { HttpPluginConfig } from '../../src/types';
+import { NoopLogger } from '@opentelemetry/core';
+import { NodeTracer } from '@opentelemetry/node-sdk';
+import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
+import { Span, SpanKind } from '@opentelemetry/types';
+import * as assert from 'assert';
+import * as http from 'http';
+import * as https from 'https';
+import * as url from 'url';
+import { plugin } from '../../src/https';
+import { assertSpan } from '../utils/assertSpan';
+import { DummyPropagation } from '../utils/DummyPropagation';
+import { httpsRequest } from '../utils/httpsRequest';
+import * as utils from '../utils/utils';
 
-const serverPort = 32345;
+const serverPort = 42345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
 
@@ -39,7 +40,7 @@ export const customAttributeFunction = (span: Span): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
 };
 
-describe('HttpPlugin Integration tests', () => {
+describe('HttpsPlugin Integration tests', () => {
   describe('enable()', () => {
     before(function(done) {
       // mandatory
@@ -70,7 +71,7 @@ describe('HttpPlugin Integration tests', () => {
 
     before(() => {
       const ignoreConfig = [
-        `http://${hostname}:${serverPort}/ignored/string`,
+        `https://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
@@ -82,7 +83,7 @@ describe('HttpPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable(http, tracer, tracer.logger, config);
+      plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
     });
 
     after(() => {
@@ -93,7 +94,7 @@ describe('HttpPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpRequest.get(`http://google.fr/?query=test`);
+      const result = await httpsRequest.get(`https://google.fr/?query=test`);
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -114,7 +115,7 @@ describe('HttpPlugin Integration tests', () => {
     });
 
     it('custom attributes should show up on client spans', async () => {
-      const result = await httpRequest.get(`http://google.fr/`);
+      const result = await httpsRequest.get(`https://google.fr/`);
       const spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -138,10 +139,10 @@ describe('HttpPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse('http://google.fr/')
+        url.parse('https://google.fr/')
       );
 
-      const result = await httpRequest.get(options);
+      const result = await httpsRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -166,10 +167,10 @@ describe('HttpPlugin Integration tests', () => {
       }
     });
     for (const headers of [
-      { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
-      { 'user-agent': 'http-plugin-test' },
+      { Expect: '100-continue', 'user-agent': 'https-plugin-test' },
+      { 'user-agent': 'https-plugin-test' },
     ]) {
-      it(`should create a span for GET requests and add propagation when using the following signature: http.get(url, options, callback) and following headers: ${JSON.stringify(
+      it(`should create a span for GET requests and add propagation when using the following signature: https.get(url, options, callback) and following headers: ${JSON.stringify(
         headers
       )}`, done => {
         let validations: {
@@ -184,8 +185,8 @@ describe('HttpPlugin Integration tests', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
         const options = { headers };
-        const req = http.get(
-          'http://google.fr/',
+        const req = https.get(
+          'https://google.fr/',
           options,
           (resp: http.IncomingMessage) => {
             const res = (resp as unknown) as http.IncomingMessage & {
@@ -211,8 +212,7 @@ describe('HttpPlugin Integration tests', () => {
             });
           }
         );
-
-        req.once('close', () => {
+        req.on('close', () => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
           assert.ok(spans[0].name.indexOf('GET /') >= 0);

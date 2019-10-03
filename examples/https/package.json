@@ -1,0 +1,43 @@
+{
+  "name": "https-example",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Example of HTTPs integration with OpenTelemetry",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "scripts": {
+    "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
+    "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
+    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
+    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "https",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.1.0",
+    "@opentelemetry/exporter-jaeger": "^0.1.0",
+    "@opentelemetry/exporter-zipkin": "^0.1.0",
+    "@opentelemetry/node-sdk": "^0.1.0",
+    "@opentelemetry/plugin-https": "^0.1.0",
+    "@opentelemetry/tracer-basic": "^0.1.0"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}

@@ -48,11 +48,13 @@ import * as utils from './utils';
  * Http instrumentation plugin for Opentelemetry
  */
 export class HttpPlugin extends BasePlugin<Http> {
-  static readonly component = 'http';
+  readonly component: string;
   protected _config!: HttpPluginConfig;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
+    // For now component is equal to moduleName but it can change in the future.
+    this.component = this.moduleName;
     this._config = {};
   }
 
@@ -76,7 +78,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       shimmer.wrap(
         this._moduleExports,
         'get',
-        this._getPatchOutgoingGetFunction()
+        this._getPatchOutgoingGetFunction(request)
       );
     }
 
@@ -134,7 +136,12 @@ export class HttpPlugin extends BasePlugin<Http> {
     };
   }
 
-  protected _getPatchOutgoingGetFunction() {
+  protected _getPatchOutgoingGetFunction(
+    clientRequest: (
+      options: RequestOptions | string | URL,
+      ...args: HttpRequestArgs
+    ) => ClientRequest
+  ) {
     return (original: Func<ClientRequest>): Func<ClientRequest> => {
       // Re-implement http.get. This needs to be done (instead of using
       // getPatchOutgoingRequestFunction to patch it) because we need to
@@ -148,10 +155,10 @@ export class HttpPlugin extends BasePlugin<Http> {
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
       return function outgoingGetRequest<
         T extends RequestOptions | string | URL
-      >(options: T, ...args: HttpRequestArgs) {
-        const req = request(options, ...args);
+      >(options: T, ...args: HttpRequestArgs): ClientRequest {
+        const req = clientRequest(options, ...args);
         req.end();
-        return req as ClientRequest;
+        return req;
       };
     };
   }
@@ -180,7 +187,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
           options,
           headers,
-          `${HttpPlugin.component}:`
+          `${this.component}:`
         ),
         [AttributeNames.HTTP_HOSTNAME]: host,
         [AttributeNames.HTTP_METHOD]: method,
@@ -311,7 +318,7 @@ export class HttpPlugin extends BasePlugin<Http> {
             [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
               requestUrl,
               headers,
-              `${HttpPlugin.component}:`
+              `${plugin.component}:`
             ),
             [AttributeNames.HTTP_HOSTNAME]: hostname,
             [AttributeNames.HTTP_METHOD]: method,
@@ -433,7 +440,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   private _startHttpSpan(name: string, options: SpanOptions) {
     return this._tracer
       .startSpan(name, options)
-      .setAttribute(AttributeNames.COMPONENT, HttpPlugin.component);
+      .setAttribute(AttributeNames.COMPONENT, this.component);
   }
   private _safeExecute<
     T extends (...args: unknown[]) => ReturnType<T>,
@@ -461,7 +468,4 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 }
 
-export const plugin = new HttpPlugin(
-  HttpPlugin.component,
-  process.versions.node
-);
+export const plugin = new HttpPlugin('http', process.versions.node);
