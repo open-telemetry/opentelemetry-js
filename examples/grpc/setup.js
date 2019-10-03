@@ -8,10 +8,6 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 
 function setupTracerAndExporters(service) {
-  let exporter;
-  const options = {
-    serviceName: service
-  };
   const tracer = new NodeTracer({
     plugins: {
       grpc: {
@@ -21,19 +17,21 @@ function setupTracerAndExporters(service) {
       }
     }
   });
+
+  let exporter;
   if (EXPORTER.toLowerCase().startsWith('z')) {
-    // need ignoreOutgoingUrls: [/spans/] to avoid infinity loops
-    // TODO: manage this situation
-    const zipkinExporter = new ZipkinExporter(options);
-    exporter = new SimpleSpanProcessor(zipkinExporter);
+    exporter = new ZipkinExporter({
+      serviceName: service,
+    });
   } else {
-    // need to shutdown exporter in order to flush spans
-    // TODO: check once PR #301 is merged
-    const jaegerExporter = new JaegerExporter(options);
-    exporter = new SimpleSpanProcessor(jaegerExporter);
+    exporter = new JaegerExporter({
+      serviceName: service,
+      // The default flush interval is 5 seconds.
+      flushInterval: 2000
+    });
   }
 
-  tracer.addSpanProcessor(exporter);
+  tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
   opentelemetry.initGlobalTracer(tracer);

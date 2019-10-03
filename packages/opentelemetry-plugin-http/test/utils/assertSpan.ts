@@ -19,10 +19,10 @@ import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
-import { HttpPlugin } from '../../src/http';
-import { Utils } from '../../src/utils';
+import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { HttpPlugin } from '../../src/http';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -76,7 +76,7 @@ export const assertSpan = (
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus ||
-      Utils.parseResponseStatus(validations.httpStatusCode)
+      utils.parseResponseStatus(validations.httpStatusCode)
   );
 
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
