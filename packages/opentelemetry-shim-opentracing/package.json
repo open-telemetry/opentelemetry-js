@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "OpenTracing to OpenTelemetry shim",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -37,8 +37,8 @@
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
-    "@opentelemetry/tracer-basic": "^0.0.1",
-    "@opentelemetry/scope-base": "^0.0.1",
+    "@opentelemetry/tracer-basic": "^0.1.0",
+    "@opentelemetry/scope-base": "^0.1.0",
     "codecov": "^3.5.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
@@ -51,8 +51,8 @@
     "tslint-consistent-codestyle": "^1.15.1"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.0.1",
-    "@opentelemetry/core": "^0.0.1",
+    "@opentelemetry/types": "^0.1.0",
+    "@opentelemetry/core": "^0.1.0",
     "opentracing": "^0.14.4"
   }
 }
