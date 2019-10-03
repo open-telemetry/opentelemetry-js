@@ -41,6 +41,9 @@ browsers_unit_tests: &browsers_unit_tests
     - run:
         name: Unit tests
         command: yarn test:browser
+    - run:
+        name: report coverage
+        command: yarn codecov:browser
 
 jobs:
   lint:
