@@ -20,7 +20,10 @@ import * as assert from 'assert';
 import * as http from 'http';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
-import { AttributeNames, parseResponseStatus } from '@opentelemetry/plugin-http';
+import {
+  AttributeNames,
+  parseResponseStatus,
+} from '@opentelemetry/plugin-http';
 
 export const assertSpan = (
   span: ReadableSpan,

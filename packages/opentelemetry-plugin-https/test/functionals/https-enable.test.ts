@@ -20,7 +20,11 @@ import {
 } from '@opentelemetry/tracer-basic';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node-sdk';
-import { Http, HttpPluginConfig, OT_REQUEST_HEADER } from '@opentelemetry/plugin-http';
+import {
+  Http,
+  HttpPluginConfig,
+  OT_REQUEST_HEADER,
+} from '@opentelemetry/plugin-http';
 import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as fs from 'fs';
