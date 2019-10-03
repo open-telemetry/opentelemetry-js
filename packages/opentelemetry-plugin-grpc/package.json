@@ -38,6 +38,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@grpc/proto-loader": "^0.4.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/shimmer": "^1.0.1",

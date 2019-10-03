@@ -60,10 +60,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     this._config = {};
   }
 
-  protected readonly _internalFilesList: ModuleExportsMapping = {
-    '0.13 - 1.6': { client: 'src/node/src/client.js' },
-    '^1.7': { client: 'src/client.js' },
-  };
+  // TODO: uncomment once makeClientConstructor patch is uncommented
+  // protected readonly _internalFilesList: ModuleExportsMapping = {
+  //   '0.13 - 1.6': { client: 'src/node/src/client.js' },
+  //   '^1.7': { client: 'src/client.js' },
+  // };
+
   protected readonly _basedir = basedir;
 
   protected patch(): typeof grpcTypes {
@@ -72,6 +74,20 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       this.moduleName,
       this.version
     );
+
+    // TODO: uncomment on completion: https://github.com/open-telemetry/opentelemetry-js/issues/285
+    // if (this._internalFilesExports['client']) {
+    //   grpcClientModule = this._internalFilesExports[
+    //     'client'
+    //   ] as GrpcInternalClientTypes;
+
+    //   // Wrap the internally used client constructor
+    //   shimmer.wrap(
+    //     grpcClientModule,
+    //     'makeClientConstructor',
+    //     this._patchClient()
+    //   );
+    // }
 
     if (this._moduleExports.Server) {
       shimmer.wrap(
@@ -91,16 +107,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       );
     }
 
-    if (this._internalFilesExports['client']) {
-      grpcClientModule = this._internalFilesExports[
-        'client'
-      ] as GrpcInternalClientTypes;
-
-      // Wrap the internally used client constructor
-      shimmer.wrap(
-        grpcClientModule,
-        'makeClientConstructor',
-        this._patchClient()
+    if (this._moduleExports.loadPackageDefinition) {
+      shimmer.wrap(this._moduleExports,
+        'loadPackageDefinition',
+        this._patchLoadPackageDefinition()
       );
     }
 
@@ -119,6 +129,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     if (this._moduleExports.makeGenericClientConstructor) {
       shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
+    }
+
+    if (this._moduleExports.loadPackageDefinition) {
+      shimmer.unwrap(this._moduleExports,
+        'loadPackageDefinition'
+      );
     }
 
     if (grpcClientModule) {
@@ -319,6 +335,48 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     // tslint:disable-next-line:no-any
     return (original as any).call(self, call);
+  }
+
+  private _patchLoadPackageDefinition() {
+    const plugin = this;
+    return (original: typeof grpcTypes.loadPackageDefinition) => {
+      plugin._logger.debug('patching loadPackageDefinition');
+      return function loadPackageDefinition(this: grpc, packageDef: grpcTypes.PackageDefinition) {
+        const result = original.apply(this, arguments as never);
+        // Copied from exports.loadPackageDefintion(...)
+        for (const serviceFqn in packageDef) {
+          const nameComponents = serviceFqn.split('.');
+          const serviceName = nameComponents[nameComponents.length-1];
+          let current = result;
+          for (const packageName of nameComponents.slice(0, -1)) {
+            if (!current[packageName]) {
+              current[packageName] = {};
+            }
+            current = current[packageName] as grpcTypes.GrpcObject;
+          }
+
+          // if makeClientConstructor was used, patch the client
+          if (current[serviceName].prototype instanceof plugin._moduleExports.Client) {
+            const serviceClient = current[serviceName] as grpcTypes.ProtobufMessage;
+            const methodList: string[] = [];
+            (Object.values(serviceClient.prototype.$method_names) as string[]).forEach(method => {
+              const originalName = serviceClient.service[method as string].originalName
+
+              // e.g. push both "Capitalize" and "capitalize"
+              originalName && methodList.push(originalName);
+              methodList.push(method);
+            });
+
+            shimmer.massWrap(
+              serviceClient.prototype,
+              methodList as never[],
+              plugin._getPatchedClientMethods() as never
+            );
+          }
+        }
+        return result;
+      }
+    }
   }
 
   private _patchClient() {

@@ -32,6 +32,7 @@ import * as grpc from 'grpc';
 import * as sinon from 'sinon';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
+const PROTO_OPTIONS = { keepCae: true, enums: String, defaults: true, oneofs: true };
 const memoryExporter = new InMemorySpanExporter();
 
 type GrpcModule = typeof grpc;
@@ -299,7 +300,7 @@ describe('GrpcPlugin', () => {
 
     it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
       plugin.enable(grpc, new NoopTracer(), new NoopLogger());
-      (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
+      (grpc as any).makeGenericClientConstructor({});
       assert.strictEqual(clientPatchStub.callCount, 1);
     });
   });
@@ -536,8 +537,9 @@ describe('GrpcPlugin', () => {
         // TODO: add plugin options here once supported
       };
       plugin.enable(grpc, tracer, logger, config);
-
-      const proto = grpc.load(PROTO_PATH).pkg_test;
+      const protoLoader = require('@grpc/proto-loader');
+      const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
+      const proto = grpc.loadPackageDefinition(definition).pkg_test;
       server = startServer(grpc, proto);
       client = createClient(grpc, proto);
     });
