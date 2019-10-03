@@ -100,6 +100,7 @@ describe('StackScopeManager', () => {
       });
       assert.strictEqual(scopeManager.active(), window);
     });
+
     it('should finally restore an old scope when scope is an object', done => {
       const scope1 = { a: 1 };
       const scope2 = { a: 2 };
