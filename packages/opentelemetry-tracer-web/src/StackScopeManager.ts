@@ -29,7 +29,7 @@ export class StackScopeManager implements ScopeManager {
   /**
    * Keeps the reference to current scope
    */
-  public _currentScope: any;
+  public _currentScope: unknown;
 
   /**
    *
@@ -39,7 +39,7 @@ export class StackScopeManager implements ScopeManager {
    */
   private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
-    const contextWrapper: any = function(...args: unknown[]) {
+    const contextWrapper = function(...args: unknown[]) {
       return manager.with(scope, () => target.apply(scope, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -48,7 +48,7 @@ export class StackScopeManager implements ScopeManager {
       writable: false,
       value: target.length,
     });
-    return contextWrapper as any;
+    return contextWrapper as unknown as T;
   }
 
   /**
@@ -63,7 +63,7 @@ export class StackScopeManager implements ScopeManager {
    * @param target
    * @param scope
    */
-  bind<T>(target: T | any, scope?: unknown): T {
+  bind<T>(target: T, scope?: unknown): T {
     // if no specific scope to propagate is given, we use the current one
     if (scope === undefined) {
       scope = this.active();
