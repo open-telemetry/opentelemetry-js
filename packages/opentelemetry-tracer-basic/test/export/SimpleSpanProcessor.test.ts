@@ -15,26 +15,17 @@
  */
 
 import * as assert from 'assert';
-import { SimpleSpanProcessor } from '../../src/export/SimpleSpanProcessor';
-import { Span, BasicTracer } from '../../src';
-import { SpanExporter } from '../../src/export/SpanExporter';
-import { ReadableSpan } from '../../src/export/ReadableSpan';
+import {
+  Span,
+  BasicTracer,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '../../src';
 import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
-
-class TestExporter implements SpanExporter {
-  spansDataList: ReadableSpan[] = [];
-  export(spans: ReadableSpan[]): void {
-    this.spansDataList.push(...spans);
-  }
-
-  shutdown(): void {
-    this.spansDataList = [];
-  }
-}
 
 describe('SimpleSpanProcessor', () => {
   const tracer = new BasicTracer();
-  const exporter = new TestExporter();
+  const exporter = new InMemorySpanExporter();
 
   describe('constructor', () => {
     it('should create a SimpleSpanProcessor instance', () => {
@@ -53,13 +44,13 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.onEnd(span);
-      assert.strictEqual(exporter.spansDataList.length, 1);
+      assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
       processor.shutdown();
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
     it('should handle span started and ended when UNSAMPLED', () => {
@@ -71,13 +62,13 @@ describe('SimpleSpanProcessor', () => {
       };
       const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
       processor.onStart(span);
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.onEnd(span);
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.shutdown();
-      assert.strictEqual(exporter.spansDataList.length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
   });
 });

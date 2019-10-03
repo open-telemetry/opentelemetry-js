@@ -15,15 +15,16 @@
  */
 
 import * as assert from 'assert';
-import { BatchSpanProcessor } from '../../src/export/BatchSpanProcessor';
-import { Span, BasicTracer } from '../../src';
-import { InMemorySpanExporter } from '../../src/export/InMemorySpanExporter';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
+import {
+  Span,
+  BasicTracer,
+  InMemorySpanExporter,
+  BatchSpanProcessor,
+} from '../../src';
 import { NEVER_SAMPLER, ALWAYS_SAMPLER, NoopLogger } from '@opentelemetry/core';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
     sampler: ALWAYS_SAMPLER,
   });
   const span = tracer.startSpan(spanName);
@@ -33,7 +34,6 @@ function createSampledSpan(spanName: string): Span {
 
 function createUnSampledSpan(spanName: string): Span {
   const tracer = new BasicTracer({
-    scopeManager: new NoopScopeManager(),
     sampler: NEVER_SAMPLER,
     logger: new NoopLogger(),
   });
