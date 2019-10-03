@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger, NoopTracer } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/core';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -29,13 +29,21 @@ import { SendUnaryDataCallback } from '../src/types';
 import * as assert from 'assert';
 import * as semver from 'semver';
 import * as grpc from 'grpc';
-import * as sinon from 'sinon';
 
+const tracer = new NodeTracer({
+  plugins: {
+    grpc: {
+      enabled: true,
+      path: '@opentelemetry/plugin-grpc',
+    },
+  },
+});
+
+const grpcModule = require('grpc');
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
 const memoryExporter = new InMemorySpanExporter();
 
-type GrpcModule = typeof grpc;
-const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
+const MAX_ERROR_STATUS = grpcModule.status.UNAUTHENTICATED;
 
 interface TestRequestResponse {
   num: number;
@@ -177,7 +185,7 @@ const replicate = (request: TestRequestResponse) => {
 };
 
 // tslint:disable-next-line:no-any
-function startServer(grpc: GrpcModule, proto: any) {
+function startServer(grpc: any, proto: any) {
   const server = new grpc.Server();
 
   function getError(msg: string, code: number): grpc.ServiceError {
@@ -267,7 +275,7 @@ function startServer(grpc: GrpcModule, proto: any) {
 }
 
 // tslint:disable-next-line:no-any
-function createClient(grpc: GrpcModule, proto: any) {
+function createClient(grpc: any, proto: any) {
   return new proto.GrpcTester(
     'localhost:' + grpcPort,
     grpc.credentials.createInsecure()
@@ -275,6 +283,10 @@ function createClient(grpc: GrpcModule, proto: any) {
 }
 
 describe('GrpcPlugin', () => {
+  after(() => {
+    tracer.stop();
+  });
+
   it('should return a plugin', () => {
     assert.ok(plugin instanceof GrpcPlugin);
   });
@@ -287,20 +299,13 @@ describe('GrpcPlugin', () => {
     assert.deepStrictEqual('grpc', plugin.moduleName);
   });
 
-  describe('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-    const clientPatchStub = sinon.stub(
-      plugin,
-      '_getPatchedClientMethods' as never
-    );
-    after(() => {
-      clientPatchStub.restore();
-      plugin.disable();
-    });
-
-    it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-      plugin.enable(grpc, new NoopTracer(), new NoopLogger());
-      (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
-      assert.strictEqual(clientPatchStub.callCount, 1);
+  describe('should patch client constructor makeClientConstructor()', () => {
+    it('should patch client constructor makeClientConstructor()', () => {
+      const grpcModule = require('grpc');
+      assert.strictEqual(
+        grpcModule.makeGenericClientConstructor.__wrapped,
+        true
+      );
     });
   });
 
@@ -366,7 +371,7 @@ describe('GrpcPlugin', () => {
             const outgoingSpan = spans[1];
             const validations = {
               name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-              status: grpc.status.OK,
+              status: grpcModule.status.OK,
             };
 
             assert.strictEqual(spans.length, 2);
@@ -405,7 +410,7 @@ describe('GrpcPlugin', () => {
               const clientSpan = spans[1];
               const validations = {
                 name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-                status: grpc.status.OK,
+                status: grpcModule.status.OK,
               };
               assertSpan(serverSpan, SpanKind.SERVER, validations);
               assertSpan(clientSpan, SpanKind.CLIENT, validations);
@@ -524,28 +529,21 @@ describe('GrpcPlugin', () => {
   };
 
   describe('enable()', () => {
-    const logger = new NoopLogger();
-    const tracer = new NodeTracer({ logger });
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      const config = {
-        // TODO: add plugin options here once supported
-      };
-      plugin.enable(grpc, tracer, logger, config);
-
-      const proto = grpc.load(PROTO_PATH).pkg_test;
-      server = startServer(grpc, proto);
-      client = createClient(grpc, proto);
+      const proto = grpcModule.load(PROTO_PATH).pkg_test;
+      server = startServer(grpcModule, proto);
+      client = createClient(grpcModule, proto);
     });
 
     after(done => {
       client.close();
       server.tryShutdown(() => {
-        plugin.disable();
+        tracer.stop();
         done();
       });
     });
@@ -558,10 +556,10 @@ describe('GrpcPlugin', () => {
 
     methodList.map(method => {
       describe(`Test error raising for grpc remote ${method.description}`, () => {
-        Object.keys(grpc.status).map((statusKey: string) => {
+        Object.keys(grpcModule.status).map((statusKey: string) => {
           // tslint:disable-next-line:no-any
-          const errorCode = Number(grpc.status[statusKey as any]);
-          if (errorCode > grpc.status.OK) {
+          const errorCode = Number(grpcModule.status[statusKey as any]);
+          if (errorCode > grpcModule.status.OK) {
             runErrorTest(method, statusKey, errorCode, tracer);
           }
         });
@@ -578,12 +576,12 @@ describe('GrpcPlugin', () => {
     });
 
     before(() => {
-      plugin.enable(grpc, tracer, logger);
+      plugin.enable(grpcModule, tracer, logger);
       plugin.disable();
 
-      const proto = grpc.load(PROTO_PATH).pkg_test;
-      server = startServer(grpc, proto);
-      client = createClient(grpc, proto);
+      const proto = grpcModule.load(PROTO_PATH).pkg_test;
+      server = startServer(grpcModule, proto);
+      client = createClient(grpcModule, proto);
     });
 
     after(done => {

@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Logger, Plugin, Tracer, PluginConfig } from '@opentelemetry/types';
+import {
+  Logger,
+  Plugin,
+  Tracer,
+  PluginConfig,
+  PluginInternalPatch,
+} from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 
@@ -28,6 +34,10 @@ export enum HookState {
 export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
+
+type PluginInternalModuleInfo = {
+  [key: string]: { patch: PluginInternalPatch; plugin: Plugin };
+};
 
 /**
  * Returns the Plugins object that meet the below conditions.
@@ -69,6 +79,27 @@ export class PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
       const pluginsToLoad = filterPlugins(plugins);
       const modulesToHook = Object.keys(pluginsToLoad);
+      const pluginModules: { [key: string]: Plugin } = {};
+      const internalPatches: PluginInternalModuleInfo = {};
+
+      for (const pluginName of modulesToHook) {
+        try {
+          const modulePath = pluginsToLoad[pluginName].path!;
+          const plugin: Plugin = require(modulePath).plugin;
+          pluginModules[modulePath] = plugin;
+
+          // Group together things needed for internal module patching
+          Object.assign(
+            internalPatches,
+            searchForValidInternalModules(plugin, pluginName)
+          );
+        } catch (e) {
+          this.logger.error(
+            `PluginLoader#load: could not load plugin ${pluginName}. Error: ${e.message}`
+          );
+        }
+      }
+
       // Do not hook require when no module is provided. In this case it is
       // not necessary. With skipping this step we lower our footprint in
       // customer applications and require-in-the-middle won't show up in CPU
@@ -79,10 +110,27 @@ export class PluginLoader {
       }
 
       // Enable the require hook.
-      hook(modulesToHook, (exports, name, baseDir) => {
+      hook(modulesToHook, { internals: true }, (exports, name, baseDir) => {
         if (this._hookState !== HookState.ENABLED) return exports;
+
+        if (internalPatches[name]) {
+          // Patch the internal module and return
+          this.logger.debug(
+            `PluginLoader#load: trying to patch internal module ${name}`
+          );
+          const internalPatch = internalPatches[name];
+          return internalPatch.patch.call(
+            internalPatch.plugin,
+            exports as never
+          );
+        } else if (!pluginsToLoad[name]) {
+          // Return the internal module as is
+          return exports;
+        }
+
         const config = pluginsToLoad[name];
         const modulePath = config.path!;
+        const plugin: Plugin = pluginModules[modulePath];
         let version = null;
 
         if (!baseDir) {
@@ -107,8 +155,6 @@ export class PluginLoader {
 
         // Expecting a plugin from module;
         try {
-          const plugin: Plugin = require(modulePath).plugin;
-
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
             return exports;
           }
@@ -153,4 +199,26 @@ export class PluginLoader {
  */
 export function searchPathForTest(searchPath: string) {
   module.paths.push(searchPath);
+}
+
+/**
+ * Group together fields needed to perform internal module patching
+ * @param plugin plugin which implements getInternalPatch
+ * @param pluginName name of the plugin, e.g. grpc, http
+ */
+function searchForValidInternalModules(
+  plugin: Plugin,
+  pluginName: string
+): PluginInternalModuleInfo {
+  const internalPatches: PluginInternalModuleInfo = {};
+  if (plugin.internalFilesList && plugin.getInternalPatch) {
+    Object.keys(plugin.internalFilesList).forEach(fname => {
+      const ritmName = `${pluginName}/${fname}`;
+      internalPatches[ritmName] = {
+        patch: plugin.getInternalPatch!(fname) as never,
+        plugin: plugin,
+      };
+    });
+  }
+  return internalPatches;
 }

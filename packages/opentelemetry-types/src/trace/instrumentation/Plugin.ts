@@ -29,6 +29,13 @@ export interface Plugin<T = any> {
   supportedVersions?: string[];
 
   /**
+   * Contains map of semver to filepath location of all internal modules which should be
+   * patched by this Plugin. The corresponding filepath should be added to the
+   * implementation of getInternalPatch
+   */
+  internalFilesList?: PluginInternalFiles;
+
+  /**
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
@@ -45,6 +52,12 @@ export interface Plugin<T = any> {
 
   /** Method to disable the instrumentation  */
   disable(): void;
+
+  /**
+   * Optional function which is called when internal module at fname is required in.
+   * @param fname filename provided by require-in-the-middle when importing this internal module
+   */
+  getInternalPatch?: (fname: string) => PluginInternalPatch;
 }
 
 export interface PluginConfig {
@@ -73,12 +86,6 @@ export interface PluginConfig {
   ignoreUrls?: Array<string | RegExp>;
 
   /**
-   * List of internal files that need patch and are not exported by
-   * default.
-   */
-  internalFilesExports?: PluginInternalFiles;
-
-  /**
    * If true, additional information about query parameters and
    * results will be attached (as `attributes`) to spans representing
    * database operations.
@@ -86,14 +93,12 @@ export interface PluginConfig {
   enhancedDatabaseReporting?: boolean;
 }
 
-export interface PluginInternalFilesVersion {
-  [pluginName: string]: string;
-}
-
 /**
- * Each key should be the name of the module to trace, and its value
- * a mapping of a property name to a internal plugin file name.
+ * Each key should be the semver of the module to trace, and its value
+ * an internal plugin file name.
  */
 export interface PluginInternalFiles {
-  [versions: string]: PluginInternalFilesVersion;
+  [versions: string]: string;
 }
+
+export type PluginInternalPatch = (exports: unknown) => unknown;

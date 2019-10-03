@@ -22,11 +22,11 @@ import {
   Status,
   CanonicalCode,
   SpanContext,
+  PluginInternalFiles,
 } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
-  ModuleExportsMapping,
   GrpcPluginOptions,
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -43,6 +43,7 @@ import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as shimmer from 'shimmer';
 import * as path from 'path';
+import * as semver from 'semver';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
@@ -51,8 +52,11 @@ let grpcClientModule: GrpcInternalClientTypes;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
+  readonly internalFilesList: PluginInternalFiles = {
+    'src/node/src/client.js': '0.13 - 1.6',
+    'src/client.js': '^1.7',
+  };
   readonly supportedVersions = ['^1.23.3'];
-
   protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
@@ -60,15 +64,23 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     this._config = {};
   }
 
-  protected readonly _internalFilesList: ModuleExportsMapping = {
-    '0.13 - 1.6': { client: 'src/node/src/client.js' },
-    '^1.7': { client: 'src/client.js' },
-  };
-  protected readonly _basedir = basedir;
+  getInternalPatch(fname: string) {
+    // If we find the internal file in internalFilesList, wrap it and return it
+    const semverVersion = this.internalFilesList[fname];
+    if (semverVersion && semver.satisfies(version, semverVersion)) {
+      return (exports: GrpcInternalClientTypes) => {
+        shimmer.wrap(exports, 'makeClientConstructor', this._patchClient());
+        return (grpcClientModule = exports);
+      };
+    }
+
+    // If not present in internalFilesList, return exports as is
+    return (exports: unknown) => exports;
+  }
 
   protected patch(): typeof grpcTypes {
     this._logger.debug(
-      'applying patch to %s@%s',
+      'applying server patch to %s@%s',
       this.moduleName,
       this.version
     );
@@ -79,28 +91,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         'register',
         // tslint:disable-next-line:no-any
         this._patchServer() as any
-      );
-    }
-
-    // Wrap the externally exported client constructor
-    if (this._moduleExports.makeGenericClientConstructor) {
-      shimmer.wrap(
-        this._moduleExports,
-        'makeGenericClientConstructor',
-        this._patchClient()
-      );
-    }
-
-    if (this._internalFilesExports['client']) {
-      grpcClientModule = this._internalFilesExports[
-        'client'
-      ] as GrpcInternalClientTypes;
-
-      // Wrap the internally used client constructor
-      shimmer.wrap(
-        grpcClientModule,
-        'makeClientConstructor',
-        this._patchClient()
       );
     }
 
@@ -115,10 +105,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     if (this._moduleExports.Server) {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
-    }
-
-    if (this._moduleExports.makeGenericClientConstructor) {
-      shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
     }
 
     if (grpcClientModule) {
@@ -324,20 +310,28 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _patchClient() {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
-      plugin._logger.debug('patching client');
       return function makeClientConstructor<ImplementationType>(
         this: typeof grpcTypes.Client,
         methods: grpcTypes.ServiceDefinition<ImplementationType>,
         serviceName: string,
         options: grpcTypes.GenericClientOptions
       ) {
-        // tslint:disable-next-line:no-any
-        const client = original.apply(this, arguments as any);
+        const client = original.apply(this, arguments as never);
+        const methodList = Object.keys(methods) as (keyof ImplementationType)[];
+
+        // Add duped originalName methods, e.g. "capitalize" is the originalName for "Capitalize"
+        methodList.forEach((method: keyof ImplementationType) => {
+          const originalName: keyof ImplementationType | undefined =
+            methods[method] && (methods[method] as any).originalName;
+          if (originalName && !methods[originalName]) {
+            methodList.push(originalName);
+          }
+        });
+
         shimmer.massWrap(
           client.prototype as never,
-          Object.keys(methods) as never[],
-          // tslint:disable-next-line:no-any
-          plugin._getPatchedClientMethods() as any
+          methodList as never[],
+          plugin._getPatchedClientMethods() as never
         );
         return client;
       } as never;
@@ -347,7 +341,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _getPatchedClientMethods() {
     const plugin = this;
     return (original: GrpcClientFunc) => {
-      plugin._logger.debug('patch all client methods');
+      plugin._logger.debug(
+        `GrpcPlugin: Patching client function: ${original.path}`
+      );
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
@@ -471,12 +467,15 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         ((call as unknown) as events.EventEmitter).on(
           'status',
           (status: Status) => {
-            span.setStatus({ code: CanonicalCode.OK });
-            span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
-              status.code.toString()
-            );
-            endSpan();
+            // if an error was emitted, the span will be ended there
+            if (status.code === 0) {
+              span.setStatus({ code: CanonicalCode.OK });
+              span.setAttribute(
+                AttributeNames.GRPC_STATUS_CODE,
+                status.code.toString()
+              );
+              endSpan();
+            }
           }
         );
       }
