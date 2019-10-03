@@ -14,19 +14,4 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-
-export class Resource implements types.Resource {
-  constructor(
-    // TODO: Consider to add check/validation on labels.
-    readonly labels: { [key: string]: string }
-  ) {}
-
-  merge(other: types.Resource | null): types.Resource {
-    if (!other || !Object.keys(other.labels).length) return this;
-
-    // Labels from resource overwrite labels from other resource.
-    const mergedLabels = Object.assign({}, other.labels, this.labels);
-    return new Resource(mergedLabels);
-  }
-}
+export * from './resources/Resource';
