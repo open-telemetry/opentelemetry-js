@@ -15,14 +15,13 @@
  */
 
 import * as assert from 'assert';
-import { Span } from '../src/Span';
 import {
   SpanKind,
   CanonicalCode,
   TraceFlags,
   SpanContext,
 } from '@opentelemetry/types';
-import { BasicTracer } from '../src';
+import { BasicTracer, Span } from '../src';
 import {
   hrTime,
   hrTimeToNanoseconds,

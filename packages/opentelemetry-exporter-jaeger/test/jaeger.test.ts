@@ -38,7 +38,7 @@ describe('JaegerExporter', () => {
         host: 'localhost',
         port: 8080,
         logger: new NoopLogger(),
-        tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.0.1' }],
+        tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.1.0' }],
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -48,7 +48,7 @@ describe('JaegerExporter', () => {
       assert.strictEqual(process.tags.length, 1);
       assert.strictEqual(process.tags[0].key, 'opentelemetry-exporter-jaeger');
       assert.strictEqual(process.tags[0].vType, 'STRING');
-      assert.strictEqual(process.tags[0].vStr, '0.0.1');
+      assert.strictEqual(process.tags[0].vStr, '0.1.0');
     });
 
     it('should construct an exporter with forceFlush and flushTimeout', () => {
