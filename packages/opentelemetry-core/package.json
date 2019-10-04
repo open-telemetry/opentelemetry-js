@@ -23,6 +23,7 @@
   "keywords": [
     "opentelemetry",
     "nodejs",
+    "browser",
     "tracing",
     "profiling",
     "metrics",

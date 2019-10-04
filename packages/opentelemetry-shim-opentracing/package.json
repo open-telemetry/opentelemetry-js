@@ -38,7 +38,6 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@opentelemetry/tracer-basic": "^0.1.0",
-    "@opentelemetry/scope-base": "^0.1.0",
     "codecov": "^3.5.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
