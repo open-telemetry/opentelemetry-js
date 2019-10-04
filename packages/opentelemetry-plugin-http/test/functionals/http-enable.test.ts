@@ -103,10 +103,9 @@ describe('HttpPlugin', () => {
           },
         };
         pluginWithBadOptions = new HttpPlugin(
-          HttpPlugin.component,
+          plugin.component,
           process.versions.node
         );
-
         pluginWithBadOptions.enable(http, tracer, tracer.logger, config);
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
@@ -133,6 +132,7 @@ describe('HttpPlugin', () => {
           pathname,
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
+          component: plugin.component,
         };
 
         assert.strictEqual(spans.length, 2);
@@ -156,7 +156,6 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
     });
-
     describe('with good plugin options', () => {
       beforeEach(() => {
         memoryExporter.reset();
@@ -195,7 +194,7 @@ describe('HttpPlugin', () => {
 
       it("should not patch if it's not a http module", () => {
         const httpNotPatched = new HttpPlugin(
-          HttpPlugin.component,
+          plugin.component,
           process.versions.node
         ).enable({} as Http, tracer, tracer.logger, {});
         assert.strictEqual(Object.keys(httpNotPatched).length, 0);
@@ -214,6 +213,7 @@ describe('HttpPlugin', () => {
           pathname,
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
+          component: plugin.component,
         };
 
         assert.strictEqual(spans.length, 2);
@@ -269,6 +269,7 @@ describe('HttpPlugin', () => {
             pathname: testPath,
             resHeaders: result.resHeaders,
             reqHeaders: result.reqHeaders,
+            component: plugin.component,
           };
 
           assertSpan(reqSpan, SpanKind.CLIENT, validations);
@@ -294,6 +295,7 @@ describe('HttpPlugin', () => {
             pathname: testPath,
             resHeaders: result.resHeaders,
             reqHeaders: result.reqHeaders,
+            component: plugin.component,
           };
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
@@ -336,6 +338,7 @@ describe('HttpPlugin', () => {
               pathname: testPath,
               resHeaders: result.resHeaders,
               reqHeaders: result.reqHeaders,
+              component: plugin.component,
             };
 
             assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);

@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-import { SpanKind, Status } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/types';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
-import { AttributeNames } from '../../src/enums/AttributeNames';
-import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import {
+  AttributeNames,
+  parseResponseStatus,
+} from '@opentelemetry/plugin-http';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -34,7 +36,6 @@ export const assertSpan = (
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string;
-    forceStatus?: Status;
     component: string;
   }
 ) => {
@@ -72,11 +73,9 @@ export const assertSpan = (
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
-
   assert.deepStrictEqual(
     span.status,
-    validations.forceStatus ||
-      utils.parseResponseStatus(validations.httpStatusCode)
+    parseResponseStatus(validations.httpStatusCode)
   );
 
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
