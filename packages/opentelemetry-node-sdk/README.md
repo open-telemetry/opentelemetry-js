@@ -44,6 +44,7 @@ npm install --save @opentelemetry/node-sdk
 # Install instrumentation plugins
 npm install --save @opentelemetry/plugin-http
 npm install --save @opentelemetry/plugin-grpc
+npm install --save @opentelemetry/plugin-https
 ```
 
 ## Usage
