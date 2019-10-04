@@ -35,4 +35,8 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
     enabled: true,
     path: '@opentelemetry/plugin-grpc',
   },
+  https: {
+    enabled: true,
+    path: '@opentelemetry/plugin-https',
+  },
 };
