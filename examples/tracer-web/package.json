@@ -1,7 +1,7 @@
 {
   "name": "web-tracer-example",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Example of using @opentelemetry/tracer-web in browser",
   "main": "index.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/tracer-web": "^0.0.1"
+    "@opentelemetry/tracer-web": "^0.1.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
