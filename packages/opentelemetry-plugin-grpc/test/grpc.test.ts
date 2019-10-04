@@ -32,7 +32,12 @@ import * as grpc from 'grpc';
 import * as sinon from 'sinon';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
-const PROTO_OPTIONS = { keepCae: true, enums: String, defaults: true, oneofs: true };
+const PROTO_OPTIONS = {
+  keepCae: true,
+  enums: String,
+  defaults: true,
+  oneofs: true,
+};
 const memoryExporter = new InMemorySpanExporter();
 
 type GrpcModule = typeof grpc;

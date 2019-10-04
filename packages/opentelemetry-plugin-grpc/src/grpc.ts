@@ -26,7 +26,6 @@ import {
 import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
-  ModuleExportsMapping,
   GrpcPluginOptions,
   ServerCallWithMeta,
   SendUnaryDataCallback,
@@ -108,7 +107,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     if (this._moduleExports.loadPackageDefinition) {
-      shimmer.wrap(this._moduleExports,
+      shimmer.wrap(
+        this._moduleExports,
         'loadPackageDefinition',
         this._patchLoadPackageDefinition()
       );
@@ -132,9 +132,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     if (this._moduleExports.loadPackageDefinition) {
-      shimmer.unwrap(this._moduleExports,
-        'loadPackageDefinition'
-      );
+      shimmer.unwrap(this._moduleExports, 'loadPackageDefinition');
     }
 
     if (grpcClientModule) {
@@ -341,12 +339,15 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     const plugin = this;
     return (original: typeof grpcTypes.loadPackageDefinition) => {
       plugin._logger.debug('patching loadPackageDefinition');
-      return function loadPackageDefinition(this: grpc, packageDef: grpcTypes.PackageDefinition) {
+      return function loadPackageDefinition(
+        this: grpc,
+        packageDef: grpcTypes.PackageDefinition
+      ) {
         const result = original.apply(this, arguments as never);
         // Copied from exports.loadPackageDefintion(...)
         for (const serviceFqn in packageDef) {
           const nameComponents = serviceFqn.split('.');
-          const serviceName = nameComponents[nameComponents.length-1];
+          const serviceName = nameComponents[nameComponents.length - 1];
           let current = result;
           for (const packageName of nameComponents.slice(0, -1)) {
             if (!current[packageName]) {
@@ -356,11 +357,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           }
 
           // if makeClientConstructor was used, patch the client
-          if (current[serviceName].prototype instanceof plugin._moduleExports.Client) {
-            const serviceClient = current[serviceName] as grpcTypes.ProtobufMessage;
+          if (
+            current[serviceName].prototype instanceof
+            plugin._moduleExports.Client
+          ) {
+            const serviceClient = current[
+              serviceName
+            ] as grpcTypes.ProtobufMessage;
             const methodList: string[] = [];
-            (Object.values(serviceClient.prototype.$method_names) as string[]).forEach(method => {
-              const originalName = serviceClient.service[method as string].originalName
+            (Object.values(
+              serviceClient.prototype.$method_names
+            ) as string[]).forEach(method => {
+              const originalName =
+                serviceClient.service[method as string].originalName;
 
               // e.g. push both "Capitalize" and "capitalize"
               originalName && methodList.push(originalName);
@@ -375,8 +384,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           }
         }
         return result;
-      }
-    }
+      };
+    };
   }
 
   private _patchClient() {
