@@ -17,11 +17,42 @@ npm install --save @opentelemetry/plugin-https
 
 ## Usage
 
-```js
-const opentelemetry = require('@opentelemetry/plugin-https');
+OpenTelemetry HTTPS Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
 
-// TODO: DEMONSTRATE API
+To load a specific plugin (HTTPS in this case), specify it in the Node Tracer's configuration.
+```js
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer({
+  plugins: {
+    https: {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-https',
+      // https plugin options
+    }
+  }
+});
 ```
+
+To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+```js
+const { NodeTracer } = require('@opentelemetry/node-sdk');
+
+const tracer = new NodeTracer();
+```
+
+See [examples/https](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/https) for a short example.
+
+### Https Plugin Options
+
+Https plugin has few options available to choose from. You can set the following:
+
+| Options | Type | Description |
+| ------- | ---- | ----------- |
+| [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L52) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+| [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
+| [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

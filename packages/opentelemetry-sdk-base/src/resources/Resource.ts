@@ -18,12 +18,15 @@
  * A Resource describes the entity for which a signals (metrics or trace) are
  * collected.
  */
-export interface Resource {
-  /**
-   * A dictionary of labels with string keys and values that provide information
-   * about the entity.
-   */
-  readonly labels: { [key: string]: string };
+export class Resource {
+  constructor(
+    /**
+     * A dictionary of labels with string keys and values that provide information
+     * about the entity.
+     * TODO: Consider to add check/validation on labels.
+     */
+    readonly labels: { [key: string]: string }
+  ) {}
 
   /**
    * Returns a new, merged {@link Resource} by merging the current Resource
@@ -33,5 +36,11 @@ export interface Resource {
    * @param other the Resource that will be merged with this.
    * @returns the newly merged Resource.
    */
-  merge(other: Resource | null): Resource;
+  merge(other: Resource | null): Resource {
+    if (!other || !Object.keys(other.labels).length) return this;
+
+    // Labels from resource overwrite labels from other resource.
+    const mergedLabels = Object.assign({}, other.labels, this.labels);
+    return new Resource(mergedLabels);
+  }
 }
