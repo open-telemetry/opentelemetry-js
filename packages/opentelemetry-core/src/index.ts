@@ -22,7 +22,6 @@ export * from './context/propagation/B3Format';
 export * from './context/propagation/BinaryTraceContext';
 export * from './context/propagation/HttpTraceContext';
 export * from './platform';
-export * from './resources/Resource';
 export * from './trace/globaltracer-utils';
 export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoopSpan';

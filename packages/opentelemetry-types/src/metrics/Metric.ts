@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import { Resource } from '../resources/Resource';
-
 /**
  * Options needed for metric creation
  */
@@ -40,9 +38,6 @@ export interface MetricOptions {
 
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
-
-  /** The resource the Metric is associated with. */
-  resource?: Resource;
 
   /**
    * Indicates the metric is a verbose metric that is disabled by default

@@ -23,7 +23,6 @@ export * from './distributed_context/EntryValue';
 export * from './metrics/Handle';
 export * from './metrics/Meter';
 export * from './metrics/Metric';
-export * from './resources/Resource';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
