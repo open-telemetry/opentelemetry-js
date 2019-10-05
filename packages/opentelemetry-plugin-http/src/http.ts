@@ -21,6 +21,7 @@ import {
   SpanOptions,
   Attributes,
   CanonicalCode,
+  Status,
 } from '@opentelemetry/types';
 import {
   ClientRequest,
@@ -39,6 +40,7 @@ import {
   ResponseEndArgs,
   ParsedRequestOptions,
   HttpRequestArgs,
+  Err,
 } from './types';
 import { Format } from './enums/Format';
 import { AttributeNames } from './enums/AttributeNames';
@@ -50,11 +52,14 @@ import * as utils from './utils';
 export class HttpPlugin extends BasePlugin<Http> {
   readonly component: string;
   protected _config!: HttpPluginConfig;
+  /** keep track on spans not ended */
+  private readonly _spanNotEnded: WeakSet<Span>;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
+    this._spanNotEnded = new WeakSet<Span>();
     this._config = {};
   }
 
@@ -192,28 +197,54 @@ export class HttpPlugin extends BasePlugin<Http> {
         [AttributeNames.HTTP_HOSTNAME]: host,
         [AttributeNames.HTTP_METHOD]: method,
         [AttributeNames.HTTP_PATH]: options.path || '/',
-        [AttributeNames.HTTP_USER_AGENT]: userAgent || '',
       });
 
+      if (userAgent !== undefined) {
+        span.setAttribute(AttributeNames.HTTP_USER_AGENT, userAgent);
+      }
+      // In case of req.abort() is called after receiving response,
+      // req.on('close') is called before res.on('end')
+      let reqShouldCloseSpan: boolean = true;
       request.on(
         'response',
-        (response: IncomingMessage & { aborted?: boolean }) => {
+        (
+          response: IncomingMessage & { aborted?: boolean; req: ClientRequest }
+        ) => {
+          if (response.statusCode) {
+            span.setAttributes({
+              [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
+              [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
+            });
+          }
+          // Check if we have the original ClientRequest
+          // Otherwise it's a package that has a custom implementation
+          // custom implementation means that listeners func is not reliable (e.g superagent, request ...) provides their own way.
+          // and we can't avoid to listen to 'end' event even no 'data'/'readable' event is attached
+          if (response.req.constructor.name === 'ClientRequest') {
+            const dataFunc = response.listeners('data') as Function[];
+            const readablefunc = response.listeners('readable') as Function[];
+            // No need to listen to response events if one of these events is not attached
+            if (dataFunc.length === 0 && readablefunc.length === 0) {
+              return;
+            }
+          }
+
+          // If data or readable event is attached, req.on('close') should not close the span
+          // because response.end will do even if req.abort() is called
+          reqShouldCloseSpan = false;
           this._tracer.bind(response);
           this._logger.debug('outgoingRequest on response()');
           response.on('end', () => {
             this._logger.debug('outgoingRequest on end()');
-            if (response.statusCode) {
-              span.setAttributes({
-                [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
-                [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
-              });
-            }
+            let status: Status;
 
             if (response.aborted && !response.complete) {
-              span.setStatus({ code: CanonicalCode.ABORTED });
+              status = { code: CanonicalCode.ABORTED };
             } else {
-              span.setStatus(utils.parseResponseStatus(response.statusCode!));
+              status = utils.parseResponseStatus(response.statusCode!);
             }
+
+            span.setStatus(status);
 
             if (this._config.applyCustomAttributesOnSpan) {
               this._safeExecute(
@@ -228,13 +259,23 @@ export class HttpPlugin extends BasePlugin<Http> {
               );
             }
 
-            span.end();
+            this._closeHttpSpan(span);
           });
-          utils.setSpanOnError(span, response);
+          response.on('error', (error: Err) => {
+            utils.setSpanWithError(span, error, response);
+            this._closeHttpSpan(span);
+          });
         }
       );
-
-      utils.setSpanOnError(span, request);
+      request.on('close', () => {
+        if (reqShouldCloseSpan) {
+          this._closeHttpSpan(span);
+        }
+      });
+      request.on('error', (error: Err) => {
+        utils.setSpanWithError(span, error, request);
+        this._closeHttpSpan(span);
+      });
 
       this._logger.debug('makeRequestTrace return request');
       return request;
@@ -331,7 +372,7 @@ export class HttpPlugin extends BasePlugin<Http> {
             attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
           }
 
-          if (userAgent) {
+          if (userAgent !== undefined) {
             attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
           }
 
@@ -352,7 +393,7 @@ export class HttpPlugin extends BasePlugin<Http> {
             );
           }
 
-          span.end();
+          plugin._closeHttpSpan(span);
           return returned;
         };
 
@@ -438,10 +479,22 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 
   private _startHttpSpan(name: string, options: SpanOptions) {
-    return this._tracer
+    const span = this._tracer
       .startSpan(name, options)
       .setAttribute(AttributeNames.COMPONENT, this.component);
+    this._spanNotEnded.add(span);
+    return span;
   }
+
+  private _closeHttpSpan(span: Span) {
+    if (!this._spanNotEnded.has(span)) {
+      return;
+    }
+
+    span.end();
+    this._spanNotEnded.delete(span);
+  }
+
   private _safeExecute<
     T extends (...args: unknown[]) => ReturnType<T>,
     K extends boolean
@@ -460,7 +513,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     } catch (error) {
       if (rethrow) {
         utils.setSpanWithError(span, error);
-        span.end();
+        this._closeHttpSpan(span);
         throw error;
       }
       this._logger.error('caught error ', error);

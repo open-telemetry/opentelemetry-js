@@ -541,12 +541,12 @@ describe('HttpPlugin', () => {
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
-          assert.ok(Object.keys(span.attributes).length > 7);
+          assert.ok(Object.keys(span.attributes).length > 6);
         }
       });
 
       it('should have 1 ended span when request is aborted after receiving response', async () => {
-        nock('http://my.server.com')
+        nock(`${protocol}://my.server.com`)
           .get('/')
           .delay({
             body: 50,
@@ -555,7 +555,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            'http://my.server.com',
+            `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -581,6 +581,20 @@ describe('HttpPlugin', () => {
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
+      });
+
+      it("should have 1 ended span when request doesn't listening response", done => {
+        nock.cleanAll();
+        nock.enableNetConnect();
+        const req = http.request(`${protocol}://${hostname}/`);
+        req.on('close', () => {
+          const spans = memoryExporter.getFinishedSpans();
+          const [span] = spans;
+          assert.strictEqual(spans.length, 1);
+          assert.ok(Object.keys(span.attributes).length > 6);
+          done();
+        });
+        req.end();
       });
     });
   });
