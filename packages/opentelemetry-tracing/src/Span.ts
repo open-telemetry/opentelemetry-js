@@ -141,6 +141,16 @@ export class Span implements types.Span, ReadableSpan {
     }
     this._ended = true;
     this.endTime = timeInputToHrTime(endTime);
+
+    this._duration = hrTimeDuration(this.startTime, this.endTime);
+    if (this._duration[0] < 0) {
+      this._logger.warn(
+        'Inconsistent start and end time, startTime > endTime',
+        this.startTime,
+        this.endTime
+      );
+    }
+
     this._spanProcessor.onEnd(this);
   }
 
@@ -153,20 +163,6 @@ export class Span implements types.Span, ReadableSpan {
   }
 
   get duration(): types.HrTime {
-    if (this._duration[0] !== -1) {
-      return this._duration;
-    }
-
-    this._duration = hrTimeDuration(this.startTime, this.endTime);
-
-    if (this._duration[0] < 0) {
-      this._logger.warn(
-        'Inconsistent start and end time, startTime > endTime',
-        this.startTime,
-        this.endTime
-      );
-    }
-
     return this._duration;
   }
 
