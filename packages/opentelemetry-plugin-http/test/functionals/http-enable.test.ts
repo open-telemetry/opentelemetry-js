@@ -30,6 +30,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as utils from '../../src/utils';
 import { HttpPluginConfig, Http } from '../../src/types';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -593,6 +594,30 @@ describe('HttpPlugin', () => {
           assert.strictEqual(spans.length, 1);
           assert.ok(Object.keys(span.attributes).length > 6);
           done();
+        });
+        req.end();
+      });
+
+      it("should have 1 ended span when response is listened by using req.on('response')", done => {
+        const host = `${protocol}://${hostname}`;
+        nock(host)
+          .get('/')
+          .reply(404);
+        const req = http.request(`${host}/`);
+        req.on('response', response => {
+          response.on('data', () => {});
+          response.on('end', () => {
+            const spans = memoryExporter.getFinishedSpans();
+            const [span] = spans;
+            assert.strictEqual(spans.length, 1);
+            assert.ok(Object.keys(span.attributes).length > 6);
+            assert.strictEqual(
+              span.attributes[AttributeNames.HTTP_STATUS_CODE],
+              404
+            );
+            assert.strictEqual(span.status.code, CanonicalCode.NOT_FOUND);
+            done();
+          });
         });
         req.end();
       });

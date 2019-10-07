@@ -202,9 +202,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       if (userAgent !== undefined) {
         span.setAttribute(AttributeNames.HTTP_USER_AGENT, userAgent);
       }
-      // In case of req.abort() is called after receiving response,
-      // req.on('close') is called before res.on('end')
-      let reqShouldCloseSpan: boolean = true;
+
       request.on(
         'response',
         (
@@ -216,22 +214,7 @@ export class HttpPlugin extends BasePlugin<Http> {
               [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
             });
           }
-          // Check if we have the original ClientRequest
-          // Otherwise it's a package that has a custom implementation
-          // custom implementation means that listeners func is not reliable (e.g superagent, request ...) provides their own way.
-          // and we can't avoid to listen to 'end' event even no 'data'/'readable' event is attached
-          if (response.req.constructor.name === 'ClientRequest') {
-            const dataFunc = response.listeners('data') as Function[];
-            const readablefunc = response.listeners('readable') as Function[];
-            // No need to listen to response events if one of these events is not attached
-            if (dataFunc.length === 0 && readablefunc.length === 0) {
-              return;
-            }
-          }
 
-          // If data or readable event is attached, req.on('close') should not close the span
-          // because response.end will do even if req.abort() is called
-          reqShouldCloseSpan = false;
           this._tracer.bind(response);
           this._logger.debug('outgoingRequest on response()');
           response.on('end', () => {
@@ -268,7 +251,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         }
       );
       request.on('close', () => {
-        if (reqShouldCloseSpan) {
+        if (!request.aborted) {
           this._closeHttpSpan(span);
         }
       });
