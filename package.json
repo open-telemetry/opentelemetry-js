@@ -5,6 +5,7 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
+    "clean": "lerna run clean",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
     "compile": "lerna run compile",
@@ -13,6 +14,7 @@
     "bootstrap": "lerna bootstrap",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
+    "codecov:browser": "lerna run codecov:browser",
     "check": "lerna run check",
     "predocs-test": "yarn docs",
     "docs-test": "lerna run docs-test",

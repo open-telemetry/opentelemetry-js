@@ -1,0 +1,41 @@
+{
+  "name": "web-tracer-example",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Example of using @opentelemetry/tracer-web in browser",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server -d --progress --colors --port 8090 --config webpack.config.js --hot --inline --host 0.0.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "tracing",
+    "web"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@types/shimmer": "^1.0.1",
+    "babel-loader": "^8.0.6",
+    "shimmer": "^1.2.0",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-dev-server": "^3.8.1",
+    "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "@opentelemetry/tracer-web": "^0.1.0"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
+}

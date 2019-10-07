@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-const webpackConfig = require('./webpack/test.config.js');
-const karmaBaseConfig = require('../../karma.base');
-
-module.exports = (config) => {
-  config.set(Object.assign({}, karmaBaseConfig, {
-    webpack: webpackConfig
-  }))
+module.exports = {
+  listenAddress: 'localhost',
+  hostname: 'localhost',
+  browsers: ['ChromeHeadless'],
+  frameworks: ['mocha'],
+  reporters: ['spec'],
+  files: ['test/index-webpack.ts'],
+  preprocessors: { 'test/index-webpack.ts': ['webpack'] },
+  webpackMiddleware: { noInfo: true }
 };
