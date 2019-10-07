@@ -538,12 +538,15 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         ((call as unknown) as events.EventEmitter).on(
           'status',
           (status: Status) => {
-            span.setStatus({ code: CanonicalCode.OK });
-            span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
-              status.code.toString()
-            );
-            endSpan();
+            // if an error was emitted, the span will be ended there
+            if (status.code === 0) {
+              span.setStatus({ code: CanonicalCode.OK });
+              span.setAttribute(
+                AttributeNames.GRPC_STATUS_CODE,
+                status.code.toString()
+              );
+              endSpan();
+            }
           }
         );
       }
