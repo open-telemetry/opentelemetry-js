@@ -20,7 +20,7 @@ import * as https from 'https';
 import * as url from 'url';
 import { NoopLogger } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracer-basic';
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 import * as zipkinTypes from './types';
 import {
   toZipkinSpan,

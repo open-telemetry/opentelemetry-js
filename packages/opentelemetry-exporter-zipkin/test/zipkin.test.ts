@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ZipkinExporter } from '../src';

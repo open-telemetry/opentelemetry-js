@@ -20,7 +20,7 @@ import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 import { ReadableSpan } from './ReadableSpan';
 
 /**
