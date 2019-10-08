@@ -1,4 +1,4 @@
-# OpenTelemetry sdk-base
+# OpenTelemetry Base
 [![Gitter chat][gitter-image]][gitter-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]

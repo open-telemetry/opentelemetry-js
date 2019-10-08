@@ -1,4 +1,4 @@
-# OpenTelemetry Node SDK
+# OpenTelemetry Node
 [![Gitter chat][gitter-image]][gitter-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
