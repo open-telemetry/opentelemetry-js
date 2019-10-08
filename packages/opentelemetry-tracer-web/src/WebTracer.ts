@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-/**
- * A Resource describes the entity for which a signals (metrics or trace) are
- * collected.
- */
-export interface Resource {
-  /**
-   * A dictionary of labels with string keys and values that provide information
-   * about the entity.
-   */
-  readonly labels: { [key: string]: string };
+import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracer-basic';
+import { StackScopeManager } from './StackScopeManager';
 
+/**
+ * This class represents a web tracer with {@link StackScopeManager}
+ */
+export class WebTracer extends BasicTracer {
   /**
-   * Returns a new, merged {@link Resource} by merging the current Resource
-   * with the other Resource. In case of a collision, current Resource takes
-   * precedence.
-   *
-   * @param other the Resource that will be merged with this.
-   * @returns the newly merged Resource.
+   * Constructs a new Tracer instance.
    */
-  merge(other: Resource | null): Resource;
+  /**
+   *
+   * @param {BasicTracerConfig} config Web Tracer config
+   */
+  constructor(config: BasicTracerConfig = {}) {
+    if (typeof config.scopeManager === 'undefined') {
+      config.scopeManager = new StackScopeManager();
+    }
+    config.scopeManager.enable();
+    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
+  }
 }

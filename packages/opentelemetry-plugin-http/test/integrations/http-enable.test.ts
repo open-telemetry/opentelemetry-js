@@ -23,7 +23,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as url from 'url';
-import { Utils } from '../utils/Utils';
+import * as utils from '../utils/utils';
 import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
@@ -48,7 +48,7 @@ describe('HttpPlugin Integration tests', () => {
         return;
       }
 
-      Utils.checkInternet(isConnected => {
+      utils.checkInternet(isConnected => {
         if (!isConnected) {
           this.skip();
           // don't disturbe people
@@ -105,6 +105,7 @@ describe('HttpPlugin Integration tests', () => {
         path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
+        component: plugin.component,
       };
 
       assert.strictEqual(spans.length, 1);
@@ -123,6 +124,7 @@ describe('HttpPlugin Integration tests', () => {
         pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
+        component: plugin.component,
       };
 
       assert.strictEqual(spans.length, 1);
@@ -149,6 +151,7 @@ describe('HttpPlugin Integration tests', () => {
         pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
+        component: plugin.component,
       };
 
       assert.strictEqual(spans.length, 1);

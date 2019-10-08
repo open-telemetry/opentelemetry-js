@@ -22,7 +22,8 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import { Resource, HrTime } from '@opentelemetry/types';
+import { HrTime } from '@opentelemetry/types';
+import { Resource, ExportResult } from '@opentelemetry/sdk-base';
 
 export interface ReadableMetric {
   /**
@@ -346,13 +347,4 @@ export interface MetricExporter {
     metrics: ReadableMetric[],
     resultCallback: (result: ExportResult) => void
   ): void;
-}
-
-/**
- * @TODO: Wait on https://github.com/open-telemetry/opentelemetry-js/issues/309
- */
-export enum ExportResult {
-  SUCCESS,
-  FAILED_NOT_RETRYABLE,
-  FAILED_RETRYABLE,
 }

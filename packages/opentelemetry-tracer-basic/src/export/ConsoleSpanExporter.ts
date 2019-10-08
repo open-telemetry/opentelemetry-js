@@ -16,7 +16,7 @@
 
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
-import { ExportResult } from './ExportResult';
+import { ExportResult } from '@opentelemetry/sdk-base';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 /**

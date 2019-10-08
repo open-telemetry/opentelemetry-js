@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-import * as dns from 'dns';
-
-export class Utils {
-  static checkInternet(cb: (isConnected: boolean) => void) {
-    dns.lookup('google.com', err => {
-      if (err && err.code === 'ENOTFOUND') {
-        cb(false);
-      } else {
-        cb(true);
-      }
-    });
-  }
-}
+// This file is the webpack entry point for the browser Karma tests. It requires
+// all modules ending in "test" from the current folder and all its subfolders.
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);

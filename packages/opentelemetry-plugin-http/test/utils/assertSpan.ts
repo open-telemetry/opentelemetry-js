@@ -22,7 +22,6 @@ import { AttributeNames } from '../../src/enums/AttributeNames';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracer-basic';
-import { HttpPlugin } from '../../src/http';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -36,6 +35,7 @@ export const assertSpan = (
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string;
     forceStatus?: Status;
+    component: string;
   }
 ) => {
   assert.strictEqual(span.spanContext.traceId.length, 32);
@@ -47,7 +47,7 @@ export const assertSpan = (
   );
   assert.strictEqual(
     span.attributes[AttributeNames.COMPONENT],
-    HttpPlugin.component
+    validations.component
   );
   assert.strictEqual(
     span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],

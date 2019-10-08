@@ -108,6 +108,7 @@ describe('Packages', () => {
           pathname: urlparsed.pathname!,
           path: urlparsed.path,
           resHeaders,
+          component: plugin.component,
         };
 
         assert.strictEqual(spans.length, 1);

@@ -126,7 +126,8 @@ export const satisfiesPattern = <T>(
  * It will not re-throw exceptions from `list` provided by the client
  * @param constant e.g URL of request
  * @param [list] List of ignore patterns
- * @param [onException] callback for doing something when an exception has occured
+ * @param [onException] callback for doing something when an exception has
+ *     occurred
  */
 export const isIgnored = (
   constant: string,

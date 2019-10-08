@@ -58,11 +58,11 @@ describe('BasePlugin', () => {
 
 class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   readonly moduleName = 'test-package';
-  readonly version = '0.0.1';
+  readonly version = '0.1.0';
   readonly _basedir = basedir;
 
   protected readonly _internalFilesList = {
-    '0.0.1': {
+    '0.1.0': {
       internal: 'foo/bar/internal.js',
     },
     '^1.0.0': {

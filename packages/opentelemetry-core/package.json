@@ -1,10 +1,11 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts"
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -23,6 +24,7 @@
   "keywords": [
     "opentelemetry",
     "nodejs",
+    "browser",
     "tracing",
     "profiling",
     "metrics",
@@ -68,6 +70,6 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.0.1"
+    "@opentelemetry/types": "^0.1.0"
   }
 }

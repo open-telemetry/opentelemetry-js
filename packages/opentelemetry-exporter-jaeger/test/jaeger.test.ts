@@ -19,7 +19,8 @@ import { JaegerExporter } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { ThriftProcess } from '../src/types';
-import { ExportResult, ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ExportResult } from '@opentelemetry/sdk-base';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
@@ -38,7 +39,7 @@ describe('JaegerExporter', () => {
         host: 'localhost',
         port: 8080,
         logger: new NoopLogger(),
-        tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.0.1' }],
+        tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.1.0' }],
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -48,7 +49,7 @@ describe('JaegerExporter', () => {
       assert.strictEqual(process.tags.length, 1);
       assert.strictEqual(process.tags[0].key, 'opentelemetry-exporter-jaeger');
       assert.strictEqual(process.tags[0].vType, 'STRING');
-      assert.strictEqual(process.tags[0].vStr, '0.0.1');
+      assert.strictEqual(process.tags[0].vStr, '0.1.0');
     });
 
     it('should construct an exporter with forceFlush and flushTimeout', () => {

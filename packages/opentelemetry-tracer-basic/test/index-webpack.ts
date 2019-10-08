@@ -14,19 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-
-export class Resource implements types.Resource {
-  constructor(
-    // TODO: Consider to add check/validation on labels.
-    readonly labels: { [key: string]: string }
-  ) {}
-
-  merge(other: types.Resource | null): types.Resource {
-    if (!other || !Object.keys(other.labels).length) return this;
-
-    // Labels from resource overwrite labels from other resource.
-    const mergedLabels = Object.assign({}, other.labels, this.labels);
-    return new Resource(mergedLabels);
-  }
-}
+// This file is the webpack entry point for the browser Karma tests. It requires
+// all modules ending in "test" from the current folder and all its subfolders.
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
