@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-const webpackConfig = require('./webpack/test.config.js.js');
+const webpackConfig = require('./webpack/test.config.js');
 const karmaBaseConfig = require('../../karma.base');
 
 module.exports = (config) => {
