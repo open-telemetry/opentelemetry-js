@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracer-basic';
+import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
 
 /**

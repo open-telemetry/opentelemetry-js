@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
-import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
@@ -247,7 +247,7 @@ describe('ZipkinExporter', () => {
     it(`should send '${OT_REQUEST_HEADER}' header`, () => {
       const scope = nock('https://localhost:9411')
         .post('/api/v2/spans')
-        .reply(function(uri, requestBody, cb) {
+        .reply(function (uri, requestBody, cb) {
           assert.ok(this.req.headers[OT_REQUEST_HEADER]);
           cb(null, [200, 'Ok']);
         });

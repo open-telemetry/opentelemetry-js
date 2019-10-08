@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
-import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
+import { Span, BasicTracer } from '@opentelemetry/tracing';
 import {
   NoopLogger,
   hrTimeToMicroseconds,
@@ -135,35 +135,35 @@ describe('transform', () => {
     ].forEach(item =>
       it(`should map OpenTelemetry SpanKind ${
         types.SpanKind[item.ot]
-      } to Zipkin ${item.zipkin}`, () => {
-        const span = new Span(tracer, 'my-span', spanContext, item.ot);
-        span.end();
+        } to Zipkin ${item.zipkin}`, () => {
+          const span = new Span(tracer, 'my-span', spanContext, item.ot);
+          span.end();
 
-        const zipkinSpan = toZipkinSpan(
-          span.toReadableSpan(),
-          'my-service',
-          statusCodeTagName,
-          statusDescriptionTagName
-        );
-        assert.deepStrictEqual(zipkinSpan, {
-          kind: item.zipkin,
-          annotations: undefined,
-          duration: hrTimeToMicroseconds(
-            hrTimeDuration(span.startTime, span.endTime)
-          ),
-          id: span.spanContext.spanId,
-          localEndpoint: {
-            serviceName: 'my-service',
-          },
-          name: span.name,
-          parentId: undefined,
-          tags: {
-            [statusCodeTagName]: 'OK',
-          },
-          timestamp: hrTimeToMicroseconds(span.startTime),
-          traceId: span.spanContext.traceId,
-        });
-      })
+          const zipkinSpan = toZipkinSpan(
+            span.toReadableSpan(),
+            'my-service',
+            statusCodeTagName,
+            statusDescriptionTagName
+          );
+          assert.deepStrictEqual(zipkinSpan, {
+            kind: item.zipkin,
+            annotations: undefined,
+            duration: hrTimeToMicroseconds(
+              hrTimeDuration(span.startTime, span.endTime)
+            ),
+            id: span.spanContext.spanId,
+            localEndpoint: {
+              serviceName: 'my-service',
+            },
+            name: span.name,
+            parentId: undefined,
+            tags: {
+              [statusCodeTagName]: 'OK',
+            },
+            timestamp: hrTimeToMicroseconds(span.startTime),
+            traceId: span.spanContext.traceId,
+          });
+        })
     );
   });
 

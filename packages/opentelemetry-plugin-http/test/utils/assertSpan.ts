@@ -21,7 +21,7 @@ import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracing';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -76,7 +76,7 @@ export const assertSpan = (
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus ||
-      utils.parseResponseStatus(validations.httpStatusCode)
+    utils.parseResponseStatus(validations.httpStatusCode)
   );
 
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');

@@ -28,7 +28,7 @@ import {
   TraceFlags,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig, TraceParams } from '../src/types';
+import { BasicTracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';

@@ -33,7 +33,7 @@ import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { Http } from '@opentelemetry/plugin-http';
 
 const memoryExporter = new InMemorySpanExporter();

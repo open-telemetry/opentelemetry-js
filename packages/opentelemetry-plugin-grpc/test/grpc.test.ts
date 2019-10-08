@@ -18,7 +18,7 @@ import { NoopLogger, NoopTracer } from '@opentelemetry/core';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { SpanKind, Tracer } from '@opentelemetry/types';
 import { NodeTracer } from '@opentelemetry/node-sdk';
 
@@ -69,10 +69,10 @@ const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
 ) =>
   x instanceof Array && y instanceof Array
     ? // tslint:disable-next-line:no-any
-      arrayIsEqual(requestEqual)(x as any)(y as any)
+    arrayIsEqual(requestEqual)(x as any)(y as any)
     : !(x instanceof Array) && !(y instanceof Array)
-    ? requestEqual(x)(y)
-    : false;
+      ? requestEqual(x)(y)
+      : false;
 
 const grpcClient = {
   unaryMethod: (
@@ -348,36 +348,36 @@ describe('GrpcPlugin', () => {
   ) => {
     it(`should ${
       checkSpans ? 'do' : 'not'
-    }: create a rootSpan for client and a childSpan for server - ${
+      }: create a rootSpan for client and a childSpan for server - ${
       method.description
-    }`, async () => {
-      const args = [client, method.request];
-      // tslint:disable-next-line:no-any
-      await (method.method as any)
-        .apply({}, args)
-        .then((result: TestRequestResponse | TestRequestResponse[]) => {
-          assert.ok(
-            checkEqual(result)(method.result),
-            'gRPC call returns correct values'
-          );
-          const spans = memoryExporter.getFinishedSpans();
-          if (checkSpans) {
-            const incomingSpan = spans[0];
-            const outgoingSpan = spans[1];
-            const validations = {
-              name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-              status: grpc.status.OK,
-            };
+      }`, async () => {
+        const args = [client, method.request];
+        // tslint:disable-next-line:no-any
+        await (method.method as any)
+          .apply({}, args)
+          .then((result: TestRequestResponse | TestRequestResponse[]) => {
+            assert.ok(
+              checkEqual(result)(method.result),
+              'gRPC call returns correct values'
+            );
+            const spans = memoryExporter.getFinishedSpans();
+            if (checkSpans) {
+              const incomingSpan = spans[0];
+              const outgoingSpan = spans[1];
+              const validations = {
+                name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+                status: grpc.status.OK,
+              };
 
-            assert.strictEqual(spans.length, 2);
-            assertSpan(incomingSpan, SpanKind.SERVER, validations);
-            assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
-            assertPropagation(incomingSpan, outgoingSpan);
-          } else {
-            assert.strictEqual(spans.length, 0);
-          }
-        });
-    });
+              assert.strictEqual(spans.length, 2);
+              assertSpan(incomingSpan, SpanKind.SERVER, validations);
+              assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+              assertPropagation(incomingSpan, outgoingSpan);
+            } else {
+              assert.strictEqual(spans.length, 0);
+            }
+          });
+      });
 
     it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
@@ -430,9 +430,9 @@ describe('GrpcPlugin', () => {
   const insertError = (
     request: TestRequestResponse | TestRequestResponse[]
   ) => (code: number) =>
-    request instanceof Array
-      ? request.splice(0, 0, { num: code }) && request.slice(0, request.length)
-      : { num: code };
+      request instanceof Array
+        ? request.splice(0, 0, { num: code }) && request.slice(0, request.length)
+        : { num: code };
 
   const runErrorTest = (
     method: typeof methodList[0],

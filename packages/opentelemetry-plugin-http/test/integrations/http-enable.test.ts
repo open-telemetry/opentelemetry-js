@@ -28,7 +28,7 @@ import { NodeTracer } from '@opentelemetry/node-sdk';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
 
 const serverPort = 32345;

@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
+import { Span, BasicTracer } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -54,7 +54,7 @@ describe('Utility', () => {
       try {
         utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
-      } catch (ignore) {}
+      } catch (ignore) { }
     });
 
     it('should not throw if no headers', () => {
@@ -239,9 +239,9 @@ describe('Utility', () => {
     it('should call span methods when we get an error event', done => {
       /* tslint:disable-next-line:no-any */
       const span: any = {
-        setAttributes: (obj: Attributes) => {},
-        setStatus: (status: unknown) => {},
-        end: () => {},
+        setAttributes: (obj: Attributes) => { },
+        setStatus: (status: unknown) => { },
+        end: () => { },
       };
       sinon.spy(span, 'setAttributes');
       sinon.spy(span, 'setStatus');

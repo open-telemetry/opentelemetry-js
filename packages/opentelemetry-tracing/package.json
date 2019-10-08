@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/tracer-basic",
+  "name": "@opentelemetry/tracing",
   "version": "0.1.0",
-  "description": "OpenTelemetry Basic Tracer",
+  "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",

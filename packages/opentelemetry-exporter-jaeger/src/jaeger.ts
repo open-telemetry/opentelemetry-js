@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanExporter, ReadableSpan } from '@opentelemetry/tracer-basic';
+import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
