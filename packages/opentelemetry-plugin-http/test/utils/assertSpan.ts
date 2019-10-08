@@ -76,7 +76,7 @@ export const assertSpan = (
   assert.deepStrictEqual(
     span.status,
     validations.forceStatus ||
-    utils.parseResponseStatus(validations.httpStatusCode)
+      utils.parseResponseStatus(validations.httpStatusCode)
   );
 
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');

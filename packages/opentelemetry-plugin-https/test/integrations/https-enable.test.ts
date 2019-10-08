@@ -42,7 +42,7 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('HttpsPlugin Integration tests', () => {
   describe('enable()', () => {
-    before(function (done) {
+    before(function(done) {
       // mandatory
       if (process.env.CI) {
         done();
@@ -82,7 +82,7 @@ describe('HttpsPlugin Integration tests', () => {
       };
       try {
         plugin.disable();
-      } catch (e) { }
+      } catch (e) {}
       plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
     });
 
