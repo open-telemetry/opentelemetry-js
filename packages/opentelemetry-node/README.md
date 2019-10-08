@@ -10,7 +10,7 @@ For manual instrumentation see the
 [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
 
 ## How does automated instrumentation work?
-node-sdk exposes a `NodeTracer` that will automatically hook into the module loader of Node.js.
+This package exposes a `NodeTracer` that will automatically hook into the module loader of Node.js.
 
 For this to work, please make sure that `NodeTracer` is initialized before any other module of your application, (like `http` or `express`) is loaded.
 
