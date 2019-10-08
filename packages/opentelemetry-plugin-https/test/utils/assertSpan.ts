@@ -19,7 +19,7 @@ import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   AttributeNames,
   parseResponseStatus,

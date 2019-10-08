@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerConfig } from '@opentelemetry/tracer-basic';
+import { BasicTracerConfig } from '@opentelemetry/tracing';
 import { StackScopeManager } from '../src/StackScopeManager';
 import { WebTracer } from '../src/WebTracer';
 

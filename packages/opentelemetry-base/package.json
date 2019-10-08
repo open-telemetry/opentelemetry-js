@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/sdk-base",
+  "name": "@opentelemetry/base",
   "version": "0.1.0",
-  "description": "OpenTelemetry SDK base",
+  "description": "OpenTelemetry base",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",

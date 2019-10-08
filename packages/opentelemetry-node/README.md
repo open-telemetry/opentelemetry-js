@@ -1,4 +1,4 @@
-# OpenTelemetry Node SDK
+# OpenTelemetry Node
 [![Gitter chat][gitter-image]][gitter-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
@@ -7,10 +7,10 @@
 This module provides *automated instrumentation and tracing* for Node.js applications.
 
 For manual instrumentation see the
-[@opentelemetry/tracer-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic) package.
+[@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
 
 ## How does automated instrumentation work?
-node-sdk exposes a `NodeTracer` that will automatically hook into the module loader of Node.js.
+This package exposes a `NodeTracer` that will automatically hook into the module loader of Node.js.
 
 For this to work, please make sure that `NodeTracer` is initialized before any other module of your application, (like `http` or `express`) is loaded.
 
@@ -33,13 +33,13 @@ This instrumentation code will automatically
 In short, this means that this module will use provided plugins to automatically instrument your application to produce spans and provide end-to-end tracing by just adding a few lines of code.
 
 ## Creating custom spans on top of auto-instrumentation
-Additionally to automated instrumentation, `NodeTracer` exposes the same API as [@opentelemetry/tracer-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic), allowing creating custom spans if needed.
+Additionally to automated instrumentation, `NodeTracer` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing), allowing creating custom spans if needed.
 
 ## Installation
 
 ```bash
 npm install --save @opentelemetry/core
-npm install --save @opentelemetry/node-sdk
+npm install --save @opentelemetry/node
 
 # Install instrumentation plugins
 npm install --save @opentelemetry/plugin-http
@@ -53,7 +53,7 @@ The following code will configure the `NodeTracer` to instrument `http` using `@
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 // Create and configure NodeTracer
 const tracer = new NodeTracer({
@@ -79,7 +79,7 @@ To enable instrumentation for all [supported modules](https://github.com/open-te
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 // Create and initialize NodeTracer
 const tracer = new NodeTracer();
@@ -108,7 +108,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-node-sdk
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node-sdk
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-node-sdk
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node-sdk&type=dev
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-node
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-node
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-node&type=dev

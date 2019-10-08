@@ -28,11 +28,11 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 
 const memoryExporter = new InMemorySpanExporter();
 

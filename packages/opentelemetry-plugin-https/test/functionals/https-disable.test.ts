@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';

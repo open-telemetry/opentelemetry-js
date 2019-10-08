@@ -31,9 +31,9 @@
     "@opentelemetry/core": "^0.1.0",
     "@opentelemetry/exporter-jaeger": "^0.1.0",
     "@opentelemetry/exporter-zipkin": "^0.1.0",
-    "@opentelemetry/node-sdk": "^0.1.0",
+    "@opentelemetry/node": "^0.1.0",
     "@opentelemetry/plugin-http": "^0.1.0",
-    "@opentelemetry/tracer-basic": "^0.1.0"
+    "@opentelemetry/tracing": "^0.1.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {

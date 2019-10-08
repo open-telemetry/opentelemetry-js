@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`mongodb`](https://github.com/mongodb/node-mongodb-native).
 
 For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
 
 ## Installation
 

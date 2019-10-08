@@ -20,7 +20,7 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../../src/http';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import { NoopLogger } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
 import { DummyPropagation } from '../utils/DummyPropagation';

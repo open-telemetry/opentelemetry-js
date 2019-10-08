@@ -51,8 +51,8 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/sdk-base": "^0.1.0",
-    "@opentelemetry/tracer-basic": "^0.1.0",
+    "@opentelemetry/base": "^0.1.0",
+    "@opentelemetry/tracing": "^0.1.0",
     "@opentelemetry/types": "^0.1.0",
     "jaeger-client": "^3.15.0"
   }

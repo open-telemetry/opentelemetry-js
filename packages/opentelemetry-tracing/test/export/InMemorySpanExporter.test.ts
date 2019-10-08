@@ -20,7 +20,7 @@ import {
   SimpleSpanProcessor,
   BasicTracer,
 } from '../../src';
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();

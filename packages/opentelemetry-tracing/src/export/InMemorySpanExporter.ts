@@ -16,7 +16,7 @@
 
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { ExportResult } from '@opentelemetry/base';
 
 /**
  * This class can be used for testing purposes. It stores the exported spans

@@ -1,6 +1,6 @@
 # Overview
 
-This example shows how to use [@opentelemetry/tracer-basic](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic) to instrument a simple Node.js application - e.g. a batch job.
+This example shows how to use [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) to instrument a simple Node.js application - e.g. a batch job.
 It supports exporting spans either to [Zipkin](https://zipkin.io) or to [Jaeger](https://www.jaegertracing.io).
 
 ## Installation
@@ -59,7 +59,7 @@ Click on the trace to view its details.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on tracer-basic, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracer-basic>
+- For more information on tracer-basic, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
 
 ## LICENSE
 
