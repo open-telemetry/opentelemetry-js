@@ -15,21 +15,28 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { TracerDelegate } from './TracerDelegate';
+import { TracerFactoryDelegate } from './TracerFactoryDelegate';
 
-let globalTracerDelegate = new TracerDelegate();
+let globalTracerFactoryDelegate = new TracerFactoryDelegate();
 
 /**
  * Set the current global tracer. Returns the initialized global tracer
  */
-export function initGlobalTracer(tracer: types.Tracer): types.Tracer {
-  return (globalTracerDelegate = new TracerDelegate(tracer));
+export function initGlobalTracerFactory(
+  tracerFactory: types.TracerFactory
+): types.TracerFactory {
+  return (globalTracerFactoryDelegate = new TracerFactoryDelegate(
+    tracerFactory
+  ));
+}
+
+export function getTracerFactory(): types.TracerFactory {
+  return globalTracerFactoryDelegate;
 }
 
 /**
- * Returns the global tracer
+ * Finds or creates tracer from the global TracerFactory
  */
-export function getTracer(): types.Tracer {
-  // Return the global tracer delegate
-  return globalTracerDelegate;
+export function getTracer(name?: string, version?: string): types.Tracer {
+  return globalTracerFactoryDelegate.getTracer(name, version);
 }

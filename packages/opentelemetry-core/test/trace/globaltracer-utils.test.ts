@@ -18,19 +18,14 @@ import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
 import {
   getTracer,
-  initGlobalTracer,
+  getTracerFactory,
+  initGlobalTracerFactory,
 } from '../../src/trace/globaltracer-utils';
-import { NoopTracer, NoopSpan } from '../../src';
+import { NoopTracer, NoopTracerFactory, NoopSpan } from '../../src';
 import { TraceFlags } from '@opentelemetry/types';
 
 describe('globaltracer-utils', () => {
-  const functions = [
-    'getCurrentSpan',
-    'startSpan',
-    'withSpan',
-    'getBinaryFormat',
-    'getHttpTextFormat',
-  ];
+  const functions = ['getTracer'];
 
   it('should expose a tracer via getTracer', () => {
     const tracer = getTracer();
@@ -47,12 +42,12 @@ describe('globaltracer-utils', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      initGlobalTracer(new NoopTracer());
+      initGlobalTracerFactory(new NoopTracerFactory());
     });
 
-    it('should not crash', () => {
+    it('getTracer should not crash', () => {
       functions.forEach(fn => {
-        const tracer = getTracer();
+        const tracer = getTracerFactory();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -65,10 +60,18 @@ describe('globaltracer-utils', () => {
     });
 
     it('should use the global tracer', () => {
-      const tracer = initGlobalTracer(new TestTracer());
-      const span = tracer.startSpan('test');
+      const tracerFactory = initGlobalTracerFactory(new TestTracerFactory());
+      const span = tracerFactory.getTracer('fake').startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
+
+    class TestTracerFactory extends NoopTracerFactory {
+      private readonly _testTracer: types.Tracer = new TestTracer();
+
+      getTracer(name?: string, version?: string) {
+        return this._testTracer;
+      }
+    }
 
     class TestTracer extends NoopTracer {
       startSpan(
