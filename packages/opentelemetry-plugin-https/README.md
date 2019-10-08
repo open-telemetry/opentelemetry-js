@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`https`](http://nodejs.org/dist/latest/docs/api/https.html).
 
 For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
 
 ## Installation
 
@@ -21,7 +21,7 @@ OpenTelemetry HTTPS Instrumentation allows the user to automatically collect tra
 
 To load a specific plugin (HTTPS in this case), specify it in the Node Tracer's configuration.
 ```js
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 const tracer = new NodeTracer({
   plugins: {
@@ -37,7 +37,7 @@ const tracer = new NodeTracer({
 
 To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 const tracer = new NodeTracer();
 ```

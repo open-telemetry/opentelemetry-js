@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/node-sdk",
+  "name": "@opentelemetry/node",
   "version": "0.1.0",
   "description": "OpenTelemetry Node SDK provides automatic telemetry (tracing, metrics, etc) for Node.js applications",
   "main": "build/src/index.js",

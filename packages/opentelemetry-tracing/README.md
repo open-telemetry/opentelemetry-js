@@ -11,7 +11,7 @@ Used standalone, this module provides methods for manual instrumentation of code
 It does **not** provide automated instrumentation of known libraries, context propagation for asynchronous invocations or distributed-context out-of-the-box.
 
 For automated instrumentation for Node.js, please see
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk).
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node).
 
 ## Installation
 
