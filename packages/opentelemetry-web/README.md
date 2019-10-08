@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides automatic tracing for Web applications.
+This module provides *automated instrumentation and tracing* for Web applications.
 
 For manual instrumentation see the
 [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) package.
