@@ -1,0 +1,61 @@
+{
+  "name": "@opentelemetry/plugin-postgres",
+  "version": "0.1.0",
+  "description": "OpenTelemetry postgres automatic instrumentation package.",
+  "private": true,
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "clean": "rimraf build/*",
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix"
+  },
+  "keywords": [
+    "opentelemetry",
+    "postgres",
+    "pg",
+    "postgresql",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "plugin"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.6.9",
+    "codecov": "^3.5.0",
+    "gts": "^1.1.0",
+    "mocha": "^6.2.0",
+    "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "tslint-consistent-codestyle": "^1.15.1",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.6.3"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.1.0",
+    "@opentelemetry/node-sdk": "^0.1.0",
+    "@opentelemetry/types": "^0.1.0"
+  }
+}
