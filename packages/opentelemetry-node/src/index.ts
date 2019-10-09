@@ -15,3 +15,4 @@
  */
 
 export * from './NodeTracer';
+export * from './NodeTracerFactory';

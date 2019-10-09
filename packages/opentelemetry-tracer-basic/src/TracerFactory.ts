@@ -19,7 +19,7 @@ import { BasicTracerConfig } from './types';
 import { BasicTracer } from './BasicTracer';
 
 export class SDKTracerFactory implements types.TracerFactory {
-  private readonly _defaultTracer: types.Tracer ;
+  private readonly _defaultTracer: types.Tracer;
   constructor(config: BasicTracerConfig) {
     this._defaultTracer = new BasicTracer(config);
   }

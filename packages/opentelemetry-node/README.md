@@ -57,7 +57,7 @@ const opentelemetry = require('@opentelemetry/core');
 const { NodeTracer } = require('@opentelemetry/node');
 
 // Create and configure NodeTracer
-const tracer = new NodeTracer({
+const tracerFactory = new NodeTracerFactory({
   plugins: {
     http: {
       enabled: true,
@@ -69,7 +69,7 @@ const tracer = new NodeTracer({
 });
 
 // Initialize the tracer
-opentelemetry.initGlobalTracer(tracer);
+opentelemetry.initGlobalTracerFactory(tracerFactory);
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
@@ -80,13 +80,13 @@ To enable instrumentation for all [supported modules](https://github.com/open-te
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerFactory} = require('@opentelemetry/node');
 
-// Create and initialize NodeTracer
-const tracer = new NodeTracer();
+// Create and initialize NodeTracerFactory
+const tracerFactory = new NodeTracerFactory();
 
 // Initialize the tracer
-opentelemetry.initGlobalTracer(tracer);
+opentelemetry.initGlobalTracerFactory(tracerFactory);
 
 // Your application code
 // ...

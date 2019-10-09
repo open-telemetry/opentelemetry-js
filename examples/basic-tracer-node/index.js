@@ -17,13 +17,13 @@ if (EXPORTER.toLowerCase().startsWith('z')) {
   exporter = new JaegerExporter(options);
 }
 
-const tracer = new BasicTracer();
+// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+opentelemetry.initGlobalTracerFactory(new BasicTracerFactory());
+
+const tracer = opentelemetry.getTracer();
 
 // Configure span processor to send spans to the provided exporter
 tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
-
-// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracer(tracer);
 
 // Create a span. A span must be closed.
 const span = opentelemetry.getTracer().startSpan('main');
