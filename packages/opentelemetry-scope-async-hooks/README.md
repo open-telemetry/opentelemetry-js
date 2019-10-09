@@ -1,5 +1,6 @@
 # OpenTelemetry AsyncHooks-based Scope Manager
 [![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
@@ -53,3 +54,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [opentracing-scope]: https://github.com/opentracing/opentracing-javascript/pull/113
 [diag-team-scope-discussion]: https://github.com/nodejs/diagnostics/issues/300
 [pkgs-that-break-ah]: https://github.com/nodejs/diagnostics/blob/master/tracing/AsyncHooks/problematic-modules.md
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/scope-async-hooks
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fscope-async-hooks.svg

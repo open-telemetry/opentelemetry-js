@@ -1,5 +1,6 @@
 # OpenTelemetry Core
 [![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
@@ -23,3 +24,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-core
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-core&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/core
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fcore.svg
