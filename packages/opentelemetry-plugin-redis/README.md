@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`redis`](https://github.com/NodeRedis/node_redis).
 
 For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
 
 ## Installation
 

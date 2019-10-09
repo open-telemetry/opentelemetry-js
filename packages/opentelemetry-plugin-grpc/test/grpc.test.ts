@@ -18,9 +18,9 @@ import { NoopLogger, NoopTracer } from '@opentelemetry/core';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { SpanKind, Tracer } from '@opentelemetry/types';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 
 import { assertSpan, assertPropagation } from './utils/assertionUtils';
 import { GrpcPlugin, plugin } from '../src';

@@ -1,4 +1,4 @@
-import { WebTracer } from '@opentelemetry/tracer-web';
+import { WebTracer } from '@opentelemetry/web';
 
 import * as shimmer from 'shimmer';
 

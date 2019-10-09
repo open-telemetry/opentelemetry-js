@@ -61,7 +61,7 @@ Go to Jaeger with your browser [http://localhost:50051/trace/(your-trace-id)]() 
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk>
+- For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node>
 
 ## LICENSE
 

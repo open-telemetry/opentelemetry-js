@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
+import { Span, BasicTracer } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 

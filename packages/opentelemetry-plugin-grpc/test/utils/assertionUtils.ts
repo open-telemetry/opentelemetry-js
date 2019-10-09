@@ -19,7 +19,7 @@ import * as assert from 'assert';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
-import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,

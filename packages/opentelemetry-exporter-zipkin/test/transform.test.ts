@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
-import { Span, BasicTracer } from '@opentelemetry/tracer-basic';
+import { Span, BasicTracer } from '@opentelemetry/tracing';
 import {
   NoopLogger,
   hrTimeToMicroseconds,

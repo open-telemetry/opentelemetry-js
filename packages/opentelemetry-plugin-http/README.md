@@ -1,5 +1,6 @@
 # OpenTelemetry HTTP Instrumentation for Node.js
 [![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
@@ -7,7 +8,7 @@
 This module provides automatic instrumentation for [`http`](https://nodejs.org/api/http.html).
 
 For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
 
 ## Installation
 
@@ -21,7 +22,7 @@ OpenTelemetry HTTP Instrumentation allows the user to automatically collect trac
 
 To load a specific plugin (HTTP in this case), specify it in the Node Tracer's configuration.
 ```js
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 const tracer = new NodeTracer({
   plugins: {
@@ -37,7 +38,7 @@ const tracer = new NodeTracer({
 
 To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { NodeTracer } = require('@opentelemetry/node');
 
 const tracer = new NodeTracer();
 ```
@@ -71,3 +72,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-http
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-http
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-http&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-http
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-http.svg

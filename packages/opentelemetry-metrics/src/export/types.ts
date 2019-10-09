@@ -23,7 +23,7 @@
  */
 
 import { HrTime } from '@opentelemetry/types';
-import { Resource, ExportResult } from '@opentelemetry/sdk-base';
+import { Resource, ExportResult } from '@opentelemetry/base';
 
 export interface ReadableMetric {
   /**

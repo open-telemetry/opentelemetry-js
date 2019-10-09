@@ -14,26 +14,31 @@
  * limitations under the License.
  */
 
-import { ExportResult } from '@opentelemetry/sdk-base';
+import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
+import { ExportResult } from '@opentelemetry/base';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 /**
- * An interface that allows different tracing services to export recorded data
- * for sampled spans in their own format.
- *
- * To export data this MUST be register to the Tracer SDK using a optional
- * config.
+ * This is implementation of {@link SpanExporter} that prints spans to the
+ * console. This class can be used for diagnostic purposes.
  */
-export interface SpanExporter {
-  /**
-   * Called to export sampled {@link ReadableSpan}s.
-   * @param spans the list of sampled Spans to be exported.
-   */
+export class ConsoleSpanExporter implements SpanExporter {
   export(
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
-  ): void;
+  ): void {
+    for (const span of spans) {
+      console.log(
+        `{name=${span.name}, traceId=${span.spanContext.traceId}, spanId=${
+          span.spanContext.spanId
+        }, kind=${span.kind}, parent=${
+          span.parentSpanId
+        }, duration=${hrTimeToMilliseconds(span.duration)}}}`
+      );
+    }
+    return resultCallback(ExportResult.SUCCESS);
+  }
 
-  /** Stops the exporter. */
-  shutdown(): void;
+  shutdown(): void {}
 }
