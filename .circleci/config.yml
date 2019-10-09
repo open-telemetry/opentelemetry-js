@@ -1,5 +1,11 @@
 version: 2
 
+test_env: &test_env
+  TEST_POSTGRES: 1
+
+postgres_service: &postgres_service
+  image: postgres:alpine
+
 node_unit_tests: &node_unit_tests
   steps:
     - checkout
@@ -71,18 +77,26 @@ jobs:
   node8:
     docker:
       - image: node:8
+        environment: *test_env
+      - *postgres_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
+        environment: *test_env
+      - *postgres_service
     <<: *node_unit_tests
   node11:
     docker:
       - image: node:11
+        environment: *test_env
+      - *postgres_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
+        environment: *test_env
+      - *postgres_service
     <<: *node_unit_tests
   node12-browsers:
     docker:

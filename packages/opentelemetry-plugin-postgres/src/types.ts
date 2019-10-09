@@ -14,5 +14,6 @@
  * limitations under the License.
  */
 
-export * from './pg';
-// export * from './pg-pool';
+export interface PostgresPluginOptions {}
+
+export type PostgresCallback = (err: Error, res: object) => unknown;

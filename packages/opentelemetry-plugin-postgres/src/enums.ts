@@ -14,5 +14,11 @@
  * limitations under the License.
  */
 
-export * from './pg';
-// export * from './pg-pool';
+export enum AttributeNames {
+  COMPONENT = 'component',
+  PG_HOST = 'pg.host',
+  PG_PORT = 'pg.port',
+  PG_TEXT = 'pg.text',
+  PG_VALUES = 'pg.values',
+  PG_PLAN = 'pg.plan',
+}
