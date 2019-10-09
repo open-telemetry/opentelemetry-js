@@ -69,7 +69,9 @@ describe('pg@7.x', () => {
       this.skip();
     }
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    testUtils.startDocker();
+    if (testPostgresLocally) {
+      testUtils.startDocker();
+    }
     client = new pg.Client(CONFIG);
 
     function connect() {
@@ -242,9 +244,9 @@ describe('pg@7.x', () => {
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
-        const resNoPromise = await client.query(query, values);
+        const resPromise = await client.query(query, values);
         try {
-          assert.ok(resNoPromise);
+          assert.ok(resPromise);
           runCallbackTest(span, attributes, events);
         } catch (e) {
           assert.ok(false, e.message);
@@ -265,12 +267,12 @@ describe('pg@7.x', () => {
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
-        const resNoPromise = await client.query({
+        const resPromise = await client.query({
           text: query,
           values: values,
         });
         try {
-          assert.ok(resNoPromise);
+          assert.ok(resPromise);
           runCallbackTest(span, attributes, events);
         } catch (e) {
           assert.ok(false, e.message);
@@ -289,9 +291,9 @@ describe('pg@7.x', () => {
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
-        const resNoPromise = await client.query(query);
+        const resPromise = await client.query(query);
         try {
-          assert.ok(resNoPromise);
+          assert.ok(resPromise);
           runCallbackTest(span, attributes, events);
         } catch (e) {
           assert.ok(false, e.message);
