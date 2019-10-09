@@ -92,7 +92,7 @@ describe('pg@7.x', () => {
     });
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     plugin.enable(pg, tracer, logger);
   });
 
