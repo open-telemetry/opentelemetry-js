@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { SpanKind, Attributes, Event, Span } from '@opentelemetry/types';
+import { SpanKind, Attributes, Event, Span, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import { PostgresPlugin } from '../src';
-import { ReadableSpan } from '@opentelemetry/tracer-basic';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
@@ -62,7 +62,7 @@ export const assertSpan = (
     events.length,
     'Should contain same number of events'
   );
-  span.events.forEach((_, index) => {
+  span.events.forEach((_: TimedEvent, index: number) => {
     assert.deepStrictEqual(span.events[index], events[index]);
   });
 };

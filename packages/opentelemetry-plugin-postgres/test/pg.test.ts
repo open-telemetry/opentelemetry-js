@@ -15,11 +15,11 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { SpanKind, Attributes, TimedEvent, Span } from '@opentelemetry/types';
 import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
@@ -61,7 +61,7 @@ describe('pg@7.x', () => {
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
   const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
-  before(function(ready) {
+  before(function (ready) {
     if (!shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
@@ -94,7 +94,7 @@ describe('pg@7.x', () => {
     });
   });
 
-  beforeEach(function() {
+  beforeEach(function () {
     plugin.enable(pg, tracer, logger);
   });
 
