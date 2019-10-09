@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { SpanKind, Attributes, Event, Span, TimedEvent } from '@opentelemetry/types';
+import {
+  SpanKind,
+  Attributes,
+  Event,
+  Span,
+  TimedEvent,
+} from '@opentelemetry/types';
 import * as assert from 'assert';
 import { PostgresPlugin } from '../src';
 import { ReadableSpan } from '@opentelemetry/tracing';

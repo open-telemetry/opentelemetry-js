@@ -61,7 +61,7 @@ describe('pg@7.x', () => {
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
   const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
-  before(function (ready) {
+  before(function(ready) {
     if (!shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
@@ -94,7 +94,7 @@ describe('pg@7.x', () => {
     });
   });
 
-  beforeEach(function () {
+  beforeEach(function() {
     plugin.enable(pg, tracer, logger);
   });
 
