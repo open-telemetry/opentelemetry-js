@@ -18,7 +18,7 @@ import * as types from '@opentelemetry/types';
 import { NoopTracerFactory } from './NoopTracerFactory';
 
 // Acts a bridge to the global tracer factory that can be safely called before the
-// global tracer is initialized. The purpose of the delegation is to avoid the
+// global tracer factory is initialized. The purpose of the delegation is to avoid the
 // sometimes nearly intractable initialization order problems that can arise in
 // applications with a complex set of dependencies. Also allows for the factory
 // to be changed/disabled during runtime without needing to change reference
@@ -48,13 +48,12 @@ export class TracerFactoryDelegate implements types.TracerFactory {
       this._tracerFactory || this._fallbackTracerFactory;
   }
 
-  // Stop the delegate from using the provided tracer. Begin to use the fallback tracer
+  // Stop the delegate from using the provided tracer factory. Begin to use the fallback factory
   stop(): void {
     this._currentTracerFactory = this._fallbackTracerFactory;
   }
 
   // -- TracerFactory interface implementation below -- //
-
   getTracer(name?: string, version?: string): types.Tracer {
     return this._currentTracerFactory.getTracer.apply(
       this._currentTracerFactory,
