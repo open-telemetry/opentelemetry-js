@@ -37,7 +37,9 @@ export class Meter implements types.Meter {
   }
 
   /**
-   * Creates a new counter metric.
+   * Creates a new counter metric. Generally, this kind of metric when the
+   * value is a quantity, the sum is of primary interest, and the event count
+   * and value distribution are not of primary interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
@@ -46,6 +48,7 @@ export class Meter implements types.Meter {
     options?: types.MetricOptions
   ): Metric<CounterHandle> {
     const opt: MetricOptions = {
+      // Counters are defined as monotonic by default
       monotonic: true,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -54,7 +57,10 @@ export class Meter implements types.Meter {
   }
 
   /**
-   * Creates a new gauge metric.
+   * Creates a new gauge metric. Generally, this kind of metric should be used
+   * when the metric cannot be expressed as a sum or because the measurement
+   * interval is arbitrary. Use this kind of metric when the measurement is not
+   * a quantity, and the sum and event count are not of interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
@@ -63,6 +69,7 @@ export class Meter implements types.Meter {
     options?: types.MetricOptions
   ): Metric<GaugeHandle> {
     const opt: MetricOptions = {
+      // Gauges are defined as non-monotonic by default
       monotonic: false,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,

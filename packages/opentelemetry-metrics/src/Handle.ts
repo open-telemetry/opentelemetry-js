@@ -17,7 +17,9 @@
 import * as types from '@opentelemetry/types';
 
 /**
- * CounterHandle is an implementation of the {@link CounterHandle} interface.
+ * CounterHandle allows the SDK to observe/record a single metric event. The
+ * value of single handle in the `Counter` associated with specified label
+ * values.
  */
 export class CounterHandle implements types.CounterHandle {
   // @todo: remove below line once data is exported as a part of Metric.
@@ -40,7 +42,8 @@ export class CounterHandle implements types.CounterHandle {
 }
 
 /**
- * GaugeHandle is an implementation of the {@link GaugeHandle} interface.
+ * GaugeHandle allows the SDK to observe/record a single metric event. The
+ * value of single handle in the `Gauge` associated with specified label values.
  */
 export class GaugeHandle implements types.GaugeHandle {
   // @todo: remove below line once data is exported as a part of Metric.
