@@ -26,12 +26,12 @@ describe('Meter', () => {
   });
 
   describe('#counter', () => {
-    it('should create a counter without options', () => {
+    it('should create a counter', () => {
       const counter = meter.createCounter('name');
       assert.ok(counter instanceof Metric);
     });
 
-    it('should create a counter without options', () => {
+    it('should create a counter with options', () => {
       const counter = meter.createCounter('name', {
         description: 'desc',
         unit: '1',
@@ -42,7 +42,7 @@ describe('Meter', () => {
     });
 
     describe('.getHandle()', () => {
-      it('should create the counter handle', () => {
+      it('should create a counter handle', () => {
         const counter = meter.createCounter('name');
         const handle = counter.getHandle(labelValues);
         handle.add(10);
@@ -51,7 +51,16 @@ describe('Meter', () => {
         assert.strictEqual(handle['_data'], 20);
       });
 
-      it('should not update the handle when disabled = true', () => {
+      it('should add positive values by default', () => {
+        const counter = meter.createCounter('name');
+        const handle = counter.getHandle(labelValues);
+        handle.add(10);
+        assert.strictEqual(handle['_data'], 10);
+        handle.add(-100);
+        assert.strictEqual(handle['_data'], 10);
+      });
+
+      it('should not add the handle data when disabled', () => {
         const counter = meter.createCounter('name', {
           disabled: true,
         });
@@ -60,19 +69,10 @@ describe('Meter', () => {
         assert.strictEqual(handle['_data'], 0);
       });
 
-      it('should not add negative value when monotonic = true', () => {
+      it('should add negative value when monotonic is set to false', () => {
         const counter = meter.createCounter('name', {
-          monotonic: true,
+          monotonic: false,
         });
-        const handle = counter.getHandle(labelValues);
-        handle.add(10);
-        assert.strictEqual(handle['_data'], 10);
-        handle.add(-100);
-        assert.strictEqual(handle['_data'], 10);
-      });
-
-      it('should add negative value when monotonic = false', () => {
-        const counter = meter.createCounter('name');
         const handle = counter.getHandle(labelValues);
         handle.add(-10);
         assert.strictEqual(handle['_data'], -10);
@@ -90,17 +90,119 @@ describe('Meter', () => {
     });
 
     describe('.removeHandle()', () => {
-      it('should remove the counter handle', () => {
+      it('should remove a counter handle', () => {
         const counter = meter.createCounter('name');
         const handle = counter.getHandle(labelValues);
+        assert.strictEqual(counter['_handles'].size, 1);
         counter.removeHandle(labelValues);
+        assert.strictEqual(counter['_handles'].size, 0);
         const handle1 = counter.getHandle(labelValues);
+        assert.strictEqual(counter['_handles'].size, 1);
         assert.notStrictEqual(handle, handle1);
       });
 
       it('should not fail when removing non existing handle', () => {
         const counter = meter.createCounter('name');
         counter.removeHandle([]);
+      });
+
+      it('should clear all handles', () => {
+        const counter = meter.createCounter('name');
+        counter.getHandle(labelValues);
+        assert.strictEqual(counter['_handles'].size, 1);
+        counter.clear();
+        assert.strictEqual(counter['_handles'].size, 0);
+      });
+    });
+  });
+
+  describe('#gauge', () => {
+    it('should create a gauge', () => {
+      const gauge = meter.createGauge('name');
+      assert.ok(gauge instanceof Metric);
+    });
+
+    it('should create a gauge with options', () => {
+      const gauge = meter.createGauge('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        monotonic: false,
+      });
+      assert.ok(gauge instanceof Metric);
+    });
+
+    describe('.getHandle()', () => {
+      it('should create a gauge handle', () => {
+        const gauge = meter.createGauge('name');
+        const handle = gauge.getHandle(labelValues);
+        handle.set(10);
+        assert.strictEqual(handle['_data'], 10);
+        handle.set(250);
+        assert.strictEqual(handle['_data'], 250);
+      });
+
+      it('should go up and down by default', () => {
+        const gauge = meter.createGauge('name');
+        const handle = gauge.getHandle(labelValues);
+        handle.set(10);
+        assert.strictEqual(handle['_data'], 10);
+        handle.set(-100);
+        assert.strictEqual(handle['_data'], -100);
+      });
+
+      it('should not set the handle data when disabled', () => {
+        const gauge = meter.createGauge('name', {
+          disabled: true,
+        });
+        const handle = gauge.getHandle(labelValues);
+        handle.set(10);
+        assert.strictEqual(handle['_data'], 0);
+      });
+
+      it('should not set negative value when monotonic is set to true', () => {
+        const gauge = meter.createGauge('name', {
+          monotonic: true,
+        });
+        const handle = gauge.getHandle(labelValues);
+        handle.set(-10);
+        assert.strictEqual(handle['_data'], 0);
+      });
+
+      it('should return same handle on same label values', () => {
+        const gauge = meter.createGauge('name');
+        const handle = gauge.getHandle(labelValues);
+        handle.set(10);
+        const handle1 = gauge.getHandle(labelValues);
+        handle1.set(10);
+        assert.strictEqual(handle['_data'], 10);
+        assert.strictEqual(handle, handle1);
+      });
+    });
+
+    describe('.removeHandle()', () => {
+      it('should remove the gauge handle', () => {
+        const gauge = meter.createGauge('name');
+        const handle = gauge.getHandle(labelValues);
+        assert.strictEqual(gauge['_handles'].size, 1);
+        gauge.removeHandle(labelValues);
+        assert.strictEqual(gauge['_handles'].size, 0);
+        const handle1 = gauge.getHandle(labelValues);
+        assert.strictEqual(gauge['_handles'].size, 1);
+        assert.notStrictEqual(handle, handle1);
+      });
+
+      it('should not fail when removing non existing handle', () => {
+        const gauge = meter.createGauge('name');
+        gauge.removeHandle([]);
+      });
+
+      it('should clear all handles', () => {
+        const gauge = meter.createGauge('name');
+        gauge.getHandle(labelValues);
+        assert.strictEqual(gauge['_handles'].size, 1);
+        gauge.clear();
+        assert.strictEqual(gauge['_handles'].size, 0);
       });
     });
   });

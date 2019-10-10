@@ -16,37 +16,40 @@
 
 import * as types from '@opentelemetry/types';
 import { hashLabelValues } from './Utils';
-import { CounterHandle } from './Handle';
+import { CounterHandle, GaugeHandle } from './Handle';
+import { MetricOptions } from './types';
 
-export class Metric<T> implements types.Metric<T> {
-  private readonly _monotonic: boolean;
-  private readonly _disabled: boolean;
+/** This is a SDK implementation of {@link Metric} interface. */
+export abstract class Metric<T> implements types.Metric<T> {
+  protected readonly _monotonic: boolean;
+  protected readonly _disabled: boolean;
   private readonly _handles: Map<String, T> = new Map();
 
-  constructor(name: string, options: types.MetricOptions) {
-    this._monotonic = options.monotonic!;
-    this._disabled = options.disabled!;
+  constructor(name: string, options: MetricOptions) {
+    this._monotonic = options.monotonic;
+    this._disabled = options.disabled;
   }
 
   /**
    * Returns a Handle associated with specified label values.
    * It is recommended to keep a reference to the Handle instead of always
-   * calling this method for every operations.
+   * calling this method for each operation.
    * @param labelValues the list of label values.
    */
   getHandle(labelValues: string[]): T {
     const hash = hashLabelValues(labelValues);
     if (this._handles.has(hash)) return this._handles.get(hash)!;
 
-    const handle = new CounterHandle(this._disabled, this._monotonic);
-    this._handles.set(hash, handle as never);
-    return handle as never;
+    const handle = this._makeHandle();
+    this._handles.set(hash, handle);
+    return handle;
   }
 
   /**
    * Returns a Handle for a metric with all labels not set.
    */
   getDefaultHandle(): T {
+    // @todo: implement this method
     throw new Error('not implemented yet');
   }
 
@@ -59,7 +62,7 @@ export class Metric<T> implements types.Metric<T> {
   }
 
   /**
-   * Clears all Handle from the Metric.
+   * Clears all Handles from the Metric.
    */
   clear(): void {
     this._handles.clear();
@@ -68,5 +71,27 @@ export class Metric<T> implements types.Metric<T> {
   setCallback(fn: () => void): void {
     // @todo: implement this method
     return;
+  }
+
+  protected abstract _makeHandle(): T;
+}
+
+/** This is a SDK implementation of Counter Metric. */
+export class CounterMetric extends Metric<CounterHandle> {
+  constructor(name: string, options: MetricOptions) {
+    super(name, options);
+  }
+  protected _makeHandle(): CounterHandle {
+    return new CounterHandle(this._disabled, this._monotonic);
+  }
+}
+
+/** This is a SDK implementation of Gauge Metric. */
+export class GaugeMetric extends Metric<GaugeHandle> {
+  constructor(name: string, options: MetricOptions) {
+    super(name, options);
+  }
+  protected _makeHandle(): GaugeHandle {
+    return new GaugeHandle(this._disabled, this._monotonic);
   }
 }

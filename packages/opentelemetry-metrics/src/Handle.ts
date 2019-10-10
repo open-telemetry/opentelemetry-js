@@ -16,67 +16,62 @@
 
 import * as types from '@opentelemetry/types';
 
-export class BaseHandle {
-  protected _data = 0;
-  protected _disabled: boolean;
-  protected _monotonic: boolean;
-
-  constructor(disabled: boolean, monotonic: boolean) {
-    this._disabled = disabled;
-    this._monotonic = monotonic;
-  }
-
-  protected validateUpdate() {
-    if (this._disabled) return false;
-    return true;
-  }
-}
-
 /**
  * CounterHandle is an implementation of the {@link CounterHandle} interface.
  */
-export class CounterHandle extends BaseHandle implements types.CounterHandle {
-  constructor(disabled: boolean, monotonic: boolean) {
-    super(disabled, monotonic);
-  }
+export class CounterHandle implements types.CounterHandle {
+  // @todo: remove below line once data is exported as a part of Metric.
+  /* tslint:disable-next-line:no-unused-variable */
+  private _data = 0;
+  constructor(
+    private readonly _disabled: boolean,
+    private readonly _monotonic: boolean
+  ) {}
 
   add(value: number): void {
-    if (!this.validateUpdate()) return;
+    if (this._disabled) return;
 
     if (this._monotonic && value < 0) {
       // log: Monotonic counter cannot descend.
       return;
     }
-    this._data += value;
+    this._data = this._data + value;
   }
 }
 
 /**
  * GaugeHandle is an implementation of the {@link GaugeHandle} interface.
  */
-export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
-  constructor(disabled: boolean, monotonic: boolean) {
-    super(disabled, monotonic);
-  }
+export class GaugeHandle implements types.GaugeHandle {
+  // @todo: remove below line once data is exported as a part of Metric.
+  /* tslint:disable-next-line:no-unused-variable */
+  private _data = 0;
+  constructor(
+    private readonly _disabled: boolean,
+    private readonly _monotonic: boolean
+  ) {}
 
   set(value: number): void {
-    return;
+    if (this._disabled) return;
+
+    if (this._monotonic && value < this._data) {
+      // log: Monotonic gauge cannot descend.
+      return;
+    }
+    this._data = value;
   }
 }
 
 /**
  * MeasureHandle is an implementation of the {@link MeasureHandle} interface.
  */
-export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
-  constructor(disabled: boolean, monotonic: boolean) {
-    super(disabled, monotonic);
-  }
-
+export class MeasureHandle implements types.MeasureHandle {
   record(
     value: number,
     distContext?: types.DistributedContext,
     spanContext?: types.SpanContext
   ): void {
-    throw new Error('not implemented yet');
+    // @todo: implement this method.
+    return;
   }
 }

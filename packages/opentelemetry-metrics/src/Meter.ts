@@ -16,7 +16,8 @@
 
 import * as types from '@opentelemetry/types';
 import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
-import { Metric } from './Metric';
+import { Metric, CounterMetric, GaugeMetric } from './Metric';
+import { MetricOptions, DEFAULT_METRIC_OPTIONS } from './types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -31,6 +32,7 @@ export class Meter implements types.Meter {
     name: string,
     options?: types.MetricOptions
   ): Metric<MeasureHandle> {
+    // @todo: implement this method
     throw new Error('not implemented yet');
   }
 
@@ -43,9 +45,12 @@ export class Meter implements types.Meter {
     name: string,
     options?: types.MetricOptions
   ): Metric<CounterHandle> {
-    const opt = Object.assign({ monotonic: false, disabled: false }, options);
-    const counter = new Metric<CounterHandle>(name, opt);
-    return counter;
+    const opt: MetricOptions = {
+      monotonic: true,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    return new CounterMetric(name, opt);
   }
 
   /**
@@ -57,6 +62,11 @@ export class Meter implements types.Meter {
     name: string,
     options?: types.MetricOptions
   ): Metric<GaugeHandle> {
-    throw new Error('not implemented yet');
+    const opt: MetricOptions = {
+      monotonic: false,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    return new GaugeMetric(name, opt);
   }
 }
