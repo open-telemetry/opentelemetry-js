@@ -19,7 +19,8 @@ import { BasicTracerConfig } from './types';
 import { BasicTracer } from './BasicTracer';
 
 export class BasicTracerFactory implements types.TracerFactory {
-  private readonly _defaultTracer: types.Tracer;
+  protected readonly _defaultTracer: BasicTracer;
+
   constructor(config: BasicTracerConfig) {
     this._defaultTracer = new BasicTracer(config);
   }
