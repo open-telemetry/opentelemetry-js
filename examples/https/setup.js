@@ -1,15 +1,17 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerFactory } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 function setupTracerAndExporters(service) {
   let exporter;
-  const tracer = new NodeTracer();
+  const factory = new NodeTracerFactory();
+  const tracer = factory.getTracer();
 
   if (EXPORTER.toLowerCase().startsWith('z')) {
     exporter = new ZipkinExporter({
@@ -26,7 +28,7 @@ function setupTracerAndExporters(service) {
   tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-  opentelemetry.initGlobalTracer(tracer);
+  opentelemetry.initGlobalTracerFactory(factory);
 }
 
 exports.setupTracerAndExporters = setupTracerAndExporters;
