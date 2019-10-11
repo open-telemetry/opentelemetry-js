@@ -40,7 +40,7 @@ export abstract class Metric<T> implements types.Metric<T> {
     const hash = hashLabelValues(labelValues);
     if (this._handles.has(hash)) return this._handles.get(hash)!;
 
-    const handle = this._makeHandle();
+    const handle = this._makeHandle(labelValues);
     this._handles.set(hash, handle);
     return handle;
   }
@@ -73,7 +73,7 @@ export abstract class Metric<T> implements types.Metric<T> {
     return;
   }
 
-  protected abstract _makeHandle(): T;
+  protected abstract _makeHandle(labelValues: string[]): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
@@ -81,8 +81,8 @@ export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(): CounterHandle {
-    return new CounterHandle(this._disabled, this._monotonic);
+  protected _makeHandle(labelValues: string[]): CounterHandle {
+    return new CounterHandle(this._disabled, this._monotonic, labelValues);
   }
 }
 
@@ -91,7 +91,7 @@ export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(): GaugeHandle {
-    return new GaugeHandle(this._disabled, this._monotonic);
+  protected _makeHandle(labelValues: string[]): GaugeHandle {
+    return new GaugeHandle(this._disabled, this._monotonic, labelValues);
   }
 }

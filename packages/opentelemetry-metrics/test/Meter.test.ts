@@ -16,10 +16,12 @@
 
 import * as assert from 'assert';
 import { Meter, Metric } from '../src';
+import * as types from '@opentelemetry/types';
 
 describe('Meter', () => {
   let meter: Meter;
   const labelValues = ['value'];
+  const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
     meter = new Meter();
@@ -49,6 +51,16 @@ describe('Meter', () => {
         assert.strictEqual(handle['_data'], 10);
         handle.add(10);
         assert.strictEqual(handle['_data'], 20);
+      });
+
+      it('should return the timeseries', () => {
+        const counter = meter.createCounter('name');
+        const handle = counter.getHandle(['value1', 'value2']);
+        handle.add(20);
+        assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
+          labelValues: [{ value: 'value1' }, { value: 'value2' }],
+          points: [{ value: 20, timestamp: hrTime }],
+        });
       });
 
       it('should add positive values by default', () => {
@@ -140,6 +152,16 @@ describe('Meter', () => {
         assert.strictEqual(handle['_data'], 10);
         handle.set(250);
         assert.strictEqual(handle['_data'], 250);
+      });
+
+      it('should return the timeseries', () => {
+        const gauge = meter.createGauge('name');
+        const handle = gauge.getHandle(['v1', 'v2']);
+        handle.set(150);
+        assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
+          labelValues: [{ value: 'v1' }, { value: 'v2' }],
+          points: [{ value: 150, timestamp: hrTime }],
+        });
       });
 
       it('should go up and down by default', () => {

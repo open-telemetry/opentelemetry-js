@@ -15,6 +15,7 @@
  */
 
 import * as types from '@opentelemetry/types';
+import { TimeSeries } from './export/types';
 
 /**
  * CounterHandle allows the SDK to observe/record a single metric event. The
@@ -22,12 +23,12 @@ import * as types from '@opentelemetry/types';
  * values.
  */
 export class CounterHandle implements types.CounterHandle {
-  // @todo: remove below line once data is exported as a part of Metric.
-  /* tslint:disable-next-line:no-unused-variable */
   private _data = 0;
+
   constructor(
     private readonly _disabled: boolean,
-    private readonly _monotonic: boolean
+    private readonly _monotonic: boolean,
+    private readonly _labelValues: string[]
   ) {}
 
   add(value: number): void {
@@ -39,6 +40,19 @@ export class CounterHandle implements types.CounterHandle {
     }
     this._data = this._data + value;
   }
+
+  /**
+   * Returns the TimeSeries with one or more Point.
+   *
+   * @param timestamp The time at which the counter is recorded.
+   * @returns The TimeSeries.
+   */
+  getTimeSeries(timestamp: types.HrTime): TimeSeries {
+    return {
+      labelValues: this._labelValues.map(value => ({ value })),
+      points: [{ value: this._data, timestamp }],
+    };
+  }
 }
 
 /**
@@ -46,12 +60,12 @@ export class CounterHandle implements types.CounterHandle {
  * value of single handle in the `Gauge` associated with specified label values.
  */
 export class GaugeHandle implements types.GaugeHandle {
-  // @todo: remove below line once data is exported as a part of Metric.
-  /* tslint:disable-next-line:no-unused-variable */
   private _data = 0;
+
   constructor(
     private readonly _disabled: boolean,
-    private readonly _monotonic: boolean
+    private readonly _monotonic: boolean,
+    private readonly _labelValues: string[]
   ) {}
 
   set(value: number): void {
@@ -62,6 +76,19 @@ export class GaugeHandle implements types.GaugeHandle {
       return;
     }
     this._data = value;
+  }
+
+  /**
+   * Returns the TimeSeries with one or more Point.
+   *
+   * @param timestamp The time at which the gauge is recorded.
+   * @returns The TimeSeries.
+   */
+  getTimeSeries(timestamp: types.HrTime): TimeSeries {
+    return {
+      labelValues: this._labelValues.map(value => ({ value })),
+      points: [{ value: this._data, timestamp }],
+    };
   }
 }
 
