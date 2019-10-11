@@ -2,8 +2,8 @@
 
 const benchmark = require('./benchmark');
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracer, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracer-basic');
-const { NodeTracer } = require('@opentelemetry/node-sdk');
+const { BasicTracer, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { NodeTracer } = require('@opentelemetry/node');
 
 const exporter = new InMemorySpanExporter();
 const logger = new opentelemetry.NoopLogger();
