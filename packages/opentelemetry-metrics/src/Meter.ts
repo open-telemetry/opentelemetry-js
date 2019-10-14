@@ -15,14 +15,29 @@
  */
 
 import * as types from '@opentelemetry/types';
+import { ConsoleLogger } from '@opentelemetry/core';
 import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
 import { Metric, CounterMetric, GaugeMetric } from './Metric';
-import { MetricOptions, DEFAULT_METRIC_OPTIONS } from './types';
+import {
+  MetricOptions,
+  DEFAULT_METRIC_OPTIONS,
+  DEFAULT_CONFIG,
+  MeterConfig,
+} from './types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements types.Meter {
+  private readonly _logger: types.Logger;
+
+  /**
+   * Constructs a new Meter instance.
+   */
+  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+    this._logger = config.logger || new ConsoleLogger(config.logLevel);
+  }
+
   /**
    * Creates and returns a new {@link Measure}.
    * @param name the name of the metric.
@@ -50,6 +65,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
       monotonic: true,
+      logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
@@ -71,6 +87,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default
       monotonic: false,
+      logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };

@@ -23,11 +23,13 @@ import { MetricOptions } from './types';
 export abstract class Metric<T> implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
+  protected readonly _logger: types.Logger;
   private readonly _handles: Map<String, T> = new Map();
 
   constructor(name: string, options: MetricOptions) {
     this._monotonic = options.monotonic;
     this._disabled = options.disabled;
+    this._logger = options.logger;
   }
 
   /**
@@ -50,6 +52,7 @@ export abstract class Metric<T> implements types.Metric<T> {
    */
   getDefaultHandle(): T {
     // @todo: implement this method
+    this._logger.error('not implemented yet');
     throw new Error('not implemented yet');
   }
 
@@ -70,6 +73,7 @@ export abstract class Metric<T> implements types.Metric<T> {
 
   setCallback(fn: () => void): void {
     // @todo: implement this method
+    this._logger.error('not implemented yet');
     return;
   }
 
@@ -82,7 +86,12 @@ export class CounterMetric extends Metric<CounterHandle> {
     super(name, options);
   }
   protected _makeHandle(labelValues: string[]): CounterHandle {
-    return new CounterHandle(this._disabled, this._monotonic, labelValues);
+    return new CounterHandle(
+      this._disabled,
+      this._monotonic,
+      labelValues,
+      this._logger
+    );
   }
 }
 
@@ -92,6 +101,11 @@ export class GaugeMetric extends Metric<GaugeHandle> {
     super(name, options);
   }
   protected _makeHandle(labelValues: string[]): GaugeHandle {
-    return new GaugeHandle(this._disabled, this._monotonic, labelValues);
+    return new GaugeHandle(
+      this._disabled,
+      this._monotonic,
+      labelValues,
+      this._logger
+    );
   }
 }

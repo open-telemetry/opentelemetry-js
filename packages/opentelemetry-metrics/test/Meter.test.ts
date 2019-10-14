@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { Meter, Metric } from '../src';
 import * as types from '@opentelemetry/types';
+import { NoopLogger } from '@opentelemetry/core';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -24,7 +25,9 @@ describe('Meter', () => {
   const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
-    meter = new Meter();
+    meter = new Meter({
+      logger: new NoopLogger(),
+    });
   });
 
   describe('#counter', () => {

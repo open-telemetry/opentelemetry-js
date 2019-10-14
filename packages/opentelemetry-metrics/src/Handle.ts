@@ -28,14 +28,15 @@ export class CounterHandle implements types.CounterHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
-    private readonly _labelValues: string[]
+    private readonly _labelValues: string[],
+    private readonly _logger: types.Logger
   ) {}
 
   add(value: number): void {
     if (this._disabled) return;
 
     if (this._monotonic && value < 0) {
-      // log: Monotonic counter cannot descend.
+      this._logger.error('Monotonic counter cannot descend.');
       return;
     }
     this._data = this._data + value;
@@ -65,14 +66,15 @@ export class GaugeHandle implements types.GaugeHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
-    private readonly _labelValues: string[]
+    private readonly _labelValues: string[],
+    private readonly _logger: types.Logger
   ) {}
 
   set(value: number): void {
     if (this._disabled) return;
 
     if (this._monotonic && value < this._data) {
-      // log: Monotonic gauge cannot descend.
+      this._logger.error('Monotonic gauge cannot descend.');
       return;
     }
     this._data = value;

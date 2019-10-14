@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { LogLevel } from '@opentelemetry/core';
+import { Logger } from '@opentelemetry/types';
+
 /** Options needed for SDK metric creation. */
 export interface MetricOptions {
   /** The name of the component that reports the Metric. */
@@ -36,7 +39,24 @@ export interface MetricOptions {
 
   /** Monotonic allows this metric to accept negative values. */
   monotonic: boolean;
+
+  /** User provided logger. */
+  logger: Logger;
 }
+
+/** MeterConfig provides an interface for configuring a Meter. */
+export interface MeterConfig {
+  /** User provided logger. */
+  logger?: Logger;
+
+  /** level of logger.  */
+  logLevel?: LogLevel;
+}
+
+/** Default Meter configuration. */
+export const DEFAULT_CONFIG = {
+  logLevel: LogLevel.DEBUG,
+};
 
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {
