@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-prometheus",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "OpenTelemetry Exporter Prometheus provides a metrics endpoint for Prometheus",
   "main": "build/src/index.js",
@@ -13,7 +13,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",

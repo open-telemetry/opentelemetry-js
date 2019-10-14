@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-http2",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry http2 automatic instrumentation package.",
   "private": true,
   "main": "build/src/index.js",
@@ -12,7 +12,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
