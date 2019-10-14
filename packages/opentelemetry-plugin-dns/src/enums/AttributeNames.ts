@@ -15,18 +15,14 @@
  */
 
 /**
- * Attributes Names according to Opencensus HTTP Specs since there is no specific OpenTelemetry Attributes
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/work_in_progress/opencensus/HTTP.md#attributes
+ * Attributes Names according [OpenTelemetry attributes specs](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md)
  */
 export enum AttributeNames {
   COMPONENT = 'component',
   PEER_HOSTNAME = 'peer.hostname',
-  PEER_IPV4 = 'peer.ipv4',
-  PEER_IPV6 = 'peer.ipv6',
   PEER_PORT = 'peer.port',
   PEER_SERVICE = 'peer.service',
   // NOT ON OFFICIAL SPEC
-  PEER_IPV0 = 'peer.ipv0',
   DNS_ERROR_CODE = 'dns.error_code',
   DNS_ERROR_NAME = 'dns.error_name',
   DNS_ERROR_MESSAGE = 'dns.error_message',

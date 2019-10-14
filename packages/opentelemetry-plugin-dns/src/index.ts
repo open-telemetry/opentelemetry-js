@@ -15,6 +15,4 @@
  */
 
 export * from './dns';
-export * from './enums/AttributeNames';
-export * from './enums/AddressFamily';
 export * from './types';
