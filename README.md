@@ -15,7 +15,8 @@ To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/o
 ## Release Schedule
 
 OpenTelemetry JS is under active development.
-This release isn't guaranteed to conform to a specific version of the specification, and future releases will not attempt to maintain backwards compatibility with the alpha release.
+This release isn't guaranteed to conform to a specific version of the specification, and future 
+releases will not attempt to maintain backwards compatibility with the alpha release.
 
 The _alpha_ release includes:
 
