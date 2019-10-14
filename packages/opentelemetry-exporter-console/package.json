@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/web",
+  "name": "@opentelemetry/exporter-console",
   "version": "0.1.0",
-  "description": "OpenTelemetry Web Tracer",
+  "description": "OpenTelemetry Console Exporter",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -40,7 +40,6 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.5",
-    "@types/node": "^12.6.8",
     "@types/webpack-env": "1.13.9",
     "@types/sinon": "^7.0.13",
     "@babel/core": "^7.6.0",
@@ -60,16 +59,14 @@
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
-    "ts-node": "^8.0.0",
     "typescript": "^3.6.3",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@opentelemetry/base": "^0.1.0",
     "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/scope-base": "^0.1.0",
-    "@opentelemetry/types": "^0.1.0",
     "@opentelemetry/tracing": "^0.1.0"
   }
 }

@@ -35,7 +35,9 @@ function numberToHrtime(epochMillis: number): types.HrTime {
 // Returns an hrtime calculated via performance component.
 export function hrTime(performanceNow?: number): types.HrTime {
   const timeOrigin = numberToHrtime(performance.timeOrigin);
-  const now = numberToHrtime(performanceNow || performance.now());
+  const now = numberToHrtime(
+    typeof performanceNow === 'number' ? performanceNow : performance.now()
+  );
 
   let seconds = timeOrigin[0] + now[0];
   let nanos = timeOrigin[1] + now[1];

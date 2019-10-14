@@ -14,8 +14,27 @@
  * limitations under the License.
  */
 
-import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracing';
+import { BasePlugin } from '@opentelemetry/core';
+import {
+  BasicTracer,
+  BasicTracerConfig,
+  SpanProcessor,
+} from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
+
+/**
+ * WebTracerConfig provides an interface for configuring a Web Tracer.
+ */
+export interface WebTracerConfig extends BasicTracerConfig {
+  /**
+   * span processor
+   */
+  spanProcessor?: SpanProcessor;
+  /**
+   * plugins to be used with tracer, they will be enabled automatically
+   */
+  plugins?: BasePlugin<unknown>[];
+}
 
 /**
  * This class represents a web tracer with {@link StackScopeManager}
@@ -23,16 +42,24 @@ import { StackScopeManager } from './StackScopeManager';
 export class WebTracer extends BasicTracer {
   /**
    * Constructs a new Tracer instance.
+   * @param {WebTracerConfig} config Web Tracer config
    */
-  /**
-   *
-   * @param {BasicTracerConfig} config Web Tracer config
-   */
-  constructor(config: BasicTracerConfig = {}) {
+  constructor(config: WebTracerConfig = {}) {
     if (typeof config.scopeManager === 'undefined') {
       config.scopeManager = new StackScopeManager();
     }
-    config.scopeManager.enable();
+    if (typeof config.plugins === 'undefined') {
+      config.plugins = [];
+    }
     super(Object.assign({}, { scopeManager: config.scopeManager }, config));
+
+    // enable scope manager
+    config.scopeManager.enable();
+
+    // enable all plugins
+    for (let i = 0, j = config.plugins.length; i < j; i++) {
+      config.plugins[i].enable([], this, this.logger, {});
+    }
+
   }
 }

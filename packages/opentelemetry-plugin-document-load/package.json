@@ -1,27 +1,27 @@
 {
-  "name": "@opentelemetry/web",
+  "name": "@opentelemetry/plugin-document-load",
   "version": "0.1.0",
-  "description": "OpenTelemetry Web Tracer",
+  "description": "OpenTelemetry document-load automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test:browser": "nyc karma start --single-run",
     "tdd": "karma start",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
-    "watch": "tsc -w",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
+    "document-load",
     "web",
     "tracing",
     "profiling",
-    "metrics",
-    "stats"
+    "plugin"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -56,7 +56,7 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
-    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-consistent-codestyle" : "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
@@ -70,6 +70,7 @@
     "@opentelemetry/core": "^0.1.0",
     "@opentelemetry/scope-base": "^0.1.0",
     "@opentelemetry/types": "^0.1.0",
-    "@opentelemetry/tracing": "^0.1.0"
+    "@opentelemetry/tracing": "^0.1.0",
+    "@opentelemetry/web": "^0.1.0"
   }
 }
