@@ -21,3 +21,9 @@ export enum LogLevel {
   INFO,
   DEBUG,
 }
+
+export interface TimeOriginLegacy {
+  timing: {
+    fetchStart: number;
+  };
+}
