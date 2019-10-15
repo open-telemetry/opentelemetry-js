@@ -42,7 +42,7 @@ export const assertSpan = (
 
   assert.strictEqual(
     span.attributes[AttributeNames.COMPONENT],
-    PostgresPlugin.component
+    PostgresPlugin.COMPONENT
   );
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);

@@ -36,7 +36,7 @@ const CONFIG = {
   password: 'test',
   database: 'postgres',
   host: '127.0.0.1',
-  port: 5432,
+  port: 54320,
 };
 
 const runCallbackTest = (
@@ -59,7 +59,7 @@ describe('pg@7.x', () => {
   const logger = new NoopLogger();
   const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
-  const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
+  const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(function(ready) {
     if (!shouldTest) {
@@ -85,13 +85,11 @@ describe('pg@7.x', () => {
     }
     connect();
   });
-  after(done => {
+  after((done) => {
     if (testPostgresLocally) {
       testUtils.cleanUpDocker();
     }
-    client.end(() => {
-      done();
-    });
+    client.end(done);
   });
 
   beforeEach(function() {
@@ -115,7 +113,7 @@ describe('pg@7.x', () => {
     assert.strictEqual(plugin.moduleName, 'pg');
   });
 
-  it('should let the pg module throw its own errors with bad arguments', () => {
+  it('should maintain pg module error throwing behavior with bad arguments', () => {
     const assertPgError = (e: Error) => {
       const src = e.stack!.split('\n').map(line => line.trim())[1];
       return /node_modules[/\\]pg/.test(src);
@@ -143,12 +141,22 @@ describe('pg@7.x', () => {
       assert.strictEqual(res, undefined, 'No promise is returned');
     });
 
+    it('should return a promise if callback is provided', done => {
+      const resPromise = client.query('SELECT NOW()');
+      resPromise.then(res => {
+        assert.ok(res);
+        done();
+      }).catch((err: Error) => {
+        assert.ok(false, err.message);
+      });
+    });
+
     it('it should intercept client.query(text, callback)', done => {
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: 'SELECT NOW()',
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -167,10 +175,10 @@ describe('pg@7.x', () => {
       const query = 'SELECT $1::text';
       const values = ['0'];
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: values,
       };
       const events: TimedEvent[] = [];
@@ -189,10 +197,10 @@ describe('pg@7.x', () => {
     it('should intercept client.query({text, callback})', done => {
       const query = 'SELECT NOW()';
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -213,10 +221,10 @@ describe('pg@7.x', () => {
     it('should intercept client.query({text}, callback)', done => {
       const query = 'SELECT NOW()';
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -231,14 +239,14 @@ describe('pg@7.x', () => {
       });
     });
 
-    it('should intercept client.query(text, values', async () => {
+    it('should intercept client.query(text, values)', async () => {
       const query = 'SELECT $1::text';
       const values = ['0'];
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: values,
       };
       const events: TimedEvent[] = [];
@@ -258,10 +266,10 @@ describe('pg@7.x', () => {
       const query = 'SELECT $1::text';
       const values = ['0'];
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: values,
       };
       const events: TimedEvent[] = [];
@@ -283,10 +291,10 @@ describe('pg@7.x', () => {
     it('should intercept client.query(text)', async () => {
       const query = 'SELECT NOW()';
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.component,
-        [AttributeNames.PG_HOST]: CONFIG.host,
-        [AttributeNames.PG_PORT]: CONFIG.port,
-        [AttributeNames.PG_TEXT]: query,
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: CONFIG.host,
+        [AttributeNames.PEER_PORT]: CONFIG.port,
+        [AttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');

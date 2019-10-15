@@ -15,10 +15,22 @@
  */
 
 export enum AttributeNames {
+  // required by https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md#databases-client-calls
   COMPONENT = 'component',
-  PG_HOST = 'pg.host',
-  PG_PORT = 'pg.port',
-  PG_TEXT = 'pg.text',
+  DB_TYPE = 'db.type',
+  DB_INSTANCE = 'db.instance',
+  DB_STATEMENT = 'db.statement',
+  PEER_ADDRESS = 'peer.address',
+  PEER_HOST = 'peer.host',
+
+  // optional
+  DB_USER = 'db.user',
+  PEER_PORT = 'peer.port',
+  PEER_IPV4 = 'peer.ipv4',
+  PEER_IPV6 = 'peer.ipv6',
+  PEER_SERVICE = 'peer.service',
+
+  // PG specific -- not specified by spec
   PG_VALUES = 'pg.values',
   PG_PLAN = 'pg.plan',
 }
