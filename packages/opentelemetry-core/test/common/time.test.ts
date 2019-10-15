@@ -83,7 +83,7 @@ describe('time', () => {
       sandbox.stub(performance, 'timeOrigin').value(11.5);
       sandbox.stub(performance, 'now').callsFake(() => 11.3);
 
-      const output = hrTime(null);
+      const output = hrTime(null as any);
       assert.deepStrictEqual(output, [0, 22800000]);
     });
 
