@@ -6,13 +6,14 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test:browser": "nyc karma start --single-run",
-    "tdd": "karma start",
     "clean": "rimraf build/*",
     "check": "gts check",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
     "fix": "gts fix",
+    "prepare": "npm run compile",
+    "tdd": "karma start",
+    "test:browser": "nyc karma start --single-run",
     "watch": "tsc -w"
   },
   "keywords": [
