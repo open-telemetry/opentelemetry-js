@@ -63,6 +63,13 @@ describe('time', () => {
       assert.deepStrictEqual(output, [0, 23100000]);
     });
 
+    it('should allow passed "performanceNow" equal to 0', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+
+      const output = hrTime(0);
+      assert.deepStrictEqual(output, [0, 11500000]);
+    });
+
     describe('when timeOrigin is not available', () => {
       it('should use the performance.timing.fetchStart as a fallback', () => {
         Object.defineProperty(performance, 'timing', {
