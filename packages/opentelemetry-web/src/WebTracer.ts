@@ -60,6 +60,5 @@ export class WebTracer extends BasicTracer {
     for (let i = 0, j = config.plugins.length; i < j; i++) {
       config.plugins[i].enable([], this, this.logger, {});
     }
-
   }
 }
