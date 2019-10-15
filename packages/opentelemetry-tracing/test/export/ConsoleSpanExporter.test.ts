@@ -14,29 +14,39 @@
  * limitations under the License.
  */
 
-import { BasicTracer, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import { ConsoleExporter } from '../src';
 import * as sinon from 'sinon';
+import {
+  BasicTracer,
+  ConsoleSpanExporter,
+  SimpleSpanProcessor,
+} from '../../src';
 
-describe('ConsoleExporter', () => {
-  let consoleExporter: ConsoleExporter;
+describe('ConsoleSpanExporter', () => {
+  let consoleExporter: ConsoleSpanExporter;
+  let previousConsoleLog: any;
 
   beforeEach(() => {
-    consoleExporter = new ConsoleExporter();
+    previousConsoleLog = console.log;
+    console.log = () => {};
+    consoleExporter = new ConsoleSpanExporter();
   });
 
-  afterEach(() => {});
+  afterEach(() => {
+    console.log = previousConsoleLog;
+  });
 
   describe('.export()', () => {
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
         const basicTracer = new BasicTracer();
-        consoleExporter = new ConsoleExporter();
-        const spyExport = sinon.spy(consoleExporter, 'export');
+        consoleExporter = new ConsoleSpanExporter();
+
         const spyConsole = sinon.spy(console, 'log');
+        const spyExport = sinon.spy(consoleExporter, 'export');
 
         basicTracer.addSpanProcessor(new SimpleSpanProcessor(consoleExporter));
+
         const span = basicTracer.startSpan('foo');
         span.addEvent('foobar');
         span.end();

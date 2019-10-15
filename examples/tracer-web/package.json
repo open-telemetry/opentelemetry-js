@@ -34,7 +34,6 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/exporter-console": "^0.1.0",
     "@opentelemetry/plugin-document-load": "^0.1.0",
     "@opentelemetry/tracing": "^0.1.0",
     "@opentelemetry/web": "^0.1.0"

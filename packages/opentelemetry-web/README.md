@@ -11,7 +11,19 @@ For manual instrumentation see the
 [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) package.
 
 ## How does automatic tracing work?
-> Automatic Instrumentation is in progress, manual instrumentation only supported
+```js
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { WebTracer } from '@opentelemetry/web';
+import { DocumentLoad } from '@opentelemetry/plugin-document-load';
+
+const webTracer = new WebTracer({
+  plugins: [
+    new DocumentLoad()
+  ]
+});
+
+webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+```
 
 ## Installation
 
@@ -27,7 +39,6 @@ const { WebTracer } = require('@opentelemetry/web');
 const webTracer = new WebTracer();
 const span = webTracer.startSpan('span1');
 webTracer.withSpan(span, function () {
-  // this === span
   this.addEvent('start');
 });
 span.addEvent('middle');

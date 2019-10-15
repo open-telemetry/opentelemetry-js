@@ -15,10 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import {
-  BasicTracer,
-  BasicTracerConfig
-} from '@opentelemetry/tracing';
+import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
 
 /**
@@ -46,7 +43,7 @@ export class WebTracer extends BasicTracer {
     if (typeof config.plugins === 'undefined') {
       config.plugins = [];
     }
-    super(Object.assign({}, {scopeManager: config.scopeManager}, config));
+    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
 
     // enable scope manager
     config.scopeManager.enable();

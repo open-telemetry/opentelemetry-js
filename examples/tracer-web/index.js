@@ -1,5 +1,4 @@
-import { ConsoleExporter } from '@opentelemetry/exporter-console';
-import { SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracer } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 
@@ -9,4 +8,4 @@ const webTracer = new WebTracer({
   ]
 });
 
-webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleExporter()));
+webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
