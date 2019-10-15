@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-http",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry http automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,7 +12,8 @@
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
