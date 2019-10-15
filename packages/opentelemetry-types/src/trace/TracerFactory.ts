@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-export * from './NodeTracer';
-export * from './NodeTracerFactory';
+import { Tracer } from './tracer';
+
+/**
+ * TracerFactory is an object that creates a new {@link Tracer}.
+ */
+export interface TracerFactory {
+  /**
+   * Find or creates a tracer for the named instrumentation library. If the name
+   * is empty or null, a default tracer is returned.
+   * @param name must identify the instrumentation library.
+   * @param [version] is the semantic version of the instrumentation library.
+   */
+  getTracer(name: string, version?: string): Tracer;
+}

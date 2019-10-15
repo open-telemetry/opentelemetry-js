@@ -15,6 +15,7 @@
  */
 
 export * from './BasicTracer';
+export * from './BasicTracerFactory';
 export * from './export/ConsoleSpanExporter';
 export * from './export/BatchSpanProcessor';
 export * from './export/InMemorySpanExporter';
