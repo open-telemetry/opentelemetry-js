@@ -17,8 +17,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import {
   BasicTracer,
-  BasicTracerConfig,
-  SpanProcessor,
+  BasicTracerConfig
 } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
 
@@ -26,10 +25,6 @@ import { StackScopeManager } from './StackScopeManager';
  * WebTracerConfig provides an interface for configuring a Web Tracer.
  */
 export interface WebTracerConfig extends BasicTracerConfig {
-  /**
-   * span processor
-   */
-  spanProcessor?: SpanProcessor;
   /**
    * plugins to be used with tracer, they will be enabled automatically
    */
@@ -51,7 +46,7 @@ export class WebTracer extends BasicTracer {
     if (typeof config.plugins === 'undefined') {
       config.plugins = [];
     }
-    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
+    super(Object.assign({}, {scopeManager: config.scopeManager}, config));
 
     // enable scope manager
     config.scopeManager.enable();
