@@ -21,8 +21,6 @@ import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 import { PerformanceEntries, PerformanceLegacy } from './types';
 import { hasKey } from './utils';
 
-// import { IPerformanceEntries, PerformanceEntries, PerformanceLegacy } from './types';
-
 /**
  * This class represents a document load plugin
  */
@@ -34,7 +32,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    *
-   * @param {DocumentLoadConfig} config
+   * @param config
    */
   constructor(config: PluginConfig = {}) {
     super();
@@ -137,9 +135,9 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * Helper function for ending span
-   * @param {Span} span
-   * @param {string} performanceName - name of performance entry for time end
-   * @param {PerformanceEntries} entries
+   * @param span
+   * @param performanceName name of performance entry for time end
+   * @param entries
    */
   private _endSpan(
     span: Span | undefined,
@@ -192,11 +190,11 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * Helper function for starting and finishing a span
-   * @param {string} spanName - name of span
-   * @param {string} performanceNameStart - name of performance entry for time start
-   * @param {string} performanceNameEnd - name of performance entry for time end
-   * @param {PerformanceEntries} entries
-   * @param {SpanOptions} spanOptions
+   * @param spanName name of span
+   * @param performanceNameStart name of performance entry for time start
+   * @param performanceNameEnd name of performance entry for time end
+   * @param entries
+   * @param spanOptions
    */
   private _startAndFinishSpan(
     spanName: string,
@@ -217,10 +215,10 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * Helper function for starting a span
-   * @param {string} spanName - name of span
-   * @param {string} performanceName - name of performance entry for time start
-   * @param {PerformanceEntries} entries
-   * @param {SpanOptions} spanOptions
+   * @param spanName name of span
+   * @param performanceName name of performance entry for time start
+   * @param entries
+   * @param spanOptions
    */
   private _startSpan(
     spanName: string,

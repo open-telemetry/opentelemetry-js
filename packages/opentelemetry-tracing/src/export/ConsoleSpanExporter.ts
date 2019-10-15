@@ -45,7 +45,7 @@ export class ConsoleSpanExporter implements SpanExporter {
 
   /**
    * converts span info into more readable format
-   * @param {ReadableSpan} span
+   * @param span
    */
   private _exportInfo(span: ReadableSpan) {
     return {
@@ -64,7 +64,7 @@ export class ConsoleSpanExporter implements SpanExporter {
 
   /**
    * Showing spans in console
-   * @param {ReadableSpan[]} spans
+   * @param spans
    * @param done
    */
   private _sendSpans(
