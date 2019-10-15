@@ -65,9 +65,26 @@ describe('time', () => {
 
     it('should allow passed "performanceNow" equal to 0', () => {
       sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
 
       const output = hrTime(0);
       assert.deepStrictEqual(output, [0, 11500000]);
+    });
+
+    it('should use performance.now() when "performanceNow" is equal to undefined', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+      const output = hrTime(undefined);
+      assert.deepStrictEqual(output, [0, 22800000]);
+    });
+
+    it('should use performance.now() when "performanceNow" is equal to null', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+      const output = hrTime(null);
+      assert.deepStrictEqual(output, [0, 22800000]);
     });
 
     describe('when timeOrigin is not available', () => {
