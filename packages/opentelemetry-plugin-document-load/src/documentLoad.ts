@@ -44,7 +44,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * callback to be executed when page is loaded
-   * @private
    */
   private _onDocumentLoaded() {
     this._collectPerformance();
@@ -52,7 +51,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * Collects information about performance and creates appropriate spans
-   * @private
    */
   private _collectPerformance() {
     const entries = this._getEntries();
@@ -142,7 +140,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * @param {Span} span
    * @param {string} performanceName - name of performance entry for time end
    * @param {PerformanceEntries} entries
-   * @private
    */
   private _endSpan(
     span: Span | undefined,
@@ -157,7 +154,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * gets performance entries of navigation
-   * @private
    */
   private _getEntries() {
     const entries: PerformanceEntries = {};
@@ -201,7 +197,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * @param {string} performanceNameEnd - name of performance entry for time end
    * @param {PerformanceEntries} entries
    * @param {SpanOptions} spanOptions
-   * @private
    */
   private _startAndFinishSpan(
     spanName: string,
@@ -226,7 +221,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * @param {string} performanceName - name of performance entry for time start
    * @param {PerformanceEntries} entries
    * @param {SpanOptions} spanOptions
-   * @private
    */
   private _startSpan(
     spanName: string,
@@ -256,7 +250,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * executes callback {_onDocumentLoaded} when the page is loaded
-   * @private
    */
   private _waitForPageLoad() {
     if (window.document.readyState === 'complete') {
