@@ -1,5 +1,5 @@
 {
-  "name": "example-tracer-basic-node",
+  "name": "example-basic-tracer-node",
   "private": true,
   "version": "0.1.0",
   "description": "Example of using @opentelemetry/tracing in Node.js",
