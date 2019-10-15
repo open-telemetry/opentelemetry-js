@@ -144,6 +144,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     performanceName: string,
     entries: PerformanceEntries
   ) {
+    // span can be undefined when entries are missing the certain performance - the span will not be created
     if (typeof span !== 'undefined' && hasKey(entries, performanceName)) {
       span.addEvent(performanceName);
       span.end(entries[performanceName]);
@@ -203,6 +204,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     entries: PerformanceEntries,
     spanOptions: SpanOptions = {}
   ): Span | undefined {
+    // span can be undefined when entries are missing the certain performance - the span will not be created
     const span = this._startSpan(
       spanName,
       performanceNameStart,
