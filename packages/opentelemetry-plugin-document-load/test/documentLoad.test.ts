@@ -78,13 +78,10 @@ describe('DocumentLoad Plugin', () => {
 
   describe('when document readyState is complete', () => {
     it('should start collecting the performance immediately', () => {
-      const spy_OnDocumentLoaded = sinon.spy(
-        plugin,
-        '_collectPerformance' as never
-      );
+      const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
       assert.strictEqual(window.document.readyState, 'complete');
-      assert.ok(spy_OnDocumentLoaded.calledOnce);
+      assert.ok(spyOnEnd.callCount === 6);
     });
   });
 
@@ -98,17 +95,14 @@ describe('DocumentLoad Plugin', () => {
 
     it('should collect performance after document load event', () => {
       const spy = sinon.spy(window, 'addEventListener');
-      const spy_OnDocumentLoaded = sinon.spy(
-        plugin,
-        '_collectPerformance' as never
-      );
+      const spyOnEnd = sinon.spy(dummyExporter, 'export');
 
       plugin.enable(moduleExports, tracer, logger, config);
       const args = spy.args[0];
       const name = args[0];
       assert.strictEqual(name, 'load');
       assert.ok(spy.calledOnce);
-      assert.ok(spy_OnDocumentLoaded.calledOnce === false);
+      assert.ok(spyOnEnd.callCount === 0);
 
       window.dispatchEvent(
         new CustomEvent('load', {
@@ -118,7 +112,7 @@ describe('DocumentLoad Plugin', () => {
           detail: {},
         })
       );
-      assert.ok(spy_OnDocumentLoaded.calledOnce);
+      assert.ok(spyOnEnd.callCount === 6);
     });
   });
 
