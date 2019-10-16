@@ -35,7 +35,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/web": "^0.1.0"
+    "@opentelemetry/web": "^0.1.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
