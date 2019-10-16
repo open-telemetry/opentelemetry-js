@@ -9,10 +9,12 @@ This document explains how to publish all OT modules at version x.y.z. Ensure th
 Since we use `lerna`, we can use [lerna-changelog](https://github.com/lerna/lerna-changelog#lerna-changelog)
 
 #### How to use
-Pass your github token to generate the changelog automatically.
+Pass your [github token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) to generate the changelog automatically. 
+For security reasons, when you create a Github token, select the permissions: under **repo**, select **Access public repositories**, **commit status**.
+
 In your terminal, execute the following command:
 ```bash
-GITHUB_AUTH=xxxxx lerna-changelog
+GITHUB_AUTH=<your token> lerna-changelog
 ```
 It will print something like:
 
