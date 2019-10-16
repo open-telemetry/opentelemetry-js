@@ -85,7 +85,7 @@ describe('pg@7.x', () => {
     }
     connect();
   });
-  after((done) => {
+  after(done => {
     if (testPostgresLocally) {
       testUtils.cleanUpDocker();
     }
@@ -143,12 +143,14 @@ describe('pg@7.x', () => {
 
     it('should return a promise if callback is provided', done => {
       const resPromise = client.query('SELECT NOW()');
-      resPromise.then(res => {
-        assert.ok(res);
-        done();
-      }).catch((err: Error) => {
-        assert.ok(false, err.message);
-      });
+      resPromise
+        .then(res => {
+          assert.ok(res);
+          done();
+        })
+        .catch((err: Error) => {
+          assert.ok(false, err.message);
+        });
     });
 
     it('it should intercept client.query(text, callback)', done => {

@@ -17,7 +17,12 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { SpanKind, Span, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
-import { PostgresPluginOptions, PgClientConnectionParams, PgPluginQueryConfig } from './types';
+import {
+  PostgresPluginOptions,
+  PgClientConnectionParams,
+  PgPluginQueryConfig,
+  PostgresCallback,
+} from './types';
 import * as path from 'path';
 import * as pgTypes from 'pg';
 import * as shimmer from 'shimmer';
@@ -34,10 +39,12 @@ function getCommandFromText(text?: string): string {
 }
 
 export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
+  protected _config: PostgresPluginOptions;
+
   static readonly COMPONENT = 'pg';
   static readonly BASE_SPAN_NAME = PostgresPlugin.COMPONENT + '.query';
+
   readonly supportedVersions = ['^7.12.1'];
-  protected _config: PostgresPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
@@ -54,26 +61,11 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
     }
     return this._moduleExports;
   }
+
   protected unpatch(): void {
     if (this._moduleExports.Client.prototype.query) {
       shimmer.unwrap(this._moduleExports.Client.prototype, 'query');
     }
-  }
-
-  // Private helper function to start a span
-  private _pgStartSpan(client: pgTypes.Client & PgClientConnectionParams) {
-    return this._tracer.startSpan(
-      PostgresPlugin.BASE_SPAN_NAME,
-      {
-        kind: SpanKind.CLIENT,
-        parent: this._tracer.getCurrentSpan() || undefined,
-        attributes: {
-          [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-          [AttributeNames.PEER_HOST]: client.connectionParameters.host,
-          [AttributeNames.PEER_PORT]: client.connectionParameters.port,
-        },
-      }
-    );
   }
 
   private _getClientQueryPatch() {
@@ -82,7 +74,10 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
       plugin._logger.debug(
         `Patching ${PostgresPlugin.COMPONENT}.Client.prototype.query`
       );
-      return function query(this: pgTypes.Client & PgClientConnectionParams, ...args: unknown[]) {
+      return function query(
+        this: pgTypes.Client & PgClientConnectionParams,
+        ...args: unknown[]
+      ) {
         let callbackProvided = false;
         const span = plugin._pgStartSpan(this);
 
@@ -98,12 +93,19 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         }
 
         // Bind callback to parent span
-        // TODO: end the span
         if (args.length > 0) {
           if (typeof args[args.length - 1] === 'function') {
-            args[args.length - 1] = plugin._tracer.bind(args[args.length - 1]);
-          } else if (typeof (args[0] as PgPluginQueryConfig).callback === 'function') {
-            (args[0] as PgPluginQueryConfig).callback = plugin._tracer.bind((args[0] as PgPluginQueryConfig).callback);
+            args[args.length - 1] = plugin._tracer.bind(
+              _patchCallback(span, args[args.length - 1] as PostgresCallback)
+            );
+            callbackProvided = true;
+          } else if (
+            typeof (args[0] as PgPluginQueryConfig).callback === 'function'
+          ) {
+            (args[0] as PgPluginQueryConfig).callback = plugin._tracer.bind(
+              _patchCallback(span, (args[0] as PgPluginQueryConfig).callback!)
+            );
+            callbackProvided = true;
           }
         }
 
@@ -112,52 +114,72 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
         // Bind promise to parent span and end the span
         if (result instanceof Promise) {
-          return plugin._tracer.bind(result
-          .then((result: unknown) => {
-            // Return a pass-along promise which ends the span and then goes to user's orig resolvers
-            return new Promise((resolve, _) => {
-              span.setStatus({ code: CanonicalCode.OK });
-              span.end();
-              resolve(result);
-            });
-          })
-          .catch((error: Error) => {
-            return new Promise((_, reject) => {
-              span.setStatus({ code: CanonicalCode.UNKNOWN })
-              span.end();
-              reject(error);
-            });
-          }));
+          return plugin._tracer.bind(
+            result
+              .then((result: unknown) => {
+                // Return a pass-along promise which ends the span and then goes to user's orig resolvers
+                return new Promise((resolve, _) => {
+                  span.setStatus({ code: CanonicalCode.OK });
+                  span.end();
+                  resolve(result);
+                });
+              })
+              .catch((error: Error) => {
+                return new Promise((_, reject) => {
+                  span.setStatus({ code: CanonicalCode.UNKNOWN });
+                  span.end();
+                  reject(error);
+                });
+              })
+          );
         }
         // else returns void
         if (!callbackProvided) {
           span.setStatus({
             code: CanonicalCode.INVALID_ARGUMENT,
-            message: 'Invalid query provided to the driver'
+            message: 'Invalid query provided to the driver',
           });
           span.end();
         }
         return result; // void
       };
-
     };
+  }
+
+  // Private helper function to start a span
+  private _pgStartSpan(client: pgTypes.Client & PgClientConnectionParams) {
+    return this._tracer.startSpan(PostgresPlugin.BASE_SPAN_NAME, {
+      kind: SpanKind.CLIENT,
+      parent: this._tracer.getCurrentSpan() || undefined,
+      attributes: {
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        [AttributeNames.PEER_HOST]: client.connectionParameters.host,
+        [AttributeNames.PEER_PORT]: client.connectionParameters.port,
+      },
+    });
   }
 }
 
-
 // Queries where args[0] is a text query and 'values' was not specified
-function _handleTextQuery(this: pgTypes.Client & PgClientConnectionParams, span: Span, ...args: unknown[]) {
+function _handleTextQuery(
+  this: pgTypes.Client & PgClientConnectionParams,
+  span: Span,
+  ...args: unknown[]
+) {
   // Set child span name
   const queryCommand = getCommandFromText(args[0] as string);
   span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
 
   // Set attributes
   span.setAttribute(AttributeNames.DB_STATEMENT, args[0]);
-
 }
 
 // Queries where args[1] is a 'values' array
-function _handleParameterizedQuery(this: pgTypes.Client & PgClientConnectionParams, span: Span, ...args: unknown[]) {
+function _handleParameterizedQuery(
+  this: pgTypes.Client & PgClientConnectionParams,
+  span: Span,
+  ...args: unknown[]
+) {
   // Set child span name
   const queryCommand = getCommandFromText(args[0] as string);
   span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
@@ -168,7 +190,11 @@ function _handleParameterizedQuery(this: pgTypes.Client & PgClientConnectionPara
 }
 
 // Queries where args[0] is a QueryConfig
-function _handleConfigQuery(this: pgTypes.Client & PgClientConnectionParams, span: Span, ...args: unknown[]) {
+function _handleConfigQuery(
+  this: pgTypes.Client & PgClientConnectionParams,
+  span: Span,
+  ...args: unknown[]
+) {
   const config = args[0] as PgPluginQueryConfig;
 
   // Set attributes
@@ -183,6 +209,26 @@ function _handleConfigQuery(this: pgTypes.Client & PgClientConnectionParams, spa
   // Update span name with query command; prefer plan name, if available
   const queryCommand = getCommandFromText(config.name || config.text);
   span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
+}
+
+function _patchCallback(span: Span, cb: PostgresCallback): PostgresCallback {
+  const originalCb = cb;
+  return function patchedCallback(
+    this: pgTypes.Client & PgClientConnectionParams,
+    err: Error,
+    res: object
+  ) {
+    if (err) {
+      span.setStatus({
+        code: CanonicalCode.UNKNOWN,
+        message: err.message,
+      });
+    } else if (res) {
+      span.setStatus({ code: CanonicalCode.OK });
+    }
+    span.end();
+    return originalCb.call(this, err, res);
+  };
 }
 
 const basedir = path.dirname(require.resolve('pg'));
