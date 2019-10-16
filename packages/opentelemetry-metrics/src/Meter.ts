@@ -14,23 +14,42 @@
  * limitations under the License.
  */
 
-import { Metric, MetricOptions } from './Metric';
+import * as types from '@opentelemetry/types';
+import { ConsoleLogger } from '@opentelemetry/core';
 import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
+import { Metric, CounterMetric, GaugeMetric } from './Metric';
+import {
+  MetricOptions,
+  DEFAULT_METRIC_OPTIONS,
+  DEFAULT_CONFIG,
+  MeterConfig,
+} from './types';
 
 /**
- * An interface to allow the recording metrics.
- *
- * {@link Metric}s are used for recording pre-defined aggregation (Gauge and
- * Counter), or raw values ({@link Measure}) in which the aggregation and labels
- * for the exported metric are deferred.
+ * Meter is an implementation of the {@link Meter} interface.
  */
-export interface Meter {
+export class Meter implements types.Meter {
+  private readonly _logger: types.Logger;
+
+  /**
+   * Constructs a new Meter instance.
+   */
+  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+    this._logger = config.logger || new ConsoleLogger(config.logLevel);
+  }
+
   /**
    * Creates and returns a new {@link Measure}.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle>;
+  createMeasure(
+    name: string,
+    options?: types.MetricOptions
+  ): Metric<MeasureHandle> {
+    // @todo: implement this method
+    throw new Error('not implemented yet');
+  }
 
   /**
    * Creates a new counter metric. Generally, this kind of metric when the
@@ -39,15 +58,19 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<CounterHandle>;
-
-  // TODO: Measurements can have a long or double type. However, it looks like
-  // the metric timeseries API (according to spec) accepts values instead of
-  // Measurements, meaning that if you accept a `number`, the type gets lost.
-  // Both java and csharp have gone down the route of having two gauge interfaces,
-  // GaugeDoubleTimeseries and GaugeLongTimeseries, with param for that type. It'd
-  // be cool to only have a single interface, but maybe having two is necessary?
-  // Maybe include the type as a metrics option? Probs a good gh issue, the same goes for Measure types.
+  createCounter(
+    name: string,
+    options?: types.MetricOptions
+  ): Metric<CounterHandle> {
+    const opt: MetricOptions = {
+      // Counters are defined as monotonic by default
+      monotonic: true,
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    return new CounterMetric(name, opt);
+  }
 
   /**
    * Creates a new gauge metric. Generally, this kind of metric should be used
@@ -57,5 +80,17 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle>;
+  createGauge(
+    name: string,
+    options?: types.MetricOptions
+  ): Metric<GaugeHandle> {
+    const opt: MetricOptions = {
+      // Gauges are defined as non-monotonic by default
+      monotonic: false,
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    return new GaugeMetric(name, opt);
+  }
 }
