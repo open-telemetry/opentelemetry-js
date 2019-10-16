@@ -17,7 +17,25 @@
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
 export type PerformanceEntries = {
-  [index in PerformanceTimingNames]?: number;
+  [PerformanceTimingNames.CONNECT_END]?: number;
+  [PerformanceTimingNames.CONNECT_START]?: number;
+  [PerformanceTimingNames.DOM_COMPLETE]?: number;
+  [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_END]?: number;
+  [PerformanceTimingNames.DOM_CONTENT_LOADED_EVENT_START]?: number;
+  [PerformanceTimingNames.DOM_INTERACTIVE]?: number;
+  [PerformanceTimingNames.DOMAIN_LOOKUP_END]?: number;
+  [PerformanceTimingNames.DOMAIN_LOOKUP_START]?: number;
+  [PerformanceTimingNames.FETCH_START]?: number;
+  [PerformanceTimingNames.LOAD_EVENT_END]?: number;
+  [PerformanceTimingNames.LOAD_EVENT_START]?: number;
+  [PerformanceTimingNames.REDIRECT_END]?: number;
+  [PerformanceTimingNames.REDIRECT_START]?: number;
+  [PerformanceTimingNames.REQUEST_START]?: number;
+  [PerformanceTimingNames.RESPONSE_END]?: number;
+  [PerformanceTimingNames.RESPONSE_START]?: number;
+  [PerformanceTimingNames.SECURE_CONNECTION_START]?: number;
+  [PerformanceTimingNames.UNLOAD_EVENT_END]?: number;
+  [PerformanceTimingNames.UNLOAD_EVENT_START]?: number;
 };
 
 export interface PerformanceLegacy {

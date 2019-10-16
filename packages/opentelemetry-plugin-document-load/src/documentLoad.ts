@@ -156,9 +156,10 @@ export class DocumentLoad extends BasePlugin<unknown> {
    */
   private _getEntries() {
     const entries: PerformanceEntries = {};
-    const performanceNavigationTiming = otperformance.getEntriesByType(
+    const performanceNavigationTiming = (otperformance.getEntriesByType(
       'navigation'
-    )[0] as PerformanceEntries;
+    )[0] as unknown) as PerformanceEntries;
+
     if (performanceNavigationTiming) {
       const keys = Object.values(PerformanceTimingNames);
       const startTime = otperformance.timeOrigin;
