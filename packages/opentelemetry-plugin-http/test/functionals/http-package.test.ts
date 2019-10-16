@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
@@ -28,17 +28,16 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
+
+import { HttpPluginConfig } from '../../src/types';
+import { customAttributeFunction } from './http-enable.test';
 
 const memoryExporter = new InMemorySpanExporter();
-
-export const customAttributeFunction = (span: Span): void => {
-  span.setAttribute('span kind', SpanKind.CLIENT);
-};
 
 describe('Packages', () => {
   describe('get', () => {
@@ -55,7 +54,10 @@ describe('Packages', () => {
     });
 
     before(() => {
-      plugin.enable(http, tracer, tracer.logger);
+      const config: HttpPluginConfig = {
+        applyCustomAttributesOnSpan: customAttributeFunction,
+      };
+      plugin.enable(http, tracer, tracer.logger, config);
     });
 
     after(() => {

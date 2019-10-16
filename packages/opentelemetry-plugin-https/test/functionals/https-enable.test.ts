@@ -17,9 +17,9 @@
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-} from '@opentelemetry/tracer-basic';
+} from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node-sdk';
+import { NodeTracer } from '@opentelemetry/node';
 import {
   Http,
   HttpPluginConfig,
@@ -436,7 +436,7 @@ describe('HttpsPlugin', () => {
         const [span] = spans;
         assert.strictEqual(spans.length, 1);
         assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
-        assert.ok(Object.keys(span.attributes).length > 7);
+        assert.ok(Object.keys(span.attributes).length > 6);
       }
     });
 

@@ -1,5 +1,6 @@
 # OpenTelemetry Base Scope Manager
 [![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
@@ -36,3 +37,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-scope-base
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-scope-base&type=dev
 [ah-scope-manager]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-scope-async-hooks
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/scope-base
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fscope-base.svg

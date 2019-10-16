@@ -155,21 +155,6 @@ export const isIgnored = (
 };
 
 /**
- * Will subscribe obj on error event and will set attributes when emitting event
- * @param span to set
- * @param obj to subscribe on 'error' event (must extend `EventEmitter`)
- */
-export const setSpanOnError = (
-  span: Span,
-  obj: IncomingMessage | ClientRequest
-) => {
-  obj.on('error', (error: Err) => {
-    setSpanWithError(span, error, obj);
-    span.end();
-  });
-};
-
-/**
  * Sets the span with the error passed in params
  * @param {Span} span the span that need to be set
  * @param {Error} error error that will be set to span
@@ -189,7 +174,6 @@ export const setSpanWithError = (
 
   if (!obj) {
     span.setStatus({ code: CanonicalCode.UNKNOWN, message });
-    span.end();
     return;
   }
 
