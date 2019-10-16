@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "browser": {
@@ -19,7 +19,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
