@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/types",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "TypeScript types for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,7 +12,8 @@
     "fix": "gts fix",
     "test": "npm run compile && npm run check",
     "docs-test": "linkinator docs/out",
-    "docs": "typedoc --tsconfig tsconfig.json"
+    "docs": "typedoc --tsconfig tsconfig.json",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
