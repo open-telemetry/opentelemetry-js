@@ -17,21 +17,22 @@
 import * as types from '@opentelemetry/types';
 import { BasicTracerConfig } from './types';
 import { BasicTracer } from './BasicTracer';
+import { SpanProcessor } from './SpanProcessor';
 
 export class BasicTracerFactory implements types.TracerFactory {
-  private static _singletonInstance: types.TracerFactory;
+  private static _singletonInstance: BasicTracerFactory;
   private readonly _tracers: Map<String, BasicTracer> = new Map();
-  private _config: BasicTracerConfig;
-  private _spanProcessors: SpanProcessor[];
+  private _spanProcessors: SpanProcessor[] = [];
+  private _config?: BasicTracerConfig;
 
   constructor(config?: BasicTracerConfig) {
     this._config = config;
   }
 
-  addSpanProcessor(processor: SpanProcessor): void {
+  addSpanProcessor(spanProcessor: SpanProcessor): void {
     this._spanProcessors.push(spanProcessor);
-    for (tracer of this._tracers) {
-      tracer.addSpanProcessor(processor);
+    for (const tracer of this._tracers.values()) {
+      tracer.addSpanProcessor(spanProcessor);
     }
   }
 
@@ -40,7 +41,7 @@ export class BasicTracerFactory implements types.TracerFactory {
     if (this._tracers.has(key)) return this._tracers.get(key)!;
 
     const tracer = new BasicTracer(this._config);
-    for (processor of this._spanProcessors) {
+    for (const processor of this._spanProcessors) {
       tracer.addSpanProcessor(processor);
     }
     this._tracers.set(key, tracer);
@@ -48,7 +49,7 @@ export class BasicTracerFactory implements types.TracerFactory {
   }
 
   /** Gets the tracing instance. Accepts a tracer config for initialization */
-  static instance(config?: BasicTracerConfig): types.TracerFactory {
+  static instance(config?: BasicTracerConfig): BasicTracerFactory {
     return this._singletonInstance || (this._singletonInstance = new this(config));
   }
 }
