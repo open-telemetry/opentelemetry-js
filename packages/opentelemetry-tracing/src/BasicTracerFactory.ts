@@ -19,13 +19,40 @@ import { BasicTracerConfig } from './types';
 import { BasicTracer } from './BasicTracer';
 
 export class BasicTracerFactory implements types.TracerFactory {
-  protected readonly _defaultTracer: BasicTracer;
+  private readonly _tracers: Map<String, BasicTracer> = new Map();
 
-  constructor(config: BasicTracerConfig) {
-    this._defaultTracer = new BasicTracer(config);
+  private _spanProcessors: SpanProcessor[];
+  private _config: BasicTracerConfig;
+
+  constructor(config?: BasicTracerConfig) {
+    this._config = config;
   }
 
-  getTracer(name?: string, version?: string): types.Tracer {
-    return this._defaultTracer;
+  addSpanProcessor(processor: SpanProcessor): void {
+    this._spanProcessors.push(spanProcessor);
+    for (tracer of this._tracers) {
+      tracer.addSpanProcessor(processor);
+    }
   }
+
+  getTracer(name: string = '', version?: string): types.Tracer {
+    const key = name + (version != undefined ? version : '');
+    if (this._tracers.has(key)) return this._tracers.get(key)!;
+
+    const tracer = new BasicTracer(this._config);
+    for (processor of this._spanProcessors) {
+      tracer.addSpanProcessor(processor);
+    }
+    this._tracers.set(key, tracer);
+    return tracer;
+  }
+
+  /** Gets the tracing instance. Accepts a tracer config for initialization */
+  static instance(config?: BasicTracerConfig): types.TracerFactory {
+    return this._singletonInstance || (this._singletonInstance = new this(config));
+  }
+}
+
+export function getTracerFactory(config?: BasicTracerConfig): BasicTracerFactory {
+  return BasicTracerFactory.instance(config);
 }

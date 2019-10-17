@@ -19,13 +19,41 @@ import { NodeTracer } from './NodeTracer';
 import { NodeTracerConfig } from './config';
 
 export class NodeTracerFactory implements types.TracerFactory {
-  private readonly _defaultTracer: NodeTracer;
+  private readonly _tracers: Map<String, NodeTracer> = new Map();
+  private readonly _config: BasicTracerConfig;
+
+  private _spanProcessors: SpanProcessor[];
 
   constructor(config?: NodeTracerConfig) {
-    this._defaultTracer = new NodeTracer(config);
+    this._config = config;
   }
 
-  getTracer(name?: string, version?: string) {
-    return this._defaultTracer;
+  addSpanProcessor(processor: SpanProcessor): void {
+    this._spanProcessors.push(spanProcessor);
+    for (tracer of this._tracers) {
+      tracer.addSpanProcessor(processor);
+    }
   }
+
+  getTracer(name: string = '', version?: string): types.Tracer {
+    const key = name + (version != undefined ? version : '');
+    if (this._tracers.has(key)) return this._tracers.get(key)!;
+
+    const tracer = new NodeTracer(this._config);
+    for (processor of this._spanProcessors) {
+      tracer.addSpanProcessor(processor);
+    }
+    this._tracers.set(key, tracer);
+    return tracer;
+  }
+
+  /** Gets the tracing instance. Accepts a tracer config for initialization*/
+  static instance(config?: NodeTracerConfig): types.TracerFactory {
+    return this._singletonInstance || (this._singletonInstance = new this(config));
+  }
+}
+
+
+export function getTracerFactory(config?: NodeTracerConfig) {
+  return NodeTracerFactory.instance(config);
 }
