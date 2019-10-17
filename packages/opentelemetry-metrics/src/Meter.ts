@@ -128,7 +128,7 @@ export class Meter implements types.Meter {
    */
   getMetrics(): ReadableMetric[] {
     return Array.from(this._metrics.values())
-      .map(metric => metric.getMetric())
+      .map(metric => metric.get())
       .filter(metric => !!metric) as ReadableMetric[];
   }
 

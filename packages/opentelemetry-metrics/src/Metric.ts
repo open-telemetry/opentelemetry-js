@@ -93,7 +93,7 @@ export abstract class Metric<T> implements types.Metric<T> {
    * @returns The ReadableMetric, or null if TimeSeries is not present in
    *     Metric.
    */
-  getMetric(): ReadableMetric | null {
+  get(): ReadableMetric | null {
     if (this._handles.size === 0) return null;
 
     const timestamp = hrTime();
