@@ -16,6 +16,9 @@
 
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
+/**
+ * Performance metrics
+ */
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
@@ -38,6 +41,10 @@ export type PerformanceEntries = {
   [PerformanceTimingNames.UNLOAD_EVENT_START]?: number;
 };
 
+/**
+ * This interface defines a fallback to read performance metrics,
+ * this happens for example on Safari Mac
+ */
 export interface PerformanceLegacy {
   timing?: PerformanceEntries;
 }
