@@ -17,7 +17,10 @@
 import * as types from '@opentelemetry/types';
 import { TimeSeries } from './export/types';
 
-/** Base class that represents a TimeSeries. */
+/**
+ * This class represent the base to handle, which is responsible for generating
+ * the TimeSeries.
+ */
 export class BaseHandle {
   protected _data = 0;
 
