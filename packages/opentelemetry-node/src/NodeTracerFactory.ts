@@ -19,9 +19,9 @@ import { NodeTracer } from './NodeTracer';
 import { NodeTracerConfig } from './config';
 
 export class NodeTracerFactory implements types.TracerFactory {
+  private static _singletonInstance: types.TracerFactory;
   private readonly _tracers: Map<String, NodeTracer> = new Map();
   private readonly _config: BasicTracerConfig;
-
   private _spanProcessors: SpanProcessor[];
 
   constructor(config?: NodeTracerConfig) {

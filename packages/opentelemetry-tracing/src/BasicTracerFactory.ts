@@ -19,10 +19,10 @@ import { BasicTracerConfig } from './types';
 import { BasicTracer } from './BasicTracer';
 
 export class BasicTracerFactory implements types.TracerFactory {
+  private static _singletonInstance: types.TracerFactory;
   private readonly _tracers: Map<String, BasicTracer> = new Map();
-
-  private _spanProcessors: SpanProcessor[];
   private _config: BasicTracerConfig;
+  private _spanProcessors: SpanProcessor[];
 
   constructor(config?: BasicTracerConfig) {
     this._config = config;
