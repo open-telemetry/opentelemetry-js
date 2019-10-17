@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Meter, Metric, CounterMetric, GaugeMetric } from '../src';
+import { Meter, Metric, CounterMetric, GaugeMetric, MetricDescriptorType } from '../src';
 import * as types from '@opentelemetry/types';
 import { NoopLogger, NoopMetric } from '@opentelemetry/core';
 
@@ -44,6 +44,13 @@ describe('Meter', () => {
         monotonic: false,
       });
       assert.ok(counter instanceof Metric);
+    });
+
+    it('should throw an error when create the same metric', () => {
+      meter.createCounter('test_metric');
+      assert.throws(() => {
+        meter.createCounter('test_metric');
+      }, /^Error: A metric with the name test_metric has already been registered.$/);
     });
 
     describe('.getHandle()', () => {
@@ -306,6 +313,50 @@ describe('Meter', () => {
         const gauge = meter.createMeasure('name with invalid characters^&*(');
         assert.ok(gauge instanceof NoopMetric);
       });
+    });
+  });
+
+  describe('#getMetrics', () => {
+    it('should create a counter', () => {
+      const counter = meter.createCounter('counter', {
+        description: 'test',
+        labelKeys: ['key'],
+      });
+      const handle = counter.getHandle(labelValues);
+      handle.add(10);
+
+      assert.deepStrictEqual(meter.getMetrics(), [
+        {
+          descriptor: {
+            name: 'counter',
+            description: 'test',
+            unit: '1',
+            type: MetricDescriptorType.GAUGE_INT64,
+            labelKeys: ['key'],
+          },
+        },
+      ]);
+    });
+
+    it('should create a gauge', () => {
+      const gauge = meter.createGauge('gauge', {
+        labelKeys: ['gauge-key'],
+        unit: 'ms',
+      });
+      const handle = gauge.getHandle(labelValues);
+      handle.set(200);
+
+      assert.deepStrictEqual(meter.getMetrics(), [
+        {
+          descriptor: {
+            name: 'gauge',
+            description: '',
+            unit: 'ms',
+            type: MetricDescriptorType.GAUGE_INT64,
+            labelKeys: ['gauge-key'],
+          },
+        },
+      ]);
     });
   });
 });

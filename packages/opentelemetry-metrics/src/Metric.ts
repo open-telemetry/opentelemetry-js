@@ -18,18 +18,28 @@ import * as types from '@opentelemetry/types';
 import { hashLabelValues } from './Utils';
 import { CounterHandle, GaugeHandle } from './Handle';
 import { MetricOptions } from './types';
+import {
+  ReadableMetric,
+  MetricDescriptor,
+  MetricDescriptorType,
+} from './export/types';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T> implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _logger: types.Logger;
+  private readonly _metricDescriptor: MetricDescriptor;
   private readonly _handles: Map<String, T> = new Map();
 
-  constructor(name: string, options: MetricOptions) {
-    this._monotonic = options.monotonic;
-    this._disabled = options.disabled;
-    this._logger = options.logger;
+  constructor(
+    private readonly _name: string,
+    private readonly _options: MetricOptions
+  ) {
+    this._monotonic = _options.monotonic;
+    this._disabled = _options.disabled;
+    this._logger = _options.logger;
+    this._metricDescriptor = this._getMetricDescriptor();
   }
 
   /**
@@ -75,6 +85,33 @@ export abstract class Metric<T> implements types.Metric<T> {
     // @todo: implement this method
     this._logger.error('not implemented yet');
     return;
+  }
+
+  /**
+   * Provides a ReadableMetric with one or more TimeSeries.
+   * @returns The ReadableMetric, or null if TimeSeries is not present in
+   *     Metric.
+   */
+  getMetric(): ReadableMetric | null {
+    if (this._handles.size === 0) return null;
+
+    //const timestamp = [20, 1000];
+    return {
+      descriptor: this._metricDescriptor,
+      // timeseries: Array.from(this._handles, ([_, handle]) =>
+      //   handle.getTimeSeries(timestamp)
+      // ),
+    };
+  }
+
+  private _getMetricDescriptor(): MetricDescriptor {
+    return {
+      name: this._name,
+      description: this._options.description,
+      unit: this._options.unit,
+      labelKeys: this._options.labelKeys,
+      type: MetricDescriptorType.GAUGE_INT64,
+    };
   }
 
   protected abstract _makeHandle(labelValues: string[]): T;

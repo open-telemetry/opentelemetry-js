@@ -39,11 +39,11 @@ export interface ReadableMetric {
    * One or more timeseries for a single metric, where each timeseries has
    * one or more points.
    */
-  readonly timeseries: TimeSeries[];
+  readonly timeseries?: TimeSeries[];
 
   // The resource for the metric. If unset, it may be set to a default value
   // provided for a sequence of messages in an RPC stream.
-  resource: Resource;
+  resource?: Resource;
 }
 
 /** Properties of a Metric type and its schema */

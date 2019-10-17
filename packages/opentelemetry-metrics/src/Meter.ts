@@ -28,12 +28,14 @@ import {
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
+import { ReadableMetric } from './export/types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
+  private readonly _metrics = new Map();
 
   /**
    * Constructs a new Meter instance.
@@ -85,7 +87,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new CounterMetric(name, opt);
+    const counter = new CounterMetric(name, opt);
+    this._registerMetric(name, counter);
+    return counter;
   }
 
   /**
@@ -113,7 +117,33 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new GaugeMetric(name, opt);
+    const gauge = new GaugeMetric(name, opt);
+    this._registerMetric(name, gauge);
+    return gauge;
+  }
+
+  /**
+   * Gets a collection of Metric`s to be exported.
+   * @returns The list of metrics.
+   */
+  getMetrics(): ReadableMetric[] {
+    return Array.from(this._metrics.values())
+      .map(metric => metric.getMetric())
+      .filter(metric => !!metric) as ReadableMetric[];
+  }
+
+  /**
+   * Registers metric to register.
+   * @param name The name of the metric.
+   * @param metric The metric to register.
+   */
+  private _registerMetric<T>(name: string, metric: Metric<T>): void {
+    if (this._metrics.has(name)) {
+      throw new Error(
+        `A metric with the name ${name} has already been registered.`
+      );
+    }
+    this._metrics.set(name, metric);
   }
 
   /**
