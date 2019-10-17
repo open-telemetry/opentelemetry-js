@@ -17,30 +17,10 @@
 import * as types from '@opentelemetry/types';
 import { TimeSeries } from './export/types';
 
-/**
- * CounterHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Counter` associated with specified label
- * values.
- */
-export class CounterHandle implements types.CounterHandle {
-  private _data = 0;
+export class BaseHandle {
+  protected _data = 0;
 
-  constructor(
-    private readonly _disabled: boolean,
-    private readonly _monotonic: boolean,
-    private readonly _labelValues: string[],
-    private readonly _logger: types.Logger
-  ) {}
-
-  add(value: number): void {
-    if (this._disabled) return;
-
-    if (this._monotonic && value < 0) {
-      this._logger.error('Monotonic counter cannot descend.');
-      return;
-    }
-    this._data = this._data + value;
-  }
+  constructor(private readonly _labelValues: string[]) {}
 
   /**
    * Returns the TimeSeries with one or more Point.
@@ -57,18 +37,44 @@ export class CounterHandle implements types.CounterHandle {
 }
 
 /**
- * GaugeHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Gauge` associated with specified label values.
+ * CounterHandle allows the SDK to observe/record a single metric event. The
+ * value of single handle in the `Counter` associated with specified label
+ * values.
  */
-export class GaugeHandle implements types.GaugeHandle {
-  private _data = 0;
-
+export class CounterHandle extends BaseHandle implements types.CounterHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
-    private readonly _labelValues: string[],
+    labelValues: string[],
     private readonly _logger: types.Logger
-  ) {}
+  ) {
+    super(labelValues);
+  }
+
+  add(value: number): void {
+    if (this._disabled) return;
+
+    if (this._monotonic && value < 0) {
+      this._logger.error('Monotonic counter cannot descend.');
+      return;
+    }
+    this._data = this._data + value;
+  }
+}
+
+/**
+ * GaugeHandle allows the SDK to observe/record a single metric event. The
+ * value of single handle in the `Gauge` associated with specified label values.
+ */
+export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
+  constructor(
+    private readonly _disabled: boolean,
+    private readonly _monotonic: boolean,
+    labelValues: string[],
+    private readonly _logger: types.Logger
+  ) {
+    super(labelValues);
+  }
 
   set(value: number): void {
     if (this._disabled) return;
@@ -78,19 +84,6 @@ export class GaugeHandle implements types.GaugeHandle {
       return;
     }
     this._data = value;
-  }
-
-  /**
-   * Returns the TimeSeries with one or more Point.
-   *
-   * @param timestamp The time at which the gauge is recorded.
-   * @returns The TimeSeries.
-   */
-  getTimeSeries(timestamp: types.HrTime): TimeSeries {
-    return {
-      labelValues: this._labelValues.map(value => ({ value })),
-      points: [{ value: this._data, timestamp }],
-    };
   }
 }
 

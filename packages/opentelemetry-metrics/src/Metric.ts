@@ -15,8 +15,9 @@
  */
 
 import * as types from '@opentelemetry/types';
+import { hrTime } from '@opentelemetry/core';
 import { hashLabelValues } from './Utils';
-import { CounterHandle, GaugeHandle } from './Handle';
+import { CounterHandle, GaugeHandle, BaseHandle } from './Handle';
 import { MetricOptions } from './types';
 import {
   ReadableMetric,
@@ -95,12 +96,12 @@ export abstract class Metric<T> implements types.Metric<T> {
   getMetric(): ReadableMetric | null {
     if (this._handles.size === 0) return null;
 
-    //const timestamp = [20, 1000];
+    const timestamp = hrTime();
     return {
       descriptor: this._metricDescriptor,
-      // timeseries: Array.from(this._handles, ([_, handle]) =>
-      //   handle.getTimeSeries(timestamp)
-      // ),
+      timeseries: Array.from(this._handles, ([_, handle]) =>
+        ((handle as unknown) as BaseHandle).getTimeSeries(timestamp)
+      ),
     };
   }
 
