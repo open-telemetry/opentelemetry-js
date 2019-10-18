@@ -78,7 +78,6 @@ export function _handleParameterizedQuery(
   span: Span,
   ...args: unknown[]
 ) {
-
   // Set child span name
   const queryCommand = _getCommandFromText(args[0] as string);
   span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);

@@ -139,64 +139,64 @@ describe('pg@7.x', () => {
   });
 
   describe('#client.query(...)', () => {
-    // it('should not return a promise if callback is provided', done => {
-    //   const res = client.query('SELECT NOW()', (err, res) => {
-    //     assert.strictEqual(err, null);
-    //     done();
-    //   });
-    //   assert.strictEqual(res, undefined, 'No promise is returned');
-    // });
+    it('should not return a promise if callback is provided', done => {
+      const res = client.query('SELECT NOW()', (err, res) => {
+        assert.strictEqual(err, null);
+        done();
+      });
+      assert.strictEqual(res, undefined, 'No promise is returned');
+    });
 
-    // it('should return a promise if callback is provided', done => {
-    //   const resPromise = client.query('SELECT NOW()');
-    //   resPromise
-    //     .then(res => {
-    //       assert.ok(res);
-    //       done();
-    //     })
-    //     .catch((err: Error) => {
-    //       assert.ok(false, err.message);
-    //     });
-    // });
+    it('should return a promise if callback is provided', done => {
+      const resPromise = client.query('SELECT NOW()');
+      resPromise
+        .then(res => {
+          assert.ok(res);
+          done();
+        })
+        .catch((err: Error) => {
+          assert.ok(false, err.message);
+        });
+    });
 
-    // it('should intercept client.query(text, callback)', done => {
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
-    //   tracer.withSpan(span, () => {
-    //     const res = client.query('SELECT NOW()', (err, res) => {
-    //       assert.strictEqual(err, null);
-    //       assert.ok(res);
-    //       runCallbackTest(span, attributes, events);
-    //       done();
-    //     });
-    //     assert.strictEqual(res, undefined, 'No promise is returned');
-    //   });
-    // });
+    it('should intercept client.query(text, callback)', done => {
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const res = client.query('SELECT NOW()', (err, res) => {
+          assert.strictEqual(err, null);
+          assert.ok(res);
+          runCallbackTest(span, attributes, events);
+          done();
+        });
+        assert.strictEqual(res, undefined, 'No promise is returned');
+      });
+    });
 
-    // it('should intercept client.query(text, values, callback)', done => {
-    //   const query = 'SELECT $1::text';
-    //   const values = ['0'];
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.DB_STATEMENT]: query,
-    //     [AttributeNames.PG_VALUES]: '[0]',
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
-    //   tracer.withSpan(span, () => {
-    //     const resNoPromise = client.query(query, values, (err, res) => {
-    //       assert.strictEqual(err, null);
-    //       assert.ok(res);
-    //       runCallbackTest(span, attributes, events);
-    //       done();
-    //     });
-    //     assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
-    //   });
-    // });
+    it('should intercept client.query(text, values, callback)', done => {
+      const query = 'SELECT $1::text';
+      const values = ['0'];
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: query,
+        [AttributeNames.PG_VALUES]: '[0]',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const resNoPromise = client.query(query, values, (err, res) => {
+          assert.strictEqual(err, null);
+          assert.ok(res);
+          runCallbackTest(span, attributes, events);
+          done();
+        });
+        assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
+      });
+    });
 
     it('should intercept client.query({text, callback})', done => {
       const query = 'SELECT NOW()';
@@ -220,97 +220,97 @@ describe('pg@7.x', () => {
       });
     });
 
-    // it('should intercept client.query({text}, callback)', done => {
-    //   const query = 'SELECT NOW()';
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.DB_STATEMENT]: query,
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
-    //   tracer.withSpan(span, () => {
-    //     const resNoPromise = client.query({ text: query }, (err, res) => {
-    //       assert.strictEqual(err, null);
-    //       assert.ok(res);
-    //       runCallbackTest(span, attributes, events);
-    //       done();
-    //     });
-    //     assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
-    //   });
-    // });
+    it('should intercept client.query({text}, callback)', done => {
+      const query = 'SELECT NOW()';
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: query,
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const resNoPromise = client.query({ text: query }, (err, res) => {
+          assert.strictEqual(err, null);
+          assert.ok(res);
+          runCallbackTest(span, attributes, events);
+          done();
+        });
+        assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
+      });
+    });
 
-    // it('should intercept client.query(text, values)', async () => {
-    //   const query = 'SELECT $1::text';
-    //   const values = ['0'];
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.DB_STATEMENT]: query,
-    //     [AttributeNames.PG_VALUES]: '[0]',
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
-    //   await tracer.withSpan(span, async () => {
-    //     const resPromise = await client.query(query, values);
-    //     try {
-    //       assert.ok(resPromise);
-    //       runCallbackTest(span, attributes, events);
-    //     } catch (e) {
-    //       assert.ok(false, e.message);
-    //     }
-    //   });
-    // });
+    it('should intercept client.query(text, values)', async () => {
+      const query = 'SELECT $1::text';
+      const values = ['0'];
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: query,
+        [AttributeNames.PG_VALUES]: '[0]',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      await tracer.withSpan(span, async () => {
+        const resPromise = await client.query(query, values);
+        try {
+          assert.ok(resPromise);
+          runCallbackTest(span, attributes, events);
+        } catch (e) {
+          assert.ok(false, e.message);
+        }
+      });
+    });
 
-    // it('should intercept client.query({text, values})', async () => {
-    //   const query = 'SELECT $1::text';
-    //   const values = ['0'];
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.DB_STATEMENT]: query,
-    //     [AttributeNames.PG_VALUES]: '[0]',
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
-    //   await tracer.withSpan(span, async () => {
-    //     const resPromise = await client.query({
-    //       text: query,
-    //       values: values,
-    //     });
-    //     try {
-    //       assert.ok(resPromise);
-    //       runCallbackTest(span, attributes, events);
-    //     } catch (e) {
-    //       assert.ok(false, e.message);
-    //     }
-    //   });
-    // });
+    it('should intercept client.query({text, values})', async () => {
+      const query = 'SELECT $1::text';
+      const values = ['0'];
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: query,
+        [AttributeNames.PG_VALUES]: '[0]',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      await tracer.withSpan(span, async () => {
+        const resPromise = await client.query({
+          text: query,
+          values: values,
+        });
+        try {
+          assert.ok(resPromise);
+          runCallbackTest(span, attributes, events);
+        } catch (e) {
+          assert.ok(false, e.message);
+        }
+      });
+    });
 
-    // it('should intercept client.query(plan)', async () => {
-    //   const name = 'fetch-text';
-    //   const query = 'SELECT $1::text';
-    //   const values = ['0'];
-    //   const attributes = {
-    //     ...DEFAULT_ATTRIBUTES,
-    //     [AttributeNames.PG_PLAN]: name,
-    //     [AttributeNames.DB_STATEMENT]: query,
-    //     [AttributeNames.PG_VALUES]: '[0]',
-    //   };
-    //   const events: TimedEvent[] = [];
-    //   const span = tracer.startSpan('test span');
+    it('should intercept client.query(plan)', async () => {
+      const name = 'fetch-text';
+      const query = 'SELECT $1::text';
+      const values = ['0'];
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.PG_PLAN]: name,
+        [AttributeNames.DB_STATEMENT]: query,
+        [AttributeNames.PG_VALUES]: '[0]',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
 
-    //   await tracer.withSpan(span, async () => {
-    //     try {
-    //       const resPromise = await client.query({
-    //         name: name,
-    //         text: query,
-    //         values: values,
-    //       });
-    //       assert.strictEqual(resPromise.command, 'SELECT');
-    //       runCallbackTest(span, attributes, events);
-    //     } catch (e) {
-    //       assert.ok(false, e.message);
-    //     }
-    //   });
-    // });
+      await tracer.withSpan(span, async () => {
+        try {
+          const resPromise = await client.query({
+            name: name,
+            text: query,
+            values: values,
+          });
+          assert.strictEqual(resPromise.command, 'SELECT');
+          runCallbackTest(span, attributes, events);
+        } catch (e) {
+          assert.ok(false, e.message);
+        }
+      });
+    });
 
     it('should intercept client.query(text)', async () => {
       const query = 'SELECT NOW()';
@@ -337,7 +337,7 @@ describe('pg@7.x', () => {
       const queryHandler = (err: Error, res: pg.QueryResult) => {
         const span = tracer.getCurrentSpan();
         assert.ok(span);
-        assert.strictEqual((span as any)['_ended'], false)
+        assert.strictEqual((span as any)['_ended'], false);
         if (err) {
           throw err;
         }
