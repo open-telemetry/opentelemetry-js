@@ -1,5 +1,6 @@
 'use strict';
 
+const { SpanKind } = require('@opentelemetry/types');
 const opentelemetry = require('@opentelemetry/core');
 
 /**
@@ -21,14 +22,14 @@ const rpcProto = grpc.loadPackageDefinition(definition).rpc;
 const tracer = opentelemetry.getTracer();
 
 /** Implements the Capitalize RPC method. */
-function capitalize (call, callback) {
+function capitalize(call, callback) {
   const currentSpan = tracer.getCurrentSpan();
   // display traceid in the terminal
   console.log(`traceid: ${currentSpan.context().traceId}`);
 
   const span = tracer.startSpan('tutorials.FetchImpl.capitalize', {
     parent: currentSpan,
-    kind: 1, // server
+    kind: SpanKind.SERVER,
   });
 
   const data = call.request.data.toString('utf8');
@@ -42,7 +43,7 @@ function capitalize (call, callback) {
  * Starts an RPC server that receives requests for the Fetch service at the
  * sample server port.
  */
-function main () {
+function main() {
   const server = new grpc.Server();
   server.addService(rpcProto.Fetch.service, { capitalize: capitalize });
   server.bind('0.0.0.0:50051', grpc.ServerCredentials.createInsecure());

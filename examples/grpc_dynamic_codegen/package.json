@@ -29,6 +29,7 @@
   "dependencies": {
     "@grpc/proto-loader": "^0.4.0",
     "@opentelemetry/tracer-basic": "^0.0.1",
+    "@opentelemetry/types": "^0.0.1",
     "@opentelemetry/core": "^0.0.1",
     "@opentelemetry/exporter-jaeger": "^0.0.1",
     "@opentelemetry/exporter-zipkin": "^0.0.1",

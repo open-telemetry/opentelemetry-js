@@ -31,6 +31,8 @@ function setupTracerAndExporters(service) {
     });
   }
 
+  // It is recommended to use this `BatchSpanProcessor` for better performance
+  // and optimization, especially in production.
   tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings

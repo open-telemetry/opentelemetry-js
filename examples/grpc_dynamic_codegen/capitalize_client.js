@@ -20,7 +20,7 @@ const PROTO_OPTIONS = { keepCase: true, enums: String, defaults: true, oneofs: t
 const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
 const rpcProto = grpc.loadPackageDefinition(definition).rpc;
 
-function main () {
+function main() {
   const client = new rpcProto.Fetch('localhost:50051',
     grpc.credentials.createInsecure());
   const data = process.argv[2] || 'opentelemetry';
@@ -34,6 +34,8 @@ function main () {
         return;
       }
       console.log('< ', response.data.toString('utf8'));
+      // display traceid in the terminal
+      console.log(`traceid: ${span.context().traceId}`);
       span.end();
     });
   });
