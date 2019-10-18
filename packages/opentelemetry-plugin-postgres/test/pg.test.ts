@@ -25,9 +25,9 @@ import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
-import * as semver from 'semver';
 import * as assertionUtils from './assertionUtils';
 import * as testUtils from './testUtils';
+import { _arrayStringifyHelper } from '../src/utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -37,6 +37,16 @@ const CONFIG = {
   database: 'postgres',
   host: '127.0.0.1',
   port: 54320,
+};
+
+const DEFAULT_ATTRIBUTES = {
+  [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+  [AttributeNames.DB_INSTANCE]: CONFIG.database,
+  [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
+  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [AttributeNames.PEER_ADDRESS]: 'jdbc:postgresql://127.0.0.1:54320/postgres',
+  [AttributeNames.PEER_PORT]: CONFIG.port,
+  [AttributeNames.DB_USER]: CONFIG.user,
 };
 
 const runCallbackTest = (
@@ -105,10 +115,6 @@ describe('pg@7.x', () => {
     assert.ok(plugin instanceof PostgresPlugin);
   });
 
-  it('should match version', () => {
-    assert.ok(semver.satisfies(plugin.version, '^7.12.1'));
-  });
-
   it('should have correct moduleName', () => {
     assert.strictEqual(plugin.moduleName, 'pg');
   });
@@ -133,75 +139,69 @@ describe('pg@7.x', () => {
   });
 
   describe('#client.query(...)', () => {
-    it('should not return a promise if callback is provided', done => {
-      const res = client.query('SELECT NOW()', (err, res) => {
-        assert.strictEqual(err, null);
-        done();
-      });
-      assert.strictEqual(res, undefined, 'No promise is returned');
-    });
+    // it('should not return a promise if callback is provided', done => {
+    //   const res = client.query('SELECT NOW()', (err, res) => {
+    //     assert.strictEqual(err, null);
+    //     done();
+    //   });
+    //   assert.strictEqual(res, undefined, 'No promise is returned');
+    // });
 
-    it('should return a promise if callback is provided', done => {
-      const resPromise = client.query('SELECT NOW()');
-      resPromise
-        .then(res => {
-          assert.ok(res);
-          done();
-        })
-        .catch((err: Error) => {
-          assert.ok(false, err.message);
-        });
-    });
+    // it('should return a promise if callback is provided', done => {
+    //   const resPromise = client.query('SELECT NOW()');
+    //   resPromise
+    //     .then(res => {
+    //       assert.ok(res);
+    //       done();
+    //     })
+    //     .catch((err: Error) => {
+    //       assert.ok(false, err.message);
+    //     });
+    // });
 
-    it('it should intercept client.query(text, callback)', done => {
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
-      };
-      const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
-        const res = client.query('SELECT NOW()', (err, res) => {
-          assert.strictEqual(err, null);
-          assert.ok(res);
-          runCallbackTest(span, attributes, events);
-          done();
-        });
-        assert.strictEqual(res, undefined, 'No promise is returned');
-      });
-    });
+    // it('should intercept client.query(text, callback)', done => {
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+    //   tracer.withSpan(span, () => {
+    //     const res = client.query('SELECT NOW()', (err, res) => {
+    //       assert.strictEqual(err, null);
+    //       assert.ok(res);
+    //       runCallbackTest(span, attributes, events);
+    //       done();
+    //     });
+    //     assert.strictEqual(res, undefined, 'No promise is returned');
+    //   });
+    // });
 
-    it('should intercept client.query(text, values, callback)', done => {
-      const query = 'SELECT $1::text';
-      const values = ['0'];
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
-        [AttributeNames.DB_STATEMENT]: query,
-        [AttributeNames.PG_VALUES]: values,
-      };
-      const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
-        const resNoPromise = client.query(query, values, (err, res) => {
-          assert.strictEqual(err, null);
-          assert.ok(res);
-          runCallbackTest(span, attributes, events);
-          done();
-        });
-        assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
-      });
-    });
+    // it('should intercept client.query(text, values, callback)', done => {
+    //   const query = 'SELECT $1::text';
+    //   const values = ['0'];
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.DB_STATEMENT]: query,
+    //     [AttributeNames.PG_VALUES]: '[0]',
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+    //   tracer.withSpan(span, () => {
+    //     const resNoPromise = client.query(query, values, (err, res) => {
+    //       assert.strictEqual(err, null);
+    //       assert.ok(res);
+    //       runCallbackTest(span, attributes, events);
+    //       done();
+    //     });
+    //     assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
+    //   });
+    // });
 
     it('should intercept client.query({text, callback})', done => {
       const query = 'SELECT NOW()';
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
+        ...DEFAULT_ATTRIBUTES,
         [AttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
@@ -220,89 +220,109 @@ describe('pg@7.x', () => {
       });
     });
 
-    it('should intercept client.query({text}, callback)', done => {
-      const query = 'SELECT NOW()';
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
-        [AttributeNames.DB_STATEMENT]: query,
-      };
-      const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
-        const resNoPromise = client.query({ text: query }, (err, res) => {
-          assert.strictEqual(err, null);
-          assert.ok(res);
-          runCallbackTest(span, attributes, events);
-          done();
-        });
-        assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
-      });
-    });
+    // it('should intercept client.query({text}, callback)', done => {
+    //   const query = 'SELECT NOW()';
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.DB_STATEMENT]: query,
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+    //   tracer.withSpan(span, () => {
+    //     const resNoPromise = client.query({ text: query }, (err, res) => {
+    //       assert.strictEqual(err, null);
+    //       assert.ok(res);
+    //       runCallbackTest(span, attributes, events);
+    //       done();
+    //     });
+    //     assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
+    //   });
+    // });
 
-    it('should intercept client.query(text, values)', async () => {
-      const query = 'SELECT $1::text';
-      const values = ['0'];
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
-        [AttributeNames.DB_STATEMENT]: query,
-        [AttributeNames.PG_VALUES]: values,
-      };
-      const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      await tracer.withSpan(span, async () => {
-        const resPromise = await client.query(query, values);
-        try {
-          assert.ok(resPromise);
-          runCallbackTest(span, attributes, events);
-        } catch (e) {
-          assert.ok(false, e.message);
-        }
-      });
-    });
+    // it('should intercept client.query(text, values)', async () => {
+    //   const query = 'SELECT $1::text';
+    //   const values = ['0'];
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.DB_STATEMENT]: query,
+    //     [AttributeNames.PG_VALUES]: '[0]',
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+    //   await tracer.withSpan(span, async () => {
+    //     const resPromise = await client.query(query, values);
+    //     try {
+    //       assert.ok(resPromise);
+    //       runCallbackTest(span, attributes, events);
+    //     } catch (e) {
+    //       assert.ok(false, e.message);
+    //     }
+    //   });
+    // });
 
-    it('should intercept client.query({text, values})', async () => {
-      const query = 'SELECT $1::text';
-      const values = ['0'];
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
-        [AttributeNames.DB_STATEMENT]: query,
-        [AttributeNames.PG_VALUES]: values,
-      };
-      const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      await tracer.withSpan(span, async () => {
-        const resPromise = await client.query({
-          text: query,
-          values: values,
-        });
-        try {
-          assert.ok(resPromise);
-          runCallbackTest(span, attributes, events);
-        } catch (e) {
-          assert.ok(false, e.message);
-        }
-      });
-    });
+    // it('should intercept client.query({text, values})', async () => {
+    //   const query = 'SELECT $1::text';
+    //   const values = ['0'];
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.DB_STATEMENT]: query,
+    //     [AttributeNames.PG_VALUES]: '[0]',
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+    //   await tracer.withSpan(span, async () => {
+    //     const resPromise = await client.query({
+    //       text: query,
+    //       values: values,
+    //     });
+    //     try {
+    //       assert.ok(resPromise);
+    //       runCallbackTest(span, attributes, events);
+    //     } catch (e) {
+    //       assert.ok(false, e.message);
+    //     }
+    //   });
+    // });
+
+    // it('should intercept client.query(plan)', async () => {
+    //   const name = 'fetch-text';
+    //   const query = 'SELECT $1::text';
+    //   const values = ['0'];
+    //   const attributes = {
+    //     ...DEFAULT_ATTRIBUTES,
+    //     [AttributeNames.PG_PLAN]: name,
+    //     [AttributeNames.DB_STATEMENT]: query,
+    //     [AttributeNames.PG_VALUES]: '[0]',
+    //   };
+    //   const events: TimedEvent[] = [];
+    //   const span = tracer.startSpan('test span');
+
+    //   await tracer.withSpan(span, async () => {
+    //     try {
+    //       const resPromise = await client.query({
+    //         name: name,
+    //         text: query,
+    //         values: values,
+    //       });
+    //       assert.strictEqual(resPromise.command, 'SELECT');
+    //       runCallbackTest(span, attributes, events);
+    //     } catch (e) {
+    //       assert.ok(false, e.message);
+    //     }
+    //   });
+    // });
 
     it('should intercept client.query(text)', async () => {
       const query = 'SELECT NOW()';
       const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-        [AttributeNames.PEER_HOST]: CONFIG.host,
-        [AttributeNames.PEER_PORT]: CONFIG.port,
+        ...DEFAULT_ATTRIBUTES,
         [AttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
-        const resPromise = await client.query(query);
         try {
+          const resPromise = await client.query(query);
           assert.ok(resPromise);
           runCallbackTest(span, attributes, events);
         } catch (e) {
@@ -315,6 +335,9 @@ describe('pg@7.x', () => {
       let events = 0;
 
       const queryHandler = (err: Error, res: pg.QueryResult) => {
+        const span = tracer.getCurrentSpan();
+        assert.ok(span);
+        assert.strictEqual((span as any)['_ended'], false)
         if (err) {
           throw err;
         }
@@ -329,10 +352,12 @@ describe('pg@7.x', () => {
       client.query(config.text, config.callback); // 1
       client.query(config); // 2
       client.query(config.text, queryHandler); // 3
+      client.query(config.text, queryHandler); // 4
       client.query(config.text); // Not using queryHandler
-      client.query(config); // 4
+      client.query(config); // 5
+      client.query(config); // 6
       client.query(config.text, (err, res) => {
-        assert.strictEqual(events, 4);
+        assert.strictEqual(events, 6);
         done();
       });
     });
@@ -353,6 +378,25 @@ describe('pg@7.x', () => {
       });
       tracer.withSpan(spans[1], () => {
         client.query('SELECT NOW()', queryHandler);
+      });
+    });
+
+    it('should preserve correct context even when using the same promise resolver in client.query()', done => {
+      const spans = [tracer.startSpan('span 1'), tracer.startSpan('span 2')];
+      const currentSpans: (Span | null)[] = [];
+      const queryHandler = () => {
+        currentSpans.push(tracer.getCurrentSpan());
+        if (currentSpans.length === 2) {
+          assert.deepStrictEqual(currentSpans, spans);
+          done();
+        }
+      };
+
+      tracer.withSpan(spans[0], () => {
+        client.query('SELECT NOW()').then(queryHandler);
+      });
+      tracer.withSpan(spans[1], () => {
+        client.query('SELECT NOW()').then(queryHandler);
       });
     });
   });

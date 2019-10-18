@@ -21,7 +21,7 @@ export enum AttributeNames {
   DB_INSTANCE = 'db.instance',
   DB_STATEMENT = 'db.statement',
   PEER_ADDRESS = 'peer.address',
-  PEER_HOST = 'peer.host',
+  PEER_HOSTNAME = 'peer.host',
 
   // optional
   DB_USER = 'db.user',
