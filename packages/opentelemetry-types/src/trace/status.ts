@@ -27,8 +27,6 @@ export interface Status {
 
 /**
  * An enumeration of canonical status codes.
- *
- * TODO (revision): https://github.com/open-telemetry/opentelemetry-specification/issues/59
  */
 export enum CanonicalCode {
   /**

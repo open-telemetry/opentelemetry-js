@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, Attributes, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
@@ -233,27 +233,6 @@ describe('Utility', () => {
         {}
       );
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
-    });
-  });
-  describe('setSpanOnError()', () => {
-    it('should call span methods when we get an error event', done => {
-      /* tslint:disable-next-line:no-any */
-      const span: any = {
-        setAttributes: (obj: Attributes) => {},
-        setStatus: (status: unknown) => {},
-        end: () => {},
-      };
-      sinon.spy(span, 'setAttributes');
-      sinon.spy(span, 'setStatus');
-      sinon.spy(span, 'end');
-      const req = http.get('http://noop');
-      utils.setSpanOnError(span, req);
-      req.on('error', () => {
-        assert.strictEqual(span.setAttributes.callCount, 1);
-        assert.strictEqual(span.setStatus.callCount, 1);
-        assert.strictEqual(span.end.callCount, 1);
-        done();
-      });
     });
   });
 
