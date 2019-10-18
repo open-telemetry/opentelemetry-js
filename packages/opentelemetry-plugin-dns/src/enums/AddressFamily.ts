@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
-export * from './Handle';
-export * from './Meter';
-export * from './Metric';
+export enum AddressFamily {
+  IPV4 = 4,
+  IPV6 = 6,
+  UNKNOWN = 0,
+}

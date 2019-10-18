@@ -14,6 +14,5 @@
  * limitations under the License.
  */
 
-export * from './Handle';
-export * from './Meter';
-export * from './Metric';
+export * from './dns';
+export * from './types';
