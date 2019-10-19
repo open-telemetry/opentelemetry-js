@@ -15,8 +15,7 @@
  */
 
 /**
- * Attributes Names according to Opencensus HTTP Specs since there is no specific OpenTelemetry Attributes
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/work_in_progress/opencensus/HTTP.md#attributes
+ * Attributes Names according to [OpenTelemetry attributes specs](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md#semantic-conventions)
  */
 export enum AttributeNames {
   HTTP_HOSTNAME = 'http.hostname',

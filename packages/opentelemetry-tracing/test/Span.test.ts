@@ -45,7 +45,6 @@ describe('Span', () => {
   it('should create a Span instance', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     assert.ok(span instanceof Span);
-    assert.strictEqual(span.tracer(), tracer);
     span.end();
   });
 

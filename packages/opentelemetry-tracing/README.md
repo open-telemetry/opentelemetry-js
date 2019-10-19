@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-`tracer-basic` contains the foundation for all tracing SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
+`tracing` contains the foundation for all tracing SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
 
@@ -45,7 +45,7 @@ span.end();
 ```
 
 ## Example
-See [examples/tracer-basic-node](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-basic-node) for an end-to-end example, including exporting created spans.
+See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

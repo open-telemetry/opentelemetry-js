@@ -59,7 +59,7 @@ Click on the trace to view its details.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- For more information on tracer-basic, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
+- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
 
 ## LICENSE
 

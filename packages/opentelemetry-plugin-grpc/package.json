@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-grpc",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry grpc automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,7 +12,8 @@
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
@@ -57,10 +58,10 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/tracing": "^0.1.0",
-    "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/node": "^0.1.0",
-    "@opentelemetry/types": "^0.1.0",
+    "@opentelemetry/tracing": "^0.1.1",
+    "@opentelemetry/core": "^0.1.1",
+    "@opentelemetry/node": "^0.1.1",
+    "@opentelemetry/types": "^0.1.1",
     "shimmer": "^1.2.1"
   }
 }

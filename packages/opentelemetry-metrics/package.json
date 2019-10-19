@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/metrics",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry metrics SDK",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -13,7 +13,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "compile": "tsc -p .",
-    "fix": "gts fix"
+    "fix": "gts fix",
+    "prepare": "npm run compile"
   },
   "keywords": [
     "opentelemetry",
@@ -52,8 +53,8 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/base": "^0.1.0",
-    "@opentelemetry/types": "^0.1.0"
+    "@opentelemetry/core": "^0.1.1",
+    "@opentelemetry/base": "^0.1.1",
+    "@opentelemetry/types": "^0.1.1"
   }
 }
