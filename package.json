@@ -1,10 +1,11 @@
 {
   "name": "opentelemetry-base",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry is a distributed tracing and stats collection framework.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
+    "bench": "node benchmark",
     "clean": "lerna run clean",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
@@ -15,6 +16,7 @@
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
+    "changelog": "lerna-changelog",
     "check": "lerna run check",
     "predocs-test": "yarn docs",
     "docs-test": "lerna run docs-test",
@@ -31,12 +33,15 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "^8.1.0",
-    "@commitlint/config-conventional": "^8.1.0",
-    "husky": "^3.0.1",
+    "@commitlint/cli": "^8.2.0",
+    "@commitlint/config-conventional": "^8.2.0",
+    "husky": "^3.0.9",
+    "benchmark": "^2.1.4",
+    "beautify-benchmark": "^0.2.4",
     "gts": "^1.0.0",
-    "lerna": "^3.13.4",
-    "typescript": "^3.6.3"
+    "lerna": "^3.17.0",
+    "lerna-changelog": "^0.8.2",
+    "typescript": "^3.6.4"
   },
   "husky": {
     "hooks": {

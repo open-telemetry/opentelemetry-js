@@ -51,8 +51,9 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.1.0",
+    "@opentelemetry/core": "^0.1.1",
     "@opentelemetry/metrics": "^0.1.1",
-    "@opentelemetry/types": "^0.1.0"
+    "@opentelemetry/types": "^0.1.1",
+    "prom-client": "^11.5.3"
   }
 }

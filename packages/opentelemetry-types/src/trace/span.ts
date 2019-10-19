@@ -34,13 +34,6 @@ export interface Span {
    */
   context(): SpanContext;
 
-  // /**
-  //  * # TODO
-  //  * Returns the Tracer object used to create this Span.
-  //  * https://github.com/open-telemetry/opentelemetry-specification/issues/21
-  //  */
-  // tracer(): Tracer;
-
   /**
    * Sets an attribute to the span.
    *
@@ -85,8 +78,6 @@ export interface Span {
   /**
    * Updates the Span name.
    *
-   * TODO (revision): https://github.com/open-telemetry/opentelemetry-specification/issues/119
-   *
    * @param name the Span name.
    */
   updateName(name: string): this;
@@ -102,7 +93,6 @@ export interface Span {
    *
    * @param [endTime] the time to set as Span's end time. If not provided,
    *     use the current time as the span's end time.
-   *     TODO (Add timestamp format): https://github.com/open-telemetry/opentelemetry-js/issues/19
    */
   end(endTime?: TimeInput): void;
 
