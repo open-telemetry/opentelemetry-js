@@ -14,4 +14,27 @@
  * limitations under the License.
  */
 
-export * from './prometheus';
+import * as types from '@opentelemetry/types';
+
+export interface ExporterConfig {
+
+  /** App prefix for metrics, if needed */
+  prefix?: string;
+
+  /** Endpoint the metrics should be exposed at with preceeding / */
+  endpoint?: string;
+
+  /**
+  * Port number for Prometheus exporter server
+  * Default registered port is 9464:
+  * https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+  */
+  port?: number;
+
+  /**
+   * Define if the Prometheus exporter server will be started - default false
+   */
+  startServer?: boolean;
+
+  logger?: types.Logger;
+}
