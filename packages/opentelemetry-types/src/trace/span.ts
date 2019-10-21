@@ -62,8 +62,9 @@ export interface Span {
    * @param name the name of the event.
    * @param [attributes] the attributes that will be added; these are
    *     associated with this event.
+   * @param [startTime] start time of the event.
    */
-  addEvent(name: string, attributes?: Attributes): this;
+  addEvent(name: string, attributes?: Attributes, startTime?: number): this;
 
   /**
    * Adds a link to the Span.

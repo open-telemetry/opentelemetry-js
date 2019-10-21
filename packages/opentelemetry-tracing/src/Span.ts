@@ -101,13 +101,25 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  addEvent(name: string, attributes?: types.Attributes): this {
+  /**
+   *
+   * @param name Span Name
+   * @param attributes Span attributes
+   * @param startTime Specified start time for the event
+   */
+  addEvent(
+    name: string,
+    attributes?: types.Attributes,
+    startTime?: number
+  ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
       this._logger.warn('Dropping extra events.');
       this.events.shift();
     }
-    this.events.push({ name, attributes, time: hrTime() });
+    const time =
+      typeof startTime === 'number' ? timeInputToHrTime(startTime) : hrTime();
+    this.events.push({ name, attributes, time });
     return this;
   }
 
