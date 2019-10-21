@@ -33,7 +33,9 @@ export interface Meter {
   createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle>;
 
   /**
-   * Creates a new counter metric.
+   * Creates a new counter metric. Generally, this kind of metric when the
+   * value is a quantity, the sum is of primary interest, and the event count
+   * and value distribution are not of primary interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
@@ -48,7 +50,10 @@ export interface Meter {
   // Maybe include the type as a metrics option? Probs a good gh issue, the same goes for Measure types.
 
   /**
-   * Creates a new gauge metric.
+   * Creates a new gauge metric. Generally, this kind of metric should be used
+   * when the metric cannot be expressed as a sum or because the measurement
+   * interval is arbitrary. Use this kind of metric when the measurement is not
+   * a quantity, and the sum and event count are not of interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */

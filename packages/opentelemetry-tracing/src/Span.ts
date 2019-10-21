@@ -25,7 +25,6 @@ import { TraceParams } from './types';
  * This class represents a span.
  */
 export class Span implements types.Span, ReadableSpan {
-  private readonly _tracer: types.Tracer;
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   readonly spanContext: types.SpanContext;
@@ -55,7 +54,6 @@ export class Span implements types.Span, ReadableSpan {
     parentSpanId?: string,
     startTime: types.TimeInput = hrTime()
   ) {
-    this._tracer = parentTracer;
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
@@ -65,10 +63,6 @@ export class Span implements types.Span, ReadableSpan {
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.activeSpanProcessor;
     this._spanProcessor.onStart(this);
-  }
-
-  tracer(): types.Tracer {
-    return this._tracer;
   }
 
   context(): types.SpanContext {
