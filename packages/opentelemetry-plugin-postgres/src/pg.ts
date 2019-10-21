@@ -15,8 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { SpanKind, CanonicalCode } from '@opentelemetry/types';
-import { AttributeNames } from './enums';
+import { CanonicalCode, Span } from '@opentelemetry/types';
 import {
   PostgresPluginOptions,
   PgClientExtended,
@@ -70,17 +69,19 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         ...args: unknown[]
       ) {
         let callbackProvided = false;
-        const span = plugin._pgStartSpan(this);
+        let span: Span;
 
         // Handle different client.query(...) signatures
         if (typeof args[0] === 'string') {
           if (args.length > 1 && args[1] instanceof Array) {
-            utils._handleParameterizedQuery.call(this, span, ...args);
+            span = utils.handleParameterizedQuery.call(this, plugin._tracer, ...args);
           } else {
-            utils._handleTextQuery.call(this, span, ...args);
+            span = utils.handleTextQuery.call(this, plugin._tracer, ...args);
           }
         } else if (typeof args[0] === 'object') {
-          utils._handleConfigQuery.call(this, span, ...args);
+          span = utils.handleConfigQuery.call(this, plugin._tracer, ...args);
+        } else {
+          return original.apply(this, args as never);
         }
 
         // Bind callback to parent span
@@ -88,7 +89,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
           const parentSpan = plugin._tracer.getCurrentSpan();
           if (typeof args[args.length - 1] === 'function') {
             // Patch ParameterQuery callback
-            args[args.length - 1] = utils._patchCallback(span, args[
+            args[args.length - 1] = utils.patchCallback(span, args[
               args.length - 1
             ] as PostgresCallback);
             // If a parent span exists, bind the callback
@@ -102,7 +103,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
             typeof (args[0] as PgPluginQueryConfig).callback === 'function'
           ) {
             // Patch ConfigQuery callback
-            let callback = utils._patchCallback(
+            let callback = utils.patchCallback(
               span,
               (args[0] as PgPluginQueryConfig).callback!
             );
@@ -113,7 +114,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
             // Copy the callback instead of writing to args.callback so that we don't modify user's
             // original callback reference
-            args[0] = { ...args[0], callback };
+            args[0] = { ...args[0] as object, callback };
             callbackProvided = true;
           }
         }
@@ -154,24 +155,6 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         return result; // void
       };
     };
-  }
-
-  // Private helper function to start a span
-  private _pgStartSpan(client: pgTypes.Client & PgClientExtended) {
-    const jdbcString = utils._getJDBCString(client.connectionParameters);
-    return this._tracer.startSpan(PostgresPlugin.BASE_SPAN_NAME, {
-      kind: SpanKind.CLIENT,
-      parent: this._tracer.getCurrentSpan() || undefined,
-      attributes: {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
-        [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
-        [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
-        [AttributeNames.PEER_ADDRESS]: jdbcString, // required
-        [AttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
-        [AttributeNames.PEER_PORT]: client.connectionParameters.port,
-        [AttributeNames.DB_USER]: client.connectionParameters.user,
-      },
-    });
   }
 }
 

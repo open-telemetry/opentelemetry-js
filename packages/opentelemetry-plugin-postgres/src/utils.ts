@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode } from '@opentelemetry/types';
+import { Span, CanonicalCode, Tracer, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import {
   PgClientExtended,
@@ -25,12 +25,19 @@ import {
 import * as pgTypes from 'pg';
 import { PostgresPlugin } from './pg';
 
-export function _arrayStringifyHelper<T>(arr: Array<T>): string {
+function getJDBCString(params: PgClientConnectionParams) {
+  const host = params.host || 'localhost'; // postgres defaults to localhost
+  const port = params.port || 5432; // postgres defaults to port 5432
+  const database = params.database || '';
+  return `jdbc:postgresql://${host}:${port}/${database}`;
+}
+
+export function arrayStringifyHelper<T>(arr: Array<T>): string {
   return '[' + arr.toString() + ']';
 }
 
 // Helper function to get a low cardinality command name from the full text query
-export function _getCommandFromText(text?: string): string {
+export function getCommandFromText(text?: string): string {
   if (text) {
     const words = text.split(' ');
     if (words && words.length > 0) {
@@ -40,70 +47,73 @@ export function _getCommandFromText(text?: string): string {
   return 'unknown';
 }
 
-export function _getJDBCString(params: PgClientConnectionParams) {
-  const host = params.host || 'localhost'; // postgres defaults to localhost
-  const port = params.port || 5432; // postgres defaults to port 5432
-  const database = params.database || '';
-  return `jdbc:postgresql://${host}:${port}/${database}`;
-}
-
 // Queries where args[0] is a QueryConfig
-export function _handleConfigQuery(
+export function handleConfigQuery(
   this: pgTypes.Client & PgClientExtended,
-  span: Span,
+  tracer: Tracer,
   ...args: unknown[]
 ) {
   const argsConfig = args[0] as PgPluginQueryConfig;
+
+  // Set child span name
+  const queryCommand = getCommandFromText(argsConfig.name || argsConfig.text);
+  const name = PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand
+  const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
   span.setAttribute(AttributeNames.DB_STATEMENT, argsConfig.text);
   if (argsConfig.values instanceof Array) {
     span.setAttribute(
       AttributeNames.PG_VALUES,
-      _arrayStringifyHelper(argsConfig.values)
+      arrayStringifyHelper(argsConfig.values)
     );
   }
+  // Set plan name attribute, if present
   if (argsConfig.name) {
     span.setAttribute(AttributeNames.PG_PLAN, argsConfig.name);
   }
 
-  // Update span name with query command; prefer plan name, if available
-  const queryCommand = _getCommandFromText(argsConfig.name || argsConfig.text);
-  span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
+  return span;
 }
 
 // Queries where args[1] is a 'values' array
-export function _handleParameterizedQuery(
+export function handleParameterizedQuery(
   this: pgTypes.Client & PgClientExtended,
-  span: Span,
+  tracer: Tracer,
   ...args: unknown[]
 ) {
   // Set child span name
-  const queryCommand = _getCommandFromText(args[0] as string);
-  span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
+  const queryCommand = getCommandFromText(args[0] as string);
+  const name = PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand;
+  const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
   span.setAttribute(AttributeNames.DB_STATEMENT, args[0]);
   if (args[1] instanceof Array) {
-    span.setAttribute(AttributeNames.PG_VALUES, _arrayStringifyHelper(args[1]));
+    span.setAttribute(AttributeNames.PG_VALUES, arrayStringifyHelper(args[1]));
   }
+
+  return span;
 }
 
 // Queries where args[0] is a text query and 'values' was not specified
-export function _handleTextQuery(
+export function handleTextQuery(
   this: pgTypes.Client & PgClientExtended,
-  span: Span,
+  tracer: Tracer,
   ...args: unknown[]
 ) {
   // Set child span name
-  const queryCommand = _getCommandFromText(args[0] as string);
-  span.updateName(PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand);
+  const queryCommand = getCommandFromText(args[0] as string);
+  const name = PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand;
+  const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
   span.setAttribute(AttributeNames.DB_STATEMENT, args[0]);
+
+  return span;
 }
 
-export function _patchCallback(
+export function patchCallback(
   span: Span,
   cb: PostgresCallback
 ): PostgresCallback {
@@ -124,4 +134,22 @@ export function _patchCallback(
     span.end();
     return originalCb.call(this, err, res);
   };
+}
+
+// Private helper function to start a span
+export function pgStartSpan(tracer: Tracer, client: pgTypes.Client & PgClientExtended, name: string) {
+  const jdbcString = getJDBCString(client.connectionParameters);
+  return tracer.startSpan(name, {
+    kind: SpanKind.CLIENT,
+    parent: tracer.getCurrentSpan() || undefined,
+    attributes: {
+      [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
+      [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
+      [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
+      [AttributeNames.PEER_ADDRESS]: jdbcString, // required
+      [AttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
+      [AttributeNames.PEER_PORT]: client.connectionParameters.port,
+      [AttributeNames.DB_USER]: client.connectionParameters.user,
+    },
+  });
 }

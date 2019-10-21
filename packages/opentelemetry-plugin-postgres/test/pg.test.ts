@@ -27,16 +27,15 @@ import * as assert from 'assert';
 import * as pg from 'pg';
 import * as assertionUtils from './assertionUtils';
 import * as testUtils from './testUtils';
-import { _arrayStringifyHelper } from '../src/utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
 const CONFIG = {
-  user: 'postgres',
-  password: 'test',
-  database: 'postgres',
-  host: '127.0.0.1',
-  port: 54320,
+  user: process.env.POSTGRES_USER || 'postgres',
+  password: process.env.POSTGRESS_PASSWORD || 'test',
+  database: process.env.POSTGRES_DB || 'postgres',
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 54320,
 };
 
 const DEFAULT_ATTRIBUTES = {
@@ -44,7 +43,7 @@ const DEFAULT_ATTRIBUTES = {
   [AttributeNames.DB_INSTANCE]: CONFIG.database,
   [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
   [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
-  [AttributeNames.PEER_ADDRESS]: 'jdbc:postgresql://127.0.0.1:54320/postgres',
+  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
   [AttributeNames.PEER_PORT]: CONFIG.port,
   [AttributeNames.DB_USER]: CONFIG.user,
 };
@@ -67,11 +66,11 @@ describe('pg@7.x', () => {
   let client: pg.Client;
   const tracer = new NodeTracer();
   const logger = new NoopLogger();
-  const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
-  const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
+  const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
+  const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker
   const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
-  before(function(ready) {
+  before(async function() {
     if (!shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
@@ -82,24 +81,20 @@ describe('pg@7.x', () => {
     if (testPostgresLocally) {
       testUtils.startDocker();
     }
-    client = new pg.Client(CONFIG);
 
-    function connect() {
-      client.connect(err => {
-        if (err) {
-          setTimeout(connect, 500);
-          return;
-        }
-        ready();
-      });
+    client = new pg.Client(CONFIG);
+    try {
+      await client.connect();
+    } catch (e) {
+      throw e;
     }
-    connect();
   });
-  after(done => {
+
+  after(async () => {
     if (testPostgresLocally) {
       testUtils.cleanUpDocker();
     }
-    client.end(done);
+    await client.end();
   });
 
   beforeEach(function() {
