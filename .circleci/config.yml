@@ -2,14 +2,16 @@ version: 2
 
 test_env: &test_env
   RUN_POSTGRES_TESTS: 1
-  POSTGRES_USER: root
+  POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
-  POSTGRES_PASSWORD: circle_password
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
+  environment: # env to pass to CircleCI, specified values must match test_env
+    POSTGRES_USER: postgres
+    POSTGRES_DB: circle_database
 
 node_unit_tests: &node_unit_tests
   steps:
