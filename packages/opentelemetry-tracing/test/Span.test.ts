@@ -106,6 +106,27 @@ describe('Span', () => {
     assert.strictEqual(hrTimeToMilliseconds(diff), 123);
   });
 
+  describe('when 2nd param is "TimeInput" type', () => {
+    it('should have an entered time for event - ', () => {
+      const span = new Span(
+        tracer,
+        name,
+        spanContext,
+        SpanKind.SERVER,
+        undefined,
+        0
+      );
+      const timeMS = 123;
+      const spanStartTime = hrTimeToMilliseconds(span.startTime);
+      const eventTime = spanStartTime + timeMS;
+
+      span.addEvent('my-event', eventTime);
+
+      const diff = hrTimeDuration(span.startTime, span.events[0].time);
+      assert.strictEqual(hrTimeToMilliseconds(diff), 123);
+    });
+  });
+
   it('should get the span context of span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();
