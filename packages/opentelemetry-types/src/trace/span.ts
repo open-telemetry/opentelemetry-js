@@ -65,15 +65,6 @@ export interface Span {
   ): this;
 
   /**
-   * Adds a link to the Span.
-   *
-   * @param spanContext the context of the linked span.
-   * @param [attributes] the attributes that will be added; these are
-   *     associated with this link.
-   */
-  addLink(spanContext: SpanContext, attributes?: Attributes): this;
-
-  /**
    * Sets a status to the span. If used, this will override the default Span
    * status. Default is {@link CanonicalCode.OK}.
    *

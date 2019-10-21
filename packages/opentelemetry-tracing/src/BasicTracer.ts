@@ -100,6 +100,7 @@ export class BasicTracer implements types.Tracer {
       spanContext,
       options.kind || types.SpanKind.INTERNAL,
       parentContext ? parentContext.spanId : undefined,
+      options.links || [],
       options.startTime
     );
     // Set default attributes

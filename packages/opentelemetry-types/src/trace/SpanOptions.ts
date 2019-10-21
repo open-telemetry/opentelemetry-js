@@ -18,6 +18,7 @@ import { Span } from './span';
 import { Attributes } from './attributes';
 import { SpanKind } from './span_kind';
 import { SpanContext } from './span_context';
+import { Link } from './link';
 
 /**
  * Options needed for span creation
@@ -31,6 +32,9 @@ export interface SpanOptions {
 
   /** Indicates that if this Span is active and recording information like events with the `AddEvent` operation and attributes using `setAttributes`. */
   isRecording?: boolean;
+
+  /** A spans links */
+  links?: Link[];
 
   /**
    * A parent SpanContext (or Span, for convenience) that the newly-started

@@ -41,7 +41,10 @@ function translateSpanOptions(
     startTime: options.startTime,
   };
 
-  // because there's no `Links` in SpanOptions, we set them in `TracerShim.startSpan()`
+  if (options.references) {
+    opts.links = translateReferences(options.references);
+  }
+
   if (options.childOf) {
     if (options.childOf instanceof SpanShim) {
       opts.parent = (options.childOf as SpanShim).getSpan();
@@ -109,13 +112,6 @@ export class TracerShim extends opentracing.Tracer {
 
     if (options.tags) {
       span.setAttributes(options.tags);
-    }
-
-    if (options.references) {
-      const links = translateReferences(options.references);
-      for (const link of links) {
-        span.addLink(link.spanContext, link.attributes);
-      }
     }
 
     return new SpanShim(this, span);

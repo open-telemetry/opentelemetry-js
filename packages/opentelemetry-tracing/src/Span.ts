@@ -57,12 +57,14 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
+    links: types.Link[] = [],
     startTime: types.TimeInput = hrTime()
   ) {
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
+    this.links = links;
     this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
@@ -131,17 +133,6 @@ export class Span implements types.Span, ReadableSpan {
       attributes: attributesOrStartTime as types.Attributes,
       time: timeInputToHrTime(startTime),
     });
-    return this;
-  }
-
-  addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
-    if (this._isSpanEnded()) return this;
-
-    if (this.links.length >= this._traceParams.numberOfLinksPerSpan!) {
-      this._logger.warn('Dropping extra links.');
-      this.links.shift();
-    }
-    this.links.push({ spanContext, attributes });
     return this;
   }
 
