@@ -69,9 +69,8 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
     // Must be a performance.now() if it's smaller than process start time.
     if (time < getTimeOrigin()) {
       return hrTime(time);
-    }
-    // epoch milliseconds or performance.timeOrigin
-    else {
+    } else {
+      // epoch milliseconds or performance.timeOrigin
       return numberToHrtime(time);
     }
   } else if (time instanceof Date) {
