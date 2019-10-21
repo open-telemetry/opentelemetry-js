@@ -32,7 +32,6 @@ const memoryExporter = new InMemorySpanExporter();
 
 const CONFIG = {
   user: process.env.POSTGRES_USER || 'postgres',
-  password: process.env.POSTGRESS_PASSWORD || 'test',
   database: process.env.POSTGRES_DB || 'postgres',
   host: process.env.POSTGRES_HOST || 'localhost',
   port: process.env.POSTGRES_PORT

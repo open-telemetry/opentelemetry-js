@@ -2,7 +2,7 @@ version: 2
 
 test_env: &test_env
   RUN_POSTGRES_TESTS: 1
-  POSTGRES_USER: circle_user
+  POSTGRES_USER: root
   POSTGRES_DB: circle_database
   POSTGRES_PASSWORD: circle_password
   POSTGRES_HOST: localhost
