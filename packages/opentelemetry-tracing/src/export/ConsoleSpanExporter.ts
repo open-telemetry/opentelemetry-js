@@ -71,8 +71,8 @@ export class ConsoleSpanExporter implements SpanExporter {
     spans: ReadableSpan[],
     done?: (result: ExportResult) => void
   ): void {
-    for (let i = 0, j = spans.length; i < j; i++) {
-      console.log(this._exportInfo(spans[i]));
+    for (const span of spans) {
+      console.log(this._exportInfo(span));
     }
     if (done) {
       return done(ExportResult.SUCCESS);
