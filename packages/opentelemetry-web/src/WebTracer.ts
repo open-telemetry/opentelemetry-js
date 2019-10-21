@@ -34,7 +34,7 @@ export interface WebTracerConfig extends BasicTracerConfig {
 export class WebTracer extends BasicTracer {
   /**
    * Constructs a new Tracer instance.
-   * @param {WebTracerConfig} config Web Tracer config
+   * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
     if (typeof config.scopeManager === 'undefined') {
@@ -49,8 +49,8 @@ export class WebTracer extends BasicTracer {
     config.scopeManager.enable();
 
     // enable all plugins
-    for (let i = 0, j = config.plugins.length; i < j; i++) {
-      config.plugins[i].enable([], this, this.logger, {});
+    for (const plugin of config.plugins) {
+      plugin.enable([], this, this.logger, {});
     }
   }
 }
