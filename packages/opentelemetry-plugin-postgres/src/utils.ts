@@ -57,7 +57,7 @@ export function handleConfigQuery(
 
   // Set child span name
   const queryCommand = getCommandFromText(argsConfig.name || argsConfig.text);
-  const name = PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand
+  const name = PostgresPlugin.BASE_SPAN_NAME + ':' + queryCommand;
   const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
@@ -137,7 +137,11 @@ export function patchCallback(
 }
 
 // Private helper function to start a span
-export function pgStartSpan(tracer: Tracer, client: pgTypes.Client & PgClientExtended, name: string) {
+export function pgStartSpan(
+  tracer: Tracer,
+  client: pgTypes.Client & PgClientExtended,
+  name: string
+) {
   const jdbcString = getJDBCString(client.connectionParameters);
   return tracer.startSpan(name, {
     kind: SpanKind.CLIENT,

@@ -35,7 +35,9 @@ const CONFIG = {
   password: process.env.POSTGRESS_PASSWORD || 'test',
   database: process.env.POSTGRES_DB || 'postgres',
   host: process.env.POSTGRES_HOST || 'localhost',
-  port: process.env.POSTGRES_PORT ? parseInt(process.env.POSTGRES_PORT, 10) : 54320,
+  port: process.env.POSTGRES_PORT
+    ? parseInt(process.env.POSTGRES_PORT, 10)
+    : 54320,
 };
 
 const DEFAULT_ATTRIBUTES = {

@@ -74,7 +74,11 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         // Handle different client.query(...) signatures
         if (typeof args[0] === 'string') {
           if (args.length > 1 && args[1] instanceof Array) {
-            span = utils.handleParameterizedQuery.call(this, plugin._tracer, ...args);
+            span = utils.handleParameterizedQuery.call(
+              this,
+              plugin._tracer,
+              ...args
+            );
           } else {
             span = utils.handleTextQuery.call(this, plugin._tracer, ...args);
           }
@@ -114,7 +118,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
             // Copy the callback instead of writing to args.callback so that we don't modify user's
             // original callback reference
-            args[0] = { ...args[0] as object, callback };
+            args[0] = { ...(args[0] as object), callback };
             callbackProvided = true;
           }
         }
