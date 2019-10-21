@@ -5,6 +5,7 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "scripts": {
+    "bench": "node benchmark",
     "clean": "lerna run clean",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
@@ -35,6 +36,8 @@
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
     "husky": "^3.0.9",
+    "benchmark": "^2.1.4",
+    "beautify-benchmark": "^0.2.4",
     "gts": "^1.0.0",
     "lerna": "^3.17.0",
     "lerna-changelog": "^0.8.2",
