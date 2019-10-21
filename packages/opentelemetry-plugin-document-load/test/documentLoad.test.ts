@@ -82,7 +82,7 @@ describe('DocumentLoad Plugin', () => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
       assert.strictEqual(window.document.readyState, 'complete');
-      assert.ok(spyOnEnd.callCount === 1);
+      assert.strictEqual(spyOnEnd.callCount, 2);
     });
   });
 
@@ -113,7 +113,7 @@ describe('DocumentLoad Plugin', () => {
           detail: {},
         })
       );
-      assert.ok(spyOnEnd.callCount === 1);
+      assert.strictEqual(spyOnEnd.callCount, 2);
     });
   });
 
@@ -165,29 +165,35 @@ describe('DocumentLoad Plugin', () => {
       plugin.enable(moduleExports, tracer, logger, config);
 
       const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const events = span1.events;
+      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
+      const events1 = span1.events;
+      const events2 = span2.events;
 
-      assert.strictEqual(span1.name, 'documentLoad');
+      assert.strictEqual(span1.name, 'documentFetch');
+      assert.strictEqual(span2.name, 'documentLoad');
 
-      assert.strictEqual(events[0].name, PTN.FETCH_START);
-      assert.strictEqual(events[1].name, PTN.DOMAIN_LOOKUP_START);
-      assert.strictEqual(events[2].name, PTN.DOMAIN_LOOKUP_END);
-      assert.strictEqual(events[3].name, PTN.CONNECT_START);
-      assert.strictEqual(events[4].name, PTN.SECURE_CONNECTION_START);
-      assert.strictEqual(events[5].name, PTN.CONNECT_END);
-      assert.strictEqual(events[6].name, PTN.REQUEST_START);
-      assert.strictEqual(events[7].name, PTN.RESPONSE_START);
-      assert.strictEqual(events[8].name, PTN.RESPONSE_END);
-      assert.strictEqual(events[9].name, PTN.UNLOAD_EVENT_START);
-      assert.strictEqual(events[10].name, PTN.UNLOAD_EVENT_END);
-      assert.strictEqual(events[11].name, PTN.DOM_INTERACTIVE);
-      assert.strictEqual(events[12].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
-      assert.strictEqual(events[13].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
-      assert.strictEqual(events[14].name, PTN.DOM_COMPLETE);
-      assert.strictEqual(events[15].name, PTN.LOAD_EVENT_START);
+      assert.strictEqual(events1[0].name, PTN.FETCH_START);
+      assert.strictEqual(events1[1].name, PTN.DOMAIN_LOOKUP_START);
+      assert.strictEqual(events1[2].name, PTN.DOMAIN_LOOKUP_END);
+      assert.strictEqual(events1[3].name, PTN.CONNECT_START);
+      assert.strictEqual(events1[4].name, PTN.SECURE_CONNECTION_START);
+      assert.strictEqual(events1[5].name, PTN.CONNECT_END);
+      assert.strictEqual(events1[6].name, PTN.REQUEST_START);
+      assert.strictEqual(events1[7].name, PTN.RESPONSE_START);
+      assert.strictEqual(events1[8].name, PTN.RESPONSE_END);
 
-      assert.strictEqual(events.length, 16);
-      assert.ok(spyOnEnd.callCount === 1);
+      assert.strictEqual(events2[0].name, PTN.FETCH_START);
+      assert.strictEqual(events2[1].name, PTN.UNLOAD_EVENT_START);
+      assert.strictEqual(events2[2].name, PTN.UNLOAD_EVENT_END);
+      assert.strictEqual(events2[3].name, PTN.DOM_INTERACTIVE);
+      assert.strictEqual(events2[4].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
+      assert.strictEqual(events2[5].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+      assert.strictEqual(events2[6].name, PTN.DOM_COMPLETE);
+      assert.strictEqual(events2[7].name, PTN.LOAD_EVENT_START);
+
+      assert.strictEqual(events1.length, 9);
+      assert.strictEqual(events2.length, 8);
+      assert.strictEqual(spyOnEnd.callCount, 2);
     });
     afterEach(() => {
       spyExport.restore();
@@ -236,27 +242,33 @@ describe('DocumentLoad Plugin', () => {
       plugin.enable(moduleExports, tracer, logger, config);
 
       const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const events = span1.events;
+      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
+      const events1 = span1.events;
+      const events2 = span2.events;
 
-      assert.strictEqual(span1.name, 'documentLoad');
+      assert.strictEqual(span1.name, 'documentFetch');
+      assert.strictEqual(span2.name, 'documentLoad');
 
-      assert.strictEqual(events[0].name, PTN.FETCH_START);
-      assert.strictEqual(events[1].name, PTN.DOMAIN_LOOKUP_START);
-      assert.strictEqual(events[2].name, PTN.DOMAIN_LOOKUP_END);
-      assert.strictEqual(events[3].name, PTN.CONNECT_START);
-      assert.strictEqual(events[4].name, PTN.SECURE_CONNECTION_START);
-      assert.strictEqual(events[5].name, PTN.CONNECT_END);
-      assert.strictEqual(events[6].name, PTN.REQUEST_START);
-      assert.strictEqual(events[7].name, PTN.RESPONSE_START);
-      assert.strictEqual(events[8].name, PTN.RESPONSE_END);
-      assert.strictEqual(events[9].name, PTN.DOM_INTERACTIVE);
-      assert.strictEqual(events[10].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
-      assert.strictEqual(events[11].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
-      assert.strictEqual(events[12].name, PTN.DOM_COMPLETE);
-      assert.strictEqual(events[13].name, PTN.LOAD_EVENT_START);
+      assert.strictEqual(events1[0].name, PTN.FETCH_START);
+      assert.strictEqual(events1[1].name, PTN.DOMAIN_LOOKUP_START);
+      assert.strictEqual(events1[2].name, PTN.DOMAIN_LOOKUP_END);
+      assert.strictEqual(events1[3].name, PTN.CONNECT_START);
+      assert.strictEqual(events1[4].name, PTN.SECURE_CONNECTION_START);
+      assert.strictEqual(events1[5].name, PTN.CONNECT_END);
+      assert.strictEqual(events1[6].name, PTN.REQUEST_START);
+      assert.strictEqual(events1[7].name, PTN.RESPONSE_START);
+      assert.strictEqual(events1[8].name, PTN.RESPONSE_END);
 
-      assert.strictEqual(events.length, 14);
-      assert.ok(spyOnEnd.callCount === 1);
+      assert.strictEqual(events2[0].name, PTN.FETCH_START);
+      assert.strictEqual(events2[1].name, PTN.DOM_INTERACTIVE);
+      assert.strictEqual(events2[2].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
+      assert.strictEqual(events2[3].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+      assert.strictEqual(events2[4].name, PTN.DOM_COMPLETE);
+      assert.strictEqual(events2[5].name, PTN.LOAD_EVENT_START);
+
+      assert.strictEqual(events1.length, 9);
+      assert.strictEqual(events2.length, 6);
+      assert.strictEqual(spyOnEnd.callCount, 2);
     });
 
     afterEach(() => {

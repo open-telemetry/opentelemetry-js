@@ -16,4 +16,5 @@
 
 export enum AttributeNames {
   DOCUMENT_LOAD = 'documentLoad',
+  DOCUMENT_FETCH = 'documentFetch',
 }

@@ -82,15 +82,26 @@ export class DocumentLoad extends BasePlugin<unknown> {
     if (!rootSpan) {
       return;
     }
+    const fetchSpan = this._startSpan(
+      AttributeNames.DOCUMENT_FETCH,
+      PTN.FETCH_START,
+      entries,
+      {
+        parent: rootSpan,
+      }
+    );
+    if (fetchSpan) {
+      this._addSpanEvent(fetchSpan, PTN.DOMAIN_LOOKUP_START, entries);
+      this._addSpanEvent(fetchSpan, PTN.DOMAIN_LOOKUP_END, entries);
+      this._addSpanEvent(fetchSpan, PTN.CONNECT_START, entries);
+      this._addSpanEvent(fetchSpan, PTN.SECURE_CONNECTION_START, entries);
+      this._addSpanEvent(fetchSpan, PTN.CONNECT_END, entries);
+      this._addSpanEvent(fetchSpan, PTN.REQUEST_START, entries);
+      this._addSpanEvent(fetchSpan, PTN.RESPONSE_START, entries);
 
-    this._addSpanEvent(rootSpan, PTN.DOMAIN_LOOKUP_START, entries);
-    this._addSpanEvent(rootSpan, PTN.DOMAIN_LOOKUP_END, entries);
-    this._addSpanEvent(rootSpan, PTN.CONNECT_START, entries);
-    this._addSpanEvent(rootSpan, PTN.SECURE_CONNECTION_START, entries);
-    this._addSpanEvent(rootSpan, PTN.CONNECT_END, entries);
-    this._addSpanEvent(rootSpan, PTN.REQUEST_START, entries);
-    this._addSpanEvent(rootSpan, PTN.RESPONSE_START, entries);
-    this._addSpanEvent(rootSpan, PTN.RESPONSE_END, entries);
+      this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
+    }
+
     this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
     this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
     this._addSpanEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
@@ -130,12 +141,11 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
     if (performanceNavigationTiming) {
       const keys = Object.values(PTN);
-      const startTime = otperformance.timeOrigin;
       keys.forEach((key: string) => {
         if (hasKey(performanceNavigationTiming, key)) {
           const value = performanceNavigationTiming[key];
           if (typeof value === 'number' && value > 0) {
-            entries[key] = value + startTime;
+            entries[key] = value;
           }
         }
       });
