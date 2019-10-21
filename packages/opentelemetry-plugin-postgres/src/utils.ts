@@ -25,6 +25,17 @@ import {
 import * as pgTypes from 'pg';
 import { PostgresPlugin } from './pg';
 
+function arrayStringifyHelper<T>(arr: Array<T>): string {
+  return '[' + arr.toString() + ']';
+}
+
+// Helper function to get a low cardinality command name from the full text query
+function getCommandFromText(text?: string): string {
+  if (!text) return 'unknown';
+  const words = text.split(' ');
+  return (words[0].length > 0) ? words[0] : 'unknown';
+}
+
 function getJDBCString(params: PgClientConnectionParams) {
   const host = params.host || 'localhost'; // postgres defaults to localhost
   const port = params.port || 5432; // postgres defaults to port 5432
@@ -32,19 +43,26 @@ function getJDBCString(params: PgClientConnectionParams) {
   return `jdbc:postgresql://${host}:${port}/${database}`;
 }
 
-export function arrayStringifyHelper<T>(arr: Array<T>): string {
-  return '[' + arr.toString() + ']';
-}
-
-// Helper function to get a low cardinality command name from the full text query
-export function getCommandFromText(text?: string): string {
-  if (text) {
-    const words = text.split(' ');
-    if (words && words.length > 0) {
-      return words[0];
-    }
-  }
-  return 'unknown';
+// Private helper function to start a span
+function pgStartSpan(
+  tracer: Tracer,
+  client: pgTypes.Client & PgClientExtended,
+  name: string
+) {
+  const jdbcString = getJDBCString(client.connectionParameters);
+  return tracer.startSpan(name, {
+    kind: SpanKind.CLIENT,
+    parent: tracer.getCurrentSpan() || undefined,
+    attributes: {
+      [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
+      [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
+      [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
+      [AttributeNames.PEER_ADDRESS]: jdbcString, // required
+      [AttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
+      [AttributeNames.PEER_PORT]: client.connectionParameters.port,
+      [AttributeNames.DB_USER]: client.connectionParameters.user,
+    },
+  });
 }
 
 // Queries where args[0] is a QueryConfig
@@ -134,26 +152,4 @@ export function patchCallback(
     span.end();
     return originalCb.call(this, err, res);
   };
-}
-
-// Private helper function to start a span
-export function pgStartSpan(
-  tracer: Tracer,
-  client: pgTypes.Client & PgClientExtended,
-  name: string
-) {
-  const jdbcString = getJDBCString(client.connectionParameters);
-  return tracer.startSpan(name, {
-    kind: SpanKind.CLIENT,
-    parent: tracer.getCurrentSpan() || undefined,
-    attributes: {
-      [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
-      [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
-      [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
-      [AttributeNames.PEER_ADDRESS]: jdbcString, // required
-      [AttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
-      [AttributeNames.PEER_PORT]: client.connectionParameters.port,
-      [AttributeNames.DB_USER]: client.connectionParameters.user,
-    },
-  });
 }
