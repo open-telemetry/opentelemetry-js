@@ -33,7 +33,7 @@ function arrayStringifyHelper<T>(arr: Array<T>): string {
 function getCommandFromText(text?: string): string {
   if (!text) return 'unknown';
   const words = text.split(' ');
-  return (words[0].length > 0) ? words[0] : 'unknown';
+  return words[0].length > 0 ? words[0] : 'unknown';
 }
 
 function getJDBCString(params: PgClientConnectionParams) {
