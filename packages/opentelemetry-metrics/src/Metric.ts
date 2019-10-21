@@ -31,7 +31,7 @@ export abstract class Metric<T> implements types.Metric<T> {
   protected readonly _disabled: boolean;
   protected readonly _logger: types.Logger;
   private readonly _metricDescriptor: MetricDescriptor;
-  private readonly _handles: Map<String, T> = new Map();
+  private readonly _handles: Map<string, T> = new Map();
 
   constructor(
     private readonly _name: string,
