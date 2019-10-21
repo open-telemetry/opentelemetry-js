@@ -28,6 +28,7 @@ import { Logger, PluginConfig } from '@opentelemetry/types';
 
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
+import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
 export class DummyExporter implements SpanExporter {
   export(
@@ -81,7 +82,7 @@ describe('DocumentLoad Plugin', () => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
       assert.strictEqual(window.document.readyState, 'complete');
-      assert.ok(spyOnEnd.callCount === 6);
+      assert.ok(spyOnEnd.callCount === 1);
     });
   });
 
@@ -112,7 +113,7 @@ describe('DocumentLoad Plugin', () => {
           detail: {},
         })
       );
-      assert.ok(spyOnEnd.callCount === 6);
+      assert.ok(spyOnEnd.callCount === 1);
     });
   });
 
@@ -159,26 +160,34 @@ describe('DocumentLoad Plugin', () => {
         .returns([entries]);
     });
 
-    it('should export correct spans', () => {
+    it('should export correct span with events', () => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
 
       const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
-      const span3 = spyOnEnd.args[2][0][0] as ReadableSpan;
-      const span4 = spyOnEnd.args[3][0][0] as ReadableSpan;
-      const span5 = spyOnEnd.args[4][0][0] as ReadableSpan;
-      const span6 = spyOnEnd.args[5][0][0] as ReadableSpan;
-      const span7 = spyOnEnd.args[6][0][0] as ReadableSpan;
+      const events = span1.events;
 
-      assert.strictEqual(span1.name, 'domainLookup');
-      assert.strictEqual(span2.name, 'connectSecure');
-      assert.strictEqual(span3.name, 'connect');
-      assert.strictEqual(span4.name, 'cacheSeek');
-      assert.strictEqual(span5.name, 'ttfb');
-      assert.strictEqual(span6.name, 'responseTime');
-      assert.strictEqual(span7.name, 'documentLoad');
-      assert.ok(spyOnEnd.callCount === 7);
+      assert.strictEqual(span1.name, 'documentLoad');
+
+      assert.strictEqual(events[0].name, PTN.FETCH_START);
+      assert.strictEqual(events[1].name, PTN.DOMAIN_LOOKUP_START);
+      assert.strictEqual(events[2].name, PTN.DOMAIN_LOOKUP_END);
+      assert.strictEqual(events[3].name, PTN.CONNECT_START);
+      assert.strictEqual(events[4].name, PTN.SECURE_CONNECTION_START);
+      assert.strictEqual(events[5].name, PTN.CONNECT_END);
+      assert.strictEqual(events[6].name, PTN.REQUEST_START);
+      assert.strictEqual(events[7].name, PTN.RESPONSE_START);
+      assert.strictEqual(events[8].name, PTN.RESPONSE_END);
+      assert.strictEqual(events[9].name, PTN.UNLOAD_EVENT_START);
+      assert.strictEqual(events[10].name, PTN.UNLOAD_EVENT_END);
+      assert.strictEqual(events[11].name, PTN.DOM_INTERACTIVE);
+      assert.strictEqual(events[12].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
+      assert.strictEqual(events[13].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+      assert.strictEqual(events[14].name, PTN.DOM_COMPLETE);
+      assert.strictEqual(events[15].name, PTN.LOAD_EVENT_START);
+
+      assert.strictEqual(events.length, 16);
+      assert.ok(spyOnEnd.callCount === 1);
     });
     afterEach(() => {
       spyExport.restore();
@@ -222,26 +231,32 @@ describe('DocumentLoad Plugin', () => {
       });
     });
 
-    it('should export correct spans', () => {
+    it('should export correct span with events', () => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
 
       const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
-      const span3 = spyOnEnd.args[2][0][0] as ReadableSpan;
-      const span4 = spyOnEnd.args[3][0][0] as ReadableSpan;
-      const span5 = spyOnEnd.args[4][0][0] as ReadableSpan;
-      const span6 = spyOnEnd.args[5][0][0] as ReadableSpan;
-      const span7 = spyOnEnd.args[6][0][0] as ReadableSpan;
+      const events = span1.events;
 
-      assert.strictEqual(span1.name, 'domainLookup');
-      assert.strictEqual(span2.name, 'connectSecure');
-      assert.strictEqual(span3.name, 'connect');
-      assert.strictEqual(span4.name, 'cacheSeek');
-      assert.strictEqual(span5.name, 'ttfb');
-      assert.strictEqual(span6.name, 'responseTime');
-      assert.strictEqual(span7.name, 'documentLoad');
-      assert.ok(spyOnEnd.callCount === 7);
+      assert.strictEqual(span1.name, 'documentLoad');
+
+      assert.strictEqual(events[0].name, PTN.FETCH_START);
+      assert.strictEqual(events[1].name, PTN.DOMAIN_LOOKUP_START);
+      assert.strictEqual(events[2].name, PTN.DOMAIN_LOOKUP_END);
+      assert.strictEqual(events[3].name, PTN.CONNECT_START);
+      assert.strictEqual(events[4].name, PTN.SECURE_CONNECTION_START);
+      assert.strictEqual(events[5].name, PTN.CONNECT_END);
+      assert.strictEqual(events[6].name, PTN.REQUEST_START);
+      assert.strictEqual(events[7].name, PTN.RESPONSE_START);
+      assert.strictEqual(events[8].name, PTN.RESPONSE_END);
+      assert.strictEqual(events[9].name, PTN.DOM_INTERACTIVE);
+      assert.strictEqual(events[10].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
+      assert.strictEqual(events[11].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+      assert.strictEqual(events[12].name, PTN.DOM_COMPLETE);
+      assert.strictEqual(events[13].name, PTN.LOAD_EVENT_START);
+
+      assert.strictEqual(events.length, 14);
+      assert.ok(spyOnEnd.callCount === 1);
     });
 
     afterEach(() => {
@@ -262,7 +277,7 @@ describe('DocumentLoad Plugin', () => {
       });
     });
 
-    it('should not create any spans', () => {
+    it('should not create any span', () => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
 

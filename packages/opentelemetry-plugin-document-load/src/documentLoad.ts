@@ -17,7 +17,7 @@
 import { BasePlugin, otperformance } from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
-import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
+import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import { PerformanceEntries, PerformanceLegacy } from './types';
 import { hasKey } from './utils';
 
@@ -48,6 +48,27 @@ export class DocumentLoad extends BasePlugin<unknown> {
   }
 
   /**
+   * Helper function for starting an event
+   * @param span
+   * @param performanceName name of performance entry for time start
+   * @param entries
+   */
+  private _addSpanEvent(
+    span: Span,
+    performanceName: string,
+    entries: PerformanceEntries
+  ): Span | undefined {
+    if (
+      hasKey(entries, performanceName) &&
+      typeof entries[performanceName] === 'number'
+    ) {
+      span.addEvent(performanceName, undefined, entries[performanceName]);
+      return span;
+    }
+    return undefined;
+  }
+
+  /**
    * Collects information about performance and creates appropriate spans
    */
   private _collectPerformance() {
@@ -55,82 +76,29 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
     const rootSpan = this._startSpan(
       AttributeNames.DOCUMENT_LOAD,
-      PerformanceTimingNames.FETCH_START,
+      PTN.FETCH_START,
       entries
     );
-
-    this._startAndFinishSpan(
-      AttributeNames.DOMAIN_LOOKUP,
-      PerformanceTimingNames.DOMAIN_LOOKUP_START,
-      PerformanceTimingNames.DOMAIN_LOOKUP_END,
-      entries,
-      {
-        parent: rootSpan,
-      }
-    );
-
-    // Opening Connection
-    const connectSpan = this._startSpan(
-      AttributeNames.CONNECT,
-      PerformanceTimingNames.CONNECT_START,
-      entries,
-      {
-        parent: rootSpan,
-      }
-    );
-
-    // TLS negotiation
-    if (hasKey(entries, PerformanceTimingNames.SECURE_CONNECTION_START)) {
-      const value = entries[PerformanceTimingNames.SECURE_CONNECTION_START];
-      if (typeof value === 'number' && value > 0) {
-        this._startAndFinishSpan(
-          AttributeNames.CONNECT_SECURE,
-          PerformanceTimingNames.SECURE_CONNECTION_START,
-          PerformanceTimingNames.CONNECT_END,
-          entries,
-          {
-            parent: connectSpan,
-          }
-        );
-      }
+    if (!rootSpan) {
+      return;
     }
-    // Connection negotiation ends
-    this._endSpan(connectSpan, PerformanceTimingNames.CONNECT_END, entries);
 
-    // Cache seek plus response time
-    this._startAndFinishSpan(
-      AttributeNames.CACHE_SEEK,
-      PerformanceTimingNames.FETCH_START,
-      PerformanceTimingNames.RESPONSE_END,
-      entries,
-      {
-        parent: rootSpan,
-      }
-    );
+    this._addSpanEvent(rootSpan, PTN.DOMAIN_LOOKUP_START, entries);
+    this._addSpanEvent(rootSpan, PTN.DOMAIN_LOOKUP_END, entries);
+    this._addSpanEvent(rootSpan, PTN.CONNECT_START, entries);
+    this._addSpanEvent(rootSpan, PTN.SECURE_CONNECTION_START, entries);
+    this._addSpanEvent(rootSpan, PTN.CONNECT_END, entries);
+    this._addSpanEvent(rootSpan, PTN.REQUEST_START, entries);
+    this._addSpanEvent(rootSpan, PTN.RESPONSE_START, entries);
+    this._addSpanEvent(rootSpan, PTN.RESPONSE_END, entries);
+    this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
+    this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
+    this._addSpanEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
+    this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_START, entries);
+    this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
+    this._addSpanEvent(rootSpan, PTN.DOM_COMPLETE, entries);
 
-    // TTFB - time to first byte
-    this._startAndFinishSpan(
-      AttributeNames.TTFB,
-      PerformanceTimingNames.REQUEST_START,
-      PerformanceTimingNames.RESPONSE_START,
-      entries,
-      {
-        parent: rootSpan,
-      }
-    );
-
-    // Response time only (download)
-    this._startAndFinishSpan(
-      AttributeNames.RESPONSE_TIME,
-      PerformanceTimingNames.RESPONSE_START,
-      PerformanceTimingNames.RESPONSE_END,
-      entries,
-      {
-        parent: rootSpan,
-      }
-    );
-
-    this._endSpan(rootSpan, PerformanceTimingNames.LOAD_EVENT_START, entries);
+    this._endSpan(rootSpan, PTN.LOAD_EVENT_START, entries);
   }
 
   /**
@@ -146,7 +114,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
   ) {
     // span can be undefined when entries are missing the certain performance - the span will not be created
     if (typeof span !== 'undefined' && hasKey(entries, performanceName)) {
-      span.addEvent(performanceName);
+      this._addSpanEvent(span, performanceName, entries);
       span.end(entries[performanceName]);
     }
   }
@@ -161,7 +129,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     )[0] as unknown) as PerformanceEntries;
 
     if (performanceNavigationTiming) {
-      const keys = Object.values(PerformanceTimingNames);
+      const keys = Object.values(PTN);
       const startTime = otperformance.timeOrigin;
       keys.forEach((key: string) => {
         if (hasKey(performanceNavigationTiming, key)) {
@@ -176,7 +144,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
       const perf: (typeof otperformance) & PerformanceLegacy = otperformance;
       const performanceTiming = perf.timing;
       if (performanceTiming) {
-        const keys = Object.values(PerformanceTimingNames);
+        const keys = Object.values(PTN);
         keys.forEach((key: string) => {
           if (hasKey(performanceTiming, key)) {
             const value = performanceTiming[key];
@@ -188,32 +156,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
       }
     }
     return entries;
-  }
-
-  /**
-   * Helper function for starting and finishing a span
-   * @param spanName name of span
-   * @param performanceNameStart name of performance entry for time start
-   * @param performanceNameEnd name of performance entry for time end
-   * @param entries
-   * @param spanOptions
-   */
-  private _startAndFinishSpan(
-    spanName: string,
-    performanceNameStart: string,
-    performanceNameEnd: string,
-    entries: PerformanceEntries,
-    spanOptions: SpanOptions = {}
-  ): Span | undefined {
-    // span can be undefined when entries are missing the certain performance - the span will not be created
-    const span = this._startSpan(
-      spanName,
-      performanceNameStart,
-      entries,
-      spanOptions
-    );
-    this._endSpan(span, performanceNameEnd, entries);
-    return span;
   }
 
   /**
@@ -243,7 +185,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
           spanOptions
         )
       );
-      span.addEvent(performanceName);
+      this._addSpanEvent(span, performanceName, entries);
       return span;
     }
     return undefined;

@@ -15,11 +15,5 @@
  */
 
 export enum AttributeNames {
-  CACHE_SEEK = 'cacheSeek',
-  CONNECT = 'connect',
-  CONNECT_SECURE = 'connectSecure',
-  DOMAIN_LOOKUP = 'domainLookup',
-  RESPONSE_TIME = 'responseTime',
   DOCUMENT_LOAD = 'documentLoad',
-  TTFB = 'ttfb',
 }
