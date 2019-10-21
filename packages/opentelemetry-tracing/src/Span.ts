@@ -104,16 +104,14 @@ export class Span implements types.Span, ReadableSpan {
   addEvent(
     name: string,
     attributes?: types.Attributes,
-    startTime?: number
+    startTime: types.TimeInput = hrTime()
   ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
       this._logger.warn('Dropping extra events.');
       this.events.shift();
     }
-    const time =
-      typeof startTime === 'number' ? timeInputToHrTime(startTime) : hrTime();
-    this.events.push({ name, attributes, time });
+    this.events.push({ name, attributes, time: timeInputToHrTime(startTime) });
     return this;
   }
 
