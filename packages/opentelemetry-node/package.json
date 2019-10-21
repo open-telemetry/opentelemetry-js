@@ -56,10 +56,10 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/tracing": "^0.1.0",
-    "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/scope-async-hooks": "^0.1.0",
-    "@opentelemetry/types": "^0.1.0",
+    "@opentelemetry/tracing": "^0.1.1",
+    "@opentelemetry/core": "^0.1.1",
+    "@opentelemetry/scope-async-hooks": "^0.1.1",
+    "@opentelemetry/types": "^0.1.1",
     "require-in-the-middle": "^5.0.0",
     "semver": "^6.2.0"
   }
