@@ -190,9 +190,10 @@ describe('DocumentLoad Plugin', () => {
       assert.strictEqual(events2[5].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
       assert.strictEqual(events2[6].name, PTN.DOM_COMPLETE);
       assert.strictEqual(events2[7].name, PTN.LOAD_EVENT_START);
+      assert.strictEqual(events2[8].name, PTN.LOAD_EVENT_END);
 
       assert.strictEqual(events1.length, 9);
-      assert.strictEqual(events2.length, 8);
+      assert.strictEqual(events2.length, 9);
       assert.strictEqual(spyOnEnd.callCount, 2);
     });
     afterEach(() => {
@@ -265,9 +266,10 @@ describe('DocumentLoad Plugin', () => {
       assert.strictEqual(events2[3].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
       assert.strictEqual(events2[4].name, PTN.DOM_COMPLETE);
       assert.strictEqual(events2[5].name, PTN.LOAD_EVENT_START);
+      assert.strictEqual(events2[6].name, PTN.LOAD_EVENT_END);
 
       assert.strictEqual(events1.length, 9);
-      assert.strictEqual(events2.length, 6);
+      assert.strictEqual(events2.length, 7);
       assert.strictEqual(spyOnEnd.callCount, 2);
     });
 
