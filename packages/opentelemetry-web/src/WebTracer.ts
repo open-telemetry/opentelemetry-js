@@ -45,10 +45,8 @@ export class WebTracer extends BasicTracer {
     }
     super(Object.assign({}, { scopeManager: config.scopeManager }, config));
 
-    // enable scope manager
     config.scopeManager.enable();
 
-    // enable all plugins
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger, {});
     }
