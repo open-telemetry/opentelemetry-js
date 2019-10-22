@@ -98,13 +98,13 @@ export class Span implements types.Span, ReadableSpan {
   /**
    *
    * @param name Span Name
-   * @param [attributes] Span attributes or start time
-   * if type is {@type TimeInput} and 3rd param is undefined
+   * @param [attributesOrStartTime] Span attributes or start time
+   *     if type is {@type TimeInput} and 3rd param is undefined
    * @param [startTime] Specified start time for the event
    */
   addEvent(
     name: string,
-    attributes?: types.Attributes | types.TimeInput,
+    attributesOrStartTime?: types.Attributes | types.TimeInput,
     startTime?: types.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
@@ -113,19 +113,19 @@ export class Span implements types.Span, ReadableSpan {
       this.events.shift();
     }
     if (
-      Array.isArray(attributes) ||
-      typeof attributes === 'number' ||
-      attributes instanceof Date
+      Array.isArray(attributesOrStartTime) ||
+      typeof attributesOrStartTime === 'number' ||
+      attributesOrStartTime instanceof Date
     ) {
       if (typeof startTime === 'undefined') {
-        startTime = attributes;
+        startTime = attributesOrStartTime;
       }
-      attributes = undefined;
+      attributesOrStartTime = undefined;
     }
     if (typeof startTime === 'undefined') {
       startTime = hrTime();
     }
-    this.events.push({ name, attributes, time: timeInputToHrTime(startTime) });
+    this.events.push({ name, attributes: attributesOrStartTime, time: timeInputToHrTime(startTime) });
     return this;
   }
 
