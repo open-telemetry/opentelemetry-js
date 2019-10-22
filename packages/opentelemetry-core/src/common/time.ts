@@ -41,6 +41,7 @@ function getTimeOrigin(): number {
   }
   return timeOrigin;
 }
+
 // Returns an hrtime calculated via performance component.
 export function hrTime(performanceNow?: number): types.HrTime {
   const timeOrigin = numberToHrtime(getTimeOrigin());
@@ -63,8 +64,8 @@ export function hrTime(performanceNow?: number): types.HrTime {
 // Converts a TimeInput to an HrTime, defaults to _hrtime().
 export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
   // process.hrtime
-  if (Array.isArray(time)) {
-    return time;
+  if (isTimeInputHrTime(time)) {
+    return time as types.HrTime;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
     if (time < getTimeOrigin()) {
@@ -111,4 +112,22 @@ export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
 // Convert hrTime to microseconds.
 export function hrTimeToMicroseconds(hrTime: types.HrTime): number {
   return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
+}
+
+export function isTimeInputHrTime(value: unknown) {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === 'number' &&
+    typeof value[1] === 'number'
+  );
+}
+
+// check if input value is a correct types.TimeInput
+export function isTimeInput(value: unknown) {
+  return (
+    isTimeInputHrTime(value) ||
+    typeof value === 'number' ||
+    value instanceof Date
+  );
 }

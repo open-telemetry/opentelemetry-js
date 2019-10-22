@@ -15,7 +15,12 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  hrTime,
+  hrTimeDuration,
+  isTimeInput,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -112,20 +117,20 @@ export class Span implements types.Span, ReadableSpan {
       this._logger.warn('Dropping extra events.');
       this.events.shift();
     }
-    if (
-      Array.isArray(attributesOrStartTime) ||
-      typeof attributesOrStartTime === 'number' ||
-      attributesOrStartTime instanceof Date
-    ) {
+    if (isTimeInput(attributesOrStartTime)) {
       if (typeof startTime === 'undefined') {
-        startTime = attributesOrStartTime;
+        startTime = attributesOrStartTime as types.TimeInput;
       }
       attributesOrStartTime = undefined;
     }
     if (typeof startTime === 'undefined') {
       startTime = hrTime();
     }
-    this.events.push({ name, attributes: attributesOrStartTime, time: timeInputToHrTime(startTime) });
+    this.events.push({
+      name,
+      attributes: attributesOrStartTime as types.Attributes,
+      time: timeInputToHrTime(startTime),
+    });
     return this;
   }
 
