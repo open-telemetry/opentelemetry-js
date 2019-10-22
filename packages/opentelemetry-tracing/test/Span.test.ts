@@ -93,13 +93,13 @@ describe('Span', () => {
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     assert.strictEqual(context.traceState, undefined);
     assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-    assert.ok(span.isRecordingEvents());
+    assert.ok(span.isRecording());
     span.end();
   });
 
-  it('should return true when isRecordingEvents:true', () => {
+  it('should return true when isRecording:true', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
-    assert.ok(span.isRecordingEvents());
+    assert.ok(span.isRecording());
     span.end();
   });
 

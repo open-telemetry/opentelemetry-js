@@ -102,5 +102,5 @@ export interface Span {
    * @returns true if this Span is active and recording information like events
    * with the AddEvent operation and attributes using setAttributes.
    */
-  isRecordingEvents(): boolean;
+  isRecording(): boolean;
 }

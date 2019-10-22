@@ -30,7 +30,7 @@ export interface SpanOptions {
   attributes?: Attributes;
 
   /** Indicates that events are being recorded for a span */
-  isRecordingEvents?: boolean;
+  isRecording?: boolean;
 
   /**
    * A parent SpanContext (or Span, for convenience) that the newly-started

@@ -148,7 +148,7 @@ export class Span implements types.Span, ReadableSpan {
     this._spanProcessor.onEnd(this);
   }
 
-  isRecordingEvents(): boolean {
+  isRecording(): boolean {
     return true;
   }
 
