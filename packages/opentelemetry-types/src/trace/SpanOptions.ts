@@ -29,8 +29,8 @@ export interface SpanOptions {
   /** A spans attributes */
   attributes?: Attributes;
 
-  /** Indicates that events are being recorded for a span */
-  isRecordingEvents?: boolean;
+  /** Indicates that if this Span is active and recording information like events with the `AddEvent` operation and attributes using `setAttributes`. */
+  isRecording?: boolean;
 
   /**
    * A parent SpanContext (or Span, for convenience) that the newly-started

@@ -146,7 +146,7 @@ describe('NodeTracer', () => {
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecordingEvents(), false);
+      assert.strictEqual(span.isRecording(), false);
     });
 
     // @todo: implement
