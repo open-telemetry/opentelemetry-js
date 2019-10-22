@@ -108,8 +108,9 @@ export class DocumentLoad extends BasePlugin<unknown> {
     this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_START, entries);
     this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
     this._addSpanEvent(rootSpan, PTN.DOM_COMPLETE, entries);
+    this._addSpanEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
 
-    this._endSpan(rootSpan, PTN.LOAD_EVENT_START, entries);
+    this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
   }
 
   /**
