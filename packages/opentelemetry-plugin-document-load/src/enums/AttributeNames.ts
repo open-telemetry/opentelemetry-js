@@ -15,6 +15,7 @@
  */
 
 export enum AttributeNames {
+  COMPONENT = 'component',
   DOCUMENT_LOAD = 'documentLoad',
   DOCUMENT_FETCH = 'documentFetch',
 }

@@ -196,6 +196,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
           spanOptions
         )
       );
+      span.setAttribute(AttributeNames.COMPONENT, this.component);
       this._addSpanEvent(span, performanceName, entries);
       return span;
     }
