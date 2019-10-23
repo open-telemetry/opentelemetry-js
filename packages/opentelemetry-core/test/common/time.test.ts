@@ -25,6 +25,7 @@ import {
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  isTimeInput,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -61,6 +62,47 @@ describe('time', () => {
 
       const output = hrTime(performanceNow);
       assert.deepStrictEqual(output, [0, 23100000]);
+    });
+
+    it('should allow passed "performanceNow" equal to 0', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+      const output = hrTime(0);
+      assert.deepStrictEqual(output, [0, 11500000]);
+    });
+
+    it('should use performance.now() when "performanceNow" is equal to undefined', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+      const output = hrTime(undefined);
+      assert.deepStrictEqual(output, [0, 22800000]);
+    });
+
+    it('should use performance.now() when "performanceNow" is equal to null', () => {
+      sandbox.stub(performance, 'timeOrigin').value(11.5);
+      sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+      const output = hrTime(null as any);
+      assert.deepStrictEqual(output, [0, 22800000]);
+    });
+
+    describe('when timeOrigin is not available', () => {
+      it('should use the performance.timing.fetchStart as a fallback', () => {
+        Object.defineProperty(performance, 'timing', {
+          writable: true,
+          value: {
+            fetchStart: 11.5,
+          },
+        });
+
+        sandbox.stub(performance, 'timeOrigin').value(undefined);
+        sandbox.stub(performance, 'now').callsFake(() => 11.3);
+
+        const output = hrTime();
+        assert.deepStrictEqual(output, [0, 22800000]);
+      });
     });
   });
 
@@ -132,6 +174,34 @@ describe('time', () => {
     it('should return microseconds', () => {
       const output = hrTimeToMicroseconds([1, 200000000]);
       assert.deepStrictEqual(output, 1200000);
+    });
+  });
+  describe('#isTimeInput', () => {
+    it('should return true for a number', () => {
+      assert.strictEqual(isTimeInput(12), true);
+    });
+    it('should return true for a date', () => {
+      assert.strictEqual(isTimeInput(new Date()), true);
+    });
+    it('should return true for an array with 2 elements type number', () => {
+      assert.strictEqual(isTimeInput([1, 1]), true);
+    });
+    it('should return FALSE for different cases for an array ', () => {
+      assert.strictEqual(isTimeInput([1, 1, 1]), false);
+      assert.strictEqual(isTimeInput([1]), false);
+      assert.strictEqual(isTimeInput([1, 'a']), false);
+    });
+    it('should return FALSE for a string', () => {
+      assert.strictEqual(isTimeInput('a'), false);
+    });
+    it('should return FALSE for an object', () => {
+      assert.strictEqual(isTimeInput({}), false);
+    });
+    it('should return FALSE for a null', () => {
+      assert.strictEqual(isTimeInput(null), false);
+    });
+    it('should return FALSE for undefined', () => {
+      assert.strictEqual(isTimeInput(undefined), false);
     });
   });
 });

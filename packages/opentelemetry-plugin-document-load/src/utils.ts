@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-/** Defines a log levels. */
-export enum LogLevel {
-  ERROR,
-  WARN,
-  INFO,
-  DEBUG,
-}
-
 /**
- * This interface defines a fallback to read a timeOrigin when it is not available on performance.timeOrigin,
- * this happens for example on Safari Mac
- * then the timeOrigin is taken from fetchStart - which is the closest to timeOrigin
+ * Helper function to be able to use enum as typed key in type and in interface when using forEach
+ * @param obj
+ * @param key
  */
-export interface TimeOriginLegacy {
-  timing: {
-    fetchStart: number;
-  };
+export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
+  return key in obj;
 }

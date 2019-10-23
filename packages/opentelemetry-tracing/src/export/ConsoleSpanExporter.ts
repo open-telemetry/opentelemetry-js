@@ -17,28 +17,65 @@
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
 import { ExportResult } from '@opentelemetry/base';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { hrTimeToMicroseconds } from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the
  * console. This class can be used for diagnostic purposes.
  */
 export class ConsoleSpanExporter implements SpanExporter {
+  /**
+   * Export spans.
+   * @param spans
+   * @param resultCallback
+   */
   export(
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
-    for (const span of spans) {
-      console.log(
-        `{name=${span.name}, traceId=${span.spanContext.traceId}, spanId=${
-          span.spanContext.spanId
-        }, kind=${span.kind}, parent=${
-          span.parentSpanId
-        }, duration=${hrTimeToMilliseconds(span.duration)}}}`
-      );
-    }
-    return resultCallback(ExportResult.SUCCESS);
+    return this._sendSpans(spans, resultCallback);
   }
 
-  shutdown(): void {}
+  /**
+   * Shutdown the exporter.
+   */
+  shutdown(): void {
+    return this._sendSpans([]);
+  }
+
+  /**
+   * converts span info into more readable format
+   * @param span
+   */
+  private _exportInfo(span: ReadableSpan) {
+    return {
+      traceId: span.spanContext.traceId,
+      parentId: span.parentSpanId,
+      name: span.name,
+      id: span.spanContext.spanId,
+      kind: span.kind,
+      timestamp: hrTimeToMicroseconds(span.startTime),
+      duration: hrTimeToMicroseconds(span.duration),
+      attributes: span.attributes,
+      status: span.status,
+      events: span.events,
+    };
+  }
+
+  /**
+   * Showing spans in console
+   * @param spans
+   * @param done
+   */
+  private _sendSpans(
+    spans: ReadableSpan[],
+    done?: (result: ExportResult) => void
+  ): void {
+    for (const span of spans) {
+      console.log(this._exportInfo(span));
+    }
+    if (done) {
+      return done(ExportResult.SUCCESS);
+    }
+  }
 }

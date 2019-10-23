@@ -61,7 +61,7 @@ browsers_unit_tests: &browsers_unit_tests
 jobs:
   lint:
     docker:
-      - image: node
+      - image: node:12
     steps:
       - checkout
       - run:
@@ -72,7 +72,7 @@ jobs:
           command: yarn run check
   docs:
     docker:
-      - image: node
+      - image: node:12
     steps:
       - checkout
       - run:
