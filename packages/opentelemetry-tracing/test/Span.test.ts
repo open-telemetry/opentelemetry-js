@@ -94,6 +94,7 @@ describe('Span', () => {
       spanContext,
       SpanKind.SERVER,
       undefined,
+      [],
       0
     );
     const timeMS = 123;
@@ -114,6 +115,7 @@ describe('Span', () => {
         spanContext,
         SpanKind.SERVER,
         undefined,
+        [],
         0
       );
       const timeMS = 123;
