@@ -16,6 +16,7 @@
 
 import * as types from '@opentelemetry/types';
 import { otperformance as performance } from '../platform';
+import { TimeOriginLegacy } from './types';
 
 const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
@@ -32,10 +33,21 @@ function numberToHrtime(epochMillis: number): types.HrTime {
   return [seconds, nanos];
 }
 
+function getTimeOrigin(): number {
+  let timeOrigin = performance.timeOrigin;
+  if (typeof timeOrigin !== 'number') {
+    const perf: TimeOriginLegacy = (performance as unknown) as TimeOriginLegacy;
+    timeOrigin = perf.timing && perf.timing.fetchStart;
+  }
+  return timeOrigin;
+}
+
 // Returns an hrtime calculated via performance component.
 export function hrTime(performanceNow?: number): types.HrTime {
-  const timeOrigin = numberToHrtime(performance.timeOrigin);
-  const now = numberToHrtime(performanceNow || performance.now());
+  const timeOrigin = numberToHrtime(getTimeOrigin());
+  const now = numberToHrtime(
+    typeof performanceNow === 'number' ? performanceNow : performance.now()
+  );
 
   let seconds = timeOrigin[0] + now[0];
   let nanos = timeOrigin[1] + now[1];
@@ -52,15 +64,14 @@ export function hrTime(performanceNow?: number): types.HrTime {
 // Converts a TimeInput to an HrTime, defaults to _hrtime().
 export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
   // process.hrtime
-  if (Array.isArray(time)) {
-    return time;
+  if (isTimeInputHrTime(time)) {
+    return time as types.HrTime;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
-    if (time < performance.timeOrigin) {
+    if (time < getTimeOrigin()) {
       return hrTime(time);
-    }
-    // epoch milliseconds or performance.timeOrigin
-    else {
+    } else {
+      // epoch milliseconds or performance.timeOrigin
       return numberToHrtime(time);
     }
   } else if (time instanceof Date) {
@@ -101,4 +112,22 @@ export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
 // Convert hrTime to microseconds.
 export function hrTimeToMicroseconds(hrTime: types.HrTime): number {
   return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
+}
+
+export function isTimeInputHrTime(value: unknown) {
+  return (
+    Array.isArray(value) &&
+    value.length === 2 &&
+    typeof value[0] === 'number' &&
+    typeof value[1] === 'number'
+  );
+}
+
+// check if input value is a correct types.TimeInput
+export function isTimeInput(value: unknown) {
+  return (
+    isTimeInputHrTime(value) ||
+    typeof value === 'number' ||
+    value instanceof Date
+  );
 }

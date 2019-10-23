@@ -15,7 +15,12 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  hrTime,
+  hrTimeDuration,
+  isTimeInput,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -95,13 +100,37 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  addEvent(name: string, attributes?: types.Attributes): this {
+  /**
+   *
+   * @param name Span Name
+   * @param [attributesOrStartTime] Span attributes or start time
+   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param [startTime] Specified start time for the event
+   */
+  addEvent(
+    name: string,
+    attributesOrStartTime?: types.Attributes | types.TimeInput,
+    startTime?: types.TimeInput
+  ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
       this._logger.warn('Dropping extra events.');
       this.events.shift();
     }
-    this.events.push({ name, attributes, time: hrTime() });
+    if (isTimeInput(attributesOrStartTime)) {
+      if (typeof startTime === 'undefined') {
+        startTime = attributesOrStartTime as types.TimeInput;
+      }
+      attributesOrStartTime = undefined;
+    }
+    if (typeof startTime === 'undefined') {
+      startTime = hrTime();
+    }
+    this.events.push({
+      name,
+      attributes: attributesOrStartTime as types.Attributes,
+      time: timeInputToHrTime(startTime),
+    });
     return this;
   }
 

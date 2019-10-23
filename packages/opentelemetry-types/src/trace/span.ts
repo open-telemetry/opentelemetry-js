@@ -53,10 +53,16 @@ export interface Span {
    * Adds an event to the Span.
    *
    * @param name the name of the event.
-   * @param [attributes] the attributes that will be added; these are
-   *     associated with this event.
+   * @param [attributesOrStartTime] the attributes that will be added; these are
+   *     associated with this event. Can be also a start time
+   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param [startTime] start time of the event.
    */
-  addEvent(name: string, attributes?: Attributes): this;
+  addEvent(
+    name: string,
+    attributesOrStartTime?: Attributes | TimeInput,
+    startTime?: TimeInput
+  ): this;
 
   /**
    * Adds a link to the Span.
