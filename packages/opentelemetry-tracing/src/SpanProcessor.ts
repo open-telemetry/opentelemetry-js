@@ -22,14 +22,14 @@ import { Span } from '@opentelemetry/types';
  */
 export interface SpanProcessor {
   /**
-   * Called when a {@link Span} is started, if the `span.isRecordingEvents()`
+   * Called when a {@link Span} is started, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just started.
    */
   onStart(span: Span): void;
 
   /**
-   * Called when a {@link Span} is ended, if the `span.isRecordingEvents()`
+   * Called when a {@link Span} is ended, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just ended.
    */

@@ -26,15 +26,16 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@types/shimmer": "^1.0.1",
     "babel-loader": "^8.0.6",
-    "shimmer": "^1.2.0",
+    "ts-loader": "^6.0.4",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@opentelemetry/plugin-document-load": "^0.1.1",
+    "@opentelemetry/tracing": "^0.1.1",
     "@opentelemetry/web": "^0.1.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
