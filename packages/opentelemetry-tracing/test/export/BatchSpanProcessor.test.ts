@@ -37,7 +37,7 @@ function createUnSampledSpan(spanName: string): Span {
     sampler: NEVER_SAMPLER,
     logger: new NoopLogger(),
   });
-  const span = tracer.startSpan(spanName, { isRecordingEvents: false });
+  const span = tracer.startSpan(spanName, { isRecording: false });
   span.end();
   return span as Span;
 }
