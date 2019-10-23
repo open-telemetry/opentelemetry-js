@@ -26,7 +26,7 @@ import {
 } from './export/types';
 
 /** This is a SDK implementation of {@link Metric} interface. */
-export abstract class Metric<T> implements types.Metric<T> {
+export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _logger: types.Logger;
@@ -100,7 +100,7 @@ export abstract class Metric<T> implements types.Metric<T> {
     return {
       descriptor: this._metricDescriptor,
       timeseries: Array.from(this._handles, ([_, handle]) =>
-        ((handle as unknown) as BaseHandle).getTimeSeries(timestamp)
+        handle.getTimeSeries(timestamp)
       ),
     };
   }

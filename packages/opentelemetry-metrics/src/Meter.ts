@@ -21,7 +21,13 @@ import {
   NOOP_GAUGE_METRIC,
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
-import { CounterMetric, GaugeMetric } from './Metric';
+import {
+  CounterHandle,
+  GaugeHandle,
+  MeasureHandle,
+  BaseHandle,
+} from './Handle';
+import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -137,7 +143,10 @@ export class Meter implements types.Meter {
    * @param name The name of the metric.
    * @param metric The metric to register.
    */
-  private _registerMetric<T>(name: string, metric: Metric<T>): void {
+  private _registerMetric<T extends BaseHandle>(
+    name: string,
+    metric: Metric<T>
+  ): void {
     if (this._metrics.has(name)) {
       throw new Error(
         `A metric with the name ${name} has already been registered.`

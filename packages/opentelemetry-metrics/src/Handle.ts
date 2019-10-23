@@ -98,7 +98,7 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
 /**
  * MeasureHandle is an implementation of the {@link MeasureHandle} interface.
  */
-export class MeasureHandle implements types.MeasureHandle {
+export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
   record(
     value: number,
     distContext?: types.DistributedContext,
