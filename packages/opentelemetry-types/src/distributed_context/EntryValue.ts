@@ -22,7 +22,7 @@ export interface EntryValue {
   /** `String` value of the `EntryValue`. */
   value: string;
   /**
-   * `EntryTtl` is an integer that represents number of hops an entry can
+   * ttl is an integer that represents number of hops an entry can
    * propagate.
    */
   ttl?: EntryTtl;
