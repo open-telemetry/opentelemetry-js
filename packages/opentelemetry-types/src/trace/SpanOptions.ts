@@ -24,24 +24,30 @@ import { Link } from './link';
  * Options needed for span creation
  */
 export interface SpanOptions {
-  /** The SpanKind of a span */
+  /**
+   * The SpanKind of a span
+   * @default {@link SpanKind.INTERNAL}
+   */
   kind?: SpanKind;
 
   /** A spans attributes */
   attributes?: Attributes;
 
-  /** Indicates that if this Span is active and recording information like events with the `AddEvent` operation and attributes using `setAttributes`. */
+  /**
+   * Indicates that if this Span is active and recording information like
+   * events with the `AddEvent` operation and attributes using `setAttributes`.
+   */
   isRecording?: boolean;
 
   /** A spans links */
   links?: Link[];
 
   /**
-   * A parent SpanContext (or Span, for convenience) that the newly-started
+   * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
    * span will be the child of.
    */
   parent?: Span | SpanContext;
 
-  /** A manually specified start time for the created Span object. */
+  /** A manually specified start time for the created `Span` object. */
   startTime?: number;
 }
