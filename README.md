@@ -44,7 +44,7 @@ We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
 
-Approvers ([@open-telemetry/js](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
+Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
 - [Yuri Shkuro](https://github.com/yurishkuro), Uber
 - [Roch Devost](https://github.com/rochdev), DataDog
