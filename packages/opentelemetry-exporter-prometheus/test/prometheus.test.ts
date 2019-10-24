@@ -22,7 +22,6 @@ import chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 
 import { PrometheusExporter } from '../src';
-import { ConsoleLogger } from '@opentelemetry/core';
 
 describe('PrometheusExporter', () => {
   describe('constructor', () => {
