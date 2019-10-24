@@ -86,6 +86,9 @@ export class BinaryTraceContext implements BinaryFormat {
     ) {
       return null;
     }
+
+    result.isRemote = true;
+
     // See serializeSpanContext for byte offsets.
     result.traceId = toHex(buf.slice(TRACE_ID_OFFSET, SPAN_ID_FIELD_ID_OFFSET));
     result.spanId = toHex(

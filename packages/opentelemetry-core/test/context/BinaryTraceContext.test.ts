@@ -134,7 +134,7 @@ describe('BinaryTraceContext', () => {
           binaryTraceContext.fromBytes(testCase.binary),
           testCase.structured &&
             Object.assign(
-              { traceFlags: TraceFlags.UNSAMPLED },
+              { isRemote: true, traceFlags: TraceFlags.UNSAMPLED },
               testCase.structured
             )
         );

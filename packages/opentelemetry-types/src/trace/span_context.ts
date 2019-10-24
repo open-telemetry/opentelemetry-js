@@ -36,6 +36,10 @@ export interface SpanContext {
    */
   spanId: string;
   /**
+   * Only true if the SpanContext was propagated from a remote parent.
+   */
+  isRemote?: boolean;
+  /**
    * Trace flags to propagate.
    *
    * It is represented as 1 byte (bitmap). Bit to represent whether trace is
