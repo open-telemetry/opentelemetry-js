@@ -36,7 +36,7 @@ export interface SpanContext {
    */
   spanId: string;
   /**
-   * Indicates if the SpanContext was propagated from a remote parent.
+   * Only true if the SpanContext was propagated from a remote parent.
    */
   isRemote?: boolean;
   /**
