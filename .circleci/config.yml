@@ -116,13 +116,18 @@ workflows:
   build:
     jobs:
       - lint
-      - docs
+      - docs:
+          filters:
+            tags:
+              only: /.*/
       - docs-deploy:
           requires:
             - docs
           filters:
+            tags:
+              only: /^v\d+\.\d+\.\d+$/
             branches:
-              only: master
+              ignore: /.*/
       - node8
       - node10
       - node11
