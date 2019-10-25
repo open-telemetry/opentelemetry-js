@@ -35,6 +35,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 
   constructor(
     private readonly _name: string,
+    private readonly _type: MetricDescriptorType,
     private readonly _options: MetricOptions
   ) {
     this._monotonic = _options.monotonic;
@@ -111,7 +112,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
       description: this._options.description,
       unit: this._options.unit,
       labelKeys: this._options.labelKeys,
-      type: MetricDescriptorType.GAUGE_INT64,
+      type: this._type,
     };
   }
 
@@ -121,7 +122,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, options);
+    super(name, MetricDescriptorType.COUNTER_DOUBLE, options);
   }
   protected _makeHandle(labelValues: string[]): CounterHandle {
     return new CounterHandle(
@@ -136,7 +137,7 @@ export class CounterMetric extends Metric<CounterHandle> {
 /** This is a SDK implementation of Gauge Metric. */
 export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, options);
+    super(name, MetricDescriptorType.GAUGE_DOUBLE, options);
   }
   protected _makeHandle(labelValues: string[]): GaugeHandle {
     return new GaugeHandle(

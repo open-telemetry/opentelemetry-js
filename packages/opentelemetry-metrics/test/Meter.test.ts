@@ -333,7 +333,7 @@ describe('Meter', () => {
         name: 'counter',
         description: 'test',
         unit: '1',
-        type: MetricDescriptorType.GAUGE_INT64,
+        type: MetricDescriptorType.COUNTER_DOUBLE,
         labelKeys: ['key'],
       });
       assert.strictEqual(timeseries.length, 1);
@@ -361,7 +361,7 @@ describe('Meter', () => {
         name: 'gauge',
         description: '',
         unit: 'ms',
-        type: MetricDescriptorType.GAUGE_INT64,
+        type: MetricDescriptorType.GAUGE_DOUBLE,
         labelKeys: ['gauge-key'],
       });
       assert.strictEqual(timeseries.length, 2);
