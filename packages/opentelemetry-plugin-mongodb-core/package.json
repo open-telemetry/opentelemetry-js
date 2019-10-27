@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/plugin-mongodb",
+  "name": "@opentelemetry/plugin-mongodb-core",
   "version": "0.2.0",
-  "description": "OpenTelemetry mongodb automatic instrumentation package.",
+  "description": "OpenTelemetry mongodb-core automatic instrumentation package.",
   "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -18,7 +18,7 @@
   },
   "keywords": [
     "opentelemetry",
-    "mongodb",
+    "mongodb-core",
     "nodejs",
     "tracing",
     "profiling",
