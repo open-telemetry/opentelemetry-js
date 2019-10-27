@@ -14,45 +14,21 @@
  * limitations under the License.
  */
 
-/**
- * Copyright 2019, OpenTelemetry Authors
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 // mongodb.Server type is deprecated so every use trigger a lint error
 /* tslint:disable:deprecation */
 
 import { BasePlugin } from '@opentelemetry/core';
 import { Span, SpanKind, CanonicalCode } from '@opentelemetry/types';
+import { Func, MongoInternalCommand, MongoInternalTopology } from './types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 
-type Func<T> = (...args: unknown[]) => T;
-type MongoDB = typeof mongodb;
-interface MongoInternalCommand {
-  findandmodify: boolean;
-  createIndexes: boolean;
-  count: boolean;
-  ismaster: boolean;
-}
-
 /** MongoDB instrumentation plugin for OpenTelemetry */
-export class MongoDBPlugin extends BasePlugin<MongoDB> {
+export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
   private readonly _SERVER_METHODS = ['insert', 'update', 'remove', 'command'];
   private readonly _CURSOR_METHODS = ['_next', 'next'];
 
-  protected readonly _supportedVersions = ['>=2 <3'];
+  readonly supportedVersions = ['>=2 <3'];
 
   constructor(readonly moduleName: string) {
     super();
@@ -109,7 +85,7 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
       return function patchedServerCommand(
         this: mongodb.Server,
         ns: string,
-        command: MongoInternalCommand,
+        commands: MongoInternalCommand[] | MongoInternalCommand,
         options: {} | Function,
         callback: Func<unknown>
       ): mongodb.Server {
@@ -120,40 +96,34 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
         if (
           currentSpan === null ||
           typeof resultHandler !== 'function' ||
-          typeof command !== 'object'
+          typeof commands !== 'object'
         ) {
           return original.apply(this, (arguments as unknown) as unknown[]);
         }
-        let type: string;
-        if (command.createIndexes !== undefined) {
-          type = 'createIndexes';
-        } else if (command.findandmodify !== undefined) {
-          type = 'findAndModify';
-        } else if (command.ismaster !== undefined) {
-          type = 'isMaster';
-        } else if (command.count !== undefined) {
-          type = 'count';
-        } else {
-          type = operationName;
-        }
-
+        const command = commands instanceof Array ? commands[0] : commands;
+        const type = plugin._getCommandType(command, operationName);
         const span = plugin._tracer.startSpan(`mongodb.${type}`, {
           parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
-        span.setAttribute('db', ns);
+        plugin._populateAttributes(
+          span,
+          ns,
+          command,
+          this as MongoInternalTopology
+        );
         if (typeof options === 'function') {
           return original.call(
             this,
             ns,
-            command,
+            commands,
             plugin._patchEnd(span, options as Func<unknown>)
           );
         } else {
           return original.call(
             this,
             ns,
-            command,
+            commands,
             options,
             plugin._patchEnd(span, callback)
           );
@@ -162,12 +132,69 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
     };
   }
 
+  /**
+   * Get the mongodb command type from the object.
+   * @param command Internal mongodb command object
+   * @param defaulType the default type to return if we could not find a
+   *  specific command.
+   */
+  private _getCommandType(command: MongoInternalCommand, defaulType: string) {
+    if (command.createIndexes !== undefined) {
+      return 'createIndexes';
+    } else if (command.findandmodify !== undefined) {
+      return 'findAndModify';
+    } else if (command.ismaster !== undefined) {
+      return 'isMaster';
+    } else if (command.count !== undefined) {
+      return 'count';
+    } else {
+      return defaulType;
+    }
+  }
+
+  /**
+   * Populate span's attributes by fetching related metadata from the context
+   * @param span span to add attributes to
+   * @param ns mongodb namespace
+   * @param command mongodb internal representation of a command
+   * @param topology mongodb internal representation of the network topology
+   */
+  private _populateAttributes(
+    span: Span,
+    ns: string,
+    command: MongoInternalCommand,
+    topology: MongoInternalTopology
+  ) {
+    // add network attributes to determine the remote server
+    if (topology && topology.s && topology.s.options) {
+      span.setAttribute('peer.hostname', `${topology.s.options.host}`);
+      span.setAttribute('peer.port', `${topology.s.options.port}`);
+    }
+    // add database related attributes
+    span.setAttribute('db.instance', `${ns}`);
+    span.setAttribute('db.type', `mongodb`);
+    span.setAttribute('component', 'mongodb-core');
+    if (command === undefined) return;
+    const query = Object.keys(command.query || command.q || {}).reduce(
+      (obj, key) => {
+        obj[key] = '?';
+        return obj;
+      },
+      {} as { [key: string]: string }
+    );
+    span.setAttribute('db.statement', JSON.stringify(query));
+  }
+
   /** Creates spans for Cursor operations */
   private _getPatchCursor() {
     const plugin = this;
     return (original: Func<mongodb.Cursor>) => {
       return function patchedCursorCommand(
-        this: { ns: string },
+        this: {
+          ns: string;
+          cmd: MongoInternalCommand;
+          topology: MongoInternalTopology;
+        },
         ...args: unknown[]
       ): mongodb.Cursor {
         const currentSpan = plugin._tracer.getCurrentSpan();
@@ -175,10 +202,11 @@ export class MongoDBPlugin extends BasePlugin<MongoDB> {
         if (currentSpan === null || resultHandler === undefined) {
           return original.apply(this, (arguments as unknown) as unknown[]);
         }
-        const span = plugin._tracer.startSpan(`mongodb.cursor`, {
+        const span = plugin._tracer.startSpan(`mongodb.query`, {
           parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
+        plugin._populateAttributes(span, this.ns, this.cmd, this.topology);
 
         return original.call(this, plugin._patchEnd(span, resultHandler));
       };
