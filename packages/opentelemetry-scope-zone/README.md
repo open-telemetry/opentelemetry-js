@@ -7,7 +7,7 @@
 
 This module provides *Zone Scope Manager with bundled [zone-js]* for Web applications.
 If you have your own [zone-js] please use *@opentelemetry/scope-zone-peer-dep*
-If you use Angular it means you already have the zone.js adn you should use *@opentelemetry/scope-zone-peer-dep*
+If you use Angular it means you already have the [zone-js] and you should use [@opentelemetry/scope-zone-peer-dep]
 
 
 ## Installation
@@ -62,9 +62,10 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
 [dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-scope-zone
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-web
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-scope-zone
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-scope-zone
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-web&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/scope-zone
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fscope-zone.svg
 [zone-js]: https://www.npmjs.com/package/zone.js
+[@opentelemetry/scope-zone-peer-dep]: https://www.npmjs.com/package/@opentelemetry/scope-zone-peer-dep
