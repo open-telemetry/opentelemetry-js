@@ -24,23 +24,25 @@ import {
   NOOP_MEASURE_HANDLE,
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
+import { LabelSet } from '@opentelemetry/types';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeter();
     const counter = meter.createCounter('some-name');
+    const labels: LabelSet = { 'key1': 'val1', 'key2': 'val2'};
     // ensure NoopMetric does not crash.
     counter.setCallback(() => {
       assert.fail('callback occurred');
     });
-    counter.getHandle(['val1', 'val2']).add(1);
+    counter.getHandle(labels).add(1);
     counter.getDefaultHandle().add(1);
-    counter.removeHandle(['val1', 'val2']);
+    counter.removeHandle(labels);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
     assert.strictEqual(
-      counter.getHandle(['val1', 'val2']),
+      counter.getHandle(labels),
       NOOP_COUNTER_HANDLE
     );
     assert.strictEqual(counter.getDefaultHandle(), NOOP_COUNTER_HANDLE);
@@ -62,7 +64,7 @@ describe('NoopMeter', () => {
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
     assert.strictEqual(measure.getDefaultHandle(), NOOP_MEASURE_HANDLE);
     assert.strictEqual(
-      measure.getHandle(['val1', 'val2']),
+      measure.getHandle(labels),
       NOOP_MEASURE_HANDLE
     );
 
@@ -72,12 +74,11 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
     assert.strictEqual(gauge.getDefaultHandle(), NOOP_GAUGE_HANDLE);
-    assert.strictEqual(gauge.getHandle(['val1', 'val2']), NOOP_GAUGE_HANDLE);
+    assert.strictEqual(gauge.getHandle(labels), NOOP_GAUGE_HANDLE);
 
     const options = {
       component: 'tests',
       description: 'the testing package',
-      labelKeys: ['key1', 'key2'],
     };
 
     const measureWithOptions = meter.createMeasure('some-name', options);

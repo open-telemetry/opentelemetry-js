@@ -33,9 +33,6 @@ export interface MetricOptions {
    */
   unit?: string;
 
-  /** The list of label keys for the Metric. */
-  labelKeys?: string[];
-
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
 
@@ -61,9 +58,9 @@ export interface Metric<T> {
    * Returns a Handle associated with specified label values.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  getHandle(labelValues: string[]): T;
+  getHandle(labels: LabelSet): T;
 
   /**
    * Returns a Handle for a metric with all labels not set.
@@ -72,9 +69,9 @@ export interface Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  removeHandle(labelValues: string[]): void;
+  removeHandle(labels: LabelSet): void;
 
   /**
    * Clears all timeseries from the Metric.
@@ -86,3 +83,5 @@ export interface Metric<T> {
    */
   setCallback(fn: () => void): void;
 }
+
+export interface LabelSet {}

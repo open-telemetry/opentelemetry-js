@@ -23,6 +23,7 @@ import {
   MetricOptions,
   MeasureHandle,
   SpanContext,
+  LabelSet
 } from '@opentelemetry/types';
 
 /**
@@ -70,9 +71,9 @@ export class NoopMetric<T> implements Metric<T> {
    * Returns a Handle associated with specified label values.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  getHandle(labelValues: string[]): T {
+  getHandle(labels: LabelSet): T {
     return this._handle;
   }
 
@@ -85,9 +86,9 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  removeHandle(labelValues: string[]): void {
+  removeHandle(labels: LabelSet): void {
     return;
   }
 

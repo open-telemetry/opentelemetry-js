@@ -36,13 +36,13 @@ export abstract class Metric<T> implements types.Metric<T> {
    * Returns a Handle associated with specified label values.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for each operation.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  getHandle(labelValues: string[]): T {
-    const hash = hashLabelValues(labelValues);
+  getHandle(labels: types.LabelSet): T {
+    const hash = hashLabelValues(Object.values(labels));
     if (this._handles.has(hash)) return this._handles.get(hash)!;
 
-    const handle = this._makeHandle(labelValues);
+    const handle = this._makeHandle(labels);
     this._handles.set(hash, handle);
     return handle;
   }
@@ -58,10 +58,10 @@ export abstract class Metric<T> implements types.Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the object of label set.
    */
-  removeHandle(labelValues: string[]): void {
-    this._handles.delete(hashLabelValues(labelValues));
+  removeHandle(labels: types.LabelSet): void {
+    this._handles.delete(hashLabelValues(Object.values(labels)));
   }
 
   /**
@@ -77,7 +77,7 @@ export abstract class Metric<T> implements types.Metric<T> {
     return;
   }
 
-  protected abstract _makeHandle(labelValues: string[]): T;
+  protected abstract _makeHandle(labels: types.LabelSet): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
@@ -85,11 +85,11 @@ export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(labelValues: string[]): CounterHandle {
+  protected _makeHandle(labels: types.LabelSet): CounterHandle {
     return new CounterHandle(
       this._disabled,
       this._monotonic,
-      labelValues,
+      labels,
       this._logger
     );
   }
@@ -100,11 +100,11 @@ export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(labelValues: string[]): GaugeHandle {
+  protected _makeHandle(labels: types.LabelSet): GaugeHandle {
     return new GaugeHandle(
       this._disabled,
       this._monotonic,
-      labelValues,
+      labels,
       this._logger
     );
   }
