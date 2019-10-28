@@ -70,9 +70,11 @@ export interface Tracer {
    * Spans.
    *
    * If no tracer implementation is provided, this defaults to the W3C Trace
-   * Context binary format ({@link BinaryFormat}). For more details see
+   * Context binary format {@link BinaryFormat}. For more details see
    * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
    * binary protocol</a>.
+   *
+   * @returns the {@link BinaryFormat} for this implementation.
    */
   getBinaryFormat(): BinaryFormat;
 
@@ -81,8 +83,10 @@ export interface Tracer {
    * Spans.
    *
    * If no tracer implementation is provided, this defaults to the W3C Trace
-   * Context HTTP text format ({@link HttpTraceContext}). For more details see
+   * Context HTTP text format {@link HttpTextFormat}. For more details see
    * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
+   *
+   * @returns the {@link HttpTextFormat} for this implementation.
    */
   getHttpTextFormat(): HttpTextFormat;
 }

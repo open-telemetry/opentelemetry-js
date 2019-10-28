@@ -21,7 +21,7 @@ import { SpanContext } from '../trace/span_context';
 export interface CounterHandle {
   /**
    * Adds the given value to the current value. Values cannot be negative.
-   * @param value the value to add
+   * @param value the value to add.
    */
   add(value: number): void;
 }

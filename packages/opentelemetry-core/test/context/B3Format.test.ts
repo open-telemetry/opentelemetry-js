@@ -55,6 +55,7 @@ describe('B3Format', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.UNSAMPLED,
         traceState: new TraceState('foo=bar,baz=qux'),
+        isRemote: false,
       };
 
       b3Format.inject(spanContext, 'B3Format', carrier);
@@ -101,6 +102,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.UNSAMPLED,
       });
     });
@@ -114,6 +116,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
     });
@@ -127,6 +130,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
     });
@@ -140,6 +144,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.UNSAMPLED,
       });
     });
@@ -173,6 +178,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
     });

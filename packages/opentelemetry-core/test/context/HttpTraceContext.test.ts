@@ -76,6 +76,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
     });
@@ -106,6 +107,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
     });
@@ -139,6 +141,7 @@ describe('HttpTraceContext', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
         traceState: new TraceState('foo=bar,baz=qux,quux=quuz'),
       });
