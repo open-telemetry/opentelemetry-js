@@ -72,7 +72,7 @@ export class ZoneScopeManager implements ScopeManager {
 
   /**
    * @param target Function to be executed within the scope
-   * @param scope
+   * @param scope A scope (span) to be executed within target function
    */
   private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;
@@ -90,7 +90,7 @@ export class ZoneScopeManager implements ScopeManager {
 
   /**
    * @param obj target object on which the listeners will be patched
-   * @param scope
+   * @param scope A scope (span) to be bind to target
    */
   private _bindListener<T>(obj: T, scope?: unknown): T {
     const target = (obj as unknown) as TargetWithEvents;
@@ -318,7 +318,7 @@ export class ZoneScopeManager implements ScopeManager {
   /**
    * Binds a the certain scope or the active one to the target function and then returns the target
    * @param target
-   * @param scope
+   * @param scope A scope (span) to be bind to target
    */
   bind<T>(target: T | TargetWithEvents, scope?: unknown): T {
     // if no specific scope to propagate is given, we use the current one
@@ -361,7 +361,7 @@ export class ZoneScopeManager implements ScopeManager {
    * Calls the callback function [fn] with the provided [scope].
    *     If [scope] is undefined then it will use the active scope.
    *     The scope will be set as active
-   * @param scope
+   * @param scope A scope (span) to be called with provided callback
    * @param fn Callback function
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
