@@ -16,4 +16,3 @@
 
 export * from './ZoneScopeManager';
 export * from './types';
-export * from './util';

@@ -16,12 +16,10 @@
 
 export type Func<T> = (...args: unknown[]) => T;
 
-export interface ScopeWithEventTargets {
-  scope: unknown;
-  target: TargetWithEvents;
-  eventTargets: TargetWithEvents;
-}
-
+/**
+ * Minimum requirements that the object needs to have so that it can bind to the events instead of function
+ * this is "addEventListener" and "removeEventListener" - see {@link isListenerObject}
+ */
 export interface TargetWithEvents {
   addEventListener?(
     event: string,

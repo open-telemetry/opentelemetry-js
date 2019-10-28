@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
+/**
+ * ZoneScopeManager
+ * This module provides an easy functionality for tracing action between asynchronous operations in web.
+ * It was not possible with standard [StackScopeManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-web/src/StackScopeManager.ts}.
+ * It heavily depends on [zone.js]{@link https://www.npmjs.com/package/zone.js}.
+ * It stores the information about scopes per zone. If there is not active zone, a new zone will be forked.
+ * It also supports binding a certain Span to a target with "addEventListener".
+ * When this happens a new zone is being created and the provided Span is being assigned to this zone.
+ *
+ */
+
 import { ScopeManager } from '@opentelemetry/scope-base';
-import { Func, ScopeWithEventTargets, TargetWithEvents } from './types';
+import { Func, TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
 /**
@@ -37,11 +48,6 @@ export class ZoneScopeManager implements ScopeManager {
    * Keeps the reference to the scopes per zone
    */
   private _scopes: { [key: string]: unknown[] } = {};
-
-  /**
-   * Keeps the reference to the scopes with original event targets
-   */
-  private _scopesWithEventTargets: ScopeWithEventTargets[] = [];
 
   /**
    * Helps to create a unique name for the zones - part of zone name
@@ -104,8 +110,7 @@ export class ZoneScopeManager implements ScopeManager {
     if (typeof target.removeEventListener === 'function') {
       target.removeEventListener = this._patchRemoveEventListener(
         target,
-        target.removeEventListener,
-        scope
+        target.removeEventListener
       );
     }
 
@@ -113,58 +118,10 @@ export class ZoneScopeManager implements ScopeManager {
   }
 
   /**
-   * Removes references to the targets that were bind to certain scope / span
-   * @param scope
-   */
-  private _cleanEventTargetsFromScope(scope: any, target?: TargetWithEvents) {
-    // console.log('_cleanEventTargetsFromScope1', this._scopesWithEventTargets.length, scope && scope.name);
-    for (let i = this._scopesWithEventTargets.length - 1; i >= 0; i--) {
-      const scopeWithEventTargets = this._scopesWithEventTargets[i];
-      if (scopeWithEventTargets.scope === scope) {
-        if (
-          typeof target !== 'undefined' &&
-          scopeWithEventTargets.target !== target
-        ) {
-          continue;
-        }
-
-        if (scopeWithEventTargets.target) {
-          try {
-            scopeWithEventTargets.target.addEventListener =
-              scopeWithEventTargets.eventTargets.addEventListener;
-
-            scopeWithEventTargets.target.removeEventListener =
-              scopeWithEventTargets.eventTargets.removeEventListener;
-
-            delete scopeWithEventTargets.target.__ot_listeners;
-          } catch (e) {
-            console.log(e);
-          }
-        }
-
-        this._scopesWithEventTargets.splice(i, 1);
-
-        if (
-          typeof target !== 'undefined' &&
-          scopeWithEventTargets.target === target
-        ) {
-          break;
-        }
-      }
-    }
-    // console.log('_cleanEventTargetsFromScope2', this._scopesWithEventTargets.length);
-  }
-
-  /**
    * Removes all the associated scopes with zone after the zone has no more tasks
    * @param zoneName
    */
   private _cleanScopesFromZone(zoneName: string) {
-    const scopes = this._scopes[zoneName];
-    for (let i = scopes.length - 1; i >= 0; i--) {
-      this._cleanEventTargetsFromScope(scopes[i]);
-      scopes.splice(i, 1);
-    }
     delete this._scopes[zoneName];
   }
 
@@ -187,38 +144,6 @@ export class ZoneScopeManager implements ScopeManager {
       onInvoke: this._onZoneInvoke.bind(this),
       onHasTask: this._onHasTask.bind(this),
     });
-  }
-
-  /**
-   * Ensure that appropriate {@link ScopeWithEventTargets} exists if not then create a new one
-   * @param scope
-   * @param target
-   */
-  private _ensureScopeWithEventTargetsExists(
-    scope: unknown,
-    target: TargetWithEvents
-  ): ScopeWithEventTargets {
-    let foundScope;
-    for (const scopeWithEventTargets of this._scopesWithEventTargets) {
-      if (
-        scopeWithEventTargets.scope === scope &&
-        scopeWithEventTargets.target === target
-      ) {
-        foundScope = scopeWithEventTargets;
-        break;
-      }
-    }
-    if (!foundScope) {
-      this._scopesWithEventTargets.push({
-        scope,
-        target,
-        eventTargets: {},
-      });
-      foundScope = this._scopesWithEventTargets[
-        this._scopesWithEventTargets.length - 1
-      ];
-    }
-    return foundScope;
   }
 
   /**
@@ -322,9 +247,8 @@ export class ZoneScopeManager implements ScopeManager {
     scope?: unknown
   ) {
     const scopeManager = this;
-    this._saveOriginalAddEventWithScope(scope, target, original);
 
-    return function(this: {}, event: string, listener: Func<void>) {
+    return function(this: {}, event: string, listener: Func<void>, opts?: any) {
       if (target.__ot_listeners === undefined) {
         target.__ot_listeners = {};
       }
@@ -336,7 +260,7 @@ export class ZoneScopeManager implements ScopeManager {
       const patchedListener = scopeManager.bind(listener, scope);
       // store a weak reference of the user listener to ours
       listeners.set(listener, patchedListener);
-      return original.call(this, event, patchedListener);
+      return original.call(this, event, patchedListener, opts);
     };
   }
 
@@ -344,15 +268,11 @@ export class ZoneScopeManager implements ScopeManager {
    * Patches removeEventListener method
    * @param target any target that has "removeEventListener" method
    * @param original reference to the patched method
-   * @param [scope] scope to be bind to the listener
    */
   private _patchRemoveEventListener(
     target: TargetWithEvents,
-    original: Function,
-    scope?: unknown
+    original: Function
   ) {
-    const scopeManager = this;
-    this._saveOriginalRemoveEventWithScope(scope, target, original);
     return function(this: {}, event: string, listener: Func<void>) {
       if (
         target.__ot_listeners === undefined ||
@@ -362,7 +282,7 @@ export class ZoneScopeManager implements ScopeManager {
       }
       const events = target.__ot_listeners[event];
       const patchedListener = events.get(listener);
-      scopeManager._cleanEventTargetsFromScope(scope, target);
+      events.delete(listener);
       return original.call(this, event, patchedListener || listener);
     };
   }
@@ -375,42 +295,7 @@ export class ZoneScopeManager implements ScopeManager {
     const zoneName = zone.name;
     const scopes = this._scopes[zoneName];
     if (scopes && scopes.length > 0) {
-      this._cleanEventTargetsFromScope(scopes[scopes.length - 1]);
       scopes.splice(scopes.length - 1, 1);
-    }
-  }
-
-  /**
-   * Saves original addEventListener method so it can be restored later
-   * @param scope
-   * @param target
-   * @param original original addEventListener method
-   */
-  private _saveOriginalAddEventWithScope(
-    scope: unknown,
-    target: TargetWithEvents,
-    original: any
-  ) {
-    const foundScope = this._ensureScopeWithEventTargetsExists(scope, target);
-    if (foundScope) {
-      foundScope.eventTargets.addEventListener = original;
-    }
-  }
-
-  /**
-   * Saves original removeEventListener method so it can be restored later
-   * @param scope
-   * @param target
-   * @param original original removeEventListener method
-   */
-  private _saveOriginalRemoveEventWithScope(
-    scope: unknown,
-    target: TargetWithEvents,
-    original: any
-  ) {
-    const foundScope = this._ensureScopeWithEventTargetsExists(scope, target);
-    if (foundScope) {
-      foundScope.eventTargets.removeEventListener = original;
     }
   }
 

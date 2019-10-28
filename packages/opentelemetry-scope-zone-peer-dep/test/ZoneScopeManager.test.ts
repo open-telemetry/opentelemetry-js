@@ -21,10 +21,6 @@ import { ZoneScopeManager } from '../src';
 
 let clock: any;
 
-class MockSpan {
-  name = 'test';
-}
-
 describe('ZoneScopeManager', () => {
   let scopeManager: ZoneScopeManager;
 
@@ -187,7 +183,7 @@ describe('ZoneScopeManager', () => {
       fn();
     });
 
-    it('should bind the target for click event', done => {
+    it('should bind the the certain scope to the target "addEventListener" function', done => {
       const scope1 = { a: 1 };
       const element = document.createElement('div');
 
@@ -211,53 +207,37 @@ describe('ZoneScopeManager', () => {
       );
     });
 
-    it('should restore original events when user removes the click event', done => {
-      // for this test block sinon as it doesn't work correctly in this particular example with zone
-
-      clock.restore();
-      const scope1 = new MockSpan();
-
+    it('should preserve zone when creating new click event inside zone', done => {
+      const scope1 = { a: 1 };
       const element = document.createElement('div');
-      const elementAddEventListener = element.addEventListener;
-      const elementRemoveEventListener = element.removeEventListener;
 
       scopeManager.bind(element, scope1);
 
-      function onClick(this: any) {
-        assert.strictEqual(
-          this,
-          element,
-          'event callback should have a proper scope'
-        );
+      element.addEventListener('click', () => {
         assert.strictEqual(scopeManager.active(), scope1);
         setTimeout(() => {
-          done();
-        }, 50);
-      }
+          assert.strictEqual(scopeManager.active(), scope1);
+          const element2 = document.createElement('div');
 
-      element.addEventListener('click', onClick);
+          element2.addEventListener('click', () => {
+            assert.strictEqual(scopeManager.active(), scope1);
+            setTimeout(() => {
+              assert.strictEqual(scopeManager.active(), scope1);
+              done();
+            }, 500);
+            clock.tick(500);
+          });
 
-      setTimeout(() => {
-        assert.ok(
-          element.addEventListener !== elementAddEventListener,
-          'element should have patched version of addEventListener'
-        );
-        assert.ok(
-          element.removeEventListener !== elementRemoveEventListener,
-          'element should have patched version of removeEventListener'
-        );
-
-        element.removeEventListener('click', onClick);
-
-        assert.ok(
-          element.addEventListener === elementAddEventListener,
-          'element should have original version of of addEventListener'
-        );
-        assert.ok(
-          element.removeEventListener === elementRemoveEventListener,
-          'element should have original version of removeEventListener'
-        );
-      }, 10);
+          element2.dispatchEvent(
+            new CustomEvent('click', {
+              bubbles: true,
+              cancelable: false,
+              composed: true,
+            })
+          );
+        }, 500);
+        clock.tick(500);
+      });
 
       element.dispatchEvent(
         new CustomEvent('click', {
