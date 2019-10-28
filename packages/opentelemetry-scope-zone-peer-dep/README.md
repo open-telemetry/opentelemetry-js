@@ -6,6 +6,7 @@
 [![Apache License][license-image]][license-image]
 
 This module provides *Zone Scope Manager with a peer dependency for [zone-js]* for Web applications.
+If you use Angular you already have the zone.js and you should use this package.
 If you don't have your own [zone-js] please use *@opentelemetry/scope-zone*
 
 

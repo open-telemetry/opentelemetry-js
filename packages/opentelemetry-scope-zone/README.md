@@ -7,6 +7,7 @@
 
 This module provides *Zone Scope Manager with bundled [zone-js]* for Web applications.
 If you have your own [zone-js] please use *@opentelemetry/scope-zone-peer-dep*
+If you use Angular it means you already have the zone.js adn you should use *@opentelemetry/scope-zone-peer-dep*
 
 
 ## Installation
