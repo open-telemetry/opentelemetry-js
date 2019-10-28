@@ -48,8 +48,6 @@ export class ZoneScopeManager implements ScopeManager {
    */
   private _zoneCounter = 0;
 
-  constructor() {}
-
   /**
    * Returns the active scope from certain zone name
    * @param activeZoneName
@@ -176,8 +174,7 @@ export class ZoneScopeManager implements ScopeManager {
   private _createZoneName() {
     this._zoneCounter++;
     const random = Math.random();
-    const zoneName = `${this._zoneCounter}-${random}`;
-    return zoneName;
+    return `${this._zoneCounter}-${random}`;
   }
 
   /**
