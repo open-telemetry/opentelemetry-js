@@ -25,7 +25,7 @@ import {
 import * as pgTypes from 'pg';
 import { PostgresPlugin } from './pg';
 
-function arrayStringifyHelper<T>(arr: Array<T>): string {
+function arrayStringifyHelper(arr: Array<unknown>): string {
   return '[' + arr.toString() + ']';
 }
 
@@ -79,7 +79,10 @@ export function handleConfigQuery(
   const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
-  span.setAttribute(AttributeNames.DB_STATEMENT, argsConfig.text);
+  if (argsConfig.text) {
+    span.setAttribute(AttributeNames.DB_STATEMENT, argsConfig.text);
+  }
+
   if (argsConfig.values instanceof Array) {
     span.setAttribute(
       AttributeNames.PG_VALUES,
@@ -131,11 +134,34 @@ export function handleTextQuery(
   return span;
 }
 
+/**
+ * Invalid query handler. We should never enter this function unless invalid args were passed to the driver.
+ * Create and immediately end a new span
+ */
+export function handleInvalidQuery(
+  this: pgTypes.Client & PgClientExtended,
+  tracer: Tracer,
+  originalQuery: typeof pgTypes.Client.prototype.query,
+  ...args: unknown[]
+) {
+  let result;
+  const span = pgStartSpan(tracer, this, PostgresPlugin.BASE_SPAN_NAME);
+  try {
+    result = originalQuery.apply(this, args as never);
+    span.setStatus({ code: CanonicalCode.OK }); // this will never happen, but set a status anyways
+  } catch (e) {
+    span.setStatus({ code: CanonicalCode.UNKNOWN, message: e.message });
+    throw e;
+  } finally {
+    span.end();
+  }
+  return result;
+}
+
 export function patchCallback(
   span: Span,
   cb: PostgresCallback
 ): PostgresCallback {
-  const originalCb = cb;
   return function patchedCallback(
     this: pgTypes.Client & PgClientExtended,
     err: Error,
@@ -150,6 +176,6 @@ export function patchCallback(
       span.setStatus({ code: CanonicalCode.OK });
     }
     span.end();
-    return originalCb.call(this, err, res);
+    cb.call(this, err, res);
   };
 }

@@ -20,7 +20,14 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { SpanKind, Attributes, TimedEvent, Span } from '@opentelemetry/types';
+import {
+  SpanKind,
+  Attributes,
+  TimedEvent,
+  Span,
+  CanonicalCode,
+  Status,
+} from '@opentelemetry/types';
 import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
@@ -49,18 +56,34 @@ const DEFAULT_ATTRIBUTES = {
   [AttributeNames.DB_USER]: CONFIG.user,
 };
 
+const okStatus: Status = {
+  code: CanonicalCode.OK,
+};
+const unknownStatus: Status = {
+  code: CanonicalCode.UNKNOWN,
+};
+
 const runCallbackTest = (
-  span: Span,
+  span: Span | null,
   attributes: Attributes,
   events: TimedEvent[],
+  status: Status = okStatus,
   spansLength = 1,
   spansIndex = 0
 ) => {
   const spans = memoryExporter.getFinishedSpans();
   assert.strictEqual(spans.length, spansLength);
   const pgSpan = spans[spansIndex];
-  assertionUtils.assertSpan(pgSpan, SpanKind.CLIENT, attributes, events);
-  assertionUtils.assertPropagation(pgSpan, span);
+  assertionUtils.assertSpan(
+    pgSpan,
+    SpanKind.CLIENT,
+    attributes,
+    events,
+    status
+  );
+  if (span) {
+    assertionUtils.assertPropagation(pgSpan, span);
+  }
 };
 
 describe('pg@7.x', () => {
@@ -69,7 +92,7 @@ describe('pg@7.x', () => {
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker
-  const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
+  const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(async function() {
     if (!shouldTest) {
@@ -128,8 +151,21 @@ describe('pg@7.x', () => {
       assertPgError,
       'pg should throw when no args provided'
     );
+    runCallbackTest(null, DEFAULT_ATTRIBUTES, [], unknownStatus);
+    memoryExporter.reset();
+
     assert.doesNotThrow(
-      () => (client as any).query({ foo: 'bar' }, undefined, () => null),
+      () =>
+        (client as any).query({ foo: 'bar' }, undefined, () => {
+          runCallbackTest(
+            null,
+            {
+              ...DEFAULT_ATTRIBUTES,
+            },
+            [],
+            unknownStatus
+          );
+        }),
       'pg should not throw when invalid config args are provided'
     );
   });

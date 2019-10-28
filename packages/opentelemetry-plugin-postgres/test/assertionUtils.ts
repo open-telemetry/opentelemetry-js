@@ -19,7 +19,7 @@ import {
   Attributes,
   Event,
   Span,
-  TimedEvent,
+  Status,
 } from '@opentelemetry/types';
 import * as assert from 'assert';
 import { PostgresPlugin } from '../src';
@@ -34,7 +34,8 @@ export const assertSpan = (
   span: ReadableSpan,
   kind: SpanKind,
   attributes: Attributes,
-  events: Event[]
+  events: Event[],
+  status: Status
 ) => {
   assert.strictEqual(span.spanContext.traceId.length, 32);
   assert.strictEqual(span.spanContext.spanId.length, 16);
@@ -53,24 +54,15 @@ export const assertSpan = (
   assert.ok(hrTimeToMilliseconds(span.endTime) > 0);
 
   // attributes
-  assert.strictEqual(
-    Object.keys(span.attributes).length,
-    Object.keys(attributes).length,
-    'Should contain same number of attributes'
-  );
-  Object.keys(span.attributes).forEach(attribute => {
-    assert.deepStrictEqual(span.attributes[attribute], attributes[attribute]);
-  });
+  assert.deepStrictEqual(span.attributes, attributes);
 
   // events
-  assert.strictEqual(
-    span.events.length,
-    events.length,
-    'Should contain same number of events'
-  );
-  span.events.forEach((_: TimedEvent, index: number) => {
-    assert.deepStrictEqual(span.events[index], events[index]);
-  });
+  assert.deepStrictEqual(span.events, events);
+
+  assert.strictEqual(span.status.code, status.code);
+  if (status.message) {
+    assert.strictEqual(span.status.message, status.message);
+  }
 };
 
 // Check if sourceSpan was propagated to targetSpan

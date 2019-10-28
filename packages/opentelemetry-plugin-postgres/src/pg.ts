@@ -34,7 +34,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
   static readonly BASE_SPAN_NAME = PostgresPlugin.COMPONENT + '.query';
 
-  readonly supportedVersions = ['^7.12.1'];
+  readonly supportedVersions = ['7.*'];
 
   constructor(readonly moduleName: string) {
     super();
@@ -68,7 +68,6 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         this: pgTypes.Client & PgClientExtended,
         ...args: unknown[]
       ) {
-        let callbackProvided = false;
         let span: Span;
 
         // Handle different client.query(...) signatures
@@ -85,7 +84,12 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
         } else if (typeof args[0] === 'object') {
           span = utils.handleConfigQuery.call(this, plugin._tracer, ...args);
         } else {
-          return original.apply(this, args as never);
+          return utils.handleInvalidQuery.call(
+            this,
+            plugin._tracer,
+            original,
+            ...args
+          );
         }
 
         // Bind callback to parent span
@@ -102,7 +106,6 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
                 args[args.length - 1]
               );
             }
-            callbackProvided = true;
           } else if (
             typeof (args[0] as PgPluginQueryConfig).callback === 'function'
           ) {
@@ -119,7 +122,6 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
             // Copy the callback instead of writing to args.callback so that we don't modify user's
             // original callback reference
             args[0] = { ...(args[0] as object), callback };
-            callbackProvided = true;
           }
         }
 
@@ -139,20 +141,14 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
             })
             .catch((error: Error) => {
               return new Promise((_, reject) => {
-                span.setStatus({ code: CanonicalCode.UNKNOWN });
+                span.setStatus({
+                  code: CanonicalCode.UNKNOWN,
+                  message: error.message,
+                });
                 span.end();
                 reject(error);
               });
             });
-        }
-
-        // If a promise was not returned and no callback is provided, we recieved invalid args
-        if (!callbackProvided) {
-          span.setStatus({
-            code: CanonicalCode.INVALID_ARGUMENT,
-            message: 'Invalid query provided to the driver',
-          });
-          span.end();
         }
 
         // else returns void
