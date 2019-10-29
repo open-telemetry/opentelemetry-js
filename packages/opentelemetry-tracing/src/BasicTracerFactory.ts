@@ -21,7 +21,7 @@ import { SpanProcessor } from './SpanProcessor';
 
 export class BasicTracerFactory implements types.TracerFactory {
   private static _singletonInstance: BasicTracerFactory;
-  private readonly _tracers: Map<String, BasicTracer> = new Map();
+  private readonly _tracers: Map<string, BasicTracer> = new Map();
   private _spanProcessors: SpanProcessor[] = [];
   private _config?: BasicTracerConfig;
 
