@@ -30,7 +30,9 @@ describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeter();
     const counter = meter.createCounter('some-name');
-    const labels: LabelSet = { 'key1': 'val1', 'key2': 'val2'};
+    const key1 = 'key1';
+    const key2 = 'key2';
+    const labels: LabelSet = { [key1]: 'val1', [key2]: 'val2' };
     // ensure NoopMetric does not crash.
     counter.setCallback(() => {
       assert.fail('callback occurred');
@@ -41,10 +43,7 @@ describe('NoopMeter', () => {
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(
-      counter.getHandle(labels),
-      NOOP_COUNTER_HANDLE
-    );
+    assert.strictEqual(counter.getHandle(labels), NOOP_COUNTER_HANDLE);
     assert.strictEqual(counter.getDefaultHandle(), NOOP_COUNTER_HANDLE);
     counter.clear();
 
@@ -63,10 +62,7 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
     assert.strictEqual(measure.getDefaultHandle(), NOOP_MEASURE_HANDLE);
-    assert.strictEqual(
-      measure.getHandle(labels),
-      NOOP_MEASURE_HANDLE
-    );
+    assert.strictEqual(measure.getHandle(labels), NOOP_MEASURE_HANDLE);
 
     const gauge = meter.createGauge('some-name');
     gauge.getDefaultHandle().set(1);

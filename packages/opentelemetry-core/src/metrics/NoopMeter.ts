@@ -23,7 +23,7 @@ import {
   MetricOptions,
   MeasureHandle,
   SpanContext,
-  LabelSet
+  LabelSet,
 } from '@opentelemetry/types';
 
 /**

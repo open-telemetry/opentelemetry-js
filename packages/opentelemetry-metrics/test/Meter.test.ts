@@ -21,7 +21,8 @@ import { NoopLogger } from '@opentelemetry/core';
 
 describe('Meter', () => {
   let meter: Meter;
-  const labels: types.LabelSet = {'key': 'value'};
+  const key = 'key';
+  const labels: types.LabelSet = { [key]: 'value' };
   const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
@@ -58,7 +59,12 @@ describe('Meter', () => {
 
       it('should return the timeseries', () => {
         const counter = meter.createCounter('name');
-        const handle = counter.getHandle({'key1': 'value1', 'key2': 'value2'});
+        const key1 = 'key1';
+        const key2 = 'key2';
+        const handle = counter.getHandle({
+          [key1]: 'value1',
+          [key2]: 'value2',
+        });
         handle.add(20);
         assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
           labelValues: [{ value: 'value1' }, { value: 'value2' }],
@@ -159,7 +165,9 @@ describe('Meter', () => {
 
       it('should return the timeseries', () => {
         const gauge = meter.createGauge('name');
-        const handle = gauge.getHandle({'k1': 'v1', 'k2': 'v2'});
+        const k1 = 'k1';
+        const k2 = 'k2';
+        const handle = gauge.getHandle({ [k1]: 'v1', [k2]: 'v2' });
         handle.set(150);
         assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
           labelValues: [{ value: 'v1' }, { value: 'v2' }],
