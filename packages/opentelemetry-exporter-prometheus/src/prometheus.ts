@@ -21,12 +21,13 @@ import { createServer, Server, IncomingMessage, ServerResponse } from 'http';
 
 import * as types from '@opentelemetry/types';
 
-import {
-
-} from '@opentelemetry/metrics'
+import { ReadableMetric, MetricDescriptor } from '@opentelemetry/metrics';
 
 import { ExporterConfig } from './types';
 import { NoopLogger } from '@opentelemetry/core';
+
+import * as Prometheus from 'prom-client';
+
 import {
   Registry,
 } from 'prom-client';
@@ -45,7 +46,7 @@ export class PrometheusExporter {
   private readonly _port: number;
   private readonly _endpoint: string;
   private _server?: Server;
-  // private readonly _prefix: string;
+  private readonly _prefix: string;
 
   // Histogram cannot have a label named 'le'
   // private static readonly RESERVED_HISTOGRAM_LABEL = 'le';
@@ -71,6 +72,36 @@ export class PrometheusExporter {
       this.startServer(callback);
     }
   }
+
+  export(metrics: ReadableMetric[]) {
+
+    metrics.forEach((metric) => {
+      this._updateMetric(metric);
+    });
+  }
+
+  private _updateMetric(metric: ReadableMetric) {
+    this._registerMetric(metric);
+  }
+
+  private _registerMetric(metric: ReadableMetric): Prometheus.Metric {
+    const metricName = this._getPrometheusMetricName(metric.descriptor);
+  }
+
+  private _getPrometheusMetricName(descriptor: MetricDescriptor): string {
+    let metricName;
+    if (this._prefix) {
+      metricName = `${this._prefix}_${descriptor.name}`;
+    } else {
+      metricName = descriptor.name;
+    }
+    return this._sanitizePrometheusMetricName(metricName);
+  }
+
+  private _sanitizePrometheusMetricName(name: string): string {
+    return name.replace(/\W/g, '_');
+  }
+
 
   /**
    * Stops the Prometheus exporter server
