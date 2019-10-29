@@ -15,7 +15,7 @@ To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/o
 ## Release Schedule
 
 OpenTelemetry JS is under active development.
-This release isn't guaranteed to conform to a specific version of the specification, and future 
+This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
 The _alpha_ release includes:
@@ -55,7 +55,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
-Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers))::
+Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
 - [Daniel Khan](https://github.com/danielkhan), Dynatrace
@@ -98,6 +98,8 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
+- [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
+- [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
 - [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
