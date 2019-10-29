@@ -19,8 +19,7 @@ import { TimeSeries } from './export/types';
 
 /**
  * CounterHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Counter` associated with specified label
- * values.
+ * value of single handle in the `Counter` associated with specified LabelSet.
  */
 export class CounterHandle implements types.CounterHandle {
   private _data = 0;
@@ -58,7 +57,7 @@ export class CounterHandle implements types.CounterHandle {
 
 /**
  * GaugeHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Gauge` associated with specified label values.
+ * value of single handle in the `Gauge` associated with specified LabelSet.
  */
 export class GaugeHandle implements types.GaugeHandle {
   private _data = 0;

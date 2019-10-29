@@ -33,10 +33,10 @@ export abstract class Metric<T> implements types.Metric<T> {
   }
 
   /**
-   * Returns a Handle associated with specified label values.
+   * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for each operation.
-   * @param labels the object of label set.
+   * @param labels the LabelSet used to associate with this metric handle.
    */
   getHandle(labels: types.LabelSet): T {
     const hash = hashLabelValues(Object.values(labels));
@@ -58,7 +58,7 @@ export abstract class Metric<T> implements types.Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labels the object of label set.
+   * @param labels the LabelSet used to associate with this metric handle.
    */
   removeHandle(labels: types.LabelSet): void {
     this._handles.delete(hashLabelValues(Object.values(labels)));

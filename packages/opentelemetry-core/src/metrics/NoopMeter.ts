@@ -68,10 +68,10 @@ export class NoopMetric<T> implements Metric<T> {
     this._handle = handle;
   }
   /**
-   * Returns a Handle associated with specified label values.
+   * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labels the object of label set.
+   * @param labels the LabelSet used to associate with this metric handle.
    */
   getHandle(labels: LabelSet): T {
     return this._handle;
@@ -86,9 +86,10 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labels the object of label set.
+   * @param labels the LabelSet used to associate with this metric handle.
    */
   removeHandle(labels: LabelSet): void {
+    // @todo: implement this method
     return;
   }
 
