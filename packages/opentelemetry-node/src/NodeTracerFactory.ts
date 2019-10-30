@@ -20,8 +20,7 @@ import { NodeTracerConfig } from './config';
 import { SpanProcessor } from '@opentelemetry/tracing';
 
 export class NodeTracerFactory implements types.TracerFactory {
-  private static _singletonInstance: NodeTracerFactory;
-  private readonly _tracers: Map<String, NodeTracer> = new Map();
+  private readonly _tracers: Map<string, NodeTracer> = new Map();
   private _spanProcessors: SpanProcessor[] = [];
   private readonly _config?: NodeTracerConfig;
 
@@ -47,14 +46,4 @@ export class NodeTracerFactory implements types.TracerFactory {
     this._tracers.set(key, tracer);
     return tracer;
   }
-
-  /** Gets the tracing instance. Accepts a tracer config for initialization*/
-  static instance(config?: NodeTracerConfig): NodeTracerFactory{
-    return this._singletonInstance || (this._singletonInstance = new this(config));
-  }
-}
-
-
-export function getTracerFactory(config?: NodeTracerConfig): NodeTracerFactory {
-  return NodeTracerFactory.instance(config);
 }

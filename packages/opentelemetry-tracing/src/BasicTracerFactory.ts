@@ -20,8 +20,7 @@ import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
 
 export class BasicTracerFactory implements types.TracerFactory {
-  private static _singletonInstance: BasicTracerFactory;
-  private readonly _tracers: Map<String, BasicTracer> = new Map();
+  private readonly _tracers: Map<string, BasicTracer> = new Map();
   private _spanProcessors: SpanProcessor[] = [];
   private _config?: BasicTracerConfig;
 
@@ -47,13 +46,4 @@ export class BasicTracerFactory implements types.TracerFactory {
     this._tracers.set(key, tracer);
     return tracer;
   }
-
-  /** Gets the tracing instance. Accepts a tracer config for initialization */
-  static instance(config?: BasicTracerConfig): BasicTracerFactory {
-    return this._singletonInstance || (this._singletonInstance = new this(config));
-  }
-}
-
-export function getTracerFactory(config?: BasicTracerConfig): BasicTracerFactory {
-  return BasicTracerFactory.instance(config);
 }

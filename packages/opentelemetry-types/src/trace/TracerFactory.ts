@@ -26,5 +26,5 @@ export interface TracerFactory {
    * @param name must identify the instrumentation library.
    * @param [version] is the semantic version of the instrumentation library.
    */
-  getTracer(name?: string, version?: string): Tracer;
+  getTracer(name: string, version?: string): Tracer;
 }
