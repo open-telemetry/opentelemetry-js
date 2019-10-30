@@ -89,6 +89,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
       monotonic: true,
+      valueType: types.ValueType.DOUBLE,
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -119,6 +120,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default
       monotonic: false,
+      valueType: types.ValueType.DOUBLE,
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,

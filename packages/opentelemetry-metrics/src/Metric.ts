@@ -29,17 +29,19 @@ import {
 export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
+  protected readonly _valueType: types.ValueType;
   protected readonly _logger: types.Logger;
   private readonly _metricDescriptor: MetricDescriptor;
   private readonly _handles: Map<string, T> = new Map();
 
   constructor(
     private readonly _name: string,
-    private readonly _type: MetricDescriptorType,
-    private readonly _options: MetricOptions
+    private readonly _options: MetricOptions,
+    private readonly _type: MetricDescriptorType
   ) {
     this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
+    this._valueType = _options.valueType;
     this._logger = _options.logger;
     this._metricDescriptor = this._getMetricDescriptor();
   }
@@ -122,12 +124,19 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, MetricDescriptorType.COUNTER_DOUBLE, options);
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.COUNTER_DOUBLE
+        : MetricDescriptorType.COUNTER_INT64
+    );
   }
   protected _makeHandle(labelValues: string[]): CounterHandle {
     return new CounterHandle(
       this._disabled,
       this._monotonic,
+      this._valueType,
       labelValues,
       this._logger
     );
@@ -137,12 +146,19 @@ export class CounterMetric extends Metric<CounterHandle> {
 /** This is a SDK implementation of Gauge Metric. */
 export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, MetricDescriptorType.GAUGE_DOUBLE, options);
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.GAUGE_DOUBLE
+        : MetricDescriptorType.GAUGE_INT64
+    );
   }
   protected _makeHandle(labelValues: string[]): GaugeHandle {
     return new GaugeHandle(
       this._disabled,
       this._monotonic,
+      this._valueType,
       labelValues,
       this._logger
     );

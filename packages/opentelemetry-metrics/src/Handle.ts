@@ -49,6 +49,7 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
+    private readonly _valueType: types.ValueType,
     private readonly _labelValues: string[],
     private readonly _logger: types.Logger
   ) {
@@ -64,6 +65,12 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
       );
       return;
     }
+    if (this._valueType === types.ValueType.INT && value % 1 != 0) {
+      this._logger.warn(
+        `INT counter cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
+    }
     this._data = this._data + value;
   }
 }
@@ -76,6 +83,7 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
+    private readonly _valueType: types.ValueType,
     private readonly _labelValues: string[],
     private readonly _logger: types.Logger
   ) {
@@ -90,6 +98,13 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
         `Monotonic gauge cannot descend for ${this._labelValues}`
       );
       return;
+    }
+
+    if (this._valueType === types.ValueType.INT && value % 1 != 0) {
+      this._logger.warn(
+        `INT gauge cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
     }
     this._data = value;
   }
