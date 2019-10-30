@@ -96,14 +96,19 @@ export class Meter implements types.Meter {
 
   /**
    * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered LabelSet into a canonicalized 
+   * converting the unordered LabelSet into a canonicalized
    * set of lables, useful for pre-aggregation.
    * @param labels user provided unordered LabelSet.
    */
   labels(labels: types.LabelSet): types.LabelSet {
-    return Object.keys(labels).sort().reduce((result, key) => {
-      result[key] = labels[key];
-      return result;
-    }, {} as types.LabelSet);
+    return Object.keys(labels)
+      .sort()
+      .reduce(
+        (result, key) => {
+          result[key] = labels[key];
+          return result;
+        },
+        {} as types.LabelSet
+      );
   }
 }

@@ -61,7 +61,7 @@ export interface Meter {
 
   /**
    * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered LabelSet into a canonicalized 
+   * converting the unordered LabelSet into a canonicalized
    * set of lables, useful for pre-aggregation.
    * @param labels user provided unordered LabelSet.
    */

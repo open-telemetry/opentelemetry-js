@@ -37,11 +37,11 @@ describe('Meter', () => {
     it('should re-order labels to a canonicalized set', () => {
       const orderedLabels: types.LabelSet = {
         [keya]: 'value1',
-        [keyb]: 'value2'
-      }
+        [keyb]: 'value2',
+      };
       assert.deepEqual(labels, orderedLabels);
     });
-  });  
+  });
 
   describe('#counter', () => {
     it('should create a counter', () => {
