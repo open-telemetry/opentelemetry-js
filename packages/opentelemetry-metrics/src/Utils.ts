@@ -23,5 +23,5 @@ const COMMA_SEPARATOR = ',';
  * @returns The hashed label values string.
  */
 export function hashLabelValues(labelValues: string[]): string {
-  return labelValues.sort().join(COMMA_SEPARATOR);
+  return labelValues.join(COMMA_SEPARATOR);
 }

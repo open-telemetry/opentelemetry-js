@@ -58,7 +58,7 @@ export interface Metric<T> {
    * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labels the LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
   getHandle(labels: LabelSet): T;
 
@@ -69,7 +69,7 @@ export interface Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labels the LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
   removeHandle(labels: LabelSet): void;
 
@@ -84,4 +84,4 @@ export interface Metric<T> {
   setCallback(fn: () => void): void;
 }
 
-export interface LabelSet {}
+export type LabelSet = Record<string, string>;

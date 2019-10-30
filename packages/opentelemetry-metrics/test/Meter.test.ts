@@ -21,15 +21,27 @@ import { NoopLogger } from '@opentelemetry/core';
 
 describe('Meter', () => {
   let meter: Meter;
-  const key = 'key';
-  const labels: types.LabelSet = { [key]: 'value' };
+  const keya = 'keya';
+  const keyb = 'keyb';
+  let labels: types.LabelSet = { [keyb]: 'value2', [keya]: 'value1' };
   const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
     meter = new Meter({
       logger: new NoopLogger(),
     });
+    labels = meter.labels(labels);
   });
+
+  describe('#meter', () => {
+    it('should re-order labels to a canonicalized set', () => {
+      const orderedLabels: types.LabelSet = {
+        [keya]: 'value1',
+        [keyb]: 'value2'
+      }
+      assert.deepEqual(labels, orderedLabels);
+    });
+  });  
 
   describe('#counter', () => {
     it('should create a counter', () => {
@@ -124,7 +136,7 @@ describe('Meter', () => {
 
       it('should not fail when removing non existing handle', () => {
         const counter = meter.createCounter('name');
-        counter.removeHandle([]);
+        counter.removeHandle({});
       });
 
       it('should clear all handles', () => {
@@ -227,7 +239,7 @@ describe('Meter', () => {
 
       it('should not fail when removing non existing handle', () => {
         const gauge = meter.createGauge('name');
-        gauge.removeHandle([]);
+        gauge.removeHandle({});
       });
 
       it('should clear all handles', () => {

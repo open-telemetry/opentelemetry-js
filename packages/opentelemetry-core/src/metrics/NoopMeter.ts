@@ -59,6 +59,10 @@ export class NoopMeter implements Meter {
   createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle> {
     return NOOP_GAUGE_METRIC;
   }
+
+  labels(labels: LabelSet): LabelSet {
+    return NOOP_METER;
+  }
 }
 
 export class NoopMetric<T> implements Metric<T> {
@@ -71,7 +75,7 @@ export class NoopMetric<T> implements Metric<T> {
    * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labels the LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
   getHandle(labels: LabelSet): T {
     return this._handle;
@@ -86,7 +90,7 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labels the LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
   removeHandle(labels: LabelSet): void {
     // @todo: implement this method
@@ -139,3 +143,5 @@ export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
 export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
   NOOP_MEASURE_HANDLE
 );
+
+export const NOOP_METER = {} as LabelSet;

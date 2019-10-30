@@ -61,6 +61,8 @@ export interface MetricDescriptor {
   readonly unit: string;
   /** MetricDescriptor type */
   readonly type: MetricDescriptorType;
+  /** The label keys associated with the metric descriptor. */
+  readonly labelKeys: string[];
   /** The label set associated with the metric descriptor. */
   readonly labels: LabelSet;
 }
