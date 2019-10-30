@@ -15,7 +15,7 @@ To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/o
 ## Release Schedule
 
 OpenTelemetry JS is under active development.
-This release isn't guaranteed to conform to a specific version of the specification, and future 
+This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
 The _alpha_ release includes:
@@ -43,6 +43,24 @@ We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
+
+Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
+
+- [Yuri Shkuro](https://github.com/yurishkuro), Uber
+- [Roch Devost](https://github.com/rochdev), DataDog
+- [Brandon Gonzalez](https://github.com/bg451), LightStep
+- [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
+- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
+- [Mark Wolff](https://github.com/markwolff), Microsoft
+
+*Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
+
+Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
+
+- [Mayur Kale](https://github.com/mayurkale22), Google
+- [Daniel Khan](https://github.com/danielkhan), Dynatrace
+
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
 ## Packages
 
@@ -80,6 +98,8 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
+- [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
+- [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
 - [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).

@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,21 +14,11 @@
  * limitations under the License.
  */
 
-/** Defines a log levels. */
-export enum LogLevel {
-  ERROR,
-  WARN,
-  INFO,
-  DEBUG,
-}
+const webpackConfig = require('./webpack/test.config.js');
+const karmaBaseConfig = require('../../karma.base');
 
-/**
- * This interface defines a fallback to read a timeOrigin when it is not available on performance.timeOrigin,
- * this happens for example on Safari Mac
- * then the timeOrigin is taken from fetchStart - which is the closest to timeOrigin
- */
-export interface TimeOriginLegacy {
-  timing: {
-    fetchStart: number;
-  };
-}
+module.exports = (config) => {
+  config.set(Object.assign({}, karmaBaseConfig, {
+    webpack: webpackConfig
+  }))
+};

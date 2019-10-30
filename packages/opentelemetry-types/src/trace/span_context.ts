@@ -19,7 +19,7 @@ import { TraceState } from './trace_state';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
- * serialized and propagated along side of a distributed context.
+ * serialized and propagated along side of a {@link DistributedContext}.
  */
 export interface SpanContext {
   /**
@@ -35,6 +35,10 @@ export interface SpanContext {
    * lowercase hex characters corresponding to 64 bits.
    */
   spanId: string;
+  /**
+   * Only true if the SpanContext was propagated from a remote parent.
+   */
+  isRemote?: boolean;
   /**
    * Trace flags to propagate.
    *

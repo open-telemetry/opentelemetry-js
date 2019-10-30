@@ -37,7 +37,7 @@ function createUnSampledSpan(spanName: string): Span {
     sampler: NEVER_SAMPLER,
     logger: new NoopLogger(),
   });
-  const span = tracer.startSpan(spanName, { isRecordingEvents: false });
+  const span = tracer.startSpan(spanName, { isRecording: false });
   span.end();
   return span as Span;
 }
@@ -60,16 +60,19 @@ describe('BatchSpanProcessor', () => {
     it('should create a BatchSpanProcessor instance', () => {
       const processor = new BatchSpanProcessor(exporter);
       assert.ok(processor instanceof BatchSpanProcessor);
+      processor.shutdown();
     });
 
     it('should create a BatchSpanProcessor instance with config', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       assert.ok(processor instanceof BatchSpanProcessor);
+      processor.shutdown();
     });
 
     it('should create a BatchSpanProcessor instance with empty config', () => {
       const processor = new BatchSpanProcessor(exporter, {});
       assert.ok(processor instanceof BatchSpanProcessor);
+      processor.shutdown();
     });
   });
 
@@ -100,6 +103,7 @@ describe('BatchSpanProcessor', () => {
         processor.onEnd(span);
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
       }
+      processor.shutdown();
     });
 
     it('should force flush when timeout exceeded', done => {

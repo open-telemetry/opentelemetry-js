@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
+import { BasePlugin } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerConfig } from '@opentelemetry/tracing';
+import { WebTracerConfig } from '../src';
 import { StackScopeManager } from '../src/StackScopeManager';
 import { WebTracer } from '../src/WebTracer';
+
+class DummyPlugin extends BasePlugin<unknown> {
+  patch() {}
+
+  unpatch() {}
+}
 
 describe('WebTracer', () => {
   let tracer: WebTracer;
   describe('constructor', () => {
-    let defaultOptions: BasicTracerConfig;
+    let defaultOptions: WebTracerConfig;
 
     beforeEach(() => {
       defaultOptions = {
@@ -45,6 +53,24 @@ describe('WebTracer', () => {
       tracer = new WebTracer(options);
 
       assert.ok(spy.calledOnce === true);
+    });
+
+    it('should enable all plugins', () => {
+      let options: WebTracerConfig;
+      const dummyPlugin1 = new DummyPlugin();
+      const dummyPlugin2 = new DummyPlugin();
+      const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
+      const spyEnable2 = sinon.spy(dummyPlugin2, 'enable');
+
+      const scopeManager = new StackScopeManager();
+
+      const plugins = [dummyPlugin1, dummyPlugin2];
+
+      options = { plugins, scopeManager };
+      tracer = new WebTracer(options);
+
+      assert.ok(spyEnable1.calledOnce === true);
+      assert.ok(spyEnable2.calledOnce === true);
     });
 
     it('should work without default scope manager', () => {

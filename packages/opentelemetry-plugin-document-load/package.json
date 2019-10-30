@@ -1,33 +1,28 @@
 {
-  "name": "@opentelemetry/tracing",
+  "name": "@opentelemetry/plugin-document-load",
   "version": "0.1.1",
-  "description": "OpenTelemetry Tracing",
+  "description": "OpenTelemetry document-load automatic instrumentation package.",
   "main": "build/src/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "check": "gts check",
     "clean": "rimraf build/*",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "check": "gts check",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
-    "test:browser": "karma start --single-run",
+    "tdd": "karma start",
+    "test:browser": "nyc karma start --single-run",
     "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
-    "nodejs",
+    "document-load",
+    "web",
     "tracing",
     "profiling",
-    "metrics",
-    "stats"
+    "plugin"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -47,8 +42,10 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
-    "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
+    "@types/sinon": "^7.0.13",
+    "@babel/core": "^7.6.0",
+    "babel-loader": "^8.0.6",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
     "karma": "^4.1.0",
@@ -60,18 +57,20 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle" : "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
     "typescript": "^3.6.3",
-    "webpack": "^4.35.2"
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.1.1",
-    "@opentelemetry/scope-base": "^0.1.1",
-    "@opentelemetry/base": "^0.1.1",
-    "@opentelemetry/types": "^0.1.1"
+    "@opentelemetry/types": "^0.1.1",
+    "@opentelemetry/tracing": "^0.1.1",
+    "@opentelemetry/web": "^0.1.1"
   }
 }
