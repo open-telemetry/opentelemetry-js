@@ -193,14 +193,6 @@ describe('DocumentLoad Plugin', () => {
       spyExport = sinon
         .stub(window.performance, 'getEntriesByType')
         .returns([entries]);
-
-      tracer = new BasicTracer();
-      logger = new ConsoleLogger();
-      config = {};
-      plugin = new DocumentLoad();
-      dummyExporter = new DummyExporter();
-      spanProcessor = new SimpleSpanProcessor(dummyExporter);
-      tracer.addSpanProcessor(spanProcessor);
     });
 
     it('should export correct span with events', done => {
@@ -260,14 +252,6 @@ describe('DocumentLoad Plugin', () => {
       spyExport = sinon
         .stub(window.performance, 'getEntriesByType')
         .returns([entriesWithoutLoadEventEnd]);
-
-      tracer = new BasicTracer();
-      logger = new ConsoleLogger();
-      config = {};
-      plugin = new DocumentLoad();
-      dummyExporter = new DummyExporter();
-      spanProcessor = new SimpleSpanProcessor(dummyExporter);
-      tracer.addSpanProcessor(spanProcessor);
     });
 
     it('should still export rootSpan and fetchSpan', done => {
@@ -302,14 +286,6 @@ describe('DocumentLoad Plugin', () => {
         writable: true,
         value: entriesFallback,
       });
-
-      tracer = new BasicTracer();
-      logger = new ConsoleLogger();
-      config = {};
-      plugin = new DocumentLoad();
-      dummyExporter = new DummyExporter();
-      spanProcessor = new SimpleSpanProcessor(dummyExporter);
-      tracer.addSpanProcessor(spanProcessor);
     });
 
     it('should export correct span with events', done => {
