@@ -287,4 +287,25 @@ describe('Meter', () => {
       });
     });
   });
+
+  describe('#measure', () => {
+    describe('names', () => {
+      it('should return no op metric if name is an empty string', () => {
+        const gauge = meter.createMeasure('');
+        assert.ok(gauge instanceof NoopMetric);
+      });
+
+      it('should return no op metric if name does not start with a letter', () => {
+        const gauge1 = meter.createMeasure('1name');
+        const gauge_ = meter.createMeasure('_name');
+        assert.ok(gauge1 instanceof NoopMetric);
+        assert.ok(gauge_ instanceof NoopMetric);
+      });
+
+      it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
+        const gauge = meter.createMeasure('name with invalid characters^&*(');
+        assert.ok(gauge instanceof NoopMetric);
+      });
+    });
+  });
 });
