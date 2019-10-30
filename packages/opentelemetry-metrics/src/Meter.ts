@@ -19,7 +19,7 @@ import {
   ConsoleLogger,
   NOOP_COUNTER_METRIC,
   NOOP_GAUGE_METRIC,
-  NOOP_MEASURE_METRIC
+  NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
 import { CounterMetric, GaugeMetric } from './Metric';
 import {
@@ -52,7 +52,9 @@ export class Meter implements types.Meter {
     options?: types.MetricOptions
   ): types.Metric<types.MeasureHandle> {
     if (!this._isValidName(name)) {
-      this._logger.warn(`Invalid metric name ${name}. Defaulting to noop metric implementation.`)
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
       return NOOP_MEASURE_METRIC;
     }
     // @todo: implement this method
@@ -71,7 +73,9 @@ export class Meter implements types.Meter {
     options?: types.MetricOptions
   ): types.Metric<types.CounterHandle> {
     if (!this._isValidName(name)) {
-      this._logger.warn(`Invalid metric name ${name}. Defaulting to noop metric implementation.`)
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
       return NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
@@ -97,7 +101,9 @@ export class Meter implements types.Meter {
     options?: types.MetricOptions
   ): types.Metric<types.GaugeHandle> {
     if (!this._isValidName(name)) {
-      this._logger.warn(`Invalid metric name ${name}. Defaulting to noop metric implementation.`)
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
       return NOOP_GAUGE_METRIC;
     }
     const opt: MetricOptions = {

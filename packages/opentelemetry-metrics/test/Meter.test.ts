@@ -133,28 +133,30 @@ describe('Meter', () => {
     describe('names', () => {
       it('should create counter with valid names', () => {
         const counter1 = meter.createCounter('name1');
-        const counter2 = meter.createCounter('Name_with-all.valid_CharacterClasses');
-        assert.ok(counter1 instanceof CounterMetric)
-        assert.ok(counter2 instanceof CounterMetric)
+        const counter2 = meter.createCounter(
+          'Name_with-all.valid_CharacterClasses'
+        );
+        assert.ok(counter1 instanceof CounterMetric);
+        assert.ok(counter2 instanceof CounterMetric);
       });
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof NoopMetric)
-      })
+        assert.ok(counter instanceof NoopMetric);
+      });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof NoopMetric)
-        assert.ok(counter_ instanceof NoopMetric)
+        assert.ok(counter1 instanceof NoopMetric);
+        assert.ok(counter_ instanceof NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof NoopMetric)
+        assert.ok(counter instanceof NoopMetric);
       });
-    })
+    });
   });
 
   describe('#gauge', () => {
@@ -260,27 +262,29 @@ describe('Meter', () => {
     describe('names', () => {
       it('should create gauges with valid names', () => {
         const gauge1 = meter.createGauge('name1');
-        const gauge2 = meter.createGauge('Name_with-all.valid_CharacterClasses');
-        assert.ok(gauge1 instanceof GaugeMetric)
-        assert.ok(gauge2 instanceof GaugeMetric)
+        const gauge2 = meter.createGauge(
+          'Name_with-all.valid_CharacterClasses'
+        );
+        assert.ok(gauge1 instanceof GaugeMetric);
+        assert.ok(gauge2 instanceof GaugeMetric);
       });
 
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createGauge('');
-        assert.ok(gauge instanceof NoopMetric)
-      })
+        assert.ok(gauge instanceof NoopMetric);
+      });
 
       it('should return no op metric if name does not start with a letter', () => {
         const gauge1 = meter.createGauge('1name');
         const gauge_ = meter.createGauge('_name');
-        assert.ok(gauge1 instanceof NoopMetric)
-        assert.ok(gauge_ instanceof NoopMetric)
+        assert.ok(gauge1 instanceof NoopMetric);
+        assert.ok(gauge_ instanceof NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const gauge = meter.createGauge('name with invalid characters^&*(');
-        assert.ok(gauge instanceof NoopMetric)
+        assert.ok(gauge instanceof NoopMetric);
       });
-    })
+    });
   });
 });
