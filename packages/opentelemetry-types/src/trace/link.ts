@@ -19,7 +19,8 @@ import { SpanContext } from './span_context';
 
 /**
  * A pointer from the current {@link Span} to another span in the same trace or
- * in a different trace.
+ * in a different trace. Used (for example) in batching operations, where a
+ * single batch handler processes multiple requests from different traces.
  */
 export interface Link {
   /** The {@link SpanContext} of a linked span. */

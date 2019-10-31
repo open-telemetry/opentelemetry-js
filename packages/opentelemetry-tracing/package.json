@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -10,14 +10,16 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+    "check": "gts check",
+    "clean": "rimraf build/*",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
     "test:browser": "karma start --single-run",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "clean": "rimraf build/*",
-    "check": "gts check",
-    "compile": "tsc -p .",
-    "fix": "gts fix"
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -45,6 +47,7 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "codecov": "^3.1.0",
     "gts": "^1.0.0",
@@ -56,6 +59,7 @@
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
+    "sinon": "^7.5.0",
     "tslint-consistent-codestyle": "^1.15.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
@@ -65,9 +69,9 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.1.0",
-    "@opentelemetry/scope-base": "^0.1.0",
-    "@opentelemetry/base": "^0.1.0",
-    "@opentelemetry/types": "^0.1.0"
+    "@opentelemetry/core": "^0.1.1",
+    "@opentelemetry/scope-base": "^0.1.1",
+    "@opentelemetry/base": "^0.1.1",
+    "@opentelemetry/types": "^0.1.1"
   }
 }

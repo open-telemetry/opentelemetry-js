@@ -30,6 +30,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as utils from '../../src/utils';
 import { HttpPluginConfig, Http } from '../../src/types';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -541,12 +542,12 @@ describe('HttpPlugin', () => {
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
-          assert.ok(Object.keys(span.attributes).length > 7);
+          assert.ok(Object.keys(span.attributes).length > 6);
         }
       });
 
       it('should have 1 ended span when request is aborted after receiving response', async () => {
-        nock('http://my.server.com')
+        nock(`${protocol}://my.server.com`)
           .get('/')
           .delay({
             body: 50,
@@ -555,7 +556,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            'http://my.server.com',
+            `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -581,6 +582,44 @@ describe('HttpPlugin', () => {
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
           assert.ok(Object.keys(span.attributes).length > 7);
         }
+      });
+
+      it("should have 1 ended span when request doesn't listening response", done => {
+        nock.cleanAll();
+        nock.enableNetConnect();
+        const req = http.request(`${protocol}://${hostname}/`);
+        req.on('close', () => {
+          const spans = memoryExporter.getFinishedSpans();
+          const [span] = spans;
+          assert.strictEqual(spans.length, 1);
+          assert.ok(Object.keys(span.attributes).length > 6);
+          done();
+        });
+        req.end();
+      });
+
+      it("should have 1 ended span when response is listened by using req.on('response')", done => {
+        const host = `${protocol}://${hostname}`;
+        nock(host)
+          .get('/')
+          .reply(404);
+        const req = http.request(`${host}/`);
+        req.on('response', response => {
+          response.on('data', () => {});
+          response.on('end', () => {
+            const spans = memoryExporter.getFinishedSpans();
+            const [span] = spans;
+            assert.strictEqual(spans.length, 1);
+            assert.ok(Object.keys(span.attributes).length > 6);
+            assert.strictEqual(
+              span.attributes[AttributeNames.HTTP_STATUS_CODE],
+              404
+            );
+            assert.strictEqual(span.status.code, CanonicalCode.NOT_FOUND);
+            done();
+          });
+        });
+        req.end();
       });
     });
   });

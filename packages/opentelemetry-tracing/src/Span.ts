@@ -15,7 +15,12 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { hrTime, hrTimeDuration, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  hrTime,
+  hrTimeDuration,
+  isTimeInput,
+  timeInputToHrTime,
+} from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
 import { BasicTracer } from './BasicTracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -25,7 +30,6 @@ import { TraceParams } from './types';
  * This class represents a span.
  */
 export class Span implements types.Span, ReadableSpan {
-  private readonly _tracer: types.Tracer;
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   readonly spanContext: types.SpanContext;
@@ -53,22 +57,19 @@ export class Span implements types.Span, ReadableSpan {
     spanContext: types.SpanContext,
     kind: types.SpanKind,
     parentSpanId?: string,
+    links: types.Link[] = [],
     startTime: types.TimeInput = hrTime()
   ) {
-    this._tracer = parentTracer;
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
+    this.links = links;
     this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.activeSpanProcessor;
     this._spanProcessor.onStart(this);
-  }
-
-  tracer(): types.Tracer {
-    return this._tracer;
   }
 
   context(): types.SpanContext {
@@ -101,24 +102,37 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  addEvent(name: string, attributes?: types.Attributes): this {
+  /**
+   *
+   * @param name Span Name
+   * @param [attributesOrStartTime] Span attributes or start time
+   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param [startTime] Specified start time for the event
+   */
+  addEvent(
+    name: string,
+    attributesOrStartTime?: types.Attributes | types.TimeInput,
+    startTime?: types.TimeInput
+  ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
       this._logger.warn('Dropping extra events.');
       this.events.shift();
     }
-    this.events.push({ name, attributes, time: hrTime() });
-    return this;
-  }
-
-  addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
-    if (this._isSpanEnded()) return this;
-
-    if (this.links.length >= this._traceParams.numberOfLinksPerSpan!) {
-      this._logger.warn('Dropping extra links.');
-      this.links.shift();
+    if (isTimeInput(attributesOrStartTime)) {
+      if (typeof startTime === 'undefined') {
+        startTime = attributesOrStartTime as types.TimeInput;
+      }
+      attributesOrStartTime = undefined;
     }
-    this.links.push({ spanContext, attributes });
+    if (typeof startTime === 'undefined') {
+      startTime = hrTime();
+    }
+    this.events.push({
+      name,
+      attributes: attributesOrStartTime as types.Attributes,
+      time: timeInputToHrTime(startTime),
+    });
     return this;
   }
 
@@ -154,7 +168,7 @@ export class Span implements types.Span, ReadableSpan {
     this._spanProcessor.onEnd(this);
   }
 
-  isRecordingEvents(): boolean {
+  isRecording(): boolean {
     return true;
   }
 

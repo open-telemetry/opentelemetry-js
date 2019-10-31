@@ -16,20 +16,25 @@ To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/o
 
 OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
-releases will not attempt to maintain backwards compatibility with the alpha
-release.
+releases will not attempt to maintain backwards compatibility with the alpha release.
+
+The _alpha_ release includes:
+
+- Tracing API
+- Tracing SDK (Node and Web)
+- Metrics API
+- Jaeger Trace Exporter
+- Zipkin Trace Exporter
+- OpenTracing Bridge
+- HTTP, GRPC Instrumentations
+
+Future release targets include:
 
 | Component                   | Version | Target Date       |
 | --------------------------- | ------- | ----------------- |
-| Tracing API                 | Alpha   | September 30 2019 |
-| Tracing SDK                 | Alpha   | September 30 2019 |
-| Metrics API                 | Alpha   | tbd |
-| Metrics SDK                 | Alpha   | tbd           |
-| Jaeger Trace Exporter       | Alpha   | September 30 2019 |
-| Zipkin Trace Exporter       | Alpha   | September 30 2019 |
-| Prometheus Metrics Exporter | Alpha   | tbd           |
-| OpenTracing Bridge          | Alpha   | September 30 2019 |
-| OpenCensus Bridge           | Alpha   | tbd           |
+| Metrics SDK                 | v0.2.0  | October 28 2019   |
+| Prometheus Metrics Exporter | v0.2.0  | October 28 2019   |
+| OpenCensus Bridge           | v0.2.0  | tbd           |
 
 
 ## Contributing
@@ -38,6 +43,24 @@ We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
 
 We have a weekly SIG meeting! See the [community page](https://github.com/open-telemetry/community#javascript-sdk) for meeting details and notes.
+
+Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
+
+- [Yuri Shkuro](https://github.com/yurishkuro), Uber
+- [Roch Devost](https://github.com/rochdev), DataDog
+- [Brandon Gonzalez](https://github.com/bg451), LightStep
+- [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
+- [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
+- [Mark Wolff](https://github.com/markwolff), Microsoft
+
+*Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
+
+Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
+
+- [Mayur Kale](https://github.com/mayurkale22), Google
+- [Daniel Khan](https://github.com/danielkhan), Dynatrace
+
+*Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
 ## Packages
 
@@ -53,14 +76,20 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 | Package                 | Description |
 | ----------------------- | -----------------|
 | [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/metrics](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics) | This module provides instruments and meters for reporting of time series data. |
 | [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
+| [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only. |
 
 ### Exporters
 
 OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends. Currently, OpenTelemetry supports:
 
+#### Trace Exporters
 - [@opentelemetry/exporter-jaeger](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-jaeger)
 - [@opentelemetry/exporter-zipkin](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-zipkin)
+
+#### Metric Exporters
+- [@opentelemetry/exporter-prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus) - WIP
 
 ### Plugins
 
@@ -69,6 +98,9 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
+- [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
+- [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
+- [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
 

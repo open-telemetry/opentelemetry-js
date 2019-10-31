@@ -35,7 +35,6 @@ export class StackScopeManager implements ScopeManager {
    *
    * @param target Function to be executed within the scope
    * @param scope
-   * @private
    */
   private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
     const manager = this;

@@ -27,6 +27,7 @@ import {
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
   NoopLogger,
+  hrTimeDuration,
 } from '@opentelemetry/core';
 
 const performanceTimeOrigin = hrTime();
@@ -45,7 +46,6 @@ describe('Span', () => {
   it('should create a Span instance', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     assert.ok(span instanceof Span);
-    assert.strictEqual(span.tracer(), tracer);
     span.end();
   });
 
@@ -87,6 +87,48 @@ describe('Span', () => {
     );
   });
 
+  it('should have an entered time for event', () => {
+    const span = new Span(
+      tracer,
+      name,
+      spanContext,
+      SpanKind.SERVER,
+      undefined,
+      [],
+      0
+    );
+    const timeMS = 123;
+    const spanStartTime = hrTimeToMilliseconds(span.startTime);
+    const eventTime = spanStartTime + timeMS;
+
+    span.addEvent('my-event', undefined, eventTime);
+
+    const diff = hrTimeDuration(span.startTime, span.events[0].time);
+    assert.strictEqual(hrTimeToMilliseconds(diff), 123);
+  });
+
+  describe('when 2nd param is "TimeInput" type', () => {
+    it('should have an entered time for event - ', () => {
+      const span = new Span(
+        tracer,
+        name,
+        spanContext,
+        SpanKind.SERVER,
+        undefined,
+        [],
+        0
+      );
+      const timeMS = 123;
+      const spanStartTime = hrTimeToMilliseconds(span.startTime);
+      const eventTime = spanStartTime + timeMS;
+
+      span.addEvent('my-event', eventTime);
+
+      const diff = hrTimeDuration(span.startTime, span.events[0].time);
+      assert.strictEqual(hrTimeToMilliseconds(diff), 123);
+    });
+  });
+
   it('should get the span context of span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     const context = span.context();
@@ -94,13 +136,13 @@ describe('Span', () => {
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     assert.strictEqual(context.traceState, undefined);
     assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-    assert.ok(span.isRecordingEvents());
+    assert.ok(span.isRecording());
     span.end();
   });
 
-  it('should return true when isRecordingEvents:true', () => {
+  it('should return true when isRecording:true', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
-    assert.ok(span.isRecordingEvents());
+    assert.ok(span.isRecording());
     span.end();
   });
 
@@ -127,22 +169,22 @@ describe('Span', () => {
       spanId: '5e0c63257de34c92',
       traceFlags: TraceFlags.SAMPLED,
     };
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
-    span.addLink(spanContext);
-    span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
+    const attributes = { attr1: 'value', attr2: 123, attr3: true };
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, '12345', [
+      { spanContext },
+      { spanContext, attributes },
+    ]);
     span.end();
   });
 
   it('should drop extra links, attributes and events', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
     for (let i = 0; i < 150; i++) {
-      span.addLink(spanContext);
       span.setAttribute('foo' + i, 'bar' + i);
       span.addEvent('sent' + i);
     }
     span.end();
 
-    assert.strictEqual(span.links.length, 32);
     assert.strictEqual(span.events.length, 128);
     assert.strictEqual(Object.keys(span.attributes).length, 32);
     assert.strictEqual(span.events[span.events.length - 1].name, 'sent149');
@@ -206,27 +248,24 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan with links', () => {
-    const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
-    span.addLink(spanContext);
-    let readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.links.length, 1);
-    assert.deepStrictEqual(readableSpan.links, [
-      {
-        attributes: undefined,
-        spanContext: {
-          spanId: '6e0c63257de34c92',
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          traceFlags: 1,
+    const span = new Span(
+      tracer,
+      'my-span',
+      spanContext,
+      SpanKind.CLIENT,
+      undefined,
+      [
+        { spanContext },
+        {
+          spanContext,
+          attributes: { attr1: 'value', attr2: 123, attr3: true },
         },
-      },
-    ]);
-
-    span.addLink(spanContext, { attr1: 'value', attr2: 123, attr3: true });
-    readableSpan = span.toReadableSpan();
+      ]
+    );
+    const readableSpan = span.toReadableSpan();
     assert.strictEqual(readableSpan.links.length, 2);
     assert.deepStrictEqual(readableSpan.links, [
       {
-        attributes: undefined,
         spanContext,
       },
       {
@@ -236,10 +275,6 @@ describe('Span', () => {
     ]);
 
     span.end();
-    // shouldn't add new link
-    span.addLink(spanContext);
-    readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.links.length, 2);
   });
 
   it('should return ReadableSpan with events', () => {

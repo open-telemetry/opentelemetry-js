@@ -21,3 +21,14 @@ export enum LogLevel {
   INFO,
   DEBUG,
 }
+
+/**
+ * This interface defines a fallback to read a timeOrigin when it is not available on performance.timeOrigin,
+ * this happens for example on Safari Mac
+ * then the timeOrigin is taken from fetchStart - which is the closest to timeOrigin
+ */
+export interface TimeOriginLegacy {
+  timing: {
+    fetchStart: number;
+  };
+}

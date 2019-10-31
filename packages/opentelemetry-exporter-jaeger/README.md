@@ -19,9 +19,9 @@ OpenTelemetry Jaeger Trace Exporter allows the user to send collected traces to 
 
 Get up and running with Jaeger in your local environment.
 
-[Jaeger](https://www.jaegertracing.io/docs/1.13/) stores and queries traces exported by
+[Jaeger](https://www.jaegertracing.io/docs/latest/) stores and queries traces exported by
 applications instrumented with OpenTelemetry. The easiest way to [start a Jaeger
-server](https://www.jaegertracing.io/docs/1.13/getting-started/) is to paste the below:
+server](https://www.jaegertracing.io/docs/latest/getting-started/) is to paste the below:
 
 ```bash
 docker run -d --name jaeger \
@@ -33,7 +33,7 @@ docker run -d --name jaeger \
   -p 16686:16686 \
   -p 14268:14268 \
   -p 9411:9411 \
-  jaegertracing/all-in-one:1.13
+  jaegertracing/all-in-one:latest
 ```
 
 Or run the `jaeger-all-in-one(.exe)` executable from the [binary distribution archives](https://www.jaegertracing.io/download/):

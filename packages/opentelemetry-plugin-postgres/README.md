@@ -7,7 +7,7 @@
 This module provides automatic instrumentation for [`pg`](https://github.com/brianc/node-postgres).
 
 For automatic instrumentation see the
-[@opentelemetry/node-sdk](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node-sdk) package.
+[@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
 
 ## Installation
 
@@ -22,6 +22,10 @@ const opentelemetry = require('@opentelemetry/plugin-postgres');
 
 // TODO: DEMONSTRATE API
 ```
+
+## Supported Versions
+
+- [pg](https://npmjs.com/package/pg): `7.x`
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

@@ -251,10 +251,10 @@ describe('BasicTracer', () => {
       const tracer = new BasicTracer({
         sampler: NEVER_SAMPLER,
       });
-      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      const span = tracer.startSpan('my-span', { isRecording: true });
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecordingEvents(), true);
+      assert.strictEqual(span.isRecording(), true);
     });
 
     it('should not create real span when not sampled and recording events false', () => {
@@ -262,10 +262,10 @@ describe('BasicTracer', () => {
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       });
-      const span = tracer.startSpan('my-span', { isRecordingEvents: false });
+      const span = tracer.startSpan('my-span', { isRecording: false });
       assert.ok(span instanceof NoRecordingSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecordingEvents(), false);
+      assert.strictEqual(span.isRecording(), false);
     });
 
     it('should not create real span when not sampled and no recording events configured', () => {
@@ -276,7 +276,7 @@ describe('BasicTracer', () => {
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecordingEvents(), false);
+      assert.strictEqual(span.isRecording(), false);
     });
 
     it('should create real span when sampled and recording events true', () => {
@@ -284,10 +284,10 @@ describe('BasicTracer', () => {
         sampler: ALWAYS_SAMPLER,
         scopeManager: new NoopScopeManager(),
       });
-      const span = tracer.startSpan('my-span', { isRecordingEvents: true });
+      const span = tracer.startSpan('my-span', { isRecording: true });
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
-      assert.strictEqual(span.isRecordingEvents(), true);
+      assert.strictEqual(span.isRecording(), true);
     });
 
     it('should set default attributes on span', () => {

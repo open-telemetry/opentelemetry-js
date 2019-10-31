@@ -90,6 +90,8 @@ export class HttpTraceContext implements HttpTextFormat {
     const spanContext = parse(traceParent);
     if (!spanContext) return null;
 
+    spanContext.isRemote = true;
+
     const traceStateHeader = carrier[TRACE_STATE_HEADER];
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a

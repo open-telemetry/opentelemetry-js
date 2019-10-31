@@ -34,13 +34,6 @@ export interface Span {
    */
   context(): SpanContext;
 
-  // /**
-  //  * # TODO
-  //  * Returns the Tracer object used to create this Span.
-  //  * https://github.com/open-telemetry/opentelemetry-specification/issues/21
-  //  */
-  // tracer(): Tracer;
-
   /**
    * Sets an attribute to the span.
    *
@@ -60,19 +53,16 @@ export interface Span {
    * Adds an event to the Span.
    *
    * @param name the name of the event.
-   * @param [attributes] the attributes that will be added; these are
-   *     associated with this event.
+   * @param [attributesOrStartTime] the attributes that will be added; these are
+   *     associated with this event. Can be also a start time
+   *     if type is {@type TimeInput} and 3rd param is undefined
+   * @param [startTime] start time of the event.
    */
-  addEvent(name: string, attributes?: Attributes): this;
-
-  /**
-   * Adds a link to the Span.
-   *
-   * @param spanContext the context of the linked span.
-   * @param [attributes] the attributes that will be added; these are
-   *     associated with this link.
-   */
-  addLink(spanContext: SpanContext, attributes?: Attributes): this;
+  addEvent(
+    name: string,
+    attributesOrStartTime?: Attributes | TimeInput,
+    startTime?: TimeInput
+  ): this;
 
   /**
    * Sets a status to the span. If used, this will override the default Span
@@ -84,8 +74,6 @@ export interface Span {
 
   /**
    * Updates the Span name.
-   *
-   * TODO (revision): https://github.com/open-telemetry/opentelemetry-specification/issues/119
    *
    * @param name the Span name.
    */
@@ -102,7 +90,6 @@ export interface Span {
    *
    * @param [endTime] the time to set as Span's end time. If not provided,
    *     use the current time as the span's end time.
-   *     TODO (Add timestamp format): https://github.com/open-telemetry/opentelemetry-js/issues/19
    */
   end(endTime?: TimeInput): void;
 
@@ -112,5 +99,5 @@ export interface Span {
    * @returns true if this Span is active and recording information like events
    * with the AddEvent operation and attributes using setAttributes.
    */
-  isRecordingEvents(): boolean;
+  isRecording(): boolean;
 }
