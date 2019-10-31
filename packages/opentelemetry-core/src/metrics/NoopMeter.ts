@@ -61,7 +61,7 @@ export class NoopMeter implements Meter {
   }
 
   labels(labels: LabelSet): LabelSet {
-    return NOOP_METER;
+    return NOOP_LABEL_SET;
   }
 }
 
@@ -144,4 +144,4 @@ export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
   NOOP_MEASURE_HANDLE
 );
 
-export const NOOP_METER = {} as LabelSet;
+export const NOOP_LABEL_SET = {} as LabelSet;
