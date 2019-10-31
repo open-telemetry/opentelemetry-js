@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-import { BasicTracerConfig } from './types';
-import { BasicTracer } from './BasicTracer';
-import { AbstractBasicTracerFactory } from './AbstractBasicTracerFactory';
+import { WebTracer } from './WebTracer';
+import {
+  BasicTracer,
+  AbstractBasicTracerFactory,
+  BasicTracerConfig,
+} from '@opentelemetry/tracing';
 
-export class BasicTracerFactory extends AbstractBasicTracerFactory {
-  private _config?: BasicTracerConfig;
+export class WebTracerFactory extends AbstractBasicTracerFactory {
+  private readonly _config?: BasicTracerConfig;
 
   constructor(config?: BasicTracerConfig) {
     super();
     this._config = config;
   }
 
-  _newTracer(): BasicTracer {
-    return new BasicTracer(this._config);
+  protected _newTracer(): BasicTracer {
+    return new WebTracer(this._config);
   }
 }

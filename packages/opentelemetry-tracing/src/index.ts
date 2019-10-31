@@ -25,3 +25,4 @@ export * from './export/SpanExporter';
 export * from './Span';
 export * from './SpanProcessor';
 export * from './types';
+export * from './AbstractBasicTracerFactory';

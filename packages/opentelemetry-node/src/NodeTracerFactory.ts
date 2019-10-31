@@ -14,36 +14,22 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
 import { NodeTracer } from './NodeTracer';
 import { NodeTracerConfig } from './config';
-import { SpanProcessor } from '@opentelemetry/tracing';
+import {
+  BasicTracer,
+  AbstractBasicTracerFactory,
+} from '@opentelemetry/tracing';
 
-export class NodeTracerFactory implements types.TracerFactory {
-  private readonly _tracers: Map<string, NodeTracer> = new Map();
-  private _spanProcessors: SpanProcessor[] = [];
+export class NodeTracerFactory extends AbstractBasicTracerFactory {
   private readonly _config?: NodeTracerConfig;
 
   constructor(config?: NodeTracerConfig) {
+    super();
     this._config = config;
   }
 
-  addSpanProcessor(processor: SpanProcessor): void {
-    this._spanProcessors.push(processor);
-    for (const tracer of this._tracers.values()) {
-      tracer.addSpanProcessor(processor);
-    }
-  }
-
-  getTracer(name: string = '', version?: string): types.Tracer {
-    const key = name + (version != undefined ? version : '');
-    if (this._tracers.has(key)) return this._tracers.get(key)!;
-
-    const tracer = new NodeTracer(this._config);
-    for (const processor of this._spanProcessors) {
-      tracer.addSpanProcessor(processor);
-    }
-    this._tracers.set(key, tracer);
-    return tracer;
+  protected _newTracer(): BasicTracer {
+    return new NodeTracer(this._config);
   }
 }
