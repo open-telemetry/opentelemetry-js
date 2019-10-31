@@ -15,9 +15,13 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { ConsoleLogger } from '@opentelemetry/core';
-import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
-import { Metric, CounterMetric, GaugeMetric } from './Metric';
+import {
+  ConsoleLogger,
+  NOOP_COUNTER_METRIC,
+  NOOP_GAUGE_METRIC,
+  NOOP_MEASURE_METRIC,
+} from '@opentelemetry/core';
+import { CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -46,7 +50,13 @@ export class Meter implements types.Meter {
   createMeasure(
     name: string,
     options?: types.MetricOptions
-  ): Metric<MeasureHandle> {
+  ): types.Metric<types.MeasureHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_MEASURE_METRIC;
+    }
     // @todo: implement this method
     throw new Error('not implemented yet');
   }
@@ -61,7 +71,13 @@ export class Meter implements types.Meter {
   createCounter(
     name: string,
     options?: types.MetricOptions
-  ): Metric<CounterHandle> {
+  ): types.Metric<types.CounterHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_COUNTER_METRIC;
+    }
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
       monotonic: true,
@@ -83,7 +99,13 @@ export class Meter implements types.Meter {
   createGauge(
     name: string,
     options?: types.MetricOptions
-  ): Metric<GaugeHandle> {
+  ): types.Metric<types.GaugeHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_GAUGE_METRIC;
+    }
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default
       monotonic: false,
@@ -92,5 +114,22 @@ export class Meter implements types.Meter {
       ...options,
     };
     return new GaugeMetric(name, opt);
+  }
+
+  /**
+   * Ensure a metric name conforms to the following rules:
+   *
+   * 1. They are non-empty strings
+   *
+   * 2. The first character must be non-numeric, non-space, non-punctuation
+   *
+   * 3. Subsequent characters must be belong to the alphanumeric characters, '_', '.', and '-'.
+   *
+   * Names are case insensitive
+   *
+   * @param name Name of metric to be created
+   */
+  private _isValidName(name: string): boolean {
+    return Boolean(name.match(/^[a-z][a-z0-9_.\-]*$/i));
   }
 }
