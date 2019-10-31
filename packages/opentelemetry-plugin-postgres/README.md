@@ -23,6 +23,10 @@ const opentelemetry = require('@opentelemetry/plugin-postgres');
 // TODO: DEMONSTRATE API
 ```
 
+## Supported Versions
+
+- [pg](https://npmjs.com/package/pg): `7.x`
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
