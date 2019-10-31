@@ -65,7 +65,7 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
       );
       return;
     }
-    if (this._valueType === types.ValueType.INT && value % 1 != 0) {
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
         `INT counter cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
       );
@@ -100,7 +100,7 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
       return;
     }
 
-    if (this._valueType === types.ValueType.INT && value % 1 != 0) {
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
         `INT gauge cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
       );

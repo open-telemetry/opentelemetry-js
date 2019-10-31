@@ -21,12 +21,7 @@ import {
   NOOP_GAUGE_METRIC,
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
-import {
-  CounterHandle,
-  GaugeHandle,
-  MeasureHandle,
-  BaseHandle,
-} from './Handle';
+import { BaseHandle } from './Handle';
 import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,

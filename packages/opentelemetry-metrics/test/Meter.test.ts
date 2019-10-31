@@ -15,9 +15,20 @@
  */
 
 import * as assert from 'assert';
-import { Meter, Metric, CounterMetric, GaugeMetric, MetricDescriptorType } from '../src';
+import {
+  Meter,
+  Metric,
+  CounterMetric,
+  GaugeMetric,
+  MetricDescriptorType,
+} from '../src';
 import * as types from '@opentelemetry/types';
-import { NoopLogger, NoopMetric, hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  NoopMetric,
+  hrTime,
+  hrTimeToMilliseconds,
+} from '@opentelemetry/core';
 
 const performanceTimeOrigin = hrTime();
 
