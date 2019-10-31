@@ -59,13 +59,6 @@ describe('Meter', () => {
       assert.ok(counter instanceof Metric);
     });
 
-    it('should throw an error when create the same metric', () => {
-      meter.createCounter('test_metric');
-      assert.throws(() => {
-        meter.createCounter('test_metric');
-      }, /^Error: A metric with the name test_metric has already been registered.$/);
-    });
-
     describe('.getHandle()', () => {
       it('should create a counter handle', () => {
         const counter = meter.createCounter('name') as CounterMetric;

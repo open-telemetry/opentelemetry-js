@@ -143,9 +143,10 @@ export class Meter implements types.Meter {
     metric: Metric<T>
   ): void {
     if (this._metrics.has(name)) {
-      throw new Error(
+      this._logger.error(
         `A metric with the name ${name} has already been registered.`
       );
+      return;
     }
     this._metrics.set(name, metric);
   }
