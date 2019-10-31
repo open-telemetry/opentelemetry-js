@@ -67,4 +67,5 @@ export const DEFAULT_METRIC_OPTIONS = {
   description: '',
   unit: '1',
   labelKeys: [],
+  valueType: ValueType.DOUBLE,
 };
