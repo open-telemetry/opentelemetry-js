@@ -1,5 +1,5 @@
 {
-  "name": "@opentelemetry/plugin-postgres",
+  "name": "@opentelemetry/plugin-pg",
   "version": "0.1.1",
   "description": "OpenTelemetry postgres automatic instrumentation package.",
   "private": true,
