@@ -18,41 +18,60 @@ import * as types from '@opentelemetry/types';
 import { TimeSeries } from './export/types';
 
 /**
+ * This class represent the base to handle, which is responsible for generating
+ * the TimeSeries.
+ */
+export class BaseHandle {
+  protected _data = 0;
+
+  constructor(private readonly _labels: string[]) {}
+
+  /**
+   * Returns the TimeSeries with one or more Point.
+   *
+   * @param timestamp The time at which the handle is recorded.
+   * @returns The TimeSeries.
+   */
+  getTimeSeries(timestamp: types.HrTime): TimeSeries {
+    return {
+      labelValues: this._labels.map(value => ({ value })),
+      points: [{ value: this._data, timestamp }],
+    };
+  }
+}
+
+/**
  * CounterHandle allows the SDK to observe/record a single metric event. The
  * value of single handle in the `Counter` associated with specified label
  * values.
  */
-export class CounterHandle implements types.CounterHandle {
-  private _data = 0;
-
+export class CounterHandle extends BaseHandle implements types.CounterHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
+    private readonly _valueType: types.ValueType,
     private readonly _labelValues: string[],
     private readonly _logger: types.Logger
-  ) {}
+  ) {
+    super(_labelValues);
+  }
 
   add(value: number): void {
     if (this._disabled) return;
 
     if (this._monotonic && value < 0) {
-      this._logger.error('Monotonic counter cannot descend.');
+      this._logger.error(
+        `Monotonic counter cannot descend for ${this._labelValues}`
+      );
       return;
     }
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
+      this._logger.warn(
+        `INT counter cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
+    }
     this._data = this._data + value;
-  }
-
-  /**
-   * Returns the TimeSeries with one or more Point.
-   *
-   * @param timestamp The time at which the counter is recorded.
-   * @returns The TimeSeries.
-   */
-  getTimeSeries(timestamp: types.HrTime): TimeSeries {
-    return {
-      labelValues: this._labelValues.map(value => ({ value })),
-      points: [{ value: this._data, timestamp }],
-    };
   }
 }
 
@@ -60,44 +79,41 @@ export class CounterHandle implements types.CounterHandle {
  * GaugeHandle allows the SDK to observe/record a single metric event. The
  * value of single handle in the `Gauge` associated with specified label values.
  */
-export class GaugeHandle implements types.GaugeHandle {
-  private _data = 0;
-
+export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
+    private readonly _valueType: types.ValueType,
     private readonly _labelValues: string[],
     private readonly _logger: types.Logger
-  ) {}
+  ) {
+    super(_labelValues);
+  }
 
   set(value: number): void {
     if (this._disabled) return;
 
     if (this._monotonic && value < this._data) {
-      this._logger.error('Monotonic gauge cannot descend.');
+      this._logger.error(
+        `Monotonic gauge cannot descend for ${this._labelValues}`
+      );
       return;
     }
-    this._data = value;
-  }
 
-  /**
-   * Returns the TimeSeries with one or more Point.
-   *
-   * @param timestamp The time at which the gauge is recorded.
-   * @returns The TimeSeries.
-   */
-  getTimeSeries(timestamp: types.HrTime): TimeSeries {
-    return {
-      labelValues: this._labelValues.map(value => ({ value })),
-      points: [{ value: this._data, timestamp }],
-    };
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
+      this._logger.warn(
+        `INT gauge cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
+    }
+    this._data = value;
   }
 }
 
 /**
  * MeasureHandle is an implementation of the {@link MeasureHandle} interface.
  */
-export class MeasureHandle implements types.MeasureHandle {
+export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
   record(
     value: number,
     distContext?: types.DistributedContext,

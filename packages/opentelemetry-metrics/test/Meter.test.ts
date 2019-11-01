@@ -15,9 +15,22 @@
  */
 
 import * as assert from 'assert';
-import { Meter, Metric, CounterMetric, GaugeMetric } from '../src';
+import {
+  Meter,
+  Metric,
+  CounterMetric,
+  GaugeMetric,
+  MetricDescriptorType,
+} from '../src';
 import * as types from '@opentelemetry/types';
-import { NoopLogger, NoopMetric } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  NoopMetric,
+  hrTime,
+  hrTimeToMilliseconds,
+} from '@opentelemetry/core';
+
+const performanceTimeOrigin = hrTime();
 
 describe('Meter', () => {
   let meter: Meter;
@@ -127,6 +140,30 @@ describe('Meter', () => {
         assert.strictEqual(counter['_handles'].size, 1);
         counter.clear();
         assert.strictEqual(counter['_handles'].size, 0);
+      });
+    });
+
+    describe('.registerMetric()', () => {
+      it('skip already registered Metric', () => {
+        const counter1 = meter.createCounter('name1') as CounterMetric;
+        counter1.getHandle(labelValues).add(10);
+
+        // should skip below metric
+        const counter2 = meter.createCounter('name1', {
+          valueType: types.ValueType.INT,
+        }) as CounterMetric;
+        counter2.getHandle(labelValues).add(500);
+
+        assert.strictEqual(meter.getMetrics().length, 1);
+        const [{ descriptor, timeseries }] = meter.getMetrics();
+        assert.deepStrictEqual(descriptor.name, 'name1');
+        assert.deepStrictEqual(
+          descriptor.type,
+          MetricDescriptorType.COUNTER_DOUBLE
+        );
+        assert.strictEqual(timeseries.length, 1);
+        assert.strictEqual(timeseries[0].points.length, 1);
+        assert.strictEqual(timeseries[0].points[0].value, 10);
       });
     });
 
@@ -306,6 +343,142 @@ describe('Meter', () => {
         const gauge = meter.createMeasure('name with invalid characters^&*(');
         assert.ok(gauge instanceof NoopMetric);
       });
+    });
+  });
+
+  describe('#getMetrics', () => {
+    it('should create a DOUBLE counter', () => {
+      const counter = meter.createCounter('counter', {
+        description: 'test',
+        labelKeys: ['key'],
+      });
+      const handle = counter.getHandle(['counter-value']);
+      handle.add(10.45);
+
+      assert.strictEqual(meter.getMetrics().length, 1);
+      const [{ descriptor, timeseries }] = meter.getMetrics();
+      assert.deepStrictEqual(descriptor, {
+        name: 'counter',
+        description: 'test',
+        unit: '1',
+        type: MetricDescriptorType.COUNTER_DOUBLE,
+        labelKeys: ['key'],
+      });
+      assert.strictEqual(timeseries.length, 1);
+      const [{ labelValues, points }] = timeseries;
+      assert.deepStrictEqual(labelValues, [{ value: 'counter-value' }]);
+      assert.strictEqual(points.length, 1);
+      assert.strictEqual(points[0].value, 10.45);
+      assert.ok(
+        hrTimeToMilliseconds(points[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
+    });
+
+    it('should create a INT counter', () => {
+      const counter = meter.createCounter('counter', {
+        description: 'test',
+        labelKeys: ['key'],
+        valueType: types.ValueType.INT,
+      });
+      const handle = counter.getHandle(['counter-value']);
+      handle.add(10.45);
+
+      assert.strictEqual(meter.getMetrics().length, 1);
+      const [{ descriptor, timeseries }] = meter.getMetrics();
+      assert.deepStrictEqual(descriptor, {
+        name: 'counter',
+        description: 'test',
+        unit: '1',
+        type: MetricDescriptorType.COUNTER_INT64,
+        labelKeys: ['key'],
+      });
+      assert.strictEqual(timeseries.length, 1);
+      const [{ labelValues, points }] = timeseries;
+      assert.deepStrictEqual(labelValues, [{ value: 'counter-value' }]);
+      assert.strictEqual(points.length, 1);
+      assert.strictEqual(points[0].value, 10);
+      assert.ok(
+        hrTimeToMilliseconds(points[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
+    });
+
+    it('should create a DOUBLE gauge', () => {
+      const gauge = meter.createGauge('gauge', {
+        labelKeys: ['gauge-key'],
+        unit: 'ms',
+      });
+      gauge.getHandle(['gauge-value1']).set(200.34);
+      gauge.getHandle(['gauge-value2']).set(-10.67);
+
+      assert.strictEqual(meter.getMetrics().length, 1);
+      const [{ descriptor, timeseries }] = meter.getMetrics();
+      assert.deepStrictEqual(descriptor, {
+        name: 'gauge',
+        description: '',
+        unit: 'ms',
+        type: MetricDescriptorType.GAUGE_DOUBLE,
+        labelKeys: ['gauge-key'],
+      });
+      assert.strictEqual(timeseries.length, 2);
+      const [
+        { labelValues: labelValues1, points: points1 },
+        { labelValues: labelValues2, points: points2 },
+      ] = timeseries;
+      assert.deepStrictEqual(labelValues1, [{ value: 'gauge-value1' }]);
+      assert.strictEqual(points1.length, 1);
+      assert.strictEqual(points1[0].value, 200.34);
+      assert.ok(
+        hrTimeToMilliseconds(points1[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
+      assert.deepStrictEqual(labelValues2, [{ value: 'gauge-value2' }]);
+      assert.strictEqual(points2.length, 1);
+      assert.strictEqual(points2[0].value, -10.67);
+      assert.ok(
+        hrTimeToMilliseconds(points2[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
+    });
+
+    it('should create a INT gauge', () => {
+      const gauge = meter.createGauge('gauge', {
+        labelKeys: ['gauge-key'],
+        unit: 'ms',
+        valueType: types.ValueType.INT,
+      });
+      gauge.getHandle(['gauge-value1']).set(200.34);
+      gauge.getHandle(['gauge-value2']).set(-10.67);
+
+      assert.strictEqual(meter.getMetrics().length, 1);
+      const [{ descriptor, timeseries }] = meter.getMetrics();
+      assert.deepStrictEqual(descriptor, {
+        name: 'gauge',
+        description: '',
+        unit: 'ms',
+        type: MetricDescriptorType.GAUGE_INT64,
+        labelKeys: ['gauge-key'],
+      });
+      assert.strictEqual(timeseries.length, 2);
+      const [
+        { labelValues: labelValues1, points: points1 },
+        { labelValues: labelValues2, points: points2 },
+      ] = timeseries;
+      assert.deepStrictEqual(labelValues1, [{ value: 'gauge-value1' }]);
+      assert.strictEqual(points1.length, 1);
+      assert.strictEqual(points1[0].value, 200);
+      assert.ok(
+        hrTimeToMilliseconds(points1[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
+      assert.deepStrictEqual(labelValues2, [{ value: 'gauge-value2' }]);
+      assert.strictEqual(points2.length, 1);
+      assert.strictEqual(points2[0].value, -10);
+      assert.ok(
+        hrTimeToMilliseconds(points2[0].timestamp) >
+          hrTimeToMilliseconds(performanceTimeOrigin)
+      );
     });
   });
 });
