@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
+import { ScopeManager } from '@opentelemetry/scope-base';
+import { Func, TargetWithEvents } from './types';
+import { isListenerObject } from './util';
+
+/* Key name to be used to save a scope reference in Zone */
+const ZONE_SCOPE_KEY = 'OT_ZONE_SCOPE';
+
 /**
  * ZoneScopeManager
  * This module provides an easy functionality for tracing action between asynchronous operations in web.
  * It was not possible with standard [StackScopeManager]{@link https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-web/src/StackScopeManager.ts}.
  * It heavily depends on [zone.js]{@link https://www.npmjs.com/package/zone.js}.
- * It stores the information about scopes per zone. If there is not active zone, a new zone will be forked.
- * It also supports binding a certain Span to a target with "addEventListener".
+ * It stores the information about scope in zone. Each Scope will have always new Zone;
+ * It also supports binding a certain Span to a target that has "addEventListener" and "removeEventListener".
  * When this happens a new zone is being created and the provided Span is being assigned to this zone.
- *
- */
-
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { Func, TargetWithEvents } from './types';
-import { isListenerObject } from './util';
-
-/**
- * Zone Scope Manager for managing the state in web
- * it fully supports the async calls
  */
 export class ZoneScopeManager implements ScopeManager {
   /**
@@ -40,34 +37,18 @@ export class ZoneScopeManager implements ScopeManager {
   private _enabled = false;
 
   /**
-   * Keeps the the information whether to prevent restoring the scope after zone onInvoke
-   */
-  private _preventScopeRestoring: { [key: string]: boolean } = {};
-
-  /**
-   * Keeps the reference to the scopes per zone
-   */
-  private _scopes: { [key: string]: unknown[] } = {};
-
-  /**
    * Helps to create a unique name for the zones - part of zone name
    */
   private _zoneCounter = 0;
 
   /**
    * Returns the active scope from certain zone name
-   * @param activeZoneName
+   * @param activeZone
    */
-  private _activeScopeFromZoneName(
-    activeZoneName: string | undefined
+  private _activeScopeFromZone(
+    activeZone: Zone | undefined
   ): unknown | undefined {
-    if (activeZoneName) {
-      const scopes = this._scopes[activeZoneName];
-      if (scopes) {
-        return scopes[scopes.length - 1];
-      }
-    }
-    return undefined;
+    return activeZone && activeZone.get(ZONE_SCOPE_KEY);
   }
 
   /**
@@ -118,14 +99,6 @@ export class ZoneScopeManager implements ScopeManager {
   }
 
   /**
-   * Removes all the associated scopes with zone after the zone has no more tasks
-   * @param zoneName
-   */
-  private _cleanScopesFromZone(zoneName: string) {
-    delete this._scopes[zoneName];
-  }
-
-  /**
    * Creates a new unique zone name
    */
   private _createZoneName() {
@@ -137,12 +110,14 @@ export class ZoneScopeManager implements ScopeManager {
   /**
    * Creates a new zone
    * @param zoneName zone name
+   * @param scope A scope (span) to be bind with Zone
    */
-  private _createZone(zoneName: string): Zone {
+  private _createZone(zoneName: string, scope: unknown): Zone {
     return Zone.root.fork({
       name: zoneName,
-      onInvoke: this._onZoneInvoke.bind(this),
-      onHasTask: this._onHasTask.bind(this),
+      properties: {
+        [ZONE_SCOPE_KEY]: scope,
+      },
     });
   }
 
@@ -150,89 +125,7 @@ export class ZoneScopeManager implements ScopeManager {
    * Returns the active zone
    */
   private _getActiveZone(): Zone | undefined {
-    const currentZone = Zone.current;
-    if (currentZone) {
-      if (
-        this._scopes[currentZone.name] &&
-        this._scopes[currentZone.name].length
-      ) {
-        return currentZone;
-      }
-    }
-    return undefined;
-  }
-
-  /**
-   * Returns the active zone name if such zone has any scope
-   */
-  private _getActiveZoneName(): string | undefined {
-    const activeZone = this._getActiveZone();
-    if (activeZone) {
-      return activeZone.name;
-    }
-    return undefined;
-  }
-
-  /**
-   * Called when zone executes any async task or after the last async task was executed
-   * @param parentZoneDelegate
-   * @param currentZone
-   * @param targetZone
-   * @param hasTaskState
-   */
-  private _onHasTask(
-    parentZoneDelegate: ZoneDelegate,
-    currentZone: Zone,
-    targetZone: Zone,
-    hasTaskState: HasTaskState
-  ) {
-    // console.log('onHasTask', hasTaskState, this._preventScopeRestoring[currentZone.name]);
-    if (
-      !hasTaskState.eventTask &&
-      !hasTaskState.microTask &&
-      !hasTaskState.macroTask
-    ) {
-      // no more tasks can clean up zone data
-      this._cleanScopesFromZone(currentZone.name);
-    } else {
-      this._preventScopeRestoring[currentZone.name] = true;
-    }
-  }
-
-  /**
-   * Called when zone invokes a delegate (callback) function
-   * @param parentZoneDelegate
-   * @param currentZone
-   * @param targetZone
-   * @param delegate
-   * @param applyThis
-   * @param applyArgs
-   * @param source
-   */
-  private _onZoneInvoke(
-    parentZoneDelegate: ZoneDelegate,
-    currentZone: Zone,
-    targetZone: Zone,
-    delegate: Function,
-    applyThis: any,
-    applyArgs?: any[],
-    source?: string
-  ) {
-    // console.log('onInvoke before', typeof applyThis === 'string' ? applyThis : applyThis && applyThis.name || 'window');
-    const result = parentZoneDelegate.invoke(
-      targetZone,
-      delegate,
-      applyThis,
-      applyArgs,
-      source
-    );
-    // console.log('onInvoke after', typeof applyThis === 'string' ? applyThis : applyThis && applyThis.name || 'window', this._preventScopeRestoring[currentZone.name]);
-    // if zone has asynchronous task then restoring scope cannot be done immediately
-    // scopes will be cleaned later in _onHasTask - when there are no more tasks
-    if (!this._preventScopeRestoring[currentZone.name]) {
-      this._restorePreviousScope(currentZone);
-    }
-    return result;
+    return Zone.current;
   }
 
   /**
@@ -288,24 +181,12 @@ export class ZoneScopeManager implements ScopeManager {
   }
 
   /**
-   * Restores previous scope for certain zone
-   * @param zone
-   */
-  private _restorePreviousScope(zone: Zone) {
-    const zoneName = zone.name;
-    const scopes = this._scopes[zoneName];
-    if (scopes && scopes.length > 0) {
-      scopes.splice(scopes.length - 1, 1);
-    }
-  }
-
-  /**
    * Returns the active scope
    */
   active(): unknown | undefined {
-    const activeZoneName = this._getActiveZoneName();
+    const activeZone = this._getActiveZone();
 
-    const active = this._activeScopeFromZoneName(activeZoneName);
+    const active = this._activeScopeFromZone(activeZone);
     if (active) {
       return active;
     }
@@ -337,11 +218,6 @@ export class ZoneScopeManager implements ScopeManager {
    * Disable the scope manager (clears all the scopes)
    */
   disable(): this {
-    const zoneNames = Object.keys(this._scopes);
-    for (const zoneName of zoneNames) {
-      this._cleanScopesFromZone(zoneName);
-    }
-    this._scopes = {};
     this._enabled = false;
     return this;
   }
@@ -373,21 +249,10 @@ export class ZoneScopeManager implements ScopeManager {
       scope = this.active();
     }
 
-    let zoneName: string;
-    let activeZone = this._getActiveZone();
-    if (!activeZone) {
-      zoneName = this._createZoneName();
-    } else {
-      zoneName = activeZone.name;
-    }
+    const zoneName = this._createZoneName();
 
-    this._scopes[zoneName] = this._scopes[zoneName] || [];
-    this._scopes[zoneName].push(scope);
+    const newZone = this._createZone(zoneName, scope);
 
-    if (!activeZone) {
-      activeZone = this._createZone(zoneName);
-    }
-
-    return activeZone.run(fn, scope);
+    return newZone.run(fn, scope);
   }
 }
