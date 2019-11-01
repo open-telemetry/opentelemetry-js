@@ -143,6 +143,30 @@ describe('Meter', () => {
       });
     });
 
+    describe('.registerMetric()', () => {
+      it('skip already registered Metric', () => {
+        const counter1 = meter.createCounter('name1') as CounterMetric;
+        counter1.getHandle(labelValues).add(10);
+
+        // should skip below metric
+        const counter2 = meter.createCounter('name1', {
+          valueType: types.ValueType.INT,
+        }) as CounterMetric;
+        counter2.getHandle(labelValues).add(500);
+
+        assert.strictEqual(meter.getMetrics().length, 1);
+        const [{ descriptor, timeseries }] = meter.getMetrics();
+        assert.deepStrictEqual(descriptor.name, 'name1');
+        assert.deepStrictEqual(
+          descriptor.type,
+          MetricDescriptorType.COUNTER_DOUBLE
+        );
+        assert.strictEqual(timeseries.length, 1);
+        assert.strictEqual(timeseries[0].points.length, 1);
+        assert.strictEqual(timeseries[0].points[0].value, 10);
+      });
+    });
+
     describe('names', () => {
       it('should create counter with valid names', () => {
         const counter1 = meter.createCounter('name1');
