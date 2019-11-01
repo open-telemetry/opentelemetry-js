@@ -21,7 +21,6 @@ webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExport
 console.log('Current span is window', webTracerWithZone.getCurrentSpan() === window);
 
 // example of keeping track of scope between async operations
-let counter = 0;
 const prepareClickEvent = () => {
   const url1 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
   const url2 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/packages/opentelemetry-web/package.json';
@@ -31,12 +30,11 @@ const prepareClickEvent = () => {
   webTracerWithZone.bind(element, mainSpan);
 
   const onClick = () => {
-    counter++;
-    const span1 = webTracerWithZone.startSpan(`files-series-info-${counter}`, {
+    const span1 = webTracerWithZone.startSpan(`files-series-info-1`, {
       parent: webTracerWithZone.getCurrentSpan()
     });
-    counter++;
-    const span2 = webTracerWithZone.startSpan(`files-series-info-${counter}`, {
+
+    const span2 = webTracerWithZone.startSpan(`files-series-info-2`, {
       parent: webTracerWithZone.getCurrentSpan()
     });
 
