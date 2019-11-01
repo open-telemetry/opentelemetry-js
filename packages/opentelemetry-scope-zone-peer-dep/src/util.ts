@@ -16,6 +16,10 @@
 
 import { TargetWithEvents } from './types';
 
+/**
+ * check if an object has addEventListener and removeEventListener functions then it will return true
+ * @param obj
+ */
 export function isListenerObject(obj: TargetWithEvents = {}): boolean {
   return (
     typeof obj.addEventListener === 'function' &&
