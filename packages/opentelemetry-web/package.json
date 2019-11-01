@@ -67,7 +67,8 @@
     "typescript": "^3.6.3",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "@opentelemetry/scope-zone": "^0.1.1"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.1.1",
