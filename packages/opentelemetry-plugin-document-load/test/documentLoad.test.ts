@@ -148,7 +148,7 @@ describe('DocumentLoad Plugin', () => {
         assert.strictEqual(window.document.readyState, 'complete');
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
-      }, 10);
+      });
     });
   });
 
