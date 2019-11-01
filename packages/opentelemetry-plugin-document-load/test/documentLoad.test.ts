@@ -182,7 +182,7 @@ describe('DocumentLoad Plugin', () => {
       setTimeout(() => {
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
-      }, 10);
+      });
     });
   });
 
@@ -235,7 +235,7 @@ describe('DocumentLoad Plugin', () => {
         assert.strictEqual(fsEvents.length, 9);
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
-      }, 10);
+      });
     });
 
     afterEach(() => {
@@ -267,7 +267,7 @@ describe('DocumentLoad Plugin', () => {
 
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
-      }, 10);
+      });
     });
 
     afterEach(() => {
@@ -325,7 +325,7 @@ describe('DocumentLoad Plugin', () => {
         assert.strictEqual(fsEvents.length, 7);
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
-      }, 10);
+      });
     });
 
     afterEach(() => {
@@ -352,7 +352,7 @@ describe('DocumentLoad Plugin', () => {
       setTimeout(() => {
         assert.ok(spyOnEnd.callCount === 0);
         done();
-      }, 10);
+      });
     });
 
     afterEach(() => {

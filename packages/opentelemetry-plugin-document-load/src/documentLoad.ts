@@ -48,7 +48,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     // Support for event "loadend" is very limited and cannot be used
     window.setTimeout(() => {
       this._collectPerformance();
-    }, 1);
+    });
   }
 
   /**
@@ -129,7 +129,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     entries: PerformanceEntries
   ) {
     // span can be undefined when entries are missing the certain performance - the span will not be created
-    if (typeof span !== 'undefined') {
+    if (span) {
       if (hasKey(entries, performanceName)) {
         this._addSpanEvent(span, performanceName, entries);
         span.end(entries[performanceName]);
