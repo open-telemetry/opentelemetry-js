@@ -15,8 +15,13 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { ConsoleLogger } from '@opentelemetry/core';
-import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
+import {
+  ConsoleLogger,
+  NOOP_COUNTER_METRIC,
+  NOOP_GAUGE_METRIC,
+  NOOP_MEASURE_METRIC,
+} from '@opentelemetry/core';
+import { BaseHandle } from './Handle';
 import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,
@@ -24,12 +29,14 @@ import {
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
+import { ReadableMetric } from './export/types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
+  private readonly _metrics = new Map();
 
   /**
    * Constructs a new Meter instance.
@@ -46,7 +53,13 @@ export class Meter implements types.Meter {
   createMeasure(
     name: string,
     options?: types.MetricOptions
-  ): Metric<MeasureHandle> {
+  ): types.Metric<types.MeasureHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_MEASURE_METRIC;
+    }
     // @todo: implement this method
     throw new Error('not implemented yet');
   }
@@ -61,7 +74,13 @@ export class Meter implements types.Meter {
   createCounter(
     name: string,
     options?: types.MetricOptions
-  ): Metric<CounterHandle> {
+  ): types.Metric<types.CounterHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_COUNTER_METRIC;
+    }
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
       monotonic: true,
@@ -69,7 +88,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new CounterMetric(name, opt);
+    const counter = new CounterMetric(name, opt);
+    this._registerMetric(name, counter);
+    return counter;
   }
 
   /**
@@ -83,7 +104,13 @@ export class Meter implements types.Meter {
   createGauge(
     name: string,
     options?: types.MetricOptions
-  ): Metric<GaugeHandle> {
+  ): types.Metric<types.GaugeHandle> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return NOOP_GAUGE_METRIC;
+    }
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default
       monotonic: false,
@@ -91,6 +118,54 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new GaugeMetric(name, opt);
+    const gauge = new GaugeMetric(name, opt);
+    this._registerMetric(name, gauge);
+    return gauge;
+  }
+
+  /**
+   * Gets a collection of Metric`s to be exported.
+   * @returns The list of metrics.
+   */
+  getMetrics(): ReadableMetric[] {
+    return Array.from(this._metrics.values())
+      .map(metric => metric.get())
+      .filter(metric => !!metric);
+  }
+
+  /**
+   * Registers metric to register.
+   * @param name The name of the metric.
+   * @param metric The metric to register.
+   */
+  private _registerMetric<T extends BaseHandle>(
+    name: string,
+    metric: Metric<T>
+  ): void {
+    if (this._metrics.has(name)) {
+      // @todo (issue/474): decide how to handle already registered metric
+      this._logger.error(
+        `A metric with the name ${name} has already been registered.`
+      );
+      return;
+    }
+    this._metrics.set(name, metric);
+  }
+
+  /**
+   * Ensure a metric name conforms to the following rules:
+   *
+   * 1. They are non-empty strings
+   *
+   * 2. The first character must be non-numeric, non-space, non-punctuation
+   *
+   * 3. Subsequent characters must be belong to the alphanumeric characters, '_', '.', and '-'.
+   *
+   * Names are case insensitive
+   *
+   * @param name Name of metric to be created
+   */
+  private _isValidName(name: string): boolean {
+    return Boolean(name.match(/^[a-z][a-z0-9_.\-]*$/i));
   }
 }

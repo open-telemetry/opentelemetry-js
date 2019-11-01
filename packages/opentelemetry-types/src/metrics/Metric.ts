@@ -50,6 +50,18 @@ export interface MetricOptions {
    * non-negative values are expected.
    */
   monotonic?: boolean;
+
+  /**
+   * Indicates the type of the recorded value.
+   * @default {@link ValueType.DOUBLE}
+   */
+  valueType?: ValueType;
+}
+
+/** The Type of value. It describes how the data is reported. */
+export enum ValueType {
+  INT,
+  DOUBLE,
 }
 
 /**
