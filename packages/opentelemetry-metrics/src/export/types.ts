@@ -342,7 +342,7 @@ export interface MetricProducer {
  * Base interface that represents a metric exporter
  */
 export interface MetricExporter {
-  /** Exports the list of a given metric */
+  /** Exports the list of a given {@link ReadableMetric} */
   export(
     metrics: ReadableMetric[],
     resultCallback: (result: ExportResult) => void
