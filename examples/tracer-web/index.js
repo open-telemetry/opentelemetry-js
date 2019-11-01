@@ -20,29 +20,11 @@ webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExport
 
 console.log('Current span is window', webTracerWithZone.getCurrentSpan() === window);
 
-const span1 = webTracerWithZone.startSpan('foo1');
-webTracerWithZone.withSpan(span1, () => {
-  console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);
-
-  setTimeout(() => {
-    const span2 = webTracerWithZone.startSpan('foo2');
-    console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);
-    webTracerWithZone.withSpan(span2, () => {
-      console.log('Current span is span2', webTracerWithZone.getCurrentSpan() === span2);
-      setTimeout(() => {
-        console.log('Current span is span2', webTracerWithZone.getCurrentSpan() === span2);
-      }, 500);
-    });
-    // there is a timeout which still keeps span2 active
-    console.log('Current span is span2', webTracerWithZone.getCurrentSpan() === span2);
-  }, 500);
-  console.log('Current span is span1', webTracerWithZone.getCurrentSpan() === span1);
-});
-
 // example of keeping track of scope between async operations
 let counter = 0;
 const prepareClickEvent = () => {
-  const url = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
+  const url1 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
+  const url2 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/packages/opentelemetry-web/package.json';
 
   const element = document.getElementById('button1');
   let mainSpan = webTracerWithZone.startSpan('main-span');
@@ -53,32 +35,28 @@ const prepareClickEvent = () => {
     const span1 = webTracerWithZone.startSpan(`files-series-info-${counter}`, {
       parent: webTracerWithZone.getCurrentSpan()
     });
+    counter++;
+    const span2 = webTracerWithZone.startSpan(`files-series-info-${counter}`, {
+      parent: webTracerWithZone.getCurrentSpan()
+    });
 
-    webTracerWithZone.withSpan(span1, ()=> {
-      span1.addEvent('fetching-data-1');
-      getData(url).then((data)=> {
-        console.log(webTracerWithZone.getCurrentSpan().name, data.description, data.version);
-        webTracerWithZone.getCurrentSpan().addEvent('fetching-data-1-completed');
-        webTracerWithZone.getCurrentSpan().addEvent('fetching-data-2');
+    webTracerWithZone.withSpan(span1, () => {
+      getData(url1).then((data) => {
+        console.log('current span is span1', webTracerWithZone.getCurrentSpan() === span1);
+        console.log('info from package.json', data.description, data.version);
+        webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
+        span1.end();
+      });
+    });
 
-        getData(url).then((data)=> {
-          console.log(webTracerWithZone.getCurrentSpan().name, data.description, data.version);
-
-          webTracerWithZone.getCurrentSpan().addEvent('fetching-data-2-completed');
-          webTracerWithZone.getCurrentSpan().end();
-          counter++
-          ;const span2 = webTracerWithZone.startSpan(`files-series-info-${counter}`, {
-            parent: webTracerWithZone.getCurrentSpan()
-          });
-          webTracerWithZone.withSpan(span2, ()=> {
-            webTracerWithZone.getCurrentSpan().addEvent('fetching-data-3');
-            getData(url).then((data)=> {
-              console.log(webTracerWithZone.getCurrentSpan().name, data.description, data.version);
-              webTracerWithZone.getCurrentSpan().addEvent('fetching-data-3-completed');
-              webTracerWithZone.getCurrentSpan().end();
-            });
-          });
-        });
+    webTracerWithZone.withSpan(span2, () => {
+      getData(url2).then((data) => {
+        setTimeout(() => {
+          console.log('current span is span2', webTracerWithZone.getCurrentSpan() === span2);
+          console.log('info from package.json', data.description, data.version);
+          webTracerWithZone.getCurrentSpan().addEvent('fetching-span2-completed');
+          span2.end();
+        }, 100);
       });
     });
   };
