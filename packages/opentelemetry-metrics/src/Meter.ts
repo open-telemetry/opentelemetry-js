@@ -143,10 +143,7 @@ export class Meter implements types.Meter {
     metric: Metric<T>
   ): void {
     if (this._metrics.has(name)) {
-      // @todo: decide how to handle already registered metric
-      // 1: Replace the old registered metric by the new
-      // 2. Throw error
-      // 3. skip duplicate metric (current approach)
+      // @todo (issue/474): decide how to handle already registered metric
       this._logger.error(
         `A metric with the name ${name} has already been registered.`
       );
