@@ -67,4 +67,3 @@ export interface Meter {
    */
   labels(labels: Labels): LabelSet;
 }
-

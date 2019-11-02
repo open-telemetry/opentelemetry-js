@@ -32,7 +32,7 @@ describe('NoopMeter', () => {
     const counter = meter.createCounter('some-name');
     const labels = {} as Labels;
     const labelSet = meter.labels(labels);
-    
+
     // ensure NoopMetric does not crash.
     counter.setCallback(() => {
       assert.fail('callback occurred');
