@@ -27,7 +27,7 @@ export class CounterHandle implements types.CounterHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
-    private readonly _labels: types.LabelSet,
+    private readonly _labelSet: types.LabelSet,
     private readonly _logger: types.Logger
   ) {}
 
@@ -49,7 +49,9 @@ export class CounterHandle implements types.CounterHandle {
    */
   getTimeSeries(timestamp: types.HrTime): TimeSeries {
     return {
-      labelValues: Object.values(this._labels).map(value => ({ value })),
+      labelValues: Object.values(this._labelSet.labels).map(value => ({
+        value,
+      })),
       points: [{ value: this._data, timestamp }],
     };
   }
@@ -65,7 +67,7 @@ export class GaugeHandle implements types.GaugeHandle {
   constructor(
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
-    private readonly _labels: types.LabelSet,
+    private readonly _labelSet: types.LabelSet,
     private readonly _logger: types.Logger
   ) {}
 
@@ -87,7 +89,9 @@ export class GaugeHandle implements types.GaugeHandle {
    */
   getTimeSeries(timestamp: types.HrTime): TimeSeries {
     return {
-      labelValues: Object.values(this._labels).map(value => ({ value })),
+      labelValues: Object.values(this._labelSet.labels).map(value => ({
+        value,
+      })),
       points: [{ value: this._data, timestamp }],
     };
   }

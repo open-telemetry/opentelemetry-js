@@ -13,15 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-const COMMA_SEPARATOR = ',';
-
-/**
- * Returns a string(comma separated) from the list of label values.
- *
- * @param labelValues The list of the label values.
- * @returns The hashed label values string.
- */
-export function hashLabelValues(labelValues: string[]): string {
-  return labelValues.join(COMMA_SEPARATOR);
-}

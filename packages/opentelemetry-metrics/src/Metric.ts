@@ -15,7 +15,6 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { hashLabelValues } from './Utils';
 import { CounterHandle, GaugeHandle } from './Handle';
 import { MetricOptions } from './types';
 
@@ -36,14 +35,14 @@ export abstract class Metric<T> implements types.Metric<T> {
    * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for each operation.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
-  getHandle(labels: types.LabelSet): T {
-    const hash = hashLabelValues(Object.values(labels));
-    if (this._handles.has(hash)) return this._handles.get(hash)!;
+  getHandle(labelSet: types.LabelSet): T {
+    if (this._handles.has(labelSet.labelSetKey))
+      return this._handles.get(labelSet.labelSetKey)!;
 
-    const handle = this._makeHandle(labels);
-    this._handles.set(hash, handle);
+    const handle = this._makeHandle(labelSet);
+    this._handles.set(labelSet.labelSetKey, handle);
     return handle;
   }
 
@@ -58,10 +57,10 @@ export abstract class Metric<T> implements types.Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
-  removeHandle(labels: types.LabelSet): void {
-    this._handles.delete(hashLabelValues(Object.values(labels)));
+  removeHandle(labelSet: types.LabelSet): void {
+    this._handles.delete(labelSet.labelSetKey);
   }
 
   /**
@@ -77,7 +76,7 @@ export abstract class Metric<T> implements types.Metric<T> {
     return;
   }
 
-  protected abstract _makeHandle(labels: types.LabelSet): T;
+  protected abstract _makeHandle(labelSet: types.LabelSet): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
@@ -85,11 +84,11 @@ export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(labels: types.LabelSet): CounterHandle {
+  protected _makeHandle(labelSet: types.LabelSet): CounterHandle {
     return new CounterHandle(
       this._disabled,
       this._monotonic,
-      labels,
+      labelSet,
       this._logger
     );
   }
@@ -100,11 +99,11 @@ export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
     super(name, options);
   }
-  protected _makeHandle(labels: types.LabelSet): GaugeHandle {
+  protected _makeHandle(labelSet: types.LabelSet): GaugeHandle {
     return new GaugeHandle(
       this._disabled,
       this._monotonic,
-      labels,
+      labelSet,
       this._logger
     );
   }

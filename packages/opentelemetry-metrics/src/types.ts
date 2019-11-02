@@ -15,7 +15,7 @@
  */
 
 import { LogLevel } from '@opentelemetry/core';
-import { Logger } from '@opentelemetry/types';
+import { Logger, Labels } from '@opentelemetry/types';
 
 /** Options needed for SDK metric creation. */
 export interface MetricOptions {
@@ -65,3 +65,13 @@ export const DEFAULT_METRIC_OPTIONS = {
   unit: '1',
   labelKeys: [],
 };
+
+export class LabelSet implements LabelSet {
+  labelSetKey: string;
+  labels: Labels;
+
+  constructor(labelSetKey: string, labels: Labels) {
+    this.labelSetKey = labelSetKey;
+    this.labels = labels;
+  }
+}

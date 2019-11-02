@@ -87,4 +87,15 @@ export interface Metric<T> {
   setCallback(fn: () => void): void;
 }
 
-export type LabelSet = Record<string, string>;
+/**
+ * key-value pairs passed by the user.
+ */
+export type Labels = Record<string, string>;
+
+/**
+ * Canonicalized labels with an unique string labelSetKey.
+ */
+export interface LabelSet {
+  labelSetKey: string;
+  labels: Labels;
+}

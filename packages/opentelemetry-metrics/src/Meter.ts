@@ -27,6 +27,7 @@ import {
   DEFAULT_METRIC_OPTIONS,
   DEFAULT_CONFIG,
   MeterConfig,
+  LabelSet,
 } from './types';
 
 /**
@@ -118,20 +119,24 @@ export class Meter implements types.Meter {
 
   /**
    * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered LabelSet into a canonicalized
-   * set of lables, useful for pre-aggregation.
-   * @param labels user provided unordered LabelSet.
+   * converting the unordered labels into a canonicalized
+   * set of lables with a unique labelSetKey, useful for pre-aggregation.
+   * @param labels user provided unordered Labels.
    */
-  labels(labels: types.LabelSet): types.LabelSet {
-    return Object.keys(labels)
-      .sort()
-      .reduce(
-        (result, key) => {
-          result[key] = labels[key];
-          return result;
-        },
-        {} as types.LabelSet
-      );
+  labels(labels: types.Labels): types.LabelSet {
+    let keys = Object.keys(labels).sort();
+    let labelSetKey = keys.reduce((result, key) => {
+      if (result.length > 2) {
+        result += ',';
+      }
+      result = result + key + ':' + labels[key];
+      return result;
+    }, '|#');
+    let sortedLabels = {} as types.Labels;
+    keys.forEach(key => {
+      sortedLabels[key] = labels[key];
+    });
+    return new LabelSet(labelSetKey, sortedLabels);
   }
 
   /**

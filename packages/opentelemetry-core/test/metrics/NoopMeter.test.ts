@@ -24,26 +24,26 @@ import {
   NOOP_MEASURE_HANDLE,
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
-import { LabelSet } from '@opentelemetry/types';
+import { Labels } from '@opentelemetry/types';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeter();
     const counter = meter.createCounter('some-name');
-    const key1 = 'key1';
-    const key2 = 'key2';
-    const labels: LabelSet = { [key1]: 'val1', [key2]: 'val2' };
+    const labels = {} as Labels;
+    const labelSet = meter.labels(labels);
+    
     // ensure NoopMetric does not crash.
     counter.setCallback(() => {
       assert.fail('callback occurred');
     });
-    counter.getHandle(labels).add(1);
+    counter.getHandle(labelSet).add(1);
     counter.getDefaultHandle().add(1);
-    counter.removeHandle(labels);
+    counter.removeHandle(labelSet);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(counter.getHandle(labels), NOOP_COUNTER_HANDLE);
+    assert.strictEqual(counter.getHandle(labelSet), NOOP_COUNTER_HANDLE);
     assert.strictEqual(counter.getDefaultHandle(), NOOP_COUNTER_HANDLE);
     counter.clear();
 
@@ -62,7 +62,7 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
     assert.strictEqual(measure.getDefaultHandle(), NOOP_MEASURE_HANDLE);
-    assert.strictEqual(measure.getHandle(labels), NOOP_MEASURE_HANDLE);
+    assert.strictEqual(measure.getHandle(labelSet), NOOP_MEASURE_HANDLE);
 
     const gauge = meter.createGauge('some-name');
     gauge.getDefaultHandle().set(1);
@@ -70,7 +70,7 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
     assert.strictEqual(gauge.getDefaultHandle(), NOOP_GAUGE_HANDLE);
-    assert.strictEqual(gauge.getHandle(labels), NOOP_GAUGE_HANDLE);
+    assert.strictEqual(gauge.getHandle(labelSet), NOOP_GAUGE_HANDLE);
 
     const options = {
       component: 'tests',

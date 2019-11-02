@@ -24,6 +24,7 @@ import {
   MeasureHandle,
   SpanContext,
   LabelSet,
+  Labels,
 } from '@opentelemetry/types';
 
 /**
@@ -60,7 +61,7 @@ export class NoopMeter implements Meter {
     return NOOP_GAUGE_METRIC;
   }
 
-  labels(labels: LabelSet): LabelSet {
+  labels(labels: Labels): LabelSet {
     return NOOP_LABEL_SET;
   }
 }
