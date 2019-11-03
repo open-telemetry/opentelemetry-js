@@ -18,8 +18,9 @@ import { NodeTracer } from '@opentelemetry/node';
 import * as assert from 'assert';
 import * as mongodb from 'mongodb';
 import { plugin } from '../src';
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind, CanonicalCode } from '@opentelemetry/types';
 import { NoopLogger } from '@opentelemetry/core';
+import { AttributeNames } from '../src/types';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -71,23 +72,33 @@ function assertSpans(
     assert(span.endTime instanceof Array);
     assert(span.endTime.length === 2);
   });
-  assert.strictEqual(spans[0].name, expectedName);
-  assert.strictEqual(spans[0].kind, expectedKind);
+  const [mongoSpan] = spans;
+  assert.strictEqual(mongoSpan.name, expectedName);
+  assert.strictEqual(mongoSpan.kind, expectedKind);
+  assert.strictEqual(
+    mongoSpan.attributes[AttributeNames.COMPONENT],
+    'mongodb-core'
+  );
+  assert.strictEqual(
+    mongoSpan.attributes[AttributeNames.PEER_HOSTNAME],
+    process.env.MONGODB_HOST || 'localhost'
+  );
+  assert.strictEqual(mongoSpan.status.code, CanonicalCode.OK);
 }
 
 describe('MongoDBPlugin', () => {
-  // For these tests, mongo must be running. Add OPENTELEMETRY_MONGODB_TESTS to run
+  // For these tests, mongo must be running. Add RUN_MONGODB_TESTS to run
   // these tests.
-  const OPENTELEMETRY_MONGODB_TESTS = process.env
-    .OPENTELEMETRY_MONGODB_TESTS as string;
+  const RUN_MONGODB_TESTS = process.env.RUN_MONGODB_TESTS as string;
   let shouldTest = true;
-  if (!OPENTELEMETRY_MONGODB_TESTS) {
+  if (!RUN_MONGODB_TESTS) {
     console.log('Skipping test-mongodb. Run MongoDB to test');
     shouldTest = false;
   }
 
-  const URL = 'mongodb://localhost:27017';
-  const DB_NAME = 'opentelemetry-tests';
+  const URL = `mongodb://${process.env.MONGODB_HOST || 'localhost'}:${process
+    .env.MONGODB_PORT || '27017'}`;
+  const DB_NAME = process.env.MONGODB_DB || 'opentelemetry-tests';
   const COLLECTION_NAME = 'test';
 
   let client: mongodb.MongoClient;

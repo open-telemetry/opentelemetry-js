@@ -7,6 +7,9 @@ test_env: &test_env
   POSTGRES_DB: circle_database
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
+  MONGODB_HOST: localhost
+  MONGODB_PORT: 27017
+  MONGODB_DB: opentelemetry-tests
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine

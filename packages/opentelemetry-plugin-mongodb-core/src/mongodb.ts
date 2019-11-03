@@ -19,7 +19,12 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import { Span, SpanKind, CanonicalCode } from '@opentelemetry/types';
-import { Func, MongoInternalCommand, MongoInternalTopology } from './types';
+import {
+  Func,
+  MongoInternalCommand,
+  MongoInternalTopology,
+  AttributeNames,
+} from './types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 
@@ -72,10 +77,14 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
 
   /** Unpatches all MongoDB patched functions. */
   unpatch(): void {
-    shimmer.massUnwrap([this._moduleExports.Server.prototype], this
-      ._SERVER_METHODS as never[]);
-    shimmer.massUnwrap([this._moduleExports.Cursor.prototype], this
-      ._CURSOR_METHODS as never[]);
+    shimmer.massUnwrap(
+      [this._moduleExports.Server.prototype],
+      this._SERVER_METHODS as never[]
+    );
+    shimmer.massUnwrap(
+      [this._moduleExports.Cursor.prototype],
+      this._CURSOR_METHODS as never[]
+    );
   }
 
   /** Creates spans for Command operations */
@@ -167,13 +176,18 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
   ) {
     // add network attributes to determine the remote server
     if (topology && topology.s && topology.s.options) {
-      span.setAttribute('peer.hostname', `${topology.s.options.host}`);
-      span.setAttribute('peer.port', `${topology.s.options.port}`);
+      span.setAttributes({
+        [AttributeNames.PEER_HOSTNAME]: `${topology.s.options.host}`,
+        [AttributeNames.PEER_PORT]: `${topology.s.options.port}`,
+      });
     }
     // add database related attributes
-    span.setAttribute('db.instance', `${ns}`);
-    span.setAttribute('db.type', `mongodb`);
-    span.setAttribute('component', 'mongodb-core');
+    span.setAttributes({
+      [AttributeNames.DB_INSTANCE]: `${ns}`,
+      [AttributeNames.DB_TYPE]: `mongodb`,
+      [AttributeNames.COMPONENT]: 'mongodb-core',
+    });
+
     if (command === undefined) return;
     const query = Object.keys(command.query || command.q || {}).reduce(
       (obj, key) => {
@@ -225,6 +239,10 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         span.setStatus({
           code: CanonicalCode.UNKNOWN,
           message: error.message,
+        });
+      } else {
+        span.setStatus({
+          code: CanonicalCode.OK,
         });
       }
       span.end();
