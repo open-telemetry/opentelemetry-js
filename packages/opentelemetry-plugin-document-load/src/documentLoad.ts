@@ -44,7 +44,11 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * callback to be executed when page is loaded
    */
   private _onDocumentLoaded() {
-    this._collectPerformance();
+    // Timeout is needed as load event doesn't have yet the performance metrics for loadEnd.
+    // Support for event "loadend" is very limited and cannot be used
+    window.setTimeout(() => {
+      this._collectPerformance();
+    });
   }
 
   /**
@@ -125,9 +129,14 @@ export class DocumentLoad extends BasePlugin<unknown> {
     entries: PerformanceEntries
   ) {
     // span can be undefined when entries are missing the certain performance - the span will not be created
-    if (typeof span !== 'undefined' && hasKey(entries, performanceName)) {
-      this._addSpanEvent(span, performanceName, entries);
-      span.end(entries[performanceName]);
+    if (span) {
+      if (hasKey(entries, performanceName)) {
+        this._addSpanEvent(span, performanceName, entries);
+        span.end(entries[performanceName]);
+      } else {
+        // just end span
+        span.end();
+      }
     }
   }
 
