@@ -15,3 +15,4 @@
  */
 
 export * from './prometheus';
+export * from './export/types'

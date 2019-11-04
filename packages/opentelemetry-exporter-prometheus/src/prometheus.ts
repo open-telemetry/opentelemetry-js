@@ -27,7 +27,7 @@ import * as types from '@opentelemetry/types';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as Prometheus from 'prom-client';
 import * as url from 'url';
-import { ExporterConfig } from './types';
+import { ExporterConfig } from './export/types';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
