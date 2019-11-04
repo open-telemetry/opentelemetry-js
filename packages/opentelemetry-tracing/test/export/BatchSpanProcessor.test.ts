@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   Span,
   BasicTracer,
@@ -107,6 +108,7 @@ describe('BatchSpanProcessor', () => {
     });
 
     it('should force flush when timeout exceeded', done => {
+      const clock = sinon.useFakeTimers();
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
@@ -118,6 +120,10 @@ describe('BatchSpanProcessor', () => {
         assert.strictEqual(exporter.getFinishedSpans().length, 5);
         done();
       }, defaultBufferConfig.bufferTimeout + 1000);
-    }).timeout(defaultBufferConfig.bufferTimeout * 2);
+
+      clock.tick(defaultBufferConfig.bufferTimeout + 1000);
+
+      clock.restore();
+    });
   });
 });
