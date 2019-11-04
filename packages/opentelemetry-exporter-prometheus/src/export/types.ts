@@ -16,21 +16,36 @@
 
 import * as types from '@opentelemetry/types';
 
+/**
+ * Configuration interface for prometheus exporter
+ */
 export interface ExporterConfig {
-  /** App prefix for metrics, if needed */
+  /**
+   * App prefix for metrics, if needed
+   *
+   * @default ''
+   * */
   prefix?: string;
 
-  /** Endpoint the metrics should be exposed at with preceeding / */
+  /**
+   * Endpoint the metrics should be exposed at with preceeding slash
+   * @default '/metrics'
+   */
   endpoint?: string;
 
   /**
    * Port number for Prometheus exporter server
+   *
    * Default registered port is 9464:
    * https://github.com/prometheus/prometheus/wiki/Default-port-allocations
+   * @default 9464
    */
   port?: number;
 
-  /** Define if the Prometheus exporter server will be started - default false */
+  /**
+   * Define if the Prometheus exporter server will be started
+   * @default false
+  */
   startServer?: boolean;
 
   /** Standard logging interface */
