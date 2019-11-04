@@ -21,7 +21,8 @@ import {
   NOOP_GAUGE_METRIC,
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
-import { CounterMetric, GaugeMetric } from './Metric';
+import { BaseHandle } from './Handle';
+import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -29,12 +30,14 @@ import {
   MeterConfig,
   LabelSet,
 } from './types';
+import { ReadableMetric } from './export/types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
+  private readonly _metrics = new Map();
 
   /**
    * Constructs a new Meter instance.
@@ -86,7 +89,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new CounterMetric(name, opt);
+    const counter = new CounterMetric(name, opt);
+    this._registerMetric(name, counter);
+    return counter;
   }
 
   /**
@@ -114,29 +119,59 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    return new GaugeMetric(name, opt);
+    const gauge = new GaugeMetric(name, opt);
+    this._registerMetric(name, gauge);
+    return gauge;
+  }
+
+  /**
+   * Gets a collection of Metric`s to be exported.
+   * @returns The list of metrics.
+   */
+  getMetrics(): ReadableMetric[] {
+    return Array.from(this._metrics.values())
+      .map(metric => metric.get())
+      .filter(metric => !!metric);
+  }
+
+  /**
+   * Registers metric to register.
+   * @param name The name of the metric.
+   * @param metric The metric to register.
+   */
+  private _registerMetric<T extends BaseHandle>(
+    name: string,
+    metric: Metric<T>
+  ): void {
+    if (this._metrics.has(name)) {
+      // @todo (issue/474): decide how to handle already registered metric
+      this._logger.error(
+        `A metric with the name ${name} has already been registered.`
+      );
+      return;
+    }
+    this._metrics.set(name, metric);
   }
 
   /**
    * Provide a pre-computed re-useable LabelSet by
    * converting the unordered labels into a canonicalized
-   * set of lables with a unique labelSetKey, useful for pre-aggregation.
+   * set of lables with an unique encoded, useful for pre-aggregation.
    * @param labels user provided unordered Labels.
    */
   labels(labels: types.Labels): types.LabelSet {
     let keys = Object.keys(labels).sort();
-    let labelSetKey = keys.reduce((result, key) => {
+    let encoded = keys.reduce((result, key) => {
       if (result.length > 2) {
         result += ',';
       }
-      result = result + key + ':' + labels[key];
-      return result;
+      return (result += key + ':' + labels[key]);
     }, '|#');
     let sortedLabels = {} as types.Labels;
     keys.forEach(key => {
       sortedLabels[key] = labels[key];
     });
-    return new LabelSet(labelSetKey, sortedLabels);
+    return new LabelSet(encoded, sortedLabels);
   }
 
   /**

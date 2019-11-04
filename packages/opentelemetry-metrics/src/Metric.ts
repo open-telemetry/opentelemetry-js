@@ -15,20 +15,34 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { CounterHandle, GaugeHandle } from './Handle';
+import { hrTime } from '@opentelemetry/core';
+import { CounterHandle, GaugeHandle, BaseHandle } from './Handle';
 import { MetricOptions } from './types';
+import {
+  ReadableMetric,
+  MetricDescriptor,
+  MetricDescriptorType,
+} from './export/types';
 
 /** This is a SDK implementation of {@link Metric} interface. */
-export abstract class Metric<T> implements types.Metric<T> {
+export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
+  protected readonly _valueType: types.ValueType;
   protected readonly _logger: types.Logger;
-  private readonly _handles: Map<String, T> = new Map();
+  private readonly _metricDescriptor: MetricDescriptor;
+  private readonly _handles: Map<string, T> = new Map();
 
-  constructor(name: string, options: MetricOptions) {
-    this._monotonic = options.monotonic;
-    this._disabled = options.disabled;
-    this._logger = options.logger;
+  constructor(
+    private readonly _name: string,
+    private readonly _options: MetricOptions,
+    private readonly _type: MetricDescriptorType
+  ) {
+    this._monotonic = _options.monotonic;
+    this._disabled = _options.disabled;
+    this._valueType = _options.valueType;
+    this._logger = _options.logger;
+    this._metricDescriptor = this._getMetricDescriptor();
   }
 
   /**
@@ -38,11 +52,11 @@ export abstract class Metric<T> implements types.Metric<T> {
    * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
   getHandle(labelSet: types.LabelSet): T {
-    if (this._handles.has(labelSet.labelSetKey))
-      return this._handles.get(labelSet.labelSetKey)!;
+    if (this._handles.has(labelSet.encoded))
+      return this._handles.get(labelSet.encoded)!;
 
     const handle = this._makeHandle(labelSet);
-    this._handles.set(labelSet.labelSetKey, handle);
+    this._handles.set(labelSet.encoded, handle);
     return handle;
   }
 
@@ -60,7 +74,7 @@ export abstract class Metric<T> implements types.Metric<T> {
    * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
   removeHandle(labelSet: types.LabelSet): void {
-    this._handles.delete(labelSet.labelSetKey);
+    this._handles.delete(labelSet.encoded);
   }
 
   /**
@@ -76,19 +90,53 @@ export abstract class Metric<T> implements types.Metric<T> {
     return;
   }
 
+  /**
+   * Provides a ReadableMetric with one or more TimeSeries.
+   * @returns The ReadableMetric, or null if TimeSeries is not present in
+   *     Metric.
+   */
+  get(): ReadableMetric | null {
+    if (this._handles.size === 0) return null;
+
+    const timestamp = hrTime();
+    return {
+      descriptor: this._metricDescriptor,
+      timeseries: Array.from(this._handles, ([_, handle]) =>
+        handle.getTimeSeries(timestamp)
+      ),
+    };
+  }
+
+  private _getMetricDescriptor(): MetricDescriptor {
+    return {
+      name: this._name,
+      description: this._options.description,
+      unit: this._options.unit,
+      labelKeys: this._options.labelKeys,
+      type: this._type,
+    };
+  }
+
   protected abstract _makeHandle(labelSet: types.LabelSet): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<CounterHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, options);
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.COUNTER_DOUBLE
+        : MetricDescriptorType.COUNTER_INT64
+    );
   }
   protected _makeHandle(labelSet: types.LabelSet): CounterHandle {
     return new CounterHandle(
+      labelSet,
       this._disabled,
       this._monotonic,
-      labelSet,
+      this._valueType,
       this._logger
     );
   }
@@ -97,13 +145,20 @@ export class CounterMetric extends Metric<CounterHandle> {
 /** This is a SDK implementation of Gauge Metric. */
 export class GaugeMetric extends Metric<GaugeHandle> {
   constructor(name: string, options: MetricOptions) {
-    super(name, options);
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.GAUGE_DOUBLE
+        : MetricDescriptorType.GAUGE_INT64
+    );
   }
   protected _makeHandle(labelSet: types.LabelSet): GaugeHandle {
     return new GaugeHandle(
+      labelSet,
       this._disabled,
       this._monotonic,
-      labelSet,
+      this._valueType,
       this._logger
     );
   }

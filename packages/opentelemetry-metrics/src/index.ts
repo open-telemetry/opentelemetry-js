@@ -17,3 +17,4 @@
 export * from './Handle';
 export * from './Meter';
 export * from './Metric';
+export * from './export/types';
