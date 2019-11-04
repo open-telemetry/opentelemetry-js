@@ -48,7 +48,7 @@ describe('PrometheusExporter', () => {
 
     it('should not start the server by default', () => {
       const exporter = new PrometheusExporter();
-      assert.ok(exporter["_server"]!.listening === false);
+      assert.ok(exporter['_server']!.listening === false);
     });
   });
 

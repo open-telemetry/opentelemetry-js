@@ -66,7 +66,7 @@ export class PrometheusExporter implements MetricExporter {
     if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
       this.startServer(callback);
     } else if (callback) {
-      callback()
+      callback();
     }
   }
 
