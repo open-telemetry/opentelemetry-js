@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { BasePlugin, otperformance } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  otperformance,
+  parseTraceParent,
+} from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
@@ -23,7 +27,7 @@ import {
   PerformanceLegacy,
   WindowWithTrace,
 } from './types';
-import { hasKey, extractServerContext } from './utils';
+import { hasKey } from './utils';
 
 /**
  * This class represents a document load plugin
@@ -81,7 +85,8 @@ export class DocumentLoad extends BasePlugin<unknown> {
    */
   private _collectPerformance() {
     const windowWithTrace: WindowWithTrace = (window as unknown) as WindowWithTrace;
-    const serverContext = extractServerContext(windowWithTrace.traceparent);
+    const serverContext =
+      parseTraceParent(windowWithTrace.traceparent || '') || undefined;
 
     const entries = this._getEntries();
 
