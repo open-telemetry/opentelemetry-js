@@ -74,7 +74,7 @@ export class PrometheusExporter implements MetricExporter {
    * Save current metric state so that it can be pulled by the metrics backend.
    *
    * @todo reach into metrics to pull metric values on endpoint
-   * In it's current state, the exporter saves the current values of all metrics when export
+   * In its current state, the exporter saves the current values of all metrics when export
    * is called and returns them when the export endpoint is called. In the future, this should
    * be a no-op and the exporter should reach into the metrics when the export endpoint is
    * called. As there is currently no interface to do this, this is our only option.
