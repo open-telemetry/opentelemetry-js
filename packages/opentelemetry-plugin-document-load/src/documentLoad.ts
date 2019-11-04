@@ -18,8 +18,12 @@ import { BasePlugin, otperformance } from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import { PerformanceEntries, PerformanceLegacy } from './types';
-import { hasKey } from './utils';
+import {
+  PerformanceEntries,
+  PerformanceLegacy,
+  WindowWithTrace,
+} from './types';
+import { hasKey, extractServerContext } from './utils';
 
 /**
  * This class represents a document load plugin
@@ -76,12 +80,16 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Collects information about performance and creates appropriate spans
    */
   private _collectPerformance() {
+    const windowWithTrace: WindowWithTrace = (window as unknown) as WindowWithTrace;
+    const serverContext = extractServerContext(windowWithTrace.traceparent);
+
     const entries = this._getEntries();
 
     const rootSpan = this._startSpan(
       AttributeNames.DOCUMENT_LOAD,
       PTN.FETCH_START,
-      entries
+      entries,
+      { parent: serverContext }
     );
     if (!rootSpan) {
       return;

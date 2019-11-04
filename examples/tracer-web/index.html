@@ -10,6 +10,15 @@
 </head>
 
 <body>
+  <script>
+    // https://www.w3.org/TR/trace-context/
+    // Set the `traceparent` in the server's HTML template code. It should be
+    // dynamically generated server side to have the server's request trace Id,
+    // a parent span Id that was set on the server's request span, and the trace
+    // flags to indicate the server's sampling decision (01 = sampled, 00 = not
+    // sampled). '{version}-{traceId}-{spanId}-{sampleDecision}'
+    window.traceparent = '00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01';
+  </script>
   Example of using Web Tracer with document load plugin and console exporter
   <script type="text/javascript" src="/bundle.js"></script>
 </body>

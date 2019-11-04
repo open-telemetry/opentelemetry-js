@@ -33,6 +33,7 @@ import { Logger, PluginConfig } from '@opentelemetry/types';
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
+import { WindowWithTrace } from '../src/types';
 
 export class DummyExporter implements SpanExporter {
   export(
@@ -235,6 +236,38 @@ describe('DocumentLoad Plugin', () => {
         assert.strictEqual(fsEvents.length, 9);
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
+      });
+    });
+
+    describe('AND window has information about server root span', () => {
+      beforeEach(() => {
+        ((window as unknown) as WindowWithTrace).traceparent =
+          '00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01';
+      });
+      it('should create a root span with server context traceId', done => {
+        const spyOnEnd = sinon.spy(dummyExporter, 'export');
+        plugin.enable(moduleExports, tracer, logger, config);
+        setTimeout(() => {
+          const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
+          const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
+          assert.strictEqual(rootSpan.name, 'documentFetch');
+          assert.strictEqual(fetchSpan.name, 'documentLoad');
+
+          assert.strictEqual(
+            rootSpan.spanContext.traceId,
+            'ab42124a3c573678d4d8b21ba52df3bf'
+          );
+          assert.strictEqual(
+            fetchSpan.spanContext.traceId,
+            'ab42124a3c573678d4d8b21ba52df3bf'
+          );
+
+          assert.strictEqual(spyOnEnd.callCount, 2);
+          done();
+        }, 1);
+      });
+      afterEach(() => {
+        delete ((window as unknown) as WindowWithTrace).traceparent;
       });
     });
 
