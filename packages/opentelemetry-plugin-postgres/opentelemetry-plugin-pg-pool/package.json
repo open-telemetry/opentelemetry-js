@@ -45,11 +45,12 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/plugin-pg": "^0.1.1",
+    "@opentelemetry/plugin-pg": "^0.2.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/pg": "^7.11.2",
     "@types/shimmer": "^1.0.1",
+    "@types/pg-pool": "^2.0.1",
     "codecov": "^3.5.0",
     "gts": "^1.0.0",
     "mocha": "^6.2.0",
@@ -64,11 +65,10 @@
     "typescript": "^3.6.3"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.1.1",
-    "@opentelemetry/node": "^0.1.1",
-    "@opentelemetry/tracing": "^0.1.1",
-    "@opentelemetry/types": "^0.1.1",
-    "@types/pg-pool": "^2.0.1",
+    "@opentelemetry/core": "^0.2.0",
+    "@opentelemetry/node": "^0.2.0",
+    "@opentelemetry/tracing": "^0.2.0",
+    "@opentelemetry/types": "^0.2.0",
     "shimmer": "^1.2.1"
   }
 }
