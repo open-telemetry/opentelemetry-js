@@ -91,7 +91,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, this);
+    const counter = new CounterMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
     this._registerMetric(name, counter);
     return counter;
   }
@@ -121,7 +123,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const gauge = new GaugeMetric(name, opt, this);
+    const gauge = new GaugeMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
     this._registerMetric(name, gauge);
     return gauge;
   }
@@ -137,9 +141,18 @@ export class Meter implements types.Meter {
   }
 
   /**
+   * Add an exporter to the list of registered exporters
+   *
+   * @param exporter exporter to add to the list of registered exporters
+   */
+  addExporter(exporter: MetricExporter) {
+    this._exporters.push(exporter);
+  }
+
+  /**
    * Send a single metric by name to all registered exporters
    */
-  exportOneMetric(name: string) {
+  private _exportOneMetric(name: string) {
     const metric = this._metrics.get(name);
     if (metric) {
       const readableMetric = metric.get();
@@ -153,15 +166,6 @@ export class Meter implements types.Meter {
         }
       }
     }
-  }
-
-  /**
-   * Add an exporter to the list of registered exporters
-   *
-   * @param exporter exporter to add to the list of registered exporters
-   */
-  addExporter(exporter: MetricExporter) {
-    this._exporters.push(exporter);
   }
 
   /**
