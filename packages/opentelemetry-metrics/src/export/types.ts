@@ -347,4 +347,7 @@ export interface MetricExporter {
     metrics: ReadableMetric[],
     resultCallback: (result: ExportResult) => void
   ): void;
+
+  /** Stops the exporter. */
+  shutdown(): void;
 }

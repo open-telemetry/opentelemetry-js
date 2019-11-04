@@ -15,11 +15,7 @@
  */
 
 import * as assert from 'assert';
-import * as chai from 'chai';
 import * as http from 'http';
-import chaiHttp = require('chai-http');
-
-chai.use(chaiHttp);
 
 import { PrometheusExporter } from '../src';
 
@@ -31,26 +27,33 @@ describe('PrometheusExporter', () => {
       assert.ok(typeof exporter.stopServer === 'function');
     });
 
-    it('should start the server if startServer is passed as an option', (done) => {
+    it('should start the server if startServer is passed as an option', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter({
-        startServer: true,
-      }, () => {
-        const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function (res: any) {
-          assert.equal(res.statusCode, 200);
-          exporter.stopServer(() => {
-            return done();
+      const exporter = new PrometheusExporter(
+        {
+          startServer: true,
+        },
+        () => {
+          const url = `http://localhost:${port}${endpoint}`;
+          http.get(url, function(res: any) {
+            assert.equal(res.statusCode, 200);
+            exporter.stopServer(() => {
+              return done();
+            });
           });
-        });
-      });
+        }
+      );
     });
 
+    it('should not start the server by default', () => {
+      const exporter = new PrometheusExporter();
+      assert.ok(exporter["_server"]!.listening === false);
+    });
   });
 
   describe('server', () => {
-    it('it should start on startServer() and call the callback', (done) => {
+    it('it should start on startServer() and call the callback', done => {
       const exporter = new PrometheusExporter({
         port: 9722,
       });
@@ -61,14 +64,14 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('it should listen on the default port and default endpoint', (done) => {
+    it('it should listen on the default port and default endpoint', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
       const exporter = new PrometheusExporter();
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.stopServer(() => {
             return done();
@@ -77,7 +80,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('it should listen on a custom port and endpoint if provided', (done) => {
+    it('it should listen on a custom port and endpoint if provided', done => {
       const port = 9991;
       const endpoint = '/metric';
 
@@ -88,7 +91,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.stopServer(() => {
             return done();
@@ -97,7 +100,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('it should lnormalize an endpoint that doesn\'t start with a slash', (done) => {
+    it('it should not require endpoints to start with a slash', done => {
       const port = 9991;
       const endpoint = 'metric';
 
@@ -107,28 +110,40 @@ describe('PrometheusExporter', () => {
       });
 
       exporter.startServer(() => {
-        const url = `http://localhost:${port}/${endpoint}`;
-        http.get(url, function (res: any) {
+        const url = `http://localhost:${port}/metric`;
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.stopServer(() => {
-            return done();
+            const exporter2 = new PrometheusExporter({
+              port,
+              endpoint: `/${endpoint}`,
+            });
+
+            exporter2.startServer(() => {
+              const url = `http://localhost:${port}/metric`;
+              http.get(url, function(res: any) {
+                assert.equal(res.statusCode, 200);
+                exporter2.stopServer(() => {
+                  return done();
+                });
+              });
+            });
           });
         });
       });
     });
 
-    it('it should return a HTTP status 404 if the endpoint does not match', (done) => {
+    it('it should return a HTTP status 404 if the endpoint does not match', done => {
       const port = 9912;
-      const endpoint = '/metricss';
+      const endpoint = '/metrics';
       const exporter = new PrometheusExporter({
         port,
         endpoint,
       });
       exporter.startServer(() => {
-        const url =
-          `http://localhost:${port}/metrics`;
+        const url = `http://localhost:${port}/invalid`;
 
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 404);
           exporter.stopServer(() => {
             return done();
@@ -137,7 +152,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should call a provided callback regardless of if the server is running', (done) => {
+    it('should call a provided callback regardless of if the server is running', done => {
       const exporter = new PrometheusExporter();
       exporter.stopServer(() => {
         return done();
@@ -145,4 +160,3 @@ describe('PrometheusExporter', () => {
     });
   });
 });
-

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-
-import * as url from 'url';
-
-import { createServer, Server, IncomingMessage, ServerResponse } from 'http';
-
-import * as types from '@opentelemetry/types';
-
-import { ReadableMetric, MetricDescriptor, MetricExporter, MetricDescriptorType, LabelValue } from '@opentelemetry/metrics';
-
-import { ExporterConfig } from './types';
-import { NoopLogger } from '@opentelemetry/core';
 import { ExportResult } from '@opentelemetry/base';
-
+import { NoopLogger } from '@opentelemetry/core';
+import {
+  LabelValue,
+  MetricDescriptor,
+  MetricDescriptorType,
+  MetricExporter,
+  ReadableMetric,
+} from '@opentelemetry/metrics';
+import * as types from '@opentelemetry/types';
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as Prometheus from 'prom-client';
+import * as url from 'url';
+import { ExporterConfig } from './types';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -41,9 +41,10 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _logger: types.Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
-  private _server?: Server;
+  private _server: Server;
   private readonly _prefix?: string;
 
+  // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a label named 'le'
   // private static readonly RESERVED_HISTOGRAM_LABEL = 'le';
 
@@ -56,20 +57,42 @@ export class PrometheusExporter implements MetricExporter {
     this._logger = config.logger || new NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
+    this._server = createServer(this._requestHandler);
 
-    let endpoint = config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-
-    if (!endpoint.startsWith('/')) {
-      endpoint = `/${endpoint}`;
-    }
-    this._endpoint = endpoint;
+    this._endpoint = (
+      config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
+    ).replace(/^([^/])/, '/$1');
 
     if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
       this.startServer(callback);
+    } else if (callback) {
+      callback()
     }
   }
 
-  export(readableMetrics: ReadableMetric[], cb: (result: ExportResult) => void) {
+  /**
+   * Save current metric state so that it can be pulled by the metrics backend.
+   *
+   * @todo reach into metrics to pull metric values on endpoint
+   * In it's current state, the exporter saves the current values of all metrics when export
+   * is called and returns them when the export endpoint is called. In the future, this should
+   * be a no-op and the exporter should reach into the metrics when the export endpoint is
+   * called. As there is currently no interface to do this, this is our only option.
+   *
+   * @param readableMetrics Metrics to be sent to the prometheus backend
+   * @param cb result callback to be called on finish
+   */
+  export(
+    readableMetrics: ReadableMetric[],
+    cb: (result: ExportResult) => void
+  ) {
+    if (!this._server) {
+      // It is conceivable that the _server may not be started as it is an async startup
+      // However unlikely, if this happens the caller may retry the export
+      cb(ExportResult.FAILED_RETRYABLE);
+      return;
+    }
+
     this._logger.debug('Prometheus exporter export');
 
     for (const readableMetric of readableMetrics) {
@@ -79,6 +102,18 @@ export class PrometheusExporter implements MetricExporter {
     cb(ExportResult.SUCCESS);
   }
 
+  /**
+   * Shut down the export server
+   */
+  shutdown() {
+    this.stopServer();
+  }
+
+  /**
+   * Save the value of one metric to be exported
+   *
+   * @param readableMetric Metric value to be saved
+   */
   private _updateMetric(readableMetric: ReadableMetric) {
     const metric = this._registerMetric(readableMetric);
     if (!metric) return;
@@ -87,19 +122,19 @@ export class PrometheusExporter implements MetricExporter {
 
     if (metric instanceof Prometheus.Counter) {
       for (const ts of readableMetric.timeseries) {
-        metric.inc(
-          this._getLabelValues(labelKeys, ts.labelValues),
-          ts.points[0].value as number
-        );
+        // Prometheus counter saves internal state and increments by given value.
+        // ReadableMetric value is the current state, not the delta to be incremented by.
+        // Currently, _registerMetric creates a new counter every time the value changes,
+        // so the increment here behaves as a set value (increment from 0)
+        metric.inc(this._getLabelValues(labelKeys, ts.labelValues), ts.points[0]
+          .value as number);
       }
     }
 
     if (metric instanceof Prometheus.Gauge) {
       for (const ts of readableMetric.timeseries) {
-        metric.set(
-          this._getLabelValues(labelKeys, ts.labelValues),
-          ts.points[0].value as number
-        );
+        metric.set(this._getLabelValues(labelKeys, ts.labelValues), ts.points[0]
+          .value as number);
       }
     }
 
@@ -116,10 +151,24 @@ export class PrometheusExporter implements MetricExporter {
     return labelValues;
   }
 
-  private _registerMetric(readableMetric: ReadableMetric): Prometheus.Metric | undefined {
+  private _registerMetric(
+    readableMetric: ReadableMetric
+  ): Prometheus.Metric | undefined {
     const metricName = this._getPrometheusMetricName(readableMetric.descriptor);
     const metric = this._registry.getSingleMetric(metricName);
-    if (metric) return metric;
+
+    /**
+     * Prometheus library does aggregation, which means its inc method must be called with
+     * the value to be incremented by. It does not have a set method. As our ReadableMetric
+     * contains the current value, not the value to be incremented by, we destroy and
+     * recreate counters when they are updated.
+     *
+     * This works because counters are identified by their name and no other internal ID
+     * https://prometheus.io/docs/instrumenting/exposition_formats/
+     */
+    if (metric instanceof Prometheus.Counter) {
+      this._registry.removeSingleMetric(metricName);
+    } else if (metric) return metric;
 
     const newMetric = this._newMetric(readableMetric, metricName);
     if (!newMetric) return;
@@ -128,11 +177,14 @@ export class PrometheusExporter implements MetricExporter {
     return newMetric;
   }
 
-  private _newMetric(readableMetric: ReadableMetric, name: string): Prometheus.Metric | undefined {
+  private _newMetric(
+    readableMetric: ReadableMetric,
+    name: string
+  ): Prometheus.Metric | undefined {
     const metricObject = {
       name,
       help: readableMetric.descriptor.description,
-      labelNames: readableMetric.descriptor.labelKeys
+      labelNames: readableMetric.descriptor.labelKeys,
     };
 
     switch (readableMetric.descriptor.type) {
@@ -142,25 +194,10 @@ export class PrometheusExporter implements MetricExporter {
       case MetricDescriptorType.GAUGE_DOUBLE:
       case MetricDescriptorType.GAUGE_INT64:
         return new Prometheus.Gauge(metricObject);
-      case MetricDescriptorType.GAUGE_HISTOGRAM:
-      case MetricDescriptorType.CUMULATIVE_HISTOGRAM:
-        const histogramConfig = {
-          ...metricObject,
-          buckets: this._getHistogramBoundaries(readableMetric)
-        };
-        return new Prometheus.Histogram(histogramConfig);
-      case MetricDescriptorType.SUMMARY:
-        return new Prometheus.Summary(metricObject);
-      case MetricDescriptorType.UNSPECIFIED:
-        this._logger.error("Do not use UNSPECIFIED readable metric type");
-        return;
+      default:
+        // Other metric types are currently unimplemented
+        return undefined;
     }
-
-  }
-
-  private _getHistogramBoundaries(_readableMetric: ReadableMetric): number[] {
-    // TODO
-    throw new Error('Unimplemented')
   }
 
   private _getPrometheusMetricName(descriptor: MetricDescriptor): string {
@@ -173,14 +210,15 @@ export class PrometheusExporter implements MetricExporter {
     return name.replace(/\W/g, '_');
   }
 
-
   /**
    * Stops the Prometheus exporter server
    * @param callback A callback that will be executed once the server is stopped
    */
   stopServer(callback?: () => void) {
     if (!this._server) {
-      this._logger.debug(`Prometheus stopServer() was called but server was never started.`);
+      this._logger.debug(
+        `Prometheus stopServer() was called but server was never started.`
+      );
       if (callback) {
         callback();
       }
@@ -199,25 +237,44 @@ export class PrometheusExporter implements MetricExporter {
    * @param callback A callback that will be called once the server is reade
    */
   startServer(callback?: () => void) {
-    const requestHandler = ((request: IncomingMessage, response: ServerResponse) => {
-      const parsedUrl = url.parse(request.url as string);
-      if (parsedUrl.pathname === this._endpoint) {
-        response.statusCode = 200;
-        response.setHeader('content-type', this._registry.contentType);
-        response.end(this._registry.metrics());
-      } else {
-        response.statusCode = 404;
-        response.end();
-      }
-
-    });
-    this._server = createServer(requestHandler);
     this._server.listen(this._port, () => {
-      this._logger.debug(`Prometheus exporter started on port ${this._port}
-        at endpoint ${this._endpoint}`);
+      this._logger.debug(
+        `Prometheus exporter started on port ${this._port} at endpoint ${this._endpoint}`
+      );
       if (callback) {
         callback();
       }
     });
   }
+
+  /**
+   * Route request based on incoming message url
+   */
+  private _requestHandler = (
+    request: IncomingMessage,
+    response: ServerResponse
+  ) => {
+    if (url.parse(request.url!).pathname === this._endpoint) {
+      this._exportMetrics(response);
+    } else {
+      this._notFound(response);
+    }
+  };
+
+  /**
+   * Respond to incoming message with current state of all metrics
+   */
+  private _exportMetrics = (response: ServerResponse) => {
+    response.statusCode = 200;
+    response.setHeader('content-type', this._registry.contentType);
+    response.end(this._registry.metrics());
+  };
+
+  /**
+   * Respond with 404 status code to all requests that do not match the configured endpoint
+   */
+  private _notFound = (response: ServerResponse) => {
+    response.statusCode = 404;
+    response.end();
+  };
 }
