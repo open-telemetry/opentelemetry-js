@@ -17,14 +17,14 @@
 import * as types from '@opentelemetry/types';
 
 /**
- * Canonicalized labels with an unique string encoded.
+ * Canonicalized labels with an unique string identifier.
  */
 export class LabelSet implements types.LabelSet {
-  encoded: string;
+  identifier: string;
   labels: types.Labels;
 
-  constructor(encoded: string, labels: types.Labels) {
-    this.encoded = encoded;
+  constructor(identifier: string, labels: types.Labels) {
+    this.identifier = identifier;
     this.labels = labels;
   }
 }

@@ -54,8 +54,8 @@ describe('Meter', () => {
         [keya]: 'value1',
         [keyb]: 'value2',
       };
-      const encoded = '|#keya:value1,keyb:value2';
-      assert.deepEqual(labelSet, new LabelSet(encoded, orderedLabels));
+      const identifier = '|#keya:value1,keyb:value2';
+      assert.deepEqual(labelSet, new LabelSet(identifier, orderedLabels));
     });
   });
 

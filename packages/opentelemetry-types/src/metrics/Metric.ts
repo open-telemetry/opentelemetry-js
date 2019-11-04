@@ -105,9 +105,9 @@ export interface Metric<T> {
 export type Labels = Record<string, string>;
 
 /**
- * Canonicalized labels with an unique string encoded.
+ * Canonicalized labels with an unique string identifier.
  */
 export interface LabelSet {
-  encoded: string;
+  identifier: string;
   labels: Labels;
 }

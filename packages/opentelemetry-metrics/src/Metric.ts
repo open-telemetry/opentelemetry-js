@@ -52,11 +52,11 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
    * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
   getHandle(labelSet: types.LabelSet): T {
-    if (this._handles.has(labelSet.encoded))
-      return this._handles.get(labelSet.encoded)!;
+    if (this._handles.has(labelSet.identifier))
+      return this._handles.get(labelSet.identifier)!;
 
     const handle = this._makeHandle(labelSet);
-    this._handles.set(labelSet.encoded, handle);
+    this._handles.set(labelSet.identifier, handle);
     return handle;
   }
 
@@ -74,7 +74,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
    * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
    */
   removeHandle(labelSet: types.LabelSet): void {
-    this._handles.delete(labelSet.encoded);
+    this._handles.delete(labelSet.identifier);
   }
 
   /**

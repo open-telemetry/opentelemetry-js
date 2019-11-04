@@ -156,12 +156,12 @@ export class Meter implements types.Meter {
   /**
    * Provide a pre-computed re-useable LabelSet by
    * converting the unordered labels into a canonicalized
-   * set of lables with an unique encoded, useful for pre-aggregation.
+   * set of lables with an unique identifier, useful for pre-aggregation.
    * @param labels user provided unordered Labels.
    */
   labels(labels: types.Labels): types.LabelSet {
     let keys = Object.keys(labels).sort();
-    let encoded = keys.reduce((result, key) => {
+    let identifier = keys.reduce((result, key) => {
       if (result.length > 2) {
         result += ',';
       }
@@ -171,7 +171,7 @@ export class Meter implements types.Meter {
     keys.forEach(key => {
       sortedLabels[key] = labels[key];
     });
-    return new LabelSet(encoded, sortedLabels);
+    return new LabelSet(identifier, sortedLabels);
   }
 
   /**
