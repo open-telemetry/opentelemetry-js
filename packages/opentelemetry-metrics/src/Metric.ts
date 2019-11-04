@@ -24,6 +24,7 @@ import {
   MetricDescriptor,
   MetricDescriptorType,
 } from './export/types';
+import { Meter } from './Meter';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
@@ -37,7 +38,8 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
   constructor(
     private readonly _name: string,
     private readonly _options: MetricOptions,
-    private readonly _type: MetricDescriptorType
+    private readonly _type: MetricDescriptorType,
+    protected readonly _meter: Meter
   ) {
     this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
@@ -57,6 +59,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
     if (this._handles.has(hash)) return this._handles.get(hash)!;
 
     const handle = this._makeHandle(labelValues);
+
     this._handles.set(hash, handle);
     return handle;
   }
@@ -118,18 +121,23 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
     };
   }
 
+  protected _onUpdate = () => {
+    this._meter.exportOneMetric(this._name);
+  };
+
   protected abstract _makeHandle(labelValues: string[]): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<CounterHandle> {
-  constructor(name: string, options: MetricOptions) {
+  constructor(name: string, options: MetricOptions, meter: Meter) {
     super(
       name,
       options,
       options.valueType === types.ValueType.DOUBLE
         ? MetricDescriptorType.COUNTER_DOUBLE
-        : MetricDescriptorType.COUNTER_INT64
+        : MetricDescriptorType.COUNTER_INT64,
+      meter
     );
   }
   protected _makeHandle(labelValues: string[]): CounterHandle {
@@ -138,20 +146,22 @@ export class CounterMetric extends Metric<CounterHandle> {
       this._monotonic,
       this._valueType,
       labelValues,
-      this._logger
+      this._logger,
+      this._onUpdate
     );
   }
 }
 
 /** This is a SDK implementation of Gauge Metric. */
 export class GaugeMetric extends Metric<GaugeHandle> {
-  constructor(name: string, options: MetricOptions) {
+  constructor(name: string, options: MetricOptions, meter: Meter) {
     super(
       name,
       options,
       options.valueType === types.ValueType.DOUBLE
         ? MetricDescriptorType.GAUGE_DOUBLE
-        : MetricDescriptorType.GAUGE_INT64
+        : MetricDescriptorType.GAUGE_INT64,
+      meter
     );
   }
   protected _makeHandle(labelValues: string[]): GaugeHandle {
@@ -160,7 +170,8 @@ export class GaugeMetric extends Metric<GaugeHandle> {
       this._monotonic,
       this._valueType,
       labelValues,
-      this._logger
+      this._logger,
+      this._onUpdate
     );
   }
 }
