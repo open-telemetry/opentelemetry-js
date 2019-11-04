@@ -4,7 +4,8 @@
   "packages": [
     "packages/*",
     "examples/*",
-    "benchmark/*"
+    "benchmark/*",
+    "packages/opentelemetry-plugin-postgres/*"
   ],
   "version": "0.1.1",
   "changelog": {
