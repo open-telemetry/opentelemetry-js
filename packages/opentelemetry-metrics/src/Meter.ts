@@ -28,9 +28,9 @@ import {
   DEFAULT_METRIC_OPTIONS,
   DEFAULT_CONFIG,
   MeterConfig,
-  LabelSet,
 } from './types';
 import { ReadableMetric } from './export/types';
+import { LabelSet } from './LabelSet';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.

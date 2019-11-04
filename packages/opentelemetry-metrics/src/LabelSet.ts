@@ -13,3 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import * as types from '@opentelemetry/types';
+
+/**
+ * Canonicalized labels with an unique string encoded.
+ */
+export class LabelSet implements types.LabelSet {
+  encoded: string;
+  labels: types.Labels;
+
+  constructor(encoded: string, labels: types.Labels) {
+    this.encoded = encoded;
+    this.labels = labels;
+  }
+}

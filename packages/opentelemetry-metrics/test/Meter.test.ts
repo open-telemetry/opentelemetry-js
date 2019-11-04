@@ -23,7 +23,7 @@ import {
   MetricDescriptorType,
 } from '../src';
 import * as types from '@opentelemetry/types';
-import { LabelSet } from '../src/types';
+import { LabelSet } from '../src/LabelSet';
 import {
   NoopLogger,
   NoopMetric,
