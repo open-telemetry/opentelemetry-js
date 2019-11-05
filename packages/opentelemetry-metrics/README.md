@@ -1,5 +1,6 @@
 # OpenTelemetry Metrics SDK
 [![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
@@ -31,7 +32,7 @@ handle.add(10);
 ```
 
 ### Gauge
-Gauge metrics express a pre-calculated value that is either Set() by explicit instrumentation or observed through a callback. Generally, this kind of metric should be used when the metric cannot be expressed as a sum or because the measurement interval is arbitrary. Use this kind of metric when the measurement is not a quantity, and the sum and event count are not of interest. Gauges are defined as `Monotonic = false` by default, meaning that new values are permitted to make positive or negative changes to the gauge. There is no restriction on the sign of the input for gauges.
+Gauge metrics express a pre-calculated value. Generally, this kind of metric should be used when the metric cannot be expressed as a sum or because the measurement interval is arbitrary. Use this kind of metric when the measurement is not a quantity, and the sum and event count are not of interest. Gauges are defined as `Monotonic = false` by default, meaning that new values are permitted to make positive or negative changes to the gauge. There is no restriction on the sign of the input for gauges.
 
 ```js
 const { Meter } = require('@opentelemetry/metrics');
@@ -43,7 +44,7 @@ const gauge = meter.createGauge('metric_name');
 
 // Create a Handle associated with specified label values.
 const handle = gauge.getHandle(['value1']);
-handle.add(10); // Set to 10
+handle.set(10); // Set to 10
 ```
 
 ## Useful links
@@ -63,3 +64,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-metrics
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-metrics
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-metrics&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/metrics
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fmetrics.svg
