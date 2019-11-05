@@ -129,6 +129,45 @@ describe('ZoneScopeManager', () => {
       });
       assert.strictEqual(scopeManager.active(), window);
     });
+    it('should correctly return the scopes for 3 parallel actions', () => {
+      const rootSpan = { name: 'rootSpan' };
+      scopeManager.with(rootSpan, () => {
+        assert.ok(
+          scopeManager.active() === rootSpan,
+          'Current span is rootSpan'
+        );
+        const concurrentSpan1 = { name: 'concurrentSpan1' };
+        const concurrentSpan2 = { name: 'concurrentSpan2' };
+        const concurrentSpan3 = { name: 'concurrentSpan3' };
+
+        scopeManager.with(concurrentSpan1, () => {
+          setTimeout(() => {
+            assert.ok(
+              scopeManager.active() === concurrentSpan1,
+              'Current span is concurrentSpan1'
+            );
+          }, 10);
+        });
+
+        scopeManager.with(concurrentSpan2, () => {
+          setTimeout(() => {
+            assert.ok(
+              scopeManager.active() === concurrentSpan2,
+              'Current span is concurrentSpan2'
+            );
+          }, 20);
+        });
+
+        scopeManager.with(concurrentSpan3, () => {
+          setTimeout(() => {
+            assert.ok(
+              scopeManager.active() === concurrentSpan3,
+              'Current span is concurrentSpan3'
+            );
+          }, 30);
+        });
+      });
+    });
   });
 
   describe('.bind(function)', () => {

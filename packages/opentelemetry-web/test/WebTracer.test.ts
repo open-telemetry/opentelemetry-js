@@ -81,7 +81,7 @@ describe('WebTracer', () => {
     });
 
     describe('when scopeManager is "ZoneScopeManager"', () => {
-      it('should correctly return the scopes for 3 parallel actions', () => {
+      it('should correctly return the scopes for 2 parallel actions', () => {
         const webTracerWithZone = new WebTracer({
           scopeManager: new ZoneScopeManager(),
         });
@@ -98,10 +98,6 @@ describe('WebTracer', () => {
           );
           const concurrentSpan2 = webTracerWithZone.startSpan(
             'concurrentSpan2'
-          );
-
-          const concurrentSpan3 = webTracerWithZone.startSpan(
-            'concurrentSpan3'
           );
 
           webTracerWithZone.withSpan(concurrentSpan1, () => {
@@ -122,14 +118,6 @@ describe('WebTracer', () => {
             }, 20);
           });
 
-          webTracerWithZone.withSpan(concurrentSpan3, () => {
-            setTimeout(() => {
-              assert.ok(
-                webTracerWithZone.getCurrentSpan() === concurrentSpan3,
-                'Current span is concurrentSpan3'
-              );
-            }, 30);
-          });
         });
       });
     });
