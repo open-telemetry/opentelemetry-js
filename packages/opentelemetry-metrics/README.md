@@ -52,7 +52,7 @@ handle.set(10); // Set to 10
 ```
 
 ### Measure
-*** Work in progress ***
+***Work in progress***
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
