@@ -178,7 +178,8 @@ export class PrometheusExporter implements MetricExporter {
   ): Metric | undefined {
     const metricObject = {
       name,
-      help: readableMetric.descriptor.description,
+      // prom-client throws with empty description which is our default
+      help: readableMetric.descriptor.description || 'description missing',
       labelNames: readableMetric.descriptor.labelKeys,
       // list of registries to register the newly created metric
       registers: [this._registry],
@@ -278,7 +279,7 @@ export class PrometheusExporter implements MetricExporter {
   private _exportMetrics = (response: ServerResponse) => {
     response.statusCode = 200;
     response.setHeader('content-type', this._registry.contentType);
-    response.end(this._registry.metrics());
+    response.end(this._registry.metrics() || '# no registered metrics');
   };
 
   /**
