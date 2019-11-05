@@ -72,7 +72,8 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Save current metric state so that it can be pulled by the metrics backend.
+   * Saves the current values of all exported {@link ReadableMetric}s so that they can be pulled
+   * by the Prometheus backend.
    *
    * @todo reach into metrics to pull metric values on endpoint
    * In its current state, the exporter saves the current values of all metrics when export
@@ -104,7 +105,9 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Shut down the export server
+   * Shuts down the export server and clears the registry
+   *
+   * @param cb called when server is stopped
    */
   shutdown(cb?: () => void) {
     this._registry.clear();
@@ -112,7 +115,7 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Save the value of one metric to be exported
+   * Updates the value of a single metric in the registry
    *
    * @param readableMetric Metric value to be saved
    */
@@ -206,7 +209,8 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Remove characters that are invalid in prometheus metric names.
+   * Ensures metric names are valid Prometheus metric names by removing
+   * characters allowed by OpenTelemetry but disallowed by Prometheus.
    *
    * https://io/docs/concepts/data_model/#metric-names-and-labels
    *
@@ -227,7 +231,7 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Stops the Prometheus exporter server
+   * Stops the Prometheus export server
    * @param callback A callback that will be executed once the server is stopped
    */
   stopServer(callback?: () => void) {
@@ -249,8 +253,9 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Starts the Prometheus exporter server and registers the request handler
-   * @param callback A callback that will be called once the server is ready
+   * Starts the Prometheus export server
+   *
+   * @param callback called once the server is ready
    */
   startServer(callback?: () => void) {
     this._server.listen(this._port, () => {
@@ -264,7 +269,11 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Route request based on incoming message url
+   * Request handler used by http library to respond to incoming requests
+   * for the current state of metrics by the Prometheus backend.
+   *
+   * @param request Incoming HTTP request to export server
+   * @param response HTTP response object used to respond to request
    */
   private _requestHandler = (
     request: IncomingMessage,
@@ -278,7 +287,7 @@ export class PrometheusExporter implements MetricExporter {
   };
 
   /**
-   * Respond to incoming message with current state of all metrics
+   * Responds to incoming message with current state of all metrics.
    */
   private _exportMetrics = (response: ServerResponse) => {
     response.statusCode = 200;
@@ -287,7 +296,7 @@ export class PrometheusExporter implements MetricExporter {
   };
 
   /**
-   * Respond with 404 status code to all requests that do not match the configured endpoint
+   * Responds with 404 status code to all requests that do not match the configured endpoint.
    */
   private _notFound = (response: ServerResponse) => {
     response.statusCode = 404;
