@@ -25,7 +25,7 @@ import {
 } from '@opentelemetry/metrics';
 import * as types from '@opentelemetry/types';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import * as Prometheus from 'prom-client';
+import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 
@@ -37,7 +37,7 @@ export class PrometheusExporter implements MetricExporter {
     prefix: '',
   };
 
-  private readonly _registry = new Prometheus.Registry();
+  private readonly _registry = new Registry();
   private readonly _logger: types.Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
@@ -105,8 +105,9 @@ export class PrometheusExporter implements MetricExporter {
   /**
    * Shut down the export server
    */
-  shutdown() {
-    this.stopServer();
+  shutdown(cb?: () => void) {
+    this._registry.clear();
+    this.stopServer(cb);
   }
 
   /**
@@ -120,7 +121,7 @@ export class PrometheusExporter implements MetricExporter {
 
     const labelKeys = readableMetric.descriptor.labelKeys;
 
-    if (metric instanceof Prometheus.Counter) {
+    if (metric instanceof Counter) {
       for (const ts of readableMetric.timeseries) {
         // Prometheus counter saves internal state and increments by given value.
         // ReadableMetric value is the current state, not the delta to be incremented by.
@@ -131,7 +132,7 @@ export class PrometheusExporter implements MetricExporter {
       }
     }
 
-    if (metric instanceof Prometheus.Gauge) {
+    if (metric instanceof Gauge) {
       for (const ts of readableMetric.timeseries) {
         metric.set(this._getLabelValues(labelKeys, ts.labelValues), ts.points[0]
           .value as number);
@@ -142,7 +143,7 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   private _getLabelValues(keys: string[], values: LabelValue[]) {
-    const labelValues: Prometheus.labelValues = {};
+    const labelValues: labelValues = {};
     for (let i = 0; i < keys.length; i++) {
       if (values[i].value !== null) {
         labelValues[keys[i]] = values[i].value!;
@@ -151,9 +152,7 @@ export class PrometheusExporter implements MetricExporter {
     return labelValues;
   }
 
-  private _registerMetric(
-    readableMetric: ReadableMetric
-  ): Prometheus.Metric | undefined {
+  private _registerMetric(readableMetric: ReadableMetric): Metric | undefined {
     const metricName = this._getPrometheusMetricName(readableMetric.descriptor);
     const metric = this._registry.getSingleMetric(metricName);
 
@@ -166,34 +165,32 @@ export class PrometheusExporter implements MetricExporter {
      * This works because counters are identified by their name and no other internal ID
      * https://prometheus.io/docs/instrumenting/exposition_formats/
      */
-    if (metric instanceof Prometheus.Counter) {
+    if (metric instanceof Counter) {
       this._registry.removeSingleMetric(metricName);
     } else if (metric) return metric;
 
-    const newMetric = this._newMetric(readableMetric, metricName);
-    if (!newMetric) return;
-
-    this._registry.registerMetric(newMetric);
-    return newMetric;
+    return this._newMetric(readableMetric, metricName);
   }
 
   private _newMetric(
     readableMetric: ReadableMetric,
     name: string
-  ): Prometheus.Metric | undefined {
+  ): Metric | undefined {
     const metricObject = {
       name,
       help: readableMetric.descriptor.description,
       labelNames: readableMetric.descriptor.labelKeys,
+      // list of registries to register the newly created metric
+      registers: [this._registry],
     };
 
     switch (readableMetric.descriptor.type) {
       case MetricDescriptorType.COUNTER_DOUBLE:
       case MetricDescriptorType.COUNTER_INT64:
-        return new Prometheus.Counter(metricObject);
+        return new Counter(metricObject);
       case MetricDescriptorType.GAUGE_DOUBLE:
       case MetricDescriptorType.GAUGE_INT64:
-        return new Prometheus.Gauge(metricObject);
+        return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented
         return undefined;
@@ -209,7 +206,7 @@ export class PrometheusExporter implements MetricExporter {
   /**
    * Remove characters that are invalid in prometheus metric names.
    *
-   * https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+   * https://io/docs/concepts/data_model/#metric-names-and-labels
    *
    * 1. Names must match `[a-zA-Z_:][a-zA-Z0-9_:]*`
    *
