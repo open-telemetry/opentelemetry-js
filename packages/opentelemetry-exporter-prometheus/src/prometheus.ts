@@ -43,6 +43,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _endpoint: string;
   private _server: Server;
   private readonly _prefix?: string;
+  private readonly _invalidCharacterRegex = /[^a-z0-9_]/gi;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a label named 'le'
@@ -214,12 +215,15 @@ export class PrometheusExporter implements MetricExporter {
    * 2. Colons are reserved for user defined recording rules.
    * They should not be used by exporters or direct instrumentation.
    *
+   * OpenTelemetry metric names are already validated in the Meter when they are created,
+   * and they match the format `[a-zA-Z][a-zA-Z0-9_.\-]*` which is very close to a valid
+   * prometheus metric name, so we only need to strip characters valid in OpenTelemetry
+   * but not valid in prometheus and replace them with '_'.
+   *
    * @param name name to be sanitized
    */
   private _sanitizePrometheusMetricName(name: string): string {
-    return name
-      .replace(/^([^a-zA-Z_].+)/, '_$1') // starts with [a-zA-Z_]
-      .replace(/[^a-zA-Z0-9_]/g, '_'); // replace all invalid characters with '_'
+    return name.replace(this._invalidCharacterRegex, '_'); // replace all invalid characters with '_'
   }
 
   /**

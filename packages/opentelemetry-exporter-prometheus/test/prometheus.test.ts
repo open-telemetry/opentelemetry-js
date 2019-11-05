@@ -36,7 +36,7 @@ describe('PrometheusExporter', () => {
         },
         () => {
           const url = `http://localhost:${port}${endpoint}`;
-          http.get(url, function (res: any) {
+          http.get(url, function(res: any) {
             assert.equal(res.statusCode, 200);
             exporter.shutdown(() => {
               return done();
@@ -71,7 +71,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
@@ -91,7 +91,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
@@ -111,7 +111,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}/metric`;
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 200);
           exporter.shutdown(() => {
             const exporter2 = new PrometheusExporter({
@@ -121,7 +121,7 @@ describe('PrometheusExporter', () => {
 
             exporter2.startServer(() => {
               const url = `http://localhost:${port}/metric`;
-              http.get(url, function (res: any) {
+              http.get(url, function(res: any) {
                 assert.equal(res.statusCode, 200);
                 exporter2.stopServer(() => {
                   return done();
@@ -143,7 +143,7 @@ describe('PrometheusExporter', () => {
       exporter.startServer(() => {
         const url = `http://localhost:${port}/invalid`;
 
-        http.get(url, function (res: any) {
+        http.get(url, function(res: any) {
           assert.equal(res.statusCode, 404);
           exporter.shutdown(() => {
             return done();
@@ -301,7 +301,6 @@ describe('PrometheusExporter', () => {
     it('should add a description if missing', done => {
       const gauge = meter.createGauge('gauge') as GaugeMetric;
 
-
       const handle = gauge.getHandle(['labelValue1']);
       handle.set(10);
       exporter.export([gauge.get()!], () => {
@@ -315,6 +314,31 @@ describe('PrometheusExporter', () => {
                 '# HELP gauge description missing',
                 '# TYPE gauge gauge',
                 'gauge 10',
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
+
+    it('should sanitize names', done => {
+      const gauge = meter.createGauge('gauge.bad-name') as GaugeMetric;
+      const handle = gauge.getHandle(['labelValue1']);
+      handle.set(10);
+      exporter.export([gauge.get()!], () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepEqual(lines, [
+                '# HELP gauge_bad_name description missing',
+                '# TYPE gauge_bad_name gauge',
+                'gauge_bad_name 10',
                 '',
               ]);
 
