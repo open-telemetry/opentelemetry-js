@@ -206,8 +206,22 @@ export class PrometheusExporter implements MetricExporter {
     );
   }
 
+  /**
+   * Remove characters that are invalid in prometheus metric names.
+   *
+   * https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
+   *
+   * 1. Names must match `[a-zA-Z_:][a-zA-Z0-9_:]*`
+   *
+   * 2. Colons are reserved for user defined recording rules.
+   * They should not be used by exporters or direct instrumentation.
+   *
+   * @param name name to be sanitized
+   */
   private _sanitizePrometheusMetricName(name: string): string {
-    return name.replace(/\W/g, '_');
+    return name
+      .replace(/^([^a-zA-Z_].+)/, '_$1') // starts with [a-zA-Z_]
+      .replace(/[^a-zA-Z0-9_]/g, '_'); // replace all invalid characters with '_'
   }
 
   /**

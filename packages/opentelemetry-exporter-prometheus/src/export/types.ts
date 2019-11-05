@@ -45,7 +45,7 @@ export interface ExporterConfig {
   /**
    * Define if the Prometheus exporter server will be started
    * @default false
-  */
+   */
   startServer?: boolean;
 
   /** Standard logging interface */
