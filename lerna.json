@@ -3,10 +3,9 @@
   "npmClient": "yarn",
   "packages": [
     "packages/*",
-    "examples/*",
     "benchmark/*"
   ],
-  "version": "0.1.1",
+  "version": "0.2.0",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {

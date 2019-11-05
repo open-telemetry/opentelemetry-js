@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "OpenTelemetry Core",
   "main": "build/src/index.js",
   "browser": {
@@ -65,16 +65,16 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
-    "tslint-consistent-codestyle" : "^1.16.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.6.3",
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.1.1",
+    "@opentelemetry/types": "^0.2.0",
     "semver": "^6.3.0"
   }
 }
