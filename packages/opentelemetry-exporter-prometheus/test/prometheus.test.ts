@@ -349,6 +349,111 @@ describe('PrometheusExporter', () => {
       });
     });
   });
+
+  describe('configuration', () => {
+    let meter: Meter;
+    let gauge: GaugeMetric;
+    let exporter: PrometheusExporter | undefined;
+
+    beforeEach(() => {
+      meter = new Meter();
+      gauge = meter.createGauge('gauge') as GaugeMetric;
+      gauge.getHandle(['labelValue1']).set(10);
+    });
+
+    afterEach(done => {
+      if (exporter) {
+        exporter.shutdown(done);
+        exporter = undefined;
+      } else {
+        done();
+      }
+    });
+
+    it('should use a configured name prefix', done => {
+      exporter = new PrometheusExporter({
+        prefix: 'test_prefix',
+      });
+
+      exporter.startServer(() => {
+        exporter!.export(meter.getMetrics(), () => {
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.deepEqual(lines, [
+                  '# HELP test_prefix_gauge description missing',
+                  '# TYPE test_prefix_gauge gauge',
+                  'test_prefix_gauge 10',
+                  '',
+                ]);
+
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+
+    it('should use a configured port', done => {
+      exporter = new PrometheusExporter({
+        port: 8080,
+      });
+
+      exporter.startServer(() => {
+        exporter!.export(meter.getMetrics(), () => {
+          http
+            .get('http://localhost:8080/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.deepEqual(lines, [
+                  '# HELP gauge description missing',
+                  '# TYPE gauge gauge',
+                  'gauge 10',
+                  '',
+                ]);
+
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+
+    it('should use a configured endpoint', done => {
+      exporter = new PrometheusExporter({
+        endpoint: '/test',
+      });
+
+      exporter.startServer(() => {
+        exporter!.export(meter.getMetrics(), () => {
+          http
+            .get('http://localhost:9464/test', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.deepEqual(lines, [
+                  '# HELP gauge description missing',
+                  '# TYPE gauge gauge',
+                  'gauge 10',
+                  '',
+                ]);
+
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+  });
 });
 
 function errorHandler(done: Mocha.Done): (err: Error) => void {
