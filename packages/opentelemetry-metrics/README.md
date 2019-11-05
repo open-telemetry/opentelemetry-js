@@ -51,6 +51,9 @@ handle.set(10); // Set to 10
 // @todo: add exporter
 ```
 
+### Measure
+*** Work in progress ***
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
