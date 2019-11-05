@@ -3,7 +3,6 @@
   "npmClient": "yarn",
   "packages": [
     "benchmark/*",
-    "examples/*",
     "packages/*",
     "packages/opentelemetry-plugin-postgres/*"
   ],
