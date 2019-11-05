@@ -41,7 +41,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _logger: types.Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
-  private _server: Server;
+  private readonly _server: Server;
   private readonly _prefix?: string;
   private readonly _invalidCharacterRegex = /[^a-z0-9_]/gi;
 
