@@ -131,7 +131,7 @@ export class Meter implements types.Meter {
   }
 
   /**
-   * Gets a collection of Metric`s to be exported.
+   * Gets a collection of Metrics to be exported.
    * @returns The list of metrics.
    */
   getMetrics(): ReadableMetric[] {
@@ -143,7 +143,7 @@ export class Meter implements types.Meter {
   /**
    * Add an exporter to the list of registered exporters
    *
-   * @param exporter exporter to add to the list of registered exporters
+   * @param exporter {@Link MetricExporter} to add to the list of registered exporters
    */
   addExporter(exporter: MetricExporter) {
     this._exporters.push(exporter);
@@ -154,17 +154,17 @@ export class Meter implements types.Meter {
    */
   private _exportOneMetric(name: string) {
     const metric = this._metrics.get(name);
-    if (metric) {
-      const readableMetric = metric.get();
-      if (readableMetric) {
-        for (const exporter of this._exporters) {
-          exporter.export([readableMetric], result => {
-            if (result !== ExportResult.SUCCESS) {
-              this._logger.error(`Failed to export ${name}`);
-            }
-          });
+    if (!metric) return;
+
+    const readableMetric = metric.get();
+    if (!readableMetric) return;
+
+    for (const exporter of this._exporters) {
+      exporter.export([readableMetric], result => {
+        if (result !== ExportResult.SUCCESS) {
+          this._logger.error(`Failed to export ${name}`);
         }
-      }
+      });
     }
   }
 
