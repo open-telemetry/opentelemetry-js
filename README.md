@@ -30,7 +30,7 @@ includes:
 - OpenTracing Bridge
 - HTTP, GRPC, DNS Instrumentations
 - Document Load for web
-- Metrics SDK (`Counter` and `Gauge` support)
+- Metrics SDK (`Counter` and `Gauge` support) - Export work is underway.
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
