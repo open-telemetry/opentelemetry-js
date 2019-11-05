@@ -208,7 +208,7 @@ export class PrometheusExporter implements MetricExporter {
   /**
    * Remove characters that are invalid in prometheus metric names.
    *
-   * https://io/docs/concepts/data_model/#metric-names-and-labels
+   * https://prometheus.io/docs/concepts/data_model/#metric-names-and-labels
    *
    * 1. Names must match `[a-zA-Z_:][a-zA-Z0-9_:]*`
    *
