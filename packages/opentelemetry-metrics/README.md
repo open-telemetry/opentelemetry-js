@@ -29,6 +29,8 @@ const counter = meter.createCounter('metric_name');
 // Create a Handle associated with specified label values.
 const handle = counter.getHandle(['value1']);
 handle.add(10);
+
+// @todo: add exporter
 ```
 
 ### Gauge
@@ -45,6 +47,8 @@ const gauge = meter.createGauge('metric_name');
 // Create a Handle associated with specified label values.
 const handle = gauge.getHandle(['value1']);
 handle.set(10); // Set to 10
+
+// @todo: add exporter
 ```
 
 ## Useful links
