@@ -234,7 +234,7 @@ export class PrometheusExporter implements MetricExporter {
 
   /**
    * Starts the Prometheus exporter server and registers the request handler
-   * @param callback A callback that will be called once the server is reade
+   * @param callback A callback that will be called once the server is ready
    */
   startServer(callback?: () => void) {
     this._server.listen(this._port, () => {
