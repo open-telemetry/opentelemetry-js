@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+/**
+ * Can't use Sinon Fake Time here as then cannot stub the performance getEntriesByType with desired metrics
+ */
+
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
@@ -38,6 +42,65 @@ export class DummyExporter implements SpanExporter {
 
   shutdown() {}
 }
+
+const entries = {
+  name: 'http://localhost:8090/',
+  entryType: 'navigation',
+  startTime: 0,
+  duration: 374.0100000286475,
+  initiatorType: 'navigation',
+  nextHopProtocol: 'http/1.1',
+  workerStart: 0,
+  redirectStart: 0,
+  redirectEnd: 0,
+  fetchStart: 0.7999999215826392,
+  domainLookupStart: 0.7999999215826392,
+  domainLookupEnd: 0.7999999215826392,
+  connectStart: 0.7999999215826392,
+  connectEnd: 0.7999999215826393,
+  secureConnectionStart: 0.7999999215826392,
+  requestStart: 4.480000003241003,
+  responseStart: 5.729999975301325,
+  responseEnd: 6.154999951831996,
+  transferSize: 655,
+  encodedBodySize: 362,
+  decodedBodySize: 362,
+  serverTiming: [],
+  unloadEventStart: 12.63499993365258,
+  unloadEventEnd: 13.514999998733401,
+  domInteractive: 200.12499997392297,
+  domContentLoadedEventStart: 200.13999997172505,
+  domContentLoadedEventEnd: 201.6000000294298,
+  domComplete: 370.62499998137355,
+  loadEventStart: 370.64999993890524,
+  loadEventEnd: 374.0100000286475,
+  type: 'reload',
+  redirectCount: 0,
+} as any;
+
+const entriesFallback = {
+  navigationStart: 1571078170305,
+  unloadEventStart: 0,
+  unloadEventEnd: 0,
+  redirectStart: 0,
+  redirectEnd: 0,
+  fetchStart: 1571078170305,
+  domainLookupStart: 1571078170307,
+  domainLookupEnd: 1571078170308,
+  connectStart: 1571078170309,
+  connectEnd: 1571078170310,
+  secureConnectionStart: 1571078170310,
+  requestStart: 1571078170310,
+  responseStart: 1571078170313,
+  responseEnd: 1571078170330,
+  domLoading: 1571078170331,
+  domInteractive: 1571078170392,
+  domContentLoadedEventStart: 1571078170392,
+  domContentLoadedEventEnd: 1571078170392,
+  domComplete: 1571078170393,
+  loadEventStart: 1571078170393,
+  loadEventEnd: 1571078170394,
+} as any;
 
 describe('DocumentLoad Plugin', () => {
   let plugin: DocumentLoad;
@@ -78,11 +141,14 @@ describe('DocumentLoad Plugin', () => {
   });
 
   describe('when document readyState is complete', () => {
-    it('should start collecting the performance immediately', () => {
+    it('should start collecting the performance immediately', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
-      assert.strictEqual(window.document.readyState, 'complete');
-      assert.strictEqual(spyOnEnd.callCount, 2);
+      setTimeout(() => {
+        assert.strictEqual(window.document.readyState, 'complete');
+        assert.strictEqual(spyOnEnd.callCount, 2);
+        done();
+      });
     });
   });
 
@@ -94,7 +160,7 @@ describe('DocumentLoad Plugin', () => {
       });
     });
 
-    it('should collect performance after document load event', () => {
+    it('should collect performance after document load event', done => {
       const spy = sinon.spy(window, 'addEventListener');
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
 
@@ -113,7 +179,10 @@ describe('DocumentLoad Plugin', () => {
           detail: {},
         })
       );
-      assert.strictEqual(spyOnEnd.callCount, 2);
+      setTimeout(() => {
+        assert.strictEqual(spyOnEnd.callCount, 2);
+        done();
+      });
     });
   });
 
@@ -121,81 +190,86 @@ describe('DocumentLoad Plugin', () => {
     let spyExport: any;
 
     beforeEach(() => {
-      const entries = {
-        name: 'http://localhost:8090/',
-        entryType: 'navigation',
-        startTime: 0,
-        duration: 374.0100000286475,
-        initiatorType: 'navigation',
-        nextHopProtocol: 'http/1.1',
-        workerStart: 0,
-        redirectStart: 0,
-        redirectEnd: 0,
-        fetchStart: 0.7999999215826392,
-        domainLookupStart: 0.7999999215826392,
-        domainLookupEnd: 0.7999999215826392,
-        connectStart: 0.7999999215826392,
-        connectEnd: 0.7999999215826393,
-        secureConnectionStart: 0.7999999215826392,
-        requestStart: 4.480000003241003,
-        responseStart: 5.729999975301325,
-        responseEnd: 6.154999951831996,
-        transferSize: 655,
-        encodedBodySize: 362,
-        decodedBodySize: 362,
-        serverTiming: [],
-        unloadEventStart: 12.63499993365258,
-        unloadEventEnd: 13.514999998733401,
-        domInteractive: 200.12499997392297,
-        domContentLoadedEventStart: 200.13999997172505,
-        domContentLoadedEventEnd: 201.6000000294298,
-        domComplete: 370.62499998137355,
-        loadEventStart: 370.64999993890524,
-        loadEventEnd: 374.0100000286475,
-        type: 'reload',
-        redirectCount: 0,
-      } as any;
       spyExport = sinon
         .stub(window.performance, 'getEntriesByType')
         .returns([entries]);
     });
 
-    it('should export correct span with events', () => {
+    it('should export correct span with events', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
 
-      const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
-      const events1 = span1.events;
-      const events2 = span2.events;
+      setTimeout(() => {
+        const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
+        const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
+        const rsEvents = rootSpan.events;
+        const fsEvents = fetchSpan.events;
 
-      assert.strictEqual(span1.name, 'documentFetch');
-      assert.strictEqual(span2.name, 'documentLoad');
+        assert.strictEqual(rootSpan.name, 'documentFetch');
+        assert.strictEqual(fetchSpan.name, 'documentLoad');
 
-      assert.strictEqual(events1[0].name, PTN.FETCH_START);
-      assert.strictEqual(events1[1].name, PTN.DOMAIN_LOOKUP_START);
-      assert.strictEqual(events1[2].name, PTN.DOMAIN_LOOKUP_END);
-      assert.strictEqual(events1[3].name, PTN.CONNECT_START);
-      assert.strictEqual(events1[4].name, PTN.SECURE_CONNECTION_START);
-      assert.strictEqual(events1[5].name, PTN.CONNECT_END);
-      assert.strictEqual(events1[6].name, PTN.REQUEST_START);
-      assert.strictEqual(events1[7].name, PTN.RESPONSE_START);
-      assert.strictEqual(events1[8].name, PTN.RESPONSE_END);
+        assert.strictEqual(rsEvents[0].name, PTN.FETCH_START);
+        assert.strictEqual(rsEvents[1].name, PTN.DOMAIN_LOOKUP_START);
+        assert.strictEqual(rsEvents[2].name, PTN.DOMAIN_LOOKUP_END);
+        assert.strictEqual(rsEvents[3].name, PTN.CONNECT_START);
+        assert.strictEqual(rsEvents[4].name, PTN.SECURE_CONNECTION_START);
+        assert.strictEqual(rsEvents[5].name, PTN.CONNECT_END);
+        assert.strictEqual(rsEvents[6].name, PTN.REQUEST_START);
+        assert.strictEqual(rsEvents[7].name, PTN.RESPONSE_START);
+        assert.strictEqual(rsEvents[8].name, PTN.RESPONSE_END);
 
-      assert.strictEqual(events2[0].name, PTN.FETCH_START);
-      assert.strictEqual(events2[1].name, PTN.UNLOAD_EVENT_START);
-      assert.strictEqual(events2[2].name, PTN.UNLOAD_EVENT_END);
-      assert.strictEqual(events2[3].name, PTN.DOM_INTERACTIVE);
-      assert.strictEqual(events2[4].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
-      assert.strictEqual(events2[5].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
-      assert.strictEqual(events2[6].name, PTN.DOM_COMPLETE);
-      assert.strictEqual(events2[7].name, PTN.LOAD_EVENT_START);
-      assert.strictEqual(events2[8].name, PTN.LOAD_EVENT_END);
+        assert.strictEqual(fsEvents[0].name, PTN.FETCH_START);
+        assert.strictEqual(fsEvents[1].name, PTN.UNLOAD_EVENT_START);
+        assert.strictEqual(fsEvents[2].name, PTN.UNLOAD_EVENT_END);
+        assert.strictEqual(fsEvents[3].name, PTN.DOM_INTERACTIVE);
+        assert.strictEqual(
+          fsEvents[4].name,
+          PTN.DOM_CONTENT_LOADED_EVENT_START
+        );
+        assert.strictEqual(fsEvents[5].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+        assert.strictEqual(fsEvents[6].name, PTN.DOM_COMPLETE);
+        assert.strictEqual(fsEvents[7].name, PTN.LOAD_EVENT_START);
+        assert.strictEqual(fsEvents[8].name, PTN.LOAD_EVENT_END);
 
-      assert.strictEqual(events1.length, 9);
-      assert.strictEqual(events2.length, 9);
-      assert.strictEqual(spyOnEnd.callCount, 2);
+        assert.strictEqual(rsEvents.length, 9);
+        assert.strictEqual(fsEvents.length, 9);
+        assert.strictEqual(spyOnEnd.callCount, 2);
+        done();
+      });
     });
+
+    afterEach(() => {
+      spyExport.restore();
+    });
+  });
+
+  describe('when navigation entries types are available and property "loadEventEnd" is missing', () => {
+    let spyExport: any;
+
+    beforeEach(() => {
+      const entriesWithoutLoadEventEnd = Object.assign({}, entries);
+      delete entriesWithoutLoadEventEnd.loadEventEnd;
+      spyExport = sinon
+        .stub(window.performance, 'getEntriesByType')
+        .returns([entriesWithoutLoadEventEnd]);
+    });
+
+    it('should still export rootSpan and fetchSpan', done => {
+      const spyOnEnd = sinon.spy(dummyExporter, 'export');
+      plugin.enable(moduleExports, tracer, logger, config);
+
+      setTimeout(() => {
+        const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
+        const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
+
+        assert.strictEqual(rootSpan.name, 'documentFetch');
+        assert.strictEqual(fetchSpan.name, 'documentLoad');
+
+        assert.strictEqual(spyOnEnd.callCount, 2);
+        done();
+      });
+    });
+
     afterEach(() => {
       spyExport.restore();
     });
@@ -205,72 +279,53 @@ describe('DocumentLoad Plugin', () => {
     let spyExport: any;
 
     beforeEach(() => {
-      const entries = {
-        navigationStart: 1571078170305,
-        unloadEventStart: 0,
-        unloadEventEnd: 0,
-        redirectStart: 0,
-        redirectEnd: 0,
-        fetchStart: 1571078170305,
-        domainLookupStart: 1571078170307,
-        domainLookupEnd: 1571078170308,
-        connectStart: 1571078170309,
-        connectEnd: 1571078170310,
-        secureConnectionStart: 1571078170310,
-        requestStart: 1571078170310,
-        responseStart: 1571078170313,
-        responseEnd: 1571078170330,
-        domLoading: 1571078170331,
-        domInteractive: 1571078170392,
-        domContentLoadedEventStart: 1571078170392,
-        domContentLoadedEventEnd: 1571078170392,
-        domComplete: 1571078170393,
-        loadEventStart: 1571078170393,
-        loadEventEnd: 1571078170394,
-      } as any;
-
       spyExport = sinon
         .stub(window.performance, 'getEntriesByType')
         .returns([]);
       Object.defineProperty(window.performance, 'timing', {
         writable: true,
-        value: entries,
+        value: entriesFallback,
       });
     });
 
-    it('should export correct span with events', () => {
+    it('should export correct span with events', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
+      setTimeout(() => {
+        const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
+        const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
+        const rsEvents = rootSpan.events;
+        const fsEvents = fetchSpan.events;
 
-      const span1 = spyOnEnd.args[0][0][0] as ReadableSpan;
-      const span2 = spyOnEnd.args[1][0][0] as ReadableSpan;
-      const events1 = span1.events;
-      const events2 = span2.events;
+        assert.strictEqual(rootSpan.name, 'documentFetch');
+        assert.strictEqual(fetchSpan.name, 'documentLoad');
 
-      assert.strictEqual(span1.name, 'documentFetch');
-      assert.strictEqual(span2.name, 'documentLoad');
+        assert.strictEqual(rsEvents[0].name, PTN.FETCH_START);
+        assert.strictEqual(rsEvents[1].name, PTN.DOMAIN_LOOKUP_START);
+        assert.strictEqual(rsEvents[2].name, PTN.DOMAIN_LOOKUP_END);
+        assert.strictEqual(rsEvents[3].name, PTN.CONNECT_START);
+        assert.strictEqual(rsEvents[4].name, PTN.SECURE_CONNECTION_START);
+        assert.strictEqual(rsEvents[5].name, PTN.CONNECT_END);
+        assert.strictEqual(rsEvents[6].name, PTN.REQUEST_START);
+        assert.strictEqual(rsEvents[7].name, PTN.RESPONSE_START);
+        assert.strictEqual(rsEvents[8].name, PTN.RESPONSE_END);
 
-      assert.strictEqual(events1[0].name, PTN.FETCH_START);
-      assert.strictEqual(events1[1].name, PTN.DOMAIN_LOOKUP_START);
-      assert.strictEqual(events1[2].name, PTN.DOMAIN_LOOKUP_END);
-      assert.strictEqual(events1[3].name, PTN.CONNECT_START);
-      assert.strictEqual(events1[4].name, PTN.SECURE_CONNECTION_START);
-      assert.strictEqual(events1[5].name, PTN.CONNECT_END);
-      assert.strictEqual(events1[6].name, PTN.REQUEST_START);
-      assert.strictEqual(events1[7].name, PTN.RESPONSE_START);
-      assert.strictEqual(events1[8].name, PTN.RESPONSE_END);
+        assert.strictEqual(fsEvents[0].name, PTN.FETCH_START);
+        assert.strictEqual(fsEvents[1].name, PTN.DOM_INTERACTIVE);
+        assert.strictEqual(
+          fsEvents[2].name,
+          PTN.DOM_CONTENT_LOADED_EVENT_START
+        );
+        assert.strictEqual(fsEvents[3].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
+        assert.strictEqual(fsEvents[4].name, PTN.DOM_COMPLETE);
+        assert.strictEqual(fsEvents[5].name, PTN.LOAD_EVENT_START);
+        assert.strictEqual(fsEvents[6].name, PTN.LOAD_EVENT_END);
 
-      assert.strictEqual(events2[0].name, PTN.FETCH_START);
-      assert.strictEqual(events2[1].name, PTN.DOM_INTERACTIVE);
-      assert.strictEqual(events2[2].name, PTN.DOM_CONTENT_LOADED_EVENT_START);
-      assert.strictEqual(events2[3].name, PTN.DOM_CONTENT_LOADED_EVENT_END);
-      assert.strictEqual(events2[4].name, PTN.DOM_COMPLETE);
-      assert.strictEqual(events2[5].name, PTN.LOAD_EVENT_START);
-      assert.strictEqual(events2[6].name, PTN.LOAD_EVENT_END);
-
-      assert.strictEqual(events1.length, 9);
-      assert.strictEqual(events2.length, 7);
-      assert.strictEqual(spyOnEnd.callCount, 2);
+        assert.strictEqual(rsEvents.length, 9);
+        assert.strictEqual(fsEvents.length, 7);
+        assert.strictEqual(spyOnEnd.callCount, 2);
+        done();
+      });
     });
 
     afterEach(() => {
@@ -291,11 +346,13 @@ describe('DocumentLoad Plugin', () => {
       });
     });
 
-    it('should not create any span', () => {
+    it('should not create any span', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
       plugin.enable(moduleExports, tracer, logger, config);
-
-      assert.ok(spyOnEnd.callCount === 0);
+      setTimeout(() => {
+        assert.ok(spyOnEnd.callCount === 0);
+        done();
+      });
     });
 
     afterEach(() => {
