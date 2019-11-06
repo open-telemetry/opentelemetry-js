@@ -39,20 +39,24 @@ describe('dns.promises.lookup()', () => {
     if (semver.lte(process.versions.node, '10.6.0')) {
       this.skip();
       done();
-    } else if (process.env.CI) {
-      // if node version is supported, it's mandatory for CI
+      return;
+    }
+
+    // if node version is supported, it's mandatory for CI
+    if (process.env.CI) {
       plugin.enable(dns, tracer, tracer.logger);
       done();
-    } else {
-      utils.checkInternet(isConnected => {
-        if (!isConnected) {
-          this.skip();
-          // don't disturbe people
-        }
-        done();
-      });
-      plugin.enable(dns, tracer, tracer.logger);
+      return;
     }
+
+    utils.checkInternet(isConnected => {
+      if (!isConnected) {
+        this.skip();
+        // don't disturbe people
+      }
+      done();
+    });
+    plugin.enable(dns, tracer, tracer.logger);
   });
 
   afterEach(() => {
