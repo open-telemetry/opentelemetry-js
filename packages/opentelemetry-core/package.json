@@ -19,6 +19,7 @@
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
+    "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"
