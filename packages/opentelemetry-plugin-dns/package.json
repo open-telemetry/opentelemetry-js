@@ -11,6 +11,7 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix"
   },
@@ -54,7 +55,7 @@
     "ts-node": "^8.4.1",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "^3.6.4"
+    "typescript": "3.6.4"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.2.0",
