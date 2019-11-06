@@ -59,7 +59,7 @@ browsers_unit_tests: &browsers_unit_tests
         command: yarn codecov:browser
 
 jobs:
-  lint:
+  lint_&_docs:
     docker:
       - image: node:12
     steps:
@@ -70,14 +70,6 @@ jobs:
       - run:
           name: Check code style and linting
           command: yarn run check
-  docs:
-    docker:
-      - image: node:12
-    steps:
-      - checkout
-      - run:
-          name: Install modules and dependencies.
-          command: yarn install
       - run:
           name: Docs tests
           command: yarn docs-test
@@ -114,8 +106,7 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint
-      - docs
+      - lint_&_docs
       - node8
       - node10
       - node11
