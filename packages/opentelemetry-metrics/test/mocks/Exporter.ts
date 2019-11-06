@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-const COMMA_SEPARATOR = ',';
+import { MetricExporter, ReadableMetric } from '../../src/export/types';
+import { ExportResult } from '@opentelemetry/base';
+import { EventEmitter } from 'events';
 
-/**
- * Returns a string(comma separated) from the list of label values.
- *
- * @param labelValues The list of the label values.
- * @returns The hashed label values string.
- */
-export function hashLabelValues(labelValues: string[]): string {
-  return labelValues.sort().join(COMMA_SEPARATOR);
-}
+export class NoopExporter extends EventEmitter implements MetricExporter {
+  export(
+    metrics: ReadableMetric[],
+    resultCallback: (result: ExportResult) => void
+  ): void {
+    this.emit('export', metrics, resultCallback);
+  }
 
-/**
- * Type guard to remove nulls from arrays
- *
- * @param value value to be checked for null equality
- */
-export function notNull<T>(value: T | null): value is T {
-  return value !== null;
+  shutdown(): void {
+    this.emit('shutdown');
+  }
 }

@@ -12,20 +12,20 @@ For automatic instrumentation see the
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/plugin-postgres
+npm install --save @opentelemetry/plugin-pg-pool
 ```
 
 ## Usage
 
 ```js
-const opentelemetry = require('@opentelemetry/plugin-postgres');
+const opentelemetry = require('@opentelemetry/plugin-pg-pool');
 
 // TODO: DEMONSTRATE API
 ```
 
 ## Supported Versions
 
-- [pg](https://npmjs.com/package/pg): `7.x`
+- [pg](https://npmjs.com/package/pg-pool): `2.x`
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
@@ -40,7 +40,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-plugin-postgres
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-postgres
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-postgres
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-postgres&type=dev
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-plugin-pg-pool
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-pg-pool
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-pg-pool
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-pg-pool&type=dev
