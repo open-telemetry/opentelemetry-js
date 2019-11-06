@@ -18,7 +18,9 @@ OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
-The _alpha_ release includes:
+The [v0.2 alpha
+release](https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.2.0)
+includes:
 
 - Tracing API
 - Tracing SDK (Node and Web)
@@ -26,16 +28,23 @@ The _alpha_ release includes:
 - Jaeger Trace Exporter
 - Zipkin Trace Exporter
 - OpenTracing Bridge
-- HTTP, GRPC Instrumentations
+- HTTP, GRPC, DNS Instrumentations
+- Document Load for web
+- Metrics SDK (`Counter` and `Gauge` support) - Export work is underway.
+
+See the [project
+milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
+for details on upcoming releases. The dates and features described here are
+estimates, and subject to change.
 
 Future release targets include:
 
-| Component                   | Version | Target Date       |
-| --------------------------- | ------- | ----------------- |
-| Metrics SDK                 | v0.2.0  | October 28 2019   |
-| Prometheus Metrics Exporter | v0.2.0  | October 28 2019   |
-| OpenCensus Bridge           | v0.2.0  | tbd           |
-
+| Component                   | Version    | Target Date        |
+| --------------------------- | ---------- | ------------------ |
+| Prometheus Metrics Exporter | Alpha v0.3 | November 15 2019   |
+| mongodb Instrumentation     | Alpha v0.3 | November 15 2019   |
+| postgres Instrumentation    | Alpha v0.3 | November 15 2019   |
+| OpenCensus Bridge           | Alpha v0.3 | tbd                |
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and

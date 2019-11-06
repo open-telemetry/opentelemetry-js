@@ -14,6 +14,7 @@
     "clean": "rimraf build/*",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "check": "gts check",
+    "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"
