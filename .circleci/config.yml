@@ -27,7 +27,7 @@ node_unit_tests: &node_unit_tests
     - run:
         name: Log out node.js version
         command: |
-        echo $(node --version)
+        node --version
         echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
@@ -63,7 +63,7 @@ browsers_unit_tests: &browsers_unit_tests
     - run:
         name: Log out node.js version
         command: |
-        echo $(node --version)
+        node --version
         echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - run:
         name: Install Dependencies
