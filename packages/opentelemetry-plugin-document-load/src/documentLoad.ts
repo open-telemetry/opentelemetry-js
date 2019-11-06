@@ -52,6 +52,21 @@ export class DocumentLoad extends BasePlugin<unknown> {
   }
 
   /**
+   * Adds spans for all resources
+   * @param rootSpan
+   */
+  private _addResourcesSpans(rootSpan: Span): void {
+    const resources: PerformanceResourceTiming[] = otperformance.getEntriesByType(
+      'resource'
+    ) as PerformanceResourceTiming[];
+    if (resources) {
+      resources.forEach(resource => {
+        this._initResourceSpan(rootSpan, resource);
+      });
+    }
+  }
+
+  /**
    * Helper function for starting an event
    * @param span
    * @param performanceName name of performance entry for time start
@@ -70,6 +85,21 @@ export class DocumentLoad extends BasePlugin<unknown> {
       return span;
     }
     return undefined;
+  }
+
+  /**
+   * Adds span network events
+   * @param span
+   * @param entries entries that contains performance information about resource
+   */
+  private _addSpanNetworkEvents(span: Span, entries: PerformanceEntries) {
+    this._addSpanEvent(span, PTN.DOMAIN_LOOKUP_START, entries);
+    this._addSpanEvent(span, PTN.DOMAIN_LOOKUP_END, entries);
+    this._addSpanEvent(span, PTN.CONNECT_START, entries);
+    this._addSpanEvent(span, PTN.SECURE_CONNECTION_START, entries);
+    this._addSpanEvent(span, PTN.CONNECT_END, entries);
+    this._addSpanEvent(span, PTN.REQUEST_START, entries);
+    this._addSpanEvent(span, PTN.RESPONSE_START, entries);
   }
 
   /**
@@ -95,16 +125,11 @@ export class DocumentLoad extends BasePlugin<unknown> {
       }
     );
     if (fetchSpan) {
-      this._addSpanEvent(fetchSpan, PTN.DOMAIN_LOOKUP_START, entries);
-      this._addSpanEvent(fetchSpan, PTN.DOMAIN_LOOKUP_END, entries);
-      this._addSpanEvent(fetchSpan, PTN.CONNECT_START, entries);
-      this._addSpanEvent(fetchSpan, PTN.SECURE_CONNECTION_START, entries);
-      this._addSpanEvent(fetchSpan, PTN.CONNECT_END, entries);
-      this._addSpanEvent(fetchSpan, PTN.REQUEST_START, entries);
-      this._addSpanEvent(fetchSpan, PTN.RESPONSE_START, entries);
-
+      this._addSpanNetworkEvents(fetchSpan, entries);
       this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
     }
+
+    this._addResourcesSpans(rootSpan);
 
     this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
     this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
@@ -176,6 +201,24 @@ export class DocumentLoad extends BasePlugin<unknown> {
       }
     }
     return entries;
+  }
+
+  /**
+   * Creates and ends a span with network information about resource added as timed events
+   * @param rootSpan
+   * @param resource
+   */
+  private _initResourceSpan(
+    rootSpan: Span,
+    resource: PerformanceResourceTiming
+  ) {
+    const span = this._startSpan(resource.name, PTN.FETCH_START, resource, {
+      parent: rootSpan,
+    });
+    if (span) {
+      this._addSpanNetworkEvents(span, resource);
+      this._endSpan(span, PTN.RESPONSE_END, resource);
+    }
   }
 
   /**

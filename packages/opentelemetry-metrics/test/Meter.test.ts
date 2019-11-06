@@ -29,6 +29,7 @@ import {
   hrTime,
   hrTimeToMilliseconds,
 } from '@opentelemetry/core';
+import { NoopExporter } from './mocks/Exporter';
 
 const performanceTimeOrigin = hrTime();
 
@@ -479,6 +480,58 @@ describe('Meter', () => {
         hrTimeToMilliseconds(points2[0].timestamp) >
           hrTimeToMilliseconds(performanceTimeOrigin)
       );
+    });
+  });
+
+  describe('Exporters', () => {
+    it('should register an exporter', () => {
+      const exporter = new NoopExporter();
+      meter.addExporter(exporter);
+      assert.equal(meter['_exporters'].length, 1);
+    });
+
+    it('should export a gauge when it is updated', done => {
+      const exporter = new NoopExporter();
+      exporter.on('export', metrics => {
+        assert.equal(metrics[0].descriptor.name, 'name');
+        assert.equal(metrics[0].timeseries[0].points[0].value, 20);
+        assert.deepEqual(metrics[0].timeseries[0].labelValues, [
+          {
+            value: 'value1',
+          },
+          {
+            value: 'value2',
+          },
+        ]);
+        done();
+      });
+
+      meter.addExporter(exporter);
+      const gauge = meter.createGauge('name') as GaugeMetric;
+      const handle = gauge.getHandle(['value1', 'value2']);
+      handle.set(20);
+    });
+
+    it('should export a counter when it is updated', done => {
+      const counter = meter.createCounter('name') as CounterMetric;
+      const exporter = new NoopExporter();
+      exporter.on('export', metrics => {
+        assert.equal(metrics[0].descriptor.name, 'name');
+        assert.equal(metrics[0].timeseries[0].points[0].value, 20);
+        assert.deepEqual(metrics[0].timeseries[0].labelValues, [
+          {
+            value: 'value1',
+          },
+          {
+            value: 'value2',
+          },
+        ]);
+        done();
+      });
+
+      meter.addExporter(exporter);
+      const handle = counter.getHandle(['value1', 'value2']);
+      handle.add(20);
     });
   });
 });
