@@ -54,7 +54,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
   /**
    * Adds spans for all resources
    * @param rootSpan
-   * @private
    */
   private _addResourcesSpans(rootSpan: Span): void {
     const resources: PerformanceResourceTiming[] = otperformance.getEntriesByType(
@@ -92,7 +91,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Adds span network events
    * @param span
    * @param entries entries that contains performance information about resource
-   * @private
    */
   private _addSpanNetworkEvents(span: Span, entries: PerformanceEntries) {
     this._addSpanEvent(span, PTN.DOMAIN_LOOKUP_START, entries);
@@ -209,7 +207,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Creates and ends a span with network information about resource added as timed events
    * @param rootSpan
    * @param resource
-   * @private
    */
   private _initResourceSpan(
     rootSpan: Span,
