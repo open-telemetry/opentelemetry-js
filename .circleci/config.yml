@@ -27,8 +27,8 @@ node_unit_tests: &node_unit_tests
     - run:
         name: Log out node.js version
         command: |
-        node --version
-        echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
+          node --version
+          echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
           - npm-cache-{{ checksum "/tmp/checksums.txt" }}
@@ -63,8 +63,8 @@ browsers_unit_tests: &browsers_unit_tests
     - run:
         name: Log out node.js version
         command: |
-        node --version
-        echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
+          node --version
+          echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - run:
         name: Install Dependencies
         command: yarn install
