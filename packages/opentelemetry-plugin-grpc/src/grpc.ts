@@ -83,13 +83,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     // Wrap the externally exported client constructor
-    if (this._moduleExports.makeGenericClientConstructor) {
-      shimmer.wrap(
-        this._moduleExports,
-        'makeGenericClientConstructor',
-        this._patchClient()
-      );
-    }
+    shimmer.wrap(
+      this._moduleExports,
+      'makeGenericClientConstructor',
+      this._patchClient()
+    );
 
     if (this._internalFilesExports['client']) {
       grpcClientModule = this._internalFilesExports[
@@ -117,9 +115,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
     }
 
-    if (this._moduleExports.makeGenericClientConstructor) {
-      shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
-    }
+    shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
 
     if (grpcClientModule) {
       shimmer.unwrap(grpcClientModule, 'makeClientConstructor');
