@@ -2,8 +2,9 @@
   "lerna": "3.13.4",
   "npmClient": "yarn",
   "packages": [
+    "benchmark/*",
     "packages/*",
-    "benchmark/*"
+    "packages/opentelemetry-plugin-postgres/*"
   ],
   "version": "0.2.0",
   "changelog": {
