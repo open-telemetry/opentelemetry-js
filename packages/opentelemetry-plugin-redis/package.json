@@ -11,6 +11,7 @@
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
+    "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"

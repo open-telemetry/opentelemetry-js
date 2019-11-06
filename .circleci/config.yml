@@ -19,6 +19,16 @@ node_unit_tests: &node_unit_tests
     - run:
         name: Create Checksum
         command: sh .circleci/checksum.sh /tmp/checksums.txt
+    - run:
+        name: Setup environment variables
+        command: |
+          echo "export CIRCLE_NODE_VERSION=\$(node --version | grep -oE 'v[0-9]+')" >> $BASH_ENV
+          source $BASH_ENV
+    - run:
+        name: Log out node.js version
+        command: |
+          node --version
+          echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
           - npm-cache-{{ checksum "/tmp/checksums.txt" }}
@@ -40,11 +50,21 @@ node_unit_tests: &node_unit_tests
         command: yarn test
     - run:
         name: report coverage
-        command: yarn codecov
+        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then yarn codecov; fi
 
 browsers_unit_tests: &browsers_unit_tests
   steps:
     - checkout
+    - run:
+        name: Setup environment variables
+        command: |
+          echo "export CIRCLE_NODE_VERSION=\$(node --version | grep -oE 'v[0-9]+')" >> $BASH_ENV
+          source $BASH_ENV
+    - run:
+        name: Log out node.js version
+        command: |
+          node --version
+          echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - run:
         name: Install Dependencies
         command: yarn install
@@ -56,7 +76,7 @@ browsers_unit_tests: &browsers_unit_tests
         command: yarn test:browser
     - run:
         name: report coverage
-        command: yarn codecov:browser
+        command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then yarn codecov:browser; fi
 
 jobs:
   lint:
@@ -93,12 +113,6 @@ jobs:
         environment: *test_env
       - *postgres_service
     <<: *node_unit_tests
-  node11:
-    docker:
-      - image: node:11
-        environment: *test_env
-      - *postgres_service
-    <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
@@ -118,6 +132,5 @@ workflows:
       - docs
       - node8
       - node10
-      - node11
       - node12
       - node12-browsers
