@@ -25,8 +25,8 @@ export class BaseHandle {
   protected _data = 0;
   protected _labelSet: types.LabelSet;
 
-  constructor(_labelSet: types.LabelSet) {
-    this._labelSet = _labelSet;
+  constructor(labelSet: types.LabelSet) {
+    this._labelSet = labelSet;
   }
 
   /**
@@ -51,13 +51,13 @@ export class BaseHandle {
  */
 export class CounterHandle extends BaseHandle implements types.CounterHandle {
   constructor(
-    _labelSet: types.LabelSet,
+    labelSet: types.LabelSet,
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
     private readonly _logger: types.Logger
   ) {
-    super(_labelSet);
+    super(labelSet);
   }
 
   add(value: number): void {
@@ -89,13 +89,13 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
  */
 export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
   constructor(
-    _labelSet: types.LabelSet,
+    labelSet: types.LabelSet,
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
     private readonly _logger: types.Logger
   ) {
-    super(_labelSet);
+    super(labelSet);
   }
 
   set(value: number): void {

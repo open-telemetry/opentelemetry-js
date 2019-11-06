@@ -167,7 +167,7 @@ export class Meter implements types.Meter {
       }
       return (result += key + ':' + labels[key]);
     }, '|#');
-    let sortedLabels = {} as types.Labels;
+    let sortedLabels: types.Labels = {};
     keys.forEach(key => {
       sortedLabels[key] = labels[key];
     });
