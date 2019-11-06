@@ -8,6 +8,7 @@
   "scripts": {
     "build": "npm run compile",
     "check": "gts check",
+    "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
     "test": "npm run compile && npm run check",

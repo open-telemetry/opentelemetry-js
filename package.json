@@ -9,6 +9,7 @@
     "clean": "lerna run clean",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
+    "precompile": "tsc --version",
     "compile": "lerna run compile",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
