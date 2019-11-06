@@ -27,7 +27,7 @@ const VERSION = '00';
 
 /**
  * Parses information from [traceParent] window property and converts it into {@link SpanContext}
- * @param traceParent - A window property that comes from server.
+ * @param traceParent - A meta property that comes from server.
  *     It should be dynamically generated server side to have the server's request trace Id,
  *     a parent span Id that was set on the server's request span,
  *     and the trace flags to indicate the server's sampling decision
