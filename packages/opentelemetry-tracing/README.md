@@ -34,7 +34,7 @@ const factory = new BasicTracerFactory();
 // Initialize the OpenTelemetry APIs to use the BasicTracerFactory bindings
 opentelemetry.initGlobalTracerFactory(factory);
 
-// To create a span in a trace, we used the global tracer to start a new span.
+// To create a span in a trace, we use the global tracer factory to start a new span.
 const span = opentelemetry.getTracer().startSpan('foo');
 
 // Create an Attributes

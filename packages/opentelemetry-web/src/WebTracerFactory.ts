@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { WebTracer } from './WebTracer';
+import { WebTracer, WebTracerConfig } from './WebTracer';
 import {
   BasicTracer,
   AbstractBasicTracerFactory,
@@ -22,9 +22,9 @@ import {
 } from '@opentelemetry/tracing';
 
 export class WebTracerFactory extends AbstractBasicTracerFactory {
-  private readonly _config?: BasicTracerConfig;
+  private readonly _config?: WebTracerConfig;
 
-  constructor(config?: BasicTracerConfig) {
+  constructor(config?: WebTracerConfig) {
     super();
     this._config = config;
   }
