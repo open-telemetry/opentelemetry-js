@@ -18,15 +18,12 @@ import {
   BasePlugin,
   otperformance,
   parseTraceParent,
+  TRACE_PARENT_HEADER,
 } from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import {
-  PerformanceEntries,
-  PerformanceLegacy,
-  WindowWithTrace,
-} from './types';
+import { PerformanceEntries, PerformanceLegacy } from './types';
 import { hasKey } from './utils';
 
 /**
@@ -84,9 +81,11 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Collects information about performance and creates appropriate spans
    */
   private _collectPerformance() {
-    const windowWithTrace: WindowWithTrace = (window as unknown) as WindowWithTrace;
+    const metaElement = [...document.getElementsByTagName('meta')].find(
+      e => e.getAttribute('name') === TRACE_PARENT_HEADER
+    );
     const serverContext =
-      parseTraceParent(windowWithTrace.traceparent || '') || undefined;
+      parseTraceParent((metaElement && metaElement.content) || '') || undefined;
 
     const entries = this._getEntries();
 

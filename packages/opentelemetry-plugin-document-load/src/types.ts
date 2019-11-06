@@ -48,10 +48,3 @@ export type PerformanceEntries = {
 export interface PerformanceLegacy {
   timing?: PerformanceEntries;
 }
-
-/**
- * A window object with traceparent information from server
- */
-export interface WindowWithTrace {
-  traceparent?: string;
-}

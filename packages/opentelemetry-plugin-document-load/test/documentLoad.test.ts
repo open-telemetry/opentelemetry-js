@@ -21,7 +21,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { ConsoleLogger } from '@opentelemetry/core';
+import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
 import {
   BasicTracer,
   ReadableSpan,
@@ -33,7 +33,6 @@ import { Logger, PluginConfig } from '@opentelemetry/types';
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
-import { WindowWithTrace } from '../src/types';
 
 export class DummyExporter implements SpanExporter {
   export(
@@ -240,9 +239,23 @@ describe('DocumentLoad Plugin', () => {
     });
 
     describe('AND window has information about server root span', () => {
+      let spyGetElementsByTagName: any;
       beforeEach(() => {
-        ((window as unknown) as WindowWithTrace).traceparent =
-          '00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01';
+        const element = {
+          content: '00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01',
+          getAttribute: (value: string) => {
+            if (value === 'name') {
+              return TRACE_PARENT_HEADER;
+            }
+            return undefined;
+          },
+        };
+
+        spyGetElementsByTagName = sinon.stub(
+          window.document,
+          'getElementsByTagName'
+        );
+        spyGetElementsByTagName.withArgs('meta').returns([element]);
       });
       it('should create a root span with server context traceId', done => {
         const spyOnEnd = sinon.spy(dummyExporter, 'export');
@@ -267,7 +280,7 @@ describe('DocumentLoad Plugin', () => {
         }, 1);
       });
       afterEach(() => {
-        delete ((window as unknown) as WindowWithTrace).traceparent;
+        spyGetElementsByTagName.restore();
       });
     });
 
