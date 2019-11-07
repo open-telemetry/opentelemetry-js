@@ -21,10 +21,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { SpanKind, Attributes, TimedEvent, Span } from '@opentelemetry/types';
-import {
-  plugin as pgPlugin,
-  PostgresPlugin,
-} from '@opentelemetry/plugin-pg';
+import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
 import { plugin, PostgresPoolPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
