@@ -195,14 +195,14 @@ export class Meter implements types.Meter {
    * @param labels user provided unordered Labels.
    */
   labels(labels: types.Labels): types.LabelSet {
-    let keys = Object.keys(labels).sort();
-    let identifier = keys.reduce((result, key) => {
+    const keys = Object.keys(labels).sort();
+    const identifier = keys.reduce((result, key) => {
       if (result.length > 2) {
         result += ',';
       }
       return (result += key + ':' + labels[key]);
     }, '|#');
-    let sortedLabels: types.Labels = {};
+    const sortedLabels: types.Labels = {};
     keys.forEach(key => {
       sortedLabels[key] = labels[key];
     });
