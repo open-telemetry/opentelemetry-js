@@ -538,8 +538,8 @@ describe('Meter', () => {
 
       meter.addExporter(exporter);
       const gauge = meter.createGauge('name') as GaugeMetric;
-      const handle = gauge.getHandle(['value1', 'value2']);
-      handle.set(20);
+      const labelSet = meter.labels({ value: 'value1', value2: 'value2' });
+      gauge.getHandle(labelSet).set(20);
     });
 
     it('should export a counter when it is updated', done => {
@@ -560,8 +560,8 @@ describe('Meter', () => {
       });
 
       meter.addExporter(exporter);
-      const handle = counter.getHandle(['value1', 'value2']);
-      handle.add(20);
+      const labelSet = meter.labels({ value: 'value1', value2: 'value2' });
+      counter.getHandle(labelSet).add(20);
     });
   });
 });
