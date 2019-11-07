@@ -40,12 +40,14 @@
     "access": "public"
   },
   "devDependencies": {
+    "@opentelemetry/node": "^0.2.0",
+    "@opentelemetry/tracing": "^0.2.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.0.13",
     "codecov": "^3.5.0",
-    "grpc": "~1.23.3",
+    "grpc": "^1.23.3",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "node-pre-gyp": "^0.12.0",
@@ -60,8 +62,6 @@
   },
   "dependencies": {
     "@opentelemetry/core": "^0.2.0",
-    "@opentelemetry/node": "^0.2.0",
-    "@opentelemetry/tracing": "^0.2.0",
     "@opentelemetry/types": "^0.2.0",
     "shimmer": "^1.2.1"
   }

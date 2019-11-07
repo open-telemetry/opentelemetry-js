@@ -51,7 +51,7 @@ let grpcClientModule: GrpcInternalClientTypes;
 
 export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
-  readonly supportedVersions = ['^1.23.3'];
+  readonly supportedVersions = ['1.*'];
 
   protected _config!: GrpcPluginOptions;
 
