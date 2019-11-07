@@ -23,6 +23,8 @@ import {
   MetricOptions,
   MeasureHandle,
   SpanContext,
+  LabelSet,
+  Labels,
 } from '@opentelemetry/types';
 
 /**
@@ -58,6 +60,10 @@ export class NoopMeter implements Meter {
   createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle> {
     return NOOP_GAUGE_METRIC;
   }
+
+  labels(labels: Labels): LabelSet {
+    return NOOP_LABEL_SET;
+  }
 }
 
 export class NoopMetric<T> implements Metric<T> {
@@ -67,12 +73,12 @@ export class NoopMetric<T> implements Metric<T> {
     this._handle = handle;
   }
   /**
-   * Returns a Handle associated with specified label values.
+   * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  getHandle(labelValues: string[]): T {
+  getHandle(labels: LabelSet): T {
     return this._handle;
   }
 
@@ -85,9 +91,10 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  removeHandle(labelValues: string[]): void {
+  removeHandle(labels: LabelSet): void {
+    // @todo: implement this method
     return;
   }
 
@@ -137,3 +144,5 @@ export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
 export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
   NOOP_MEASURE_HANDLE
 );
+
+export const NOOP_LABEL_SET = {} as LabelSet;

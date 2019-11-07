@@ -23,6 +23,7 @@ import {
   MetricDescriptorType,
 } from '../src';
 import * as types from '@opentelemetry/types';
+import { LabelSet } from '../src/LabelSet';
 import {
   NoopLogger,
   NoopMetric,
@@ -35,12 +36,27 @@ const performanceTimeOrigin = hrTime();
 
 describe('Meter', () => {
   let meter: Meter;
-  const labelValues = ['value'];
+  const keya = 'keya';
+  const keyb = 'keyb';
+  let labels: types.Labels = { [keyb]: 'value2', [keya]: 'value1' };
+  let labelSet: types.LabelSet;
   const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
     meter = new Meter({
       logger: new NoopLogger(),
+    });
+    labelSet = meter.labels(labels);
+  });
+
+  describe('#meter', () => {
+    it('should re-order labels to a canonicalized set', () => {
+      const orderedLabels: types.Labels = {
+        [keya]: 'value1',
+        [keyb]: 'value2',
+      };
+      const identifier = '|#keya:value1,keyb:value2';
+      assert.deepEqual(labelSet, new LabelSet(identifier, orderedLabels));
     });
   });
 
@@ -63,7 +79,7 @@ describe('Meter', () => {
     describe('.getHandle()', () => {
       it('should create a counter handle', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         handle.add(10);
         assert.strictEqual(handle['_data'], 10);
         handle.add(10);
@@ -72,7 +88,7 @@ describe('Meter', () => {
 
       it('should return the timeseries', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        const handle = counter.getHandle(['value1', 'value2']);
+        const handle = counter.getHandle(labelSet);
         handle.add(20);
         assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
           labelValues: [{ value: 'value1' }, { value: 'value2' }],
@@ -82,7 +98,7 @@ describe('Meter', () => {
 
       it('should add positive values by default', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         handle.add(10);
         assert.strictEqual(handle['_data'], 10);
         handle.add(-100);
@@ -93,7 +109,7 @@ describe('Meter', () => {
         const counter = meter.createCounter('name', {
           disabled: true,
         }) as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         handle.add(10);
         assert.strictEqual(handle['_data'], 0);
       });
@@ -102,16 +118,16 @@ describe('Meter', () => {
         const counter = meter.createCounter('name', {
           monotonic: false,
         }) as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         handle.add(-10);
         assert.strictEqual(handle['_data'], -10);
       });
 
       it('should return same handle on same label values', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         handle.add(10);
-        const handle1 = counter.getHandle(labelValues);
+        const handle1 = counter.getHandle(labelSet);
         handle1.add(10);
         assert.strictEqual(handle['_data'], 20);
         assert.strictEqual(handle, handle1);
@@ -121,23 +137,23 @@ describe('Meter', () => {
     describe('.removeHandle()', () => {
       it('should remove a counter handle', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        const handle = counter.getHandle(labelValues);
+        const handle = counter.getHandle(labelSet);
         assert.strictEqual(counter['_handles'].size, 1);
-        counter.removeHandle(labelValues);
+        counter.removeHandle(labelSet);
         assert.strictEqual(counter['_handles'].size, 0);
-        const handle1 = counter.getHandle(labelValues);
+        const handle1 = counter.getHandle(labelSet);
         assert.strictEqual(counter['_handles'].size, 1);
         assert.notStrictEqual(handle, handle1);
       });
 
       it('should not fail when removing non existing handle', () => {
         const counter = meter.createCounter('name');
-        counter.removeHandle([]);
+        counter.removeHandle(new LabelSet('', {}));
       });
 
       it('should clear all handles', () => {
         const counter = meter.createCounter('name') as CounterMetric;
-        counter.getHandle(labelValues);
+        counter.getHandle(labelSet);
         assert.strictEqual(counter['_handles'].size, 1);
         counter.clear();
         assert.strictEqual(counter['_handles'].size, 0);
@@ -147,13 +163,13 @@ describe('Meter', () => {
     describe('.registerMetric()', () => {
       it('skip already registered Metric', () => {
         const counter1 = meter.createCounter('name1') as CounterMetric;
-        counter1.getHandle(labelValues).add(10);
+        counter1.getHandle(labelSet).add(10);
 
         // should skip below metric
         const counter2 = meter.createCounter('name1', {
           valueType: types.ValueType.INT,
         }) as CounterMetric;
-        counter2.getHandle(labelValues).add(500);
+        counter2.getHandle(labelSet).add(500);
 
         assert.strictEqual(meter.getMetrics().length, 1);
         const [{ descriptor, timeseries }] = meter.getMetrics();
@@ -216,7 +232,7 @@ describe('Meter', () => {
     describe('.getHandle()', () => {
       it('should create a gauge handle', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         handle.set(10);
         assert.strictEqual(handle['_data'], 10);
         handle.set(250);
@@ -225,7 +241,11 @@ describe('Meter', () => {
 
       it('should return the timeseries', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        const handle = gauge.getHandle(['v1', 'v2']);
+        const k1 = 'k1';
+        const k2 = 'k2';
+        const labels = { [k1]: 'v1', [k2]: 'v2' };
+        const LabelSet2 = new LabelSet('|#k1:v1,k2:v2', labels);
+        const handle = gauge.getHandle(LabelSet2);
         handle.set(150);
         assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
           labelValues: [{ value: 'v1' }, { value: 'v2' }],
@@ -235,7 +255,7 @@ describe('Meter', () => {
 
       it('should go up and down by default', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         handle.set(10);
         assert.strictEqual(handle['_data'], 10);
         handle.set(-100);
@@ -246,7 +266,7 @@ describe('Meter', () => {
         const gauge = meter.createGauge('name', {
           disabled: true,
         }) as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         handle.set(10);
         assert.strictEqual(handle['_data'], 0);
       });
@@ -255,16 +275,16 @@ describe('Meter', () => {
         const gauge = meter.createGauge('name', {
           monotonic: true,
         }) as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         handle.set(-10);
         assert.strictEqual(handle['_data'], 0);
       });
 
       it('should return same handle on same label values', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         handle.set(10);
-        const handle1 = gauge.getHandle(labelValues);
+        const handle1 = gauge.getHandle(labelSet);
         handle1.set(10);
         assert.strictEqual(handle['_data'], 10);
         assert.strictEqual(handle, handle1);
@@ -274,23 +294,23 @@ describe('Meter', () => {
     describe('.removeHandle()', () => {
       it('should remove the gauge handle', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        const handle = gauge.getHandle(labelValues);
+        const handle = gauge.getHandle(labelSet);
         assert.strictEqual(gauge['_handles'].size, 1);
-        gauge.removeHandle(labelValues);
+        gauge.removeHandle(labelSet);
         assert.strictEqual(gauge['_handles'].size, 0);
-        const handle1 = gauge.getHandle(labelValues);
+        const handle1 = gauge.getHandle(labelSet);
         assert.strictEqual(gauge['_handles'].size, 1);
         assert.notStrictEqual(handle, handle1);
       });
 
       it('should not fail when removing non existing handle', () => {
         const gauge = meter.createGauge('name');
-        gauge.removeHandle([]);
+        gauge.removeHandle(new LabelSet('', {}));
       });
 
       it('should clear all handles', () => {
         const gauge = meter.createGauge('name') as GaugeMetric;
-        gauge.getHandle(labelValues);
+        gauge.getHandle(labelSet);
         assert.strictEqual(gauge['_handles'].size, 1);
         gauge.clear();
         assert.strictEqual(gauge['_handles'].size, 0);
@@ -349,11 +369,13 @@ describe('Meter', () => {
 
   describe('#getMetrics', () => {
     it('should create a DOUBLE counter', () => {
+      const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: ['key'],
+        labelKeys: [key],
       });
-      const handle = counter.getHandle(['counter-value']);
+      const labelSet = meter.labels({ [key]: 'counter-value' });
+      const handle = counter.getHandle(labelSet);
       handle.add(10.45);
 
       assert.strictEqual(meter.getMetrics().length, 1);
@@ -377,12 +399,14 @@ describe('Meter', () => {
     });
 
     it('should create a INT counter', () => {
+      const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: ['key'],
+        labelKeys: [key],
         valueType: types.ValueType.INT,
       });
-      const handle = counter.getHandle(['counter-value']);
+      const labelSet = meter.labels({ [key]: 'counter-value' });
+      const handle = counter.getHandle(labelSet);
       handle.add(10.45);
 
       assert.strictEqual(meter.getMetrics().length, 1);
@@ -406,12 +430,15 @@ describe('Meter', () => {
     });
 
     it('should create a DOUBLE gauge', () => {
+      const key = 'gauge-key';
       const gauge = meter.createGauge('gauge', {
-        labelKeys: ['gauge-key'],
+        labelKeys: [key],
         unit: 'ms',
       });
-      gauge.getHandle(['gauge-value1']).set(200.34);
-      gauge.getHandle(['gauge-value2']).set(-10.67);
+      const labelSet1 = meter.labels({ [key]: 'gauge-value1' });
+      const labelSet2 = meter.labels({ [key]: 'gauge-value2' });
+      gauge.getHandle(labelSet1).set(200.34);
+      gauge.getHandle(labelSet2).set(-10.67);
 
       assert.strictEqual(meter.getMetrics().length, 1);
       const [{ descriptor, timeseries }] = meter.getMetrics();
@@ -444,13 +471,16 @@ describe('Meter', () => {
     });
 
     it('should create a INT gauge', () => {
+      const key = 'gauge-key';
       const gauge = meter.createGauge('gauge', {
-        labelKeys: ['gauge-key'],
+        labelKeys: [key],
         unit: 'ms',
         valueType: types.ValueType.INT,
       });
-      gauge.getHandle(['gauge-value1']).set(200.34);
-      gauge.getHandle(['gauge-value2']).set(-10.67);
+      const labelSet1 = meter.labels({ [key]: 'gauge-value1' });
+      const labelSet2 = meter.labels({ [key]: 'gauge-value2' });
+      gauge.getHandle(labelSet1).set(200.34);
+      gauge.getHandle(labelSet2).set(-10.67);
 
       assert.strictEqual(meter.getMetrics().length, 1);
       const [{ descriptor, timeseries }] = meter.getMetrics();
@@ -508,8 +538,8 @@ describe('Meter', () => {
 
       meter.addExporter(exporter);
       const gauge = meter.createGauge('name') as GaugeMetric;
-      const handle = gauge.getHandle(['value1', 'value2']);
-      handle.set(20);
+      const labelSet = meter.labels({ value: 'value1', value2: 'value2' });
+      gauge.getHandle(labelSet).set(20);
     });
 
     it('should export a counter when it is updated', done => {
@@ -530,8 +560,8 @@ describe('Meter', () => {
       });
 
       meter.addExporter(exporter);
-      const handle = counter.getHandle(['value1', 'value2']);
-      handle.add(20);
+      const labelSet = meter.labels({ value: 'value1', value2: 'value2' });
+      counter.getHandle(labelSet).add(20);
     });
   });
 });
