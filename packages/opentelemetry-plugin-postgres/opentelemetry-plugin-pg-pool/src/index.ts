@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
- export * from './pg-pool';
+export * from './pg-pool';

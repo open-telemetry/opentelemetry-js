@@ -15,5 +15,5 @@
  */
 
 export enum AttributeNames {
-  COMPONENT = 'component'
+  COMPONENT = 'component',
 }

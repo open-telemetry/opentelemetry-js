@@ -21,7 +21,10 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { SpanKind, Attributes, TimedEvent, Span } from '@opentelemetry/types';
-import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
+import {
+  plugin as pgPlugin,
+  PostgresPlugin,
+} from '@opentelemetry/plugin-pg';
 import { plugin, PostgresPoolPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
@@ -33,11 +36,12 @@ import * as testUtils from './testUtils';
 const memoryExporter = new InMemorySpanExporter();
 
 const CONFIG = {
-  user: 'postgres',
-  password: 'test',
-  database: 'postgres',
-  host: '127.0.0.1',
-  port: 54320,
+  user: process.env.POSTGRES_USER || 'postgres',
+  database: process.env.POSTGRES_DB || 'postgres',
+  host: process.env.POSTGRES_HOST || 'localhost',
+  port: process.env.POSTGRES_PORT
+    ? parseInt(process.env.POSTGRES_PORT, 10)
+    : 54320,
 };
 
 const runCallbackTest = (
@@ -60,7 +64,7 @@ describe('pg-pool@2.x', () => {
   const logger = new NoopLogger();
   const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
-  const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
+  const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(function(done) {
     if (!shouldTest) {
@@ -77,7 +81,7 @@ describe('pg-pool@2.x', () => {
     done();
   });
 
-  after(function (done) {
+  after(function(done) {
     if (testPostgresLocally) {
       testUtils.cleanUpDocker();
     }
@@ -107,23 +111,25 @@ describe('pg-pool@2.x', () => {
 
   describe('#pool.connect()', () => {
     // promise - checkout a client
-    it ('should intercept pool.connect()', async () => {
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT
+    it('should intercept pool.connect()', async () => {
+      const pgPoolattributes = {
+        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+      };
+      const pgAttributes = {
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
         const client = await pool.connect();
-        runCallbackTest(span, attributes, events, 1, 0);
+        runCallbackTest(span, pgPoolattributes, events, 1, 0);
         assert.ok(client, 'pool.connect() returns a promise');
         try {
           await client.query('SELECT NOW()');
-          const pgAttributes = {
-              [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT
-          }
+
           runCallbackTest(span, pgAttributes, events, 2, 1);
         } catch (e) {
+          throw e;
         } finally {
           client.release();
         }
@@ -131,9 +137,12 @@ describe('pg-pool@2.x', () => {
     });
 
     // callback - checkout a client
-    it('should not return a promise if callback is provided', (done) => {
-      const attributes = {
-        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT
+    it('should not return a promise if callback is provided', done => {
+      const pgPoolattributes = {
+        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+      };
+      const pgAttributes = {
+        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
       };
       const events: TimedEvent[] = [];
       const parentSpan = tracer.startSpan('test span');
@@ -144,21 +153,18 @@ describe('pg-pool@2.x', () => {
           }
           release();
           assert.ok(client);
-          runCallbackTest(parentSpan, attributes, events, 1, 0);
-          client.query("SELECT NOW()", (err, ret) => {
+          runCallbackTest(parentSpan, pgPoolattributes, events, 1, 0);
+          client.query('SELECT NOW()', (err, ret) => {
             if (err) {
               return done(err);
             }
+            assert.ok(ret);
+            runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
             done();
           });
-          const pgAttributes = {
-            [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT
-          }
-          runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
         });
         assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
-      })
+      });
     });
   });
 });
-

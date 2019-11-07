@@ -22,7 +22,6 @@ import {
   TimedEvent,
 } from '@opentelemetry/types';
 import * as assert from 'assert';
-import { PostgresPoolPlugin } from '../src';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
@@ -42,8 +41,9 @@ export const assertSpan = (
 
   assert.strictEqual(
     span.attributes[AttributeNames.COMPONENT],
-    PostgresPoolPlugin.COMPONENT
+    attributes[AttributeNames.COMPONENT]
   );
+
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
 
@@ -51,16 +51,6 @@ export const assertSpan = (
     hrTimeToMicroseconds(span.startTime) < hrTimeToMicroseconds(span.endTime)
   );
   assert.ok(hrTimeToMilliseconds(span.endTime) > 0);
-
-  // attributes
-  assert.strictEqual(
-    Object.keys(span.attributes).length,
-    Object.keys(attributes).length,
-    'Should contain same number of attributes'
-  );
-  Object.keys(span.attributes).forEach(attribute => {
-    assert.deepStrictEqual(span.attributes[attribute], attributes[attribute]);
-  });
 
   // events
   assert.strictEqual(

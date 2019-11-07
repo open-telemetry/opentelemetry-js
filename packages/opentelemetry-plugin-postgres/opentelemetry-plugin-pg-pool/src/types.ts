@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
- export interface PostgresPoolPluginOptions {}
+export interface PostgresPoolPluginOptions {}
 
- export type PgPoolCallback = (err: Error, client: any, done: (release?: any) => void) => void;
+export type PgPoolCallback = (
+  err: Error,
+  client: any,
+  done: (release?: any) => void
+) => void;
