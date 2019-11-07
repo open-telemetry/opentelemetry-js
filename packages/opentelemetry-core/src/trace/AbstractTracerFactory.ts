@@ -19,13 +19,14 @@ import * as types from '@opentelemetry/types';
 /**
  * AbstractTracerFactory provides a base class for other tracer factories to extend from.
  */
-export abstract class AbstractTracerFactory implements types.TracerFactory {
-  protected readonly _tracers: Map<string, types.Tracer> = new Map();
+export abstract class AbstractTracerFactory<T extends types.Tracer>
+  implements types.TracerFactory {
+  protected readonly _tracers: Map<string, T> = new Map();
 
   /**
    * _newTracer creates a new concrete tracer for factories that extend this.
    */
-  protected abstract _newTracer(): types.Tracer;
+  protected abstract _newTracer(): T;
 
   /**
    * getTracer finds or creates a new tracer.

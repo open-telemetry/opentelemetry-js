@@ -19,7 +19,7 @@ import { BasicTracer } from './BasicTracer';
 import { BasicTracerConfig } from './types';
 import { SpanProcessor } from './SpanProcessor';
 
-export class BasicTracerFactory extends AbstractTracerFactory {
+export class BasicTracerFactory extends AbstractTracerFactory<BasicTracer> {
   private _config?: BasicTracerConfig;
   private _spanProcessors: SpanProcessor[] = [];
 
@@ -35,7 +35,7 @@ export class BasicTracerFactory extends AbstractTracerFactory {
   addSpanProcessor(spanProcessor: SpanProcessor): void {
     this._spanProcessors.push(spanProcessor);
     for (const tracer of this._tracers.values()) {
-      (tracer as BasicTracer).addSpanProcessor(spanProcessor);
+      tracer.addSpanProcessor(spanProcessor);
     }
   }
 
