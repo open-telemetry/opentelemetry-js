@@ -40,5 +40,5 @@ export abstract class AbstractTracerFactory implements types.TracerFactory {
     this._tracers.set(key, tracer);
 
     return tracer;
-  };
+  }
 }
