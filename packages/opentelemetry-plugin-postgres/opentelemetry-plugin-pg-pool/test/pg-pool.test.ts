@@ -13,27 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as types from '@opentelemetry/types';
-
-/**
- * Canonicalized labels with an unique string identifier.
- */
-export class LabelSet implements types.LabelSet {
-  identifier: string;
-  labels: types.Labels;
-
-  constructor(identifier: string, labels: types.Labels) {
-    this.identifier = identifier;
-    this.labels = labels;
-  }
-}
-
-/**
- * Type guard to remove nulls from arrays
- *
- * @param value value to be checked for null equality
- */
-export function notNull<T>(value: T | null): value is T {
-  return value !== null;
-}

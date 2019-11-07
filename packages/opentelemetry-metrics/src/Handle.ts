@@ -55,7 +55,8 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
-    private readonly _logger: types.Logger
+    private readonly _logger: types.Logger,
+    private readonly _onUpdate: Function
   ) {
     super(labelSet);
   }
@@ -80,6 +81,7 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
       value = Math.trunc(value);
     }
     this._data = this._data + value;
+    this._onUpdate();
   }
 }
 
@@ -93,7 +95,8 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
-    private readonly _logger: types.Logger
+    private readonly _logger: types.Logger,
+    private readonly _onUpdate: Function
   ) {
     super(labelSet);
   }
@@ -119,6 +122,7 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
       value = Math.trunc(value);
     }
     this._data = value;
+    this._onUpdate();
   }
 }
 

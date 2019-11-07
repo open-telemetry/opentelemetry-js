@@ -122,7 +122,11 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<CounterHandle> {
-  constructor(name: string, options: MetricOptions) {
+  constructor(
+    name: string,
+    options: MetricOptions,
+    private readonly _onUpdate: Function
+  ) {
     super(
       name,
       options,
@@ -137,14 +141,19 @@ export class CounterMetric extends Metric<CounterHandle> {
       this._disabled,
       this._monotonic,
       this._valueType,
-      this._logger
+      this._logger,
+      this._onUpdate
     );
   }
 }
 
 /** This is a SDK implementation of Gauge Metric. */
 export class GaugeMetric extends Metric<GaugeHandle> {
-  constructor(name: string, options: MetricOptions) {
+  constructor(
+    name: string,
+    options: MetricOptions,
+    private readonly _onUpdate: Function
+  ) {
     super(
       name,
       options,
@@ -159,7 +168,8 @@ export class GaugeMetric extends Metric<GaugeHandle> {
       this._disabled,
       this._monotonic,
       this._valueType,
-      this._logger
+      this._logger,
+      this._onUpdate
     );
   }
 }
