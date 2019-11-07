@@ -37,6 +37,6 @@ export function getTracerFactory(): types.TracerFactory {
 /**
  * Finds or creates tracer from the global TracerFactory
  */
-export function getTracer(name?: string, version?: string): types.Tracer {
+export function getTracer(name: string = '', version?: string): types.Tracer {
   return globalTracerFactoryDelegate.getTracer(name, version);
 }

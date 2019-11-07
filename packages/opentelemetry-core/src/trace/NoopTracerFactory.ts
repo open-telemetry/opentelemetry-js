@@ -24,7 +24,7 @@ export class NoopTracerFactory implements types.TracerFactory {
     this._tracer = new NoopTracer();
   }
 
-  getTracer(name?: string, version?: string): types.Tracer {
+  getTracer(name: string, version?: string): types.Tracer {
     return this._tracer;
   }
 }

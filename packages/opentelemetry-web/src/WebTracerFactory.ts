@@ -15,21 +15,20 @@
  */
 
 import { WebTracer, WebTracerConfig } from './WebTracer';
-import {
-  BasicTracer,
-  AbstractBasicTracerFactory,
-  BasicTracerConfig,
-} from '@opentelemetry/tracing';
+import { BasicTracerFactory } from '@opentelemetry/tracing';
 
-export class WebTracerFactory extends AbstractBasicTracerFactory {
-  private readonly _config?: WebTracerConfig;
+/**
+ * WebTracerFactory produces named tracers.
+ */
+export class WebTracerFactory extends BasicTracerFactory {
+  private readonly _webConfig?: WebTracerConfig;
 
   constructor(config?: WebTracerConfig) {
     super();
-    this._config = config;
+    this._webConfig = config;
   }
 
-  protected _newTracer(): BasicTracer {
-    return new WebTracer(this._config);
+  protected _newTracer(): WebTracer {
+    return new WebTracer(this._webConfig);
   }
 }

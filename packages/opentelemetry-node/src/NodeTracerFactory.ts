@@ -16,20 +16,17 @@
 
 import { NodeTracer } from './NodeTracer';
 import { NodeTracerConfig } from './config';
-import {
-  BasicTracer,
-  AbstractBasicTracerFactory,
-} from '@opentelemetry/tracing';
+import { BasicTracerFactory } from '@opentelemetry/tracing';
 
-export class NodeTracerFactory extends AbstractBasicTracerFactory {
-  private readonly _config?: NodeTracerConfig;
+export class NodeTracerFactory extends BasicTracerFactory {
+  private readonly _nodeConfig?: NodeTracerConfig;
 
   constructor(config?: NodeTracerConfig) {
     super();
-    this._config = config;
+    this._nodeConfig = config;
   }
 
-  protected _newTracer(): BasicTracer {
-    return new NodeTracer(this._config);
+  protected _newTracer(): NodeTracer {
+    return new NodeTracer(this._nodeConfig);
   }
 }

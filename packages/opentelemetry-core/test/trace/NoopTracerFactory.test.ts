@@ -21,7 +21,7 @@ import { NOOP_SPAN } from '../../src/trace/NoopSpan';
 describe('NoopTracerFactory', () => {
   it('should return a NOOP_SPAN', () => {
     const factory = new NoopTracerFactory();
-    const span = factory.getTracer().startSpan('my-span');
+    const span = factory.getTracer('fake').startSpan('my-span');
     assert.deepStrictEqual(span, NOOP_SPAN);
   });
 });

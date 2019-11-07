@@ -1,11 +1,13 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerFactory } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 
-const webTracer = new WebTracer({
+const webTracerFactory = new WebTracerFactory({
   plugins: [
     new DocumentLoad()
   ]
 });
 
-webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+webTracerFactory.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
+const webTracer = webTracerFactory.getTracer('example');

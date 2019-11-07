@@ -15,32 +15,30 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { BasicTracer } from './BasicTracer';
-import { SpanProcessor } from './SpanProcessor';
 
-export abstract class AbstractBasicTracerFactory
-  implements types.TracerFactory {
-  protected readonly _tracers: Map<string, BasicTracer> = new Map();
-  protected _spanProcessors: SpanProcessor[] = [];
+/**
+ * AbstractTracerFactory provides a base class for other tracer factories to extend from.
+ */
+export abstract class AbstractTracerFactory implements types.TracerFactory {
+  protected readonly _tracers: Map<string, types.Tracer> = new Map();
 
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    this._spanProcessors.push(spanProcessor);
-    for (const tracer of this._tracers.values()) {
-      tracer.addSpanProcessor(spanProcessor);
-    }
-  }
+  /**
+   * _newTracer creates a new concrete tracer for factories that extend this.
+   */
+  protected abstract _newTracer(): types.Tracer;
 
-  getTracer(name: string = '', version?: string): types.Tracer {
+  /**
+   * getTracer finds or creates a new tracer.
+   * @param name identifies the instrumentation library
+   * @param [version] is the semantic version of the library.
+   */
+  getTracer(name: string, version?: string): types.Tracer {
     const key = name + (version != undefined ? version : '');
     if (this._tracers.has(key)) return this._tracers.get(key)!;
 
     const tracer = this._newTracer();
-    for (const processor of this._spanProcessors) {
-      tracer.addSpanProcessor(processor);
-    }
     this._tracers.set(key, tracer);
-    return tracer;
-  }
 
-  protected abstract _newTracer(): BasicTracer;
+    return tracer;
+  };
 }

@@ -14,19 +14,41 @@
  * limitations under the License.
  */
 
-import { BasicTracerConfig } from './types';
+import { AbstractTracerFactory } from '@opentelemetry/core';
 import { BasicTracer } from './BasicTracer';
-import { AbstractBasicTracerFactory } from './AbstractBasicTracerFactory';
+import { BasicTracerConfig } from './types';
+import { SpanProcessor } from './SpanProcessor';
 
-export class BasicTracerFactory extends AbstractBasicTracerFactory {
+export class BasicTracerFactory extends AbstractTracerFactory {
   private _config?: BasicTracerConfig;
+  private _spanProcessors: SpanProcessor[] = [];
 
   constructor(config?: BasicTracerConfig) {
     super();
     this._config = config;
   }
 
-  _newTracer(): BasicTracer {
+  /**
+   * addSpanProcessor adds a {@link SpanProcessor} to the factory, applying it
+   * to all new and existing tracers.
+   */
+  addSpanProcessor(spanProcessor: SpanProcessor): void {
+    this._spanProcessors.push(spanProcessor);
+    for (const tracer of this._tracers.values()) {
+      (tracer as BasicTracer).addSpanProcessor(spanProcessor);
+    }
+  }
+
+  getTracer(name: string = '', version?: string): BasicTracer {
+    const tracer = super.getTracer(name, version) as BasicTracer;
+    for (const processor of this._spanProcessors) {
+      tracer.addSpanProcessor(processor);
+    }
+
+    return tracer;
+  }
+
+  protected _newTracer(): BasicTracer {
     return new BasicTracer(this._config);
   }
 }

@@ -26,6 +26,7 @@ export * from './trace/globaltracer-utils';
 export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
+export * from './trace/AbstractTracerFactory';
 export * from './trace/NoopTracerFactory';
 export * from './trace/NoRecordingSpan';
 export * from './trace/sampler/ProbabilitySampler';

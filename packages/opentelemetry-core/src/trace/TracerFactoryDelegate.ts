@@ -54,11 +54,7 @@ export class TracerFactoryDelegate implements types.TracerFactory {
   }
 
   // -- TracerFactory interface implementation below -- //
-  getTracer(name?: string, version?: string): types.Tracer {
-    return this._currentTracerFactory.getTracer.apply(
-      this._currentTracerFactory,
-      // tslint:disable-next-line:no-any
-      arguments as any
-    );
+  getTracer(name: string, version?: string): types.Tracer {
+    return this._currentTracerFactory.getTracer(name, version);
   }
 }
