@@ -29,14 +29,17 @@ import {
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
-import { ReadableMetric } from './export/types';
+import { ReadableMetric, MetricExporter } from './export/types';
+import { notNull } from './Utils';
+import { ExportResult } from '@opentelemetry/base';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
-  private readonly _metrics = new Map();
+  private readonly _metrics = new Map<string, Metric<BaseHandle>>();
+  private readonly _exporters: MetricExporter[] = [];
 
   /**
    * Constructs a new Meter instance.
@@ -88,7 +91,9 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt);
+    const counter = new CounterMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
     this._registerMetric(name, counter);
     return counter;
   }
@@ -118,19 +123,49 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const gauge = new GaugeMetric(name, opt);
+    const gauge = new GaugeMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
     this._registerMetric(name, gauge);
     return gauge;
   }
 
   /**
-   * Gets a collection of Metric`s to be exported.
+   * Gets a collection of Metrics to be exported.
    * @returns The list of metrics.
    */
   getMetrics(): ReadableMetric[] {
     return Array.from(this._metrics.values())
       .map(metric => metric.get())
-      .filter(metric => !!metric);
+      .filter(notNull);
+  }
+
+  /**
+   * Add an exporter to the list of registered exporters
+   *
+   * @param exporter {@Link MetricExporter} to add to the list of registered exporters
+   */
+  addExporter(exporter: MetricExporter) {
+    this._exporters.push(exporter);
+  }
+
+  /**
+   * Send a single metric by name to all registered exporters
+   */
+  private _exportOneMetric(name: string) {
+    const metric = this._metrics.get(name);
+    if (!metric) return;
+
+    const readableMetric = metric.get();
+    if (!readableMetric) return;
+
+    for (const exporter of this._exporters) {
+      exporter.export([readableMetric], result => {
+        if (result !== ExportResult.SUCCESS) {
+          this._logger.error(`Failed to export ${name}`);
+        }
+      });
+    }
   }
 
   /**

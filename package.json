@@ -9,6 +9,7 @@
     "clean": "lerna run clean",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
+    "precompile": "tsc --version",
     "compile": "lerna run compile",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
@@ -41,7 +42,7 @@
     "gts": "^1.0.0",
     "lerna": "^3.17.0",
     "lerna-changelog": "^0.8.2",
-    "typescript": "^3.6.4"
+    "typescript": "3.6.4"
   },
   "husky": {
     "hooks": {
