@@ -85,7 +85,7 @@ describe('pg-pool@2.x', () => {
   const logger = new NoopLogger();
   const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
-  const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
+  const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(function(done) {
     if (!shouldTest) {

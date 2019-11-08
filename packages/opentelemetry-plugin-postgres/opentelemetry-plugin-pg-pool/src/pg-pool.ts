@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
 import * as pgPoolTypes from 'pg-pool';
@@ -88,6 +88,7 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
         if (callback) {
           const parentSpan = plugin._tracer.getCurrentSpan();
           callback = utils.patchCallback(span, callback) as PgPoolCallback;
+          // If a parent span exists, bind the callback
           if (parentSpan) {
             callback = plugin._tracer.bind(callback);
           }
@@ -106,12 +107,17 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
               .then((result: any) => {
                 // Resturn a pass-along promise which ends the span and then goes to user's orig resolvers
                 return new Promise((resolve, _) => {
+                  span.setStatus({ code: CanonicalCode.OK });
                   span.end();
                   resolve(result);
                 });
               })
               .catch((error: Error) => {
                 return new Promise((_, reject) => {
+                  span.setStatus({
+                    code: CanonicalCode.UNKNOWN,
+                    message: error.message,
+                  });
                   span.end();
                   reject(error);
                 });
@@ -120,7 +126,6 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
         }
 
         // Else a callback was provided, so just return the result
-        span.end();
         return connectResult;
       };
     };
