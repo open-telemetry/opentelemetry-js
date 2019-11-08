@@ -103,18 +103,21 @@ jobs:
       - image: node:8
         environment: *test_env
       - *postgres_service
+      - *redis_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
         environment: *test_env
       - *postgres_service
+      - *redis_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
         environment: *test_env
       - *postgres_service
+      - *redis_service
     <<: *node_unit_tests
   node12-browsers:
     docker:
