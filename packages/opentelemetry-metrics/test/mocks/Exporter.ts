@@ -14,11 +14,19 @@
  * limitations under the License.
  */
 
-/**
- * Type guard to remove nulls from arrays
- *
- * @param value value to be checked for null equality
- */
-export function notNull<T>(value: T | null): value is T {
-  return value !== null;
+import { MetricExporter, ReadableMetric } from '../../src/export/types';
+import { ExportResult } from '@opentelemetry/base';
+import { EventEmitter } from 'events';
+
+export class NoopExporter extends EventEmitter implements MetricExporter {
+  export(
+    metrics: ReadableMetric[],
+    resultCallback: (result: ExportResult) => void
+  ): void {
+    this.emit('export', metrics, resultCallback);
+  }
+
+  shutdown(): void {
+    this.emit('shutdown');
+  }
 }
