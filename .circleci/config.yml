@@ -1,6 +1,6 @@
 version: 2
 
-test_env: &test_env
+node_test_env: &node_test_env
   RUN_POSTGRES_TESTS: 1
   POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
@@ -12,7 +12,7 @@ test_env: &test_env
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
-  environment: # env to pass to CircleCI, specified values must match test_env
+  environment: # env to pass to CircleCI, specified values must match node_test_env
     POSTGRES_USER: postgres
     POSTGRES_DB: circle_database
 redis_service: &redis_service
@@ -101,21 +101,21 @@ jobs:
   node8:
     docker:
       - image: node:8
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
       - *redis_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
       - *redis_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
       - *redis_service
     <<: *node_unit_tests

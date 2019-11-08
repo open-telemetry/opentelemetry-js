@@ -66,7 +66,7 @@ describe('redis@2.x', () => {
     if (shouldTestLocal) {
       dockerUtils.startDocker();
     }
-    
+
     redis = require('redis');
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     client = redis.createClient(URL);
