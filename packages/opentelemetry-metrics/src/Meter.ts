@@ -29,6 +29,7 @@ import {
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
+import { LabelSet } from './LabelSet';
 import { ReadableMetric, MetricExporter } from './export/types';
 import { notNull } from './Utils';
 import { ExportResult } from '@opentelemetry/base';
@@ -185,6 +186,27 @@ export class Meter implements types.Meter {
       return;
     }
     this._metrics.set(name, metric);
+  }
+
+  /**
+   * Provide a pre-computed re-useable LabelSet by
+   * converting the unordered labels into a canonicalized
+   * set of lables with an unique identifier, useful for pre-aggregation.
+   * @param labels user provided unordered Labels.
+   */
+  labels(labels: types.Labels): types.LabelSet {
+    const keys = Object.keys(labels).sort();
+    const identifier = keys.reduce((result, key) => {
+      if (result.length > 2) {
+        result += ',';
+      }
+      return (result += key + ':' + labels[key]);
+    }, '|#');
+    const sortedLabels: types.Labels = {};
+    keys.forEach(key => {
+      sortedLabels[key] = labels[key];
+    });
+    return new LabelSet(identifier, sortedLabels);
   }
 
   /**

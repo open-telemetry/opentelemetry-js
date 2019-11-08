@@ -23,8 +23,11 @@ import { TimeSeries } from './export/types';
  */
 export class BaseHandle {
   protected _data = 0;
+  protected _labelSet: types.LabelSet;
 
-  constructor(private readonly _labels: string[]) {}
+  constructor(labelSet: types.LabelSet) {
+    this._labelSet = labelSet;
+  }
 
   /**
    * Returns the TimeSeries with one or more Point.
@@ -34,7 +37,9 @@ export class BaseHandle {
    */
   getTimeSeries(timestamp: types.HrTime): TimeSeries {
     return {
-      labelValues: this._labels.map(value => ({ value })),
+      labelValues: Object.values(this._labelSet.labels).map(value => ({
+        value,
+      })),
       points: [{ value: this._data, timestamp }],
     };
   }
@@ -42,19 +47,18 @@ export class BaseHandle {
 
 /**
  * CounterHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Counter` associated with specified label
- * values.
+ * value of single handle in the `Counter` associated with specified LabelSet.
  */
 export class CounterHandle extends BaseHandle implements types.CounterHandle {
   constructor(
+    labelSet: types.LabelSet,
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
-    private readonly _labelValues: string[],
     private readonly _logger: types.Logger,
     private readonly _onUpdate: Function
   ) {
-    super(_labelValues);
+    super(labelSet);
   }
 
   add(value: number): void {
@@ -62,13 +66,17 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
 
     if (this._monotonic && value < 0) {
       this._logger.error(
-        `Monotonic counter cannot descend for ${this._labelValues}`
+        `Monotonic counter cannot descend for ${Object.values(
+          this._labelSet.labels
+        )}`
       );
       return;
     }
     if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
-        `INT counter cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+        `INT counter cannot accept a floating-point value for ${Object.values(
+          this._labelSet.labels
+        )}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
     }
@@ -79,18 +87,18 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
 
 /**
  * GaugeHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Gauge` associated with specified label values.
+ * value of single handle in the `Gauge` associated with specified LabelSet.
  */
 export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
   constructor(
+    labelSet: types.LabelSet,
     private readonly _disabled: boolean,
     private readonly _monotonic: boolean,
     private readonly _valueType: types.ValueType,
-    private readonly _labelValues: string[],
     private readonly _logger: types.Logger,
     private readonly _onUpdate: Function
   ) {
-    super(_labelValues);
+    super(labelSet);
   }
 
   set(value: number): void {
@@ -98,14 +106,18 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
 
     if (this._monotonic && value < this._data) {
       this._logger.error(
-        `Monotonic gauge cannot descend for ${this._labelValues}`
+        `Monotonic gauge cannot descend for ${Object.values(
+          this._labelSet.labels
+        )}`
       );
       return;
     }
 
     if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
-        `INT gauge cannot accept a floating-point value for ${this._labelValues}, ignoring the fractional digits.`
+        `INT gauge cannot accept a floating-point value for ${Object.values(
+          this._labelSet.labels
+        )}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
     }

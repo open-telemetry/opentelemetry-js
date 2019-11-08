@@ -24,25 +24,26 @@ import {
   NOOP_MEASURE_HANDLE,
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
+import { Labels } from '@opentelemetry/types';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeter();
     const counter = meter.createCounter('some-name');
+    const labels = {} as Labels;
+    const labelSet = meter.labels(labels);
+
     // ensure NoopMetric does not crash.
     counter.setCallback(() => {
       assert.fail('callback occurred');
     });
-    counter.getHandle(['val1', 'val2']).add(1);
+    counter.getHandle(labelSet).add(1);
     counter.getDefaultHandle().add(1);
-    counter.removeHandle(['val1', 'val2']);
+    counter.removeHandle(labelSet);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(
-      counter.getHandle(['val1', 'val2']),
-      NOOP_COUNTER_HANDLE
-    );
+    assert.strictEqual(counter.getHandle(labelSet), NOOP_COUNTER_HANDLE);
     assert.strictEqual(counter.getDefaultHandle(), NOOP_COUNTER_HANDLE);
     counter.clear();
 
@@ -61,10 +62,7 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
     assert.strictEqual(measure.getDefaultHandle(), NOOP_MEASURE_HANDLE);
-    assert.strictEqual(
-      measure.getHandle(['val1', 'val2']),
-      NOOP_MEASURE_HANDLE
-    );
+    assert.strictEqual(measure.getHandle(labelSet), NOOP_MEASURE_HANDLE);
 
     const gauge = meter.createGauge('some-name');
     gauge.getDefaultHandle().set(1);
@@ -72,12 +70,11 @@ describe('NoopMeter', () => {
     // ensure the correct noop const is returned
     assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
     assert.strictEqual(gauge.getDefaultHandle(), NOOP_GAUGE_HANDLE);
-    assert.strictEqual(gauge.getHandle(['val1', 'val2']), NOOP_GAUGE_HANDLE);
+    assert.strictEqual(gauge.getHandle(labelSet), NOOP_GAUGE_HANDLE);
 
     const options = {
       component: 'tests',
       description: 'the testing package',
-      labelKeys: ['key1', 'key2'],
     };
 
     const measureWithOptions = meter.createMeasure('some-name', options);
