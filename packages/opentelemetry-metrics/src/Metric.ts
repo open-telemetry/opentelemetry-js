@@ -121,7 +121,8 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 }
 
 /** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<CounterHandle> {
+export class CounterMetric extends Metric<CounterHandle>
+  implements Pick<types.MetricUtils, 'add'> {
   constructor(
     name: string,
     options: MetricOptions,
@@ -157,7 +158,8 @@ export class CounterMetric extends Metric<CounterHandle> {
 }
 
 /** This is a SDK implementation of Gauge Metric. */
-export class GaugeMetric extends Metric<GaugeHandle> {
+export class GaugeMetric extends Metric<GaugeHandle>
+  implements Pick<types.MetricUtils, 'set'> {
   constructor(
     name: string,
     options: MetricOptions,
