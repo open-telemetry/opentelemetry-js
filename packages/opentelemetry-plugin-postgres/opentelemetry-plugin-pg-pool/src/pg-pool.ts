@@ -19,13 +19,18 @@ import { SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
 import * as pgPoolTypes from 'pg-pool';
-import * as pgTypes from 'pg';
-import { PostgresPoolPluginOptions, PgPoolCallback } from './types';
+import {
+  PostgresPoolPluginOptions,
+  PgPoolCallback,
+  PgPoolExtended,
+} from './types';
+import * as utils from './utils';
 
 export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   protected _config: PostgresPoolPluginOptions;
 
   static readonly COMPONENT = 'pg-pool';
+  static readonly DB_TYPE = 'sql';
 
   readonly supportedVersions = ['^2.0.7'];
 
@@ -57,10 +62,8 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
       plugin._logger.debug(
         `Patching ${PostgresPoolPlugin.COMPONENT}.prototype.connect`
       );
-      return function connect(
-        this: pgPoolTypes<pgTypes.Client>,
-        callback?: PgPoolCallback
-      ) {
+      return function connect(this: PgPoolExtended, callback?: PgPoolCallback) {
+        const jdbcString = utils.getJDBCString(this.options);
         // setup span
         const span = plugin._tracer.startSpan(
           `${PostgresPoolPlugin.COMPONENT}.connect`,
@@ -68,13 +71,26 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
             kind: SpanKind.CLIENT,
             parent: plugin._tracer.getCurrentSpan() || undefined,
             attributes: {
-              [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+              [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT, // required
+              [AttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE, // required
+              [AttributeNames.DB_INSTANCE]: this.options.database, // required
+              [AttributeNames.PEER_HOSTNAME]: this.options.host, // required
+              [AttributeNames.PEER_ADDRESS]: jdbcString, // required
+              [AttributeNames.PEER_PORT]: this.options.port,
+              [AttributeNames.DB_USER]: this.options.user,
+              [AttributeNames.IDLE_TIMEOUT_MILLIS]: this.options
+                .idleTimeoutMillis,
+              [AttributeNames.MAX_CLIENT]: this.options.maxClient,
             },
           }
         );
 
         if (callback) {
-          callback = plugin._tracer.bind(callback);
+          const parentSpan = plugin._tracer.getCurrentSpan();
+          callback = utils.patchCallback(span, callback) as PgPoolCallback;
+          if (parentSpan) {
+            callback = plugin._tracer.bind(callback);
+          }
         }
 
         const connectResult: unknown = originalConnect.call(

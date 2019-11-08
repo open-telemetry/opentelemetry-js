@@ -39,6 +39,30 @@ const CONFIG = {
   port: process.env.POSTGRES_PORT
     ? parseInt(process.env.POSTGRES_PORT, 10)
     : 54320,
+  maxClient: 1,
+  idleTimeoutMillis: 10000,
+};
+
+const DEFAULT_PGPOOL_ATTRIBUTES = {
+  [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+  [AttributeNames.DB_INSTANCE]: CONFIG.database,
+  [AttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE,
+  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
+  [AttributeNames.PEER_PORT]: CONFIG.port,
+  [AttributeNames.DB_USER]: CONFIG.user,
+  [AttributeNames.MAX_CLIENT]: CONFIG.maxClient,
+  [AttributeNames.IDLE_TIMEOUT_MILLIS]: CONFIG.idleTimeoutMillis,
+};
+
+const DEFAULT_PG_ATTRIBUTES = {
+  [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+  [AttributeNames.DB_INSTANCE]: CONFIG.database,
+  [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
+  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
+  [AttributeNames.PEER_PORT]: CONFIG.port,
+  [AttributeNames.DB_USER]: CONFIG.user,
 };
 
 const runCallbackTest = (
@@ -61,7 +85,7 @@ describe('pg-pool@2.x', () => {
   const logger = new NoopLogger();
   const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
-  const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
+  const shouldTest = true || testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(function(done) {
     if (!shouldTest) {
@@ -110,10 +134,11 @@ describe('pg-pool@2.x', () => {
     // promise - checkout a client
     it('should intercept pool.connect()', async () => {
       const pgPoolattributes = {
-        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+        ...DEFAULT_PGPOOL_ATTRIBUTES,
       };
       const pgAttributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        ...DEFAULT_PG_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -123,7 +148,6 @@ describe('pg-pool@2.x', () => {
         assert.ok(client, 'pool.connect() returns a promise');
         try {
           await client.query('SELECT NOW()');
-
           runCallbackTest(span, pgAttributes, events, 2, 1);
         } catch (e) {
           throw e;
@@ -136,10 +160,11 @@ describe('pg-pool@2.x', () => {
     // callback - checkout a client
     it('should not return a promise if callback is provided', done => {
       const pgPoolattributes = {
-        [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+        ...DEFAULT_PGPOOL_ATTRIBUTES,
       };
       const pgAttributes = {
-        [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+        ...DEFAULT_PG_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const parentSpan = tracer.startSpan('test span');
@@ -159,6 +184,55 @@ describe('pg-pool@2.x', () => {
             runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
             done();
           });
+        });
+        assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
+      });
+    });
+  });
+
+  describe('#pool.query()', () => {
+    // promise
+    it('should call patched client.query()', async () => {
+      const pgPoolattributes = {
+        ...DEFAULT_PGPOOL_ATTRIBUTES,
+      };
+      const pgAttributes = {
+        ...DEFAULT_PG_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+      };
+      const events: TimedEvent[] = [];
+      const span = tracer.startSpan('test span');
+      await tracer.withSpan(span, async () => {
+        try {
+          const result = await pool.query('SELECT NOW()');
+          runCallbackTest(span, pgPoolattributes, events, 2, 0);
+          runCallbackTest(span, pgAttributes, events, 2, 1);
+          assert.ok(result, 'pool.query() returns a promise');
+        } catch (e) {
+          throw e;
+        }
+      });
+    });
+
+    // callback
+    it('should not return a promise if callback is provided', done => {
+      const pgPoolattributes = {
+        ...DEFAULT_PGPOOL_ATTRIBUTES,
+      };
+      const pgAttributes = {
+        ...DEFAULT_PG_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+      };
+      const events: TimedEvent[] = [];
+      const parentSpan = tracer.startSpan('test span');
+      tracer.withSpan(parentSpan, () => {
+        const resNoPromise = pool.query('SELECT NOW()', (err, result) => {
+          if (err) {
+            return done(err);
+          }
+          runCallbackTest(parentSpan, pgPoolattributes, events, 2, 0);
+          runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
+          done();
         });
         assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
       });

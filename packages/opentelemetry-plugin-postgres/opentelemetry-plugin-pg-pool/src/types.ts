@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import * as pgTypes from 'pg';
+import * as pgPoolTypes from 'pg-pool';
+
 export interface PostgresPoolPluginOptions {}
 
 export type PgPoolCallback = (
@@ -21,3 +24,16 @@ export type PgPoolCallback = (
   client: any,
   done: (release?: any) => void
 ) => void;
+
+export interface PgPoolOptionsParams {
+  database: string;
+  host: string;
+  port: number;
+  user: string;
+  idleTimeoutMillis: number; // the minimum amount of time that an object may sit idle in the pool before it is eligible for eviction due to idle time
+  maxClient: number; // maximum size of the pool
+}
+
+export interface PgPoolExtended extends pgPoolTypes<pgTypes.Client> {
+  options: PgPoolOptionsParams;
+}

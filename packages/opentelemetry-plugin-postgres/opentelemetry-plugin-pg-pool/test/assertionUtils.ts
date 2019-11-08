@@ -27,7 +27,6 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import { AttributeNames } from '../src/enums';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -39,10 +38,10 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.strictEqual(
-    span.attributes[AttributeNames.COMPONENT],
-    attributes[AttributeNames.COMPONENT]
-  );
+  // check all the AttributeNames fields
+  Object.keys(span.attributes).forEach(key => {
+    assert.deepStrictEqual(span.attributes[key], attributes[key]);
+  });
 
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
