@@ -26,7 +26,7 @@ export interface RedisCommand {
   command: string;
   args: string[];
   buffer_args: boolean;
-  callback: Function;
+  callback: redisTypes.Callback<unknown>;
   call_on_write: boolean;
 }
 
@@ -107,13 +107,23 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
           }
 
           const originalCallback = arguments[0].callback;
-          arguments[0].callback = function callback() {
-            span.setStatus({
-              code: CanonicalCode.OK,
-            });
+          (arguments[0] as RedisCommand).callback = function callback<T>(
+            this: unknown,
+            err: Error | null,
+            _reply: T
+          ) {
+            if (err) {
+              span.setStatus({
+                code: CanonicalCode.UNKNOWN,
+                message: err.message,
+              });
+            } else {
+              span.setStatus({ code: CanonicalCode.OK });
+            }
+
             span.end();
             return originalCallback.apply(this, arguments);
-          };
+          } as redisTypes.Callback<unknown>;
           return original.apply(this, arguments);
         }
         return original.apply(this, arguments);

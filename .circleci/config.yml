@@ -7,6 +7,8 @@ test_env: &test_env
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
   RUN_REDIS_TESTS: 1
+  OPENTELEMETRY_REDIS_HOST: 'localhost'
+  OPENTELEMETRY_REDIS_PORT: 6379
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
