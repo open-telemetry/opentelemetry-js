@@ -33,9 +33,19 @@ export class ConsoleMetricExporter implements MetricExporter {
         name: descriptor.name,
         description: descriptor.description,
       });
+
       for (const ts of timeseries) {
+        const labels = descriptor.labelKeys
+          .map((k, i) => [k, ts.labelValues[i]])
+          .reduce(
+            (p, c) => ({
+              ...p,
+              [c[0] as string]: typeof c[1] === 'string' ? c[1] : c[1].value,
+            }),
+            {}
+          );
         for (const point of ts.points) {
-          console.log({ labels: ts.labelValues, value: point.value });
+          console.log({ labels, value: point.value });
         }
       }
     }

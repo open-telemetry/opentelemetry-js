@@ -40,17 +40,23 @@ describe('ConsoleMetricExporter', () => {
       meter.addExporter(consoleExporter);
       const gauge = meter.createGauge('gauge', {
         description: 'a test description',
-        labelKeys: ['key1'],
+        labelKeys: ['key1', 'key2'],
       }) as GaugeMetric;
-      const handle = gauge.getHandle(['labelValue1']);
+      const handle = gauge.getHandle(
+        meter.labels({ key1: 'labelValue1', key2: 'labelValue2' })
+      );
       handle.set(10);
       const [descriptor, timeseries] = spyConsole.args;
       assert.deepStrictEqual(descriptor, [
         { description: 'a test description', name: 'gauge' },
       ]);
       assert.deepStrictEqual(timeseries, [
-        { labels: [{ value: 'labelValue1' }], value: 10 },
+        {
+          labels: { key1: 'labelValue1', key2: 'labelValue2' },
+          value: 10,
+        },
       ]);
     });
   });
 });
+
