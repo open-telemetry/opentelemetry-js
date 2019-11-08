@@ -26,7 +26,7 @@ const INVALID_ID_REGEX = /^0+$/i;
 const VERSION = '00';
 
 /**
- * Parses information from [traceParent] window property and converts it into {@link SpanContext}
+ * Parses information from the [traceparent] span tag and converts it into {@link SpanContext}
  * @param traceParent - A meta property that comes from server.
  *     It should be dynamically generated server side to have the server's request trace Id,
  *     a parent span Id that was set on the server's request span,
