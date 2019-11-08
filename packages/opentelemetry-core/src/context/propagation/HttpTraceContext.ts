@@ -25,7 +25,17 @@ const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
 const VERSION = '00';
 
-function parse(traceParent: string): SpanContext | null {
+/**
+ * Parses information from the [traceparent] span tag and converts it into {@link SpanContext}
+ * @param traceParent - A meta property that comes from server.
+ *     It should be dynamically generated server side to have the server's request trace Id,
+ *     a parent span Id that was set on the server's request span,
+ *     and the trace flags to indicate the server's sampling decision
+ *     (01 = sampled, 00 = not sampled).
+ *     for example: '{version}-{traceId}-{spanId}-{sampleDecision}'
+ *     For more information see {@link https://www.w3.org/TR/trace-context/}
+ */
+export function parseTraceParent(traceParent: string): SpanContext | null {
   const match = traceParent.match(VALID_TRACE_PARENT_REGEX);
   if (!match) return null;
   const parts = traceParent.split('-');
@@ -87,7 +97,7 @@ export class HttpTraceContext implements HttpTextFormat {
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
       : traceParentHeader;
-    const spanContext = parse(traceParent);
+    const spanContext = parseTraceParent(traceParent);
     if (!spanContext) return null;
 
     spanContext.isRemote = true;
