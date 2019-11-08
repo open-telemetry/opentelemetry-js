@@ -36,13 +36,13 @@
   "devDependencies": {
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
-    "husky": "^3.0.9",
-    "benchmark": "^2.1.4",
     "beautify-benchmark": "^0.2.4",
+    "benchmark": "^2.1.4",
     "gts": "^1.0.0",
+    "husky": "^3.0.9",
     "lerna": "^3.17.0",
     "lerna-changelog": "^0.8.2",
-    "typescript": "3.6.4"
+    "typescript": "^3.7.2"
   },
   "husky": {
     "hooks": {

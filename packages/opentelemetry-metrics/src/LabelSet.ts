@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
+import * as types from '@opentelemetry/types';
+
+/**
+ * Canonicalized labels with an unique string identifier.
+ */
+export class LabelSet implements types.LabelSet {
+  identifier: string;
+  labels: types.Labels;
+
+  constructor(identifier: string, labels: types.Labels) {
+    this.identifier = identifier;
+    this.labels = labels;
+  }
+}
+
 /**
  * Type guard to remove nulls from arrays
  *
