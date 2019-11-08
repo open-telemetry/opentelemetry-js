@@ -53,11 +53,20 @@ describe('redis@2.x', () => {
   let redis: typeof redisTypes;
   let client: redisTypes.RedisClient;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
+  const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
 
-  before(done => {
+  before(function(done) {
+    if (!shouldTest) {
+      // this.skip() workaround
+      // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
+      this.test!.parent!.pending = true;
+      this.skip();
+    }
+
     if (shouldTestLocal) {
       dockerUtils.startDocker();
     }
+    
     redis = require('redis');
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     client = redis.createClient(URL);
