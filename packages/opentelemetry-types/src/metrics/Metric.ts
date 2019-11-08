@@ -103,15 +103,21 @@ export interface MetricUtils {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    */
-  add(value: number, labelSet: LabelSet): void
+  add(
+    value: number,
+    labelSet: LabelSet
+  ): void;
   /**
    * Sets the given value. Values can be negative.
-   */;
+   */
 
-  set(value: number, labelSet: LabelSet): void
+  set(
+    value: number,
+    labelSet: LabelSet
+  ): void;
   /**
    * Records the given value to this measure.
-   */;
+   */
 
   record(value: number, labelSet: LabelSet): void;
 }
