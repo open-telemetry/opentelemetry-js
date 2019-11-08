@@ -180,14 +180,14 @@ describe('PrometheusExporter', () => {
         labelKeys: ['key1'],
       }) as CounterMetric;
 
-      const handle = counter.getHandle(['labelValue1']);
+      const handle = counter.getHandle(meter.labels({ key1: 'labelValue1' }));
       handle.add(10);
-      exporter.export([counter.get()!], () => {
+      exporter.export(meter.getMetrics(), () => {
         // This is to test the special case where counters are destroyed
         // and recreated in the exporter in order to get around prom-client's
         // aggregation and use ours.
         handle.add(10);
-        exporter.export([counter.get()!], () => {
+        exporter.export(meter.getMetrics(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -220,7 +220,7 @@ describe('PrometheusExporter', () => {
         labelKeys: ['key1'],
       }) as GaugeMetric;
 
-      const handle = gauge.getHandle(['labelValue1']);
+      const handle = gauge.getHandle(meter.labels({ key1: 'labelValue1' }));
       handle.set(10);
       exporter.export([gauge.get()!], () => {
         http
@@ -254,8 +254,8 @@ describe('PrometheusExporter', () => {
         labelKeys: ['counterKey1'],
       }) as CounterMetric;
 
-      gauge.getHandle(['labelValue1']).set(10);
-      counter.getHandle(['labelValue1']).add(10);
+      gauge.getHandle(meter.labels({ key1: 'labelValue1' })).set(10);
+      counter.getHandle(meter.labels({ key1: 'labelValue1' })).add(10);
       exporter.export([gauge.get()!, counter.get()!], () => {
         http
           .get('http://localhost:9464/metrics', res => {
@@ -301,7 +301,7 @@ describe('PrometheusExporter', () => {
     it('should add a description if missing', done => {
       const gauge = meter.createGauge('gauge') as GaugeMetric;
 
-      const handle = gauge.getHandle(['labelValue1']);
+      const handle = gauge.getHandle(meter.labels({ key1: 'labelValue1' }));
       handle.set(10);
       exporter.export([gauge.get()!], () => {
         http
@@ -326,7 +326,7 @@ describe('PrometheusExporter', () => {
 
     it('should sanitize names', done => {
       const gauge = meter.createGauge('gauge.bad-name') as GaugeMetric;
-      const handle = gauge.getHandle(['labelValue1']);
+      const handle = gauge.getHandle(meter.labels({ key1: 'labelValue1' }));
       handle.set(10);
       exporter.export([gauge.get()!], () => {
         http
@@ -358,7 +358,7 @@ describe('PrometheusExporter', () => {
     beforeEach(() => {
       meter = new Meter();
       gauge = meter.createGauge('gauge') as GaugeMetric;
-      gauge.getHandle(['labelValue1']).set(10);
+      gauge.getHandle(meter.labels({ key1: 'labelValue1' })).set(10);
     });
 
     afterEach(done => {
