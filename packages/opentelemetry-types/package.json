@@ -11,7 +11,6 @@
     "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
-    "test": "npm run compile && npm run check",
     "docs-test": "linkinator docs/out",
     "docs": "typedoc --tsconfig tsconfig.json",
     "prepare": "npm run compile"
