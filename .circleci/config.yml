@@ -31,17 +31,73 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-{{ checksum "/tmp/checksums.txt" }}
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-03-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
     - run:
         name: Install Dependencies
         command: yarn install
     - save_cache:
-        key: npm-cache-{{ checksum "/tmp/checksums.txt" }}
+        key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
         paths:
           - ./node_modules
           - ./yarn.lock
-          - ./packages/*/node_modules
-          - ./packages/*/yarn.lock
+          - packages/opentelemetry-base/node_modules
+          - packages/opentelemetry-scope-base/node_modules
+          - packages/opentelemetry-types/node_modules
+          - packages/opentelemetry-scope-async-hooks/node_modules
+          - packages/opentelemetry-core/node_modules
+          - packages/opentelemetry-exporter-prometheus/node_modules
+          - packages/opentelemetry-metrics/node_modules
+          - packages/opentelemetry-tracing/node_modules
+          - packages/opentelemetry-exporter-jaeger/node_modules
+          - packages/opentelemetry-exporter-zipkin/node_modules
+          - packages/opentelemetry-node/node_modules
+          - packages/opentelemetry-shim-opentracing/node_modules
+          - packages/opentelemetry-web/node_modules
+          - packages/opentelemetry-plugin-dns/node_modules
+    - save_cache:
+        key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+        paths:
+          - packages/opentelemetry-plugin-grpc/node_modules
+          - packages/opentelemetry-plugin-http/node_modules
+          - packages/opentelemetry-plugin-http2/node_modules
+          - packages/opentelemetry-plugin-mongodb/node_modules
+          - packages/opentelemetry-plugin-redis/node_modules
+          - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
+          - packages/opentelemetry-plugin-document-load/node_modules
+          - packages/opentelemetry-plugin-https/node_modules
+          - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
+          - packages/opentelemetry-base/yarn.lock
+          - packages/opentelemetry-scope-base/yarn.lock
+          - packages/opentelemetry-types/yarn.lock
+          - packages/opentelemetry-scope-async-hooks/yarn.lock
+          - packages/opentelemetry-core/yarn.lock
+          - packages/opentelemetry-exporter-prometheus/yarn.lock
+    - save_cache:
+        key: npm-cache-03-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+        paths:
+          - packages/opentelemetry-metrics/yarn.lock
+          - packages/opentelemetry-tracing/yarn.lock
+          - packages/opentelemetry-exporter-jaeger/yarn.lock
+          - packages/opentelemetry-exporter-zipkin/yarn.lock
+          - packages/opentelemetry-node/yarn.lock
+          - packages/opentelemetry-shim-opentracing/yarn.lock
+          - packages/opentelemetry-web/yarn.lock
+          - packages/opentelemetry-plugin-dns/yarn.lock
+          - packages/opentelemetry-plugin-grpc/yarn.lock
+          - packages/opentelemetry-plugin-http/yarn.lock
+          - packages/opentelemetry-plugin-http2/yarn.lock
+          - packages/opentelemetry-plugin-mongodb/yarn.lock
+          - packages/opentelemetry-plugin-redis/yarn.lock
+          - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/yarn.lock
+          - packages/opentelemetry-plugin-document-load/yarn.lock
+          - packages/opentelemetry-plugin-https/yarn.lock
+          - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/yarn.lock
     - run:
         name: Compile code
         command: yarn compile
