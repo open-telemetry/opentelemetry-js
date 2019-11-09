@@ -125,9 +125,21 @@ export class NoopGaugeMetric extends NoopMetric<GaugeHandle>
   }
 }
 
-export class NoopMeasureMetric extends NoopMetric<MeasureHandle> {
-  record(value: number, labelSet: LabelSet) {
-    this.getHandle(labelSet).record(value);
+export class NoopMeasureMetric extends NoopMetric<MeasureHandle>
+  implements Pick<MetricUtils, 'record'> {
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
+  ) {
+    if (typeof distContext === 'undefined') {
+      this.getHandle(labelSet).record(value);
+    } else if (typeof spanContext === 'undefined') {
+      this.getHandle(labelSet).record(value, distContext);
+    } else {
+      this.getHandle(labelSet).record(value, distContext, spanContext);
+    }
   }
 }
 
