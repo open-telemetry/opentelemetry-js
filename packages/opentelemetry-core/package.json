@@ -51,6 +51,7 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/semver": "^6.2.0",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "codecov": "^3.1.0",
