@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@opentelemetry/plugin-document-load": "^0.2.0",
+    "@opentelemetry/scope-zone": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
     "@opentelemetry/web": "^0.2.0"
   },
