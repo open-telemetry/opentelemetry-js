@@ -14,8 +14,5 @@
  * limitations under the License.
  */
 
-export * from './Handle';
-export * from './Meter';
-export * from './Metric';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+export * from './ZoneScopeManager';
+export * from './types';

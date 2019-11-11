@@ -21,7 +21,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { ConsoleLogger } from '@opentelemetry/core';
+import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
 import {
   BasicTracer,
   ReadableSpan,
@@ -304,6 +304,53 @@ describe('DocumentLoad Plugin', () => {
         assert.strictEqual(fsEvents.length, 9);
         assert.strictEqual(spyOnEnd.callCount, 2);
         done();
+      });
+    });
+
+    describe('AND window has information about server root span', () => {
+      let spyGetElementsByTagName: any;
+      beforeEach(() => {
+        const element = {
+          content: '00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01',
+          getAttribute: (value: string) => {
+            if (value === 'name') {
+              return TRACE_PARENT_HEADER;
+            }
+            return undefined;
+          },
+        };
+
+        spyGetElementsByTagName = sinon.stub(
+          window.document,
+          'getElementsByTagName'
+        );
+        spyGetElementsByTagName.withArgs('meta').returns([element]);
+      });
+      afterEach(() => {
+        spyGetElementsByTagName.restore();
+      });
+
+      it('should create a root span with server context traceId', done => {
+        const spyOnEnd = sinon.spy(dummyExporter, 'export');
+        plugin.enable(moduleExports, tracer, logger, config);
+        setTimeout(() => {
+          const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
+          const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
+          assert.strictEqual(rootSpan.name, 'documentFetch');
+          assert.strictEqual(fetchSpan.name, 'documentLoad');
+
+          assert.strictEqual(
+            rootSpan.spanContext.traceId,
+            'ab42124a3c573678d4d8b21ba52df3bf'
+          );
+          assert.strictEqual(
+            fetchSpan.spanContext.traceId,
+            'ab42124a3c573678d4d8b21ba52df3bf'
+          );
+
+          assert.strictEqual(spyOnEnd.callCount, 2);
+          done();
+        }, 1);
       });
     });
   });

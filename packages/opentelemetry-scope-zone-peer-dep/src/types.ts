@@ -14,8 +14,22 @@
  * limitations under the License.
  */
 
-export * from './Handle';
-export * from './Meter';
-export * from './Metric';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+export type Func<T> = (...args: unknown[]) => T;
+
+/**
+ * Minimum requirements that the object needs to have so that it can bind to the events instead of function
+ * this is "addEventListener" and "removeEventListener" - see {@link isListenerObject}
+ */
+export interface TargetWithEvents {
+  addEventListener?(
+    event: string,
+    listener: (...args: any[]) => void,
+    opts?: { once: boolean }
+  ): any;
+  removeEventListener?(
+    event: string,
+    listener: (...args: any[]) => void,
+    opts?: { once: boolean }
+  ): any;
+  __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
+}
