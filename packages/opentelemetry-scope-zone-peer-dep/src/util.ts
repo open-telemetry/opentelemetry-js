@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-export * from './Handle';
-export * from './Meter';
-export * from './Metric';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+import { TargetWithEvents } from './types';
+
+/**
+ * check if an object has addEventListener and removeEventListener functions then it will return true
+ * @param obj
+ */
+export function isListenerObject(obj: TargetWithEvents = {}): boolean {
+  return (
+    typeof obj.addEventListener === 'function' &&
+    typeof obj.removeEventListener === 'function'
+  );
+}

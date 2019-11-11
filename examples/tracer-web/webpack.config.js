@@ -26,14 +26,6 @@ const common = {
       }
     ]
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      jQuery: 'jquery',
-      $: 'jquery',
-      jquery: 'jquery',
-      'window.jQuery': 'jquery'
-    })
-  ],
   resolve: {
     modules: [
       path.resolve(mainPath, 'src'),
@@ -52,8 +44,6 @@ module.exports = webpackMerge(common, {
   },
   devServer: {
     contentBase: path.resolve(__dirname),
-    // contentBase: path.resolve('.'),
-    // historyApiFallback: true
   },
   plugins: [
     new webpack.DefinePlugin({
