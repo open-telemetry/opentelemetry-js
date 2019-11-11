@@ -19,25 +19,12 @@ import * as redisTypes from 'redis';
 import * as shimmer from 'shimmer';
 import { SpanKind, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
-
-// exported from
-// https://github.com/NodeRedis/node_redis/blob/master/lib/command.js
-export interface RedisCommand {
-  command: string;
-  args: string[];
-  buffer_args: boolean;
-  callback: redisTypes.Callback<unknown>;
-  call_on_write: boolean;
-}
-
-interface RedisPluginClientTypes {
-  options?: {
-    host: string;
-    port: string;
-  };
-
-  address?: string;
-}
+import {
+  RedisPluginStreamTypes,
+  RedisPluginClientTypes,
+  RedisCommand,
+} from './types';
+import { EventEmitter } from 'events';
 
 export class RedisPlugin extends BasePlugin<typeof redisTypes> {
   static readonly COMPONENT = 'redis';
@@ -48,14 +35,30 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
   }
 
   protected patch() {
-    this._logger.debug(
-      'Patching redis.RedisClient.prototype.internal_send_command'
-    );
-    shimmer.wrap(
-      this._moduleExports.RedisClient.prototype,
-      'internal_send_command',
-      this._getPatchInternalSendCommand()
-    );
+    if (this._moduleExports.RedisClient) {
+      this._logger.debug(
+        'Patching redis.RedisClient.prototype.internal_send_command'
+      );
+      shimmer.wrap(
+        this._moduleExports.RedisClient.prototype,
+        'internal_send_command',
+        this._getPatchInternalSendCommand()
+      );
+
+      this._logger.debug('patching redis.create_stream');
+      shimmer.wrap(
+        this._moduleExports.RedisClient.prototype,
+        'create_stream',
+        this._getPatchCreateStream()
+      );
+
+      this._logger.debug('patching redis.createClient');
+      shimmer.wrap(
+        this._moduleExports,
+        'createClient',
+        this._getPatchCreateClient()
+      );
+    }
     return this._moduleExports;
   }
 
@@ -65,6 +68,11 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
         this._moduleExports.RedisClient.prototype,
         'internal_send_command'
       );
+      shimmer.unwrap(
+        this._moduleExports.RedisClient.prototype,
+        'create_stream'
+      );
+      shimmer.unwrap(this._moduleExports, 'createClient');
     }
   }
 
@@ -106,12 +114,9 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
             );
           }
 
-          const originalCallback = arguments[0].callback;
-          (arguments[0] as RedisCommand).callback = function callback<T>(
-            this: unknown,
-            err: Error | null,
-            _reply: T
-          ) {
+          let spanEnded = false;
+          const endSpan = (err?: Error | null) => {
+            if (spanEnded) return; // never
             if (err) {
               span.setStatus({
                 code: CanonicalCode.UNKNOWN,
@@ -120,11 +125,60 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
             } else {
               span.setStatus({ code: CanonicalCode.OK });
             }
-
             span.end();
-            return originalCallback.apply(this, arguments);
-          } as redisTypes.Callback<unknown>;
-          return original.apply(this, arguments);
+            spanEnded = true;
+          };
+
+          const originalCallback = arguments[0].callback;
+          if (originalCallback) {
+            (arguments[0] as RedisCommand).callback = function callback<T>(
+              this: unknown,
+              err: Error | null,
+              _reply: T
+            ) {
+              endSpan(err);
+              return originalCallback.apply(this, arguments);
+            };
+          }
+          try {
+            // Span will be ended in callback
+            return original.apply(this, arguments);
+          } catch (rethrow) {
+            endSpan(rethrow);
+            throw rethrow; // rethrow after ending span
+          }
+        }
+
+        // We don't know how to trace this call, so don't start/stop a span
+        return original.apply(this, arguments);
+      };
+    };
+  }
+
+  private _getPatchCreateClient() {
+    const plugin = this;
+    return function createClient(original: Function) {
+      return function createClientTrace(this: redisTypes.RedisClient) {
+        const client: redisTypes.RedisClient = original.apply(this, arguments);
+        return plugin._tracer.bind(client);
+      };
+    };
+  }
+
+  private _getPatchCreateStream() {
+    const plugin = this;
+    return function createReadStream(original: Function) {
+      return function create_stream_trace(this: RedisPluginStreamTypes) {
+        if (!this.stream) {
+          Object.defineProperty(this, 'stream', {
+            get() {
+              return this._patched_redis_stream;
+            },
+            set(val: EventEmitter) {
+              plugin._tracer.bind(val);
+              this._patched_redis_stream = val;
+            },
+          });
         }
         return original.apply(this, arguments);
       };

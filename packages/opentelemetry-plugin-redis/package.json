@@ -8,7 +8,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
-    "test:debug": "ts-mocha --inspect-brk --no-timeouts -p tsconfig.json 'test/**/*.test.ts'",
+    "test:debug": "cross-env RUN_REDIS_TESTS_LOCAL=true ts-mocha --inspect-brk --no-timeouts -p tsconfig.json 'test/**/*.test.ts'",
     "test:local": "cross-env RUN_REDIS_TESTS_LOCAL=true yarn test",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
@@ -50,6 +50,7 @@
     "@opentelemetry/node": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
     "codecov": "^3.5.0",
+    "cross-env": "^6.0.3",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",

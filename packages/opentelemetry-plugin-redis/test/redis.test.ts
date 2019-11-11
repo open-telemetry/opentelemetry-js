@@ -51,11 +51,11 @@ const okStatus: Status = {
 describe('redis@2.x', () => {
   const tracer = new NodeTracer();
   let redis: typeof redisTypes;
-  let client: redisTypes.RedisClient;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
 
-  before(function(done) {
+  before(function() {
+    // needs to be "function" to have MochaContext "this" scope
     if (!shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
@@ -69,34 +69,10 @@ describe('redis@2.x', () => {
 
     redis = require('redis');
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    client = redis.createClient(URL);
-    client.on('error', err => {
-      done(err);
-    });
-    client.on('ready', () => {
-      plugin.enable(redis, tracer, new NoopLogger());
-      done();
-    });
-  });
-
-  beforeEach(done => {
-    client.set('test', 'data', () => {
-      memoryExporter.reset();
-      done();
-    });
-  });
-
-  afterEach(done => {
-    client.del('hash', () => {
-      memoryExporter.reset();
-      done();
-    });
+    plugin.enable(redis, tracer, new NoopLogger());
   });
 
   after(() => {
-    if (client) {
-      client.quit();
-    }
     if (shouldTestLocal) {
       dockerUtils.cleanUpDocker();
     }
@@ -106,80 +82,131 @@ describe('redis@2.x', () => {
     assert.strictEqual(plugin.moduleName, RedisPlugin.COMPONENT);
   });
 
-  const REDIS_OPERATIONS: Array<{
-    description: string;
-    command: string;
-    method: (cb: redisTypes.Callback<unknown>) => unknown;
-  }> = [
-    {
-      description: 'insert',
-      command: 'hset',
-      method: (cb: redisTypes.Callback<number>) =>
-        client.hset('hash', 'random', 'random', cb),
-    },
-    {
-      description: 'get',
-      command: 'get',
-      method: (cb: redisTypes.Callback<string>) => client.get('test', cb),
-    },
-    {
-      description: 'delete',
-      command: 'del',
-      method: (cb: redisTypes.Callback<number>) => client.del('test', cb),
-    },
-  ];
+  describe('#createClient()', () => {
+    it('should propagate the current span to event handlers', done => {
+      const span = tracer.startSpan('test span');
+      let client: redisTypes.RedisClient;
+      const readyHandler = () => {
+        assert.strictEqual(tracer.getCurrentSpan(), span);
+        client.quit(done);
+      };
+      const errorHandler = (err: Error) => {
+        assert.ifError(err);
+        client.quit(done);
+      };
 
-  describe('Instrumenting query operations', () => {
-    REDIS_OPERATIONS.forEach(operation => {
-      it(`should create a child span for ${operation.description}`, done => {
-        const attributes = {
-          ...DEFAULT_ATTRIBUTES,
-          [AttributeNames.DB_STATEMENT]: operation.command,
-        };
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
-          operation.method((err, _result) => {
-            assert.ifError(err);
-            assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
-            span.end();
-            const endedSpans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(endedSpans.length, 2);
-            assert.strictEqual(
-              endedSpans[0].name,
-              `redis-${operation.command}`
-            );
-            assertionUtils.assertSpan(
-              endedSpans[0],
-              SpanKind.CLIENT,
-              attributes,
-              [],
-              okStatus
-            );
-            assertionUtils.assertPropagation(endedSpans[0], span);
-            done();
-          });
-        });
+      tracer.withSpan(span, () => {
+        client = redis.createClient(URL);
+        client.on('ready', readyHandler);
+        client.on('error', errorHandler);
       });
     });
   });
 
-  describe('Removing instrumentation', () => {
-    before(() => {
-      plugin.disable();
+  describe('#send_internal_message()', () => {
+    let client: redisTypes.RedisClient;
+
+    const REDIS_OPERATIONS: Array<{
+      description: string;
+      command: string;
+      method: (cb: redisTypes.Callback<unknown>) => unknown;
+    }> = [
+      {
+        description: 'insert',
+        command: 'hset',
+        method: (cb: redisTypes.Callback<number>) =>
+          client.hset('hash', 'random', 'random', cb),
+      },
+      {
+        description: 'get',
+        command: 'get',
+        method: (cb: redisTypes.Callback<string>) => client.get('test', cb),
+      },
+      {
+        description: 'delete',
+        command: 'del',
+        method: (cb: redisTypes.Callback<number>) => client.del('test', cb),
+      },
+    ];
+
+    before(done => {
+      client = redis.createClient(URL);
+      client.on('error', err => {
+        done(err);
+      });
+      client.on('ready', done);
     });
 
-    REDIS_OPERATIONS.forEach(operation => {
-      it(`should not create a child span for ${operation.description}`, done => {
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
-          operation.method((err, _) => {
-            assert.ifError(err);
-            assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-            span.end();
-            const endedSpans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(endedSpans.length, 1);
-            assert.strictEqual(endedSpans[0], span);
-            done();
+    beforeEach(done => {
+      client.set('test', 'data', () => {
+        memoryExporter.reset();
+        done();
+      });
+    });
+
+    after(done => {
+      client.quit(done);
+    });
+
+    afterEach(done => {
+      client.del('hash', () => {
+        memoryExporter.reset();
+        done();
+      });
+    });
+
+    describe('Instrumenting query operations', () => {
+      REDIS_OPERATIONS.forEach(operation => {
+        it(`should create a child span for ${operation.description}`, done => {
+          const attributes = {
+            ...DEFAULT_ATTRIBUTES,
+            [AttributeNames.DB_STATEMENT]: operation.command,
+          };
+          const span = tracer.startSpan('test span');
+          tracer.withSpan(span, () => {
+            operation.method((err, _result) => {
+              assert.ifError(err);
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+              span.end();
+              const endedSpans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(endedSpans.length, 2);
+              assert.strictEqual(
+                endedSpans[0].name,
+                `redis-${operation.command}`
+              );
+              assertionUtils.assertSpan(
+                endedSpans[0],
+                SpanKind.CLIENT,
+                attributes,
+                [],
+                okStatus
+              );
+              assertionUtils.assertPropagation(endedSpans[0], span);
+              done();
+            });
+          });
+        });
+      });
+    });
+
+    describe('Removing instrumentation', () => {
+      before(() => {
+        plugin.disable();
+      });
+
+      REDIS_OPERATIONS.forEach(operation => {
+        it(`should not create a child span for ${operation.description}`, done => {
+          const span = tracer.startSpan('test span');
+          tracer.withSpan(span, () => {
+            operation.method((err, _) => {
+              assert.ifError(err);
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+              span.end();
+              const endedSpans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(endedSpans.length, 1);
+              assert.strictEqual(endedSpans[0], span);
+              done();
+            });
           });
         });
       });
