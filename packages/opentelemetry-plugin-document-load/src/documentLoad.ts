@@ -198,7 +198,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
       });
     } else {
       // // fallback to previous version
-      const perf: (typeof otperformance) & PerformanceLegacy = otperformance;
+      const perf: typeof otperformance & PerformanceLegacy = otperformance;
       const performanceTiming = perf.timing;
       if (performanceTiming) {
         const keys = Object.values(PTN);

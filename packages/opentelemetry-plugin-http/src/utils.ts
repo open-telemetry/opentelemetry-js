@@ -46,7 +46,9 @@ export const getAbsoluteUrl = (
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
     (host as string).indexOf(':') === -1 &&
-    (port && port !== '80' && port !== '443')
+    port &&
+    port !== '80' &&
+    port !== '443'
   ) {
     host += `:${port}`;
   }
