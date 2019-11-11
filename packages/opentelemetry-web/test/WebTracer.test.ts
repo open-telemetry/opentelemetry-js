@@ -21,6 +21,7 @@ import { BasicTracerConfig } from '@opentelemetry/tracing';
 import { WebTracerConfig } from '../src';
 import { StackScopeManager } from '../src/StackScopeManager';
 import { WebTracer } from '../src/WebTracer';
+import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 
 class DummyPlugin extends BasePlugin<unknown> {
   patch() {}
@@ -76,6 +77,47 @@ describe('WebTracer', () => {
     it('should work without default scope manager', () => {
       assert.doesNotThrow(() => {
         tracer = new WebTracer({});
+      });
+    });
+
+    describe('when scopeManager is "ZoneScopeManager"', () => {
+      it('should correctly return the scopes for 2 parallel actions', () => {
+        const webTracerWithZone = new WebTracer({
+          scopeManager: new ZoneScopeManager(),
+        });
+
+        const rootSpan = webTracerWithZone.startSpan('rootSpan');
+
+        webTracerWithZone.withSpan(rootSpan, () => {
+          assert.ok(
+            webTracerWithZone.getCurrentSpan() === rootSpan,
+            'Current span is rootSpan'
+          );
+          const concurrentSpan1 = webTracerWithZone.startSpan(
+            'concurrentSpan1'
+          );
+          const concurrentSpan2 = webTracerWithZone.startSpan(
+            'concurrentSpan2'
+          );
+
+          webTracerWithZone.withSpan(concurrentSpan1, () => {
+            setTimeout(() => {
+              assert.ok(
+                webTracerWithZone.getCurrentSpan() === concurrentSpan1,
+                'Current span is concurrentSpan1'
+              );
+            }, 10);
+          });
+
+          webTracerWithZone.withSpan(concurrentSpan2, () => {
+            setTimeout(() => {
+              assert.ok(
+                webTracerWithZone.getCurrentSpan() === concurrentSpan2,
+                'Current span is concurrentSpan2'
+              );
+            }, 20);
+          });
+        });
       });
     });
   });
