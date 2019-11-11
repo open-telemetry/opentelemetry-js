@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { BasePlugin, otperformance } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  otperformance,
+  parseTraceParent,
+  TRACE_PARENT_HEADER,
+} from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
@@ -106,12 +111,19 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Collects information about performance and creates appropriate spans
    */
   private _collectPerformance() {
+    const metaElement = [...document.getElementsByTagName('meta')].find(
+      e => e.getAttribute('name') === TRACE_PARENT_HEADER
+    );
+    const serverContext =
+      parseTraceParent((metaElement && metaElement.content) || '') || undefined;
+
     const entries = this._getEntries();
 
     const rootSpan = this._startSpan(
       AttributeNames.DOCUMENT_LOAD,
       PTN.FETCH_START,
-      entries
+      entries,
+      { parent: serverContext }
     );
     if (!rootSpan) {
       return;

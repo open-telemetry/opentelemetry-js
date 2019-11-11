@@ -97,9 +97,10 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
           const parentSpan = plugin._tracer.getCurrentSpan();
           if (typeof args[args.length - 1] === 'function') {
             // Patch ParameterQuery callback
-            args[args.length - 1] = utils.patchCallback(span, args[
-              args.length - 1
-            ] as PostgresCallback);
+            args[args.length - 1] = utils.patchCallback(
+              span,
+              args[args.length - 1] as PostgresCallback
+            );
             // If a parent span exists, bind the callback
             if (parentSpan) {
               args[args.length - 1] = plugin._tracer.bind(
