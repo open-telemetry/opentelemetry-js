@@ -61,6 +61,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
+- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
@@ -104,12 +105,16 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 
 OpenTelemetry can collect tracing data automatically using plugins. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:
 
+#### Node Plugins
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
 - [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
 - [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
 - [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
+
+#### Web Plugins
+- [@opentelemetry/plugin-document-load](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-document-load)
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
 
