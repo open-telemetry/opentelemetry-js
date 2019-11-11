@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Metric, MetricOptions } from './Metric';
+import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
 import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
 
 /**
@@ -58,4 +58,12 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle>;
+
+  /**
+   * Provide a pre-computed re-useable LabelSet by
+   * converting the unordered labels into a canonicalized
+   * set of lables with an unique identifier, useful for pre-aggregation.
+   * @param labels user provided unordered Labels.
+   */
+  labels(labels: Labels): LabelSet;
 }

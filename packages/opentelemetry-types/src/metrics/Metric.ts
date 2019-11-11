@@ -70,12 +70,12 @@ export enum ValueType {
  */
 export interface Metric<T> {
   /**
-   * Returns a Handle associated with specified label values.
+   * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  getHandle(labelValues: string[]): T;
+  getHandle(labels: LabelSet): T;
 
   /**
    * Returns a Handle for a metric with all labels not set.
@@ -84,9 +84,9 @@ export interface Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  removeHandle(labelValues: string[]): void;
+  removeHandle(labels: LabelSet): void;
 
   /**
    * Clears all timeseries from the Metric.
@@ -97,4 +97,17 @@ export interface Metric<T> {
    * what should the callback signature be?
    */
   setCallback(fn: () => void): void;
+}
+
+/**
+ * key-value pairs passed by the user.
+ */
+export type Labels = Record<string, string>;
+
+/**
+ * Canonicalized labels with an unique string identifier.
+ */
+export interface LabelSet {
+  identifier: string;
+  labels: Labels;
 }
