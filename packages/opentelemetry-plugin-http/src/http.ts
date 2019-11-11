@@ -485,7 +485,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     span: Span,
     execute: T,
     rethrow: K
-  ): K extends true ? ReturnType<T> : (ReturnType<T> | void);
+  ): K extends true ? ReturnType<T> : ReturnType<T> | void;
   private _safeExecute<T extends (...args: unknown[]) => ReturnType<T>>(
     span: Span,
     execute: T,
