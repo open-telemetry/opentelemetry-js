@@ -39,7 +39,7 @@ export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
 export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
 export type ParsedRequestOptions =
-  | http.RequestOptions & Partial<url.UrlWithParsedQuery>
+  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
   | http.RequestOptions;
 export type Http = typeof http;
 /* tslint:disable-next-line:no-any */

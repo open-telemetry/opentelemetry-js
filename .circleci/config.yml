@@ -85,8 +85,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install modules and dependencies.
-          command: yarn install
+          name: Install minimal doc and lint modules globally
+          command: yarn global add lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
+      - run:
+          name: Symlink global modules into all lerna packages
+          command: lerna exec 'ln -s $(yarn global dir)/node_modules node_modules'
       - run:
           name: Check code style and linting
           command: yarn run check
