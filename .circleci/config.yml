@@ -65,7 +65,7 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
     - restore_cache:
         keys:
           - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
@@ -118,8 +118,6 @@ browsers_unit_tests: &browsers_unit_tests
         <<: *cache_1
     - save_cache:
         <<: *cache_2
-    - save_cache:
-        <<: *cache_3
     - run:
         name: Compile code
         command: yarn compile
