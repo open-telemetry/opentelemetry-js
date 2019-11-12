@@ -41,7 +41,7 @@
     "@types/mocha": "^5.2.7",
     "@types/nock": "^10.0.3",
     "@types/node": "^12.6.9",
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.1",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "nock": "^11.0.0",
