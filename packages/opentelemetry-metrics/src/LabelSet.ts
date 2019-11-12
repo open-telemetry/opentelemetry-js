@@ -28,12 +28,3 @@ export class LabelSet implements types.LabelSet {
     this.labels = labels;
   }
 }
-
-/**
- * Type guard to remove nulls from arrays
- *
- * @param value value to be checked for null equality
- */
-export function notNull<T>(value: T | null): value is T {
-  return value !== null;
-}
