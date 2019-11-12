@@ -108,9 +108,6 @@ browsers_unit_tests: &browsers_unit_tests
     - restore_cache:
         keys:
           - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
-    - restore_cache:
-        keys:
-          - npm-cache-03-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
     - run:
         name: Install Dependencies
         command: yarn install
