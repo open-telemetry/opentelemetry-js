@@ -13,6 +13,40 @@ postgres_service: &postgres_service
     POSTGRES_USER: postgres
     POSTGRES_DB: circle_database
 
+cache_1: &cache_1
+  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+  paths:
+    - ./node_modules
+    - ./yarn.lock
+    - packages/opentelemetry-base/node_modules
+    - packages/opentelemetry-scope-base/node_modules
+    - packages/opentelemetry-types/node_modules
+    - packages/opentelemetry-scope-async-hooks/node_modules
+    - packages/opentelemetry-core/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
+    - packages/opentelemetry-metrics/node_modules
+    - packages/opentelemetry-tracing/node_modules
+    - packages/opentelemetry-exporter-jaeger/node_modules
+    - packages/opentelemetry-exporter-zipkin/node_modules
+    - packages/opentelemetry-node/node_modules
+    - packages/opentelemetry-shim-opentracing/node_modules
+    - packages/opentelemetry-web/node_modules
+    - packages/opentelemetry-plugin-dns/node_modules
+
+cache_2: &cache_2
+  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
+  paths:
+    - packages/opentelemetry-plugin-grpc/node_modules
+    - packages/opentelemetry-plugin-http/node_modules
+    - packages/opentelemetry-plugin-http2/node_modules
+    - packages/opentelemetry-plugin-mongodb/node_modules
+    - packages/opentelemetry-plugin-redis/node_modules
+    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
+    - packages/opentelemetry-plugin-document-load/node_modules
+    - packages/opentelemetry-plugin-https/node_modules
+    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
+
 node_unit_tests: &node_unit_tests
   steps:
     - checkout
@@ -31,17 +65,17 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-{{ checksum "/tmp/checksums.txt" }}
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
     - run:
         name: Install Dependencies
         command: yarn install
     - save_cache:
-        key: npm-cache-{{ checksum "/tmp/checksums.txt" }}
-        paths:
-          - ./node_modules
-          - ./yarn.lock
-          - ./packages/*/node_modules
-          - ./packages/*/yarn.lock
+        <<: *cache_1
+    - save_cache:
+        <<: *cache_2
     - run:
         name: Compile code
         command: yarn compile
@@ -56,6 +90,9 @@ browsers_unit_tests: &browsers_unit_tests
   steps:
     - checkout
     - run:
+        name: Create Checksum
+        command: sh .circleci/checksum.sh /tmp/checksums.txt
+    - run:
         name: Setup environment variables
         command: |
           echo "export CIRCLE_NODE_VERSION=\$(node --version | grep -oE 'v[0-9]+')" >> $BASH_ENV
@@ -65,9 +102,19 @@ browsers_unit_tests: &browsers_unit_tests
         command: |
           node --version
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
+    - restore_cache:
+        keys:
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
     - run:
         name: Install Dependencies
         command: yarn install
+    - save_cache:
+        <<: *cache_1
+    - save_cache:
+        <<: *cache_2
     - run:
         name: Compile code
         command: yarn compile
