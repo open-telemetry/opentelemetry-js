@@ -76,6 +76,14 @@ describe('Meter', () => {
       assert.ok(counter instanceof Metric);
     });
 
+    it('should be able to call add() directly on counter', () => {
+      const counter = meter.createCounter('name') as CounterMetric;
+      counter.add(10, labelSet);
+      assert.strictEqual(counter.getHandle(labelSet)['_data'], 10);
+      counter.add(10, labelSet);
+      assert.strictEqual(counter.getHandle(labelSet)['_data'], 20);
+    });
+
     describe('.getHandle()', () => {
       it('should create a counter handle', () => {
         const counter = meter.createCounter('name') as CounterMetric;
@@ -227,6 +235,14 @@ describe('Meter', () => {
         monotonic: false,
       });
       assert.ok(gauge instanceof Metric);
+    });
+
+    it('should be able to call set() directly on gauge', () => {
+      const gauge = meter.createGauge('name') as GaugeMetric;
+      gauge.set(10, labelSet);
+      assert.strictEqual(gauge.getHandle(labelSet)['_data'], 10);
+      gauge.set(250, labelSet);
+      assert.strictEqual(gauge.getHandle(labelSet)['_data'], 250);
     });
 
     describe('.getHandle()', () => {

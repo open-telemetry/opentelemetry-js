@@ -38,7 +38,7 @@
     "@commitlint/config-conventional": "^8.2.0",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "gts": "^1.0.0",
+    "gts": "^1.1.0",
     "husky": "^3.0.9",
     "lerna": "^3.17.0",
     "lerna-changelog": "^0.8.2",
