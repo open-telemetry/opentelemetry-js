@@ -91,14 +91,17 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
         // New versions of redis (2.4+) use a single options object
         // instead of named arguments
         if (arguments.length === 1 && typeof cmd === 'object') {
-          const span = plugin._tracer.startSpan(`${RedisPlugin.COMPONENT}-${cmd.command}`, {
-            kind: SpanKind.CLIENT,
-            parent: parentSpan || undefined,
-            attributes: {
-              [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
-              [AttributeNames.DB_STATEMENT]: cmd.command,
-            },
-          });
+          const span = plugin._tracer.startSpan(
+            `${RedisPlugin.COMPONENT}-${cmd.command}`,
+            {
+              kind: SpanKind.CLIENT,
+              parent: parentSpan || undefined,
+              attributes: {
+                [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
+                [AttributeNames.DB_STATEMENT]: cmd.command,
+              },
+            }
+          );
 
           // Set attributes for not explicitly typed RedisPluginClientTypes
           if (this.options) {
