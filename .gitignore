@@ -74,3 +74,6 @@ docs
 
 # OS generated files
 .DS_Store
+
+# VsCode configs
+.vscode/
