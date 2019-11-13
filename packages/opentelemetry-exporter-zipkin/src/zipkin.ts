@@ -73,7 +73,7 @@ export class ZipkinExporter implements SpanExporter {
   ) {
     this._logger.debug('Zipkin exporter export');
     if (this._shutdown) {
-      setImmediate(resultCallback, ExportResult.FAILED_NOT_RETRYABLE);
+      setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
       return;
     }
     return this._sendSpans(spans, resultCallback);
