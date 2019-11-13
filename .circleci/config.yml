@@ -116,9 +116,6 @@ browsers_unit_tests: &browsers_unit_tests
     - save_cache:
         <<: *cache_2
     - run:
-        name: Compile code
-        command: yarn compile
-    - run:
         name: Unit tests
         command: yarn test:browser
     - run:
