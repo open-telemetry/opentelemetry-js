@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { DistributedContext } from '../distributed_context/DistributedContext';
+import { SpanContext } from '../trace/span_context';
+
 /**
  * Options needed for metric creation
  */
@@ -97,6 +100,36 @@ export interface Metric<T> {
    * what should the callback signature be?
    */
   setCallback(fn: () => void): void;
+}
+
+export interface MetricUtils {
+  /**
+   * Adds the given value to the current value. Values cannot be negative.
+   */
+  add(value: number, labelSet: LabelSet): void;
+
+  /**
+   * Sets the given value. Values can be negative.
+   */
+  set(value: number, labelSet: LabelSet): void;
+
+  /**
+   * Records the given value to this measure.
+   */
+  record(value: number, labelSet: LabelSet): void;
+
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext: DistributedContext
+  ): void;
+
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext: DistributedContext,
+    spanContext: SpanContext
+  ): void;
 }
 
 /**

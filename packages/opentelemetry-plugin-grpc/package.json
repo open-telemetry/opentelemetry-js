@@ -47,7 +47,7 @@
     "@types/semver": "^6.2.0",
     "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.0.13",
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.1",
     "grpc": "^1.23.3",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",

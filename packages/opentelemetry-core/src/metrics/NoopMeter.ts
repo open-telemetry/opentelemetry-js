@@ -21,6 +21,7 @@ import {
   Meter,
   Metric,
   MetricOptions,
+  MetricUtils,
   MeasureHandle,
   SpanContext,
   LabelSet,
@@ -110,6 +111,38 @@ export class NoopMetric<T> implements Metric<T> {
   }
 }
 
+export class NoopCounterMetric extends NoopMetric<CounterHandle>
+  implements Pick<MetricUtils, 'add'> {
+  add(value: number, labelSet: LabelSet) {
+    this.getHandle(labelSet).add(value);
+  }
+}
+
+export class NoopGaugeMetric extends NoopMetric<GaugeHandle>
+  implements Pick<MetricUtils, 'set'> {
+  set(value: number, labelSet: LabelSet) {
+    this.getHandle(labelSet).set(value);
+  }
+}
+
+export class NoopMeasureMetric extends NoopMetric<MeasureHandle>
+  implements Pick<MetricUtils, 'record'> {
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
+  ) {
+    if (typeof distContext === 'undefined') {
+      this.getHandle(labelSet).record(value);
+    } else if (typeof spanContext === 'undefined') {
+      this.getHandle(labelSet).record(value, distContext);
+    } else {
+      this.getHandle(labelSet).record(value, distContext, spanContext);
+    }
+  }
+}
+
 export class NoopCounterHandle implements CounterHandle {
   add(value: number): void {
     return;
@@ -133,16 +166,12 @@ export class NoopMeasureHandle implements MeasureHandle {
 }
 
 export const NOOP_GAUGE_HANDLE = new NoopGaugeHandle();
-export const NOOP_GAUGE_METRIC = new NoopMetric<GaugeHandle>(NOOP_GAUGE_HANDLE);
+export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_GAUGE_HANDLE);
 
 export const NOOP_COUNTER_HANDLE = new NoopCounterHandle();
-export const NOOP_COUNTER_METRIC = new NoopMetric<CounterHandle>(
-  NOOP_COUNTER_HANDLE
-);
+export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_COUNTER_HANDLE);
 
 export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
-export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
-  NOOP_MEASURE_HANDLE
-);
+export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_MEASURE_HANDLE);
 
 export const NOOP_LABEL_SET = {} as LabelSet;
