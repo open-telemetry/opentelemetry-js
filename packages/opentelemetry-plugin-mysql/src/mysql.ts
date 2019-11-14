@@ -97,7 +97,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       );
       return function getConnection(cb?: Function) {
         originalGetConnection.apply(pool, [
-          function () {
+          function() {
             if (arguments[1]) {
               shimmer.wrap(
                 arguments[1],
@@ -162,13 +162,13 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
 
           return originalQuery.apply(connection, arguments);
         }
-      }
-    }
+      };
+    };
   }
 
   private _patchCallbackQuery(span: Span): (original: any) => any {
     return (originalCallback: mysqlTypes.queryCallback) => {
-      return function (
+      return function(
         err: mysqlTypes.MysqlError | null,
         results?: any,
         fields?: mysqlTypes.FieldInfo[]
