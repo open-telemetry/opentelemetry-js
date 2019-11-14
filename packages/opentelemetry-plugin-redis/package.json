@@ -48,7 +48,7 @@
     "@types/shimmer": "^1.0.1",
     "@opentelemetry/node": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
-    "codecov": "^3.5.0",
+    "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",

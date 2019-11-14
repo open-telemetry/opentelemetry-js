@@ -121,7 +121,8 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
 }
 
 /** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<CounterHandle> {
+export class CounterMetric extends Metric<CounterHandle>
+  implements Pick<types.MetricUtils, 'add'> {
   constructor(
     name: string,
     options: MetricOptions,
@@ -145,10 +146,20 @@ export class CounterMetric extends Metric<CounterHandle> {
       this._onUpdate
     );
   }
+
+  /**
+   * Adds the given value to the current value. Values cannot be negative.
+   * @param value the value to add.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric's handle.
+   */
+  add(value: number, labelSet: types.LabelSet) {
+    this.getHandle(labelSet).add(value);
+  }
 }
 
 /** This is a SDK implementation of Gauge Metric. */
-export class GaugeMetric extends Metric<GaugeHandle> {
+export class GaugeMetric extends Metric<GaugeHandle>
+  implements Pick<types.MetricUtils, 'set'> {
   constructor(
     name: string,
     options: MetricOptions,
@@ -171,5 +182,14 @@ export class GaugeMetric extends Metric<GaugeHandle> {
       this._logger,
       this._onUpdate
     );
+  }
+
+  /**
+   * Sets the given value. Values can be negative.
+   * @param value the new value.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric's handle.
+   */
+  set(value: number, labelSet: types.LabelSet) {
+    this.getHandle(labelSet).set(value);
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/base",
   "version": "0.2.0",
-  "description": "OpenTelemetry base",
+  "description": "OpenTelemetry base provides base code for the SDK packages",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -43,8 +43,8 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
-    "codecov": "^3.1.0",
-    "gts": "^1.0.0",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
     "mocha": "^6.1.0",
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
