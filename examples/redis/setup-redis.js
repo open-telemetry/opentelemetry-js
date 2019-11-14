@@ -10,5 +10,4 @@ const redisPromise = new Promise(function(resolve, reject) {
   });
 });
 
-
 exports.redis = redisPromise;

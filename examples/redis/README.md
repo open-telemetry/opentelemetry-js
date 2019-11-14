@@ -28,10 +28,10 @@ Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/
 
  - Start redis via docker
 
-  ```sh
-  # from this directory
-  npm run docker:start
-  ```
+   ```sh
+   # from this directory
+   npm run docker:start
+   ```
 
  - Run the server
 
@@ -47,12 +47,12 @@ Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/
    npm run zipkin:client
    ```
 
-  - Cleanup docker
+ - Cleanup docker
 
-    ```sh
-    # from this directory
-    npm run docker:stop
-    ```
+   ```sh
+   # from this directory
+   npm run docker:stop
+   ```
 
 #### Zipkin UI
 `zipkin:server` script should output the `traceid` in the terminal (e.g `traceid: 4815c3d576d930189725f1f1d1bdfcc6`).
@@ -64,31 +64,31 @@ Go to Zipkin with your browser [http://localhost:9411/zipkin/traces/(your-trace-
 
  - Start redis via docker
 
-  ```sh
-  # from this directory
-  npm run docker:start
-  ```
+   ```sh
+   # from this directory
+   npm run docker:start
+   ```
 
  - Run the server
 
    ```sh
-   $ # from this directory
+   # from this directory
    $ npm run jaeger:server
    ```
 
  - Run the client
 
    ```sh
-   $ # from this directory
-   $ npm run jaeger:client
+   # from this directory
+   npm run jaeger:client
    ```
 
-  - Cleanup docker
+ - Cleanup docker
 
-    ```sh
-    # from this directory
-    npm run docker:stop
-    ```
+   ```sh
+   # from this directory
+   npm run docker:stop
+   ```
 
 #### Jaeger UI
 
