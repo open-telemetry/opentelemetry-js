@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
-import  * as redisTypes from 'redis';
+import * as redisTypes from 'redis';
 import { Tracer, SpanKind, Span, CanonicalCode } from '@opentelemetry/types';
-import { RedisPluginStreamTypes, RedisPluginClientTypes, RedisCommand } from './types';
+import {
+  RedisPluginStreamTypes,
+  RedisPluginClientTypes,
+  RedisCommand,
+} from './types';
 import { EventEmitter } from 'events';
 import { RedisPlugin } from './redis';
 import { AttributeNames } from './enums';
@@ -38,9 +42,12 @@ export const getTracedCreateClient = (tracer: Tracer, original: Function) => {
     const client: redisTypes.RedisClient = original.apply(this, arguments);
     return tracer.bind(client);
   };
-}
+};
 
-export const getTracedCreateStreamTrace = (tracer: Tracer, original: Function) => {
+export const getTracedCreateStreamTrace = (
+  tracer: Tracer,
+  original: Function
+) => {
   return function create_stream_trace(this: RedisPluginStreamTypes) {
     if (!this.stream) {
       Object.defineProperty(this, 'stream', {
@@ -55,10 +62,12 @@ export const getTracedCreateStreamTrace = (tracer: Tracer, original: Function) =
     }
     return original.apply(this, arguments);
   };
-}
+};
 
-export const getTracedInternalSendCommand = (tracer: Tracer, original: Function) => {
-
+export const getTracedInternalSendCommand = (
+  tracer: Tracer,
+  original: Function
+) => {
   return function internal_send_command_trace(
     this: redisTypes.RedisClient & RedisPluginClientTypes,
     cmd?: RedisCommand
@@ -68,17 +77,14 @@ export const getTracedInternalSendCommand = (tracer: Tracer, original: Function)
     // New versions of redis (2.4+) use a single options object
     // instead of named arguments
     if (arguments.length === 1 && typeof cmd === 'object') {
-      const span = tracer.startSpan(
-        `${RedisPlugin.COMPONENT}-${cmd.command}`,
-        {
-          kind: SpanKind.CLIENT,
-          parent: parentSpan || undefined,
-          attributes: {
-            [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
-            [AttributeNames.DB_STATEMENT]: cmd.command,
-          },
-        }
-      );
+      const span = tracer.startSpan(`${RedisPlugin.COMPONENT}-${cmd.command}`, {
+        kind: SpanKind.CLIENT,
+        parent: parentSpan || undefined,
+        attributes: {
+          [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
+          [AttributeNames.DB_STATEMENT]: cmd.command,
+        },
+      });
 
       // Set attributes for not explicitly typed RedisPluginClientTypes
       if (this.options) {
@@ -117,4 +123,4 @@ export const getTracedInternalSendCommand = (tracer: Tracer, original: Function)
     // We don't know how to trace this call, so don't start/stop a span
     return original.apply(this, arguments);
   };
-}
+};

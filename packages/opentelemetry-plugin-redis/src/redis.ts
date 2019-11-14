@@ -17,8 +17,11 @@
 import { BasePlugin } from '@opentelemetry/core';
 import * as redisTypes from 'redis';
 import * as shimmer from 'shimmer';
-import { getTracedCreateClient, getTracedCreateStreamTrace, getTracedInternalSendCommand } from './utils';
-
+import {
+  getTracedCreateClient,
+  getTracedCreateStreamTrace,
+  getTracedInternalSendCommand,
+} from './utils';
 
 export class RedisPlugin extends BasePlugin<typeof redisTypes> {
   static readonly COMPONENT = 'redis';
@@ -74,7 +77,7 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
    * Patch internal_send_command(...) to trace requests
    */
   private _getPatchInternalSendCommand() {
-    const tracer = this._tracer
+    const tracer = this._tracer;
     return function internal_send_command(original: Function) {
       return getTracedInternalSendCommand(tracer, original);
     };
