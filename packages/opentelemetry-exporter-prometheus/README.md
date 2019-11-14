@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected metrics with [OpenTelemetry Metrics](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics) to Prometheus.
+The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected [OpenTelemetry Metrics](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics) to Prometheus.
 
 [Prometheus](https://prometheus.io/) is a monitoring system that collects metrics, by scraping exposed endpoints at regular intervals, evaluating rule expressions. It can also trigger alerts if certain conditions are met. For assistance setting up Prometheus, [Click here](https://opencensus.io/codelabs/prometheus/#0) for a guided codelab.
 
@@ -42,9 +42,10 @@ handle.add(10);
 
 // .. some other work
 
-handle.add(50);
+// Create and record Gauge
+const gauge = meter.createGauge('metric_name1');
+gauge.set(10, meter.labels({ [key1]: 'value1' }));
 ```
-
 
 ## Viewing your metrics
 
