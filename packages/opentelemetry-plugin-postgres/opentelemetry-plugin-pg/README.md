@@ -13,6 +13,7 @@ For automatic instrumentation see the
 
 ```bash
 npm install --save @opentelemetry/plugin-pg
+npm install --save @opentelemetry/plugin-pg-pool
 ```
 
 ## Usage
