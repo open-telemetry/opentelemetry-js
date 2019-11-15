@@ -27,7 +27,7 @@ import {
   ReadableSpan,
 } from '@opentelemetry/tracing';
 
-export interface MongoDBAccess {
+interface MongoDBAccess {
   client: mongodb.MongoClient;
   collection: mongodb.Collection;
 }

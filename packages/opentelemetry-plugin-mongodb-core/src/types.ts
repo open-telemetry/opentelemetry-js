@@ -49,3 +49,11 @@ export enum AttributeNames {
   PEER_IPV6 = 'peer.ipv6',
   PEER_SERVICE = 'peer.service',
 }
+
+export enum MongodbCommandType {
+  CREATE_INDEXES = 'createIndexes',
+  FIND_AND_MODIFY = 'findAndModify',
+  IS_MASTER = 'isMaster',
+  COUNT = 'count',
+  UNKNOWN = 'unknown',
+}

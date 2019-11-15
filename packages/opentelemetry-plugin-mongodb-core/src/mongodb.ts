@@ -24,14 +24,18 @@ import {
   MongoInternalCommand,
   MongoInternalTopology,
   AttributeNames,
+  MongodbCommandType,
 } from './types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 
-/** MongoDB instrumentation plugin for OpenTelemetry */
-export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
+/** MongoDBCore instrumentation plugin for OpenTelemetry */
+export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   private readonly _SERVER_METHODS = ['insert', 'update', 'remove', 'command'];
   private readonly _CURSOR_METHODS = ['_next', 'next'];
+
+  private readonly _COMPONENT = 'mongodb-core';
+  private readonly _DB_TYPE = 'mongodb';
 
   readonly supportedVersions = ['>=2 <3'];
 
@@ -96,10 +100,9 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         ns: string,
         commands: MongoInternalCommand[] | MongoInternalCommand,
         options: {} | Function,
-        callback: Func<unknown>
+        callback: Function
       ): mongodb.Server {
         const currentSpan = plugin._tracer.getCurrentSpan();
-        // @ts-ignore
         const resultHandler =
           typeof options === 'function' ? options : callback;
         if (
@@ -110,7 +113,11 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
           return original.apply(this, (arguments as unknown) as unknown[]);
         }
         const command = commands instanceof Array ? commands[0] : commands;
-        const type = plugin._getCommandType(command, operationName);
+        const commandType = plugin._getCommandType(command);
+        const type =
+          commandType === MongodbCommandType.UNKNOWN
+            ? operationName
+            : commandType;
         const span = plugin._tracer.startSpan(`mongodb.${type}`, {
           parent: currentSpan,
           kind: SpanKind.CLIENT,
@@ -121,22 +128,12 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
           command,
           this as MongoInternalTopology
         );
-        if (typeof options === 'function') {
-          return original.call(
-            this,
-            ns,
-            commands,
-            plugin._patchEnd(span, options as Func<unknown>)
-          );
-        } else {
-          return original.call(
-            this,
-            ns,
-            commands,
-            options,
-            plugin._patchEnd(span, callback)
-          );
-        }
+        return original.call(
+          this,
+          ns,
+          commands,
+          plugin._patchEnd(span, resultHandler)
+        );
       };
     };
   }
@@ -147,17 +144,17 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
    * @param defaulType the default type to return if we could not find a
    *  specific command.
    */
-  private _getCommandType(command: MongoInternalCommand, defaulType: string) {
+  private _getCommandType(command: MongoInternalCommand): MongodbCommandType {
     if (command.createIndexes !== undefined) {
-      return 'createIndexes';
+      return MongodbCommandType.CREATE_INDEXES;
     } else if (command.findandmodify !== undefined) {
-      return 'findAndModify';
+      return MongodbCommandType.FIND_AND_MODIFY;
     } else if (command.ismaster !== undefined) {
-      return 'isMaster';
+      return MongodbCommandType.IS_MASTER;
     } else if (command.count !== undefined) {
-      return 'count';
+      return MongodbCommandType.COUNT;
     } else {
-      return defaulType;
+      return MongodbCommandType.UNKNOWN;
     }
   }
 
@@ -184,8 +181,8 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
     // add database related attributes
     span.setAttributes({
       [AttributeNames.DB_INSTANCE]: `${ns}`,
-      [AttributeNames.DB_TYPE]: `mongodb`,
-      [AttributeNames.COMPONENT]: 'mongodb-core',
+      [AttributeNames.DB_TYPE]: this._DB_TYPE,
+      [AttributeNames.COMPONENT]: this._COMPONENT,
     });
 
     if (command === undefined) return;
@@ -212,9 +209,9 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         ...args: unknown[]
       ): mongodb.Cursor {
         const currentSpan = plugin._tracer.getCurrentSpan();
-        const resultHandler = args[0] as Func<unknown> | undefined;
-        if (currentSpan === null || resultHandler === undefined) {
-          return original.apply(this, (arguments as unknown) as unknown[]);
+        const resultHandler = args[0];
+        if (currentSpan === null || typeof resultHandler !== 'function') {
+          return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(`mongodb.query`, {
           parent: currentSpan,
@@ -232,7 +229,7 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
    * @param span The created span to end.
    * @param resultHandler A callback function.
    */
-  private _patchEnd(span: Span, resultHandler: Func<unknown>): Function {
+  private _patchEnd(span: Span, resultHandler: Function): Function {
     return function patchedEnd(this: {}, ...args: unknown[]) {
       const error = args[0];
       if (error instanceof Error) {
@@ -246,9 +243,9 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         });
       }
       span.end();
-      return resultHandler.apply(this, (arguments as unknown) as unknown[]);
+      return resultHandler.apply(this, args);
     };
   }
 }
 
-export const plugin = new MongoDBPlugin('mongodb-core');
+export const plugin = new MongoDBCorePlugin('mongodb-core');
