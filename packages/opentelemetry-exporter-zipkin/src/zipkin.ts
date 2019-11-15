@@ -39,7 +39,7 @@ export class ZipkinExporter implements SpanExporter {
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private readonly _reqOpts: http.RequestOptions;
-  private _shutdown: boolean;
+  private _isShutdown: boolean;
 
   constructor(config: zipkinTypes.ExporterConfig) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
@@ -61,7 +61,7 @@ export class ZipkinExporter implements SpanExporter {
     this._statusCodeTagName = config.statusCodeTagName || statusCodeTagName;
     this._statusDescriptionTagName =
       config.statusDescriptionTagName || statusDescriptionTagName;
-    this._shutdown = false;
+    this._isShutdown = false;
   }
 
   /**
@@ -72,7 +72,7 @@ export class ZipkinExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ) {
     this._logger.debug('Zipkin exporter export');
-    if (this._shutdown) {
+    if (this._isShutdown) {
       setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
       return;
     }
@@ -84,10 +84,10 @@ export class ZipkinExporter implements SpanExporter {
    */
   shutdown() {
     this._logger.debug('Zipkin exporter shutdown');
-    if (this._shutdown) {
+    if (this._isShutdown) {
       return;
     }
-    this._shutdown = true;
+    this._isShutdown = true;
     // Make an optimistic flush.
     if (this._forceFlush) {
       // @todo get spans from span processor (batch)
