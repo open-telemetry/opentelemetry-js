@@ -27,6 +27,14 @@ const connection = mysql.createConnection({
   database : 'my_db',
 });
 
+const cluster = mysql.createPoolCluster();
+
+cluster.add({
+  host     : 'localhost',
+  user     : 'root',
+  password : 'secret',
+  database : 'my_db',
+})
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer (port) {
@@ -56,7 +64,11 @@ function handleRequest (request, response) {
       if (request.url === "/connection/query") {
         handleConnectionQuery(response);
       } else if (request.url === "/pool/query") {
-        handlePoolQuery(response)
+        handlePoolQuery(response);
+      } else if (request.url === "/cluster/query") {
+        handleClusterQuery(response);
+      } else {
+        handleNotFound(response);
       }
     });
   } catch (err) {
@@ -93,5 +105,25 @@ function handleConnectionQuery(response) {
       response.end(`${query}: ${results[0].solution}`);
     }
   });
+}
+
+function handleClusterQuery(response) {
+  const query = "SELECT 1 + 1 as cluster_solution";
+  cluster.getConnection((err, conn) => {
+    conn.query(query, (err, results, fields) => {
+      tracer.getCurrentSpan().addEvent("results");
+      if (err) {
+        console.log("Error code:", err.code);
+        response.end(err.message);
+      }
+      else {
+        response.end(`${query}: ${results[0].cluster_solution}`);
+      }
+    });
+  })
+}
+
+function handleNotFound(response) {
+  response.end("not found");
 }
 

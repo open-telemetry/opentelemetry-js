@@ -54,6 +54,22 @@ function makeRequest() {
             });
         });
     });
+    tracer.withSpan(span, () => {
+        queries += 1;
+        http.get({
+            host: 'localhost',
+            port: 8080,
+            path: '/cluster/query'
+        }, (response) => {
+            let body = [];
+            response.on('data', chunk => body.push(chunk));
+            response.on('end', () => {
+                responses += 1;
+                console.log(body.toString());
+                if (responses === queries) span.end();
+            });
+        });
+    });
 
     // The process must live for at least the interval past any traces that
     // must be exported, or some risk being lost if they are recorded after the

@@ -19,6 +19,7 @@ import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
 import * as mysqlTypes from 'mysql';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums';
+import { getConnectionAttributes, getSpanName } from './utils';
 
 export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   moduleName = 'mysql';
@@ -43,14 +44,22 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       this._patchCreatePool() as any
     );
 
+    shimmer.wrap(
+      this._moduleExports,
+      'createPoolCluster',
+      this._patchCreatePoolCluster() as any
+    );
+
     return this._moduleExports;
   }
 
   protected unpatch(): void {
     shimmer.unwrap(this._moduleExports, 'createConnection');
     shimmer.unwrap(this._moduleExports, 'createPool');
+    shimmer.unwrap(this._moduleExports, 'createPoolCluster');
   }
 
+  // global export function
   private _patchCreateConnection() {
     return (originalCreateConnection: typeof mysqlTypes.createConnection) => {
       const plugin = this;
@@ -73,6 +82,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     };
   }
 
+  // global export function
   private _patchCreatePool() {
     return (originalCreatePool: typeof mysqlTypes.createPool) => {
       const plugin = this;
@@ -89,34 +99,73 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     };
   }
 
-  private _patchGetConnection(pool: mysqlTypes.Pool) {
+  // global export function
+  private _patchCreatePoolCluster() {
+    return (originalCreatePoolCluster: typeof mysqlTypes.createPoolCluster) => {
+      const plugin = this;
+      plugin._logger.debug(
+        'MysqlPlugin#patch: patched mysql createPoolCluster'
+      );
+      return function createPool(_config: string | mysqlTypes.PoolConfig) {
+        //@ts-ignore
+        const cluster = originalCreatePoolCluster(...arguments);
+
+        shimmer.wrap(
+          cluster,
+          'getConnection',
+          plugin._patchGetConnection(cluster)
+        );
+
+        return cluster;
+      };
+    };
+  }
+
+  // method on cluster or pool
+  private _patchGetConnection(pool: mysqlTypes.Pool | mysqlTypes.PoolCluster) {
     return (originalGetConnection: Function) => {
       const plugin = this;
       plugin._logger.debug(
         'MysqlPlugin#patch: patched mysql pool getConnection'
       );
-      return function getConnection(cb?: Function) {
-        originalGetConnection.apply(pool, [
-          function() {
-            if (arguments[1]) {
-              shimmer.wrap(
-                arguments[1],
-                'query',
-                plugin._patchQuery(arguments[1])
-              );
-            }
+      return function getConnection(
+        arg1?: unknown,
+        arg2?: unknown,
+        arg3?: unknown
+      ) {
+        if (arguments.length === 1 && typeof arg1 === 'function') {
+          const patchFn = plugin._getConnectionCallbackPatchFn(arg1);
+          return originalGetConnection.call(pool, patchFn);
+        }
+        if (arguments.length === 2 && typeof arg2 === 'function') {
+          const patchFn = plugin._getConnectionCallbackPatchFn(arg2);
+          return originalGetConnection.call(pool, arg1, patchFn);
+        }
+        if (arguments.length === 3 && typeof arg3 === 'function') {
+          const patchFn = plugin._getConnectionCallbackPatchFn(arg3);
+          return originalGetConnection.call(pool, arg1, arg2, patchFn);
+        }
 
-            if (typeof cb === 'function') cb(...arguments);
-          },
-        ]);
+        return originalGetConnection.apply(pool, arguments);
       };
+    };
+  }
+
+  private _getConnectionCallbackPatchFn(cb: Function) {
+    return function() {
+      if (arguments[1]) {
+        shimmer.wrap(arguments[1], 'query', plugin._patchQuery(arguments[1]));
+      }
+      if (typeof cb === 'function') {
+        cb(...arguments);
+      }
     };
   }
 
   private _patchQuery(connection: mysqlTypes.Connection | mysqlTypes.Pool) {
     return (originalQuery: Function): mysqlTypes.QueryFunction => {
       const plugin = this;
-      plugin._logger.debug('MysqlPlugin#patch: patched mysql query');
+      plugin._logger.debug('MysqlPlugin: patched mysql query');
 
       // TODO handle query function overloads
       return function query(
@@ -124,14 +173,14 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         _valuesOrCallback?: string[] | mysqlTypes.queryCallback,
         _callback?: mysqlTypes.queryCallback
       ) {
-        const spanName = plugin._getSpanName(query);
+        const spanName = getSpanName(query);
 
         const span = plugin._tracer.startSpan(spanName, {
           parent: plugin._tracer.getCurrentSpan() || undefined,
           kind: SpanKind.CLIENT,
           attributes: {
             ...MysqlPlugin.COMMON_ATTRIBUTES,
-            ...plugin._getConnectionAttributes(connection.config),
+            ...getConnectionAttributes(connection.config),
           },
         });
 
@@ -183,42 +232,6 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         originalCallback(err, results, fields);
       };
     };
-  }
-
-  // TODO implement these patches
-  // private _patchCreatePoolCluster() {
-  //
-  // }
-  //
-  // private _patchCreateQuery() {
-  //
-  // }
-  //
-  // private _patchConnectionCreateQuery() {
-  //
-  // }
-
-  private _getConnectionAttributes(config: mysqlTypes.PoolConfig) {
-    const { host, port, database, user } = config;
-
-    return {
-      [AttributeNames.PEER_ADDRESS]: `jdbc:mysql://${host}:${port}/${database}`,
-      [AttributeNames.DB_INSTANCE]: database,
-      [AttributeNames.PEER_HOSTNAME]: host,
-      [AttributeNames.PEER_PORT]: port,
-      [AttributeNames.DB_USER]: user,
-    };
-  }
-
-  private _getSpanName(
-    query: string | mysqlTypes.QueryOptions | mysqlTypes.Query
-  ) {
-    const queryString = typeof query === 'string' ? query : query.sql;
-
-    const match = queryString.match(/^\s*(\w+)/);
-    const command = (match && match[1]) || 'UNKNOWN_COMMAND';
-
-    return `mysql.query:${command}`;
   }
 }
 
