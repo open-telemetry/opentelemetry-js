@@ -2,16 +2,23 @@ version: 2
 
 test_env: &test_env
   RUN_POSTGRES_TESTS: 1
+  RUN_MONGODB_TESTS: 1
   POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
+  MONGODB_HOST: localhost
+  MONGODB_PORT: 27017
+  MONGODB_DB: opentelemetry-tests
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
   environment: # env to pass to CircleCI, specified values must match test_env
     POSTGRES_USER: postgres
     POSTGRES_DB: circle_database
+
+mongo_service: &mongo_service
+  image: mongo
 
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
@@ -39,7 +46,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
     - packages/opentelemetry-plugin-http2/node_modules
-    - packages/opentelemetry-plugin-mongodb/node_modules
+    - packages/opentelemetry-plugin-mongodb-core/node_modules
     - packages/opentelemetry-plugin-redis/node_modules
     - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
     - packages/opentelemetry-plugin-document-load/node_modules
@@ -145,18 +152,21 @@ jobs:
       - image: node:8
         environment: *test_env
       - *postgres_service
+      - *mongo_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
         environment: *test_env
       - *postgres_service
+      - *mongo_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
         environment: *test_env
       - *postgres_service
+      - *mongo_service
     <<: *node_unit_tests
   node12-browsers:
     docker:
