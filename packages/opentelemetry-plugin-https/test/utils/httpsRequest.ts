@@ -23,7 +23,7 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 export const httpsRequest = {
   get: (
-    options: string | RequestOptions
+    options: string | RequestOptions | url.URL
   ): Promise<{
     data: string;
     statusCode: number | undefined;
@@ -33,11 +33,11 @@ export const httpsRequest = {
   }> => {
     const _options =
       typeof options === 'string'
-        ? Object.assign(url.parse(options), {
+        ? (Object.assign(url.parse(options), {
             headers: {
               'user-agent': 'https-plugin-test',
             },
-          })
+          }) as RequestOptions)
         : options;
     return new Promise((resolve, reject) => {
       const req = https.get(_options, (resp: http.IncomingMessage) => {

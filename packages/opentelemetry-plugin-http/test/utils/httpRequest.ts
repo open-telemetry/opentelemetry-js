@@ -30,11 +30,11 @@ export const httpRequest = {
   }> => {
     const _options =
       typeof options === 'string'
-        ? Object.assign(url.parse(options), {
+        ? (Object.assign(url.parse(options), {
             headers: {
               'user-agent': 'http-plugin-test',
             },
-          }) as RequestOptions
+          }) as RequestOptions)
         : options;
     return new Promise((resolve, reject) => {
       const req = http.get(_options, (resp: http.IncomingMessage) => {

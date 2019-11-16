@@ -41,7 +41,8 @@ export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
 export type ParsedRequestOptions = (
   | http.RequestOptions
-  | Omit<url.UrlWithParsedQuery, 'query'>) & {
+  | Omit<url.UrlWithParsedQuery, 'query'>
+) & {
   protocol?: string | null;
   query?: string | ParsedUrlQuery | null;
 };

@@ -31,6 +31,7 @@ import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 import * as utils from '../utils/utils';
+import { RequestOptions } from 'https';
 
 const serverPort = 42345;
 const hostname = 'localhost';
@@ -140,7 +141,7 @@ describe('HttpsPlugin Integration tests', () => {
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
         url.parse('https://google.fr/')
-      );
+      ) as RequestOptions;
 
       const result = await httpsRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
