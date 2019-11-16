@@ -78,7 +78,7 @@ describe('Utility', () => {
       const urlParsed = url.parse(webUrl);
       const urlParsedWithoutPathname = {
         ...urlParsed,
-        pathname: undefined,
+        pathname: null,
       };
       for (const param of [webUrl, urlParsed, urlParsedWithoutPathname]) {
         const result = utils.getRequestInfo(param);

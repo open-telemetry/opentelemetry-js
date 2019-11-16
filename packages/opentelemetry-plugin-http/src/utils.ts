@@ -93,7 +93,7 @@ export const parseResponseStatus = (
  * Returns whether the Expect header is on the given options object.
  * @param options Options for http.request.
  */
-export const hasExpectHeader = (options: RequestOptions | url.URL): boolean => {
+export const hasExpectHeader = (options: ParsedRequestOptions): boolean => {
   if (typeof (options as RequestOptions).headers !== 'object') {
     return false;
   }
@@ -200,7 +200,7 @@ export const setSpanWithError = (
  * @param [extraOptions] additional options for the request
  */
 export const getRequestInfo = (
-  options: RequestOptions | string,
+  options: string | ParsedRequestOptions,
   extraOptions?: RequestOptions
 ) => {
   let pathname = '/';

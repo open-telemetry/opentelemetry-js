@@ -24,6 +24,7 @@ import {
   get,
 } from 'http';
 import * as http from 'http';
+import { ParsedUrlQuery } from 'querystring';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
@@ -38,9 +39,12 @@ export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
 
 export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
-export type ParsedRequestOptions =
-  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
-  | http.RequestOptions;
+export type ParsedRequestOptions = (
+  | http.RequestOptions
+  | Omit<url.UrlWithParsedQuery, 'query'>) & {
+  protocol?: string | null;
+  query?: string | ParsedUrlQuery | null;
+};
 export type Http = typeof http;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;

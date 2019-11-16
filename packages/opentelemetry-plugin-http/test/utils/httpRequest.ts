@@ -20,7 +20,7 @@ import { RequestOptions } from 'https';
 
 export const httpRequest = {
   get: (
-    options: string | RequestOptions
+    options: string | RequestOptions | url.URL
   ): Promise<{
     data: string;
     statusCode: number | undefined;
@@ -34,7 +34,7 @@ export const httpRequest = {
             headers: {
               'user-agent': 'http-plugin-test',
             },
-          })
+          }) as RequestOptions
         : options;
     return new Promise((resolve, reject) => {
       const req = http.get(_options, (resp: http.IncomingMessage) => {

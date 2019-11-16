@@ -184,8 +184,10 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._logger.debug('makeRequestTrace by injecting context into header');
 
       const host = options.hostname || options.host || 'localhost';
-      const method = options.method ? options.method.toUpperCase() : 'GET';
-      const headers = options.headers || {};
+      const method = (options as RequestOptions).method
+        ? (options as RequestOptions).method!.toUpperCase()
+        : 'GET';
+      const headers = (options as RequestOptions).headers || {};
       const userAgent = headers['user-agent'];
 
       span.setAttributes({
@@ -409,7 +411,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           : undefined
       );
 
-      options = optionsParsed;
+      options = optionsParsed as RequestOptions;
 
       if (
         utils.isOpenTelemetryRequest(options) ||

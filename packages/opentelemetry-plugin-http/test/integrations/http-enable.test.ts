@@ -30,6 +30,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
+import { RequestOptions } from 'http';
 
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -139,7 +140,7 @@ describe('HttpPlugin Integration tests', () => {
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
         url.parse('http://google.fr/')
-      );
+      ) as RequestOptions;
 
       const result = await httpRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
