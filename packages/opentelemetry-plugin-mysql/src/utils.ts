@@ -29,7 +29,7 @@ export function getSpanName(
 }
 
 export function getConnectionAttributes(config: mysqlTypes.PoolConfig) {
-  const { host, port, database, user } = config;
+  const { host, port, database, user } = getConfig(config);
 
   return {
     [AttributeNames.PEER_ADDRESS]: getJDBCString(host, port, database),
@@ -38,6 +38,12 @@ export function getConnectionAttributes(config: mysqlTypes.PoolConfig) {
     [AttributeNames.PEER_PORT]: port,
     [AttributeNames.DB_USER]: user,
   };
+}
+
+function getConfig(config: any) {
+  const { host, port, database, user } =
+    (config && config.connectionConfig) || config || {};
+  return { host, port, database, user };
 }
 
 function getJDBCString(

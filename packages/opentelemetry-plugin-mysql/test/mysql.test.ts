@@ -19,12 +19,14 @@ import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  ReadableSpan,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as mysql from 'mysql';
 import { MysqlPlugin, plugin } from '../src';
 import * as testUtils from './testUtils';
 import { AttributeNames } from '../src/enums';
+import { CanonicalCode } from '@opentelemetry/types';
 
 const port = parseInt(process.env.MYSQL_PORT || '33306', 10);
 const database = process.env.MYSQL_DATABASE || 'test_db';
@@ -85,7 +87,7 @@ describe('mysql@2.x', () => {
       database,
     });
     poolCluster = mysql.createPoolCluster();
-    poolCluster.add({
+    poolCluster.add('name', {
       port,
       user,
       host,
@@ -131,41 +133,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(rows, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          done();
-        });
-      });
-    });
-
-    it('should intercept connection.query(text: string)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
-        const statement = 'SELECT 1+1 as solution';
-        const query = connection.query(statement);
-        let rows = 0;
-
-        query.on('result', row => {
-          assert.strictEqual(row.solution, 2);
-          rows += 1;
-        });
-
-        query.on('end', () => {
-          assert.strictEqual(rows, 1);
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement);
           done();
         });
       });
@@ -181,13 +149,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement);
           done();
         });
       });
@@ -203,17 +165,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -231,17 +183,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -257,17 +199,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -283,17 +215,21 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
+          done();
+        });
+      });
+    });
+
+    it('should attach error messages to spans', done => {
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const statement = 'SELECT ? as solution';
+        pool.query(statement, (err, res) => {
+          assert.ok(err);
+          const spans = memoryExporter.getFinishedSpans();
+          assert.strictEqual(spans.length, 1);
+          assertSpan(spans[0], statement, undefined, err!.message);
           done();
         });
       });
@@ -317,41 +253,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(rows, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          done();
-        });
-      });
-    });
-
-    it('should intercept pool.query(text: string)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
-        const statement = 'SELECT 1+1 as solution';
-        const query = pool.query(statement);
-        let rows = 0;
-
-        query.on('result', row => {
-          assert.strictEqual(row.solution, 2);
-          rows += 1;
-        });
-
-        query.on('end', () => {
-          assert.strictEqual(rows, 1);
-          const spans = memoryExporter.getFinishedSpans();
-          assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement);
           done();
         });
       });
@@ -367,13 +269,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement);
           done();
         });
       });
@@ -389,17 +285,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -417,17 +303,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 2);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -443,17 +319,7 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
           done();
         });
       });
@@ -469,17 +335,21 @@ describe('mysql@2.x', () => {
           assert.strictEqual(res[0].solution, 1);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
-          assert.ok(spans[0].attributes['component']);
-          assert.ok(spans[0].attributes['db.type']);
-          assert.ok(spans[0].attributes['db.statement']);
-          assert.strictEqual(
-            spans[0].attributes[AttributeNames.DB_STATEMENT],
-            statement
-          );
-          assert.deepStrictEqual(
-            spans[0].attributes[AttributeNames.MYSQL_VALUES],
-            [1]
-          );
+          assertSpan(spans[0], statement, [1]);
+          done();
+        });
+      });
+    });
+
+    it('should attach error messages to spans', done => {
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const statement = 'SELECT ? as solution';
+        pool.query(statement, (err, res) => {
+          assert.ok(err);
+          const spans = memoryExporter.getFinishedSpans();
+          assert.strictEqual(spans.length, 1);
+          assertSpan(spans[0], statement, undefined, err!.message);
           done();
         });
       });
@@ -505,44 +375,7 @@ describe('mysql@2.x', () => {
             assert.strictEqual(rows, 1);
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
-            done();
-          });
-        });
-      });
-    });
-
-    it('should intercept poolClusterConnection.query(text: string)', done => {
-      poolCluster.getConnection((err, poolClusterConnection) => {
-        assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
-          const statement = 'SELECT 1+1 as solution';
-          const query = poolClusterConnection.query(statement);
-          let rows = 0;
-
-          query.on('result', row => {
-            assert.strictEqual(row.solution, 2);
-            rows += 1;
-          });
-
-          query.on('end', () => {
-            assert.strictEqual(rows, 1);
-            const spans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
+            assertSpan(spans[0], statement);
             done();
           });
         });
@@ -561,13 +394,7 @@ describe('mysql@2.x', () => {
             assert.strictEqual(res[0].solution, 2);
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
+            assertSpan(spans[0], statement);
             done();
           });
         });
@@ -588,17 +415,7 @@ describe('mysql@2.x', () => {
               assert.strictEqual(res[0].solution, 2);
               const spans = memoryExporter.getFinishedSpans();
               assert.strictEqual(spans.length, 1);
-              assert.ok(spans[0].attributes['component']);
-              assert.ok(spans[0].attributes['db.type']);
-              assert.ok(spans[0].attributes['db.statement']);
-              assert.strictEqual(
-                spans[0].attributes[AttributeNames.DB_STATEMENT],
-                statement
-              );
-              assert.deepStrictEqual(
-                spans[0].attributes[AttributeNames.MYSQL_VALUES],
-                [1]
-              );
+              assertSpan(spans[0], statement, [1]);
               done();
             }
           );
@@ -620,17 +437,7 @@ describe('mysql@2.x', () => {
             assert.strictEqual(res[0].solution, 2);
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.deepStrictEqual(
-              spans[0].attributes[AttributeNames.MYSQL_VALUES],
-              [1]
-            );
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
+            assertSpan(spans[0], statement, [1]);
             done();
           });
         });
@@ -649,17 +456,7 @@ describe('mysql@2.x', () => {
             assert.strictEqual(res[0].solution, 1);
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
-            assert.deepStrictEqual(
-              spans[0].attributes[AttributeNames.MYSQL_VALUES],
-              [1]
-            );
+            assertSpan(spans[0], statement, [1]);
             done();
           });
         });
@@ -678,21 +475,88 @@ describe('mysql@2.x', () => {
             assert.strictEqual(res[0].solution, 1);
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
-            assert.ok(spans[0].attributes['component']);
-            assert.ok(spans[0].attributes['db.type']);
-            assert.ok(spans[0].attributes['db.statement']);
-            assert.strictEqual(
-              spans[0].attributes[AttributeNames.DB_STATEMENT],
-              statement
-            );
-            assert.deepStrictEqual(
-              spans[0].attributes[AttributeNames.MYSQL_VALUES],
-              [1]
-            );
+            assertSpan(spans[0], statement, [1]);
             done();
           });
         });
       });
     });
+
+    it('should attach error messages to spans', done => {
+      poolCluster.getConnection((err, poolClusterConnection) => {
+        assert.ifError(err);
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, () => {
+          const statement = 'SELECT ? as solution';
+          poolClusterConnection.query(statement, (err, res) => {
+            assert.ok(err);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
+            assertSpan(spans[0], statement, undefined, err!.message);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should get connection by name', done => {
+      poolCluster.getConnection('name', (err, poolClusterConnection) => {
+        assert.ifError(err);
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, () => {
+          const statement = 'SELECT 1 as solution';
+          poolClusterConnection.query(statement, (err, res) => {
+            assert.ifError(err);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
+            assertSpan(spans[0], statement);
+            done();
+          });
+        });
+      });
+    });
+
+    it('should get connection by name and selector', done => {
+      poolCluster.getConnection(
+        'name',
+        'ORDER',
+        (err, poolClusterConnection) => {
+          assert.ifError(err);
+          const statement = 'SELECT 1 as solution';
+          poolClusterConnection.query(statement, (err, res) => {
+            assert.ifError(err);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
+            assertSpan(spans[0], statement);
+            done();
+          });
+        }
+      );
+    });
   });
 });
+
+function assertSpan(
+  span: ReadableSpan,
+  statement: string,
+  values?: any,
+  errorMessage?: string
+) {
+  assert.equal(span.attributes[AttributeNames.COMPONENT], 'mysql');
+  assert.equal(span.attributes[AttributeNames.DB_TYPE], 'sql');
+  assert.equal(span.attributes[AttributeNames.DB_INSTANCE], database);
+  assert.equal(span.attributes[AttributeNames.PEER_PORT], port);
+  assert.equal(span.attributes[AttributeNames.PEER_HOSTNAME], host);
+  assert.equal(span.attributes[AttributeNames.DB_USER], user);
+  assert.strictEqual(span.attributes[AttributeNames.DB_STATEMENT], statement);
+  if (values) {
+    assert.deepStrictEqual(
+      span.attributes[AttributeNames.MYSQL_VALUES],
+      values
+    );
+  }
+  if (errorMessage) {
+    assert.equal(span.status.message, errorMessage);
+    assert.equal(span.status.code, CanonicalCode.UNKNOWN);
+  }
+}
