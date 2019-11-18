@@ -64,6 +64,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-document-load/node_modules
     - packages/opentelemetry-plugin-https/node_modules
     - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
+    - packages/opentelemetry-plugin-mysql/node_modules
     - packages/opentelemetry-exporter-prometheus/node_modules
 
 node_unit_tests: &node_unit_tests
