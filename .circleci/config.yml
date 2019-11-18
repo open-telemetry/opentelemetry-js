@@ -14,6 +14,7 @@ test_env: &test_env
   MYSQL_USER: otel
   MYSQL_DATABASE: circle_database
   MYSQL_PASSWORD: secret
+  MYSQL_PORT: 3306
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
