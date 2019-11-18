@@ -26,6 +26,12 @@ import { MysqlPlugin, plugin } from '../src';
 import * as testUtils from './testUtils';
 import { AttributeNames } from '../src/enums';
 
+const port = parseInt(process.env.MYSQL_PORT || '33306', 10);
+const database = process.env.MYSQL_DATABASE || 'test_db';
+const host = process.env.MYSQL_HOST || '127.0.0.1';
+const user = process.env.MYSQL_USER || 'otel';
+const password = process.env.MYSQL_PASSWORD || 'secret';
+
 describe('mysql@5.7', () => {
   let connection: mysql.Connection;
   let pool: mysql.Pool;
@@ -65,26 +71,26 @@ describe('mysql@5.7', () => {
   beforeEach(function() {
     plugin.enable(mysql, tracer, logger);
     connection = mysql.createConnection({
-      port: 33306,
-      user: 'otel',
-      host: '127.0.0.1',
-      password: 'secret',
-      database: "test_db",
+      port,
+      user,
+      host,
+      password,
+      database,
     });
     pool = mysql.createPool({
-      port: 33306,
-      user: 'otel',
-      host: '127.0.0.1',
-      password: 'secret',
-      database: "test_db",
+      port,
+      user,
+      host,
+      password,
+      database,
     });
     poolCluster = mysql.createPoolCluster();
     poolCluster.add({
-      port: 33306,
-      user: 'otel',
-      host: '127.0.0.1',
-      password: 'secret',
-      database: "test_db",
+      port,
+      user,
+      host,
+      password,
+      database,
     });
   });
 
