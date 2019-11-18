@@ -168,10 +168,9 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       const plugin = this;
       plugin._logger.debug('MysqlPlugin: patched mysql query');
 
-      // TODO handle query function overloads
       return function query(
         query: string | mysqlTypes.Query | mysqlTypes.QueryOptions,
-        _valuesOrCallback?: string[] | mysqlTypes.queryCallback,
+        _valuesOrCallback?: unknown[] | mysqlTypes.queryCallback,
         _callback?: mysqlTypes.queryCallback
       ) {
         const spanName = getSpanName(query);
@@ -185,33 +184,48 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
           },
         });
 
-        if (typeof arguments[0] === 'string') {
-          if (arguments.length === 1) {
-            const streamableQuery: mysqlTypes.Query = originalQuery.apply(
-              connection,
-              arguments
-            );
-
-            return streamableQuery
-              .on('error', err =>
-                span.setStatus({
-                  code: CanonicalCode.UNKNOWN,
-                  message: err.message,
-                })
-              )
-              .on('end', () => {
-                span.end();
-              });
+        if (typeof query === 'string') {
+          span.setAttribute(AttributeNames.DB_STATEMENT, query);
+        } else if (typeof query === 'object') {
+          if (query.sql) {
+            span.setAttribute(AttributeNames.DB_STATEMENT, query.sql);
           }
 
-          if (typeof arguments[1] === 'function') {
-            shimmer.wrap(arguments, 1, plugin._patchCallbackQuery(span));
-          } else if (typeof arguments[2] === 'function') {
-            shimmer.wrap(arguments, 2, plugin._patchCallbackQuery(span));
+          if (query.values) {
+            span.setAttribute(AttributeNames.MYSQL_VALUES, query.values);
           }
-
-          return originalQuery.apply(connection, arguments);
         }
+
+        if (arguments.length === 1) {
+          const streamableQuery: mysqlTypes.Query = originalQuery.apply(
+            connection,
+            arguments
+          );
+
+          return streamableQuery
+            .on('error', err =>
+              span.setStatus({
+                code: CanonicalCode.UNKNOWN,
+                message: err.message,
+              })
+            )
+            .on('end', () => {
+              span.end();
+            });
+        }
+
+        if (typeof arguments[1] === 'function') {
+          shimmer.wrap(arguments, 1, plugin._patchCallbackQuery(span));
+        } else if (typeof arguments[2] === 'function') {
+          if (Array.isArray(_valuesOrCallback)) {
+            span.setAttribute(AttributeNames.MYSQL_VALUES, _valuesOrCallback);
+          } else if (arguments[2]) {
+            span.setAttribute(AttributeNames.MYSQL_VALUES, [_valuesOrCallback]);
+          }
+          shimmer.wrap(arguments, 2, plugin._patchCallbackQuery(span));
+        }
+
+        return originalQuery.apply(connection, arguments);
       };
     };
   }

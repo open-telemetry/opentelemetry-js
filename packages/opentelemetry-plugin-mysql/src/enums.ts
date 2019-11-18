@@ -31,4 +31,6 @@ export enum AttributeNames {
   PEER_IPV4 = 'peer.ipv4',
   PEER_IPV6 = 'peer.ipv6',
   PEER_SERVICE = 'peer.service',
+
+  MYSQL_VALUES = 'mysql.values',
 }
