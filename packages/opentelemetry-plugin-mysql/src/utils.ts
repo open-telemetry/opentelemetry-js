@@ -32,10 +32,28 @@ export function getConnectionAttributes(config: mysqlTypes.PoolConfig) {
   const { host, port, database, user } = config;
 
   return {
-    [AttributeNames.PEER_ADDRESS]: `jdbc:mysql://${host}:${port}/${database}`,
+    [AttributeNames.PEER_ADDRESS]: getJDBCString(host, port, database),
     [AttributeNames.DB_INSTANCE]: database,
     [AttributeNames.PEER_HOSTNAME]: host,
     [AttributeNames.PEER_PORT]: port,
     [AttributeNames.DB_USER]: user,
   };
+}
+
+function getJDBCString(
+  host: string | undefined,
+  port: number | undefined,
+  database: string | undefined
+) {
+  let str = `jdbc:mysql://${host || 'localhost'}`;
+
+  if (typeof port === 'number') {
+    str += `:${port}`;
+  }
+
+  if (typeof database === 'string') {
+    str += `/${database}`;
+  }
+
+  return str;
 }

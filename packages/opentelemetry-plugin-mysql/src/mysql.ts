@@ -24,11 +24,12 @@ import { getConnectionAttributes, getSpanName } from './utils';
 export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   moduleName = 'mysql';
   static COMPONENT = 'mysql';
-  static DB_TYPE = 'SQL';
+  static DB_TYPE = 'sql';
 
   static COMMON_ATTRIBUTES = {
     [AttributeNames.COMPONENT]: MysqlPlugin.COMPONENT,
     [AttributeNames.DB_TYPE]: MysqlPlugin.DB_TYPE,
+    [AttributeNames.PEER_SERVICE]: MysqlPlugin.COMPONENT,
   };
 
   protected patch(): typeof mysqlTypes {
