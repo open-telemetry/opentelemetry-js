@@ -66,22 +66,25 @@ describe('mysql@5.7', () => {
     plugin.enable(mysql, tracer, logger);
     connection = mysql.createConnection({
       port: 33306,
-      user: 'root',
+      user: 'otel',
       host: '127.0.0.1',
       password: 'secret',
+      database: "test_db",
     });
     pool = mysql.createPool({
       port: 33306,
-      user: 'root',
+      user: 'otel',
       host: '127.0.0.1',
       password: 'secret',
+      database: "test_db",
     });
     poolCluster = mysql.createPoolCluster();
     poolCluster.add({
       port: 33306,
-      user: 'root',
+      user: 'otel',
       host: '127.0.0.1',
       password: 'secret',
+      database: "test_db",
     });
   });
 

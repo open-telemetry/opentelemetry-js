@@ -2,6 +2,7 @@ version: 2
 
 test_env: &test_env
   RUN_POSTGRES_TESTS: 1
+  RUN_MYSQL_TESTS: 1
   RUN_MONGODB_TESTS: 1
   POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
@@ -10,6 +11,10 @@ test_env: &test_env
   MONGODB_HOST: localhost
   MONGODB_PORT: 27017
   MONGODB_DB: opentelemetry-tests
+  MYSQL_USER: postgres
+  MYSQL_DATABASE: circle_database
+  MYSQL_HOST: localhost
+  MYSQL_PORT: 3306
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
@@ -19,6 +24,14 @@ postgres_service: &postgres_service
 
 mongo_service: &mongo_service
   image: mongo
+
+mysql_service: &mysql_service
+  image: circleci/mysql:5.7
+  environment:
+    MYSQL_ROOT_PASSWORD: rootpw
+    MYSQL_DATABASE: test_db
+    MYSQL_USER: otel
+    MYSQL_PASSWORD: secret
 
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
@@ -152,6 +165,7 @@ jobs:
       - image: node:8
         environment: *test_env
       - *postgres_service
+      - *mysql_service
       - *mongo_service
     <<: *node_unit_tests
   node10:
@@ -159,6 +173,7 @@ jobs:
       - image: node:10
         environment: *test_env
       - *postgres_service
+      - *mysql_service
       - *mongo_service
     <<: *node_unit_tests
   node12:
@@ -166,6 +181,7 @@ jobs:
       - image: node:12
         environment: *test_env
       - *postgres_service
+      - *mysql_service
       - *mongo_service
     <<: *node_unit_tests
   node12-browsers:

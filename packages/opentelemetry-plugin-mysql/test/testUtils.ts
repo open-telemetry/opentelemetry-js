@@ -18,7 +18,7 @@ import * as childProcess from 'child_process';
 export function startDocker() {
   const tasks = [
     run(
-      'docker run --rm -d -e MYSQL_ROOT_PASSWORD=secret -p 33306:3306 --name otmysql mysql:5.7'
+      'docker run --rm -d -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=test_db -e MYSQL_USER=otel -e MYSQL_PASSWORD=secret -p 33306:3306 --name otmysql circleci/mysql:5.7'
     ),
   ];
 
