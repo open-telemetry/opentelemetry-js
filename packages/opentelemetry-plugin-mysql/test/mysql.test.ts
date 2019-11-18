@@ -32,7 +32,7 @@ const host = process.env.MYSQL_HOST || '127.0.0.1';
 const user = process.env.MYSQL_USER || 'otel';
 const password = process.env.MYSQL_PASSWORD || 'secret';
 
-describe('mysql@5.7', () => {
+describe('mysql@2.x', () => {
   let connection: mysql.Connection;
   let pool: mysql.Pool;
   let poolCluster: mysql.PoolCluster;
