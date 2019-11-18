@@ -22,11 +22,13 @@ import { AttributeNames } from './enums';
 import { getConnectionAttributes, getSpanName } from './utils';
 
 export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
-  moduleName = 'mysql';
-  static COMPONENT = 'mysql';
-  static DB_TYPE = 'sql';
+  readonly moduleName = 'mysql';
+  readonly supportedVersions = ['2.*'];
 
-  static COMMON_ATTRIBUTES = {
+  static readonly COMPONENT = 'mysql';
+  static readonly DB_TYPE = 'sql';
+
+  static readonly COMMON_ATTRIBUTES = {
     [AttributeNames.COMPONENT]: MysqlPlugin.COMPONENT,
     [AttributeNames.DB_TYPE]: MysqlPlugin.DB_TYPE,
     [AttributeNames.PEER_SERVICE]: MysqlPlugin.COMPONENT,
