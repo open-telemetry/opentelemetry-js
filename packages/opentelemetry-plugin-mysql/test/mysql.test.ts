@@ -225,7 +225,7 @@ describe('mysql@2.x', () => {
       const span = tracer.startSpan('test span');
       tracer.withSpan(span, () => {
         const statement = 'SELECT ? as solution';
-        pool.query(statement, (err, res) => {
+        connection.query(statement, (err, res) => {
           assert.ok(err);
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
