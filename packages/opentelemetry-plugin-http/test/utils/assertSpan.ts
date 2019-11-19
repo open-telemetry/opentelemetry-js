@@ -33,7 +33,7 @@ export const assertSpan = (
     hostname: string;
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
-    path?: string;
+    path?: string | null;
     forceStatus?: Status;
     component: string;
   }
