@@ -38,7 +38,7 @@ describe('mysql@2.x', () => {
   let connection: mysql.Connection;
   let pool: mysql.Pool;
   let poolCluster: mysql.PoolCluster;
-  const tracer = new NodeTracer();
+  const tracer = new NodeTracer({ plugins: {} });
   const logger = new NoopLogger();
   const testMysql = process.env.RUN_MYSQL_TESTS; // For CI: assumes local mysql db is already available
   const testMysqlLocally = process.env.RUN_MYSQL_TESTS_LOCAL; // For local: spins up local mysql db via docker
@@ -259,6 +259,30 @@ describe('mysql@2.x', () => {
       });
     });
 
+    it('should intercept pool.getConnection().query(text: string)', done => {
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const statement = 'SELECT 1+1 as solution';
+        pool.getConnection((err, conn) => {
+          const query = conn.query(statement);
+          let rows = 0;
+
+          query.on('result', row => {
+            assert.strictEqual(row.solution, 2);
+            rows += 1;
+          });
+
+          query.on('end', () => {
+            assert.strictEqual(rows, 1);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
+            assertSpan(spans[0], statement);
+            done();
+          });
+        });
+      });
+    });
+
     it('should intercept pool.query(text: string, callback)', done => {
       const span = tracer.startSpan('test span');
       tracer.withSpan(span, () => {
@@ -271,6 +295,24 @@ describe('mysql@2.x', () => {
           assert.strictEqual(spans.length, 1);
           assertSpan(spans[0], statement);
           done();
+        });
+      });
+    });
+
+    it('should intercept pool.getConnection().query(text: string, callback)', done => {
+      const span = tracer.startSpan('test span');
+      tracer.withSpan(span, () => {
+        const statement = 'SELECT 1+1 as solution';
+        pool.getConnection((err, conn) => {
+          conn.query(statement, (err, res) => {
+            assert.ifError(err);
+            assert.ok(res);
+            assert.strictEqual(res[0].solution, 2);
+            const spans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(spans.length, 1);
+            assertSpan(spans[0], statement);
+            done();
+          });
         });
       });
     });
