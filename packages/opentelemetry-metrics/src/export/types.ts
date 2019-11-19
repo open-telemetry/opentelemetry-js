@@ -124,7 +124,7 @@ export enum MetricDescriptorType {
 export interface TimeSeries {
   /**
    * The set of label values that uniquely identify this timeseries. Applies to
-   * all points. The order of label values must match that of label keys in the
+   * all points. The order of label values must match that of LabelSet keys in the
    * metric descriptor.
    */
   readonly labelValues: LabelValue[];

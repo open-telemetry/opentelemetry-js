@@ -47,8 +47,8 @@
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "babel-loader": "^8.0.6",
-    "codecov": "^3.1.0",
-    "gts": "^1.0.0",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "^3.1.0",
@@ -65,10 +65,11 @@
     "ts-node": "^8.0.0",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.6.4",
+    "typescript": "3.7.2",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
-    "webpack-merge": "^4.2.2"
+    "webpack-merge": "^4.2.2",
+    "@opentelemetry/scope-zone": "^0.2.0"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.2.0",

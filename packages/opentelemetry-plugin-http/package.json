@@ -46,7 +46,7 @@
     "@types/got": "^9.6.7",
     "@types/mocha": "^5.2.7",
     "@types/nock": "^11.1.0",
-    "@types/node": "^12.7.9",
+    "@types/node": "^12.12.9",
     "@types/request-promise-native": "^1.0.17",
     "@types/semver": "^6.0.2",
     "@types/shimmer": "^1.0.1",
@@ -68,7 +68,7 @@
     "ts-node": "^8.4.1",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.6.4"
+    "typescript": "3.7.2"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.2.0",
