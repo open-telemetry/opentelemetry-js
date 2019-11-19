@@ -65,8 +65,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   // global export function
   private _patchCreateConnection() {
     return (originalCreateConnection: typeof mysqlTypes.createConnection) => {
-      const plugin = this;
-      plugin._logger.debug('MysqlPlugin#patch: patched mysql createConnection');
+      const thisPlugin = this;
+      thisPlugin._logger.debug('MysqlPlugin#patch: patched mysql createConnection');
 
       return function createConnection(
         _connectionUri: string | mysqlTypes.ConnectionConfig
@@ -77,7 +77,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         shimmer.wrap(
           originalResult,
           'query',
-          plugin._patchQuery(originalResult) as any
+          thisPlugin._patchQuery(originalResult) as any
         );
 
         return originalResult;
@@ -88,14 +88,14 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   // global export function
   private _patchCreatePool() {
     return (originalCreatePool: typeof mysqlTypes.createPool) => {
-      const plugin = this;
-      plugin._logger.debug('MysqlPlugin#patch: patched mysql createPool');
+      const thisPlugin = this;
+      thisPlugin._logger.debug('MysqlPlugin#patch: patched mysql createPool');
       return function createPool(_config: string | mysqlTypes.PoolConfig) {
         //@ts-ignore
         const pool = originalCreatePool(...arguments);
 
-        shimmer.wrap(pool, 'query', plugin._patchQuery(pool));
-        shimmer.wrap(pool, 'getConnection', plugin._patchGetConnection(pool));
+        shimmer.wrap(pool, 'query', thisPlugin._patchQuery(pool));
+        shimmer.wrap(pool, 'getConnection', thisPlugin._patchGetConnection(pool));
 
         return pool;
       };
@@ -105,8 +105,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   // global export function
   private _patchCreatePoolCluster() {
     return (originalCreatePoolCluster: typeof mysqlTypes.createPoolCluster) => {
-      const plugin = this;
-      plugin._logger.debug(
+      const thisPlugin = this;
+      thisPlugin._logger.debug(
         'MysqlPlugin#patch: patched mysql createPoolCluster'
       );
       return function createPool(_config: string | mysqlTypes.PoolConfig) {
@@ -116,7 +116,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         shimmer.wrap(
           cluster,
           'getConnection',
-          plugin._patchGetConnection(cluster)
+          thisPlugin._patchGetConnection(cluster)
         );
 
         return cluster;
@@ -127,8 +127,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   // method on cluster or pool
   private _patchGetConnection(pool: mysqlTypes.Pool | mysqlTypes.PoolCluster) {
     return (originalGetConnection: Function) => {
-      const plugin = this;
-      plugin._logger.debug(
+      const thisPlugin = this;
+      thisPlugin._logger.debug(
         'MysqlPlugin#patch: patched mysql pool getConnection'
       );
       return function getConnection(
@@ -137,15 +137,15 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         arg3?: unknown
       ) {
         if (arguments.length === 1 && typeof arg1 === 'function') {
-          const patchFn = plugin._getConnectionCallbackPatchFn(arg1);
+          const patchFn = thisPlugin._getConnectionCallbackPatchFn(arg1);
           return originalGetConnection.call(pool, patchFn);
         }
         if (arguments.length === 2 && typeof arg2 === 'function') {
-          const patchFn = plugin._getConnectionCallbackPatchFn(arg2);
+          const patchFn = thisPlugin._getConnectionCallbackPatchFn(arg2);
           return originalGetConnection.call(pool, arg1, patchFn);
         }
         if (arguments.length === 3 && typeof arg3 === 'function') {
-          const patchFn = plugin._getConnectionCallbackPatchFn(arg3);
+          const patchFn = thisPlugin._getConnectionCallbackPatchFn(arg3);
           return originalGetConnection.call(pool, arg1, arg2, patchFn);
         }
 
@@ -155,9 +155,10 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   }
 
   private _getConnectionCallbackPatchFn(cb: Function) {
+    const thisPlugin = this;
     return function() {
       if (arguments[1]) {
-        shimmer.wrap(arguments[1], 'query', plugin._patchQuery(arguments[1]));
+        shimmer.wrap(arguments[1], 'query', thisPlugin._patchQuery(arguments[1]));
       }
       if (typeof cb === 'function') {
         cb(...arguments);
@@ -167,8 +168,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
 
   private _patchQuery(connection: mysqlTypes.Connection | mysqlTypes.Pool) {
     return (originalQuery: Function): mysqlTypes.QueryFunction => {
-      const plugin = this;
-      plugin._logger.debug('MysqlPlugin: patched mysql query');
+      const thisPlugin = this;
+      thisPlugin._logger.debug('MysqlPlugin: patched mysql query');
 
       return function query(
         query: string | mysqlTypes.Query | mysqlTypes.QueryOptions,
@@ -177,8 +178,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       ) {
         const spanName = getSpanName(query);
 
-        const span = plugin._tracer.startSpan(spanName, {
-          parent: plugin._tracer.getCurrentSpan() || undefined,
+        const span = thisPlugin._tracer.startSpan(spanName, {
+          parent: thisPlugin._tracer.getCurrentSpan() || undefined,
           kind: SpanKind.CLIENT,
           attributes: {
             ...MysqlPlugin.COMMON_ATTRIBUTES,
@@ -217,14 +218,14 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         }
 
         if (typeof arguments[1] === 'function') {
-          shimmer.wrap(arguments, 1, plugin._patchCallbackQuery(span));
+          shimmer.wrap(arguments, 1, thisPlugin._patchCallbackQuery(span));
         } else if (typeof arguments[2] === 'function') {
           if (Array.isArray(_valuesOrCallback)) {
             span.setAttribute(AttributeNames.MYSQL_VALUES, _valuesOrCallback);
           } else if (arguments[2]) {
             span.setAttribute(AttributeNames.MYSQL_VALUES, [_valuesOrCallback]);
           }
-          shimmer.wrap(arguments, 2, plugin._patchCallbackQuery(span));
+          shimmer.wrap(arguments, 2, thisPlugin._patchCallbackQuery(span));
         }
 
         return originalQuery.apply(connection, arguments);
