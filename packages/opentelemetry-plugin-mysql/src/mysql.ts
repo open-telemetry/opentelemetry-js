@@ -66,7 +66,9 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   private _patchCreateConnection() {
     return (originalCreateConnection: typeof mysqlTypes.createConnection) => {
       const thisPlugin = this;
-      thisPlugin._logger.debug('MysqlPlugin#patch: patched mysql createConnection');
+      thisPlugin._logger.debug(
+        'MysqlPlugin#patch: patched mysql createConnection'
+      );
 
       return function createConnection(
         _connectionUri: string | mysqlTypes.ConnectionConfig
@@ -95,7 +97,11 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         const pool = originalCreatePool(...arguments);
 
         shimmer.wrap(pool, 'query', thisPlugin._patchQuery(pool));
-        shimmer.wrap(pool, 'getConnection', thisPlugin._patchGetConnection(pool));
+        shimmer.wrap(
+          pool,
+          'getConnection',
+          thisPlugin._patchGetConnection(pool)
+        );
 
         return pool;
       };
@@ -158,7 +164,11 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     const thisPlugin = this;
     return function() {
       if (arguments[1]) {
-        shimmer.wrap(arguments[1], 'query', thisPlugin._patchQuery(arguments[1]));
+        shimmer.wrap(
+          arguments[1],
+          'query',
+          thisPlugin._patchQuery(arguments[1])
+        );
       }
       if (typeof cb === 'function') {
         cb(...arguments);
