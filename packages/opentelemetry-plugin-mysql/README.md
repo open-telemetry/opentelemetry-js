@@ -15,6 +15,9 @@ For automatic instrumentation see the
 npm install --save @opentelemetry/plugin-mysql
 ```
 
+## Supported Versions
+- `~2.0.0`
+
 ## Usage
 
 ```js
