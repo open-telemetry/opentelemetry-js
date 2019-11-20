@@ -1,0 +1,19 @@
+version: "2"
+services:
+
+  # Collector
+  collector:
+    image: omnition/opencensus-collector
+    command: ["--config=/conf/collector-config.yaml", "--http-pprof-port=1777", "--receive-zipkin", "--receive-oc-trace", "--log-level=DEBUG"]
+    volumes:
+      - ./collector-config.yaml:/conf/collector-config.yaml
+    ports:
+      - "55678:55678"
+    depends_on:
+      - zipkin-all-in-one
+
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"

@@ -13,6 +13,9 @@ $ npm install
 Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
 or
 Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
+or
+Setup [Collector Exporter](https://github.com/open-telemetry/opentelemetry-exporter-collector)
+
 
 ## Run the Application
 
@@ -56,6 +59,22 @@ Select `basic-service` under *Service Name* and click on *Find Traces*.
 Click on the trace to view its details.
 
 <p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
+
+### Collector Exporter
+Make sure you have [docker](https://docs.docker.com/) installed
+ - Run the docker container
+   ```sh
+   $ # from this directory
+   $ # open telemetry
+   $ npm run collector:docker:ot
+   $ # or alternatively open census
+   $ npm run collector:docker:oc
+   $ # at any time you can stop & clean them
+   $ npm run collector:docker:stop
+   ```
+
+#### Collector Exporter - Zipkin UI
+Please follow the section [Zipkin UI](#zipkin-ui) only
 
 ### Export to multiple exporters
 

@@ -25,7 +25,9 @@ import {
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToTimeStamp,
   isTimeInput,
+  hrTimeEndTime,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -153,6 +155,33 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
+    });
+  });
+
+  describe('#hrTimeEndTime', () => {
+    it('should return endTime', () => {
+      const startTime: types.HrTime = [22, 400000000];
+      const durationTime: types.HrTime = [32, 800000000];
+
+      const output = hrTimeEndTime(startTime, durationTime);
+      assert.deepStrictEqual(output, [54, 1200000000]);
+    });
+
+    it('should handle nanosecond overflow', () => {
+      const startTime: types.HrTime = [22, 400000000];
+      const durationTime: types.HrTime = [32, 200000000];
+
+      const output = hrTimeEndTime(startTime, durationTime);
+      assert.deepStrictEqual(output, [54, 600000000]);
+    });
+  });
+
+  describe('#hrTimeToTimeStamp', () => {
+    it('should return timestamp', () => {
+      const time: types.HrTime = [1573513121, 123456];
+
+      const output = hrTimeToTimeStamp(time);
+      assert.deepStrictEqual(output, '2019-11-11T22:58:41.000123456Z');
     });
   });
 

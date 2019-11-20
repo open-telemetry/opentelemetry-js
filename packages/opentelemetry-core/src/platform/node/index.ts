@@ -17,3 +17,4 @@
 export * from './id';
 export * from './performance';
 export * from './timer-util';
+export * from './span-id-to-base64';
