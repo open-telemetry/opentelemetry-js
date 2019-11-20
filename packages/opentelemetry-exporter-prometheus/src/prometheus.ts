@@ -131,15 +131,19 @@ export class PrometheusExporter implements MetricExporter {
         // ReadableMetric value is the current state, not the delta to be incremented by.
         // Currently, _registerMetric creates a new counter every time the value changes,
         // so the increment here behaves as a set value (increment from 0)
-        metric.inc(this._getLabelValues(labelKeys, ts.labelValues), ts.points[0]
-          .value as number);
+        metric.inc(
+          this._getLabelValues(labelKeys, ts.labelValues),
+          ts.points[0].value as number
+        );
       }
     }
 
     if (metric instanceof Gauge) {
       for (const ts of readableMetric.timeseries) {
-        metric.set(this._getLabelValues(labelKeys, ts.labelValues), ts.points[0]
-          .value as number);
+        metric.set(
+          this._getLabelValues(labelKeys, ts.labelValues),
+          ts.points[0].value as number
+        );
       }
     }
 
