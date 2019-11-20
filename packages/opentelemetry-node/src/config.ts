@@ -43,10 +43,6 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
     enabled: true,
     path: '@opentelemetry/plugin-https',
   },
-  mysql: {
-    enabled: true,
-    path: '@opentelemetry/plugin-mysql',
-  },
   redis: {
     enabled: true,
     path: "@opentelemetry/plugin-redis",
