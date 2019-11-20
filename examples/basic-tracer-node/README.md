@@ -57,6 +57,17 @@ Click on the trace to view its details.
 
 <p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
+### Export to multiple exporters
+
+ - Run the sample
+
+   ```sh
+   $ # from this directory
+   $ npm run multi_exporter
+   ```
+
+   This will export the spans data simultaneously on `Zipkin` and `Jaeger` backend. This is handy if transitioning from one vendor/OSS project to another for the tracing backend. You might want to export to both during the transitional phase.
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>

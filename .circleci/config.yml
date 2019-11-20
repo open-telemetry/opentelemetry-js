@@ -1,21 +1,26 @@
 version: 2
 
-test_env: &test_env
+node_test_env: &node_test_env
   RUN_POSTGRES_TESTS: 1
   RUN_MONGODB_TESTS: 1
+  RUN_REDIS_TESTS: 1
   POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
+  OPENTELEMETRY_REDIS_HOST: 'localhost'
+  OPENTELEMETRY_REDIS_PORT: 6379
   MONGODB_HOST: localhost
   MONGODB_PORT: 27017
   MONGODB_DB: opentelemetry-tests
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
-  environment: # env to pass to CircleCI, specified values must match test_env
+  environment: # env to pass to CircleCI, specified values must match node_test_env
     POSTGRES_USER: postgres
     POSTGRES_DB: circle_database
+redis_service: &redis_service
+  image: redis
 
 mongo_service: &mongo_service
   image: mongo
@@ -150,22 +155,25 @@ jobs:
   node8:
     docker:
       - image: node:8
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *redis_service
       - *mongo_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *redis_service
       - *mongo_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *redis_service
       - *mongo_service
     <<: *node_unit_tests
   node12-browsers:

@@ -55,7 +55,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Yuri Shkuro](https://github.com/yurishkuro), Uber
 - [Roch Devost](https://github.com/rochdev), DataDog
 - [Brandon Gonzalez](https://github.com/bg451), LightStep
 - [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
