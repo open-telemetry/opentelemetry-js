@@ -33,7 +33,7 @@
     "@opentelemetry/exporter-zipkin": "^0.2.0",
     "@opentelemetry/node": "^0.2.0",
     "@opentelemetry/plugin-http": "^0.2.0",
-    "@opentelemetry/plugin-mysql": "../../packages/opentelemetry-plugin-mysql",
+    "@opentelemetry/plugin-mysql": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
     "mysql": "*"
   },
