@@ -45,6 +45,6 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   },
   redis: {
     enabled: true,
-    path: "@opentelemetry/plugin-redis",
+    path: '@opentelemetry/plugin-redis',
   },
 };
