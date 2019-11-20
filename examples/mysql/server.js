@@ -55,7 +55,8 @@ function handleRequest (request, response) {
   // display traceid in the terminal
   const {traceId} = currentSpan.context();
   console.log(`traceid: ${traceId}`);
-  console.log(`http://localhost:16686/trace/${traceId}`)
+  console.log(`Jaeger URL: http://localhost:16686/trace/${traceId}`)
+  console.log(`Zipkin URL: http://localhost:9411/zipkin/traces/${traceId}`)
   try {
     let body = [];
     request.on('error', err => console.log(err));
