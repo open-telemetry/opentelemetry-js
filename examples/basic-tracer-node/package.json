@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "zipkin:basic": "cross-env EXPORTER=zipkin node ./index.js",
-    "jaeger:basic": "cross-env EXPORTER=jaeger node ./index.js"
+    "jaeger:basic": "cross-env EXPORTER=jaeger node ./index.js",
+    "multi_exporter": "node ./multi_exporter.js"
   },
   "repository": {
     "type": "git",
