@@ -14,17 +14,19 @@ const exporter = new PrometheusExporter({
 meter.addExporter(exporter);
 
 // Monotonic counters and gauges can only be increased.
-const monotonicCounter = meter.createCounter("monotonic_counter", {monotonic: true, description: "Example of a monotonic counter"});
-const monotonicGauge = meter.createCounter("monotonic_gauge", {monotonic: true, description: "Example of a monotonic gauge"});
+const monotonicCounter = meter.createCounter("monotonic_counter", {monotonic: true, labelKeys: ["pid"], description: "Example of a monotonic counter"});
+const monotonicGauge = meter.createCounter("monotonic_gauge", {monotonic: true, labelKeys: ["pid"], description: "Example of a monotonic gauge"});
 
 // Non-monotonic counters and gauges can be increased or decreased
-const nonmonotonicCounter = meter.createCounter("non_monotonic_counter", {monotonic: false, description: "Example of a non-monotonic counter"});
-const nonmonotonicGauge = meter.createCounter("non_monotonic_gauge", {monotonic: false, description: "Example of a non-monotonic gauge"});
+const nonmonotonicCounter = meter.createCounter("non_monotonic_counter", {monotonic: false, labelKeys: ["pid"], description: "Example of a non-monotonic counter"});
+const nonmonotonicGauge = meter.createCounter("non_monotonic_gauge", {monotonic: false, labelKeys: ["pid"], description: "Example of a non-monotonic gauge"});
 
 setInterval(() => {
-  monotonicCounter.getHandle(meter.labels({})).add(1);
-  nonmonotonicCounter.getHandle(meter.labels({})).add(Math.random() > 0.5 ? 1 : -1);
-  monotonicGauge.getHandle(meter.labels({})).add(Math.random() * 10);
-  nonmonotonicGauge.getHandle(meter.labels({})).add(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
+  const labels = Meter.labels({ pid: process.pid })
+
+  monotonicCounter.getHandle(labels).add(1);
+  nonmonotonicCounter.getHandle(labels).add(Math.random() > 0.5 ? 1 : -1);
+  monotonicGauge.getHandle(labels).add(Math.random() * 10);
+  nonmonotonicGauge.getHandle(labels).add(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
 }, 1000);
 
