@@ -55,7 +55,6 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Yuri Shkuro](https://github.com/yurishkuro), Uber
 - [Roch Devost](https://github.com/rochdev), DataDog
 - [Brandon Gonzalez](https://github.com/bg451), LightStep
 - [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
@@ -89,6 +88,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 | [@opentelemetry/metrics](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics) | This module provides instruments and meters for reporting of time series data. |
 | [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
 | [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only. |
+| [@opentelemetry/base](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-base) | This package provides base code for the SDK packages (tracing and metrics). |
 
 ### Exporters
 
@@ -99,7 +99,7 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 - [@opentelemetry/exporter-zipkin](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-zipkin)
 
 #### Metric Exporters
-- [@opentelemetry/exporter-prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus) - WIP
+- [@opentelemetry/exporter-prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus)
 
 ### Plugins
 
@@ -112,6 +112,8 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
 - [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
 - [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
+- [@opentelemetry/plugin-redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis) - WIP
+- [@opentelemetry/plugin-mysql](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mysql) - WIP
 
 #### Web Plugins
 - [@opentelemetry/plugin-document-load](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-document-load)

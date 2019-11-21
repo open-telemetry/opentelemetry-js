@@ -311,6 +311,20 @@ describe('ZipkinExporter', () => {
         assert.strictEqual(result, ExportResult.FAILED_RETRYABLE);
       });
     });
+
+    it('should return FailedNonRetryable after shutdown', done => {
+      const exporter = new ZipkinExporter({
+        serviceName: 'my-service',
+        logger: new NoopLogger(),
+      });
+
+      exporter.shutdown();
+
+      exporter.export([getReadableSpan()], (result: ExportResult) => {
+        assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
+        done();
+      });
+    });
   });
 
   describe('shutdown', () => {
