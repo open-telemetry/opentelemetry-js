@@ -19,7 +19,7 @@ $ npm start
 
 By default, the application will run on port `8090`.
 
-To see the results, open the browser at `http://localhost:8090/` and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
+To see the results, open the browser at <http://localhost:8090/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
 
 The screen will look as follows:
 
