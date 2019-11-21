@@ -61,20 +61,22 @@ Click on the trace to view its details.
 <p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
 ### Collector Exporter
-Make sure you have [docker](https://docs.docker.com/) installed
+You can use the [opentelemetry-collector][opentelemetry-collector-url] docker container.
+For that please make sure you have [docker](https://docs.docker.com/) installed
  - Run the docker container
    ```sh
    $ # from this directory
    $ # open telemetry
    $ npm run collector:docker:ot
-   $ # or alternatively open census
-   $ npm run collector:docker:oc
-   $ # at any time you can stop & clean them
+   $ # at any time you can stop it
    $ npm run collector:docker:stop
    ```
 
 #### Collector Exporter - Zipkin UI
-Please follow the section [Zipkin UI](#zipkin-ui) only
+The [opentelemetry-collector][opentelemetry-collector-url] 
+docker container is using [Zipkin Exporter](#zipkin).
+You can define more exporters without changing the instrumented code.
+To use default [Zipkin Exporter](#zipkin) please follow the section [Zipkin UI](#zipkin-ui) only
 
 ### Export to multiple exporters
 
@@ -94,3 +96,6 @@ Please follow the section [Zipkin UI](#zipkin-ui) only
 ## LICENSE
 
 Apache License 2.0
+
+
+[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-exporter-collector

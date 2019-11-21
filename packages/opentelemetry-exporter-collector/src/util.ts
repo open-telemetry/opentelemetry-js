@@ -16,7 +16,6 @@
 
 import {
   spanIdToBase64,
-  hrTimeEndTime,
   hrTimeToTimeStamp,
 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
@@ -33,17 +32,17 @@ import {
   OTCTraceState,
 } from './types';
 
-const OC_MAX_STRING_LENGTH = 128;
-const OC_MAX_ATTRIBUTES = 30;
+const OT_MAX_STRING_LENGTH = 128;
+const OT_MAX_ATTRIBUTES = 30;
 
 /**
  * convert string to maximum length of 128, providing information of truncated bytes
  * @param name - string to be converted
  */
 export function stringToTruncatableString(name: string): OTCTruncatableString {
-  const value = name.substr(0, OC_MAX_STRING_LENGTH);
+  const value = name.substr(0, OT_MAX_STRING_LENGTH);
   const truncatedByteCount =
-    name.length > OC_MAX_STRING_LENGTH ? name.length - OC_MAX_STRING_LENGTH : 0;
+    name.length > OT_MAX_STRING_LENGTH ? name.length - OT_MAX_STRING_LENGTH : 0;
 
   return { value, truncatedByteCount };
 }
@@ -55,7 +54,7 @@ export function stringToTruncatableString(name: string): OTCTruncatableString {
  */
 export function convertAttributesToOTCAttributes(
   attributes: Attributes,
-  maxAttributes: number = OC_MAX_ATTRIBUTES
+  maxAttributes: number = OT_MAX_ATTRIBUTES
 ): OTCAttributes {
   const attributeMap: OTCAttributeMap = {};
   let droppedAttributesCount = 0;
@@ -114,7 +113,7 @@ export function convertEventValueToOTCValue(
  */
 export function convertEventsToOTCEvents(
   events: TimedEvent[],
-  maxAttributes: number = OC_MAX_ATTRIBUTES
+  maxAttributes: number = OT_MAX_ATTRIBUTES
 ): OTCTimeEvents {
   let droppedAnnotationsCount = 0;
   let droppedMessageEventsCount = 0; // not counting yet as messageEvent is not implemented
@@ -178,7 +177,7 @@ export function convertSpan(span: ReadableSpan): OTCSpan {
     name: stringToTruncatableString(span.name),
     kind: span.kind,
     startTime: hrTimeToTimeStamp(span.startTime),
-    endTime: hrTimeToTimeStamp(hrTimeEndTime(span.startTime, span.duration)),
+    endTime: hrTimeToTimeStamp(span.endTime),
     attributes: convertAttributesToOTCAttributes(span.attributes),
     // stackTrace: // not implemented
     timeEvents: convertEventsToOTCEvents(span.events),

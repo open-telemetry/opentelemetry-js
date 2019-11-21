@@ -8,9 +8,8 @@
     "zipkin:basic": "cross-env EXPORTER=zipkin node ./index.js",
     "jaeger:basic": "cross-env EXPORTER=jaeger node ./index.js",
     "collector:basic": "cross-env EXPORTER=collector node ./index.js",
-    "collector:docker:oc": "cd ./dockers/ot && docker-compose down && cd ../oc && docker-compose down && docker-compose up",
-    "collector:docker:ot": "cd ./dockers/oc && docker-compose down && cd ../ot && docker-compose down && docker-compose up",
-    "collector:docker:stop": "cd ./dockers/oc && docker-compose down && cd ../ot && docker-compose down",
+    "collector:docker:ot": "cd ./dockers/ot && docker-compose down && docker-compose up",
+    "collector:docker:stop": "cd ./dockers/ot && docker-compose down",
     "multi_exporter": "node ./multi_exporter.js"
   },
   "repository": {

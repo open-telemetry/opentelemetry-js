@@ -27,7 +27,6 @@ import {
   hrTimeToMicroseconds,
   hrTimeToTimeStamp,
   isTimeInput,
-  hrTimeEndTime,
 } from '../../src/common/time';
 
 describe('time', () => {
@@ -155,24 +154,6 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
-    });
-  });
-
-  describe('#hrTimeEndTime', () => {
-    it('should return endTime', () => {
-      const startTime: types.HrTime = [22, 400000000];
-      const durationTime: types.HrTime = [32, 800000000];
-
-      const output = hrTimeEndTime(startTime, durationTime);
-      assert.deepStrictEqual(output, [54, 1200000000]);
-    });
-
-    it('should handle nanosecond overflow', () => {
-      const startTime: types.HrTime = [22, 400000000];
-      const durationTime: types.HrTime = [32, 200000000];
-
-      const output = hrTimeEndTime(startTime, durationTime);
-      assert.deepStrictEqual(output, [54, 600000000]);
     });
   });
 

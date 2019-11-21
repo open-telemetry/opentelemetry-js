@@ -99,24 +99,6 @@ export function hrTimeDuration(
   return [seconds, nanos];
 }
 
-// Returns end time based on startTime and duration
-export function hrTimeEndTime(
-  startTime: types.HrTime,
-  duration: types.HrTime
-): types.HrTime {
-  let seconds = startTime[0] + duration[0];
-  let nanos = startTime[1] + duration[1];
-
-  // overflow
-  if (nanos < 0) {
-    seconds -= 1;
-    // negate
-    nanos += SECOND_TO_NANOSECONDS;
-  }
-
-  return [seconds, nanos];
-}
-
 // Convert hrTime to timestamp.
 export function hrTimeToTimeStamp(hrTime: types.HrTime): string {
   const precision = NANOSECOND_DIGITS;

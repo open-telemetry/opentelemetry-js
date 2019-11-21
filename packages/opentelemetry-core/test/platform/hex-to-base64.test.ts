@@ -15,13 +15,13 @@
  */
 
 import * as assert from 'assert';
-import { spanIdToBase64 } from '../../src/platform';
+import { hexToBase64 } from '../../src/platform';
 
-describe('idToBase64', () => {
-  it('returns convert id to base64', () => {
+describe('hexToBase64', () => {
+  it('convert hex to base64', () => {
     const id1 = '7deb739e02e44ef2';
     const id2 = '46cef837b919a16ff26e608c8cf42c80';
-    assert.strictEqual(spanIdToBase64(id1), 'fetzngLkTvI=');
-    assert.strictEqual(spanIdToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
+    assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
+    assert.strictEqual(hexToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
   });
 });

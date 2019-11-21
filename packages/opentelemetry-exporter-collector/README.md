@@ -74,4 +74,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-collector&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-collector
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%exporter-collector.svg
-[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-exporter-collector
+[opentelemetry-collector-url]: https://github.com/open-telemetry/opentelemetry-collector

@@ -40,7 +40,8 @@ export function onShutdown(shutdownF: EventListener) {
 }
 
 /**
- *
+ * function to send spans to the [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
+ *     using the standard http/https node module
  * @param spans
  * @param onSuccess
  * @param onError

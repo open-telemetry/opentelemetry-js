@@ -30,20 +30,21 @@ const url = require('url');
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
- * in node version thsi is not used
+ * in node version this is not used
  * @param shutdownF shutdown method of {@link ExporterCollector}
  */
 export function onInit(shutdownF: Function) {}
 
 /**
  * function to be called once when {@link ExporterCollector} is shutdown
- * in node version thsi is not used
+ * in node version this is not used
  * @param shutdownF - shutdown method of {@link ExporterCollector}
  */
 export function onShutdown(shutdownF: Function) {}
 
 /**
- *
+ * function to send spans to the [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
+ *     using the standard http/https node module
  * @param spans
  * @param onSuccess
  * @param onError
