@@ -25,33 +25,33 @@ export enum LibraryInfoLanguage {
   WEB_JS = 10,
 }
 
-export interface OTCAttributeMap {
-  [key: string]: OTCAttributeValue;
+export interface AttributeMap {
+  [key: string]: AttributeValue;
 }
 
 /**
  * A text annotation with a set of attributes.
  */
-export interface OTCAnnotation {
+export interface Annotation {
   /**
    * A user-supplied message describing the event.
    */
-  description?: OTCTruncatableString;
+  description?: TruncatableString;
   /**
    * A set of attributes on the annotation.
    */
-  attributes?: OTCAttributes;
+  attributes?: Attributes;
 }
 
 /**
  * A set of attributes, each with a key and a value.
  */
-export interface OTCAttributes {
+export interface Attributes {
   /**
    * \"/instance_id\": \"my-instance\"     \"/http/user_agent\": \"\"
    * \"/http/server_latency\": 300     \"abc.com/myattribute\": true
    */
-  attributeMap?: OTCAttributeMap;
+  attributeMap?: AttributeMap;
   /**
    * The number of attributes that were discarded. Attributes can be discarded
    * because their keys are too long or because there are too many attributes.
@@ -63,11 +63,11 @@ export interface OTCAttributes {
 /**
  * The value of an Attribute.
  */
-export interface OTCAttributeValue {
+export interface AttributeValue {
   /**
    * A string up to 256 bytes long.
    */
-  stringValue?: OTCTruncatableString;
+  stringValue?: TruncatableString;
   /**
    * A 64-bit signed integer. May be sent to the API as either number or string
    * type (string is needed to accurately express some 64-bit ints).
@@ -86,11 +86,11 @@ export interface OTCAttributeValue {
 /**
  * Format for an HTTP/JSON request to a grpc-gateway for a trace span exporter.
  */
-export interface OTCExportTraceServiceRequest {
-  node?: OTCNode;
+export interface ExportTraceServiceRequest {
+  node?: Node;
 
   /** A list of Spans that belong to the last received Node. */
-  spans?: OTCSpan[];
+  spans?: Span[];
 
   /**
    * The resource for the spans in this message that do not have an explicit
@@ -98,11 +98,11 @@ export interface OTCExportTraceServiceRequest {
    * If unset, the most recently set resource in the RPC stream applies. It is
    * valid to never be set within a stream, e.g. when no resource info is known.
    */
-  resource?: OTCResource;
+  resource?: Resource;
 }
 
 /** Information on OpenTelemetry library that produced the spans/metrics. */
-export interface OTCLibraryInfo {
+export interface LibraryInfo {
   /** Language of OpenTelemetry Library. */
   language?: LibraryInfoLanguage;
 
@@ -116,16 +116,16 @@ export interface OTCLibraryInfo {
 /**
  * A description of a binary module.
  */
-export interface OTCModule {
+export interface Module {
   /**
    * TODO: document the meaning of this field. For example: main binary, kernel
    * modules, and dynamic libraries such as libc.so, sharedlib.so.
    */
-  module?: OTCTruncatableString;
+  module?: TruncatableString;
   /**
    * A unique identifier for the module, usually a hash of its contents.
    */
-  buildId?: OTCTruncatableString;
+  buildId?: TruncatableString;
 }
 
 /**
@@ -134,15 +134,15 @@ export interface OTCModule {
  * In the future we plan to extend the identifier proto definition to support
  * additional information (e.g cloud id, etc.)
  */
-export interface OTCNode {
+export interface Node {
   /** Identifier that uniquely identifies a process within a VM/container. */
-  identifier?: OTCProcessIdentifier;
+  identifier?: ProcessIdentifier;
 
   /** Information on the OpenTelemetry Library that initiates the stream. */
-  libraryInfo?: OTCLibraryInfo;
+  libraryInfo?: LibraryInfo;
 
   /** Additional information on service. */
-  serviceInfo?: OTCServiceInfo;
+  serviceInfo?: ServiceInfo;
 
   /** Additional attributes. */
   attributes?: { [key: string]: string };
@@ -152,7 +152,7 @@ export interface OTCNode {
  * Identifier that uniquely identifies a process within a VM/container.
  * For OpenTelemetry Web, this identifies the domain name of the site.
  */
-export interface OTCProcessIdentifier {
+export interface ProcessIdentifier {
   /**
    * The host name. Usually refers to the machine/container name.
    * For example: os.Hostname() in Go, socket.gethostname() in Python.
@@ -168,7 +168,7 @@ export interface OTCProcessIdentifier {
 }
 
 /** Resource information. */
-export interface OTCResource {
+export interface Resource {
   /** Type identifier for the resource. */
   type?: string;
 
@@ -177,7 +177,7 @@ export interface OTCResource {
 }
 
 /** Additional service information. */
-export interface OTCServiceInfo {
+export interface ServiceInfo {
   /** Name of the service. */
   name?: string;
 }
@@ -190,7 +190,7 @@ export interface OTCServiceInfo {
  * contiguous - there may be gaps or overlaps between spans in a trace.  The
  * next id is 16.
  */
-export interface OTCSpan {
+export interface Span {
   /**
    * A unique identifier for a trace. All spans from the same trace share the
    * same `trace_id`. The ID is a 16-byte array.  This field is required.
@@ -214,7 +214,7 @@ export interface OTCSpan {
    * carriage returns, etc.  See the https://github.com/w3c/distributed-tracing
    * for more details about this field.
    */
-  tracestate?: OTCTraceState;
+  tracestate?: TraceState;
   /**
    * The `span_id` of this span's parent span. If this is a root span, then this
    * field must be empty. The ID is an 8-byte array.
@@ -227,7 +227,7 @@ export interface OTCSpan {
    * point in an application. This makes it easier to correlate spans in
    * different traces.  This field is required.
    */
-  name?: OTCTruncatableString;
+  name?: TruncatableString;
   /**
    * Distinguishes between spans generated in a particular context. For example,
    * two spans with the same name may be distinguished using `CLIENT` and
@@ -251,16 +251,16 @@ export interface OTCSpan {
   /**
    * A set of attributes on the span.
    */
-  attributes?: OTCAttributes;
+  attributes?: Attributes;
   /**
    * A stack trace captured at the start of the span.
    * Currently not used
    */
-  stackTrace?: OTCStackTrace;
+  stackTrace?: StackTrace;
   /**
    * The included time events.
    */
-  timeEvents?: OTCTimeEvents;
+  timeEvents?: TimeEvents;
   /**
    * An optional final status for this span.
    */
@@ -287,22 +287,22 @@ export interface OTCSpan {
 /**
  * A single stack frame in a stack trace.
  */
-export interface OTCStackFrame {
+export interface StackFrame {
   /**
    * The fully-qualified name that uniquely identifies the function or method
    * that is active in this frame.
    */
-  functionName?: OTCTruncatableString;
+  functionName?: TruncatableString;
   /**
    * An un-mangled function name, if `function_name` is
    * [mangled](http://www.avabodh.com/cxxin/namemangling.html). The name can be
    * fully qualified.
    */
-  originalFunctionName?: OTCTruncatableString;
+  originalFunctionName?: TruncatableString;
   /**
    * The name of the source file where the function call appears.
    */
-  fileName?: OTCTruncatableString;
+  fileName?: TruncatableString;
   /**
    * The line number in `file_name` where the function call appears.
    */
@@ -315,21 +315,21 @@ export interface OTCStackFrame {
   /**
    * The binary module from where the code was loaded.
    */
-  loadModule?: OTCModule;
+  loadModule?: Module;
   /**
    * The version of the deployed source code.
    */
-  sourceVersion?: OTCTruncatableString;
+  sourceVersion?: TruncatableString;
 }
 
 /**
  * A collection of stack frames, which can be truncated.
  */
-export interface OTCStackFrames {
+export interface StackFrames {
   /**
    * Stack frames in this call stack.
    */
-  frame?: OTCStackFrame[];
+  frame?: StackFrame[];
   /**
    * The number of stack frames that were dropped because there were too many
    * stack frames. If this value is 0, then no stack frames were dropped.
@@ -340,11 +340,11 @@ export interface OTCStackFrames {
 /**
  * The call stack which originated this span.
  */
-export interface OTCStackTrace {
+export interface StackTrace {
   /**
    * Stack frames in this stack trace.
    */
-  stackFrames?: OTCStackFrames;
+  stackFrames?: StackFrames;
   /**
    * The hash ID is used to conserve network bandwidth for duplicate stack
    * traces within a single trace.  Often multiple spans will have identical
@@ -359,7 +359,7 @@ export interface OTCStackTrace {
 /**
  * A time-stamped annotation or message event in the OCSpan.
  */
-export interface OTCTimeEvent {
+export interface TimeEvent {
   /**
    * The time the event occurred.
    */
@@ -367,7 +367,7 @@ export interface OTCTimeEvent {
   /**
    * A text annotation with a set of attributes.
    */
-  annotation?: OTCAnnotation;
+  annotation?: Annotation;
   /**
    * An event describing a message sent/received between Spans.
    */
@@ -379,11 +379,11 @@ export interface OTCTimeEvent {
  * the span, consisting of either user-supplied key-value pairs, or details of a
  * message sent/received between Spans.
  */
-export interface OTCTimeEvents {
+export interface TimeEvents {
   /**
    * A collection of `TimeEvent`s.
    */
-  timeEvent?: OTCTimeEvent[];
+  timeEvent?: TimeEvent[];
   /**
    * The number of dropped annotations in all the included time events. If the
    * value is 0, then no annotations were dropped.
@@ -399,7 +399,7 @@ export interface OTCTimeEvents {
 /**
  * A string that might be shortened to a specified length.
  */
-export interface OTCTruncatableString {
+export interface TruncatableString {
   /**
    * The shortened string. For example, if the original string was 500 bytes
    * long and the limit of the string was 128 bytes, then this value contains
@@ -416,6 +416,6 @@ export interface OTCTruncatableString {
   truncatedByteCount?: number;
 }
 
-export interface OTCTraceState {
+export interface TraceState {
   [key: string]: string;
 }

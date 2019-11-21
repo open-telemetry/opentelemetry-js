@@ -20,11 +20,8 @@ const https = require('https');
 import { IncomingMessage } from 'http';
 import { hrTime, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { CollectorExporter } from '../../CollectorExporter';
-import {
-  LibraryInfoLanguage,
-  OTCExportTraceServiceRequest,
-  OTCSpan,
-} from '../../types';
+
+import * as collectorTypes from '../../types';
 
 const url = require('url');
 
@@ -51,19 +48,19 @@ export function onShutdown(shutdownF: Function) {}
  * @param collectorExporter
  */
 export function sendSpans(
-  spans: OTCSpan[],
+  spans: collectorTypes.Span[],
   onSuccess: () => void,
   onError: (status?: number) => void,
   collectorExporter: CollectorExporter
 ) {
-  const ocExportTraceServiceRequest: OTCExportTraceServiceRequest = {
+  const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
     node: {
       identifier: {
         hostName: collectorExporter.hostName,
         startTimestamp: hrTimeToTimeStamp(hrTime()),
       },
       libraryInfo: {
-        language: LibraryInfoLanguage.NODE_JS,
+        language: collectorTypes.LibraryInfoLanguage.NODE_JS,
         // coreLibraryVersion: , not implemented
         // exporterVersion: , not implemented
         // coreLibraryVersion: , not implemented
@@ -76,7 +73,7 @@ export function sendSpans(
     // resource: '', not implemented
     spans,
   };
-  const body = JSON.stringify(ocExportTraceServiceRequest);
+  const body = JSON.stringify(exportTraceServiceRequest);
   const parsedUrl = url.parse(collectorExporter.url);
 
   const options = {

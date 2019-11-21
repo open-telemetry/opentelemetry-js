@@ -23,7 +23,7 @@ import {
   CollectorExporter,
   CollectorExporterConfig,
 } from '../../src/CollectorExporter';
-import { OTCExportTraceServiceRequest } from '../../src/types';
+import * as collectorTypes from '../../src/types';
 
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 
@@ -87,7 +87,9 @@ describe('CollectorExporter', () => {
 
       setTimeout(() => {
         const writeArgs = spyWrite.args[0];
-        const json = JSON.parse(writeArgs[0]) as OTCExportTraceServiceRequest;
+        const json = JSON.parse(
+          writeArgs[0]
+        ) as collectorTypes.ExportTraceServiceRequest;
         const span1 = json.spans && json.spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {

@@ -16,7 +16,7 @@
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import { OTCSpan, OTCTimeEvent, OTCTimeEvents } from '../src/types';
+import * as collectorTypes from '../src/types';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -57,9 +57,10 @@ export const mockedReadableSpan: ReadableSpan = {
   duration: [0, 8885000],
 };
 
-export function ensureSpanIsCorrect(span: OTCSpan) {
-  const timeEvents: OTCTimeEvents = (span.timeEvents && span.timeEvents) || {};
-  const timeEvent: OTCTimeEvent[] = timeEvents.timeEvent || [];
+export function ensureSpanIsCorrect(span: collectorTypes.Span) {
+  const timeEvents: collectorTypes.TimeEvents =
+    (span.timeEvents && span.timeEvents) || {};
+  const timeEvent: collectorTypes.TimeEvent[] = timeEvents.timeEvent || [];
 
   assert.strictEqual(span.traceId, 'HxAI3I4nDoXECg18OTmyeA==');
   assert.strictEqual(span.spanId, 'XhByYfZPpT4=');

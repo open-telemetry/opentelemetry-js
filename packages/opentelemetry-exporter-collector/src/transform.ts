@@ -17,17 +17,7 @@
 import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Attributes, TimedEvent, TraceState } from '@opentelemetry/types';
-import {
-  OTCAttributeMap,
-  OTCAnnotation,
-  OTCAttributes,
-  OTCAttributeValue,
-  OTCSpan,
-  OTCTimeEvent,
-  OTCTimeEvents,
-  OTCTruncatableString,
-  OTCTraceState,
-} from './types';
+import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;
 const OT_MAX_ATTRIBUTES = 30;
@@ -38,7 +28,7 @@ const OT_MAX_ATTRIBUTES = 30;
  */
 export function toCollectorTruncatableString(
   name: string
-): OTCTruncatableString {
+): collectorTypes.TruncatableString {
   const value = name.substr(0, OT_MAX_STRING_LENGTH);
   const truncatedByteCount =
     name.length > OT_MAX_STRING_LENGTH ? name.length - OT_MAX_STRING_LENGTH : 0;
@@ -54,8 +44,8 @@ export function toCollectorTruncatableString(
 export function toCollectorAttributes(
   attributes: Attributes,
   maxAttributes: number = OT_MAX_ATTRIBUTES
-): OTCAttributes {
-  const attributeMap: OTCAttributeMap = {};
+): collectorTypes.Attributes {
+  const attributeMap: collectorTypes.AttributeMap = {};
   let droppedAttributesCount = 0;
 
   const keys = Object.keys(attributes || {});
@@ -87,22 +77,22 @@ export function toCollectorAttributes(
  */
 export function toCollectorEventValue(
   value: unknown
-): OTCAttributeValue | undefined {
-  const ocAttributeValue: OTCAttributeValue = {};
+): collectorTypes.AttributeValue | undefined {
+  const attributeValue: collectorTypes.AttributeValue = {};
 
   if (typeof value === 'string') {
-    ocAttributeValue.stringValue = toCollectorTruncatableString(value);
+    attributeValue.stringValue = toCollectorTruncatableString(value);
   } else if (typeof value === 'boolean') {
-    ocAttributeValue.boolValue = value;
+    attributeValue.boolValue = value;
   } else if (typeof value === 'number') {
     if (Math.floor(value) === value) {
-      ocAttributeValue.intValue = value;
+      attributeValue.intValue = value;
     } else {
-      ocAttributeValue.doubleValue = value;
+      attributeValue.doubleValue = value;
     }
   }
 
-  return ocAttributeValue;
+  return attributeValue;
 }
 
 /**
@@ -113,44 +103,46 @@ export function toCollectorEventValue(
 export function toCollectorEvents(
   events: TimedEvent[],
   maxAttributes: number = OT_MAX_ATTRIBUTES
-): OTCTimeEvents {
+): collectorTypes.TimeEvents {
   let droppedAnnotationsCount = 0;
   let droppedMessageEventsCount = 0; // not counting yet as messageEvent is not implemented
 
-  const timeEvent: OTCTimeEvent[] = events.map((event: TimedEvent) => {
-    let attributes: OTCAttributes | undefined;
+  const timeEvent: collectorTypes.TimeEvent[] = events.map(
+    (event: TimedEvent) => {
+      let attributes: collectorTypes.Attributes | undefined;
 
-    if (event && event.attributes) {
-      attributes = toCollectorAttributes(event.attributes, maxAttributes);
-      droppedAnnotationsCount += attributes.droppedAttributesCount || 0;
+      if (event && event.attributes) {
+        attributes = toCollectorAttributes(event.attributes, maxAttributes);
+        droppedAnnotationsCount += attributes.droppedAttributesCount || 0;
+      }
+
+      let annotation: collectorTypes.Annotation = {};
+      if (event.name || attributes) {
+        annotation = {};
+      }
+
+      if (event.name) {
+        annotation.description = toCollectorTruncatableString(event.name);
+      }
+
+      if (typeof attributes !== 'undefined') {
+        annotation.attributes = attributes;
+      }
+
+      // const messageEvent: MessageEvent;
+
+      const timeEvent: collectorTypes.TimeEvent = {
+        time: hrTimeToTimeStamp(event.time),
+        // messageEvent,
+      };
+
+      if (annotation) {
+        timeEvent.annotation = annotation;
+      }
+
+      return timeEvent;
     }
-
-    let annotation: OTCAnnotation = {};
-    if (event.name || attributes) {
-      annotation = {};
-    }
-
-    if (event.name) {
-      annotation.description = toCollectorTruncatableString(event.name);
-    }
-
-    if (typeof attributes !== 'undefined') {
-      annotation.attributes = attributes;
-    }
-
-    // const messageEvent: MessageEvent;
-
-    const ocTimeEvent: OTCTimeEvent = {
-      time: hrTimeToTimeStamp(event.time),
-      // messageEvent,
-    };
-
-    if (annotation) {
-      ocTimeEvent.annotation = annotation;
-    }
-
-    return ocTimeEvent;
-  });
+  );
 
   return {
     timeEvent,
@@ -162,14 +154,14 @@ export function toCollectorEvents(
 /**
  * @param span
  */
-export function toCollectorSpan(span: ReadableSpan): OTCSpan {
+export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
   return {
     traceId: hexToBase64(span.spanContext.traceId),
     spanId: hexToBase64(span.spanContext.spanId),
     parentSpanId: span.parentSpanId
       ? hexToBase64(span.parentSpanId)
       : undefined,
-    tracestate: convertTraceStateToOTCTraceState(span.spanContext.traceState),
+    tracestate: toTraceState(span.spanContext.traceState),
     name: toCollectorTruncatableString(span.name),
     kind: span.kind,
     startTime: hrTimeToTimeStamp(span.startTime),
@@ -186,12 +178,10 @@ export function toCollectorSpan(span: ReadableSpan): OTCSpan {
 /**
  * @param traceState
  */
-function convertTraceStateToOTCTraceState(
-  traceState?: TraceState
-): OTCTraceState {
+function toTraceState(traceState?: TraceState): collectorTypes.TraceState {
   if (!traceState) return {};
   const entries = traceState.serialize().split(',');
-  const apiTraceState: OTCTraceState = {};
+  const apiTraceState: collectorTypes.TraceState = {};
   for (const entry of entries) {
     const [key, value] = entry.split('=');
     apiTraceState[key] = value;

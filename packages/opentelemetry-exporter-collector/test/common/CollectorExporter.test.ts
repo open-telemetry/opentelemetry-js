@@ -22,7 +22,7 @@ import {
   CollectorExporter,
   CollectorExporterConfig,
 } from '../../src/CollectorExporter';
-import { OTCSpan } from '../../src/types';
+import * as collectorTypes from '../../src/types';
 import * as platform from '../../src/platform/index';
 
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
@@ -99,13 +99,13 @@ describe('CollectorExporter', () => {
       spySend.restore();
     });
 
-    it('should export spans as OTCSpans', done => {
+    it('should export spans as collectorTypes.Spans', done => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
       collectorExporter.export(spans, function() {});
       setTimeout(() => {
-        const span1 = spySend.args[0][0][0] as OTCSpan;
+        const span1 = spySend.args[0][0][0] as collectorTypes.Span;
         ensureSpanIsCorrect(span1);
         done();
       });

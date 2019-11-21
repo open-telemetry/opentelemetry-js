@@ -22,7 +22,7 @@ import {
   CollectorExporter,
   CollectorExporterConfig,
 } from '../../src/CollectorExporter';
-import { OTCExportTraceServiceRequest } from '../../src/types';
+import * as collectorTypes from '../../src/types';
 
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 const sendBeacon = navigator.sendBeacon;
@@ -67,7 +67,9 @@ describe('CollectorExporter', () => {
           const args = spyBeacon.args[0];
           const url = args[0];
           const body = args[1];
-          const json = JSON.parse(body) as OTCExportTraceServiceRequest;
+          const json = JSON.parse(
+            body
+          ) as collectorTypes.ExportTraceServiceRequest;
           const span1 = json.spans && json.spans[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
@@ -137,7 +139,9 @@ describe('CollectorExporter', () => {
           assert.strictEqual(request.url, 'http://foo.bar.com');
 
           const body = request.requestBody;
-          const json = JSON.parse(body) as OTCExportTraceServiceRequest;
+          const json = JSON.parse(
+            body
+          ) as collectorTypes.ExportTraceServiceRequest;
           const span1 = json.spans && json.spans[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");

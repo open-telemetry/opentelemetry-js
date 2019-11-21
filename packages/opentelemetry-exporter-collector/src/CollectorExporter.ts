@@ -18,7 +18,8 @@ import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Attributes, Logger } from '@opentelemetry/types';
-import { OTCSpan } from './types';
+
+import * as collectorTypes from './types';
 import { toCollectorSpan } from './transform';
 
 import { onInit, onShutdown, sendSpans } from './platform/index';
@@ -90,7 +91,7 @@ export class CollectorExporter implements SpanExporter {
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        const spansToBeSent: OTCSpan[] = spans.map(span =>
+        const spansToBeSent: collectorTypes.Span[] = spans.map(span =>
           toCollectorSpan(span)
         );
         this.logger.debug('spans to be sent', spansToBeSent);
@@ -109,7 +110,7 @@ export class CollectorExporter implements SpanExporter {
    * @param onError
    */
   sendSpan(
-    spans: OTCSpan[],
+    spans: collectorTypes.Span[],
     onSuccess: () => void,
     onError: (status?: number) => void
   ) {

@@ -17,11 +17,7 @@
 import { hrTime, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/types';
 import { CollectorExporter } from '../../CollectorExporter';
-import {
-  LibraryInfoLanguage,
-  OTCExportTraceServiceRequest,
-  OTCSpan,
-} from '../../types';
+import * as collectorTypes from '../../types';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -48,19 +44,19 @@ export function onShutdown(shutdownF: EventListener) {
  * @param collectorExporter
  */
 export function sendSpans(
-  spans: OTCSpan[],
+  spans: collectorTypes.Span[],
   onSuccess: () => void,
   onError: (status?: number) => void,
   collectorExporter: CollectorExporter
 ) {
-  const ocExportTraceServiceRequest: OTCExportTraceServiceRequest = {
+  const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
     node: {
       identifier: {
         hostName: collectorExporter.hostName || window.location.host,
         startTimestamp: hrTimeToTimeStamp(hrTime()),
       },
       libraryInfo: {
-        language: LibraryInfoLanguage.WEB_JS,
+        language: collectorTypes.LibraryInfoLanguage.WEB_JS,
         // coreLibraryVersion: , not implemented
         // exporterVersion: , not implemented
         // coreLibraryVersion: , not implemented
@@ -74,7 +70,7 @@ export function sendSpans(
     spans,
   };
 
-  const body = JSON.stringify(ocExportTraceServiceRequest);
+  const body = JSON.stringify(exportTraceServiceRequest);
 
   if (typeof navigator.sendBeacon === 'function') {
     sendSpansWithBeacon(
