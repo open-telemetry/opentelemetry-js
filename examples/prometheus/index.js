@@ -22,7 +22,7 @@ const monotonicCounter = meter.createCounter("monotonic_counter", {
   labelKeys: ["pid"],
   description: "Example of a monotonic counter"
 });
-const monotonicGauge = meter.createCounter("monotonic_gauge", {
+const monotonicGauge = meter.createGauge("monotonic_gauge", {
   monotonic: true,
   labelKeys: ["pid"],
   description: "Example of a monotonic gauge"
