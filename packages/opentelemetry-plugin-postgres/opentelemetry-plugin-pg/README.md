@@ -68,6 +68,7 @@ See [examples/postgres](https://github.com/open-telemetry/opentelemetry-js/tree/
 ## Supported Versions
 
 - [pg](https://npmjs.com/package/pg): `7.x`
+- [pg-pool](https://npmjs.com/package/pg-pool): `2.x` (Installed by `pg`)
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
