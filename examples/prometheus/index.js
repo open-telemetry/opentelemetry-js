@@ -36,7 +36,7 @@ const monotonicGauge = meter.createGauge("monotonic_gauge", {
 //   labelKeys: ["pid"],
 //   description: "Example of a non-monotonic counter"
 // });
-const nonmonotonicGauge = meter.createCounter("non_monotonic_gauge", {
+const nonmonotonicGauge = meter.createGauge("non_monotonic_gauge", {
   monotonic: false,
   labelKeys: ["pid"],
   description: "Example of a non-monotonic gauge"

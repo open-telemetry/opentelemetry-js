@@ -1,12 +1,12 @@
 {
   "name": "prometheus-example",
   "version": "0.2.0",
-  "description": "OpenTelemetry Authors",
+  "description": "Example of using @opentelemetry/metrics and  @opentelemetry/exporter-prometheus",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "",
+  "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/exporter-prometheus": "0.2.0",
