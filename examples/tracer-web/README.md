@@ -1,6 +1,6 @@
 # Overview
 
-This example shows how to use [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) to instrument your JavaScript code running in the browser.
+This example shows how to use [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) to instrument your JavaScript code running in the browser.
 This example uses the `ConsoleSpanExporter()` to export spans to the browser console output.
 
 ## Installation
