@@ -32,13 +32,6 @@ const endSpan = (span: Span, err?: Error | null) => {
   span.end();
 };
 
-export const getTracedCreateClient = (tracer: Tracer, original: Function) => {
-  return function createClientTrace(this: ioredisTypes.Redis) {
-    const client: ioredisTypes.Redis = original.apply(this, arguments);
-    return tracer.bind(client);
-  };
-};
-
 export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
   return function sendCommandTrace(
     this: ioredisTypes.Redis & IORedisPluginClientTypes,
