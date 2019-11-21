@@ -1,6 +1,6 @@
 # Overview
 
-OpenTelemetry Postgres Instrumentation allows the user to automatically collect trace data and export them to the backend of choice (we can use Zipkin or Jaeger for this example), to give observability to distributed systems.
+OpenTelemetry PostgreSQL Instrumentation allows the user to automatically collect trace data and export them to the backend of choice (we can use Zipkin or Jaeger for this example), to give observability to distributed systems.
 
 This is a simple example that demonstrates tracing HTTP request from client to server. The example
 shows key aspects of tracing such as
