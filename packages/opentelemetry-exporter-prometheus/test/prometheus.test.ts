@@ -348,6 +348,33 @@ describe('PrometheusExporter', () => {
           .on('error', errorHandler(done));
       });
     });
+
+    it('should export a non-monotonic counter as a gauge', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+        monotonic: false,
+        labelKeys: ['key1'],
+      }) as CounterMetric;
+
+      const handle = counter.getHandle(meter.labels({ key1: 'labelValue1' }));
+      handle.add(20);
+      exporter.export(meter.getMetrics(), () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              assert.deepEqual(chunk.toString().split('\n'), [
+                '# HELP counter a test description',
+                '# TYPE counter gauge',
+                'counter{key1="labelValue1"} 20',
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
   });
 
   describe('configuration', () => {
