@@ -16,13 +16,13 @@
 
 import { Attributes, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
-import * as util from '../../src/util';
+import * as transform from '../../src/transform';
 import { mockedReadableSpan } from '../helper';
 
 describe('util', () => {
-  describe('stringToTruncatableString', () => {
+  describe('toCollectorTruncatableString', () => {
     it('should convert string to TruncatableString', () => {
-      assert.deepStrictEqual(util.stringToTruncatableString('foo'), {
+      assert.deepStrictEqual(transform.toCollectorTruncatableString('foo'), {
         truncatedByteCount: 0,
         value: 'foo',
       });
@@ -32,7 +32,7 @@ describe('util', () => {
       let foo =
         'foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890';
       foo += foo;
-      assert.deepStrictEqual(util.stringToTruncatableString(foo), {
+      assert.deepStrictEqual(transform.toCollectorTruncatableString(foo), {
         truncatedByteCount: 54,
         value:
           'foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo12345678',
@@ -40,76 +40,64 @@ describe('util', () => {
     });
   });
 
-  describe('convertAttributesToOTCAttributes', () => {
+  describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
       const attributes: Attributes = {
         foo: 'bar',
       };
-      assert.deepStrictEqual(
-        util.convertAttributesToOTCAttributes(attributes),
-        {
-          attributeMap: {
-            foo: {
-              stringValue: {
-                truncatedByteCount: 0,
-                value: 'bar',
-              },
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
+        attributeMap: {
+          foo: {
+            stringValue: {
+              truncatedByteCount: 0,
+              value: 'bar',
             },
           },
-          droppedAttributesCount: 0,
-        }
-      );
+        },
+        droppedAttributesCount: 0,
+      });
     });
 
     it('should convert attribute integer', () => {
       const attributes: Attributes = {
         foo: 13,
       };
-      assert.deepStrictEqual(
-        util.convertAttributesToOTCAttributes(attributes),
-        {
-          attributeMap: {
-            foo: {
-              intValue: 13,
-            },
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
+        attributeMap: {
+          foo: {
+            intValue: 13,
           },
-          droppedAttributesCount: 0,
-        }
-      );
+        },
+        droppedAttributesCount: 0,
+      });
     });
 
     it('should convert attribute boolean', () => {
       const attributes: Attributes = {
         foo: true,
       };
-      assert.deepStrictEqual(
-        util.convertAttributesToOTCAttributes(attributes),
-        {
-          attributeMap: {
-            foo: {
-              boolValue: true,
-            },
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
+        attributeMap: {
+          foo: {
+            boolValue: true,
           },
-          droppedAttributesCount: 0,
-        }
-      );
+        },
+        droppedAttributesCount: 0,
+      });
     });
 
     it('should convert attribute double', () => {
       const attributes: Attributes = {
         foo: 1.34,
       };
-      assert.deepStrictEqual(
-        util.convertAttributesToOTCAttributes(attributes),
-        {
-          attributeMap: {
-            foo: {
-              doubleValue: 1.34,
-            },
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
+        attributeMap: {
+          foo: {
+            doubleValue: 1.34,
           },
-          droppedAttributesCount: 0,
-        }
-      );
+        },
+        droppedAttributesCount: 0,
+      });
     });
 
     it('should convert only first attribute', () => {
@@ -117,21 +105,18 @@ describe('util', () => {
         foo: 1,
         bar: 1,
       };
-      assert.deepStrictEqual(
-        util.convertAttributesToOTCAttributes(attributes, 1),
-        {
-          attributeMap: {
-            foo: {
-              intValue: 1,
-            },
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes, 1), {
+        attributeMap: {
+          foo: {
+            intValue: 1,
           },
-          droppedAttributesCount: 1,
-        }
-      );
+        },
+        droppedAttributesCount: 1,
+      });
     });
   });
 
-  describe('convertEventsToOTCEvents', () => {
+  describe('toCollectorEvents', () => {
     it('should convert events to otc events', () => {
       const events: TimedEvent[] = [
         { name: 'foo', time: [123, 123], attributes: { a: 'b' } },
@@ -141,7 +126,7 @@ describe('util', () => {
           attributes: { c: 'd' },
         },
       ];
-      assert.deepStrictEqual(util.convertEventsToOTCEvents(events), {
+      assert.deepStrictEqual(transform.toCollectorEvents(events), {
         timeEvent: [
           {
             time: '1970-01-01T00:02:03.000000123Z',
@@ -174,9 +159,9 @@ describe('util', () => {
     });
   });
 
-  describe('convertSpan', () => {
+  describe('toCollectorSpan', () => {
     it('should convert span', () => {
-      assert.deepStrictEqual(util.convertSpan(mockedReadableSpan), {
+      assert.deepStrictEqual(transform.toCollectorSpan(mockedReadableSpan), {
         traceId: 'HxAI3I4nDoXECg18OTmyeA==',
         spanId: 'XhByYfZPpT4=',
         parentSpanId: 'eKiRUJiGQ4g=',

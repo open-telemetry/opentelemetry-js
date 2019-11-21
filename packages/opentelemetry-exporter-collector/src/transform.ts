@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  spanIdToBase64,
-  hrTimeToTimeStamp,
-} from '@opentelemetry/core';
+import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Attributes, TimedEvent, TraceState } from '@opentelemetry/types';
 import {
@@ -39,7 +36,9 @@ const OT_MAX_ATTRIBUTES = 30;
  * convert string to maximum length of 128, providing information of truncated bytes
  * @param name - string to be converted
  */
-export function stringToTruncatableString(name: string): OTCTruncatableString {
+export function toCollectorTruncatableString(
+  name: string
+): OTCTruncatableString {
   const value = name.substr(0, OT_MAX_STRING_LENGTH);
   const truncatedByteCount =
     name.length > OT_MAX_STRING_LENGTH ? name.length - OT_MAX_STRING_LENGTH : 0;
@@ -52,7 +51,7 @@ export function stringToTruncatableString(name: string): OTCTruncatableString {
  * @param attributes
  * @param maxAttributes - default value is 30
  */
-export function convertAttributesToOTCAttributes(
+export function toCollectorAttributes(
   attributes: Attributes,
   maxAttributes: number = OT_MAX_ATTRIBUTES
 ): OTCAttributes {
@@ -68,7 +67,7 @@ export function convertAttributesToOTCAttributes(
 
   for (let i = 0; i <= countKeys - 1; i++) {
     const key = keys[i];
-    const eventAttributeValue = convertEventValueToOTCValue(
+    const eventAttributeValue = toCollectorEventValue(
       attributes && attributes[key]
     );
     if (eventAttributeValue) {
@@ -86,13 +85,13 @@ export function convertAttributesToOTCAttributes(
  * convert event value
  * @param value event value
  */
-export function convertEventValueToOTCValue(
+export function toCollectorEventValue(
   value: unknown
 ): OTCAttributeValue | undefined {
   const ocAttributeValue: OTCAttributeValue = {};
 
   if (typeof value === 'string') {
-    ocAttributeValue.stringValue = stringToTruncatableString(value);
+    ocAttributeValue.stringValue = toCollectorTruncatableString(value);
   } else if (typeof value === 'boolean') {
     ocAttributeValue.boolValue = value;
   } else if (typeof value === 'number') {
@@ -111,7 +110,7 @@ export function convertEventValueToOTCValue(
  * @param events array of events
  * @param maxAttributes - maximum number of event attributes to be converted
  */
-export function convertEventsToOTCEvents(
+export function toCollectorEvents(
   events: TimedEvent[],
   maxAttributes: number = OT_MAX_ATTRIBUTES
 ): OTCTimeEvents {
@@ -122,10 +121,7 @@ export function convertEventsToOTCEvents(
     let attributes: OTCAttributes | undefined;
 
     if (event && event.attributes) {
-      attributes = convertAttributesToOTCAttributes(
-        event.attributes,
-        maxAttributes
-      );
+      attributes = toCollectorAttributes(event.attributes, maxAttributes);
       droppedAnnotationsCount += attributes.droppedAttributesCount || 0;
     }
 
@@ -135,7 +131,7 @@ export function convertEventsToOTCEvents(
     }
 
     if (event.name) {
-      annotation.description = stringToTruncatableString(event.name);
+      annotation.description = toCollectorTruncatableString(event.name);
     }
 
     if (typeof attributes !== 'undefined') {
@@ -166,21 +162,21 @@ export function convertEventsToOTCEvents(
 /**
  * @param span
  */
-export function convertSpan(span: ReadableSpan): OTCSpan {
+export function toCollectorSpan(span: ReadableSpan): OTCSpan {
   return {
-    traceId: spanIdToBase64(span.spanContext.traceId),
-    spanId: spanIdToBase64(span.spanContext.spanId),
+    traceId: hexToBase64(span.spanContext.traceId),
+    spanId: hexToBase64(span.spanContext.spanId),
     parentSpanId: span.parentSpanId
-      ? spanIdToBase64(span.parentSpanId)
+      ? hexToBase64(span.parentSpanId)
       : undefined,
     tracestate: convertTraceStateToOTCTraceState(span.spanContext.traceState),
-    name: stringToTruncatableString(span.name),
+    name: toCollectorTruncatableString(span.name),
     kind: span.kind,
     startTime: hrTimeToTimeStamp(span.startTime),
     endTime: hrTimeToTimeStamp(span.endTime),
-    attributes: convertAttributesToOTCAttributes(span.attributes),
+    attributes: toCollectorAttributes(span.attributes),
     // stackTrace: // not implemented
-    timeEvents: convertEventsToOTCEvents(span.events),
+    timeEvents: toCollectorEvents(span.events),
     status: span.status,
     sameProcessAsParentSpan: !!span.parentSpanId,
     // childSpanCount: // not implemented
