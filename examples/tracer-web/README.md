@@ -1,0 +1,34 @@
+# Overview
+
+This example shows how to use [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) to instrument your JavScript code running in the browser.
+The supplied example uses the `ConsoleSpanExporter()` to export spans into the console output.
+
+## Installation
+
+```sh
+$ # from this directory
+$ npm install
+```
+
+## Run the Application
+
+```sh
+$ # from this directory
+$ npm start
+```
+
+By default, the application will run on port `8090`: `http://localhost:8090/`
+
+To see the results, make sure you have the console open. The application is using the `ConsoleSpanExporter` and will post the created spans into the console.
+
+The screen will look as follows:
+
+![Screenshot of the running example](images/traces.png)
+
+## Useful links
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
+
+## LICENSE
+
+Apache License 2.0
