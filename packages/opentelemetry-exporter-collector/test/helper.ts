@@ -16,6 +16,7 @@
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
+import * as transform from '../src/transform';
 import * as collectorTypes from '../src/types';
 
 export const mockedReadableSpan: ReadableSpan = {
@@ -31,7 +32,16 @@ export const mockedReadableSpan: ReadableSpan = {
   endTime: [1574120165, 438688070],
   status: { code: 0 },
   attributes: { component: 'document-load' },
-  links: [],
+  links: [
+    {
+      spanContext: {
+        traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+        spanId: '78a8915098864388',
+        traceFlags: 1,
+      },
+      attributes: { component: 'document-load' },
+    },
+  ],
   events: [
     { name: 'fetchStart', time: [1574120165, 429803070] },
     {
@@ -58,30 +68,102 @@ export const mockedReadableSpan: ReadableSpan = {
 };
 
 export function ensureSpanIsCorrect(span: collectorTypes.Span) {
-  const timeEvents: collectorTypes.TimeEvents =
-    (span.timeEvents && span.timeEvents) || {};
-  const timeEvent: collectorTypes.TimeEvent[] = timeEvents.timeEvent || [];
-
-  assert.strictEqual(span.traceId, 'HxAI3I4nDoXECg18OTmyeA==');
-  assert.strictEqual(span.spanId, 'XhByYfZPpT4=');
-  assert.strictEqual(span.parentSpanId, 'eKiRUJiGQ4g=');
-  assert.deepStrictEqual(span.tracestate, {});
-  assert.strictEqual(span.name && span.name.value, 'documentFetch');
-  assert.strictEqual(span.name && span.name.truncatedByteCount, 0);
-  assert.strictEqual(span.kind, 0);
-  assert.strictEqual(span.startTime, '2019-11-18T23:36:05.429803070Z');
-  assert.strictEqual(span.endTime, '2019-11-18T23:36:05.438688070Z');
-  assert.strictEqual(timeEvents.droppedAnnotationsCount, 0);
-  assert.strictEqual(timeEvents.droppedMessageEventsCount, 0);
-  assert.deepStrictEqual(span.status, { code: 0 });
-  assert.strictEqual(span.sameProcessAsParentSpan, true);
-
-  assert.strictEqual(timeEvent.length, 8);
-  const timeEvent1 = timeEvent[0];
-  assert.deepStrictEqual(timeEvent1, {
-    time: '2019-11-18T23:36:05.429803070Z',
-    annotation: {
-      description: { value: 'fetchStart', truncatedByteCount: 0 },
+  assert.deepStrictEqual(transform.toCollectorSpan(mockedReadableSpan), {
+    traceId: 'HxAI3I4nDoXECg18OTmyeA==',
+    spanId: 'XhByYfZPpT4=',
+    parentSpanId: 'eKiRUJiGQ4g=',
+    tracestate: {},
+    name: { value: 'documentFetch', truncatedByteCount: 0 },
+    kind: 0,
+    startTime: '2019-11-18T23:36:05.429803070Z',
+    endTime: '2019-11-18T23:36:05.438688070Z',
+    attributes: {
+      droppedAttributesCount: 0,
+      attributeMap: {
+        component: {
+          stringValue: { value: 'document-load', truncatedByteCount: 0 },
+        },
+      },
+    },
+    timeEvents: {
+      timeEvent: [
+        {
+          time: '2019-11-18T23:36:05.429803070Z',
+          annotation: {
+            description: { value: 'fetchStart', truncatedByteCount: 0 },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.429803070Z',
+          annotation: {
+            description: {
+              value: 'domainLookupStart',
+              truncatedByteCount: 0,
+            },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.429803070Z',
+          annotation: {
+            description: {
+              value: 'domainLookupEnd',
+              truncatedByteCount: 0,
+            },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.429803070Z',
+          annotation: {
+            description: { value: 'connectStart', truncatedByteCount: 0 },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.429803070Z',
+          annotation: {
+            description: { value: 'connectEnd', truncatedByteCount: 0 },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.435513070Z',
+          annotation: {
+            description: { value: 'requestStart', truncatedByteCount: 0 },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.436923070Z',
+          annotation: {
+            description: { value: 'responseStart', truncatedByteCount: 0 },
+          },
+        },
+        {
+          time: '2019-11-18T23:36:05.438688070Z',
+          annotation: {
+            description: { value: 'responseEnd', truncatedByteCount: 0 },
+          },
+        },
+      ],
+      droppedAnnotationsCount: 0,
+      droppedMessageEventsCount: 0,
+    },
+    status: { code: 0 },
+    sameProcessAsParentSpan: true,
+    links: {
+      droppedLinksCount: 0,
+      link: [
+        {
+          traceId: 'HxAI3I4nDoXECg18OTmyeA==',
+          spanId: 'eKiRUJiGQ4g=',
+          type: 2,
+          attributes: {
+            droppedAttributesCount: 0,
+            attributeMap: {
+              component: {
+                stringValue: { value: 'document-load', truncatedByteCount: 0 },
+              },
+            },
+          },
+        },
+      ],
     },
   });
 }

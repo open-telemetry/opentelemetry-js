@@ -114,6 +114,67 @@ export interface LibraryInfo {
 }
 
 /**
+ * A pointer from the current span to another span in the same trace or in a
+ * different trace. For example, this can be used in batching operations, where
+ * a single batch handler processes multiple requests from different traces or
+ * when the handler receives a request from a different project.
+ */
+export interface Link {
+  /**
+   * A unique identifier for a trace. All spans from the same trace share the
+   * same `trace_id`. The ID is a 16-byte array.
+   */
+  traceId?: string;
+  /**
+   * A unique identifier for a span within a trace, assigned when the span is
+   * created. The ID is an 8-byte array.
+   */
+  spanId?: string;
+  /**
+   * The relationship of the current span relative to the linked span.
+   */
+  type?: LinkType;
+  /**
+   * A set of attributes on the link.
+   */
+  attributes?: Attributes;
+}
+
+/**
+ * A collection of links, which are references from this span to a span in the
+ * same or different trace.
+ */
+export interface Links {
+  /**
+   * A collection of links.
+   */
+  link?: Link[];
+  /**
+   * The number of dropped links after the maximum size was enforced. If this
+   * value is 0, then no links were dropped.
+   */
+  droppedLinksCount?: number;
+}
+
+/**
+ * The relationship of the two spans is unknown, or known but other than
+ * parent-child.
+ */
+export type LinkTypeUnspecified = 0;
+/** The linked span is a child of the current span. */
+export type LinkTypeChildLinkedSpan = 1;
+/** The linked span is a parent of the current span. */
+export type LinkTypeParentLinkedSpan = 2;
+/**
+ * The relationship of the current span relative to the linked span: child,
+ * parent, or unspecified.
+ */
+export type LinkType =
+  | LinkTypeUnspecified
+  | LinkTypeChildLinkedSpan
+  | LinkTypeParentLinkedSpan;
+
+/**
  * A description of a binary module.
  */
 export interface Module {
@@ -278,10 +339,10 @@ export interface Span {
   //  * active. If set, allows an implementation to detect missing child spans.
   //  */
   // childSpanCount?: number;
-  // /**
-  //  * The included links.
-  //  */
-  // links?: Links;
+  /**
+   * The included links.
+   */
+  links?: Links;
 }
 
 /**
@@ -357,7 +418,7 @@ export interface StackTrace {
 }
 
 /**
- * A time-stamped annotation or message event in the OCSpan.
+ * A time-stamped annotation or message event in the Span.
  */
 export interface TimeEvent {
   /**

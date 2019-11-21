@@ -16,11 +16,15 @@
 
 import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { Attributes, TimedEvent, TraceState } from '@opentelemetry/types';
+import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/types';
 import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;
 const OT_MAX_ATTRIBUTES = 30;
+
+const LINK_TYPE_UNSPECIFIED: collectorTypes.LinkTypeUnspecified = 0;
+// const LINK_TYPE_CHILD_LINKED_SPAN: collectorTypes.LinkTypeChildLinkedSpan = 1;
+const LINK_TYPE_PARENT_LINKED_SPAN: collectorTypes.LinkTypeParentLinkedSpan = 2;
 
 /**
  * convert string to maximum length of 128, providing information of truncated bytes
@@ -152,6 +156,50 @@ export function toCollectorEvents(
 }
 
 /**
+ * determines the type of link, only parent link type can be determined now
+ * @param span
+ * @param link
+ */
+export function toCollectorLinkType(
+  span: ReadableSpan,
+  link: Link
+): collectorTypes.LinkType {
+  const linkSpanId = link.spanContext.spanId;
+  const spanParentId = span.parentSpanId;
+
+  if (linkSpanId === spanParentId) {
+    return LINK_TYPE_PARENT_LINKED_SPAN;
+  }
+
+  return LINK_TYPE_UNSPECIFIED;
+}
+
+/**
+ * converts span links
+ * @param span
+ */
+export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
+  const collectorLinks: collectorTypes.Link[] = span.links.map((link: Link) => {
+    const collectorLink: collectorTypes.Link = {
+      traceId: hexToBase64(link.spanContext.traceId),
+      spanId: hexToBase64(link.spanContext.spanId),
+      type: toCollectorLinkType(span, link),
+    };
+
+    if (link.attributes) {
+      collectorLink.attributes = toCollectorAttributes(link.attributes);
+    }
+
+    return collectorLink;
+  });
+
+  return {
+    link: collectorLinks,
+    droppedLinksCount: 0,
+  };
+}
+
+/**
  * @param span
  */
 export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
@@ -161,7 +209,7 @@ export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
     parentSpanId: span.parentSpanId
       ? hexToBase64(span.parentSpanId)
       : undefined,
-    tracestate: toTraceState(span.spanContext.traceState),
+    tracestate: toCollectorTraceState(span.spanContext.traceState),
     name: toCollectorTruncatableString(span.name),
     kind: span.kind,
     startTime: hrTimeToTimeStamp(span.startTime),
@@ -171,6 +219,7 @@ export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
     timeEvents: toCollectorEvents(span.events),
     status: span.status,
     sameProcessAsParentSpan: !!span.parentSpanId,
+    links: toCollectorLinks(span),
     // childSpanCount: // not implemented
   };
 }
@@ -178,7 +227,9 @@ export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
 /**
  * @param traceState
  */
-function toTraceState(traceState?: TraceState): collectorTypes.TraceState {
+function toCollectorTraceState(
+  traceState?: TraceState
+): collectorTypes.TraceState {
   if (!traceState) return {};
   const entries = traceState.serialize().split(',');
   const apiTraceState: collectorTypes.TraceState = {};

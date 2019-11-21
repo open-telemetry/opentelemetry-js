@@ -77,7 +77,7 @@ describe('CollectorExporter', () => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
-        assert.deepStrictEqual(options.headers, { 'Content-Length': 1652 });
+        assert.deepStrictEqual(options.headers, { 'Content-Length': 1901 });
         done();
       });
     });

@@ -17,9 +17,9 @@
 import { Attributes, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
-import { mockedReadableSpan } from '../helper';
+import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 
-describe('util', () => {
+describe('transform', () => {
   describe('toCollectorTruncatableString', () => {
     it('should convert string to TruncatableString', () => {
       assert.deepStrictEqual(transform.toCollectorTruncatableString('foo'), {
@@ -161,86 +161,7 @@ describe('util', () => {
 
   describe('toCollectorSpan', () => {
     it('should convert span', () => {
-      assert.deepStrictEqual(transform.toCollectorSpan(mockedReadableSpan), {
-        traceId: 'HxAI3I4nDoXECg18OTmyeA==',
-        spanId: 'XhByYfZPpT4=',
-        parentSpanId: 'eKiRUJiGQ4g=',
-        tracestate: {},
-        name: { value: 'documentFetch', truncatedByteCount: 0 },
-        kind: 0,
-        startTime: '2019-11-18T23:36:05.429803070Z',
-        endTime: '2019-11-18T23:36:05.438688070Z',
-        attributes: {
-          droppedAttributesCount: 0,
-          attributeMap: {
-            component: {
-              stringValue: { value: 'document-load', truncatedByteCount: 0 },
-            },
-          },
-        },
-        timeEvents: {
-          timeEvent: [
-            {
-              time: '2019-11-18T23:36:05.429803070Z',
-              annotation: {
-                description: { value: 'fetchStart', truncatedByteCount: 0 },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.429803070Z',
-              annotation: {
-                description: {
-                  value: 'domainLookupStart',
-                  truncatedByteCount: 0,
-                },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.429803070Z',
-              annotation: {
-                description: {
-                  value: 'domainLookupEnd',
-                  truncatedByteCount: 0,
-                },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.429803070Z',
-              annotation: {
-                description: { value: 'connectStart', truncatedByteCount: 0 },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.429803070Z',
-              annotation: {
-                description: { value: 'connectEnd', truncatedByteCount: 0 },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.435513070Z',
-              annotation: {
-                description: { value: 'requestStart', truncatedByteCount: 0 },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.436923070Z',
-              annotation: {
-                description: { value: 'responseStart', truncatedByteCount: 0 },
-              },
-            },
-            {
-              time: '2019-11-18T23:36:05.438688070Z',
-              annotation: {
-                description: { value: 'responseEnd', truncatedByteCount: 0 },
-              },
-            },
-          ],
-          droppedAnnotationsCount: 0,
-          droppedMessageEventsCount: 0,
-        },
-        status: { code: 0 },
-        sameProcessAsParentSpan: true,
-      });
+      ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan));
     });
   });
 });
