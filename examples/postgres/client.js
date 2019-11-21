@@ -9,19 +9,19 @@ const tracer = opentelemetry.getTracer();
 
 function makeRequest() {
     const span = tracer.startSpan('makeRequest');
-    const randomeId = Math.floor(Math.random() * 10);
+    const randomId = Math.floor(Math.random() * 10);
     tracer.withSpan(span, () => {
         console.log('Client traceId ', span.context().traceId);
         http.get({
             host: 'localhost',
             port: 3000,
-            path: `/insert?id=${randomeId}&text=radomstring`
+            path: `/insert?id=${randomId}&text=randomstring`
         });
 
         http.get({
             host: 'localhost',
             port: 3000,
-            path: `/get?id=${randomeId}`
+            path: `/get?id=${randomId}`
         });
     });
 

@@ -1,8 +1,8 @@
 {
-  "name": "http-example",
+  "name": "postgres-example",
   "private": true,
   "version": "0.2.0",
-  "description": "Example of HTTP integration with OpenTelemetry",
+  "description": "Example of Postgres integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
     "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
