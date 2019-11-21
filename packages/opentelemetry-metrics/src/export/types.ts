@@ -61,6 +61,8 @@ export interface MetricDescriptor {
   readonly unit: string;
   /** MetricDescriptor type */
   readonly type: MetricDescriptorType;
+  /** Does this metric only count up */
+  readonly monotonic: boolean;
   /** The label keys associated with the metric descriptor. */
   readonly labelKeys: string[];
 }
