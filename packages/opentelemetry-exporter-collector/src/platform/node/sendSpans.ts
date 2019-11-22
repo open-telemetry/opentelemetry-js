@@ -23,7 +23,7 @@ import { CollectorExporter } from '../../CollectorExporter';
 
 import * as collectorTypes from '../../types';
 
-const url = require('url');
+import * as url from 'url';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
