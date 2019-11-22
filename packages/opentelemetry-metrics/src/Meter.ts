@@ -22,7 +22,7 @@ import {
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
 import { BaseHandle } from './Handle';
-import { Metric, CounterMetric, GaugeMetric } from './Metric';
+import { Metric, CounterMetric, GaugeMetric, MeasureMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -64,8 +64,19 @@ export class Meter implements types.Meter {
       );
       return NOOP_MEASURE_METRIC;
     }
-    // @todo: implement this method
-    throw new Error('not implemented yet');
+    const opt: MetricOptions = {
+      absolute: true,
+      monotonic: false, // noop
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+
+    const measure = new MeasureMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
+    this._registerMetric(name, measure);
+    return measure;
   }
 
   /**

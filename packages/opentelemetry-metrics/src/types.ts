@@ -40,6 +40,9 @@ export interface MetricOptions {
   /** Monotonic allows this metric to accept negative values. */
   monotonic: boolean;
 
+  /** (Measure only) Absolute asserts that this metric will only accept positive values. Default true */
+  absolute?: boolean;
+
   /** User provided logger. */
   logger: Logger;
 

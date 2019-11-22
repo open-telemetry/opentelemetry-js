@@ -16,7 +16,7 @@
 
 import * as types from '@opentelemetry/types';
 import { hrTime } from '@opentelemetry/core';
-import { CounterHandle, GaugeHandle, BaseHandle } from './Handle';
+import { CounterHandle, GaugeHandle, BaseHandle, MeasureHandle } from './Handle';
 import { MetricOptions } from './types';
 import {
   ReadableMetric,
@@ -191,5 +191,35 @@ export class GaugeMetric extends Metric<GaugeHandle>
    */
   set(value: number, labelSet: types.LabelSet) {
     this.getHandle(labelSet).set(value);
+  }
+}
+
+export class MeasureMetric extends Metric<MeasureHandle> implements Pick<types.MetricUtils, 'record'> {
+  protected readonly _absolute: boolean;
+
+  constructor(name: string, options: MetricOptions, private readonly _onUpdate: Function) {
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.GAUGE_DOUBLE
+        : MetricDescriptorType.GAUGE_INT64
+    );
+
+    this._absolute = options.absolute || true; // Absolute default is true
+  }
+  protected _makeHandle(labelSet: types.LabelSet): MeasureHandle {
+    return new MeasureHandle(
+      labelSet,
+      this._disabled,
+      this._absolute,
+      this._valueType,
+      this._logger,
+      this._onUpdate
+    );
+  }
+
+  record(value: number, labelSet: types.LabelSet) {
+    this.getHandle(labelSet).record(value);
   }
 }

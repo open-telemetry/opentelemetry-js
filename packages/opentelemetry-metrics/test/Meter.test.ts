@@ -21,6 +21,7 @@ import {
   CounterMetric,
   GaugeMetric,
   MetricDescriptorType,
+  MeasureMetric,
 } from '../src';
 import * as types from '@opentelemetry/types';
 import { LabelSet } from '../src/LabelSet';
@@ -363,6 +364,20 @@ describe('Meter', () => {
   });
 
   describe('#measure', () => {
+    it('should create a measure', () => {
+      const measure = meter.createMeasure('name') as MeasureMetric;
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should create a measure with options', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      assert.ok(measure instanceof Metric);
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createMeasure('');
@@ -379,6 +394,94 @@ describe('Meter', () => {
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const gauge = meter.createMeasure('name with invalid characters^&*(');
         assert.ok(gauge instanceof NoopMetric);
+      });
+    });
+
+    describe('.getHandle()', () => {
+      it('should create a measure handle', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        handle.record(10);
+        assert.strictEqual(handle['_data'], 10);
+        handle.record(250);
+        assert.strictEqual(handle['_data'], 250);
+      });
+
+      it('should return the timeseries', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        handle.record(150);
+        assert.deepStrictEqual(handle.getTimeSeries(hrTime), {
+          labelValues: [{ value: 'v1' }, { value: 'v2' }],
+          points: [{ value: 150, timestamp: hrTime }],
+        });
+      });
+
+      it('should not accept negative values by default', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        handle.record(10);
+        assert.strictEqual(handle['_data'], 10);
+        assert.strictEqual(handle.getTimeSeries.length, 1);
+        handle.record(-123);
+        assert.strictEqual(handle.getTimeSeries.length, 1);
+        assert.strictEqual(handle['_data'], 10);
+      });
+
+      it('should not set the handle data when disabled', () => {
+        const measure = meter.createMeasure('name', {
+          disabled: true
+        }) as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        handle.record(10);
+        assert.strictEqual(handle['_data'], 0);
+      });
+
+      it('should accept negative (and positive) values when monotonic is set to false', () => {
+        const measure = meter.createMeasure('name', {
+          monotonic: false
+        }) as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        handle.record(-10);
+        assert.strictEqual(handle['_data'], -10);
+        handle.record(100);
+        assert.strictEqual(handle['_data'], 100);
+      });
+
+      it('should return same handle on same label values', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const handle1 = measure.getHandle(labelSet);
+        handle1.record(10);
+        const handle2 = measure.getHandle(labelSet);
+        handle2.record(10);
+        assert.strictEqual(handle1['_data'], 10);
+        assert.strictEqual(handle1, handle2);
+      });
+    });
+
+    describe('.removeHandle()', () => {
+      it('should remove the measure handle', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const handle = measure.getHandle(labelSet);
+        assert.strictEqual(measure['_handles'].size, 1);
+        measure.removeHandle(labelSet);
+        assert.strictEqual(measure['_handles'].size, 0);
+        const handle1 = measure.getHandle(labelSet);
+        assert.strictEqual(measure['_handles'].size, 1);
+        assert.notStrictEqual(handle, handle1);
+      });
+
+      it('should not fail when removing non existing handle', () => {
+        const measure = meter.createMeasure('name');
+        measure.removeHandle(new LabelSet('nonexistant', {}));
+      });
+
+      it('should clear all handles', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        measure.getHandle(labelSet);
+        assert.strictEqual(measure['_handles'].size, 1);
+        measure.clear();
+        assert.strictEqual(measure['_handles'].size, 0);
       });
     });
   });

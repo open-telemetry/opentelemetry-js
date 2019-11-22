@@ -130,12 +130,40 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
  * MeasureHandle is an implementation of the {@link MeasureHandle} interface.
  */
 export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
+  constructor(
+    labelSet: types.LabelSet,
+    private readonly _disabled: boolean,
+    private readonly _absolute: boolean,
+    private readonly _valueType: types.ValueType,
+    private readonly _logger: types.Logger,
+    private readonly _onUpdate: Function
+  ) {
+    super(labelSet);
+  }
+
   record(
     value: number,
     distContext?: types.DistributedContext,
     spanContext?: types.SpanContext
   ): void {
-    // @todo: implement this method.
-    return;
+    if (this._disabled) return;
+    
+    if (this._absolute && value < 0) {
+      this._logger.error(
+        `Absolute measure cannot contain negative values for ${this._labelSet}}`
+      );
+      return;
+    }
+
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
+      this._logger.warn(
+        `INT measure cannot accept a floating-point value for ${Object.values(this._labelSet.labels)}; truncating the value.`
+      );
+      value = Math.trunc(value);
+    }
+    
+    //@todo: implement this._data logic
+
+    this._onUpdate();
   }
 }
