@@ -216,7 +216,7 @@ export class MeasureMetric extends Metric<MeasureHandle>
         : MetricDescriptorType.GAUGE_INT64
     );
 
-    this._absolute = options.absolute || true; // Absolute default is true
+    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
   protected _makeHandle(labelSet: types.LabelSet): MeasureHandle {
     return new MeasureHandle(

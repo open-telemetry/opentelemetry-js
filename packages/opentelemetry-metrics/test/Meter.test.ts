@@ -378,6 +378,25 @@ describe('Meter', () => {
       assert.ok(measure instanceof Metric);
     });
 
+    it('should be absolute by default', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      assert.strictEqual((measure as MeasureMetric)['_absolute'], true);
+    });
+
+    it('should be able to set absolute to false', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        absolute: false,
+      });
+      assert.strictEqual((measure as MeasureMetric)['_absolute'], false);
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createMeasure('');

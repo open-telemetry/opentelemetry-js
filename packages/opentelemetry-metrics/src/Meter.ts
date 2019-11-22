@@ -65,8 +65,9 @@ export class Meter implements types.Meter {
       return NOOP_MEASURE_METRIC;
     }
     const opt: MetricOptions = {
+      // Measures are defined as absolute by default
       absolute: true,
-      monotonic: false, // noop
+      monotonic: false, // @todo: currently noop, required for typings
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
