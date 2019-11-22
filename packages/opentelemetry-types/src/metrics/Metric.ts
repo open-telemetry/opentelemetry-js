@@ -58,7 +58,7 @@ export interface MetricOptions {
    * (Measure only) Absolute asserts that this metric cannot only accept positive values.
    * Default true
    */
-    absolute?: boolean;
+  absolute?: boolean;
 
   /**
    * Indicates the type of the recorded value.
