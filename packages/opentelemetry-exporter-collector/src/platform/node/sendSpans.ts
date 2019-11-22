@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-const http = require('http');
-const https = require('https');
+import * as http from 'http';
+import * as https from 'https';
 
 import { IncomingMessage } from 'http';
 import * as core from '@opentelemetry/core';

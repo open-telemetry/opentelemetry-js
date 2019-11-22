@@ -65,7 +65,7 @@ describe('transform', () => {
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
         attributeMap: {
           foo: {
-            intValue: 13,
+            doubleValue: 13,
           },
         },
         droppedAttributesCount: 0,
@@ -97,21 +97,6 @@ describe('transform', () => {
           },
         },
         droppedAttributesCount: 0,
-      });
-    });
-
-    it('should convert only first attribute', () => {
-      const attributes: Attributes = {
-        foo: 1,
-        bar: 1,
-      };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes, 1), {
-        attributeMap: {
-          foo: {
-            intValue: 1,
-          },
-        },
-        droppedAttributesCount: 1,
       });
     });
   });

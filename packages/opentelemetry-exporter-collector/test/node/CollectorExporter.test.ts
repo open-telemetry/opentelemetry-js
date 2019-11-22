@@ -41,7 +41,7 @@ const mockResError = {
   statusCode: 400,
 };
 
-describe('CollectorExporter', () => {
+describe('CollectorExporter - node', () => {
   let collectorExporter: CollectorExporter;
   let collectorExporterConfig: CollectorExporterConfig;
   let spyRequest: any;
@@ -77,7 +77,7 @@ describe('CollectorExporter', () => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
-        assert.deepStrictEqual(options.headers, { 'Content-Length': 1956 });
+        assert.deepStrictEqual(options.headers, { 'Content-Length': 1901 });
         done();
       });
     });
@@ -111,13 +111,13 @@ describe('CollectorExporter', () => {
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
-        setTimeout(()=> {
+        setTimeout(() => {
           const response: any = spyLoggerDebug.args[1][0];
           assert.strictEqual(response, 'statusCode: 200');
           assert.strictEqual(spyLoggerError.args.length, 0);
           assert.strictEqual(responseSpy.args[0][0], 0);
           done();
-        })
+        });
       });
     });
 
@@ -131,7 +131,7 @@ describe('CollectorExporter', () => {
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockResError);
-        setTimeout(()=> {
+        setTimeout(() => {
           const response: any = spyLoggerError.args[0][0];
           assert.strictEqual(response, 'statusCode: 400');
 

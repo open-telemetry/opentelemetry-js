@@ -121,8 +121,10 @@ export class CollectorExporter implements SpanExporter {
     onShutdown(this.shutdown);
 
     // @TODO get spans from span processor (batch)
-    this._exportSpans([]).then(() => {
-      this.logger.debug('shutdown completed');
-    }).catch(()=> {});
+    this._exportSpans([])
+      .then(() => {
+        this.logger.debug('shutdown completed');
+      })
+      .catch(() => {});
   }
 }

@@ -27,7 +27,7 @@ import * as platform from '../../src/platform/index';
 
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 
-describe('CollectorExporter', () => {
+describe('CollectorExporter - common', () => {
   let collectorExporter: CollectorExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 

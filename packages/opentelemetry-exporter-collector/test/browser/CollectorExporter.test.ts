@@ -27,7 +27,7 @@ import * as collectorTypes from '../../src/types';
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
-describe('CollectorExporter', () => {
+describe('CollectorExporter - web', () => {
   let collectorExporter: CollectorExporter;
   let collectorExporterConfig: CollectorExporterConfig;
   let spyOpen: any;

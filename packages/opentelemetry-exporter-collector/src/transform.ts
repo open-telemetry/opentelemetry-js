@@ -20,7 +20,6 @@ import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/types';
 import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;
-const OT_MAX_ATTRIBUTES = 30;
 
 const LINK_TYPE_UNSPECIFIED: collectorTypes.LinkTypeUnspecified = 0;
 // const LINK_TYPE_CHILD_LINKED_SPAN: collectorTypes.LinkTypeChildLinkedSpan = 1;
@@ -43,34 +42,17 @@ export function toCollectorTruncatableString(
 /**
  * convert attributes
  * @param attributes
- * @param maxAttributes - default value is 30
  */
 export function toCollectorAttributes(
-  attributes: Attributes,
-  maxAttributes: number = OT_MAX_ATTRIBUTES
+  attributes: Attributes
 ): collectorTypes.Attributes {
   const attributeMap: collectorTypes.AttributeMap = {};
-  let droppedAttributesCount = 0;
-
-  const keys = Object.keys(attributes || {});
-
-  const countKeys = Math.min(keys.length, maxAttributes);
-  if (keys.length > maxAttributes) {
-    droppedAttributesCount = keys.length - maxAttributes;
-  }
-
-  for (let i = 0; i <= countKeys - 1; i++) {
-    const key = keys[i];
-    const eventAttributeValue = toCollectorEventValue(
-      attributes && attributes[key]
-    );
-    if (eventAttributeValue) {
-      attributeMap[key] = eventAttributeValue;
-    }
-  }
+  Object.keys(attributes || {}).forEach(key => {
+    attributeMap[key] = toCollectorEventValue(attributes[key]);
+  });
 
   return {
-    droppedAttributesCount,
+    droppedAttributesCount: 0,
     attributeMap,
   };
 }
@@ -81,7 +63,7 @@ export function toCollectorAttributes(
  */
 export function toCollectorEventValue(
   value: unknown
-): collectorTypes.AttributeValue | undefined {
+): collectorTypes.AttributeValue {
   const attributeValue: collectorTypes.AttributeValue = {};
 
   if (typeof value === 'string') {
@@ -89,21 +71,11 @@ export function toCollectorEventValue(
   } else if (typeof value === 'boolean') {
     attributeValue.boolValue = value;
   } else if (typeof value === 'number') {
-    if (valueCanBeInteger(value) && Math.floor(value) === value) {
-      attributeValue.intValue = value;
-    } else {
-      attributeValue.doubleValue = value;
-    }
+    // all numbers will be treated as double
+    attributeValue.doubleValue = value;
   }
 
   return attributeValue;
-}
-
-function valueCanBeInteger(value: unknown) {
-  if (typeof value === 'number') {
-    return value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER;
-  }
-  return false;
 }
 
 /**
@@ -112,8 +84,7 @@ function valueCanBeInteger(value: unknown) {
  * @param maxAttributes - maximum number of event attributes to be converted
  */
 export function toCollectorEvents(
-  events: TimedEvent[],
-  maxAttributes: number = OT_MAX_ATTRIBUTES
+  events: TimedEvent[]
 ): collectorTypes.TimeEvents {
   let droppedAnnotationsCount = 0;
   let droppedMessageEventsCount = 0; // not counting yet as messageEvent is not implemented
@@ -123,7 +94,7 @@ export function toCollectorEvents(
       let attributes: collectorTypes.Attributes | undefined;
 
       if (event && event.attributes) {
-        attributes = toCollectorAttributes(event.attributes, maxAttributes);
+        attributes = toCollectorAttributes(event.attributes);
         droppedAnnotationsCount += attributes.droppedAttributesCount || 0;
       }
 
