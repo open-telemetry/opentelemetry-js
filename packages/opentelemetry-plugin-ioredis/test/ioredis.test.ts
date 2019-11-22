@@ -115,13 +115,13 @@ describe('ioredis', () => {
         description: 'insert',
         command: 'hset',
         method: (cb: ioredisTypes.CallbackFunction<number>) =>
-          client.hset('hash', 'random', 'random', cb),
+          client.hset('hash', 'testField', 'testValue', cb),
       },
       {
         description: 'get',
         command: 'get',
-        method: (cb: ioredisTypes.CallbackFunction<string>) =>
-          client.get('test'),
+        method: (cb: ioredisTypes.CallbackFunction<string|null>) =>
+          client.get('test', cb),
       },
       {
         description: 'delete',
@@ -139,22 +139,18 @@ describe('ioredis', () => {
       client.on('ready', done);
     });
 
-    beforeEach(done => {
-      client.set('test', 'data', () => {
-        memoryExporter.reset();
-        done();
-      });
+    beforeEach(async () => {
+      await client.set('test', 'data');
+      memoryExporter.reset();
     });
 
     after(done => {
       client.quit(done);
     });
 
-    afterEach(done => {
-      client.del('hash', () => {
-        memoryExporter.reset();
-        done();
-      });
+    afterEach(async () => {
+      client.del('hash');
+      memoryExporter.reset();
     });
 
     describe('Instrumenting query operations', () => {
@@ -169,8 +165,6 @@ describe('ioredis', () => {
             operation.method((err, _result) => {
               assert.ifError(err);
               assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
-              console.error('HAHAHAHAHAHAHAHA');
-
               span.end();
               const endedSpans = memoryExporter.getFinishedSpans();
               assert.strictEqual(endedSpans.length, 2);
