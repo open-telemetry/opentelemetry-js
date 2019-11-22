@@ -20,7 +20,7 @@ import { IORedisPluginClientTypes, IORedisCommand } from './types';
 import { IORedisPlugin } from './ioredis';
 import { AttributeNames } from './enums';
 
-const endSpan = (span: Span, err?: Error | null) => {
+const endSpan = (span: Span, err: Error | null) => {
   if (err) {
     span.setStatus({
       code: CanonicalCode.UNKNOWN,
