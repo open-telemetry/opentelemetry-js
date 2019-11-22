@@ -150,7 +150,9 @@ export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
 
     if (this._absolute && value < 0) {
       this._logger.error(
-        `Absolute measure cannot contain negative values for ${this._labelSet}}`
+        `Absolute measure cannot contain negative values for ${Object.values(
+          this._labelSet.labels
+        )}}`
       );
       return;
     }
