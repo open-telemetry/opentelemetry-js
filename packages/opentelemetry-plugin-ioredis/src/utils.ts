@@ -63,9 +63,10 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         );
       }
 
-      const originalCallback = arguments[0].callback;
+      const command = arguments[0];
+      const originalCallback = command.callback;
       if (originalCallback) {
-        (arguments[0] as IORedisCommand).callback = function callback<T>(
+        (command as IORedisCommand).callback = function callback<T>(
           this: unknown,
           err: Error | null,
           _reply: T
@@ -73,6 +74,8 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           endSpan(span, err);
           return originalCallback.apply(this, arguments);
         };
+      } else {
+        console.error('Cannot figure out your callback', command);
       }
       try {
         // Span will be ended in callback
