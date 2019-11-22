@@ -430,7 +430,7 @@ describe('Meter', () => {
 
       it('should not set the handle data when disabled', () => {
         const measure = meter.createMeasure('name', {
-          disabled: true
+          disabled: true,
         }) as MeasureMetric;
         const handle = measure.getHandle(labelSet);
         handle.record(10);
@@ -439,7 +439,7 @@ describe('Meter', () => {
 
       it('should accept negative (and positive) values when monotonic is set to false', () => {
         const measure = meter.createMeasure('name', {
-          monotonic: false
+          monotonic: false,
         }) as MeasureMetric;
         const handle = measure.getHandle(labelSet);
         handle.record(-10);

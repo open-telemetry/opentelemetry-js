@@ -16,7 +16,12 @@
 
 import * as types from '@opentelemetry/types';
 import { hrTime } from '@opentelemetry/core';
-import { CounterHandle, GaugeHandle, BaseHandle, MeasureHandle } from './Handle';
+import {
+  CounterHandle,
+  GaugeHandle,
+  BaseHandle,
+  MeasureHandle,
+} from './Handle';
 import { MetricOptions } from './types';
 import {
   ReadableMetric,
@@ -194,10 +199,15 @@ export class GaugeMetric extends Metric<GaugeHandle>
   }
 }
 
-export class MeasureMetric extends Metric<MeasureHandle> implements Pick<types.MetricUtils, 'record'> {
+export class MeasureMetric extends Metric<MeasureHandle>
+  implements Pick<types.MetricUtils, 'record'> {
   protected readonly _absolute: boolean;
 
-  constructor(name: string, options: MetricOptions, private readonly _onUpdate: Function) {
+  constructor(
+    name: string,
+    options: MetricOptions,
+    private readonly _onUpdate: Function
+  ) {
     super(
       name,
       options,

@@ -147,7 +147,7 @@ export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
     spanContext?: types.SpanContext
   ): void {
     if (this._disabled) return;
-    
+
     if (this._absolute && value < 0) {
       this._logger.error(
         `Absolute measure cannot contain negative values for ${this._labelSet}}`
@@ -157,11 +157,13 @@ export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
 
     if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
-        `INT measure cannot accept a floating-point value for ${Object.values(this._labelSet.labels)}; truncating the value.`
+        `INT measure cannot accept a floating-point value for ${Object.values(
+          this._labelSet.labels
+        )}; truncating the value.`
       );
       value = Math.trunc(value);
     }
-    
+
     //@todo: implement this._data logic
 
     this._onUpdate();
