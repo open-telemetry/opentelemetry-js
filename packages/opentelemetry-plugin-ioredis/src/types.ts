@@ -28,6 +28,4 @@ export interface IORedisPluginClientTypes {
     host: string;
     port: string;
   };
-
-  address?: string;
 }
