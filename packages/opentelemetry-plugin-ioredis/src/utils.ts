@@ -56,12 +56,6 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           [AttributeNames.PEER_PORT]: this.options.port,
         });
       }
-      if (this.address) {
-        span.setAttribute(
-          AttributeNames.PEER_ADDRESS,
-          `redis://${this.address}`
-        );
-      }
 
       const command = arguments[0];
       const originalCallback = command.callback;
