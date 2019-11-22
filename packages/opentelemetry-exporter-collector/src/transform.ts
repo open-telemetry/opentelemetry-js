@@ -89,7 +89,7 @@ export function toCollectorEventValue(
   } else if (typeof value === 'boolean') {
     attributeValue.boolValue = value;
   } else if (typeof value === 'number') {
-    if (Math.floor(value) === value) {
+    if (valueCanBeInteger(value) && Math.floor(value) === value) {
       attributeValue.intValue = value;
     } else {
       attributeValue.doubleValue = value;
@@ -97,6 +97,13 @@ export function toCollectorEventValue(
   }
 
   return attributeValue;
+}
+
+function valueCanBeInteger(value: unknown) {
+  if (typeof value === 'number') {
+    return value >= Number.MIN_SAFE_INTEGER && value <= Number.MAX_SAFE_INTEGER;
+  }
+  return false;
 }
 
 /**

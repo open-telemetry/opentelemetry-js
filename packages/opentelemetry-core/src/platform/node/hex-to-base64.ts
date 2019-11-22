@@ -18,7 +18,7 @@
  * converts id string into base64
  * @param hexStr - id of span
  */
-export function hexToBase64(hexStr: string = ''): string {
+export function hexToBase64(hexStr: string): string {
   const hexStrLen = hexStr.length;
   let hexAsciiCharsStr = '';
   for (let i = 0; i < hexStrLen; i += 2) {

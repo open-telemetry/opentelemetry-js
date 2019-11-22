@@ -77,7 +77,7 @@ describe('CollectorExporter', () => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
-        assert.deepStrictEqual(options.headers, { 'Content-Length': 1901 });
+        assert.deepStrictEqual(options.headers, { 'Content-Length': 1956 });
         done();
       });
     });
@@ -104,34 +104,40 @@ describe('CollectorExporter', () => {
       const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
       const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-      collectorExporter.export(spans, function() {});
+      const responseSpy = sinon.spy();
+      collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockRes);
-
-        const response: any = spyLoggerDebug.args[1][0];
-        assert.strictEqual(response, 'statusCode: 200');
-        assert.strictEqual(spyLoggerError.args.length, 0);
-        done();
+        setTimeout(()=> {
+          const response: any = spyLoggerDebug.args[1][0];
+          assert.strictEqual(response, 'statusCode: 200');
+          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(responseSpy.args[0][0], 0);
+          done();
+        })
       });
     });
 
     it('should log the error message', done => {
       const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-      collectorExporter.export(spans, function() {});
+      const responseSpy = sinon.spy();
+      collectorExporter.export(spans, responseSpy);
 
       setTimeout(() => {
-        // const response: any = spyLoggerDebug.args[0][0];
         const args = spyRequest.args[0];
         const callback = args[1];
         callback(mockResError);
+        setTimeout(()=> {
+          const response: any = spyLoggerError.args[0][0];
+          assert.strictEqual(response, 'statusCode: 400');
 
-        const response: any = spyLoggerError.args[0][0];
-        assert.strictEqual(response, 'statusCode: 400');
-        done();
+          assert.strictEqual(responseSpy.args[0][0], 1);
+          done();
+        });
       });
     });
   });

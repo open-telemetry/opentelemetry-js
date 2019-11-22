@@ -18,7 +18,7 @@ const http = require('http');
 const https = require('https');
 
 import { IncomingMessage } from 'http';
-import { hrTime, hrTimeToTimeStamp } from '@opentelemetry/core';
+import * as core from '@opentelemetry/core';
 import { CollectorExporter } from '../../CollectorExporter';
 
 import * as collectorTypes from '../../types';
@@ -57,13 +57,14 @@ export function sendSpans(
     node: {
       identifier: {
         hostName: collectorExporter.hostName,
-        startTimestamp: hrTimeToTimeStamp(hrTime()),
+        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
       },
       libraryInfo: {
         language: collectorTypes.LibraryInfoLanguage.NODE_JS,
-        // coreLibraryVersion: , not implemented
-        // exporterVersion: , not implemented
-        // coreLibraryVersion: , not implemented
+        // @TODO add version - cannot use require('package.json')
+        //  as it is failing in browser need to figure out better way
+        // coreLibraryVersion: core.version,
+        // exporterVersion: version,
       },
       serviceInfo: {
         name: collectorExporter.serviceName,
@@ -91,13 +92,16 @@ export function sendSpans(
   const req = request(options, (res: IncomingMessage) => {
     if (res.statusCode && res.statusCode < 299) {
       collectorExporter.logger.debug(`statusCode: ${res.statusCode}`);
+      onSuccess();
     } else {
       collectorExporter.logger.error(`statusCode: ${res.statusCode}`);
+      onError(res.statusCode);
     }
   });
 
   req.on('error', (error: Error) => {
     collectorExporter.logger.error('error', error.message);
+    onError();
   });
   req.write(body);
   req.end();

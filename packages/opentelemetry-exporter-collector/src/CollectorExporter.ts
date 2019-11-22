@@ -35,8 +35,8 @@ export interface CollectorExporterConfig {
   url?: string;
 }
 
-const defaultServiceName = 'collector-exporter';
-const defaultCollectorUrl = 'http://localhost:55678/v1/trace';
+const DEFAULT_SERVICE_NAME = 'collector-exporter';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
  * Collector Exporter
@@ -52,8 +52,8 @@ export class CollectorExporter implements SpanExporter {
    * @param config
    */
   constructor(config: CollectorExporterConfig = {}) {
-    this.serviceName = config.serviceName || defaultServiceName;
-    this.url = config.url || defaultCollectorUrl;
+    this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
+    this.url = config.url || DEFAULT_COLLECTOR_URL;
     if (typeof config.hostName === 'string') {
       this.hostName = config.hostName;
     }
@@ -95,7 +95,10 @@ export class CollectorExporter implements SpanExporter {
           toCollectorSpan(span)
         );
         this.logger.debug('spans to be sent', spansToBeSent);
-        this.sendSpan(spansToBeSent, resolve, reject);
+
+        // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
+        // it will use the appropriate transport layer automatically depends on platform
+        sendSpans(spansToBeSent, resolve, reject, this);
       } catch (e) {
         reject(e);
       }
@@ -103,21 +106,6 @@ export class CollectorExporter implements SpanExporter {
   }
 
   /**
-   * Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
-   *     it will use the appropriate transport layer automatically depends on platform
-   * @param spans
-   * @param onSuccess
-   * @param onError
-   */
-  sendSpan(
-    spans: collectorTypes.Span[],
-    onSuccess: () => void,
-    onError: (status?: number) => void
-  ) {
-    // platform dependent
-    sendSpans(spans, onSuccess, onError, this);
-  }
-
   /**
    * Shutdown the exporter.
    */
@@ -132,8 +120,9 @@ export class CollectorExporter implements SpanExporter {
     // platform dependent
     onShutdown(this.shutdown);
 
+    // @TODO get spans from span processor (batch)
     this._exportSpans([]).then(() => {
       this.logger.debug('shutdown completed');
-    });
+    }).catch(()=> {});
   }
 }

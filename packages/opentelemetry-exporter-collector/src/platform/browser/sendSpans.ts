@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hrTime, hrTimeToTimeStamp } from '@opentelemetry/core';
+import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/types';
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
@@ -53,13 +53,14 @@ export function sendSpans(
     node: {
       identifier: {
         hostName: collectorExporter.hostName || window.location.host,
-        startTimestamp: hrTimeToTimeStamp(hrTime()),
+        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
       },
       libraryInfo: {
         language: collectorTypes.LibraryInfoLanguage.WEB_JS,
-        // coreLibraryVersion: , not implemented
-        // exporterVersion: , not implemented
-        // coreLibraryVersion: , not implemented
+        // @TODO add version - cannot use require('package.json')
+        //  as it is failing in browser need to figure out better way
+        // coreLibraryVersion: core.version,
+        // exporterVersion: version,
       },
       serviceInfo: {
         name: collectorExporter.serviceName,

@@ -93,7 +93,7 @@ describe('CollectorExporter', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(collectorExporter, 'sendSpan');
+      spySend = sinon.stub(platform, 'sendSpans');
     });
     afterEach(() => {
       spySend.restore();
@@ -114,10 +114,8 @@ describe('CollectorExporter', () => {
   });
 
   describe('shutdown', () => {
-    let spySend: any;
     let onShutdownSpy: any;
     beforeEach(() => {
-      spySend = sinon.stub(collectorExporter, 'sendSpan');
       onShutdownSpy = sinon.stub(platform, 'onShutdown');
       collectorExporterConfig = {
         hostName: 'foo',
@@ -129,7 +127,6 @@ describe('CollectorExporter', () => {
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
     afterEach(() => {
-      spySend.restore();
       onShutdownSpy.restore();
     });
 
