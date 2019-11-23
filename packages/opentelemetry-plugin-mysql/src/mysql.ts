@@ -64,7 +64,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
 
   // global export function
   private _patchCreateConnection() {
-    return (originalCreateConnection: typeof mysqlTypes.createConnection) => {
+    return (originalCreateConnection: Function) => {
       const thisPlugin = this;
       thisPlugin._logger.debug(
         'MysqlPlugin#patch: patched mysql createConnection'
@@ -73,7 +73,6 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       return function createConnection(
         _connectionUri: string | mysqlTypes.ConnectionConfig
       ) {
-        //@ts-ignore
         const originalResult = originalCreateConnection(...arguments);
 
         shimmer.wrap(
@@ -89,11 +88,10 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
 
   // global export function
   private _patchCreatePool() {
-    return (originalCreatePool: typeof mysqlTypes.createPool) => {
+    return (originalCreatePool: Function) => {
       const thisPlugin = this;
       thisPlugin._logger.debug('MysqlPlugin#patch: patched mysql createPool');
       return function createPool(_config: string | mysqlTypes.PoolConfig) {
-        //@ts-ignore
         const pool = originalCreatePool(...arguments);
 
         shimmer.wrap(pool, 'query', thisPlugin._patchQuery(pool));
@@ -110,13 +108,12 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
 
   // global export function
   private _patchCreatePoolCluster() {
-    return (originalCreatePoolCluster: typeof mysqlTypes.createPoolCluster) => {
+    return (originalCreatePoolCluster: Function) => {
       const thisPlugin = this;
       thisPlugin._logger.debug(
         'MysqlPlugin#patch: patched mysql createPoolCluster'
       );
       return function createPool(_config: string | mysqlTypes.PoolConfig) {
-        //@ts-ignore
         const cluster = originalCreatePoolCluster(...arguments);
 
         shimmer.wrap(
@@ -243,8 +240,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     };
   }
 
-  private _patchCallbackQuery(span: Span): (original: any) => any {
-    return (originalCallback: mysqlTypes.queryCallback) => {
+  private _patchCallbackQuery(span: Span) {
+    return (originalCallback: Function) => {
       return function(
         err: mysqlTypes.MysqlError | null,
         results?: any,
@@ -255,9 +252,13 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
             code: CanonicalCode.UNKNOWN,
             message: err.message,
           });
+        } else {
+          span.setStatus({
+            code: CanonicalCode.OK,
+          });
         }
         span.end();
-        originalCallback(err, results, fields);
+        return originalCallback(...arguments);
       };
     };
   }
