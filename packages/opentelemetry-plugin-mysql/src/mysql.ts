@@ -34,7 +34,10 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     [AttributeNames.PEER_SERVICE]: MysqlPlugin.COMPONENT,
   };
 
+  private _enabled = false;
+
   protected patch(): typeof mysqlTypes {
+    this._enabled = true;
     shimmer.wrap(
       this._moduleExports,
       'createConnection',
@@ -57,6 +60,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   }
 
   protected unpatch(): void {
+    this._enabled = false;
     shimmer.unwrap(this._moduleExports, 'createConnection');
     shimmer.unwrap(this._moduleExports, 'createPool');
     shimmer.unwrap(this._moduleExports, 'createPoolCluster');
@@ -75,6 +79,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       ) {
         const originalResult = originalCreateConnection(...arguments);
 
+        // This is unwrapped on next call after unpatch
         shimmer.wrap(
           originalResult,
           'query',
@@ -116,6 +121,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       return function createPool(_config: string | mysqlTypes.PoolConfig) {
         const cluster = originalCreatePoolCluster(...arguments);
 
+        // This is unwrapped on next call after unpatch
         shimmer.wrap(
           cluster,
           'getConnection',
@@ -139,6 +145,12 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         arg2?: unknown,
         arg3?: unknown
       ) {
+        // Unwrap if unpatch has been called
+        if (!thisPlugin._enabled) {
+          shimmer.unwrap(pool, 'getConnection');
+          return originalGetConnection.apply(pool, arguments);
+        }
+
         if (arguments.length === 1 && typeof arg1 === 'function') {
           const patchFn = thisPlugin._getConnectionCallbackPatchFn(arg1);
           return originalGetConnection.call(pool, patchFn);
@@ -161,6 +173,8 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
     const thisPlugin = this;
     return function() {
       if (arguments[1]) {
+        // this is the callback passed into a query
+        // no need to unwrap
         shimmer.wrap(
           arguments[1],
           'query',
@@ -183,6 +197,11 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         _valuesOrCallback?: unknown[] | mysqlTypes.queryCallback,
         _callback?: mysqlTypes.queryCallback
       ) {
+        if (!thisPlugin._enabled) {
+          shimmer.unwrap(connection, 'query');
+          return originalQuery.apply(connection, arguments);
+        }
+
         const spanName = getSpanName(query);
 
         const span = thisPlugin._tracer.startSpan(spanName, {
