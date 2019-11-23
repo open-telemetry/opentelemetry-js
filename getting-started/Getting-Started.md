@@ -1,6 +1,20 @@
 # Getting Started with OpenTelemetry JS
 This guide will walk you through the setup and configuration process for a tracing backend (in this case [Zipkin](https://zipkin.io), but [Jaeger](https://www.jaegertracing.io) would be simple to use as well), a metrics backend like [Prometheus](https://prometheus.io), and auto-instrumentation of NodeJS.
 
+
+1. [Tracing Your Application with OpenTelemetry](#tracing-your-application-with-opentelemetry)
+    1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
+    2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
+        1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
+        2. [Initialize a global tracer](#initialize-a-global-tracer)
+        3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
+2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
+    1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
+    2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+        1. [Initialize a global meter](#initialize-a-global-meter)
+        2. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
+        3. [Create and keep updated any metrics you wish to collect](#create-and-keep-updated-any-metrics-you-wish-to-collect)
+
 ## Tracing Your Application with OpenTelemetry
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
 
@@ -19,7 +33,7 @@ Browse to <http://localhost:9411> to ensure that you can see the Zipkin UI.
 
 <p align="center"><img src="./images/zipkin.png?raw=true"/></p>
 
-### Instrument Your NodeJS Application
+### Trace Your NodeJS Application
 This guide uses the example application provided in the `example` directory, but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
 
 1. Install the required OpenTelemetry libraries
@@ -117,6 +131,8 @@ $ node -r ./tracing.js app.js
 ## Collect Metrics Using OpenTelemetry
 This guide assumes you are going to be using Prometheus as your metrics backend. It is currently the only metrics backend supported by OpenTelemetry JS.
 
+**Note**: This section is a work in progress
+
 ### Set up a Metrics Backend
 Now that we have end-to-end traces, we will collect and export some basic metrics.
 
@@ -152,7 +168,7 @@ level=info ts=2019-11-21T20:39:40.383Z caller=main.go:626 msg="Server is ready t
 
 <p align="center"><img src="./images/prometheus.png?raw=true"/></p>
 
-### Instrument Your NodeJS Application
+### Monitor Your NodeJS Application
 #### Initialize a global meter
 #### Initialize and register a metrics exporter
 #### Create and keep updated any metrics you wish to collect
