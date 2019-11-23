@@ -45,7 +45,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         parent: parentSpan || undefined,
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
-          [AttributeNames.DB_STATEMENT]: cmd.name,
+          [AttributeNames.DB_STATEMENT]: cmd.name + ' ' + cmd.args.join(' '),
         },
       });
 
