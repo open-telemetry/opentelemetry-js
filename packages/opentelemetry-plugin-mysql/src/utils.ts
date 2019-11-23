@@ -14,21 +14,42 @@
  * limitations under the License.
  */
 
-import * as mysqlTypes from 'mysql';
+import { Attributes } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
+import { ConnectionConfig, Query } from './types';
 
-export function getSpanName(
-  query: string | mysqlTypes.QueryOptions | mysqlTypes.Query
-) {
-  const queryString = typeof query === 'string' ? query : query.sql;
-
-  const match = queryString.match(/^\s*(\w+)/);
-  const command = (match && match[1]) || 'UNKNOWN_COMMAND';
-
-  return `mysql.query:${command}`;
+/**
+ * Get a span name from a mysql query
+ *
+ * @param query mysql Query or string
+ */
+export function getSpanName(query: string | Query) {
+  return `mysql.query:${getCommand(query)}`;
 }
 
-export function getConnectionAttributes(config: mysqlTypes.PoolConfig) {
+/**
+ * Get the low cardinality command name from a query.
+ *
+ * @param query mysql Query or string
+ */
+function getCommand(query: string | Query) {
+  const queryString = typeof query === 'string' ? query : query.sql;
+
+  if (!queryString) {
+    return 'UNKNOWN_COMMAND';
+  }
+
+  // Command is the first non-whitespace token in the query
+  const match = queryString.match(/^\s*(\w+)/);
+  return (match && match[1]) || 'UNKNOWN_COMMAND';
+}
+
+/**
+ * Get an Attributes map from a mysql connection config object
+ *
+ * @param config ConnectionConfig
+ */
+export function getConnectionAttributes(config: ConnectionConfig): Attributes {
   const { host, port, database, user } = getConfig(config);
 
   return {
@@ -51,15 +72,15 @@ function getJDBCString(
   port: number | undefined,
   database: string | undefined
 ) {
-  let str = `jdbc:mysql://${host || 'localhost'}`;
+  let jdbcString = `jdbc:mysql://${host || 'localhost'}`;
 
   if (typeof port === 'number') {
-    str += `:${port}`;
+    jdbcString += `:${port}`;
   }
 
   if (typeof database === 'string') {
-    str += `/${database}`;
+    jdbcString += `/${database}`;
   }
 
-  return str;
+  return jdbcString;
 }

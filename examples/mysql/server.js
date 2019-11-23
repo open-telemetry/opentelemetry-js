@@ -4,7 +4,7 @@ const opentelemetry = require('@opentelemetry/core');
 const config = require('./setup');
 /**
  * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (HTTP in this case).
+ * automatic tracing for built-in plugins (HTTP and MySQL in this case).
  */
 config.setupTracerAndExporters('http-mysql-server-service');
 
