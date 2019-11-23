@@ -10,7 +10,10 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 > This project is currently in Alpha stage. Its APIs can change at any time and it is not intended to be used in production scenarios!
 
 ## Quick start
-To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) which provides auto-instrumentation for Node.js applications.
+
+To get started tracing your own application, see the [Getting Started Guide](getting-started/Getting-Started.md).
+
+For more information, see [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) which provides auto-instrumentation for Node.js applications.
 
 ## Release Schedule
 
