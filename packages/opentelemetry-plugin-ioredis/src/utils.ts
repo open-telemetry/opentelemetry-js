@@ -58,10 +58,10 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         });
       }
 
-      const command = arguments[0];
-      const originalCallback = command.callback;
+      const originalCallback = cmd.callback;
+      const originalPromise = cmd.promise;
       if (originalCallback) {
-        (command as IORedisCommand).callback = function callback<T>(
+        (cmd as IORedisCommand).callback = function callback<T>(
           this: unknown,
           err: Error | null,
           _reply: T
@@ -69,8 +69,26 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           endSpan(span, err);
           return originalCallback.apply(this, arguments);
         };
-      } else {
-        console.error('Cannot figure out your callback', command);
+      } else if (originalPromise) {
+        return originalPromise
+          .then((result: unknown) => {
+            // Return a pass-along promise which ends the span and then goes to user's orig resolvers
+            return new Promise((resolve, _) => {
+              span.setStatus({ code: CanonicalCode.OK });
+              span.end();
+              resolve(result);
+            });
+          })
+          .catch((error: Error) => {
+            return new Promise((_, reject) => {
+              span.setStatus({
+                code: CanonicalCode.UNKNOWN,
+                message: error.message,
+              });
+              span.end();
+              reject(error);
+            });
+          });
       }
       try {
         // Span will be ended in callback
