@@ -174,7 +174,7 @@ export class BasicTracer implements types.Tracer {
   }
 
   private _getParentSpanContext(
-    parent: types.Span | types.SpanContext | undefined
+    parent?: types.Span | types.SpanContext | null
   ): types.SpanContext | undefined {
     if (!parent) return undefined;
 
