@@ -18,6 +18,7 @@ import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/types';
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
+import { version } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -57,10 +58,8 @@ export function sendSpans(
       },
       libraryInfo: {
         language: collectorTypes.LibraryInfoLanguage.WEB_JS,
-        // @TODO add version - cannot use require('package.json')
-        //  as it is failing in browser need to figure out better way
-        // coreLibraryVersion: core.version,
-        // exporterVersion: version,
+        coreLibraryVersion: core.version,
+        exporterVersion: version,
       },
       serviceInfo: {
         name: collectorExporter.serviceName,
