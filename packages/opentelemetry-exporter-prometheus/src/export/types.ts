@@ -28,7 +28,7 @@ export interface ExporterConfig {
   prefix?: string;
 
   /**
-   * Endpoint the metrics should be exposed at with preceeding slash
+   * Endpoint the metrics should be exposed at with preceding slash
    * @default '/metrics'
    */
   endpoint?: string;
