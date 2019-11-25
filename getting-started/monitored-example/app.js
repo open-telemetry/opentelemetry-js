@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const PORT = process.env.PORT || "8080";
 
@@ -10,24 +10,26 @@ const app = express();
 app.use(countAllRequests());
 
 app.get("/", (req, res) => {
-  axios.get(`http://localhost:${PORT}/middle-tier`)
+  axios
+    .get(`http://localhost:${PORT}/middle-tier`)
     .then(() => axios.get(`http://localhost:${PORT}/middle-tier`))
-    .then((result) => {
-      res.send(result.data)
+    .then(result => {
+      res.send(result.data);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       res.status(500).send();
     });
 });
 
 app.get("/middle-tier", (req, res) => {
-  axios.get(`http://localhost:${PORT}/backend`)
+  axios
+    .get(`http://localhost:${PORT}/backend`)
     .then(() => axios.get(`http://localhost:${PORT}/backend`))
-    .then((result) => {
-      res.send(result.data)
+    .then(result => {
+      res.send(result.data);
     })
-    .catch((err) => {
+    .catch(err => {
       console.error(err);
       res.status(500).send();
     });
