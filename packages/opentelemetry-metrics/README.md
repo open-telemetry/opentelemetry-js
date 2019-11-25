@@ -29,7 +29,7 @@ const counter = meter.createCounter('metric_name', {
   description: "Example of a counter"
 });
 
-const labels = Meter.labels({ pid: process.pid });
+const labels = meter.labels({ pid: process.pid });
 
 // Create a Handle associated with specified label values.
 const handle = counter.getHandle(labels);
@@ -50,7 +50,7 @@ const gauge = meter.createGauge('metric_name', {
   description: "Example of a gauge"
 });
 
-const labels = Meter.labels({ pid: process.pid });
+const labels = meter.labels({ pid: process.pid });
 
 // Create a Handle associated with specified label values.
 const handle = gauge.getHandle(labels);
