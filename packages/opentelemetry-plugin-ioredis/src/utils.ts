@@ -46,7 +46,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
           [AttributeNames.DB_TYPE]: 'redis',
-          [AttributeNames.DB_STATEMENT]: cmd.name + ' ' + cmd.args.join(' '),
+          [AttributeNames.DB_STATEMENT]: `${cmd.name} ${cmd.args.join(' ')}`,
         },
       });
 
