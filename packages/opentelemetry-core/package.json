@@ -20,10 +20,10 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "compile": "npm run version && tsc -p .",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
-    "version": "node scripts/version.js",
+    "version:update": "node scripts/version-update.js",
     "watch": "tsc -w"
   },
   "keywords": [

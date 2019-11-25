@@ -14,14 +14,14 @@
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
-    "compile": "npm run version && tsc -p .",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
-    "version": "node scripts/version.js",
+    "version:update": "node scripts/version-update.js",
     "watch": "tsc -w"
   },
   "keywords": [

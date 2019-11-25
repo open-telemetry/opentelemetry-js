@@ -24,7 +24,7 @@ import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
 
 import * as url from 'url';
-import { version } from '../../version';
+import { VERSION } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -62,8 +62,8 @@ export function sendSpans(
       },
       libraryInfo: {
         language: collectorTypes.LibraryInfoLanguage.NODE_JS,
-        coreLibraryVersion: core.version,
-        exporterVersion: version,
+        coreLibraryVersion: core.VERSION,
+        exporterVersion: VERSION,
       },
       serviceInfo: {
         name: collectorExporter.serviceName,

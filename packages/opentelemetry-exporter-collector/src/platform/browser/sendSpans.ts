@@ -18,7 +18,7 @@ import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/types';
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
-import { version } from '../../version';
+import { VERSION } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -58,8 +58,8 @@ export function sendSpans(
       },
       libraryInfo: {
         language: collectorTypes.LibraryInfoLanguage.WEB_JS,
-        coreLibraryVersion: core.version,
-        exporterVersion: version,
+        coreLibraryVersion: core.VERSION,
+        exporterVersion: VERSION,
       },
       serviceInfo: {
         name: collectorExporter.serviceName,
