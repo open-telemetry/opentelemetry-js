@@ -10,10 +10,10 @@ This guide will walk you through the setup and configuration process for a traci
         3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
 2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
     1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
-    2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
-        1. [Initialize a global meter](#initialize-a-global-meter)
-        2. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
-        3. [Create and keep updated any metrics you wish to collect](#create-and-keep-updated-any-metrics-you-wish-to-collect)
+    2. TODO [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+        1. TODO [Initialize a global meter](#initialize-a-global-meter)
+        2. TODO [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
+        3. TODO [Create and keep updated any metrics you wish to collect](#create-and-keep-updated-any-metrics-you-wish-to-collect)
 
 ## Tracing Your Application with OpenTelemetry
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
