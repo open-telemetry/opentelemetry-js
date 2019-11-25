@@ -42,13 +42,16 @@ const nonmonotonicGauge = meter.createGauge("non_monotonic_gauge", {
   description: "Example of a non-monotonic gauge"
 });
 
+let currentMonotonicGaugeValue = 0;
 setInterval(() => {
-  const labels = Meter.labels({ pid: process.pid });
+  const labels = meter.labels({ pid: process.pid });
+
+  currentMonotonicGaugeValue += Math.random();
 
   monotonicCounter.getHandle(labels).add(1);
   // nonmonotonicCounter.getHandle(labels).add(Math.random() > 0.5 ? 1 : -1);
-  monotonicGauge.getHandle(labels).add(Math.random() * 10);
+  monotonicGauge.getHandle(labels).set(currentMonotonicGaugeValue);
   nonmonotonicGauge
     .getHandle(labels)
-    .add(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
+    .set(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
 }, 1000);
