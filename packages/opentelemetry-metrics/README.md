@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-`Metric` instruments are the entry point for application and framework developers to instrument their code using `counters`, `gauges`, and `measures`.
+OpenTelemetry metrics allow a user to collect data and export it to a metrics backend like [Prometheus](https://prometheus.io/).
 
 ## Installation
 
@@ -24,13 +24,16 @@ const { Meter } = require('@opentelemetry/metrics');
 // Initialize the Meter to capture measurements in various ways.
 const meter = new Meter();
 
-const counter = meter.createCounter('metric_name');
+const counter = meter.createCounter('metric_name', {
+  labelKeys: ["pid"],
+  description: "Example of a counter"
+});
+
+const labels = Meter.labels({ pid: process.pid });
 
 // Create a Handle associated with specified label values.
-const handle = counter.getHandle(['value1']);
+const handle = counter.getHandle(labels);
 handle.add(10);
-
-// @todo: add exporter
 ```
 
 ### Gauge
@@ -42,17 +45,22 @@ const { Meter } = require('@opentelemetry/metrics');
 // Initialize the Meter to capture measurements in various ways.
 const meter = new Meter();
 
-const gauge = meter.createGauge('metric_name');
+const gauge = meter.createGauge('metric_name', {
+  labelKeys: ["pid"],
+  description: "Example of a gauge"
+});
+
+const labels = Meter.labels({ pid: process.pid });
 
 // Create a Handle associated with specified label values.
-const handle = gauge.getHandle(['value1']);
+const handle = gauge.getHandle(labels);
 handle.set(10); // Set to 10
-
-// @todo: add exporter
 ```
 
 ### Measure
 ***Work in progress***
+
+See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
