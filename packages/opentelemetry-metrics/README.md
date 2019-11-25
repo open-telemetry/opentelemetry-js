@@ -57,10 +57,10 @@ const handle = gauge.getHandle(labels);
 handle.set(10); // Set to 10
 ```
 
+See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
+
 ### Measure
 ***Work in progress***
-
-See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
