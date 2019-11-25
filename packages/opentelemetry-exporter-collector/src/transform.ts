@@ -135,6 +135,7 @@ export function toCollectorEvents(
 
 /**
  * determines the type of link, only parent link type can be determined now
+ * @TODO refactor this once such data is directly available from {@link Link}
  * @param span
  * @param link
  */
@@ -143,9 +144,11 @@ export function toCollectorLinkType(
   link: Link
 ): collectorTypes.LinkType {
   const linkSpanId = link.spanContext.spanId;
+  const linkTraceId = link.spanContext.traceId;
   const spanParentId = span.parentSpanId;
+  const spanTraceId = span.spanContext.traceId;
 
-  if (linkSpanId === spanParentId) {
+  if (linkSpanId === spanParentId && linkTraceId === spanTraceId) {
     return LINK_TYPE_PARENT_LINKED_SPAN;
   }
 
