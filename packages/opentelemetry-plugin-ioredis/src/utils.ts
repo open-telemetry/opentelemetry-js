@@ -87,18 +87,13 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           .then((result: unknown) => {
             // Return a pass-along promise which ends the span and then goes to user's orig resolvers
             return new Promise((resolve, _) => {
-              span.setStatus({ code: CanonicalCode.OK });
-              span.end();
+              endSpan(span, null);
               resolve(result);
             });
           })
           .catch((error: Error) => {
             return new Promise((_, reject) => {
-              span.setStatus({
-                code: CanonicalCode.UNKNOWN,
-                message: error.message,
-              });
-              span.end();
+              endSpan(span, error);
               reject(error);
             });
           });
