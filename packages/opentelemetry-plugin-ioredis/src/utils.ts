@@ -80,7 +80,9 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           throw rethrow; // rethrow after ending span
         }
       } else if (originalPromise) {
+        // Perform the original query
         const result = original.apply(this, arguments);
+        // Bind promise to parent span and end the span
         return result
           .then((result: unknown) => {
             // Return a pass-along promise which ends the span and then goes to user's orig resolvers
