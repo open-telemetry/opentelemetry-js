@@ -43,7 +43,7 @@ describe('CollectorExporter - web', () => {
       hostName: 'foo',
       logger: new NoopLogger(),
       serviceName: 'bar',
-      spanAttributes: {},
+      attributes: {},
       url: 'http://foo.bar.com',
     };
     collectorExporter = new CollectorExporter(collectorExporterConfig);

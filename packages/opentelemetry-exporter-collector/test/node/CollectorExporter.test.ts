@@ -55,7 +55,7 @@ describe('CollectorExporter - node', () => {
         hostName: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
-        spanAttributes: {},
+        attributes: {},
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorExporter(collectorExporterConfig);
@@ -77,7 +77,7 @@ describe('CollectorExporter - node', () => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
-        assert.deepStrictEqual(options.headers, { 'Content-Length': 1901 });
+        assert.deepStrictEqual(options.headers, { 'Content-Length': 1917 });
         done();
       });
     });

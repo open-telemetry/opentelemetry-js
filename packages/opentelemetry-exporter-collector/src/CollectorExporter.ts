@@ -31,7 +31,7 @@ export interface CollectorExporterConfig {
   hostName?: string;
   logger?: Logger;
   serviceName?: string;
-  spanAttributes?: Attributes;
+  attributes?: Attributes;
   url?: string;
 }
 
@@ -46,6 +46,7 @@ export class CollectorExporter implements SpanExporter {
   readonly url: string;
   readonly logger: Logger;
   readonly hostName: string | undefined;
+  readonly attributes?: Attributes;
   private _isShutdown: boolean = false;
 
   /**
@@ -57,6 +58,8 @@ export class CollectorExporter implements SpanExporter {
     if (typeof config.hostName === 'string') {
       this.hostName = config.hostName;
     }
+
+    this.attributes = config.attributes;
 
     this.logger = config.logger || new NoopLogger();
 

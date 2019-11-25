@@ -206,7 +206,7 @@ export interface Node {
   serviceInfo?: ServiceInfo;
 
   /** Additional attributes. */
-  attributes?: { [key: string]: string };
+  attributes?: { [key: string]: unknown };
 }
 
 /**

@@ -69,7 +69,7 @@ export function sendSpans(
       serviceInfo: {
         name: collectorExporter.serviceName,
       },
-      // attributes: {}
+      attributes: collectorExporter.attributes,
     },
     // resource: '', not implemented
     spans,
