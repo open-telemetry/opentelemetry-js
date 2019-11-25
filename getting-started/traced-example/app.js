@@ -9,6 +9,7 @@ const app = express();
 
 app.get("/", (req, res) => {
   axios.get(`http://localhost:${PORT}/middle-tier`)
+    .then(() => axios.get(`http://localhost:${PORT}/middle-tier`))
     .then((result) => {
       res.send(result.data)
     })
@@ -20,6 +21,7 @@ app.get("/", (req, res) => {
 
 app.get("/middle-tier", (req, res) => {
   axios.get(`http://localhost:${PORT}/backend`)
+    .then(() => axios.get(`http://localhost:${PORT}/backend`))
     .then((result) => {
       res.send(result.data)
     })

@@ -5,7 +5,9 @@ const PORT = process.env.PORT || "8080";
 const express = require("express");
 const axios = require("axios");
 
+const { countAllRequests } = require("./monitoring");
 const app = express();
+app.use(countAllRequests());
 
 app.get("/", (req, res) => {
   axios.get(`http://localhost:${PORT}/middle-tier`)

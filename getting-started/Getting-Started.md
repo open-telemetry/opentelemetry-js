@@ -10,10 +10,10 @@ This guide will walk you through the setup and configuration process for a traci
         3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
 2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
     1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
-    2. TODO [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
-        1. TODO [Initialize a global meter](#initialize-a-global-meter)
-        2. TODO [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
-        3. TODO [Create and keep updated any metrics you wish to collect](#create-and-keep-updated-any-metrics-you-wish-to-collect)
+    2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+        1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
+        2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
+        3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
 
 ## Tracing Your Application with OpenTelemetry
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
@@ -169,6 +169,121 @@ level=info ts=2019-11-21T20:39:40.383Z caller=main.go:626 msg="Server is ready t
 <p align="center"><img src="./images/prometheus.png?raw=true"/></p>
 
 ### Monitor Your NodeJS Application
-#### Initialize a global meter
+
+An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with metric monitoring enabled in the [monitored-example directory](monitored-example).
+
+1. Install the required OpenTelemetry metrics libraries
+2. Initialize a meter and collect metrics
+3. Initialize and register a metrics exporter
+
+#### Install the required OpenTelemetry metrics libraries
+To create metrics on NodeJS, you will need `@opentelemetry/metrics`.
+
+```sh
+$ npm install \
+  @opentelemetry/metrics
+```
+
+#### Initialize a meter and collect metrics
+In order to create and monitor metrics, we will need a `Meter`. In OpenTelemetry, a `Meter` is the mechanism used to create and manage metrics, labels, and metric exporters.
+
+Create a file named `monitoring.js` and add the following code:
+
+```javascript
+'use strict';
+
+const { Meter } = require("@opentelemetry/metrics");
+
+const meter = new Meter();
+```
+
+Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so that it looks like this:
+
+```javascript
+'use strict';
+
+const { Meter } = require("@opentelemetry/metrics");
+
+const meter = new Meter();
+
+const requestCount = meter.createCounter("requests", {
+  monotonic: true,
+  labelKeys: ["route"],
+  description: "Count all incoming requests"
+});
+
+const handles = new Map();
+
+module.exports.countAllRequests = () => {
+  return (req, res, next) => {
+    if (!handles.has(req.path)) {
+      const labelSet = meter.labels({ route: req.path });
+      const handle = requestCount.getHandle(labelSet);
+      handles.set(req.path, handle);
+    }
+
+    handles.get(req.path).add(1);
+    next();
+  };
+};
+```
+
+Now let's import and use this middleware in our application code:
+
+```javascript
+const { countAllRequests } = require("./monitoring");
+const app = express();
+app.use(countAllRequests());
+```
+
+Now, when we make requests to our service our meter will count all requests.
+
+**Note**: Creating a new `labelSet` and `handle` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why handles are created and stored in a `Map` according to the route key.
+
 #### Initialize and register a metrics exporter
-#### Create and keep updated any metrics you wish to collect
+Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
+
+```sh
+$ npm install @opentelemetry/exporter-prometheus
+```
+
+Next, modify your `monitoring.js` file to look like this:
+
+```javascript
+"use strict";
+
+const { Meter } = require("@opentelemetry/metrics");
+const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+
+const meter = new Meter();
+
+meter.addExporter(
+  new PrometheusExporter(
+    { startServer: true },
+    () => {
+      console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
+    }
+  )
+);
+
+const requestCount = meter.createCounter("requests", {
+  monotonic: true,
+  labelKeys: ["route"],
+  description: "Count all incoming requests"
+});
+
+const handles = new Map();
+
+module.exports.countAllRequests = () => {
+  return (req, res, next) => {
+    if (!handles.has(req.path)) {
+      const labelSet = meter.labels({ route: req.path });
+      const handle = requestCount.getHandle(labelSet);
+      handles.set(req.path, handle);
+    }
+
+    handles.get(req.path).add(1);
+    next();
+  };
+};
+```
