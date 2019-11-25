@@ -40,7 +40,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
     const parentSpan = tracer.getCurrentSpan();
 
     if (arguments.length === 1 && typeof cmd === 'object') {
-      const span = tracer.startSpan(`${IORedisPlugin.COMPONENT}-${cmd.name}`, {
+      const span = tracer.startSpan(cmd.name, {
         kind: SpanKind.CLIENT,
         parent: parentSpan || undefined,
         attributes: {
@@ -52,9 +52,12 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
 
       // Set attributes for not explicitly typed IORedisPluginClientTypes
       if (this.options) {
+        const { host } = this.options;
+        const { port } = this.options;
         span.setAttributes({
-          [AttributeNames.PEER_HOSTNAME]: this.options.host,
-          [AttributeNames.PEER_PORT]: this.options.port,
+          [AttributeNames.PEER_HOSTNAME]: host,
+          [AttributeNames.PEER_PORT]: port,
+          [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
         });
       }
 
@@ -69,8 +72,16 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           endSpan(span, err);
           return originalCallback.apply(this, arguments);
         };
+        try {
+          // Span will be ended in callback
+          return original.apply(this, arguments);
+        } catch (rethrow) {
+          endSpan(span, rethrow);
+          throw rethrow; // rethrow after ending span
+        }
       } else if (originalPromise) {
-        return originalPromise
+        const result = original.apply(this, arguments);
+        return result
           .then((result: unknown) => {
             // Return a pass-along promise which ends the span and then goes to user's orig resolvers
             return new Promise((resolve, _) => {
@@ -89,13 +100,6 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
               reject(error);
             });
           });
-      }
-      try {
-        // Span will be ended in callback
-        return original.apply(this, arguments);
-      } catch (rethrow) {
-        endSpan(span, rethrow);
-        throw rethrow; // rethrow after ending span
       }
     }
 
