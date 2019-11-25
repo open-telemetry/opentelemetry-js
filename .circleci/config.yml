@@ -12,11 +12,11 @@ node_test_env: &node_test_env
   OPENTELEMETRY_REDIS_HOST: 'localhost'
   OPENTELEMETRY_REDIS_PORT: 6379
   MONGODB_HOST: localhost
-  MONGODB_PORT: 27017
   MONGODB_DB: opentelemetry-tests
+  MONGODB_PORT: 27017
   MYSQL_USER: otel
-  MYSQL_DATABASE: circle_database
   MYSQL_PASSWORD: secret
+  MYSQL_DATABASE: circle_database
   MYSQL_PORT: 3306
 
 postgres_service: &postgres_service
@@ -33,10 +33,10 @@ mongo_service: &mongo_service
 mysql_service: &mysql_service
   image: circleci/mysql:5.7
   environment:
-    MYSQL_ROOT_PASSWORD: rootpw
-    MYSQL_DATABASE: circle_database
     MYSQL_USER: otel
     MYSQL_PASSWORD: secret
+    MYSQL_DATABASE: circle_database
+    MYSQL_ROOT_PASSWORD: rootpw
 
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
