@@ -107,7 +107,8 @@ export function toCollectorEvents(
         annotation.attributes = attributes;
       }
 
-      // const messageEvent: MessageEvent;
+      // @TODO convert from event.attributes into appropriate MessageEvent
+      // const messageEvent: collectorTypes.MessageEvent;
 
       const timeEvent: collectorTypes.TimeEvent = {
         time: hrTimeToTimeStamp(event.time),

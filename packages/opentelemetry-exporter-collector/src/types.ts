@@ -173,6 +173,43 @@ export const enum LinkType {
 }
 
 /**
+ * An event describing a message sent/received between Spans.
+ */
+export interface MessageEvent {
+  /**
+   * The type of MessageEvent. Indicates whether the message was sent or
+   * received.
+   */
+  type?: MessageEventType;
+  /**
+   * An identifier for the MessageEvent's message that can be used to match SENT
+   * and RECEIVED MessageEvents. For example, this field could represent a
+   * sequence ID for a streaming RPC. It is recommended to be unique within a
+   * Span.
+   */
+  id?: string | number;
+  /**
+   * The number of uncompressed bytes sent or received.
+   */
+  uncompressedSize?: string | number;
+  /**
+   * The number of compressed bytes sent or received. If zero, assumed to be the
+   * same size as uncompressed.
+   */
+  compressedSize?: string | number;
+}
+
+/** Indicates whether the message was sent or received. */
+export const enum MessageEventType {
+  /** Unknown message event type. */
+  MESSAGE_EVENT_TYPE_UNSPECIFIED,
+  /** Indicates a sent message. */
+  MESSAGE_EVENT_TYPE_SENT,
+  /** Indicates a received message. */
+  MESSAGE_EVENT_TYPE_RECEIVED,
+}
+
+/**
  * A description of a binary module.
  */
 export interface Module {
