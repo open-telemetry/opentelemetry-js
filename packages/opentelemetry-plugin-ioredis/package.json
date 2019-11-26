@@ -47,7 +47,7 @@
     "@opentelemetry/tracing": "^0.2.0",
     "@types/ioredis": "^4.0.19",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.12",
+    "@types/node": "^12.12.14",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
