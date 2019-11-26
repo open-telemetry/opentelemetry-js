@@ -4,7 +4,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides automatic instrumentation for [`ioredis@^4.14.0`](https://github.com/luin/ioredis).
+This module provides automatic instrumentation for [`ioredis`](https://github.com/luin/ioredis).
 
 For automatic instrumentation see the
 [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) package.
@@ -16,7 +16,7 @@ npm install --save @opentelemetry/plugin-ioredis
 ```
 
 ### Supported Versions
- - `>=4.14.0`
+ - `>=2.0.0`
 
 ## Usage
 
