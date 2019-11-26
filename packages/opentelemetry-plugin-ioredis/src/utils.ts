@@ -42,7 +42,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
     if (arguments.length === 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(cmd.name, {
         kind: SpanKind.CLIENT,
-        parent: parentSpan || undefined,
+        parent: parentSpan ?? undefined,
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
           [AttributeNames.DB_TYPE]: 'redis',
