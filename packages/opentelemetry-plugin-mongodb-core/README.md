@@ -25,7 +25,7 @@ const { NodeTracer } = require('@opentelemetry/node');
 
 const tracer = new NodeTracer({
   plugins: {
-    http: {
+    'mongodb-core': {
       enabled: true,
       // You may use a package name or absolute path to the file.
       path: '@opentelemetry/plugin-mongodb-core',
