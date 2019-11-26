@@ -74,9 +74,9 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         try {
           // Span will be ended in callback
           return original.apply(this, arguments);
-        } catch (rethrow) {
-          endSpan(span, rethrow);
-          throw rethrow; // rethrow after ending span
+        } catch (error) {
+          endSpan(span, error);
+          throw error;
         }
       } else if (originalPromise) {
         // Perform the original query
