@@ -44,6 +44,6 @@ Each exporter must implement `MetricExporter`, which contain `export` and `shutd
 
 Please refer to the [Prometheus Exporter][prometheus-exporter] for more comprehensive examples.
 
-[zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-zipkin/src/zipkin.ts
-[jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-jaeger/src/jaeger.ts
-[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-prometheus/src/prometheus.ts
+[zipkin-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-zipkin
+[jaeger-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-jaeger
+[prometheus-exporter]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-exporter-prometheus
