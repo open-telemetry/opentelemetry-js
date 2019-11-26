@@ -168,6 +168,21 @@ level=info ts=2019-11-21T20:39:40.383Z caller=main.go:626 msg="Server is ready t
 
 <p align="center"><img src="./images/prometheus.png?raw=true"/></p>
 
+Once we know prometheus starts, replace the contents of `prometheus.yml` with the following:
+
+```yaml
+# my global config
+global:
+  scrape_interval:     15s # Set the scrape interval to every 15 seconds.
+
+scrape_configs:
+  - job_name: 'opentelemetry'
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+    static_configs:
+    - targets: ['localhost:9464']
+```
+
 ### Monitor Your NodeJS Application
 
 An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with metric monitoring enabled in the [monitored-example directory](monitored-example).
@@ -287,3 +302,29 @@ module.exports.countAllRequests = () => {
   };
 };
 ```
+
+Ensure prometheus is running by running the `prometheus` binary from earlier and start your application.
+
+```sh
+$ npm start
+
+> @opentelemetry/getting-started@1.0.0 start /App/opentelemetry-js/getting-started/monitored-example
+> node app.js
+
+prometheus scrape endpoint: http://localhost:9464/metrics
+Listening for requests on http://localhost:8080
+```
+
+Now, each time you browse to <http://localhost:8080> you should see "Hello from the backend" in your browser and your metrics in prometheus should update. You can verify the current metrics by browsing to <http://localhost:9464/metrics>, which should look like this:
+
+```
+# HELP requests Count all incoming requests
+# TYPE requests counter
+requests{route="/"} 1
+requests{route="/middle-tier"} 2
+requests{route="/backend"} 4
+```
+
+You should also be able to see gathered metrics in your prometheus web UI.
+
+<p align="center"><img src="./images/prometheus-graph.png?raw=true"/></p>
