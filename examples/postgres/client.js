@@ -3,7 +3,7 @@
 // set up ot
 const opentelemetry = require('@opentelemetry/core');
 const config = require('./setup');
-config.setupTracerAndExporters('porgres-client-service');
+config.setupTracerAndExporters('postgres-client-service');
 const http = require('http');
 const tracer = opentelemetry.getTracer();
 
