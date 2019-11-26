@@ -32,7 +32,7 @@ const memoryExporter = new InMemorySpanExporter();
 
 const CONFIG = {
   host: process.env.OPENTELEMETRY_REDIS_HOST || 'localhost',
-  port: process.env.OPENTELEMETRY_REDIS_PORT || '63790',
+  port: process.env.OPENTELEMETRY_REDIS_PORT || 63790,
 };
 
 const URL = `redis://${CONFIG.host}:${CONFIG.port}`;
@@ -106,7 +106,7 @@ describe('ioredis', () => {
   describe('#send_internal_message()', () => {
     let client: ioredisTypes.Redis;
 
-    const REDIS_OPERATIONS: Array<{
+    const IOREDIS_CALLBACK_OPERATIONS: Array<{
       description: string;
       command: string;
       method: (cb: ioredisTypes.CallbackFunction<unknown>) => unknown;
@@ -120,14 +120,8 @@ describe('ioredis', () => {
       {
         description: 'get',
         command: 'get',
-        method: (cb: ioredisTypes.CallbackFunction<string|null>) =>
+        method: (cb: ioredisTypes.CallbackFunction<string | null>) =>
           client.get('test', cb),
-      },
-      {
-        description: 'delete',
-        command: 'del',
-        method: (cb: ioredisTypes.CallbackFunction<number>) =>
-          client.del('test'),
       },
     ];
 
@@ -154,7 +148,102 @@ describe('ioredis', () => {
     });
 
     describe('Instrumenting query operations', () => {
-      REDIS_OPERATIONS.forEach(operation => {
+      it('should create a child span for hset promise', done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_TYPE]: 'redis',
+          [AttributeNames.DB_STATEMENT]: 'hset hash random random',
+        };
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, async () => {
+          try {
+            await client.hset('hash', 'random', 'random');
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 2);
+            assert.strictEqual(endedSpans[0].name, `hset`);
+            assertionUtils.assertSpan(
+              endedSpans[0],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+            done();
+          } catch (error) {
+            assert.ifError(error);
+            done();
+          }
+        });
+      });
+
+      it('should create a child span for get promise', done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_TYPE]: 'redis',
+          [AttributeNames.DB_STATEMENT]: 'get test',
+        };
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, async () => {
+          try {
+            const value = await client.get('test');
+            assert.strictEqual(value, 'data');
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 2);
+            assert.strictEqual(endedSpans[0].name, `get`);
+            assertionUtils.assertSpan(
+              endedSpans[0],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+            done();
+          } catch (error) {
+            assert.ifError(error);
+            done();
+          }
+        });
+      });
+
+      it('should create a child span for del', done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_TYPE]: 'redis',
+          [AttributeNames.DB_STATEMENT]: 'del test',
+        };
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, async () => {
+          try {
+            const result = await client.del('test');
+            assert.strictEqual(result, 1);
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 2);
+            assert.strictEqual(endedSpans[0].name, 'del');
+            assertionUtils.assertSpan(
+              endedSpans[0],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+            done();
+          } catch (error) {
+            assert.ifError(error);
+            done();
+          }
+        });
+      });
+
+      IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
         it(`should create a child span for ${operation.description}`, done => {
           const attributes = {
             ...DEFAULT_ATTRIBUTES,
@@ -192,7 +281,7 @@ describe('ioredis', () => {
         plugin.disable();
       });
 
-      REDIS_OPERATIONS.forEach(operation => {
+      IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
         it(`should not create a child span for ${operation.description}`, done => {
           const span = tracer.startSpan('test span');
           tracer.withSpan(span, () => {
