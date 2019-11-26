@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -25,7 +25,11 @@ import {
 } from '../../src/CollectorExporter';
 import * as collectorTypes from '../../src/types';
 
-import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import {
+  ensureExportTraceServiceRequestIsSet,
+  ensureSpanIsCorrect,
+  mockedReadableSpan,
+} from '../helper';
 
 const fakeRequest = {
   end: function() {},
@@ -53,7 +57,7 @@ describe('CollectorExporter - node', () => {
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
         hostName: 'foo',
-        logger: new NoopLogger(),
+        logger: new core.NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
@@ -94,6 +98,8 @@ describe('CollectorExporter - node', () => {
         if (span1) {
           ensureSpanIsCorrect(span1);
         }
+
+        ensureExportTraceServiceRequestIsSet(json, 6);
 
         done();
       });

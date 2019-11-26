@@ -92,7 +92,7 @@ export function sendSpans(
 }
 
 /**
- *
+ * function to send spans using browser navigator.sendBeacon
  * @param body
  * @param onSuccess
  * @param onError
@@ -116,7 +116,8 @@ function sendSpansWithBeacon(
 }
 
 /**
- *
+ * function to send spans using browser XMLHttpRequest
+ *     used when navigator.sendBeacon is not available
  * @param body
  * @param onSuccess
  * @param onError

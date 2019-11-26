@@ -18,10 +18,8 @@ import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Attributes, Logger } from '@opentelemetry/types';
-
 import * as collectorTypes from './types';
 import { toCollectorSpan } from './transform';
-
 import { onInit, onShutdown, sendSpans } from './platform/index';
 
 /**

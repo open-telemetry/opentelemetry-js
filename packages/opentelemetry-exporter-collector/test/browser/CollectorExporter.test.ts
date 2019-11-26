@@ -24,7 +24,11 @@ import {
 } from '../../src/CollectorExporter';
 import * as collectorTypes from '../../src/types';
 
-import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import {
+  ensureExportTraceServiceRequestIsSet,
+  ensureSpanIsCorrect,
+  mockedReadableSpan,
+} from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorExporter - web', () => {
@@ -80,6 +84,9 @@ describe('CollectorExporter - web', () => {
           assert.strictEqual(spyBeacon.callCount, 1);
 
           assert.strictEqual(spyOpen.callCount, 0);
+
+          ensureExportTraceServiceRequestIsSet(json, 10);
+
           done();
         });
       });
@@ -149,6 +156,9 @@ describe('CollectorExporter - web', () => {
             ensureSpanIsCorrect(span1);
           }
           assert.strictEqual(spyBeacon.callCount, 0);
+
+          ensureExportTraceServiceRequestIsSet(json, 10);
+
           done();
         });
       });

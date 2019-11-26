@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/exporter-collector",
   "version": "0.2.0",
-  "description": "OpenTelemetry Exporter Collector for Web and Node",
+  "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",

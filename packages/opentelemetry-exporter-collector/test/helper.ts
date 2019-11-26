@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as transform from '../src/transform';
 import * as collectorTypes from '../src/types';
+import { VERSION } from '../src/version';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -166,4 +168,28 @@ export function ensureSpanIsCorrect(span: collectorTypes.Span) {
       ],
     },
   });
+}
+
+export function ensureExportTraceServiceRequestIsSet(
+  json: collectorTypes.ExportTraceServiceRequest,
+  languageInfo: collectorTypes.LibraryInfoLanguage
+) {
+  const libraryInfo = json.node && json.node.libraryInfo;
+  const serviceInfo = json.node && json.node.serviceInfo;
+  const identifier = json.node && json.node.identifier;
+
+  const language = libraryInfo && libraryInfo.language;
+  assert.strictEqual(language, languageInfo, 'language is missing');
+
+  const exporterVersion = libraryInfo && libraryInfo.exporterVersion;
+  assert.strictEqual(exporterVersion, VERSION, 'version is missing');
+
+  const coreVersion = libraryInfo && libraryInfo.coreLibraryVersion;
+  assert.strictEqual(coreVersion, core.VERSION, 'core version is missing');
+
+  const name = serviceInfo && serviceInfo.name;
+  assert.strictEqual(name, 'bar', 'name is missing');
+
+  const hostName = identifier && identifier.hostName;
+  assert.strictEqual(hostName, 'foo', 'hostName is missing');
 }
