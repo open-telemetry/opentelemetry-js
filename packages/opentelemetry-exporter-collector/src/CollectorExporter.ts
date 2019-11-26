@@ -109,7 +109,6 @@ export class CollectorExporter implements SpanExporter {
   }
 
   /**
-  /**
    * Shutdown the exporter.
    */
   shutdown(): void {
