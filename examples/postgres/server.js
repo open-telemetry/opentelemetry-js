@@ -4,7 +4,7 @@
 const opentelemetry = require('@opentelemetry/core');
 const { SpanKind, CanonicalCode } = require('@opentelemetry/types');
 const config = require('./setup');
-config.setupTracerAndExporters('porgres-server-service');
+config.setupTracerAndExporters('postgres-server-service');
 const tracer = opentelemetry.getTracer();
 
 // set up pg
@@ -57,5 +57,4 @@ const port = 3000;
 app.listen(port, function() {
   console.log(`Node HTTP listening on ${port}`);
 });
-
 
