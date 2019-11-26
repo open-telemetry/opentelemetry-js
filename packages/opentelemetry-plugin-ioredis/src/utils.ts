@@ -52,8 +52,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
 
       // Set attributes for not explicitly typed IORedisPluginClientTypes
       if (this.options) {
-        const { host } = this.options;
-        const { port } = this.options;
+        const { host, port } = this.options;
         span.setAttributes({
           [AttributeNames.PEER_HOSTNAME]: host,
           [AttributeNames.PEER_PORT]: port,
