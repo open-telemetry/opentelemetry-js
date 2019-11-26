@@ -21,10 +21,6 @@ import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;
 
-const LINK_TYPE_UNSPECIFIED: collectorTypes.LinkTypeUnspecified = 0;
-// const LINK_TYPE_CHILD_LINKED_SPAN: collectorTypes.LinkTypeChildLinkedSpan = 1;
-const LINK_TYPE_PARENT_LINKED_SPAN: collectorTypes.LinkTypeParentLinkedSpan = 2;
-
 /**
  * convert string to maximum length of 128, providing information of truncated bytes
  * @param name - string to be converted
@@ -149,10 +145,9 @@ export function toCollectorLinkType(
   const spanTraceId = span.spanContext.traceId;
 
   if (linkSpanId === spanParentId && linkTraceId === spanTraceId) {
-    return LINK_TYPE_PARENT_LINKED_SPAN;
+    return collectorTypes.LinkType.PARENT_LINKED_SPAN;
   }
-
-  return LINK_TYPE_UNSPECIFIED;
+  return collectorTypes.LinkType.UNSPECIFIED;
 }
 
 /**

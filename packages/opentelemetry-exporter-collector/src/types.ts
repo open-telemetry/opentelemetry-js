@@ -157,22 +157,20 @@ export interface Links {
 }
 
 /**
- * The relationship of the two spans is unknown, or known but other than
- * parent-child.
- */
-export type LinkTypeUnspecified = 0;
-/** The linked span is a child of the current span. */
-export type LinkTypeChildLinkedSpan = 1;
-/** The linked span is a parent of the current span. */
-export type LinkTypeParentLinkedSpan = 2;
-/**
  * The relationship of the current span relative to the linked span: child,
  * parent, or unspecified.
  */
-export type LinkType =
-  | LinkTypeUnspecified
-  | LinkTypeChildLinkedSpan
-  | LinkTypeParentLinkedSpan;
+export const enum LinkType {
+  /**
+   * The relationship of the two spans is unknown, or known but other than
+   * parent-child.
+   */
+  UNSPECIFIED,
+  /** The linked span is a child of the current span. */
+  CHILD_LINKED_SPAN,
+  /** The linked span is a parent of the current span. */
+  PARENT_LINKED_SPAN,
+}
 
 /**
  * A description of a binary module.
