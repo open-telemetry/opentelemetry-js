@@ -19,7 +19,7 @@ import { SpanKind, Status } from '@opentelemetry/types';
 /**
  * {@link https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/agent/common/v1/common.proto#L66}
  */
-export enum LibraryInfoLanguage {
+export const enum LibraryInfoLanguage {
   LANGUAGE_UNSPECIFIED = 0,
   NODE_JS = 6,
   WEB_JS = 10,
