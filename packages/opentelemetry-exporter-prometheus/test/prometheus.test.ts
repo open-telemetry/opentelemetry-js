@@ -37,7 +37,7 @@ describe('PrometheusExporter', () => {
         () => {
           const url = `http://localhost:${port}${endpoint}`;
           http.get(url, function(res: any) {
-            assert.equal(res.statusCode, 200);
+            assert.strictEqual(res.statusCode, 200);
             exporter.shutdown(() => {
               return done();
             });
@@ -72,7 +72,7 @@ describe('PrometheusExporter', () => {
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, function(res: any) {
-          assert.equal(res.statusCode, 200);
+          assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
           });
@@ -92,7 +92,7 @@ describe('PrometheusExporter', () => {
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, function(res: any) {
-          assert.equal(res.statusCode, 200);
+          assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
           });
@@ -112,7 +112,7 @@ describe('PrometheusExporter', () => {
       exporter.startServer(() => {
         const url = `http://localhost:${port}/metric`;
         http.get(url, function(res: any) {
-          assert.equal(res.statusCode, 200);
+          assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             const exporter2 = new PrometheusExporter({
               port,
@@ -122,7 +122,7 @@ describe('PrometheusExporter', () => {
             exporter2.startServer(() => {
               const url = `http://localhost:${port}/metric`;
               http.get(url, function(res: any) {
-                assert.equal(res.statusCode, 200);
+                assert.strictEqual(res.statusCode, 200);
                 exporter2.stopServer(() => {
                   return done();
                 });
@@ -144,7 +144,7 @@ describe('PrometheusExporter', () => {
         const url = `http://localhost:${port}/invalid`;
 
         http.get(url, function(res: any) {
-          assert.equal(res.statusCode, 404);
+          assert.strictEqual(res.statusCode, 404);
           exporter.shutdown(() => {
             return done();
           });
@@ -199,7 +199,7 @@ describe('PrometheusExporter', () => {
                   '# HELP counter a test description'
                 );
 
-                assert.deepEqual(lines, [
+                assert.deepStrictEqual(lines, [
                   '# HELP counter a test description',
                   '# TYPE counter counter',
                   'counter{key1="labelValue1"} 20',
@@ -229,7 +229,7 @@ describe('PrometheusExporter', () => {
               const body = chunk.toString();
               const lines = body.split('\n');
 
-              assert.deepEqual(lines, [
+              assert.deepStrictEqual(lines, [
                 '# HELP gauge a test description',
                 '# TYPE gauge gauge',
                 'gauge{key1="labelValue1"} 10',
@@ -263,7 +263,7 @@ describe('PrometheusExporter', () => {
               const body = chunk.toString();
               const lines = body.split('\n');
 
-              assert.deepEqual(lines, [
+              assert.deepStrictEqual(lines, [
                 '# HELP gauge a test description',
                 '# TYPE gauge gauge',
                 'gauge{gaugeKey1="labelValue1"} 10',
@@ -289,7 +289,7 @@ describe('PrometheusExporter', () => {
               const body = chunk.toString();
               const lines = body.split('\n');
 
-              assert.deepEqual(lines, ['# no registered metrics']);
+              assert.deepStrictEqual(lines, ['# no registered metrics']);
 
               done();
             });
@@ -310,7 +310,7 @@ describe('PrometheusExporter', () => {
               const body = chunk.toString();
               const lines = body.split('\n');
 
-              assert.deepEqual(lines, [
+              assert.deepStrictEqual(lines, [
                 '# HELP gauge description missing',
                 '# TYPE gauge gauge',
                 'gauge 10',
@@ -335,7 +335,7 @@ describe('PrometheusExporter', () => {
               const body = chunk.toString();
               const lines = body.split('\n');
 
-              assert.deepEqual(lines, [
+              assert.deepStrictEqual(lines, [
                 '# HELP gauge_bad_name description missing',
                 '# TYPE gauge_bad_name gauge',
                 'gauge_bad_name 10',
@@ -362,7 +362,7 @@ describe('PrometheusExporter', () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
-              assert.deepEqual(chunk.toString().split('\n'), [
+              assert.deepStrictEqual(chunk.toString().split('\n'), [
                 '# HELP counter a test description',
                 '# TYPE counter gauge',
                 'counter{key1="labelValue1"} 20',
@@ -410,7 +410,7 @@ describe('PrometheusExporter', () => {
                 const body = chunk.toString();
                 const lines = body.split('\n');
 
-                assert.deepEqual(lines, [
+                assert.deepStrictEqual(lines, [
                   '# HELP test_prefix_gauge description missing',
                   '# TYPE test_prefix_gauge gauge',
                   'test_prefix_gauge 10',
@@ -438,7 +438,7 @@ describe('PrometheusExporter', () => {
                 const body = chunk.toString();
                 const lines = body.split('\n');
 
-                assert.deepEqual(lines, [
+                assert.deepStrictEqual(lines, [
                   '# HELP gauge description missing',
                   '# TYPE gauge gauge',
                   'gauge 10',
@@ -466,7 +466,7 @@ describe('PrometheusExporter', () => {
                 const body = chunk.toString();
                 const lines = body.split('\n');
 
-                assert.deepEqual(lines, [
+                assert.deepStrictEqual(lines, [
                   '# HELP gauge description missing',
                   '# TYPE gauge gauge',
                   'gauge 10',
