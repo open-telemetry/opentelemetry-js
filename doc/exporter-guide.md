@@ -2,7 +2,7 @@
 
 An exporter sends traces and metrics to any backend that is capable of consuming them. With OpenTelemetry, you can easily add and remove any exporter without requiring changes to your application code.
 
-We provide support for several open source backends and vendors out-of-the-box like Zipkin, Jaeger, and Prometheus, but OpenTelemetry exporters follow a public interface can be implemented by anyone. This document describes the process for developers to create their own exporter if the provided ones do not meet their needs.
+We provide support for several open source backends and vendors out-of-the-box like Zipkin, Jaeger, and Prometheus, but OpenTelemetry exporters follow a public interface which can be implemented by anyone. This document describes the process for developers to create their own exporter if the provided ones do not meet their needs.
 
 A typical package layout:
 
