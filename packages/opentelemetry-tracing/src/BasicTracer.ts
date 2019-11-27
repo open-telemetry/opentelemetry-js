@@ -115,11 +115,11 @@ export class BasicTracer implements types.Tracer {
    *
    * If there is no Span associated with the current context, null is returned.
    */
-  getCurrentSpan(): types.Span | null {
+  getCurrentSpan(): types.Span | undefined {
     // Get the current Span from the context or null if none found.
     const current = this._scopeManager.active();
     if (current === null || current === undefined) {
-      return null;
+      return;
     } else {
       return current as types.Span;
     }
@@ -174,7 +174,7 @@ export class BasicTracer implements types.Tracer {
   }
 
   private _getParentSpanContext(
-    parent: types.Span | types.SpanContext | undefined
+    parent?: types.Span | types.SpanContext | null
   ): types.SpanContext | undefined {
     if (!parent) return undefined;
 
