@@ -396,7 +396,7 @@ describe('pg@7.x', () => {
 
     it('should preserve correct context even when using the same callback in client.query()', done => {
       const spans = [tracer.startSpan('span 1'), tracer.startSpan('span 2')];
-      const currentSpans: (Span | null)[] = [];
+      const currentSpans: (Span | undefined)[] = [];
       const queryHandler = () => {
         currentSpans.push(tracer.getCurrentSpan());
         if (currentSpans.length === 2) {
@@ -415,7 +415,7 @@ describe('pg@7.x', () => {
 
     it('should preserve correct context even when using the same promise resolver in client.query()', done => {
       const spans = [tracer.startSpan('span 1'), tracer.startSpan('span 2')];
-      const currentSpans: (Span | null)[] = [];
+      const currentSpans: (Span | undefined)[] = [];
       const queryHandler = () => {
         currentSpans.push(tracer.getCurrentSpan());
         if (currentSpans.length === 2) {
