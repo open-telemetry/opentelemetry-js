@@ -32,6 +32,7 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   grpc: { enabled: true, path: '@opentelemetry/plugin-grpc' },
   http: { enabled: true, path: '@opentelemetry/plugin-http' },
   https: { enabled: true, path: '@opentelemetry/plugin-https' },
+  mysql: { enabled: true, path: '@opentelemetry/plugin-mysql' },
   pg: { enabled: true, path: '@opentelemetry/plugin-pg' },
   redis: { enabled: true, path: '@opentelemetry/plugin-redis' },
 };
