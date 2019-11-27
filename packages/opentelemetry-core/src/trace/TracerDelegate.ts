@@ -48,7 +48,7 @@ export class TracerDelegate implements types.Tracer {
 
   // -- Tracer interface implementation below -- //
 
-  getCurrentSpan(): types.Span | null {
+  getCurrentSpan(): types.Span | undefined {
     return this._currentTracer.getCurrentSpan.apply(
       this._currentTracer,
       // tslint:disable-next-line:no-any
