@@ -59,7 +59,7 @@ const resources = [
     domainLookupEnd: 20.985000010114163,
     connectStart: 20.985000010114163,
     connectEnd: 20.985000010114163,
-    secureConnectionStart: 0,
+    secureConnectionStart: 20.985000010114163,
     requestStart: 29.28999997675419,
     responseStart: 31.88999998383224,
     responseEnd: 111.93499999353662,
@@ -83,13 +83,39 @@ const resources = [
     domainLookupEnd: 1998.5950000118464,
     connectStart: 1998.5950000118464,
     connectEnd: 1998.5950000118464,
-    secureConnectionStart: 0,
+    secureConnectionStart: 1998.5950000118464,
     requestStart: 2001.7900000093505,
     responseStart: 2002.3700000019744,
     responseEnd: 2002.8049999964423,
     transferSize: 368,
     encodedBodySize: 79,
     decodedBodySize: 79,
+    serverTiming: [],
+  },
+];
+const resourcesNoSecureConnectionStart = [
+  {
+    name: 'http://localhost:8090/bundle.js',
+    entryType: 'resource',
+    startTime: 20.985000010114163,
+    duration: 90.94999998342246,
+    initiatorType: 'script',
+    nextHopProtocol: 'http/1.1',
+    workerStart: 0,
+    redirectStart: 0,
+    redirectEnd: 0,
+    fetchStart: 20.985000010114163,
+    domainLookupStart: 20.985000010114163,
+    domainLookupEnd: 20.985000010114163,
+    connectStart: 20.985000010114163,
+    connectEnd: 20.985000010114163,
+    secureConnectionStart: 0,
+    requestStart: 29.28999997675419,
+    responseStart: 31.88999998383224,
+    responseEnd: 111.93499999353662,
+    transferSize: 1446645,
+    encodedBodySize: 1446396,
+    decodedBodySize: 1446396,
     serverTiming: [],
   },
 ];
@@ -389,6 +415,44 @@ describe('DocumentLoad Plugin', () => {
         ensureNetworkEventsExists(srEvents2);
 
         assert.strictEqual(spyOnEnd.callCount, 4);
+        done();
+      });
+    });
+  });
+  describe('when resource entries are available AND secureConnectionStart is 0', () => {
+    let spyEntries: any;
+    beforeEach(() => {
+      spyEntries = sinon.stub(window.performance, 'getEntriesByType');
+      spyEntries.withArgs('navigation').returns([entries]);
+      spyEntries.withArgs('resource').returns(resourcesNoSecureConnectionStart);
+    });
+    afterEach(() => {
+      spyEntries.restore();
+    });
+
+    it('should create span for each of the resource', done => {
+      const spyOnEnd = sinon.spy(dummyExporter, 'export');
+      plugin.enable(moduleExports, tracer, logger, config);
+      setTimeout(() => {
+        const spanResource1 = spyOnEnd.args[1][0][0] as ReadableSpan;
+
+        const srEvents1 = spanResource1.events;
+
+        assert.strictEqual(
+          spanResource1.name,
+          'http://localhost:8090/bundle.js'
+        );
+
+        assert.strictEqual(srEvents1[0].name, PTN.FETCH_START);
+        assert.strictEqual(srEvents1[1].name, PTN.DOMAIN_LOOKUP_START);
+        assert.strictEqual(srEvents1[2].name, PTN.DOMAIN_LOOKUP_END);
+        assert.strictEqual(srEvents1[3].name, PTN.CONNECT_START);
+        assert.strictEqual(srEvents1[4].name, PTN.CONNECT_END);
+        assert.strictEqual(srEvents1[5].name, PTN.REQUEST_START);
+        assert.strictEqual(srEvents1[6].name, PTN.RESPONSE_START);
+        assert.strictEqual(srEvents1[7].name, PTN.RESPONSE_END);
+
+        assert.strictEqual(spyOnEnd.callCount, 3);
         done();
       });
     });
