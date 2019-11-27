@@ -10,7 +10,10 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 > This project is currently in Alpha stage. Its APIs can change at any time and it is not intended to be used in production scenarios!
 
 ## Quick start
-To get started, see [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) which provides auto-instrumentation for Node.js applications.
+
+To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md).
+
+For more information, see [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) which provides auto-instrumentation for Node.js applications.
 
 ## Release Schedule
 
@@ -110,9 +113,11 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
 - [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
-- [@opentelemetry/plugin-mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb) - WIP
-- [@opentelemetry/plugin-postgres](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres) - WIP
-- [@opentelemetry/plugin-redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis) - WIP
+- [@opentelemetry/plugin-mongodb-core](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb-core)
+- [@opentelemetry/plugin-pg](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg)
+- [@opentelemetry/plugin-redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis)
+- [@opentelemetry/plugin-pg-pool](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool) - WIP
+- [@opentelemetry/plugin-ioredis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-ioredis) - WIP
 - [@opentelemetry/plugin-mysql](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mysql) - WIP
 
 #### Web Plugins
