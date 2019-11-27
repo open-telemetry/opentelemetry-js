@@ -76,6 +76,10 @@ export class CollectorExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ) {
+    if (this._isShutdown) {
+      resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+      return;
+    }
     this._exportSpans(spans)
       .then(() => {
         resultCallback(ExportResult.SUCCESS);

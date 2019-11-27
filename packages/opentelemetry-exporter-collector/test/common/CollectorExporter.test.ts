@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -94,6 +95,7 @@ describe('CollectorExporter - common', () => {
     let spySend: any;
     beforeEach(() => {
       spySend = sinon.stub(platform, 'sendSpans');
+      collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
     afterEach(() => {
       spySend.restore();
@@ -110,6 +112,26 @@ describe('CollectorExporter - common', () => {
         done();
       });
       assert.strictEqual(spySend.callCount, 1);
+    });
+
+    describe('when exporter is shutdown', () => {
+      it('should not export anything but return callback with code "FailedNotRetryable"', () => {
+        const spans: ReadableSpan[] = [];
+        spans.push(Object.assign({}, mockedReadableSpan));
+        collectorExporter.shutdown();
+        spySend.resetHistory();
+
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(spans, callbackSpy);
+        const returnCode = callbackSpy.args[0][0];
+
+        assert.strictEqual(
+          returnCode,
+          ExportResult.FAILED_NOT_RETRYABLE,
+          'return value is wrong'
+        );
+        assert.strictEqual(spySend.callCount, 0, 'should not call send');
+      });
     });
   });
 
