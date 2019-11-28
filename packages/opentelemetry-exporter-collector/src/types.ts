@@ -16,6 +16,9 @@
 
 import { SpanKind, Status } from '@opentelemetry/types';
 
+// header to prevent instrumentation on request
+export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+
 /**
  * {@link https://github.com/open-telemetry/opentelemetry-proto/blob/master/opentelemetry/proto/agent/common/v1/common.proto#L66}
  */

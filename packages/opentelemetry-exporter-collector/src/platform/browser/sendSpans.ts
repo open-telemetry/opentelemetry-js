@@ -133,6 +133,7 @@ function sendSpansWithXhr(
 ) {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', collectorUrl);
+  xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
   xhr.send(body);
 
   xhr.onreadystatechange = () => {

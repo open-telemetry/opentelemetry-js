@@ -81,9 +81,9 @@ export function sendSpans(
     port: parsedUrl.port,
     path: parsedUrl.path,
     method: 'POST',
-    timeout: 5000,
     headers: {
       'Content-Length': Buffer.byteLength(body),
+      [collectorTypes.OT_REQUEST_HEADER]: 1,
     },
   };
 
