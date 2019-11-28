@@ -11,7 +11,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Quick start
 
-To get started tracing your own application, see the [Getting Started Guide](getting-started/Getting-Started.md).
+To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md).
 
 For more information, see [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node) which provides auto-instrumentation for Node.js applications.
 
