@@ -45,14 +45,13 @@
   "devDependencies": {
     "@opentelemetry/node": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
-    "@types/ioredis": "^4.0.19",
+    "@types/ioredis": "^4.0.20",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.14",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
     "gts": "^1.1.2",
-    "ioredis": "^4.14.1",
     "mocha": "^6.2.2",
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
@@ -63,6 +62,7 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
+    "ioredis": "^4.14.1",
     "@opentelemetry/core": "^0.2.0",
     "@opentelemetry/types": "^0.2.0",
     "shimmer": "^1.2.1"
