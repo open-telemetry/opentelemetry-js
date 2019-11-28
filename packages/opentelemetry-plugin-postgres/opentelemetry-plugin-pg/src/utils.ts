@@ -52,7 +52,7 @@ function pgStartSpan(
   const jdbcString = getJDBCString(client.connectionParameters);
   return tracer.startSpan(name, {
     kind: SpanKind.CLIENT,
-    parent: tracer.getCurrentSpan() || undefined,
+    parent: tracer.getCurrentSpan(),
     attributes: {
       [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
       [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required

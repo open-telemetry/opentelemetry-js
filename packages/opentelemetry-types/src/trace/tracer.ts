@@ -34,7 +34,7 @@ export interface Tracer {
    *
    * @returns Span The currently active Span
    */
-  getCurrentSpan(): Span | null;
+  getCurrentSpan(): Span | undefined;
 
   /**
    * Starts a new {@link Span}.
