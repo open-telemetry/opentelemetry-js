@@ -204,7 +204,7 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
-          }  finally {
+          } finally {
             done();
           }
         });
@@ -235,7 +235,7 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
-          }  finally {
+          } finally {
             done();
           }
         });
