@@ -171,9 +171,9 @@ describe('ioredis', () => {
               okStatus
             );
             assertionUtils.assertPropagation(endedSpans[0], span);
-            done();
           } catch (error) {
             assert.ifError(error);
+          } finally {
             done();
           }
         });
@@ -202,9 +202,9 @@ describe('ioredis', () => {
               okStatus
             );
             assertionUtils.assertPropagation(endedSpans[0], span);
-            done();
           } catch (error) {
             assert.ifError(error);
+          }  finally {
             done();
           }
         });
@@ -233,16 +233,16 @@ describe('ioredis', () => {
               okStatus
             );
             assertionUtils.assertPropagation(endedSpans[0], span);
-            done();
           } catch (error) {
             assert.ifError(error);
+          }  finally {
             done();
           }
         });
       });
 
       IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
-        it(`should create a child span for ${operation.description}`, done => {
+        it(`should create a child span for cb style ${operation.description}`, done => {
           const attributes = {
             ...DEFAULT_ATTRIBUTES,
             [AttributeNames.DB_STATEMENT]: operation.command,
@@ -280,7 +280,7 @@ describe('ioredis', () => {
       });
 
       IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
-        it(`should not create a child span for ${operation.description}`, done => {
+        it(`should not create a child span for cb style ${operation.description}`, done => {
           const span = tracer.startSpan('test span');
           tracer.withSpan(span, () => {
             operation.method((err, _) => {
