@@ -21,6 +21,7 @@ import { getTracedSendCommand } from './utils';
 
 export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
   static readonly COMPONENT = 'ioredis';
+  static readonly DB_TYPE = 'redis';
   readonly supportedVersions = ['^2.0.0'];
 
   constructor(readonly moduleName: string) {

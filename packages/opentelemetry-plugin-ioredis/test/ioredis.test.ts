@@ -39,6 +39,7 @@ const URL = `redis://${CONFIG.host}:${CONFIG.port}`;
 
 const DEFAULT_ATTRIBUTES = {
   [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
+  [AttributeNames.DB_TYPE]: IORedisPlugin.DB_TYPE,
   [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
   [AttributeNames.PEER_PORT]: CONFIG.port,
   [AttributeNames.PEER_ADDRESS]: URL,
@@ -151,7 +152,6 @@ describe('ioredis', () => {
       it('should create a child span for hset promise', done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
-          [AttributeNames.DB_TYPE]: 'redis',
           [AttributeNames.DB_STATEMENT]: 'hset hash random random',
         };
         const span = tracer.startSpan('test span');
@@ -182,7 +182,6 @@ describe('ioredis', () => {
       it('should create a child span for get promise', done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
-          [AttributeNames.DB_TYPE]: 'redis',
           [AttributeNames.DB_STATEMENT]: 'get test',
         };
         const span = tracer.startSpan('test span');
@@ -214,7 +213,6 @@ describe('ioredis', () => {
       it('should create a child span for del', done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
-          [AttributeNames.DB_TYPE]: 'redis',
           [AttributeNames.DB_STATEMENT]: 'del test',
         };
         const span = tracer.startSpan('test span');
