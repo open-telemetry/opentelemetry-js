@@ -42,6 +42,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
     if (arguments.length === 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(cmd.name, {
         kind: SpanKind.CLIENT,
+        // Change || to ?? once widely supported in IDEs
         parent: parentSpan || undefined,
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
