@@ -56,7 +56,7 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
-    "ts-node": "^8.5.2",
+    "ts-node": "^8.5.4",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
