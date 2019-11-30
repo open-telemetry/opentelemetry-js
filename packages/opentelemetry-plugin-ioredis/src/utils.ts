@@ -61,25 +61,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         });
       }
 
-      const originalCallback = cmd.callback;
-      const originalPromise = cmd.promise;
-      if (originalCallback) {
-        (cmd as IORedisCommand).callback = function callback<T>(
-          this: unknown,
-          err: Error | null,
-          _reply: T
-        ) {
-          endSpan(span, err);
-          return originalCallback.apply(this, arguments);
-        };
-        try {
-          // Span will be ended in callback
-          return original.apply(this, arguments);
-        } catch (error) {
-          endSpan(span, error);
-          throw error;
-        }
-      } else if (originalPromise) {
+      if (cmd.promise) {
         // Perform the original query
         const result = original.apply(this, arguments);
         // Bind promise to parent span and end the span
