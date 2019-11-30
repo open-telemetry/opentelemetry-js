@@ -159,22 +159,24 @@ describe('ioredis', () => {
           tracer.withSpan(span, () => {
             operation.method((err, _result) => {
               assert.ifError(err);
-              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
-              span.end();
-              const endedSpans = memoryExporter.getFinishedSpans();
-              assert.strictEqual(endedSpans.length, 2);
-              assert.strictEqual(
-                endedSpans[0].name,
-                `redis-${operation.command}`
-              );
-              assertionUtils.assertSpan(
-                endedSpans[0],
-                SpanKind.CLIENT,
-                attributes,
-                [],
-                okStatus
-              );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              (_result: string | number) => {
+                assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+                span.end();
+                const endedSpans = memoryExporter.getFinishedSpans();
+                assert.strictEqual(endedSpans.length, 2);
+                assert.strictEqual(
+                  endedSpans[0].name,
+                  `redis-${operation.command}`
+                );
+                assertionUtils.assertSpan(
+                  endedSpans[0],
+                  SpanKind.CLIENT,
+                  attributes,
+                  [],
+                  okStatus
+                );
+                assertionUtils.assertPropagation(endedSpans[0], span);
+              };
               done();
             });
           });
