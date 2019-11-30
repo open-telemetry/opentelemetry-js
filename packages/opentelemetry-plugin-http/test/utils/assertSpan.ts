@@ -69,7 +69,7 @@ export const assertSpan = (
     span.attributes[AttributeNames.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
-  assert.ok(span.endTime);
+
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
 
@@ -79,6 +79,13 @@ export const assertSpan = (
       utils.parseResponseStatus(validations.httpStatusCode)
   );
 
+  assert.ok(
+    (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
+      span.attributes[AttributeNames.HTTP_HOSTNAME] as string
+    ) > -1,
+    'should be consistent'
+  );
+  assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
   if (validations.reqHeaders) {
