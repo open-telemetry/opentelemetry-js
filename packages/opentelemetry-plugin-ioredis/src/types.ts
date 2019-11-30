@@ -17,7 +17,7 @@
 import * as ioredisTypes from 'ioredis';
 
 export interface IORedisCommand {
-  reject:  (err: Error) => void;
+  reject: (err: Error) => void;
   resolve: (result: {}) => void;
   promise: Promise<{}>;
   args: Array<string | Buffer | number>;
