@@ -2,6 +2,7 @@
   "name": "@opentelemetry/shim-opentracing",
   "version": "0.2.0",
   "description": "OpenTracing to OpenTelemetry shim",
+  "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
