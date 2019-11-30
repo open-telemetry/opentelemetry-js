@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
+import * as ioredisTypes from 'ioredis';
+
 export interface IORedisCommand {
-  reject: (err: Error) => void;
+  reject:  (err: Error) => void;
   resolve: (result: {}) => void;
   promise: Promise<{}>;
   args: Array<string | Buffer | number>;
-  callback: Function | undefined;
+  callback: ioredisTypes.CallbackFunction<unknown>;
   name: string;
 }
 
