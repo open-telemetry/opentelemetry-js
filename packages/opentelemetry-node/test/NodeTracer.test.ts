@@ -190,7 +190,9 @@ describe('NodeTracerRegistry', () => {
       registry.getTracer().withSpan(span, () => {
         assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
 
-        const span1 = registry.getTracer().startSpan('my-span1', { parent: span });
+        const span1 = registry
+          .getTracer()
+          .startSpan('my-span1', { parent: span });
         registry.getTracer().withSpan(span1, () => {
           assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span1);
           assert.deepStrictEqual(
@@ -236,14 +238,18 @@ describe('NodeTracerRegistry', () => {
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
       registry = new NodeTracerRegistry({});
-      assert.ok(registry.getTracer().getBinaryFormat() instanceof BinaryTraceContext);
+      assert.ok(
+        registry.getTracer().getBinaryFormat() instanceof BinaryTraceContext
+      );
     });
   });
 
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
       registry = new NodeTracerRegistry({});
-      assert.ok(registry.getTracer().getHttpTextFormat() instanceof HttpTraceContext);
+      assert.ok(
+        registry.getTracer().getHttpTextFormat() instanceof HttpTraceContext
+      );
     });
   });
 });

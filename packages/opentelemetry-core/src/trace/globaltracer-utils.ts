@@ -22,7 +22,9 @@ let globalTracerRegistry: types.TracerRegistry = new NoopTracerRegistry();
 /**
  * Set the current global tracer. Returns the initialized global tracer
  */
-export function initGlobalTracerRegistry(tracerRegistry: types.TracerRegistry): types.TracerRegistry {
+export function initGlobalTracerRegistry(
+  tracerRegistry: types.TracerRegistry
+): types.TracerRegistry {
   return (globalTracerRegistry = tracerRegistry);
 }
 

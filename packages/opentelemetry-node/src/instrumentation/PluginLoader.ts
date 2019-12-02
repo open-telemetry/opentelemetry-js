@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Logger, Plugin, PluginConfig, TracerRegistry } from '@opentelemetry/types';
+import {
+  Logger,
+  Plugin,
+  PluginConfig,
+  TracerRegistry,
+} from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 

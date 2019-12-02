@@ -17,7 +17,12 @@
 import { NoopLogger, NoopTracerRegistry } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as path from 'path';
-import { HookState, PluginLoader, Plugins, searchPathForTest } from '../../src/instrumentation/PluginLoader';
+import {
+  HookState,
+  PluginLoader,
+  Plugins,
+  searchPathForTest,
+} from '../../src/instrumentation/PluginLoader';
 
 const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
 

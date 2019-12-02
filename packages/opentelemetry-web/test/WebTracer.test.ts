@@ -25,7 +25,7 @@ import { WebTracerRegistry } from '../src/WebTracerRegistry';
 
 class DummyPlugin extends BasePlugin<unknown> {
   constructor() {
-    super("dummy");
+    super('dummy');
   }
   patch() {}
   unpatch() {}
@@ -42,7 +42,9 @@ describe('WebTracer', () => {
     });
 
     it('should construct an instance with required only options', () => {
-      const tracer = new WebTracerRegistry(Object.assign({}, defaultOptions)).getTracer();
+      const tracer = new WebTracerRegistry(
+        Object.assign({}, defaultOptions)
+      ).getTracer();
       assert.ok(tracer instanceof Tracer);
     });
 

@@ -67,7 +67,7 @@ describe('globaltracer-utils', () => {
 
     it('should use the global tracer registry', () => {
       initGlobalTracerRegistry(new TestTracerRegistry());
-      const tracer = getTracerRegistry().getTracer("name");
+      const tracer = getTracerRegistry().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });

@@ -42,7 +42,12 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(registry.getTracer(), 'span-name', spanContext, SpanKind.CLIENT);
+      const span = new Span(
+        registry.getTracer(),
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
       processor.onStart(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -60,7 +65,12 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.UNSAMPLED,
       };
-      const span = new Span(registry.getTracer(), 'span-name', spanContext, SpanKind.CLIENT);
+      const span = new Span(
+        registry.getTracer(),
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
       processor.onStart(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 

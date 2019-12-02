@@ -19,7 +19,12 @@
  */
 
 import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
-import { BasicTracerRegistry, ReadableSpan, SimpleSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
+import {
+  BasicTracerRegistry,
+  ReadableSpan,
+  SimpleSpanProcessor,
+  SpanExporter,
+} from '@opentelemetry/tracing';
 import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';

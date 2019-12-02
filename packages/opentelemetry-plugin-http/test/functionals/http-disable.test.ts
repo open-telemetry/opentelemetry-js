@@ -20,7 +20,11 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../../src/http';
-import { NoopLogger, NoopTracerRegistry, noopTracer } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  NoopTracerRegistry,
+  noopTracer,
+} from '@opentelemetry/core';
 import { AddressInfo } from 'net';
 import { httpRequest } from '../utils/httpRequest';
 
@@ -74,7 +78,10 @@ describe('HttpPlugin', () => {
           );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual((noopTracer.withSpan as sinon.SinonSpy).called, false);
+          assert.strictEqual(
+            (noopTracer.withSpan as sinon.SinonSpy).called,
+            false
+          );
         });
       });
     });

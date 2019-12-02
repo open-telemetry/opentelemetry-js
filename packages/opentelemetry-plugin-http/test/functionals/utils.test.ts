@@ -54,7 +54,7 @@ describe('Utility', () => {
       try {
         utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
-      } catch (ignore) { }
+      } catch (ignore) {}
     });
 
     it('should not throw if no headers', () => {

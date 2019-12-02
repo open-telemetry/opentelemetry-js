@@ -28,7 +28,7 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
   readonly supportedVersions = ['^2.6.0']; // equivalent to >= 2.6.0 <3
 
   constructor(readonly moduleName: string) {
-    super(`opentelemetry.${moduleName}`, "0.2.0");
+    super(`opentelemetry.${moduleName}`, '0.2.0');
   }
 
   protected patch() {

@@ -89,7 +89,7 @@ const runCallbackTest = (
 describe('pg@7.x', () => {
   let client: pg.Client;
   const registry = new NodeTracerRegistry();
-  const tracer = registry.getTracer("external");
+  const tracer = registry.getTracer('external');
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker

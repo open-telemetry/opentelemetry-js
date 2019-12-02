@@ -100,7 +100,12 @@ describe('HttpsPlugin', () => {
         ],
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable((https as unknown) as Http, registry, registry.logger, config);
+      plugin.enable(
+        (https as unknown) as Http,
+        registry,
+        registry.logger,
+        config
+      );
       server = https.createServer(
         {
           key: fs.readFileSync('test/fixtures/server-key.pem'),

@@ -63,7 +63,7 @@ class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   readonly _basedir = basedir;
 
   constructor() {
-    super("test-package.opentelemetry")
+    super('test-package.opentelemetry');
   }
 
   protected readonly _internalFilesList = {

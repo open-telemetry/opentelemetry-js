@@ -56,7 +56,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   private readonly _spanNotEnded: WeakSet<Span>;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super(`opentelemetry.${moduleName}`, "0.2.0");
+    super(`opentelemetry.${moduleName}`, '0.2.0');
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
     this._spanNotEnded = new WeakSet<Span>();

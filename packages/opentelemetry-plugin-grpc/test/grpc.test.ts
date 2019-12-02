@@ -16,7 +16,10 @@
 
 import { NoopLogger, NoopTracerRegistry } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as grpc from 'grpc';
@@ -378,7 +381,9 @@ describe('GrpcPlugin', () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      const span = registry.getTracer().startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      const span = registry
+        .getTracer()
+        .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return registry.getTracer().withSpan(span, async () => {
         const rootSpan = registry.getTracer().getCurrentSpan();
         if (!rootSpan) {
@@ -471,7 +476,9 @@ describe('GrpcPlugin', () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      const span = registry.getTracer().startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      const span = registry
+        .getTracer()
+        .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
       return registry.getTracer().withSpan(span, async () => {
         const rootSpan = registry.getTracer().getCurrentSpan();
         if (!rootSpan) {

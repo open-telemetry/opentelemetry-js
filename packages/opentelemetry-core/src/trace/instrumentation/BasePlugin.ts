@@ -40,8 +40,10 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
 
-
-  constructor(protected readonly _tracerName: string, protected readonly _tracerVersion?: string) { }
+  constructor(
+    protected readonly _tracerName: string,
+    protected readonly _tracerVersion?: string
+  ) {}
 
   enable(
     moduleExports: T,
@@ -50,7 +52,10 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
-    this._tracer = tracerRegistry.getTracer(this._tracerName, this._tracerVersion);
+    this._tracer = tracerRegistry.getTracer(
+      this._tracerName,
+      this._tracerVersion
+    );
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
