@@ -141,8 +141,6 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   /**
    * Get the mongodb command type from the object.
    * @param command Internal mongodb command object
-   * @param defaulType the default type to return if we could not find a
-   *  specific command.
    */
   private _getCommandType(command: MongoInternalCommand): MongodbCommandType {
     if (command.createIndexes !== undefined) {

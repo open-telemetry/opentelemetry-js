@@ -309,7 +309,7 @@ describe('BasicTracerRegistry', () => {
     it('should return null with NoopScopeManager', () => {
       const tracer = new BasicTracerRegistry().getTracer();
       const currentSpan = tracer.getCurrentSpan();
-      assert.deepStrictEqual(currentSpan, null);
+      assert.deepStrictEqual(currentSpan, undefined);
     });
 
     it('should return current span when it exists', () => {
@@ -327,7 +327,7 @@ describe('BasicTracerRegistry', () => {
       const tracer = new BasicTracerRegistry().getTracer();
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
-        assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
         return done();
       });
     });
@@ -338,7 +338,7 @@ describe('BasicTracerRegistry', () => {
       const tracer = new BasicTracerRegistry().getTracer();
       const span = tracer.startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
         return done();
       };
       const patchedFn = tracer.bind(fn, span);

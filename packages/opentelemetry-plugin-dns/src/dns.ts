@@ -116,7 +116,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
       plugin._logger.debug('wrap lookup callback function and starts span');
       const name = utils.getOperationName('lookup');
       const span = plugin._startDnsSpan(name, {
-        parent: plugin._tracer.getCurrentSpan() || undefined,
+        parent: plugin._tracer.getCurrentSpan(),
         attributes: {
           [AttributeNames.PEER_HOSTNAME]: hostname,
         },

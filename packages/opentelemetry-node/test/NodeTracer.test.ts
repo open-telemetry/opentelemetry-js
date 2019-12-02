@@ -167,9 +167,9 @@ describe('NodeTracerRegistry', () => {
   });
 
   describe('.getCurrentSpan()', () => {
-    it('should return null with AsyncHooksScopeManager when no span started', () => {
+    it('should return undefined with AsyncHooksScopeManager when no span started', () => {
       registry = new NodeTracerRegistry({});
-      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), null);
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
   });
 
@@ -181,7 +181,7 @@ describe('NodeTracerRegistry', () => {
         assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
         return done();
       });
-      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), null);
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
@@ -202,7 +202,7 @@ describe('NodeTracerRegistry', () => {
       });
       // when span ended.
       // @todo: below check is not running.
-      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), null);
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
 
     it('should find correct scope with promises', done => {
@@ -216,7 +216,7 @@ describe('NodeTracerRegistry', () => {
         }
         return done();
       });
-      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), null);
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
   });
 

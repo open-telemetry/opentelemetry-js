@@ -72,14 +72,12 @@ export const getTracedInternalSendCommand = (
     this: redisTypes.RedisClient & RedisPluginClientTypes,
     cmd?: RedisCommand
   ) {
-    const parentSpan = tracer.getCurrentSpan();
-
     // New versions of redis (2.4+) use a single options object
     // instead of named arguments
     if (arguments.length === 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(`${RedisPlugin.COMPONENT}-${cmd.command}`, {
         kind: SpanKind.CLIENT,
-        parent: parentSpan || undefined,
+        parent: tracer.getCurrentSpan(),
         attributes: {
           [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
           [AttributeNames.DB_STATEMENT]: cmd.command,

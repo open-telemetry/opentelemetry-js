@@ -1,0 +1,66 @@
+{
+  "name": "@opentelemetry/plugin-mysql",
+  "version": "0.2.0",
+  "description": "OpenTelemetry mysql automatic instrumentation package.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "clean": "rimraf build/*",
+    "check": "gts check",
+    "precompile": "tsc --version",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile"
+  },
+  "keywords": [
+    "opentelemetry",
+    "mysql",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "plugin"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@opentelemetry/node": "^0.2.0",
+    "@opentelemetry/tracing": "^0.2.0",
+    "@types/mocha": "^5.2.7",
+    "@types/mysql": "^2.15.4",
+    "@types/node": "^12.6.9",
+    "@types/shimmer": "^1.0.1",
+    "codecov": "^3.5.0",
+    "gts": "^1.1.0",
+    "mocha": "^6.2.0",
+    "mysql": "^2.17.1",
+    "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.3.0",
+    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.7.2"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.2.0",
+    "@opentelemetry/types": "^0.2.0",
+    "shimmer": "^1.2.1"
+  }
+}

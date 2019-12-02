@@ -121,8 +121,6 @@ export class DocumentLoad extends BasePlugin<unknown> {
     const metaElement = [...document.getElementsByTagName('meta')].find(
       e => e.getAttribute('name') === TRACE_PARENT_HEADER
     );
-    const serverContext =
-      parseTraceParent((metaElement && metaElement.content) || '') || undefined;
 
     const entries = this._getEntries();
 
@@ -130,7 +128,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
       AttributeNames.DOCUMENT_LOAD,
       PTN.FETCH_START,
       entries,
-      { parent: serverContext }
+      { parent: parseTraceParent((metaElement && metaElement.content) || '') }
     );
     if (!rootSpan) {
       return;

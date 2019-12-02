@@ -149,7 +149,7 @@ describe('Span', () => {
   it('should set an attribute', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
 
-    ['String', 'Number', 'Boolean'].map(attType => {
+    ['String', 'Number', 'Boolean'].forEach(attType => {
       span.setAttribute('testKey' + attType, 'testValue' + attType);
     });
     span.setAttribute('object', { foo: 'bar' });
