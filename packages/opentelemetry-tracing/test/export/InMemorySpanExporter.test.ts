@@ -18,14 +18,14 @@ import * as assert from 'assert';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  BasicTracer,
+  BasicTracerRegistry,
 } from '../../src';
 import { ExportResult } from '@opentelemetry/base';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
-  const tracer = new BasicTracer();
-  tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  const registry = new BasicTracerRegistry();
+  registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   afterEach(() => {
     // reset spans in memory.
@@ -33,9 +33,11 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should get finished spans', () => {
-    const root = tracer.startSpan('root');
-    const child = tracer.startSpan('child', { parent: root });
-    const grandChild = tracer.startSpan('grand-child', { parent: child });
+    const root = registry.getTracer().startSpan('root');
+    const child = registry.getTracer().startSpan('child', { parent: root });
+    const grandChild = registry
+      .getTracer()
+      .startSpan('grand-child', { parent: child });
 
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
     grandChild.end();
@@ -56,15 +58,21 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should shutdown the exorter', () => {
-    const root = tracer.startSpan('root');
-    tracer.startSpan('child', { parent: root }).end();
+    const root = registry.getTracer().startSpan('root');
+    registry
+      .getTracer()
+      .startSpan('child', { parent: root })
+      .end();
     root.end();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
     memoryExporter.shutdown();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
 
     // after shutdown no new spans are accepted
-    tracer.startSpan('child1', { parent: root }).end();
+    registry
+      .getTracer()
+      .startSpan('child1', { parent: root })
+      .end();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
   });
 

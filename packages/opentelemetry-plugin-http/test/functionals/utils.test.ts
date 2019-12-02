@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracing';
+import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -54,7 +54,7 @@ describe('Utility', () => {
       try {
         utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
-      } catch (ignore) {}
+      } catch (ignore) { }
     });
 
     it('should not throw if no headers', () => {
@@ -241,9 +241,9 @@ describe('Utility', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracer({
+          new BasicTracerRegistry({
             scopeManager: new NoopScopeManager(),
-          }),
+          }).getTracer(),
           'test',
           { spanId: '', traceId: '' },
           SpanKind.INTERNAL

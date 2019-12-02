@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { NoopTracerRegistry } from './NoopTracerRegistry';
-
-let globalTracerRegistry: types.TracerRegistry = new NoopTracerRegistry();
+import { Tracer } from './tracer';
 
 /**
- * Set the current global tracer. Returns the initialized global tracer
+ * TracerRegistry provides an interface for creating {@link Tracer}s
  */
-export function initGlobalTracerRegistry(tracerRegistry: types.TracerRegistry): types.TracerRegistry {
-  return (globalTracerRegistry = tracerRegistry);
-}
-
-/**
- * Returns the global tracer
- */
-export function getTracerRegistry(): types.TracerRegistry {
-  // Return the global tracer registry
-  return globalTracerRegistry;
+export interface TracerRegistry {
+  /**
+   * Returns a Tracer, creating one if one with the given name and version is not already created
+   *
+   * If there is no Span associated with the current context, null is returned.
+   *
+   * @returns Tracer A Tracer with the given name and version
+   */
+  getTracer(name?: string, version?: string): Tracer;
 }

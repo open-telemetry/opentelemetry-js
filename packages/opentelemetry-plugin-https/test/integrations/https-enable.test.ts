@@ -19,7 +19,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
 import { Span, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
@@ -60,11 +60,11 @@ describe('HttpsPlugin Integration tests', () => {
 
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -83,7 +83,7 @@ describe('HttpsPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
+      plugin.enable((https as unknown) as Http, registry, registry.logger, config);
     });
 
     after(() => {

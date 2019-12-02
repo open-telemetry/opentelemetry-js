@@ -18,18 +18,11 @@
  * Can't use Sinon Fake Time here as then cannot stub the performance getEntriesByType with desired metrics
  */
 
+import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
+import { BasicTracerRegistry, ReadableSpan, SimpleSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
+import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
-import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
-import {
-  BasicTracer,
-  ReadableSpan,
-  SimpleSpanProcessor,
-  SpanExporter,
-} from '@opentelemetry/tracing';
-import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
-
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
@@ -193,7 +186,7 @@ function ensureNetworkEventsExists(events: TimedEvent[]) {
 describe('DocumentLoad Plugin', () => {
   let plugin: DocumentLoad;
   let moduleExports: any;
-  let tracer: BasicTracer;
+  let registry: BasicTracerRegistry;
   let logger: Logger;
   let config: PluginConfig;
   let spanProcessor: SimpleSpanProcessor;
@@ -205,13 +198,13 @@ describe('DocumentLoad Plugin', () => {
       value: 'complete',
     });
     moduleExports = {};
-    tracer = new BasicTracer();
+    registry = new BasicTracerRegistry();
     logger = new ConsoleLogger();
     config = {};
     plugin = new DocumentLoad();
     dummyExporter = new DummyExporter();
     spanProcessor = new SimpleSpanProcessor(dummyExporter);
-    tracer.addSpanProcessor(spanProcessor);
+    registry.addSpanProcessor(spanProcessor);
   });
 
   afterEach(() => {
@@ -239,7 +232,7 @@ describe('DocumentLoad Plugin', () => {
       spyEntries.restore();
     });
     it('should start collecting the performance immediately', done => {
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       setTimeout(() => {
         assert.strictEqual(window.document.readyState, 'complete');
         assert.strictEqual(spyEntries.callCount, 2);
@@ -266,7 +259,7 @@ describe('DocumentLoad Plugin', () => {
     it('should collect performance after document load event', done => {
       const spy = sinon.spy(window, 'addEventListener');
 
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       const args = spy.args[0];
       const name = args[0];
       assert.strictEqual(name, 'load');
@@ -301,7 +294,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should export correct span with events', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
 
       setTimeout(() => {
         const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
@@ -358,7 +351,7 @@ describe('DocumentLoad Plugin', () => {
 
       it('should create a root span with server context traceId', done => {
         const spyOnEnd = sinon.spy(dummyExporter, 'export');
-        plugin.enable(moduleExports, tracer, logger, config);
+        plugin.enable(moduleExports, registry, logger, config);
         setTimeout(() => {
           const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
           const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
@@ -394,7 +387,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should create span for each of the resource', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       setTimeout(() => {
         const spanResource1 = spyOnEnd.args[1][0][0] as ReadableSpan;
         const spanResource2 = spyOnEnd.args[2][0][0] as ReadableSpan;
@@ -432,7 +425,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should create span for each of the resource', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       setTimeout(() => {
         const spanResource1 = spyOnEnd.args[1][0][0] as ReadableSpan;
 
@@ -473,7 +466,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should still export rootSpan and fetchSpan', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
 
       setTimeout(() => {
         const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
@@ -505,7 +498,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should export correct span with events', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       setTimeout(() => {
         const rootSpan = spyOnEnd.args[0][0][0] as ReadableSpan;
         const fetchSpan = spyOnEnd.args[1][0][0] as ReadableSpan;
@@ -553,7 +546,7 @@ describe('DocumentLoad Plugin', () => {
 
     it('should not create any span', done => {
       const spyOnEnd = sinon.spy(dummyExporter, 'export');
-      plugin.enable(moduleExports, tracer, logger, config);
+      plugin.enable(moduleExports, registry, logger, config);
       setTimeout(() => {
         assert.ok(spyOnEnd.callCount === 0);
         done();

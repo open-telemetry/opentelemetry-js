@@ -40,7 +40,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   readonly supportedVersions = ['>=2 <3'];
 
   constructor(readonly moduleName: string) {
-    super();
+    super(`opentelemetry.${moduleName}`, "0.2.0");
   }
 
   /**

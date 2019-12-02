@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import * as assert from 'assert';
 import * as mongodb from 'mongodb';
 import { plugin } from '../src';
@@ -104,12 +104,12 @@ describe('MongoDBPlugin', () => {
   let client: mongodb.MongoClient;
   let collection: mongodb.Collection;
   const logger = new NoopLogger();
-  const tracer = new NodeTracer();
+  const registry = new NodeTracerRegistry();
   const memoryExporter = new InMemorySpanExporter();
-  tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   before(done => {
-    plugin.enable(mongodb, tracer, logger);
+    plugin.enable(mongodb, registry, logger);
     accessCollection(URL, DB_NAME, COLLECTION_NAME)
       .then(result => {
         client = result.client;
@@ -155,8 +155,8 @@ describe('MongoDBPlugin', () => {
     it('should create a child span for insert', done => {
       const insertData = [{ a: 1 }, { a: 2 }, { a: 3 }];
 
-      const span = tracer.startSpan(`insertRootSpan`);
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer().startSpan(`insertRootSpan`);
+      registry.getTracer().withSpan(span, () => {
         collection.insertMany(insertData, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -171,8 +171,8 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should create a child span for update', done => {
-      const span = tracer.startSpan('updateRootSpan');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer().startSpan('updateRootSpan');
+      registry.getTracer().withSpan(span, () => {
         collection.updateOne({ a: 2 }, { $set: { b: 1 } }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -187,8 +187,8 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should create a child span for remove', done => {
-      const span = tracer.startSpan('removeRootSpan');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer().startSpan('removeRootSpan');
+      registry.getTracer().withSpan(span, () => {
         collection.deleteOne({ a: 3 }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -206,8 +206,8 @@ describe('MongoDBPlugin', () => {
   /** Should intercept cursor */
   describe('Instrumenting cursor operations', () => {
     it('should create a child span for find', done => {
-      const span = tracer.startSpan('findRootSpan');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer().startSpan('findRootSpan');
+      registry.getTracer().withSpan(span, () => {
         collection.find({}).toArray((err, result) => {
           span.end();
           assert.ifError(err);
@@ -225,8 +225,8 @@ describe('MongoDBPlugin', () => {
   /** Should intercept command */
   describe('Instrumenting command operations', () => {
     it('should create a child span for create index', done => {
-      const span = tracer.startSpan('indexRootSpan');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer().startSpan('indexRootSpan');
+      registry.getTracer().withSpan(span, () => {
         collection.createIndex({ a: 1 }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -252,7 +252,7 @@ describe('MongoDBPlugin', () => {
     it('should not create a child span for query', done => {
       const insertData = [{ a: 1 }, { a: 2 }, { a: 3 }];
 
-      const span = tracer.startSpan('insertRootSpan');
+      const span = registry.getTracer().startSpan('insertRootSpan');
       collection.insertMany(insertData, (err, result) => {
         span.end();
         assert.ifError(err);
@@ -262,7 +262,7 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should not create a child span for cursor', done => {
-      const span = tracer.startSpan('findRootSpan');
+      const span = registry.getTracer().startSpan('findRootSpan');
       collection.find({}).toArray((err, result) => {
         span.end();
         assert.ifError(err);
@@ -272,7 +272,7 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should not create a child span for command', done => {
-      const span = tracer.startSpan('indexRootSpan');
+      const span = registry.getTracer().startSpan('indexRootSpan');
       collection.createIndex({ a: 1 }, (err, result) => {
         span.end();
         assert.ifError(err);
