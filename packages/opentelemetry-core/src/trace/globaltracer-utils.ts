@@ -29,9 +29,17 @@ export function initGlobalTracerRegistry(
 }
 
 /**
- * Returns the global tracer
+ * Returns the global tracer registry.
  */
 export function getTracerRegistry(): types.TracerRegistry {
   // Return the global tracer registry
   return globalTracerRegistry;
+}
+
+/**
+ * Returns a tracer from the global tracer registry.
+ */
+export function getTracer(name?: string, version?: string): types.Tracer {
+  // Return the global tracer registry
+  return globalTracerRegistry.getTracer(name, version);
 }
