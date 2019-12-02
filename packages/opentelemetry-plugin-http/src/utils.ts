@@ -40,7 +40,7 @@ export const getAbsoluteUrl = (
   const port = (reqUrlObject.port || '').toString();
   const path = reqUrlObject.path || '/';
   let host =
-    headers.host || reqUrlObject.hostname || headers.host || 'localhost';
+    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
 
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)

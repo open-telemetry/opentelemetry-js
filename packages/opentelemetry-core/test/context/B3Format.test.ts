@@ -77,7 +77,7 @@ describe('B3Format', () => {
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], undefined);
     });
 
-    it('should handle absense of sampling decision', () => {
+    it('should handle absence of sampling decision', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',

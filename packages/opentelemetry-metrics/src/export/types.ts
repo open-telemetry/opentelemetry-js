@@ -61,6 +61,13 @@ export interface MetricDescriptor {
   readonly unit: string;
   /** MetricDescriptor type */
   readonly type: MetricDescriptorType;
+  /**
+   * Metric may only increase
+   *
+   * This property is not in the .proto file, but is included here because
+   * it is required for correct export of prometheus metrics
+   */
+  readonly monotonic: boolean;
   /** The label keys associated with the metric descriptor. */
   readonly labelKeys: string[];
 }

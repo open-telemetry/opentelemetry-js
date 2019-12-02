@@ -17,11 +17,31 @@ npm install --save @opentelemetry/plugin-mongodb-core
 
 ## Usage
 
-```js
-const opentelemetry = require('@opentelemetry/plugin-mongodb-core');
+OpenTelemetry Mongodb Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
 
-// TODO: DEMONSTRATE API
+To load a specific plugin (mongodb in this case), specify it in the Node Tracer's configuration.
+```js
+const { NodeTracer } = require('@opentelemetry/node');
+
+const tracer = new NodeTracer({
+  plugins: {
+    'mongodb-core': {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-mongodb-core',
+    }
+  }
+});
 ```
+
+To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+```js
+const { NodeTracer } = require('@opentelemetry/node');
+
+const tracer = new NodeTracer();
+```
+
+See [examples/mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/mongodb-core) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

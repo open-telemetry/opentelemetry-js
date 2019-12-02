@@ -239,7 +239,7 @@ function startServer(grpc: GrpcModule, proto: any) {
           getError('Server Stream Method Error', call.request.num)
         );
       } else {
-        result.map(element => {
+        result.forEach(element => {
           call.write(element);
         });
       }
@@ -550,15 +550,15 @@ describe('GrpcPlugin', () => {
       });
     });
 
-    methodList.map(method => {
+    methodList.forEach(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
         runTest(method, tracer);
       });
     });
 
-    methodList.map(method => {
+    methodList.forEach(method => {
       describe(`Test error raising for grpc remote ${method.description}`, () => {
-        Object.keys(grpc.status).map((statusKey: string) => {
+        Object.keys(grpc.status).forEach((statusKey: string) => {
           // tslint:disable-next-line:no-any
           const errorCode = Number(grpc.status[statusKey as any]);
           if (errorCode > grpc.status.OK) {
