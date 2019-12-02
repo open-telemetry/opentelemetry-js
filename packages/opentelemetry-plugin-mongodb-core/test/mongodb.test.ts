@@ -65,8 +65,12 @@ function accessCollection(
 function assertSpans(
   spans: ReadableSpan[],
   expectedName: string,
-  expectedKind: SpanKind
+  expectedKind: SpanKind,
+  log = false
 ) {
+  if (log) {
+    console.log(spans);
+  }
   assert.strictEqual(spans.length, 2);
   spans.forEach(span => {
     assert(span.endTime instanceof Array);
@@ -106,7 +110,8 @@ describe('MongoDBPlugin', () => {
   const logger = new NoopLogger();
   const registry = new NodeTracerRegistry();
   const memoryExporter = new InMemorySpanExporter();
-  registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  const spanProcessor = new SimpleSpanProcessor(memoryExporter);
+  registry.addSpanProcessor(spanProcessor);
 
   before(done => {
     plugin.enable(mongodb, registry, logger);

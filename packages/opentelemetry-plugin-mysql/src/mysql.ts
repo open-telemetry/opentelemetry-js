@@ -22,7 +22,6 @@ import { AttributeNames } from './enums';
 import { getConnectionAttributes, getSpanName } from './utils';
 
 export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
-  readonly moduleName = 'mysql';
   readonly supportedVersions = ['2.*'];
 
   static readonly COMPONENT = 'mysql';
@@ -35,6 +34,10 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   };
 
   private _enabled = false;
+
+  constructor(readonly moduleName: string) {
+    super(`opentelemetry.${moduleName}`, '0.2.0');
+  }
 
   protected patch(): typeof mysqlTypes {
     this._enabled = true;
@@ -283,4 +286,4 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   }
 }
 
-export const plugin = new MysqlPlugin();
+export const plugin = new MysqlPlugin(MysqlPlugin.COMPONENT);
