@@ -35,7 +35,7 @@ export class BasicTracerRegistry implements types.TracerRegistry {
   }
 
   getTracer(
-    name = 'DEFAULT_TRACER',
+    name = '',
     version = '*',
     config?: TracerConfig
   ): Tracer {
