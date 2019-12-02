@@ -196,7 +196,10 @@ export class PrometheusExporter implements MetricExporter {
     switch (readableMetric.descriptor.type) {
       case MetricDescriptorType.COUNTER_DOUBLE:
       case MetricDescriptorType.COUNTER_INT64:
-        return new Counter(metricObject);
+        // there is no such thing as a non-monotonic counter in prometheus
+        return readableMetric.descriptor.monotonic
+          ? new Counter(metricObject)
+          : new Gauge(metricObject);
       case MetricDescriptorType.GAUGE_DOUBLE:
       case MetricDescriptorType.GAUGE_INT64:
         return new Gauge(metricObject);

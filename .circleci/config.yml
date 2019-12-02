@@ -2,6 +2,7 @@ version: 2
 
 node_test_env: &node_test_env
   RUN_POSTGRES_TESTS: 1
+  RUN_MYSQL_TESTS: 1
   RUN_MONGODB_TESTS: 1
   RUN_REDIS_TESTS: 1
   POSTGRES_USER: postgres
@@ -11,8 +12,12 @@ node_test_env: &node_test_env
   OPENTELEMETRY_REDIS_HOST: 'localhost'
   OPENTELEMETRY_REDIS_PORT: 6379
   MONGODB_HOST: localhost
-  MONGODB_PORT: 27017
   MONGODB_DB: opentelemetry-tests
+  MONGODB_PORT: 27017
+  MYSQL_USER: otel
+  MYSQL_PASSWORD: secret
+  MYSQL_DATABASE: circle_database
+  MYSQL_PORT: 3306
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
@@ -24,6 +29,14 @@ redis_service: &redis_service
 
 mongo_service: &mongo_service
   image: mongo
+
+mysql_service: &mysql_service
+  image: circleci/mysql:5.7
+  environment:
+    MYSQL_USER: otel
+    MYSQL_PASSWORD: secret
+    MYSQL_DATABASE: circle_database
+    MYSQL_ROOT_PASSWORD: rootpw
 
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
@@ -57,6 +70,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-document-load/node_modules
     - packages/opentelemetry-plugin-https/node_modules
     - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
+    - packages/opentelemetry-plugin-mysql/node_modules
     - packages/opentelemetry-exporter-prometheus/node_modules
 
 node_unit_tests: &node_unit_tests
@@ -157,6 +171,7 @@ jobs:
       - image: node:8
         environment: *node_test_env
       - *postgres_service
+      - *mysql_service
       - *redis_service
       - *mongo_service
     <<: *node_unit_tests
@@ -165,6 +180,7 @@ jobs:
       - image: node:10
         environment: *node_test_env
       - *postgres_service
+      - *mysql_service
       - *redis_service
       - *mongo_service
     <<: *node_unit_tests
@@ -173,6 +189,7 @@ jobs:
       - image: node:12
         environment: *node_test_env
       - *postgres_service
+      - *mysql_service
       - *redis_service
       - *mongo_service
     <<: *node_unit_tests

@@ -46,7 +46,7 @@ export interface SpanOptions {
    * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
    * span will be the child of.
    */
-  parent?: Span | SpanContext;
+  parent?: Span | SpanContext | null;
 
   /** A manually specified start time for the created `Span` object. */
   startTime?: number;
