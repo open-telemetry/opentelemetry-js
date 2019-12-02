@@ -398,6 +398,7 @@ describe('Meter', () => {
       const [{ descriptor, timeseries }] = meter.getMetrics();
       assert.deepStrictEqual(descriptor, {
         name: 'counter',
+        monotonic: true,
         description: 'test',
         unit: '1',
         type: MetricDescriptorType.COUNTER_DOUBLE,
@@ -430,6 +431,7 @@ describe('Meter', () => {
       assert.deepStrictEqual(descriptor, {
         name: 'counter',
         description: 'test',
+        monotonic: true,
         unit: '1',
         type: MetricDescriptorType.COUNTER_INT64,
         labelKeys: ['key'],
@@ -460,6 +462,7 @@ describe('Meter', () => {
       const [{ descriptor, timeseries }] = meter.getMetrics();
       assert.deepStrictEqual(descriptor, {
         name: 'gauge',
+        monotonic: false,
         description: '',
         unit: 'ms',
         type: MetricDescriptorType.GAUGE_DOUBLE,
@@ -502,6 +505,7 @@ describe('Meter', () => {
       const [{ descriptor, timeseries }] = meter.getMetrics();
       assert.deepStrictEqual(descriptor, {
         name: 'gauge',
+        monotonic: false,
         description: '',
         unit: 'ms',
         type: MetricDescriptorType.GAUGE_INT64,

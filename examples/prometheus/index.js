@@ -29,14 +29,12 @@ const monotonicGauge = meter.createGauge("monotonic_gauge", {
 });
 
 // Non-monotonic counters and gauges can be increased or decreased.
-
-// This is commented out until non-monotonic counter export is fixed
-// const nonmonotonicCounter = meter.createCounter("non_monotonic_counter", {
-//   monotonic: false,
-//   labelKeys: ["pid"],
-//   description: "Example of a non-monotonic counter"
-// });
-const nonmonotonicGauge = meter.createGauge("non_monotonic_gauge", {
+const nonMonotonicCounter = meter.createCounter("non_monotonic_counter", {
+  monotonic: false,
+  labelKeys: ["pid"],
+  description: "Example of a non-monotonic counter"
+});
+const nonMonotonicGauge = meter.createGauge("non_monotonic_gauge", {
   monotonic: false,
   labelKeys: ["pid"],
   description: "Example of a non-monotonic gauge"
@@ -49,9 +47,9 @@ setInterval(() => {
   currentMonotonicGaugeValue += Math.random();
 
   monotonicCounter.getHandle(labels).add(1);
-  // nonmonotonicCounter.getHandle(labels).add(Math.random() > 0.5 ? 1 : -1);
+  nonMonotonicCounter.getHandle(labels).add(Math.random() > 0.5 ? 1 : -1);
   monotonicGauge.getHandle(labels).set(currentMonotonicGaugeValue);
-  nonmonotonicGauge
+  nonMonotonicGauge
     .getHandle(labels)
     .set(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
 }, 1000);
