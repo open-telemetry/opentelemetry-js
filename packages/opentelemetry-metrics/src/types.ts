@@ -37,7 +37,7 @@ export interface MetricOptions {
   /** Indicates the metric is a verbose metric that is disabled by default */
   disabled: boolean;
 
-  /** Monotonic allows this metric to accept negative values. */
+  /** Monotonic metrics may only increase. */
   monotonic: boolean;
 
   /** User provided logger. */
