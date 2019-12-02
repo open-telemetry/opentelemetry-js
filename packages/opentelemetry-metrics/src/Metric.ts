@@ -114,6 +114,7 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
       unit: this._options.unit,
       labelKeys: this._options.labelKeys,
       type: this._type,
+      monotonic: this._monotonic,
     };
   }
 
