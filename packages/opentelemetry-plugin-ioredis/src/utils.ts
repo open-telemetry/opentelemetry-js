@@ -61,7 +61,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         });
       }
 
-      if (cmd.promise) {
+      if (arguments.length === 1 && typeof cmd === 'object') {
         // Perform the original query
         const result = original.apply(this, arguments);
         // Bind promise to parent span and end the span
@@ -81,8 +81,7 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
           });
       }
     }
-
     // We don't know how to trace this call, so don't start/stop a span
-    return original.apply(this, arguments);
+    else return original.apply(this, arguments);
   };
 };
