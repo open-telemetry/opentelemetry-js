@@ -167,9 +167,9 @@ describe('NodeTracer', () => {
   });
 
   describe('.getCurrentSpan()', () => {
-    it('should return null with AsyncHooksScopeManager when no span started', () => {
+    it('should return undefined with AsyncHooksScopeManager when no span started', () => {
       tracer = new NodeTracer({});
-      assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+      assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
     });
   });
 
@@ -181,7 +181,8 @@ describe('NodeTracer', () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
         return done();
       });
-      assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+      // @todo: below check is not running.a
+      assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
@@ -202,7 +203,7 @@ describe('NodeTracer', () => {
       });
       // when span ended.
       // @todo: below check is not running.
-      assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+      assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
     });
 
     it('should find correct scope with promises', done => {
@@ -216,7 +217,7 @@ describe('NodeTracer', () => {
         }
         return done();
       });
-      assert.deepStrictEqual(tracer.getCurrentSpan(), null);
+      assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
     });
   });
 
