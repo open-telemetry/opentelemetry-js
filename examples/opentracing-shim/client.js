@@ -1,13 +1,8 @@
 "use strict";
 
 const http = require("http");
-
 const opentracing = require("opentracing");
-
-const utils = require("./utils");
-
-const Tracer = require("./tracer");
-Tracer.init("http_client_service");
+require("./tracer").init("http_client_service");
 
 const tracer = opentracing.globalTracer();
 
@@ -38,9 +33,8 @@ async function makeRequest() {
           console.log(JSON.parse(data));
           span.finish();
 
-          console.log("Sleeping 3 seconds before shutdown to ensure all records are flushed.");
-          await utils.sleep(3000);
-          console.log("Completed.");
+          console.log("Sleeping 5 seconds before shutdown to ensure all records are flushed.");
+          setTimeout(() => { console.log('Completed.'); }, 5000);
           process.exit(0);
         });
       }

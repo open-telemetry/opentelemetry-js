@@ -1,8 +1,8 @@
 # Overview
 
-OpenTelemetry Shim Opentracing allows user to report to OpenTelemetry with existing OpenTracing instrumentation.
+OpenTelemetry Opentracing shim allows user to report to OpenTelemetry with existing OpenTracing instrumentation.
 
-This is a simple example that demonstrates tracing HTTP from client to server.
+This is a simple example that demonstrates how existing OpenTracing instrumentation can be integrated with OpenTelemetry.
 
 The example shows key aspects of tracing such as
 
@@ -69,6 +69,7 @@ $ npm run jaeger:client
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node>
+- For more information on OpenTracing, visit: <https://opentracing.io/>
 
 ## LICENSE
 

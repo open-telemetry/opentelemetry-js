@@ -17,7 +17,8 @@
   "keywords": [
     "opentelemetry",
     "http",
-    "tracing"
+    "tracing",
+    "opentracing"
   ],
   "engines": {
     "node": ">=8"
@@ -28,7 +29,6 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.2.0",
     "@opentelemetry/exporter-jaeger": "^0.2.0",
     "@opentelemetry/exporter-zipkin": "^0.2.0",
     "@opentelemetry/node": "^0.2.0",

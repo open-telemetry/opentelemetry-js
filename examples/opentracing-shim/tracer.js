@@ -1,3 +1,5 @@
+"use strict";
+
 const { NodeTracer } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");

@@ -1,13 +1,9 @@
 "use strict";
 
 const http = require("http");
-
 const opentracing = require("opentracing");
-
 const utils = require("./utils");
-
-const Tracer = require("./tracer");
-Tracer.init("http_server_service");
+require("./tracer").init("http_server_service");
 
 const tracer = opentracing.globalTracer();
 
