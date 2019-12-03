@@ -49,14 +49,13 @@ export interface MetricOptions {
   disabled?: boolean;
 
   /**
-   * Monotonic allows this metric to accept negative values. If `true` only
-   * non-negative values are expected.
+   * Asserts that this metric may only increase (e.g. time spent).
    */
   monotonic?: boolean;
 
   /**
-   * (Measure only) Absolute asserts that this metric cannot only accept positive values.
-   * Default true
+   * (Measure only, default true) Asserts that this metric will only accept
+   * non-negative values (e.g. disk usage).
    */
   absolute?: boolean;
 

@@ -212,8 +212,8 @@ export class MeasureMetric extends Metric<MeasureHandle>
       name,
       options,
       options.valueType === types.ValueType.DOUBLE
-        ? MetricDescriptorType.GAUGE_DOUBLE
-        : MetricDescriptorType.GAUGE_INT64
+        ? MetricDescriptorType.MEASURE_DOUBLE
+        : MetricDescriptorType.MEASURE_INT64
     );
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
