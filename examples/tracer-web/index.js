@@ -2,6 +2,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracer } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { CollectorExporter } from '@opentelemetry/exporter-collector'
 
 const webTracer = new WebTracer({
   plugins: [
@@ -17,6 +18,7 @@ const webTracerWithZone = new WebTracer({
   ]
 });
 webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
 console.log('Current span is window', webTracerWithZone.getCurrentSpan() === window);
 

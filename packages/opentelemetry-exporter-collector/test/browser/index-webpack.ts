@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './performance';
-export * from './timer-util';
-export * from './hex-to-base64';
+// This file is the webpack entry point for the browser Karma tests. It requires
+// all modules ending in "test" from the current folder and all its subfolders.
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
+
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
