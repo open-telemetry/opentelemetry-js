@@ -31,7 +31,8 @@ function get(input: RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
     let req: http.ClientRequest;
-    function getResponseCb(resp: http.IncomingMessage): void {
+
+    function onGetResponseCb(resp: http.IncomingMessage): void {
       const res = (resp as unknown) as http.IncomingMessage & {
         req: http.IncomingMessage;
       };
@@ -54,8 +55,8 @@ function get(input: any, options?: any): GetResult {
     }
     req =
       options != null
-        ? http.get(input, options, getResponseCb)
-        : http.get(input, getResponseCb);
+        ? http.get(input, options, onGetResponseCb)
+        : http.get(input, onGetResponseCb);
     req.on('error', err => {
       reject(err);
     });
