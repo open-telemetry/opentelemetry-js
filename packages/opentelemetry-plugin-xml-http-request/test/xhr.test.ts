@@ -108,7 +108,7 @@ describe('xhr', () => {
     let exportSpy: any;
     let rootSpan: types.Span;
     let spyEntries: any;
-    const url = 'http://localhost:9876';
+    const url = window.location.origin;
     let fakeNow = 0;
 
     clearData = () => {
@@ -168,7 +168,7 @@ describe('xhr', () => {
     };
 
     beforeEach(done => {
-      const propagateTraceHeaderUrls = ['http://localhost:9876'];
+      const propagateTraceHeaderUrls = [window.location.origin];
       prepareData(done, propagateTraceHeaderUrls);
     });
 
