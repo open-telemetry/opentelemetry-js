@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides auto instrumentation for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+This module provides auto instrumentation for web using XMLHttpRequest .
 
 ## Installation
 
@@ -25,7 +25,8 @@ const webTracerWithZone = new WebTracer({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new XMLHttpRequestPlugin({
-      ignoreUrls: ['http://localhost:8090/sockjs-node/info']    
+      ignoreUrls: ['http://localhost:8090/sockjs-node/info'],
+      propagateTraceHeaderUrls: ['http://localhost:8090']    
     })
   ]
 });
@@ -33,7 +34,7 @@ webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExport
 
 // and some test
 const req = new XMLHttpRequest();
-req.open('GET', 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json', true);
+req.open('GET', 'http://localhost:8090/xml-http-request.js', true);
 req.send();
 
 ```

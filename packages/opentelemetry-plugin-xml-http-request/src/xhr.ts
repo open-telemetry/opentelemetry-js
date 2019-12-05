@@ -41,10 +41,17 @@ import {
   XMLHttpRequestWrapped,
 } from './types';
 
+/**
+ * XMLHttpRequest config
+ */
 export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
+  // urls which should include trace headers when origin matches
   propagateTraceHeaderUrls?: PropagateTraceHeaderUrls;
 }
 
+/**
+ * This class represents a XMLHttpRequest plugin for auto instrumentation
+ */
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
   readonly version: string = '0.3.0';
@@ -336,6 +343,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       shimmer.unwrap(XMLHttpRequest.prototype, 'open');
       this._logger.debug('removing previous patch from method open');
     }
+
     if (isWrapped(XMLHttpRequest.prototype.send)) {
       shimmer.unwrap(XMLHttpRequest.prototype, 'send');
       this._logger.debug('removing previous patch from method send');
@@ -343,6 +351,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     shimmer.wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
     shimmer.wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+
     return this._moduleExports;
   }
 
@@ -354,6 +363,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     shimmer.unwrap(XMLHttpRequest.prototype, 'open');
     shimmer.unwrap(XMLHttpRequest.prototype, 'send');
+
     Object.keys(this._callbackToRemoveEvents).forEach(key =>
       this._callbackToRemoveEvents[key]()
     );
