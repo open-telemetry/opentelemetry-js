@@ -250,8 +250,7 @@ export const getRequestInfo = (
   }
   // some packages return method in lowercase..
   // ensure upperCase for consistency
-  let method = optionsParsed.method;
-  method = method ? method.toUpperCase() : 'GET';
+  const method = optionsParsed.method ? optionsParsed.method.toUpperCase() : 'GET';
 
   return { origin, pathname, method, optionsParsed };
 };
