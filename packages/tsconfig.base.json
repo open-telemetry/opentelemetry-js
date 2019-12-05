@@ -13,7 +13,7 @@
     "sourceMap": true,
     "strict": true,
     "strictNullChecks": true,
-    "target": "esnext"
+    "target": "es2017"
   },
   "exclude": [
     "node_modules"
