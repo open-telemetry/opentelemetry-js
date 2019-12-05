@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-/**
- * Helper function to be able to use enum as typed key in type and in interface when using forEach
- * @param obj
- * @param key
- */
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
-  return key in obj;
+export enum AttributeNames {
+  COMPONENT = 'component',
+  HTTP_HOSTNAME = 'http.hostname',
+  HTTP_METHOD = 'http.method',
+  HTTP_PATH = 'http.path',
+  HTTP_URL = 'http.url',
+  HTTP_STATUS_CODE = 'http.status_code',
+  HTTP_STATUS_TEXT = 'http.status_text',
+  // NOT ON OFFICIAL SPEC
+  HTTP_USER_AGENT = 'http.user_agent',
 }

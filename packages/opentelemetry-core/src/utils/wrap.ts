@@ -14,8 +14,17 @@
  * limitations under the License.
  */
 
-export * from './WebTracer';
-export * from './StackScopeManager';
-export * from './enums/PerformanceTimingNames';
-export * from './types';
-export * from './utils';
+import { ShimWrapped } from '../common/types';
+
+/**
+ * Checks if certain function has been already wrapped
+ * @param func
+ */
+export function isWrapped(func: any) {
+  return (
+    typeof func === 'function' &&
+    typeof (func as ShimWrapped).__original === 'function' &&
+    typeof (func as ShimWrapped).__unwrap === 'function' &&
+    (func as ShimWrapped).__wrapped === true
+  );
+}

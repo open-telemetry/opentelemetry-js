@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-export * from './WebTracer';
-export * from './StackScopeManager';
-export * from './enums/PerformanceTimingNames';
-export * from './types';
-export * from './utils';
+export enum TRACE_HEADERS {
+  TRACE_ID = 'x-b3-traceid',
+  SPAN_ID = 'x-b3-spanid',
+  SAMPLED = 'x-b3-sampled',
+}

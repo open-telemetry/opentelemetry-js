@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
-
 /**
  * Performance metrics
  */
+import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
+
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
