@@ -16,14 +16,19 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 
-import { LogLevel, otperformance as performance } from '@opentelemetry/core';
+import {
+  LogLevel,
+  otperformance as performance,
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from '@opentelemetry/core';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import * as tracing from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
 import { PerformanceTimingNames as PTN, WebTracer } from '@opentelemetry/web';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
-import { TRACE_HEADERS } from '../src/enums/xhr';
 import { XMLHttpRequestPlugin } from '../src/xhr';
 
 class DummySpanExporter implements tracing.SpanExporter {
@@ -108,7 +113,7 @@ describe('xhr', () => {
     let exportSpy: any;
     let rootSpan: types.Span;
     let spyEntries: any;
-    const url = window.location.origin;
+    const url = `${window.location.origin}/xml-http-request.js`;
     let fakeNow = 0;
 
     clearData = () => {
@@ -234,7 +239,7 @@ describe('xhr', () => {
       );
       assert.strictEqual(
         attributes[keys[6]],
-        '/',
+        '/xml-http-request.js',
         `attributes ${AttributeNames.HTTP_PATH} is wrong`
       );
       assert.ok(
@@ -317,19 +322,19 @@ describe('xhr', () => {
       it('should set trace headers', () => {
         const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.TRACE_ID],
+          requests[0].requestHeaders[X_B3_TRACE_ID],
           span.spanContext.traceId,
-          `trace header '${TRACE_HEADERS.TRACE_ID}' not set`
+          `trace header '${X_B3_TRACE_ID}' not set`
         );
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.SPAN_ID],
+          requests[0].requestHeaders[X_B3_SPAN_ID],
           span.spanContext.spanId,
-          `trace header '${TRACE_HEADERS.SPAN_ID}' not set`
+          `trace header '${X_B3_SPAN_ID}' not set`
         );
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.SAMPLED],
+          requests[0].requestHeaders[X_B3_SAMPLED],
           String(span.spanContext.traceFlags),
-          `trace header '${TRACE_HEADERS.SAMPLED}' not set`
+          `trace header '${X_B3_SAMPLED}' not set`
         );
       });
     });
@@ -341,19 +346,19 @@ describe('xhr', () => {
       });
       it('should NOT set trace headers', () => {
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.TRACE_ID],
+          requests[0].requestHeaders[X_B3_TRACE_ID],
           undefined,
-          `trace header '${TRACE_HEADERS.TRACE_ID}' should not be set`
+          `trace header '${X_B3_TRACE_ID}' should not be set`
         );
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.SPAN_ID],
+          requests[0].requestHeaders[X_B3_SPAN_ID],
           undefined,
-          `trace header '${TRACE_HEADERS.SPAN_ID}' should not be set`
+          `trace header '${X_B3_SPAN_ID}' should not be set`
         );
         assert.strictEqual(
-          requests[0].requestHeaders[TRACE_HEADERS.SAMPLED],
+          requests[0].requestHeaders[X_B3_SAMPLED],
           undefined,
-          `trace header '${TRACE_HEADERS.SAMPLED}' should not be set`
+          `trace header '${X_B3_SAMPLED}' should not be set`
         );
       });
     });
