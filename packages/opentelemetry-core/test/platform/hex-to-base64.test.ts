@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './performance';
-export * from './timer-util';
-export * from './hex-to-base64';
+import * as assert from 'assert';
+import { hexToBase64 } from '../../src/platform';
+
+describe('hexToBase64', () => {
+  it('convert hex to base64', () => {
+    const id1 = '7deb739e02e44ef2';
+    const id2 = '46cef837b919a16ff26e608c8cf42c80';
+    assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
+    assert.strictEqual(hexToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
+  });
+});

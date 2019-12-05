@@ -1,28 +1,26 @@
 {
-  "name": "@opentelemetry/core",
+  "name": "@opentelemetry/exporter-collector",
   "version": "0.2.0",
-  "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
+  "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
-  "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
-    "test:browser": "nyc karma start --single-run",
-    "tdd": "yarn tdd:node",
-    "tdd:node": "yarn test -- --watch-extensions ts --watch",
-    "tdd:browser": "karma start",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "clean": "rimraf build/*",
     "check": "gts check",
+    "clean": "rimraf build/*",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/browser/**/*.ts'",
+    "test:browser": "nyc karma start --single-run",
     "version:update": "node scripts/version-update.js",
     "watch": "tsc -w"
   },
@@ -51,13 +49,14 @@
     "access": "public"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.0",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
-    "@types/semver": "^6.2.0",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
-    "codecov": "^3.6.1",
-    "gts": "^1.1.0",
+    "babel-loader": "^8.0.6",
+    "codecov": "^3.1.0",
+    "gts": "^1.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "^3.1.0",
@@ -74,11 +73,15 @@
     "ts-node": "^8.0.0",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.7.2",
-    "webpack": "^4.35.2"
+    "typescript": "3.6.4",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.2.0",
-    "semver": "^6.3.0"
+    "@opentelemetry/base": "^0.2.0",
+    "@opentelemetry/core": "^0.2.0",
+    "@opentelemetry/tracing": "^0.2.0",
+    "@opentelemetry/types": "^0.2.0"
   }
 }

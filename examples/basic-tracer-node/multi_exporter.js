@@ -2,6 +2,7 @@ const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, BatchSpanProcessor, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const tracer = new BasicTracer();
 
@@ -10,7 +11,8 @@ const jaegerExporter = new JaegerExporter({
   serviceName: 'basic-service',
   // The default flush interval is 5 seconds.
   flushInterval: 2000
-})
+});
+const collectorExporter = new CollectorExporter({serviceName: 'basic-service'});
 
 // It is recommended to use this BatchSpanProcessor for better performance
 // and optimization, especially in production.
@@ -21,6 +23,8 @@ tracer.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
 // It is recommended to use SimpleSpanProcessor in case of Jaeger exporter as
 // it's internal client already handles the spans with batching logic.
 tracer.addSpanProcessor(new SimpleSpanProcessor(jaegerExporter));
+
+tracer.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
 opentelemetry.initGlobalTracer(tracer);
@@ -36,6 +40,7 @@ span.end();
 // flush and close the connection.
 zipkinExporter.shutdown();
 jaegerExporter.shutdown();
+collectorExporter.shutdown();
 
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
