@@ -222,7 +222,7 @@ export const getRequestInfo = (
           : options.hostname,
       path: `${options.pathname || ''}${options.search || ''}`,
     };
-    if (optionsParsed.port !== '') {
+    if (options.port !== '') {
       optionsParsed.port = Number(options.port);
     }
     if (options.username || options.password) {
