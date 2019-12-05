@@ -15,7 +15,7 @@
  */
 
 import * as http from 'http';
-import * as url from 'url';
+import { URL } from 'url';
 import { RequestOptions } from 'https';
 
 type GetResult = Promise<{
@@ -26,9 +26,9 @@ type GetResult = Promise<{
   method: string | undefined;
 }>;
 
-function get(url: string | url.URL, options?: RequestOptions): GetResult;
-function get(url: RequestOptions): GetResult;
-function get(url: any, options?: any): GetResult {
+function get(input: string | URL, options?: RequestOptions): GetResult;
+function get(input: RequestOptions): GetResult;
+function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
     let req: http.ClientRequest;
     function getResponseCb(resp: http.IncomingMessage): void {
@@ -54,8 +54,8 @@ function get(url: any, options?: any): GetResult {
     }
     req =
       options != null
-        ? http.get(url, options, getResponseCb)
-        : http.get(url, getResponseCb);
+        ? http.get(input, options, getResponseCb)
+        : http.get(input, getResponseCb);
     req.on('error', err => {
       reject(err);
     });

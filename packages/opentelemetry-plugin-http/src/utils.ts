@@ -234,7 +234,7 @@ export const getRequestInfo = (
       Object.assign(optionsParsed, extraOptions);
     }
   } else {
-    optionsParsed = options;
+    optionsParsed = Object.assign({}, options);
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';
