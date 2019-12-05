@@ -402,12 +402,14 @@ export class HttpPlugin extends BasePlugin<Http> {
         return original.apply(this, [options, ...args]);
       }
 
+      const extraOptions =
+        typeof args[0] === 'object' &&
+        (typeof options === 'string' || options instanceof url.URL)
+          ? (args.shift() as RequestOptions)
+          : undefined;
       const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
         options,
-        typeof args[0] === 'object' &&
-          (typeof options === 'string' || options instanceof url.URL)
-          ? (args.shift() as RequestOptions)
-          : undefined
+        extraOptions
       );
 
       options = optionsParsed;
