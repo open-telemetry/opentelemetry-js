@@ -41,9 +41,27 @@ function defineProperty(obj: any, name: string, value: unknown) {
 }
 
 const notWrappedFunctions: any[] = [];
-notWrappedFunctions.push(makeWrapped(false, function() {}, function() {}));
-notWrappedFunctions.push(makeWrapped(false, 'foo', function() {}));
-notWrappedFunctions.push(makeWrapped(false, function() {}, 'foo'));
+notWrappedFunctions.push(
+  makeWrapped(
+    false,
+    function() {},
+    function() {}
+  )
+);
+notWrappedFunctions.push(
+  makeWrapped(
+    false,
+    'foo',
+    function() {}
+  )
+);
+notWrappedFunctions.push(
+  makeWrapped(
+    false,
+    function() {},
+    'foo'
+  )
+);
 notWrappedFunctions.push({
   __wrapped: true,
   __unwrap: function() {},
