@@ -238,13 +238,12 @@ describe('xhr', () => {
       );
       assert.strictEqual(
         attributes[keys[5]],
-        'localhost',
-        `attributes ${AttributeNames.HTTP_HOSTNAME} is wrong`
+        window.location.host,
+        `attributes ${AttributeNames.HTTP_HOST} is wrong`
       );
-      assert.strictEqual(
-        attributes[keys[6]],
-        '/xml-http-request.js',
-        `attributes ${AttributeNames.HTTP_PATH} is wrong`
+      assert.ok(
+        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+        `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',
@@ -499,12 +498,11 @@ describe('xhr', () => {
       assert.strictEqual(
         attributes[keys[5]],
         'raw.githubusercontent.com',
-        `attributes ${AttributeNames.HTTP_HOSTNAME} is wrong`
+        `attributes ${AttributeNames.HTTP_HOST} is wrong`
       );
-      assert.strictEqual(
-        attributes[keys[6]],
-        '/open-telemetry/opentelemetry-js/master/package.json',
-        `attributes ${AttributeNames.HTTP_PATH} is wrong`
+      assert.ok(
+        attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+        `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',

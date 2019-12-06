@@ -264,12 +264,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
             xhr.statusText
           );
           currentSpan.setAttribute(
-            AttributeNames.HTTP_HOSTNAME,
-            parsedUrl.hostname
+            AttributeNames.HTTP_HOST,
+            parsedUrl.host
           );
           currentSpan.setAttribute(
-            AttributeNames.HTTP_PATH,
-            parsedUrl.pathname
+            AttributeNames.HTTP_SCHEME,
+            parsedUrl.protocol.replace(':', '')
           );
 
           // @TODO do we want to collect this or it will be collected earlier once only or

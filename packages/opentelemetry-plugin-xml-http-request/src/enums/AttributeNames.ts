@@ -16,12 +16,13 @@
 
 export enum AttributeNames {
   COMPONENT = 'component',
-  HTTP_HOSTNAME = 'http.hostname',
+  HTTP_HOST = 'http.host',
+  HTTP_FLAVOR = 'http.flavor',
   HTTP_METHOD = 'http.method',
-  HTTP_PATH = 'http.path',
-  HTTP_URL = 'http.url',
+  HTTP_SCHEME = 'http.scheme',
   HTTP_STATUS_CODE = 'http.status_code',
   HTTP_STATUS_TEXT = 'http.status_text',
+  HTTP_URL = 'http.url',
   // NOT ON OFFICIAL SPEC
   HTTP_USER_AGENT = 'http.user_agent',
 }
