@@ -263,10 +263,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
             AttributeNames.HTTP_STATUS_TEXT,
             xhr.statusText
           );
-          currentSpan.setAttribute(
-            AttributeNames.HTTP_HOST,
-            parsedUrl.host
-          );
+          currentSpan.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
           currentSpan.setAttribute(
             AttributeNames.HTTP_SCHEME,
             parsedUrl.protocol.replace(':', '')
