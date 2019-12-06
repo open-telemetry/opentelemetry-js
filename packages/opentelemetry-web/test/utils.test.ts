@@ -24,19 +24,16 @@ import { HrTime } from '@opentelemetry/types';
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  addSpanNetworkEvent,
-  getResource,
-  PerformanceEntries,
-  sameOriginOrUrlMatches,
-} from '../src';
+import { addSpanNetworkEvent, getResource, PerformanceEntries } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
+
+const SECOND_TO_NANOSECONDS = 1e9;
 
 function createHrTime(startTime: HrTime, addToStart: number): HrTime {
   let seconds = startTime[0];
   let nanos = startTime[1] + addToStart;
-  if (nanos >= core.SECOND_TO_NANOSECONDS) {
-    nanos = core.SECOND_TO_NANOSECONDS - nanos;
+  if (nanos >= SECOND_TO_NANOSECONDS) {
+    nanos = SECOND_TO_NANOSECONDS - nanos;
     seconds++;
   }
   return [seconds, nanos];
@@ -300,48 +297,6 @@ describe('utils', () => {
             'resource should be defined'
           );
         });
-      });
-    });
-
-    describe('sameOriginOrUrlMatches', () => {
-      it('should return true for the same url', () => {
-        const url1 = 'http://foo.com/1';
-        const url2 = 'http://foo.com/2';
-        assert.strictEqual(
-          sameOriginOrUrlMatches(url1, url2),
-          true,
-          'origins are not the same'
-        );
-      });
-
-      it('should return true if url matches with RegExp', () => {
-        const url1 = 'http://foo.com/1';
-        const url2 = /foo\.com/;
-        assert.strictEqual(
-          sameOriginOrUrlMatches(url1, url2),
-          true,
-          'url does not match'
-        );
-      });
-
-      it('should return false for different urls', () => {
-        const url1 = 'http://foo.com/1';
-        const url2 = 'http://foo.au/2';
-        assert.strictEqual(
-          sameOriginOrUrlMatches(url1, url2),
-          false,
-          'origins are not the same'
-        );
-      });
-
-      it('should return false if url does NOT matches with RegExp', () => {
-        const url1 = 'http://foo.com/1';
-        const url2 = /foo\.cam/;
-        assert.strictEqual(
-          sameOriginOrUrlMatches(url1, url2),
-          false,
-          'url does not match'
-        );
       });
     });
   });

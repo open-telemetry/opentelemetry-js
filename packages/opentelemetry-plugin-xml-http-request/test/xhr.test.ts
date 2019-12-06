@@ -122,7 +122,11 @@ describe('xhr', () => {
       spyEntries.restore();
     };
 
-    prepareData = (done: any, propagateTraceHeaderUrls?: any) => {
+    prepareData = (
+      done: any,
+      fileUrl: string,
+      propagateTraceHeaderUrls?: any
+    ) => {
       sandbox = sinon.createSandbox();
       sandbox.stub(performance, 'timeOrigin').value(0);
       sandbox.stub(performance, 'now').callsFake(() => fakeNow);
@@ -138,7 +142,7 @@ describe('xhr', () => {
       spyEntries.withArgs('resource').returns(resources);
 
       webTracerWithZone = new WebTracer({
-        logLevel: LogLevel.WARN,
+        logLevel: LogLevel.ERROR,
         scopeManager: new ZoneScopeManager(),
         plugins: [
           new XMLHttpRequestPlugin({
@@ -155,7 +159,7 @@ describe('xhr', () => {
       rootSpan = webTracerWithZone.startSpan('root');
 
       webTracerWithZone.withSpan(rootSpan, () => {
-        getData(url, () => {
+        getData(fileUrl, () => {
           fakeNow = 100;
         }).then(() => {
           fakeNow = 0;
@@ -174,7 +178,7 @@ describe('xhr', () => {
 
     beforeEach(done => {
       const propagateTraceHeaderUrls = [window.location.origin];
-      prepareData(done, propagateTraceHeaderUrls);
+      prepareData(done, url, propagateTraceHeaderUrls);
     });
 
     afterEach(() => {
@@ -318,7 +322,7 @@ describe('xhr', () => {
       assert.strictEqual(events.length, 12, 'number of events is wrong');
     });
 
-    describe('AND origin match with propagateTraceHeaderUrls', () => {
+    describe('AND origin match with window.location', () => {
       it('should set trace headers', () => {
         const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
         assert.strictEqual(
@@ -339,29 +343,68 @@ describe('xhr', () => {
       });
     });
 
-    describe('AND origin does NOT match with propagateTraceHeaderUrls', () => {
-      beforeEach(done => {
-        clearData();
-        prepareData(done);
-      });
-      it('should NOT set trace headers', () => {
-        assert.strictEqual(
-          requests[0].requestHeaders[X_B3_TRACE_ID],
-          undefined,
-          `trace header '${X_B3_TRACE_ID}' should not be set`
-        );
-        assert.strictEqual(
-          requests[0].requestHeaders[X_B3_SPAN_ID],
-          undefined,
-          `trace header '${X_B3_SPAN_ID}' should not be set`
-        );
-        assert.strictEqual(
-          requests[0].requestHeaders[X_B3_SAMPLED],
-          undefined,
-          `trace header '${X_B3_SAMPLED}' should not be set`
-        );
-      });
-    });
+    describe(
+      'AND origin does NOT match window.location but match with' +
+        ' propagateTraceHeaderUrls',
+      () => {
+        beforeEach(done => {
+          clearData();
+          prepareData(
+            done,
+            'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
+            /raw\.githubusercontent\.com/
+          );
+        });
+        it('should set trace headers', () => {
+          const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_TRACE_ID],
+            span.spanContext.traceId,
+            `trace header '${X_B3_TRACE_ID}' not set`
+          );
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_SPAN_ID],
+            span.spanContext.spanId,
+            `trace header '${X_B3_SPAN_ID}' not set`
+          );
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_SAMPLED],
+            String(span.spanContext.traceFlags),
+            `trace header '${X_B3_SAMPLED}' not set`
+          );
+        });
+      }
+    );
+    describe(
+      'AND origin does NOT match window.location And does NOT match' +
+        ' with propagateTraceHeaderUrls',
+      () => {
+        beforeEach(done => {
+          clearData();
+          prepareData(
+            done,
+            'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
+          );
+        });
+        it('should NOT set trace headers', () => {
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_TRACE_ID],
+            undefined,
+            `trace header '${X_B3_TRACE_ID}' should not be set`
+          );
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_SPAN_ID],
+            undefined,
+            `trace header '${X_B3_SPAN_ID}' should not be set`
+          );
+          assert.strictEqual(
+            requests[0].requestHeaders[X_B3_SAMPLED],
+            undefined,
+            `trace header '${X_B3_SAMPLED}' should not be set`
+          );
+        });
+      }
+    );
   });
 
   describe('when request is NOT successful', () => {
@@ -389,7 +432,7 @@ describe('xhr', () => {
       spyEntries.withArgs('resource').returns(resources);
 
       webTracerWithZone = new WebTracer({
-        logLevel: LogLevel.WARN,
+        logLevel: LogLevel.ERROR,
         scopeManager: new ZoneScopeManager(),
         plugins: [new XMLHttpRequestPlugin()],
       });

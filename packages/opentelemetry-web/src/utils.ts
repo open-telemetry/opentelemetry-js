@@ -22,7 +22,6 @@ import {
   hrTime,
   hrTimeToNanoseconds,
   timeInputToHrTime,
-  urlMatches,
 } from '@opentelemetry/core';
 
 /**
@@ -153,24 +152,4 @@ export function parseUrl(url: string): HTMLAnchorElement {
   const a = document.createElement('a');
   a.href = url;
   return a;
-}
-
-/**
- * Check if both url might have the same origin or
- *     if {@param urlToMatch} is part of {@param url}
- * @param url
- * @param urlToMatch
- */
-export function sameOriginOrUrlMatches(
-  url: string,
-  urlToMatch: string | RegExp
-): boolean {
-  const urlA = parseUrl(url);
-  if (typeof urlToMatch === 'string') {
-    const urlToMatchA = parseUrl(urlToMatch);
-    if (urlA.origin === urlToMatchA.origin) {
-      return true;
-    }
-  }
-  return urlMatches(url, urlToMatch);
 }

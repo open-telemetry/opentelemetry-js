@@ -19,7 +19,7 @@ import { otperformance as performance } from '../platform';
 import { TimeOriginLegacy } from './types';
 
 const NANOSECOND_DIGITS = 9;
-export const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
+const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
 
 /**
  * Converts a number to HrTime

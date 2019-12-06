@@ -45,7 +45,7 @@ import {
  * XMLHttpRequest config
  */
 export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
-  // urls which should include trace headers when origin matches
+  // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderUrls?: PropagateTraceHeaderUrls;
 }
 
@@ -75,11 +75,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, span: types.Span) {
-    let propagateTraceHeaderUrls = this._config.propagateTraceHeaderUrls;
-    if (!propagateTraceHeaderUrls) {
-      return;
-    }
-
+    let propagateTraceHeaderUrls = this._config.propagateTraceHeaderUrls || [];
     if (
       typeof propagateTraceHeaderUrls === 'string' ||
       propagateTraceHeaderUrls instanceof RegExp
@@ -89,22 +85,28 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     const url = (span as tracing.Span).name;
     const spanUrl = parseUrl(url);
+    let addHeaderOnDifferentOrigin = false;
+
     if (spanUrl.origin !== window.location.origin) {
-      this._logger.warn('Cannot set headers on different origin');
-      return;
-    }
-
-    for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-      if (sameOriginOrUrlMatches(url, propagateTraceHeaderUrl)) {
-        const b3Format = new B3Format();
-        const carrier: { [key: string]: unknown } = {};
-        b3Format.inject(span.context(), 'B3Format', carrier);
-
-        Object.keys(carrier).forEach(key => {
-          xhr.setRequestHeader(key, String(carrier[key]));
-        });
+      for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
+        if (sameOriginOrUrlMatches(url, propagateTraceHeaderUrl)) {
+          addHeaderOnDifferentOrigin = true;
+          break;
+        }
+      }
+      if (!addHeaderOnDifferentOrigin) {
+        this._logger.warn('Cannot set headers on different origin');
+        return;
       }
     }
+
+    const b3Format = new B3Format();
+    const carrier: { [key: string]: unknown } = {};
+    b3Format.inject(span.context(), 'B3Format', carrier);
+
+    Object.keys(carrier).forEach(key => {
+      xhr.setRequestHeader(key, String(carrier[key]));
+    });
   }
 
   /**
@@ -171,7 +173,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
 
     const currentSpan = this._tracer.startSpan(url, {
-      parent: this._tracer.getCurrentSpan() || undefined,
+      parent: this._tracer.getCurrentSpan(),
       attributes: {
         [AttributeNames.COMPONENT]: this.component,
         [AttributeNames.HTTP_METHOD]: method,
