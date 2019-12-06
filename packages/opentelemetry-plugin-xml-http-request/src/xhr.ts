@@ -20,6 +20,7 @@ import {
   isUrlIgnored,
   isWrapped,
   otperformance,
+  urlMatches,
 } from '@opentelemetry/core';
 import * as tracing from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
@@ -28,7 +29,6 @@ import {
   getResource,
   parseUrl,
   PerformanceTimingNames as PTN,
-  sameOriginOrUrlMatches,
 } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
@@ -89,7 +89,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     if (spanUrl.origin !== window.location.origin) {
       for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (sameOriginOrUrlMatches(url, propagateTraceHeaderUrl)) {
+        if (urlMatches(url, propagateTraceHeaderUrl)) {
           addHeaderOnDifferentOrigin = true;
           break;
         }
