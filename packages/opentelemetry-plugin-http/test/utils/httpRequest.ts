@@ -16,7 +16,6 @@
 
 import * as http from 'http';
 import { URL } from 'url';
-import { RequestOptions } from 'https';
 
 type GetResult = Promise<{
   data: string;
@@ -26,8 +25,8 @@ type GetResult = Promise<{
   method: string | undefined;
 }>;
 
-function get(input: string | URL, options?: RequestOptions): GetResult;
-function get(input: RequestOptions): GetResult;
+function get(input: string | URL, options?: http.RequestOptions): GetResult;
+function get(input: http.RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
     let req: http.ClientRequest;
