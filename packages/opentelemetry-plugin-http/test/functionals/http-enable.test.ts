@@ -23,6 +23,7 @@ import { NodeTracer } from '@opentelemetry/node';
 import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as path from 'path';
 import * as nock from 'nock';
 import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
@@ -393,7 +394,7 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of ['string', '', {}, new Date()]) {
+      for (const arg of ['string', {}, new Date()]) {
         it(`should be tracable and not throw exception in http plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -409,7 +410,7 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of [true, 1, false, 0]) {
+      for (const arg of [true, 1, false, 0, '']) {
         it(`should not throw exception in http plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
@@ -420,7 +421,9 @@ describe('HttpPlugin', () => {
             // http request has been made
             // nock throw
             assert.ok(
-              error.stack.indexOf('/node_modules/nock/lib/intercept.js') > 0
+              error.stack.indexOf(
+                path.normalize('/node_modules/nock/lib/intercept.js')
+              ) > 0
             );
           }
           const spans = memoryExporter.getFinishedSpans();
