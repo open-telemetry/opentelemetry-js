@@ -183,13 +183,13 @@ describe('ioredis', () => {
         });
       });
 
-      it('should create a child span for hset promise', done => {
+      it('should create a child span for hset promise', async () => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'hset hash random random',
         };
         const span = tracer.startSpan('test span');
-        tracer.withSpan(span, async () => {
+        await tracer.withSpan(span, async () => {
           try {
             await client.hset('hash', 'random', 'random');
             assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
@@ -207,19 +207,17 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
-          } finally {
-            done();
           }
         });
       });
 
-      it('should create a child span for get promise', done => {
+      it('should create a child span for get promise', async () => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'get test',
         };
         const span = tracer.startSpan('test span');
-        tracer.withSpan(span, async () => {
+        await tracer.withSpan(span, async () => {
           try {
             const value = await client.get('test');
             assert.strictEqual(value, 'data');
@@ -238,19 +236,17 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
-          } finally {
-            done();
           }
         });
       });
 
-      it('should create a child span for del', done => {
+      it('should create a child span for del', async () => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'del test',
         };
         const span = tracer.startSpan('test span');
-        tracer.withSpan(span, async () => {
+        await tracer.withSpan(span, async () => {
           try {
             const result = await client.del('test');
             assert.strictEqual(result, 1);
@@ -269,8 +265,6 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
-          } finally {
-            done();
           }
         });
       });
@@ -295,6 +289,22 @@ describe('ioredis', () => {
               done();
             });
           });
+        });
+      });
+
+      it('should not create a child span for hset promise upon error', async () => {
+        const span = tracer.startSpan('test span');
+        await tracer.withSpan(span, async () => {
+          try {
+            await client.hset('hash', 'random', 'random');
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 1);
+            assert.strictEqual(endedSpans[0].name, `test span`);
+          } catch (error) {
+            assert.ifError(error);
+          }
         });
       });
     });
