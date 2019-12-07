@@ -63,20 +63,14 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
       if (arguments.length === 1 && typeof cmd === 'object') {
         // Perform the original query
         const result = original.apply(this, arguments);
-        // Bind promise to parent span and end the span
         return result
-          .then((result: unknown) => {
-            // Return a pass-along promise which ends the span and then goes to user's orig resolvers
-            return new Promise((resolve, _) => {
-              endSpan(span, null);
-              resolve(result);
-            });
+          .then((res: unknown) => {
+            endSpan(span, null);
+            return res;
           })
           .catch((error: Error) => {
-            return new Promise((_, reject) => {
-              endSpan(span, error);
-              reject(error);
-            });
+            endSpan(span, error);
+            throw error;
           });
       }
     }
