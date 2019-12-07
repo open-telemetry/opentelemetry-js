@@ -50,7 +50,6 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         },
       });
 
-      // Set attributes for not explicitly typed IORedisPluginClientTypes
       if (this.options) {
         const { host, port } = this.options;
         span.setAttributes({
@@ -60,21 +59,16 @@ export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
         });
       }
 
-      if (arguments.length === 1 && typeof cmd === 'object') {
-        // Perform the original query
-        const result = original.apply(this, arguments);
-        return result
-          .then((res: unknown) => {
-            endSpan(span, null);
-            return res;
-          })
-          .catch((error: Error) => {
-            endSpan(span, error);
-            throw error;
-          });
-      }
-    }
-    // We don't know how to trace this call, so don't start/stop a span
-    else return original.apply(this, arguments);
+      const result = original.apply(this, arguments);
+      return result
+        .then((res: unknown) => {
+          endSpan(span, null);
+          return res;
+        })
+        .catch((error: Error) => {
+          endSpan(span, error);
+          throw error;
+        });
+    } else return original.apply(this, arguments);
   };
 };
