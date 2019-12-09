@@ -20,8 +20,6 @@ npm install --save @opentelemetry/plugin-ioredis
 
 ## Usage
 
-OpenTelemetry IORedis Instrumentation allows the user to automatically trace service calls using the [ioredis](https://www.npmjs.com/package/ioredis) npm package.
-
 To load a specific plugin (**ioredis** in this case), specify it in the Node Tracer's configuration
 ```js
 const { NodeTracer } = require('@opentelemetry/node');
