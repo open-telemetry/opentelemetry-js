@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-zone",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "OpenTelemetry Scope Zone",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -37,11 +37,11 @@
     "access": "public"
   },
   "devDependencies": {
+    "@babel/core": "^7.6.0",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
-    "@types/webpack-env": "1.13.9",
     "@types/sinon": "^7.0.13",
-    "@babel/core": "^7.6.0",
+    "@types/webpack-env": "1.13.9",
     "babel-loader": "^8.0.6",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
@@ -54,20 +54,19 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
-    "tslint-consistent-codestyle": "^1.16.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.0.0",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.6.3",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/scope-zone-peer-dep": "^0.2.0",
+    "@opentelemetry/scope-zone-peer-dep": "^0.3.0",
     "zone.js": "^0.10.2"
   },
-
   "sideEffects": true
 }
