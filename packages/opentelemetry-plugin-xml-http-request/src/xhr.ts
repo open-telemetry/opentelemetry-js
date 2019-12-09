@@ -315,11 +315,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       ) {
         plugin._createSpan(this as XMLHttpRequestWrapped, url, method);
 
-        if (async) {
-          return original.call(this, method, url, async, user, pass);
-        } else {
-          return original.call(this, method, url, true, null, null);
-        }
+        return original.call(this, method, url, true, user, pass);
       };
     };
   }
