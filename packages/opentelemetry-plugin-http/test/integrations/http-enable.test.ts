@@ -113,6 +113,60 @@ describe('HttpPlugin Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
+    it('should create a rootSpan for GET requests and add propagation headers if URL is used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpRequest.get(
+        new url.URL('http://google.fr/?query=test')
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
+    it('should create a rootSpan for GET requests and add propagation headers if URL and options are used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpRequest.get(
+        new url.URL('http://google.fr/?query=test'),
+        { headers: { 'x-foo': 'foo' } }
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
     it('custom attributes should show up on client spans', async () => {
       const result = await httpRequest.get(`http://google.fr/`);
       const spans = memoryExporter.getFinishedSpans();
