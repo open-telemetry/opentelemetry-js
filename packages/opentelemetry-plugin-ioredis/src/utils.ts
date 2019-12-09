@@ -32,8 +32,8 @@ const endSpan = (span: Span, err: Error | null) => {
   span.end();
 };
 
-export const getTracedSendCommand = (tracer: Tracer, original: Function) => {
-  return function sendCommandTrace(
+export const traceSendCommand = (tracer: Tracer, original: Function) => {
+  return function(
     this: ioredisTypes.Redis & IORedisPluginClientTypes,
     cmd?: IORedisCommand
   ) {
