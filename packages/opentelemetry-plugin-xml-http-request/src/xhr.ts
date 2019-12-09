@@ -312,7 +312,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         async?: boolean,
         user?: string | null,
         pass?: string | null
-      ): OpenFunction | any {
+      ) {
         plugin._createSpan(this as XMLHttpRequestWrapped, url, method);
 
         if (async) {
