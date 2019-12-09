@@ -2,10 +2,11 @@ const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const options = {
   serviceName: 'basic-service'
-}
+};
 
 // Initialize an exporter depending on how we were started
 let exporter;
@@ -13,8 +14,10 @@ let exporter;
 const EXPORTER = process.env.EXPORTER || '';
 if (EXPORTER.toLowerCase().startsWith('z')) {
   exporter = new ZipkinExporter(options);
-} else {
+} else if (EXPORTER.toLowerCase().startsWith('j')) {
   exporter = new JaegerExporter(options);
+} else {
+  exporter = new CollectorExporter(options);
 }
 
 const tracer = new BasicTracer();

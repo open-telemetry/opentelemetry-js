@@ -71,3 +71,9 @@ docs
 
 #lerna
 .changelog
+
+# OS generated files
+.DS_Store
+
+# VsCode configs
+.vscode/

@@ -1,17 +1,77 @@
 version: 2
 
-test_env: &test_env
+node_test_env: &node_test_env
   RUN_POSTGRES_TESTS: 1
+  RUN_MYSQL_TESTS: 1
+  RUN_MONGODB_TESTS: 1
+  RUN_REDIS_TESTS: 1
   POSTGRES_USER: postgres
   POSTGRES_DB: circle_database
   POSTGRES_HOST: localhost
   POSTGRES_PORT: 5432
+  OPENTELEMETRY_REDIS_HOST: 'localhost'
+  OPENTELEMETRY_REDIS_PORT: 6379
+  MONGODB_HOST: localhost
+  MONGODB_DB: opentelemetry-tests
+  MONGODB_PORT: 27017
+  MYSQL_USER: otel
+  MYSQL_PASSWORD: secret
+  MYSQL_DATABASE: circle_database
+  MYSQL_PORT: 3306
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
-  environment: # env to pass to CircleCI, specified values must match test_env
+  environment: # env to pass to CircleCI, specified values must match node_test_env
     POSTGRES_USER: postgres
     POSTGRES_DB: circle_database
+redis_service: &redis_service
+  image: redis
+
+mongo_service: &mongo_service
+  image: mongo
+
+mysql_service: &mysql_service
+  image: circleci/mysql:5.7
+  environment:
+    MYSQL_USER: otel
+    MYSQL_PASSWORD: secret
+    MYSQL_DATABASE: circle_database
+    MYSQL_ROOT_PASSWORD: rootpw
+
+cache_1: &cache_1
+  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+  paths:
+    - ./node_modules
+    - ./yarn.lock
+    - packages/opentelemetry-base/node_modules
+    - packages/opentelemetry-scope-base/node_modules
+    - packages/opentelemetry-types/node_modules
+    - packages/opentelemetry-scope-async-hooks/node_modules
+    - packages/opentelemetry-core/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
+    - packages/opentelemetry-metrics/node_modules
+    - packages/opentelemetry-tracing/node_modules
+    - packages/opentelemetry-exporter-jaeger/node_modules
+    - packages/opentelemetry-exporter-zipkin/node_modules
+    - packages/opentelemetry-node/node_modules
+    - packages/opentelemetry-shim-opentracing/node_modules
+    - packages/opentelemetry-web/node_modules
+    - packages/opentelemetry-plugin-dns/node_modules
+
+cache_2: &cache_2
+  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
+  paths:
+    - packages/opentelemetry-plugin-grpc/node_modules
+    - packages/opentelemetry-plugin-http/node_modules
+    - packages/opentelemetry-plugin-http2/node_modules
+    - packages/opentelemetry-plugin-mongodb-core/node_modules
+    - packages/opentelemetry-plugin-redis/node_modules
+    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
+    - packages/opentelemetry-plugin-document-load/node_modules
+    - packages/opentelemetry-plugin-https/node_modules
+    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
+    - packages/opentelemetry-plugin-mysql/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
 
 node_unit_tests: &node_unit_tests
   steps:
@@ -31,17 +91,17 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-{{ checksum "/tmp/checksums.txt" }}
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
     - run:
         name: Install Dependencies
         command: yarn install
     - save_cache:
-        key: npm-cache-{{ checksum "/tmp/checksums.txt" }}
-        paths:
-          - ./node_modules
-          - ./yarn.lock
-          - ./packages/*/node_modules
-          - ./packages/*/yarn.lock
+        <<: *cache_1
+    - save_cache:
+        <<: *cache_2
     - run:
         name: Compile code
         command: yarn compile
@@ -56,6 +116,9 @@ browsers_unit_tests: &browsers_unit_tests
   steps:
     - checkout
     - run:
+        name: Create Checksum
+        command: sh .circleci/checksum.sh /tmp/checksums.txt
+    - run:
         name: Setup environment variables
         command: |
           echo "export CIRCLE_NODE_VERSION=\$(node --version | grep -oE 'v[0-9]+')" >> $BASH_ENV
@@ -65,12 +128,19 @@ browsers_unit_tests: &browsers_unit_tests
         command: |
           node --version
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
+    - restore_cache:
+        keys:
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+    - restore_cache:
+        keys:
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
     - run:
         name: Install Dependencies
         command: yarn install
-    - run:
-        name: Compile code
-        command: yarn compile
+    - save_cache:
+        <<: *cache_1
+    - save_cache:
+        <<: *cache_2
     - run:
         name: Unit tests
         command: yarn test:browser
@@ -85,8 +155,11 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install modules and dependencies.
-          command: yarn install
+          name: Install minimal doc and lint modules globally
+          command: yarn global add lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
+      - run:
+          name: Symlink global modules into all lerna packages
+          command: lerna exec 'ln -s $(yarn global dir)/node_modules node_modules'
       - run:
           name: Check code style and linting
           command: yarn run check
@@ -96,20 +169,29 @@ jobs:
   node8:
     docker:
       - image: node:8
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *mysql_service
+      - *redis_service
+      - *mongo_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *mysql_service
+      - *redis_service
+      - *mongo_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
-        environment: *test_env
+        environment: *node_test_env
       - *postgres_service
+      - *mysql_service
+      - *redis_service
+      - *mongo_service
     <<: *node_unit_tests
   node12-browsers:
     docker:

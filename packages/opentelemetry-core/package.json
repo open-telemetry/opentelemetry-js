@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/core",
   "version": "0.2.0",
-  "description": "OpenTelemetry Core",
+  "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
   "main": "build/src/index.js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",
@@ -20,9 +20,11 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "compile": "tsc -p .",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "version:update": "node scripts/version-update.js",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -51,10 +53,11 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/semver": "^6.2.0",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
-    "codecov": "^3.1.0",
-    "gts": "^1.0.0",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^4.4.1",
     "karma-chrome-launcher": "^3.1.0",
@@ -71,7 +74,7 @@
     "ts-node": "^8.0.0",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.6.4",
+    "typescript": "3.7.2",
     "webpack": "^4.35.2"
   },
   "dependencies": {
