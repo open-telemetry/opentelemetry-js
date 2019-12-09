@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import * as fs from 'fs';
-import * as http from 'http';
 import * as https from 'https';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
@@ -24,6 +23,7 @@ import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
 import { NodeTracer } from '@opentelemetry/node';
 import { NoopLogger } from '@opentelemetry/core';
+import { Http } from '@opentelemetry/plugin-http';
 import { AddressInfo } from 'net';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
@@ -43,7 +43,7 @@ describe('HttpsPlugin', () => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable((https as unknown) as typeof http, tracer, tracer.logger);
+      plugin.enable((https as unknown) as Http, tracer, tracer.logger);
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);
       server = https.createServer(
