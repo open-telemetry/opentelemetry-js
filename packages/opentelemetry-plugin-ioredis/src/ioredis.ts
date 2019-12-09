@@ -17,7 +17,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import * as ioredisTypes from 'ioredis';
 import * as shimmer from 'shimmer';
-import { getTracedSendCommand } from './utils';
+import { traceSendCommand } from './utils';
 
 export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
   static readonly COMPONENT = 'ioredis';
@@ -28,15 +28,14 @@ export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
     super();
   }
 
-  protected patch() {
-    if (this._moduleExports) {
-      this._logger.debug('Patching ioredis.prototype.sendCommand');
-      shimmer.wrap(
-        this._moduleExports.prototype,
-        'sendCommand',
-        this._getPatchSendCommand()
-      );
-    }
+  protected patch(): typeof ioredisTypes {
+    this._logger.debug('Patching ioredis.prototype.sendCommand');
+    shimmer.wrap(
+      this._moduleExports.prototype,
+      'sendCommand',
+      this._patchSendCommand()
+    );
+
     return this._moduleExports.prototype;
   }
 
@@ -49,10 +48,10 @@ export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
   /**
    * Patch send command internal to trace requests
    */
-  private _getPatchSendCommand() {
+  private _patchSendCommand() {
     const tracer = this._tracer;
-    return function sendCommand(original: Function) {
-      return getTracedSendCommand(tracer, original);
+    return (original: Function) => {
+      return traceSendCommand(tracer, original);
     };
   }
 }
