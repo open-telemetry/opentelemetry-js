@@ -23,12 +23,12 @@ export type OpenFunction = (
   async?: boolean,
   user?: string | null,
   pass?: string | null
-) => any;
+) => void;
 
 /**
  * method "send" from XMLHttpRequest
  */
-export type SendFunction = (body?: SendBody) => any;
+export type SendFunction = (body?: SendBody) => void;
 
 export type SendBody =
   | string

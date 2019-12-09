@@ -312,7 +312,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         async?: boolean,
         user?: string | null,
         pass?: string | null
-      ) {
+      ): void {
         plugin._createSpan(this as XMLHttpRequestWrapped, url, method);
 
         return original.call(this, method, url, true, user, pass);
@@ -402,10 +402,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
 
     return (original: SendFunction): SendFunction => {
-      return function patchSend(
-        this: XMLHttpRequest,
-        body?: SendBody
-      ): SendFunction {
+      return function patchSend(this: XMLHttpRequest, body?: SendBody): void {
         const spanId = (this as XMLHttpRequestWrapped).__OT_SPAN_ID;
         const currentSpan: types.Span | undefined = spanId
           ? plugin._spans[spanId]
