@@ -15,7 +15,6 @@
  */
 
 import {
-  B3Format,
   BasePlugin,
   isUrlIgnored,
   isWrapped,
@@ -33,6 +32,7 @@ import {
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
+import { Format } from './enums/Format';
 import {
   OpenFunction,
   PropagateTraceHeaderUrls,
@@ -108,13 +108,13 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         return;
       }
     }
+    const headers: { [key: string]: unknown } = {};
+    this._tracer
+      .getHttpTextFormat()
+      .inject(span.context(), Format.HTTP, headers);
 
-    const b3Format = new B3Format();
-    const carrier: { [key: string]: unknown } = {};
-    b3Format.inject(span.context(), 'B3Format', carrier);
-
-    Object.keys(carrier).forEach(key => {
-      xhr.setRequestHeader(key, String(carrier[key]));
+    Object.keys(headers).forEach(key => {
+      xhr.setRequestHeader(key, String(headers[key]));
     });
   }
 

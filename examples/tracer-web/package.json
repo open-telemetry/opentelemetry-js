@@ -34,12 +34,13 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
+    "@opentelemetry/core": "^0.2.0",
     "@opentelemetry/exporter-collector": "^0.2.0",
     "@opentelemetry/plugin-document-load": "^0.2.0",
+    "@opentelemetry/plugin-xml-http-request": "^0.3.0",
     "@opentelemetry/scope-zone": "^0.2.0",
     "@opentelemetry/tracing": "^0.2.0",
-    "@opentelemetry/web": "^0.2.0",
-    "@opentelemetry/plugin-xml-http-request": "^0.3.0"
+    "@opentelemetry/web": "^0.2.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

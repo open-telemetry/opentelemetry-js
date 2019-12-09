@@ -17,6 +17,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 
 import {
+  B3Format,
   LogLevel,
   otperformance as performance,
   X_B3_SAMPLED,
@@ -143,6 +144,7 @@ describe('xhr', () => {
 
       webTracerWithZone = new WebTracer({
         logLevel: LogLevel.ERROR,
+        httpTextFormat: new B3Format(),
         scopeManager: new ZoneScopeManager(),
         plugins: [
           new XMLHttpRequestPlugin({
