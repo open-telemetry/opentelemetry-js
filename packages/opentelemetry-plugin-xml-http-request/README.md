@@ -39,6 +39,10 @@ req.send();
 
 ```
 
+## Example Screenshots
+![Screenshot of the running example](images/main.jpg)
+![Screenshot of the running example](images/request.jpg)
+![Screenshot of the running example](images/cors.jpg)
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

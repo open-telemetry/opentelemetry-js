@@ -176,8 +176,15 @@ describe('utils', () => {
 
         const resources: PerformanceResourceTiming[] = [];
 
-        const resource = getResource(span, resources);
-        assert.strictEqual(resource, undefined, 'resource should be undefined');
+        const resource = getResource(span, 'send', resources);
+
+        assert.deepStrictEqual(
+          resource,
+          {
+            mainRequest: undefined,
+          },
+          'main request should be undefined'
+        );
       });
     });
 
@@ -225,12 +232,12 @@ describe('utils', () => {
           )
         );
 
-        const resource = getResource(span, resources);
+        const resource = getResource(span, 'send', resources);
 
         assert.deepStrictEqual(
-          resource,
+          resource.mainRequest,
           resources[1],
-          'resource should be defined'
+          'main request should be defined'
         );
       });
       describe('But one resource has been already used', () => {
@@ -289,14 +296,82 @@ describe('utils', () => {
           );
 
           const ignoredResources: PerformanceResourceTiming[] = [resources[1]];
-          const resource = getResource(span, resources, ignoredResources);
+          const resource = getResource(
+            span,
+            'send',
+            resources,
+            ignoredResources
+          );
 
           assert.deepStrictEqual(
-            resource,
+            resource.mainRequest,
             resources[2],
-            'resource should be defined'
+            'main request should be defined'
           );
         });
+      });
+    });
+
+    describe('when there are multiple resources from CorsPreflight requests', () => {
+      it('should', () => {
+        const spanStartTime = createHrTime(startTime, 1);
+
+        const span = ({
+          startTime: spanStartTime,
+          name: 'http://foo.com/bar.json',
+        } as unknown) as tracing.Span;
+
+        const resources: PerformanceResourceTiming[] = [];
+
+        // this one started earlier
+        resources.push(
+          createResource(
+            {
+              name: 'http://foo.com/bar.json',
+            },
+            createHrTime(startTime, 1),
+            10
+          )
+        );
+
+        // this one is correct
+        resources.push(
+          createResource(
+            {
+              name: 'http://foo.com/bar.json',
+            },
+            createHrTime(startTime, 1),
+            11
+          )
+        );
+
+        // this one finished after span
+        resources.push(
+          createResource(
+            {
+              name: 'http://foo.com/bar.json',
+            },
+            createHrTime(startTime, 50),
+            100
+          )
+        );
+
+        const maybeCors: PerformanceResourceTiming[] = [];
+        maybeCors.push(resources[0]);
+        maybeCors.push(resources[1]);
+
+        const resource = getResource(span, 'send', resources, [], maybeCors);
+
+        assert.deepStrictEqual(
+          resource.mainRequest,
+          resources[2],
+          'main request should be defined'
+        );
+        assert.deepStrictEqual(
+          resource.corsPreFlightRequest,
+          resources[0],
+          'cors preflight request should be defined'
+        );
       });
     });
   });

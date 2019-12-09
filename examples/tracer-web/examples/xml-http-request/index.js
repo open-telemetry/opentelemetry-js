@@ -21,24 +21,22 @@ webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter
 
 // example of keeping track of scope between async operations
 const prepareClickEvent = () => {
-  const url1 = 'http://localhost:8090/xml-http-request.js';
+  const url1 = 'https://httpbin.org/get';
 
   const element = document.getElementById('button1');
-  let mainSpan = webTracerWithZone.startSpan('main-span');
-  webTracerWithZone.bind(element, mainSpan);
 
   const onClick = () => {
-    const span1 = webTracerWithZone.startSpan(`files-series-info-1`, {
-      parent: webTracerWithZone.getCurrentSpan()
-    });
-
-    webTracerWithZone.withSpan(span1, () => {
-      getData(url1).then((data) => {
-        webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
-        span1.end();
+    for (let i = 0, j = 5; i < j; i++) {
+      const span1 = webTracerWithZone.startSpan(`files-series-info-${i}`, {
+        parent: webTracerWithZone.getCurrentSpan()
       });
-    });
-
+      webTracerWithZone.withSpan(span1, () => {
+        getData(url1).then((data) => {
+          webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
+          span1.end();
+        });
+      });
+    }
   };
   element.addEventListener('click', onClick);
 };
@@ -47,7 +45,8 @@ const getData = (url) => {
   return new Promise(async (resolve, reject) => {
     const req = new XMLHttpRequest();
     req.open('GET', url, true);
-    req.withCredentials = true;
+    req.setRequestHeader('Content-Type', 'application/json');
+    req.setRequestHeader('Accept', 'application/json');
     req.send();
     req.onload = function () {
       resolve();

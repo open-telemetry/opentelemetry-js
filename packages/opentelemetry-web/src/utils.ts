@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { PerformanceEntries } from './types';
+import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import * as types from '@opentelemetry/types';
 import * as tracing from '@opentelemetry/tracing';
@@ -62,25 +62,33 @@ export function addSpanNetworkEvent(
 /**
  * Get closes performance resource ignoring the resources that has been already used.
  * @param span
+ * @param eventName
  * @param resources
  * @param ignoredResources
  */
 export function getResource(
   span: tracing.Span,
+  eventName: string,
   resources: PerformanceResourceTiming[],
-  ignoredResources?: PerformanceResourceTiming[]
-): PerformanceResourceTiming | undefined {
+  ignoredResources?: PerformanceResourceTiming[],
+  maybeCors?: PerformanceResourceTiming[]
+): PerformanceResourceTimingInfo {
   const filteredResources = filterResourcesForSpan(
     span,
+    eventName,
     resources,
     ignoredResources
   );
 
   if (filteredResources.length === 0) {
-    return undefined;
+    return {
+      mainRequest: undefined,
+    };
   }
   if (filteredResources.length === 1) {
-    return filteredResources[0];
+    return {
+      mainRequest: filteredResources[0],
+    };
   }
   const sorted = filteredResources.slice().sort((a, b) => {
     const valueA = a[PTN.FETCH_START];
@@ -92,22 +100,78 @@ export function getResource(
     }
     return 0;
   });
-  return sorted[0];
+
+  const spanUrl = parseUrl(span.name);
+  if (spanUrl.origin !== window.location.origin && sorted.length > 1) {
+    let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
+    let mainRequest: PerformanceResourceTiming = findMainRequest(
+      sorted,
+      maybeCors
+    );
+
+    const responseEnd = corsPreFlightRequest[PTN.RESPONSE_END];
+    const fetchStart = mainRequest[PTN.FETCH_START];
+
+    // no corsPreFlightRequest
+    if (fetchStart < responseEnd) {
+      mainRequest = corsPreFlightRequest;
+      corsPreFlightRequest = undefined;
+    }
+
+    return {
+      corsPreFlightRequest,
+      mainRequest,
+    };
+  } else {
+    return {
+      mainRequest: filteredResources[0],
+    };
+  }
+}
+
+/**
+ * Will find the main request skipping the cors pre flight requests
+ * @param resources
+ * @param maybeCors
+ */
+function findMainRequest(
+  resources: PerformanceResourceTiming[],
+  maybeCors: PerformanceResourceTiming[] = []
+): PerformanceResourceTiming {
+  let mainRequest: PerformanceResourceTiming = resources[1];
+  const length = resources.length;
+  for (let i = 1; i < length; i++) {
+    const resource = resources[i];
+    if (maybeCors.indexOf(resource) >= 0) {
+      continue;
+    }
+    mainRequest = resource;
+    break;
+  }
+  return mainRequest;
 }
 
 /**
  * Filter all resources that has started and finished according to span start time and end time.
  *     It will return the closest resource to a start time
  * @param span
+ * @param eventName
  * @param resources
  * @param ignoredResources
  */
 function filterResourcesForSpan(
   span: tracing.Span,
+  eventName: string,
   resources: PerformanceResourceTiming[],
   ignoredResources?: PerformanceResourceTiming[]
 ) {
-  const startTime = hrTimeToNanoseconds(span.startTime);
+  let startTime = hrTimeToNanoseconds(span.startTime);
+  const eventWithTime =
+    span.events && span.events.find(e => e.name === eventName);
+  if (eventWithTime) {
+    startTime = hrTimeToNanoseconds(eventWithTime.time);
+  }
+
   const nowTime = hrTimeToNanoseconds(hrTime());
 
   const spanUrl = span.name;

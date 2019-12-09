@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes
+ */
 export enum AttributeNames {
   COMPONENT = 'component',
   HTTP_HOST = 'http.host',

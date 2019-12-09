@@ -59,8 +59,17 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   protected _config!: XMLHttpRequestPluginConfig;
 
+  private _tasksCount = 0;
   private _callbackToRemoveEvents: { [key: string]: Function } = {};
   private _spans: { [key: string]: tracing.Span } = {};
+  // resources created between send and end - possible candidates for
+  // cors preflight requests
+  private _resourcesCreatedInTheMiddle: {
+    [key: string]: {
+      observer: PerformanceObserver;
+      entries: PerformanceResourceTiming[];
+    };
+  } = {};
   private _usedResources: { [key: string]: PerformanceResourceTiming[] } = {};
 
   constructor(config: XMLHttpRequestPluginConfig = {}) {
@@ -109,31 +118,113 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     });
   }
 
+  private _addChildSpan(
+    span: tracing.Span,
+    corsPreFlightRequest: PerformanceResourceTiming
+  ): void {
+    const childSpan = this._tracer.startSpan('CORS Preflight', {
+      startTime: corsPreFlightRequest[PTN.FETCH_START],
+      parent: span,
+    }) as tracing.Span;
+    this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+    childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
+  }
+
   /**
-   * Adds span network events
+   * Adds Network events to the span
+   * @param span
+   * @param resource
+   * @private
+   */
+  private _addSpanNetworkEvents(
+    span: tracing.Span,
+    resource: PerformanceResourceTiming
+  ) {
+    addSpanNetworkEvent(span, PTN.FETCH_START, resource);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
+    addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
+    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+    addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
+    addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
+    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
+    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+  }
+
+  /**
+   * will collect information about all resources created
+   * between "send" and "end"
+   * @param spanId
+   * @param spanName
+   * @private
+   */
+  private _addPossibleCorsPreflightResourceObserver(
+    spanId: string,
+    spanName: string
+  ) {
+    this._resourcesCreatedInTheMiddle[spanId] = {
+      observer: new PerformanceObserver(list => {
+        const entries = list.getEntries() as PerformanceResourceTiming[];
+        entries.forEach(entry => {
+          if (
+            entry.initiatorType === 'xmlhttprequest' &&
+            entry.name === spanName
+          ) {
+            this._resourcesCreatedInTheMiddle[spanId].entries.push(entry);
+          }
+        });
+      }),
+      entries: [],
+    };
+    this._resourcesCreatedInTheMiddle[spanId].observer.observe({
+      entryTypes: ['resource'],
+    });
+  }
+
+  /**
+   * clear resources assigned with certain span
+   * @private
+   */
+  private _clearResources() {
+    if (this._tasksCount === 0) {
+      ((otperformance as unknown) as Performance).clearResourceTimings();
+      this._callbackToRemoveEvents = {};
+      this._resourcesCreatedInTheMiddle = {};
+      this._spans = {};
+      this._usedResources = {};
+    }
+  }
+
+  /**
+   * Finds appropriate resource and add network events to the span
    * @param span
    */
-  private _addSpanNetworkEvents(span: tracing.Span) {
+  private _findResourceAndAddNetworkEvents(
+    span: tracing.Span,
+    maybeCors: PerformanceResourceTiming[] = []
+  ) {
     const resources: PerformanceResourceTiming[] = otperformance.getEntriesByType(
       'resource'
     ) as PerformanceResourceTiming[];
+
     const resource = getResource(
       span,
+      EventNames.METHOD_SEND,
       resources,
-      this._usedResources[span.name]
+      this._usedResources[span.name],
+      maybeCors
     );
 
-    if (resource) {
-      this._markResourceAsUsed(resource);
-      addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-      addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-      addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-      addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-      addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
-      addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-      addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-      addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-      addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+    if (resource.mainRequest) {
+      const mainRequest = resource.mainRequest;
+      this._markResourceAsUsed(mainRequest);
+
+      const corsPreFlightRequest = resource.corsPreFlightRequest;
+      if (corsPreFlightRequest) {
+        this._addChildSpan(span, corsPreFlightRequest);
+        this._markResourceAsUsed(mainRequest);
+      }
+      this._addSpanNetworkEvents(span, mainRequest);
     }
   }
 
@@ -246,12 +337,19 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         ? plugin._callbackToRemoveEvents[spanId]
         : undefined;
 
+      let resourcesCreatedInTheMiddle = spanId
+        ? plugin._resourcesCreatedInTheMiddle[spanId]
+        : undefined;
+      let entries;
+      if (resourcesCreatedInTheMiddle) {
+        entries = resourcesCreatedInTheMiddle.entries.slice();
+      }
       if (typeof callbackToRemoveEvents === 'function') {
         callbackToRemoveEvents();
       }
       const currentSpan = spanId ? plugin._spans[spanId] : undefined;
-      if (currentSpan) {
-        plugin._addSpanNetworkEvents(currentSpan);
+      if (currentSpan && spanId) {
+        plugin._findResourceAndAddNetworkEvents(currentSpan, entries);
         currentSpan.addEvent(eventName);
 
         const url = currentSpan.attributes[AttributeNames.HTTP_URL];
@@ -279,6 +377,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
         currentSpan.end();
       }
+      plugin._tasksCount--;
+      plugin._clearResources();
     }
 
     function onError(this: XMLHttpRequestWrapped) {
@@ -316,7 +416,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           : undefined;
 
         if (currentSpan && spanId) {
+          plugin._tasksCount++;
           currentSpan.addEvent(EventNames.METHOD_SEND);
+          const spanName = (currentSpan as tracing.Span).name;
 
           this.addEventListener('load', onLoad);
           this.addEventListener('error', onError);
@@ -324,8 +426,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
           plugin._callbackToRemoveEvents[spanId] = () => {
             unregister(this as XMLHttpRequestWrapped, spanId);
+            plugin._resourcesCreatedInTheMiddle[spanId].observer.disconnect();
+            delete plugin._resourcesCreatedInTheMiddle[spanId];
           };
           plugin._addHeaders(this, currentSpan);
+
+          plugin._addPossibleCorsPreflightResourceObserver(spanId, spanName);
         }
         return original.call(this, body);
       };
