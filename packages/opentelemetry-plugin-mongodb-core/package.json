@@ -8,6 +8,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
@@ -40,8 +41,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.1.1",
-    "@opentelemetry/tracing": "^0.1.1",
+    "@opentelemetry/node": "^0.2.0",
+    "@opentelemetry/tracing": "^0.2.0",
     "@types/mocha": "^5.2.7",
     "@types/mongodb": "^3.2.3",
     "@types/node": "^12.7.2",

@@ -25,6 +25,7 @@ import {
   hrTimeToNanoseconds,
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
+  hrTimeToTimeStamp,
   isTimeInput,
 } from '../../src/common/time';
 
@@ -153,6 +154,15 @@ describe('time', () => {
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
+    });
+  });
+
+  describe('#hrTimeToTimeStamp', () => {
+    it('should return timestamp', () => {
+      const time: types.HrTime = [1573513121, 123456];
+
+      const output = hrTimeToTimeStamp(time);
+      assert.deepStrictEqual(output, '2019-11-11T22:58:41.000123456Z');
     });
   });
 

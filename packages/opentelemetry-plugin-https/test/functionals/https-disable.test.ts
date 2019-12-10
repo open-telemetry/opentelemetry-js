@@ -14,16 +14,17 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
-import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as https from 'https';
-import { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
+
 import { plugin } from '../../src/https';
+import { NodeTracer } from '@opentelemetry/node';
+import { NoopLogger } from '@opentelemetry/core';
+import { Http } from '@opentelemetry/plugin-http';
+import { AddressInfo } from 'net';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 

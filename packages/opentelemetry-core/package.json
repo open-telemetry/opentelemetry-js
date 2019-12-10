@@ -20,9 +20,11 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "compile": "tsc -p .",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "version:update": "node scripts/version-update.js",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
