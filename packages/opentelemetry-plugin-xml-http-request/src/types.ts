@@ -59,8 +59,8 @@ export interface XhrMem {
   callbackToRemoveEvents?: Function;
 }
 
-export type PropagateTraceHeaderUrl = string | RegExp;
+export type PropagateTraceHeaderCorsUrl = string | RegExp;
 
-export type PropagateTraceHeaderUrls =
-  | PropagateTraceHeaderUrl
-  | PropagateTraceHeaderUrl[];
+export type PropagateTraceHeaderCorsUrls =
+  | PropagateTraceHeaderCorsUrl
+  | PropagateTraceHeaderCorsUrl[];

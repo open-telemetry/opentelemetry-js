@@ -126,7 +126,7 @@ describe('xhr', () => {
     prepareData = (
       done: any,
       fileUrl: string,
-      propagateTraceHeaderUrls?: any
+      propagateTraceHeaderCorsUrls?: any
     ) => {
       sandbox = sinon.createSandbox();
       sandbox.stub(performance, 'timeOrigin').value(0);
@@ -148,7 +148,7 @@ describe('xhr', () => {
         scopeManager: new ZoneScopeManager(),
         plugins: [
           new XMLHttpRequestPlugin({
-            propagateTraceHeaderUrls,
+            propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
           }),
         ],
       });
@@ -179,8 +179,8 @@ describe('xhr', () => {
     };
 
     beforeEach(done => {
-      const propagateTraceHeaderUrls = [window.location.origin];
-      prepareData(done, url, propagateTraceHeaderUrls);
+      const propagateTraceHeaderCorsUrls = [window.location.origin];
+      prepareData(done, url, propagateTraceHeaderCorsUrls);
     });
 
     afterEach(() => {
@@ -346,7 +346,7 @@ describe('xhr', () => {
 
     describe(
       'AND origin does NOT match window.location but match with' +
-        ' propagateTraceHeaderUrls',
+        ' propagateTraceHeaderCorsUrls',
       () => {
         beforeEach(done => {
           clearData();
@@ -378,7 +378,7 @@ describe('xhr', () => {
     );
     describe(
       'AND origin does NOT match window.location And does NOT match' +
-        ' with propagateTraceHeaderUrls',
+        ' with propagateTraceHeaderCorsUrls',
       () => {
         beforeEach(done => {
           clearData();

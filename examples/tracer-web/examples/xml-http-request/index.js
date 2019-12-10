@@ -11,7 +11,7 @@ const webTracerWithZone = new WebTracer({
   plugins: [
     new XMLHttpRequestPlugin({
       ignoreUrls: ['http://localhost:8090/sockjs-node/info'],
-      propagateTraceHeaderUrls: [
+      propagateTraceHeaderCorsUrls: [
         'http://localhost:8090'
       ]
     })

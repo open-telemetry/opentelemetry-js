@@ -35,7 +35,7 @@ import { EventNames } from './enums/EventNames';
 import { Format } from './enums/Format';
 import {
   OpenFunction,
-  PropagateTraceHeaderUrls,
+  PropagateTraceHeaderCorsUrls,
   SendBody,
   SendFunction,
   XhrMem,
@@ -46,7 +46,7 @@ import {
  */
 export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
   // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderUrls?: PropagateTraceHeaderUrls;
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
 }
 
 /**
@@ -76,7 +76,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, span: types.Span) {
-    let propagateTraceHeaderUrls = this._config.propagateTraceHeaderUrls || [];
+    let propagateTraceHeaderUrls =
+      this._config.propagateTraceHeaderCorsUrls || [];
     if (
       typeof propagateTraceHeaderUrls === 'string' ||
       propagateTraceHeaderUrls instanceof RegExp
