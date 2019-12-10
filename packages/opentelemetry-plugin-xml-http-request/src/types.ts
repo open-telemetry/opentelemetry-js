@@ -17,6 +17,8 @@
 /**
  * method "open" from XMLHttpRequest
  */
+import * as tracing from '@opentelemetry/tracing';
+
 export type OpenFunction = (
   method: string,
   url: string,
@@ -42,10 +44,19 @@ export type SendBody =
   | null;
 
 /**
- * Wrapped XMLHttpRequest
+ * interface to store information in weak map about spans, resources and
+ * callbacks
  */
-export interface XMLHttpRequestWrapped extends XMLHttpRequest {
-  __OT_SPAN_ID?: string;
+export interface XhrMem {
+  // span assigned to xhr
+  span: tracing.Span;
+  // resources created between send and end - possible candidates for
+  // cors preflight requests
+  resourcesCreatedInTheMiddle?: {
+    observer: PerformanceObserver;
+    entries: PerformanceResourceTiming[];
+  };
+  callbackToRemoveEvents?: Function;
 }
 
 export type PropagateTraceHeaderUrl = string | RegExp;

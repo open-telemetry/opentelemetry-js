@@ -38,7 +38,7 @@ import {
   PropagateTraceHeaderUrls,
   SendBody,
   SendFunction,
-  XMLHttpRequestWrapped,
+  XhrMem,
 } from './types';
 
 /**
@@ -61,16 +61,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   protected _config!: XMLHttpRequestPluginConfig;
 
   private _tasksCount = 0;
-  private _callbackToRemoveEvents: { [key: string]: Function } = {};
-  private _spans: { [key: string]: tracing.Span } = {};
-  // resources created between send and end - possible candidates for
-  // cors preflight requests
-  private _resourcesCreatedInTheMiddle: {
-    [key: string]: {
-      observer: PerformanceObserver;
-      entries: PerformanceResourceTiming[];
-    };
-  } = {};
+  private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources: { [key: string]: PerformanceResourceTiming[] } = {};
 
   constructor(config: XMLHttpRequestPluginConfig = {}) {
@@ -155,15 +146,19 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   /**
    * will collect information about all resources created
    * between "send" and "end"
-   * @param spanId
+   * @param xhr
    * @param spanName
    * @private
    */
   private _addPossibleCorsPreflightResourceObserver(
-    spanId: string,
+    xhr: XMLHttpRequest,
     spanName: string
   ) {
-    this._resourcesCreatedInTheMiddle[spanId] = {
+    const xhrMem = this._xhrMem.get(xhr);
+    if (!xhrMem) {
+      return;
+    }
+    xhrMem.resourcesCreatedInTheMiddle = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
         entries.forEach(entry => {
@@ -171,13 +166,15 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
             entry.initiatorType === 'xmlhttprequest' &&
             entry.name === spanName
           ) {
-            this._resourcesCreatedInTheMiddle[spanId].entries.push(entry);
+            if (xhrMem.resourcesCreatedInTheMiddle) {
+              xhrMem.resourcesCreatedInTheMiddle.entries.push(entry);
+            }
           }
         });
       }),
       entries: [],
     };
-    this._resourcesCreatedInTheMiddle[spanId].observer.observe({
+    xhrMem.resourcesCreatedInTheMiddle.observer.observe({
       entryTypes: ['resource'],
     });
   }
@@ -189,9 +186,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   private _clearResources() {
     if (this._tasksCount === 0) {
       ((otperformance as unknown) as Performance).clearResourceTimings();
-      this._callbackToRemoveEvents = {};
-      this._resourcesCreatedInTheMiddle = {};
-      this._spans = {};
+      this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = {};
     }
   }
@@ -235,12 +230,10 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param xhr
    * @private
    */
-  private _cleanPreviousSpanInformation(xhr: XMLHttpRequestWrapped) {
-    const existingSpanId = xhr.__OT_SPAN_ID;
-    if (existingSpanId) {
-      const callbackToRemoveEvents = this._callbackToRemoveEvents[
-        existingSpanId
-      ];
+  private _cleanPreviousSpanInformation(xhr: XMLHttpRequest) {
+    const xhrMem = this._xhrMem.get(xhr);
+    if (xhrMem) {
+      const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
       if (callbackToRemoveEvents) {
         callbackToRemoveEvents();
       }
@@ -255,7 +248,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _createSpan(
-    xhr: XMLHttpRequestWrapped,
+    xhr: XMLHttpRequest,
     url: string,
     method: string
   ): tracing.Span | undefined {
@@ -275,11 +268,11 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     currentSpan.addEvent(EventNames.METHOD_OPEN);
 
-    const spanId = currentSpan.context().spanId;
-    this._spans[spanId] = currentSpan;
+    this._xhrMem.set(xhr, {
+      span: currentSpan,
+    });
 
     this._cleanPreviousSpanInformation(xhr);
-    xhr.__OT_SPAN_ID = spanId;
 
     return currentSpan;
   }
@@ -314,7 +307,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         user?: string | null,
         pass?: string | null
       ): void {
-        plugin._createSpan(this as XMLHttpRequestWrapped, url, method);
+        plugin._createSpan(this as XMLHttpRequest, url, method);
 
         return original.call(this, method, url, true, user, pass);
       };
@@ -328,15 +321,14 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   protected _patchSend() {
     const plugin = this;
 
-    function endSpan(xhr: XMLHttpRequestWrapped, eventName: string) {
-      const spanId = xhr.__OT_SPAN_ID;
-      const callbackToRemoveEvents = spanId
-        ? plugin._callbackToRemoveEvents[spanId]
-        : undefined;
+    function endSpan(xhr: XMLHttpRequest, eventName: string) {
+      const xhrMem = plugin._xhrMem.get(xhr);
+      if (!xhrMem) {
+        return;
+      }
+      const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
-      let resourcesCreatedInTheMiddle = spanId
-        ? plugin._resourcesCreatedInTheMiddle[spanId]
-        : undefined;
+      let resourcesCreatedInTheMiddle = xhrMem.resourcesCreatedInTheMiddle;
       let entries;
       if (resourcesCreatedInTheMiddle) {
         entries = resourcesCreatedInTheMiddle.entries.slice();
@@ -344,8 +336,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       if (typeof callbackToRemoveEvents === 'function') {
         callbackToRemoveEvents();
       }
-      const currentSpan = spanId ? plugin._spans[spanId] : undefined;
-      if (currentSpan && spanId) {
+      const currentSpan = xhrMem.span;
+      if (currentSpan) {
         plugin._findResourceAndAddNetworkEvents(currentSpan, entries);
         currentSpan.addEvent(eventName);
 
@@ -378,15 +370,15 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       plugin._clearResources();
     }
 
-    function onError(this: XMLHttpRequestWrapped) {
+    function onError(this: XMLHttpRequest) {
       endSpan(this, EventNames.EVENT_ERROR);
     }
 
-    function onTimeout(this: XMLHttpRequestWrapped) {
+    function onTimeout(this: XMLHttpRequest) {
       endSpan(this, EventNames.EVENT_TIMEOUT);
     }
 
-    function onLoad(this: XMLHttpRequestWrapped) {
+    function onLoad(this: XMLHttpRequest) {
       if (this.status < 299) {
         endSpan(this, EventNames.EVENT_LOAD);
       } else {
@@ -394,22 +386,25 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       }
     }
 
-    function unregister(xhr: XMLHttpRequestWrapped, spanId: string) {
+    function unregister(xhr: XMLHttpRequest) {
       xhr.removeEventListener('load', onLoad);
       xhr.removeEventListener('error', onError);
       xhr.removeEventListener('timeout', onTimeout);
-      delete plugin._callbackToRemoveEvents[spanId];
-      delete xhr.__OT_SPAN_ID;
+      const xhrMem = plugin._xhrMem.get(xhr);
+      if (xhrMem) {
+        delete xhrMem.callbackToRemoveEvents;
+      }
     }
 
     return (original: SendFunction): SendFunction => {
       return function patchSend(this: XMLHttpRequest, body?: SendBody): void {
-        const spanId = (this as XMLHttpRequestWrapped).__OT_SPAN_ID;
-        const currentSpan: types.Span | undefined = spanId
-          ? plugin._spans[spanId]
-          : undefined;
+        const xhrMem = plugin._xhrMem.get(this);
+        if (!xhrMem) {
+          return;
+        }
+        const currentSpan: types.Span = xhrMem.span;
 
-        if (currentSpan && spanId) {
+        if (currentSpan) {
           plugin._tasksCount++;
           currentSpan.addEvent(EventNames.METHOD_SEND);
           const spanName = (currentSpan as tracing.Span).name;
@@ -418,14 +413,15 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           this.addEventListener('error', onError);
           this.addEventListener('timeout', onTimeout);
 
-          plugin._callbackToRemoveEvents[spanId] = () => {
-            unregister(this as XMLHttpRequestWrapped, spanId);
-            plugin._resourcesCreatedInTheMiddle[spanId].observer.disconnect();
-            delete plugin._resourcesCreatedInTheMiddle[spanId];
+          xhrMem.callbackToRemoveEvents = () => {
+            unregister(this);
+            if (xhrMem.resourcesCreatedInTheMiddle) {
+              xhrMem.resourcesCreatedInTheMiddle.observer.disconnect();
+              delete xhrMem.resourcesCreatedInTheMiddle;
+            }
           };
           plugin._addHeaders(this, currentSpan);
-
-          plugin._addPossibleCorsPreflightResourceObserver(spanId, spanName);
+          plugin._addPossibleCorsPreflightResourceObserver(this, spanName);
         }
         return original.call(this, body);
       };
@@ -462,9 +458,5 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     shimmer.unwrap(XMLHttpRequest.prototype, 'open');
     shimmer.unwrap(XMLHttpRequest.prototype, 'send');
-
-    Object.keys(this._callbackToRemoveEvents).forEach(key =>
-      this._callbackToRemoveEvents[key]()
-    );
   }
 }
