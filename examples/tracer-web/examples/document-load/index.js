@@ -80,6 +80,4 @@ const getData = (url) => {
   });
 };
 
-window.addEventListener('load', () => {
-  prepareClickEvent();
-});
+window.addEventListener('load', prepareClickEvent);
