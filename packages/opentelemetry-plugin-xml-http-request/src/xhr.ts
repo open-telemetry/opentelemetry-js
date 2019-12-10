@@ -308,7 +308,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         user?: string | null,
         pass?: string | null
       ): void {
-        plugin._createSpan(this as XMLHttpRequest, url, method);
+        plugin._createSpan(this, url, method);
 
         return original.call(this, method, url, true, user, pass);
       };
