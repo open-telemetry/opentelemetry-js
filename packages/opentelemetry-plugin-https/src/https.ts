@@ -17,6 +17,7 @@
 import { HttpPlugin, Func, HttpRequestArgs } from '@opentelemetry/plugin-http';
 import * as http from 'http';
 import * as https from 'https';
+import { URL } from 'url';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as utils from './utils';
