@@ -54,6 +54,7 @@ export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
  */
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
+  // @TODO align this with all packages #600
   readonly version: string = '0.3.0';
   moduleName = this.component;
 
@@ -74,7 +75,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   constructor(config: XMLHttpRequestPluginConfig = {}) {
     super();
-    this._config = config as XMLHttpRequestPluginConfig;
+    this._config = config;
   }
 
   /**
