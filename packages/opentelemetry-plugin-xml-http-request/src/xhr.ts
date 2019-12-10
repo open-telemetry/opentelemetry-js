@@ -182,7 +182,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   }
 
   /**
-   * clear resources assigned with certain span
+   * clear all resources assigned with spans
    * @private
    */
   private _clearResources() {
@@ -372,8 +372,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         }
 
         currentSpan.end();
+        plugin._tasksCount--;
       }
-      plugin._tasksCount--;
       plugin._clearResources();
     }
 
