@@ -6,10 +6,11 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
