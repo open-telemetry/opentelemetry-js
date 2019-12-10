@@ -3,8 +3,9 @@
 const http = require("http");
 const opentracing = require("opentracing");
 const utils = require("./utils");
-require("./tracer").init("http_server_service");
+const shim = require("./shim").shim("http_server_service");
 
+opentracing.initGlobalTracer(shim);
 const tracer = opentracing.globalTracer();
 
 startServer(3000);
@@ -35,7 +36,9 @@ async function handleRequest(req, res) {
   await doSomething(span);
 
   res.writeHead(200, { "Content-Type": "application/json" });
-  res.write(JSON.stringify({ status: "OK", traceId: span.context().toTraceId() }));
+  res.write(
+    JSON.stringify({ status: "OK", traceId: span.context().toTraceId() })
+  );
 
   res.end();
   span.finish();

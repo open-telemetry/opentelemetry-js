@@ -1,6 +1,6 @@
 # Overview
 
-OpenTelemetry Opentracing shim allows user to report to OpenTelemetry with existing OpenTracing instrumentation.
+OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry.
 
 This is a simple example that demonstrates how existing OpenTracing instrumentation can be integrated with OpenTelemetry.
 
@@ -10,6 +10,7 @@ The example shows key aspects of tracing such as
 - Child Span from a remote parent (on server)
 - Span Tag
 - Span Log
+- Make a shim between OpenTracing and OpenTelemetry tracers
 
 ## Installation
 ```sh

@@ -2,8 +2,9 @@
 
 const http = require("http");
 const opentracing = require("opentracing");
-require("./tracer").init("http_client_service");
+const shim = require("./shim").shim("http_client_service");
 
+opentracing.initGlobalTracer(shim);
 const tracer = opentracing.globalTracer();
 
 makeRequest();
@@ -34,8 +35,7 @@ async function makeRequest() {
           span.finish();
 
           console.log("Sleeping 5 seconds before shutdown to ensure all records are flushed.");
-          setTimeout(() => { console.log('Completed.'); }, 5000);
-          process.exit(0);
+          setTimeout(() => { console.log("Completed."); }, 5000);
         });
       }
     )
