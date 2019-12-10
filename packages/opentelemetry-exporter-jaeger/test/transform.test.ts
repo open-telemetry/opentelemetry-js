@@ -90,8 +90,8 @@ describe('transform', () => {
         thriftSpan.startTime,
         Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
-      assert.strictEqual(thriftSpan.tags.length, 5);
-      const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
+      assert.strictEqual(thriftSpan.tags.length, 6);
+      const [tag1, tag2, tag3, tag4, tag5, tag6] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);
@@ -107,6 +107,9 @@ describe('transform', () => {
       assert.strictEqual(tag5.key, 'status.name');
       assert.strictEqual(tag5.vType, 'STRING');
       assert.strictEqual(tag5.vStr, 'OK');
+      assert.strictEqual(tag6.key, 'span.kind');
+      assert.strictEqual(tag6.vType, 'STRING');
+      assert.strictEqual(tag6.vStr, 'INTERNAL');
       assert.strictEqual(thriftSpan.references.length, 0);
 
       assert.strictEqual(thriftSpan.logs.length, 1);
@@ -157,8 +160,8 @@ describe('transform', () => {
       assert.deepStrictEqual(thriftSpan.parentSpanId, ThriftUtils.emptyBuffer);
       assert.deepStrictEqual(thriftSpan.flags, 1);
       assert.strictEqual(thriftSpan.references.length, 0);
-      assert.strictEqual(thriftSpan.tags.length, 4);
-      const [tag1, tag2, tag3, tag4] = thriftSpan.tags;
+      assert.strictEqual(thriftSpan.tags.length, 5);
+      const [tag1, tag2, tag3, tag4, tag5] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'status.code');
       assert.strictEqual(tag1.vType, 'DOUBLE');
       assert.strictEqual(tag1.vDouble, 15);
@@ -171,6 +174,9 @@ describe('transform', () => {
       assert.strictEqual(tag4.key, 'error');
       assert.strictEqual(tag4.vType, 'BOOL');
       assert.strictEqual(tag4.vBool, true);
+      assert.strictEqual(tag5.key, 'span.kind');
+      assert.strictEqual(tag5.vType, 'STRING');
+      assert.strictEqual(tag5.vStr, 'CLIENT');
       assert.strictEqual(thriftSpan.logs.length, 0);
     });
 

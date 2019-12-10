@@ -2,6 +2,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerRegistry } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { CollectorExporter } from '@opentelemetry/exporter-collector'
 
 const registry = new WebTracerRegistry({
   plugins: [
@@ -17,8 +18,9 @@ const registryWithZone = new WebTracerRegistry({
   ]
 });
 registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-const tracerWithZone = registryWithZone.getTracer();
+registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
+const tracerWithZone = registryWithZone.getTracer();
 console.log('Current span is window', tracerWithZone.getCurrentSpan() === window);
 
 // example of keeping track of scope between async operations

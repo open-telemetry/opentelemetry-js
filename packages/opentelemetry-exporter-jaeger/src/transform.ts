@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Link, CanonicalCode } from '@opentelemetry/types';
+import { Link, CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
@@ -59,6 +59,11 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   if (span.status.code !== CanonicalCode.OK) {
     tags.push({ key: 'error', value: true });
   }
+
+  if (span.kind !== undefined) {
+    tags.push({ key: 'span.kind', value: SpanKind[span.kind] });
+  }
+
   const spanTags: ThriftTag[] = ThriftUtils.getThriftTags(tags);
 
   const logs = span.events.map(

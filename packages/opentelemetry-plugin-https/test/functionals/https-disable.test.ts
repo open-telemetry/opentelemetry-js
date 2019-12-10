@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  NoopLogger,
-  NoopTracerRegistry,
-  noopTracer,
-} from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/core';
+import { NodeTracer } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
@@ -27,6 +24,7 @@ import { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
+import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 
 describe('HttpsPlugin', () => {
@@ -34,13 +32,17 @@ describe('HttpsPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
+    const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const registry = new NoopTracerRegistry();
+    const tracer = new NodeTracer({
+      logger,
+      httpTextFormat,
+    });
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable((https as unknown) as Http, registry, logger);
+      plugin.enable((https as unknown) as Http, tracer, tracer.logger);
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);
       server = https.createServer(
@@ -60,8 +62,8 @@ describe('HttpsPlugin', () => {
     });
 
     beforeEach(() => {
-      noopTracer.startSpan = sinon.spy();
-      noopTracer.withSpan = sinon.spy();
+      tracer.startSpan = sinon.spy();
+      tracer.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -72,7 +74,7 @@ describe('HttpsPlugin', () => {
       server.close();
     });
     describe('unpatch()', () => {
-      it('should not call registry methods for creating span', async () => {
+      it('should not call tracer methods for creating span', async () => {
         plugin.disable();
         const testPath = '/incoming/unpatch/';
 
@@ -80,15 +82,12 @@ describe('HttpsPlugin', () => {
 
         await httpsRequest.get(options).then(result => {
           assert.strictEqual(
-            (noopTracer.startSpan as sinon.SinonSpy).called,
+            (tracer.startSpan as sinon.SinonSpy).called,
             false
           );
 
           assert.strictEqual(https.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual(
-            (noopTracer.withSpan as sinon.SinonSpy).called,
-            false
-          );
+          assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         });
       });
     });

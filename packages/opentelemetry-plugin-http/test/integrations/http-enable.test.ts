@@ -30,7 +30,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
-
+const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
@@ -70,7 +70,7 @@ describe('HttpPlugin Integration tests', () => {
 
     before(() => {
       const ignoreConfig = [
-        `http://${hostname}:${serverPort}/ignored/string`,
+        `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
@@ -93,7 +93,9 @@ describe('HttpPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpRequest.get(`http://google.fr/?query=test`);
+      const result = await httpRequest.get(
+        `${protocol}://google.fr/?query=test`
+      );
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -113,8 +115,62 @@ describe('HttpPlugin Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
+    it('should create a rootSpan for GET requests and add propagation headers if URL is used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://google.fr/?query=test`)
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
+    it('should create a rootSpan for GET requests and add propagation headers if URL and options are used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://google.fr/?query=test`),
+        { headers: { 'x-foo': 'foo' } }
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
     it('custom attributes should show up on client spans', async () => {
-      const result = await httpRequest.get(`http://google.fr/`);
+      const result = await httpRequest.get(`${protocol}://google.fr/`);
       const spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -138,7 +194,7 @@ describe('HttpPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse('http://google.fr/')
+        url.parse(`${protocol}://google.fr/`)
       );
 
       const result = await httpRequest.get(options);
@@ -169,7 +225,7 @@ describe('HttpPlugin Integration tests', () => {
       { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
       { 'user-agent': 'http-plugin-test' },
     ]) {
-      it(`should create a span for GET requests and add propagation when using the following signature: http.get(url, options, callback) and following headers: ${JSON.stringify(
+      it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
       )}`, done => {
         let validations: {
@@ -185,7 +241,7 @@ describe('HttpPlugin Integration tests', () => {
         assert.strictEqual(spans.length, 0);
         const options = { headers };
         const req = http.get(
-          'http://google.fr/',
+          `${protocol}://google.fr/`,
           options,
           (resp: http.IncomingMessage) => {
             const res = (resp as unknown) as http.IncomingMessage & {
@@ -212,7 +268,7 @@ describe('HttpPlugin Integration tests', () => {
           }
         );
 
-        req.once('close', () => {
+        req.on('close', () => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
           assert.ok(spans[0].name.indexOf('GET /') >= 0);
