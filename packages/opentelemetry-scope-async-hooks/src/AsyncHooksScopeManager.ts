@@ -50,7 +50,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
   }
 
   active(): unknown {
-    return this._scopes[asyncHooks.executionAsyncId()] || null;
+    return this._scopes[asyncHooks.executionAsyncId()] || undefined;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(

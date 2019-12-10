@@ -48,7 +48,7 @@ describe('NoopScopeManager', () => {
       scopeManager.with(test, () => {
         assert.strictEqual(
           scopeManager.active(),
-          null,
+          undefined,
           'should not have scope'
         );
         return done();
@@ -66,12 +66,20 @@ describe('NoopScopeManager', () => {
 
   describe('.active()', () => {
     it('should always return null (when enabled)', () => {
-      assert.strictEqual(scopeManager.active(), null, 'should not have scope');
+      assert.strictEqual(
+        scopeManager.active(),
+        undefined,
+        'should not have scope'
+      );
     });
 
     it('should always return null (when disabled)', () => {
       scopeManager.disable();
-      assert.strictEqual(scopeManager.active(), null, 'should not have scope');
+      assert.strictEqual(
+        scopeManager.active(),
+        undefined,
+        'should not have scope'
+      );
       scopeManager.enable();
     });
   });
