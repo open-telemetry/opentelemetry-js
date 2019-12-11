@@ -20,7 +20,6 @@ import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 import { spanToThrift } from './transform';
-import { unrefTimer } from '@opentelemetry/core';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -29,17 +28,16 @@ export class JaegerExporter implements SpanExporter {
   private readonly _logger: types.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
-  private readonly _forceFlush: boolean = true;
-  private readonly _flushTimeout: number;
-  private _timer: NodeJS.Timeout;
+  private readonly _forceFlushOnShutdown: boolean = true;
+  private readonly _onShutdownFlushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = config.tags || [];
-    if (config.forceFlush !== undefined) {
-      this._forceFlush = config.forceFlush;
-    }
-    this._flushTimeout = config.flushTimeout || 2000;
+    this._forceFlushOnShutdown =
+      typeof config.forceFlush === 'boolean' ? config.forceFlush : true;
+    this._onShutdownFlushTimeout =
+      typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
 
     this._sender = new jaegerTypes.UDPSender(config);
     this._process = {
@@ -47,10 +45,6 @@ export class JaegerExporter implements SpanExporter {
       tags: jaegerTypes.ThriftUtils.getThriftTags(tags),
     };
     this._sender.setProcess(this._process);
-
-    const flushInterval = config.flushInterval || 5000;
-    this._timer = setInterval(this._flush.bind(this), flushInterval);
-    unrefTimer(this._timer);
   }
 
   /** Exports a list of spans to Jaeger. */
@@ -64,14 +58,14 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): void {
-    if (!this._forceFlush) return;
+    if (!this._forceFlushOnShutdown) return;
     // Make an optimistic flush.
     this._flush();
     // Sleeping x seconds before closing the sender's connection to ensure
     // all spans are flushed.
     setTimeout(() => {
       this._sender.close();
-    }, this._flushTimeout);
+    }, this._onShutdownFlushTimeout);
   }
 
   /** Transform spans and sends to Jaeger service. */
