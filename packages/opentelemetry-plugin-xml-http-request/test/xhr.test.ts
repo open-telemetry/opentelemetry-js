@@ -196,7 +196,7 @@ describe('xhr', () => {
     });
 
     it('should create a span with correct root span', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(
         span.parentSpanId,
         rootSpan.context().spanId,
@@ -205,12 +205,12 @@ describe('xhr', () => {
     });
 
     it('span should have correct name', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(span.name, url, 'span has wrong name');
     });
 
     it('span should have correct attributes', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
 
@@ -256,7 +256,7 @@ describe('xhr', () => {
     });
 
     it('span should have correct events', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 
       assert.strictEqual(
@@ -325,20 +325,20 @@ describe('xhr', () => {
 
     describe('AND origin match with window.location', () => {
       it('should set trace headers', () => {
-        const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+        const span: types.Span = exportSpy.args[0][0][0];
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_TRACE_ID],
-          span.spanContext.traceId,
+          span.context().traceId,
           `trace header '${X_B3_TRACE_ID}' not set`
         );
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_SPAN_ID],
-          span.spanContext.spanId,
+          span.context().spanId,
           `trace header '${X_B3_SPAN_ID}' not set`
         );
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_SAMPLED],
-          String(span.spanContext.traceFlags),
+          String(span.context().traceFlags),
           `trace header '${X_B3_SAMPLED}' not set`
         );
       });
@@ -357,20 +357,20 @@ describe('xhr', () => {
           );
         });
         it('should set trace headers', () => {
-          const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+          const span: types.Span = exportSpy.args[0][0][0];
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_TRACE_ID],
-            span.spanContext.traceId,
+            span.context().traceId,
             `trace header '${X_B3_TRACE_ID}' not set`
           );
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_SPAN_ID],
-            span.spanContext.spanId,
+            span.context().spanId,
             `trace header '${X_B3_SPAN_ID}' not set`
           );
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_SAMPLED],
-            String(span.spanContext.traceFlags),
+            String(span.context().traceFlags),
             `trace header '${X_B3_SAMPLED}' not set`
           );
         });
@@ -469,7 +469,7 @@ describe('xhr', () => {
     });
 
     it('span should have correct attributes', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
 
@@ -515,7 +515,7 @@ describe('xhr', () => {
     });
 
     it('span should have correct events', () => {
-      const span = exportSpy.args[0][0][0] as tracing.ReadableSpan;
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const events = span.events;
 
       assert.strictEqual(

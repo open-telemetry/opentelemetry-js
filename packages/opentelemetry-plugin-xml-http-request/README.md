@@ -25,8 +25,7 @@ const webTracerWithZone = new WebTracer({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new XMLHttpRequestPlugin({
-      ignoreUrls: ['http://localhost:8090/sockjs-node/info'],
-      propagateTraceHeaderUrls: ['http://localhost:8090']    
+      propagateTraceHeaderCorsUrls: ['http://localhost:8090']    
     })
   ]
 });

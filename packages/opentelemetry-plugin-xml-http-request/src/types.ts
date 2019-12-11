@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+import * as types from '@opentelemetry/types';
+
 /**
  * method "open" from XMLHttpRequest
  */
-import * as tracing from '@opentelemetry/tracing';
-
 export type OpenFunction = (
   method: string,
   url: string,
@@ -49,13 +49,18 @@ export type SendBody =
  */
 export interface XhrMem {
   // span assigned to xhr
-  span: tracing.Span;
+  span: types.Span;
+  // span url - not available on types.Span
+  spanUrl?: string;
+  // startTime of send function - used to filter cors preflight requests
+  sendStartTime?: types.HrTime;
   // resources created between send and end - possible candidates for
   // cors preflight requests
   resourcesCreatedInTheMiddle?: {
     observer: PerformanceObserver;
     entries: PerformanceResourceTiming[];
   };
+  // callback to remove events from xhr once the span ends
   callbackToRemoveEvents?: Function;
 }
 

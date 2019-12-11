@@ -168,15 +168,10 @@ describe('utils', () => {
     describe('when resources are empty', () => {
       it('should return undefined', () => {
         const spanStartTime = createHrTime(startTime, 1);
-
-        const span = ({
-          startTime: spanStartTime,
-          name: 'http://foo.com/bar.json',
-        } as unknown) as tracing.Span;
-
+        const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
-        const resource = getResource(span, 'send', resources);
+        const resource = getResource(spanUrl, spanStartTime, resources);
 
         assert.deepStrictEqual(
           resource,
@@ -191,12 +186,7 @@ describe('utils', () => {
     describe('when resources has correct entry', () => {
       it('should return the closest one', () => {
         const spanStartTime = createHrTime(startTime, 1);
-
-        const span = ({
-          startTime: spanStartTime,
-          name: 'http://foo.com/bar.json',
-        } as unknown) as tracing.Span;
-
+        const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
         // this one started earlier
@@ -232,7 +222,7 @@ describe('utils', () => {
           )
         );
 
-        const resource = getResource(span, 'send', resources);
+        const resource = getResource(spanUrl, spanStartTime, resources);
 
         assert.deepStrictEqual(
           resource.mainRequest,
@@ -243,12 +233,7 @@ describe('utils', () => {
       describe('But one resource has been already used', () => {
         it('should return the next closest', () => {
           const spanStartTime = createHrTime(startTime, 1);
-
-          const span = ({
-            startTime: spanStartTime,
-            name: 'http://foo.com/bar.json',
-          } as unknown) as tracing.Span;
-
+          const spanUrl = 'http://foo.com/bar.json';
           const resources: PerformanceResourceTiming[] = [];
 
           // this one started earlier
@@ -295,10 +280,11 @@ describe('utils', () => {
             )
           );
 
-          const ignoredResources: PerformanceResourceTiming[] = [resources[1]];
+          const ignoredResources = new WeakSet<PerformanceResourceTiming>();
+          ignoredResources.add(resources[1]);
           const resource = getResource(
-            span,
-            'send',
+            spanUrl,
+            spanStartTime,
             resources,
             ignoredResources
           );
@@ -315,12 +301,7 @@ describe('utils', () => {
     describe('when there are multiple resources from CorsPreflight requests', () => {
       it('should', () => {
         const spanStartTime = createHrTime(startTime, 1);
-
-        const span = ({
-          startTime: spanStartTime,
-          name: 'http://foo.com/bar.json',
-        } as unknown) as tracing.Span;
-
+        const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
         // this one started earlier
@@ -360,7 +341,13 @@ describe('utils', () => {
         maybeCors.push(resources[0]);
         maybeCors.push(resources[1]);
 
-        const resource = getResource(span, 'send', resources, [], maybeCors);
+        const resource = getResource(
+          spanUrl,
+          spanStartTime,
+          resources,
+          undefined,
+          maybeCors
+        );
 
         assert.deepStrictEqual(
           resource.mainRequest,

@@ -17,7 +17,6 @@
 import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import * as types from '@opentelemetry/types';
-import * as tracing from '@opentelemetry/tracing';
 import {
   hrTime,
   hrTimeToNanoseconds,
@@ -60,22 +59,24 @@ export function addSpanNetworkEvent(
 }
 
 /**
- * Get closes performance resource ignoring the resources that has been already used.
- * @param span
- * @param eventName
+ * Get closest performance resource ignoring the resources that have been
+ * already used.
+ * @param spanUrl
+ * @param startTimeHR
  * @param resources
  * @param ignoredResources
+ * @param maybeCors
  */
 export function getResource(
-  span: tracing.Span,
-  eventName: string,
+  spanUrl: string,
+  startTimeHR: types.HrTime,
   resources: PerformanceResourceTiming[],
-  ignoredResources?: PerformanceResourceTiming[],
+  ignoredResources?: WeakSet<PerformanceResourceTiming>,
   maybeCors?: PerformanceResourceTiming[]
 ): PerformanceResourceTimingInfo {
   const filteredResources = filterResourcesForSpan(
-    span,
-    eventName,
+    spanUrl,
+    startTimeHR,
     resources,
     ignoredResources
   );
@@ -101,8 +102,8 @@ export function getResource(
     return 0;
   });
 
-  const spanUrl = parseUrl(span.name);
-  if (spanUrl.origin !== window.location.origin && sorted.length > 1) {
+  const parsedSpanUrl = parseUrl(spanUrl);
+  if (parsedSpanUrl.origin !== window.location.origin && sorted.length > 1) {
     let corsPreFlightRequest: PerformanceResourceTiming | undefined = sorted[0];
     let mainRequest: PerformanceResourceTiming = findMainRequest(
       sorted,
@@ -154,27 +155,20 @@ function findMainRequest(
 /**
  * Filter all resources that has started and finished according to span start time and end time.
  *     It will return the closest resource to a start time
- * @param span
- * @param eventName
+ * @param spanUrl
+ * @param startTimeHR
  * @param resources
  * @param ignoredResources
  */
 function filterResourcesForSpan(
-  span: tracing.Span,
-  eventName: string,
+  spanUrl: string,
+  startTimeHR: types.HrTime,
   resources: PerformanceResourceTiming[],
-  ignoredResources?: PerformanceResourceTiming[]
+  ignoredResources?: WeakSet<PerformanceResourceTiming>
 ) {
-  let startTime = hrTimeToNanoseconds(span.startTime);
-  const eventWithTime =
-    span.events && span.events.find(e => e.name === eventName);
-  if (eventWithTime) {
-    startTime = hrTimeToNanoseconds(eventWithTime.time);
-  }
-
   const nowTime = hrTimeToNanoseconds(hrTime());
+  const startTime = hrTimeToNanoseconds(startTimeHR);
 
-  const spanUrl = span.name;
   let filteredResource = resources.filter(resource => {
     const resourceStartTime = hrTimeToNanoseconds(
       timeInputToHrTime(resource[PTN.FETCH_START])
@@ -196,12 +190,7 @@ function filterResourcesForSpan(
       if (!ignoredResources) {
         return true;
       }
-      for (let i = ignoredResources.length - 1; i >= 0; i--) {
-        if (ignoredResources[i] === resource) {
-          return false;
-        }
-      }
-      return true;
+      return !ignoredResources.has(resource);
     });
   }
 

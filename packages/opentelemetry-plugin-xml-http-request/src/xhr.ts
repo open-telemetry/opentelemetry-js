@@ -16,12 +16,12 @@
 
 import {
   BasePlugin,
+  hrTime,
   isUrlIgnored,
   isWrapped,
   otperformance,
   urlMatches,
 } from '@opentelemetry/core';
-import * as tracing from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
 import {
   addSpanNetworkEvent,
@@ -62,7 +62,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
-  private _usedResources: { [key: string]: PerformanceResourceTiming[] } = {};
+  private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(config: XMLHttpRequestPluginConfig = {}) {
     super();
@@ -75,31 +75,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param span
    * @private
    */
-  private _addHeaders(xhr: XMLHttpRequest, span: types.Span) {
-    let propagateTraceHeaderUrls =
-      this._config.propagateTraceHeaderCorsUrls || [];
-    if (
-      typeof propagateTraceHeaderUrls === 'string' ||
-      propagateTraceHeaderUrls instanceof RegExp
-    ) {
-      propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
-    }
-
-    const url = (span as tracing.Span).name;
-    const spanUrl = parseUrl(url);
-    let addHeaderOnDifferentOrigin = false;
-
-    if (spanUrl.origin !== window.location.origin) {
-      for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (urlMatches(url, propagateTraceHeaderUrl)) {
-          addHeaderOnDifferentOrigin = true;
-          break;
-        }
-      }
-      if (!addHeaderOnDifferentOrigin) {
-        this._logger.warn('Cannot set headers on different origin');
-        return;
-      }
+  private _addHeaders(xhr: XMLHttpRequest, span: types.Span, spanUrl: string) {
+    if (!this._shouldPropagateTraceHeaders(spanUrl)) {
+      return;
     }
     const headers: { [key: string]: unknown } = {};
     this._tracer
@@ -111,16 +89,80 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     });
   }
 
+  /**
+   * checks if trace headers shoudl be propagated
+   * @param spanUrl
+   * @private
+   */
+  _shouldPropagateTraceHeaders(spanUrl: string) {
+    let propagateTraceHeaderUrls =
+      this._config.propagateTraceHeaderCorsUrls || [];
+    if (
+      typeof propagateTraceHeaderUrls === 'string' ||
+      propagateTraceHeaderUrls instanceof RegExp
+    ) {
+      propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
+    }
+    const parsedSpanUrl = parseUrl(spanUrl);
+
+    if (parsedSpanUrl.origin === window.location.origin) {
+      return true;
+    } else {
+      for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
+        if (urlMatches(spanUrl, propagateTraceHeaderUrl)) {
+          return true;
+        }
+      }
+      this._logger.warn('Cannot set headers on different origin');
+      return false;
+    }
+  }
+
+  /**
+   * Add cors pre flight child span
+   * @param span
+   * @param corsPreFlightRequest
+   * @private
+   */
   private _addChildSpan(
-    span: tracing.Span,
+    span: types.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
     const childSpan = this._tracer.startSpan('CORS Preflight', {
       startTime: corsPreFlightRequest[PTN.FETCH_START],
       parent: span,
-    }) as tracing.Span;
+    }) as types.Span;
     this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
     childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
+  }
+
+  /**
+   * Add attributes when span is going to end
+   * @param span
+   * @param xhr
+   * @param spanUrl
+   * @private
+   */
+  _addFinalSpanAttributes(
+    span: types.Span,
+    xhr: XMLHttpRequest,
+    spanUrl?: string
+  ) {
+    if (typeof spanUrl === 'string') {
+      const parsedUrl = parseUrl(spanUrl);
+
+      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhr.status);
+      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhr.statusText);
+      span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(
+        AttributeNames.HTTP_SCHEME,
+        parsedUrl.protocol.replace(':', '')
+      );
+
+      // @TODO do we want to collect this or it will be collected earlier once only or
+      //    maybe when parent span is not available ?
+      span.setAttribute(AttributeNames.HTTP_USER_AGENT, navigator.userAgent);
+    }
   }
 
   /**
@@ -130,7 +172,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addSpanNetworkEvents(
-    span: tracing.Span,
+    span: types.Span,
     resource: PerformanceResourceTiming
   ) {
     addSpanNetworkEvent(span, PTN.FETCH_START, resource);
@@ -188,7 +230,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     if (this._tasksCount === 0) {
       ((otperformance as unknown) as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
-      this._usedResources = {};
+      this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
   }
 
@@ -197,18 +239,24 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param span
    */
   private _findResourceAndAddNetworkEvents(
-    span: tracing.Span,
+    span: types.Span,
+    spanUrl?: string,
+    startTime?: types.HrTime,
     maybeCors: PerformanceResourceTiming[] = []
-  ) {
+  ): void {
+    if (!spanUrl || !startTime) {
+      return;
+    }
+
     const resources: PerformanceResourceTiming[] = otperformance.getEntriesByType(
       'resource'
     ) as PerformanceResourceTiming[];
 
     const resource = getResource(
-      span,
-      EventNames.METHOD_SEND,
+      spanUrl,
+      startTime,
       resources,
-      this._usedResources[span.name],
+      this._usedResources,
       maybeCors
     );
 
@@ -238,6 +286,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       if (callbackToRemoveEvents) {
         callbackToRemoveEvents();
       }
+      this._xhrMem.delete(xhr);
     }
   }
 
@@ -252,7 +301,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     xhr: XMLHttpRequest,
     url: string,
     method: string
-  ): tracing.Span | undefined {
+  ): types.Span | undefined {
     if (isUrlIgnored(url, this._config.ignoreUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
@@ -265,15 +314,16 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         [AttributeNames.HTTP_METHOD]: method,
         [AttributeNames.HTTP_URL]: url,
       },
-    }) as tracing.Span;
+    });
 
     currentSpan.addEvent(EventNames.METHOD_OPEN);
 
+    this._cleanPreviousSpanInformation(xhr);
+
     this._xhrMem.set(xhr, {
       span: currentSpan,
+      spanUrl: url,
     });
-
-    this._cleanPreviousSpanInformation(xhr);
 
     return currentSpan;
   }
@@ -286,11 +336,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _markResourceAsUsed(resource: PerformanceResourceTiming) {
-    const name = resource.name;
-    if (!this._usedResources[name]) {
-      this._usedResources[name] = [];
-    }
-    this._usedResources[name].push(resource);
+    this._usedResources.add(resource);
   }
 
   /**
@@ -332,42 +378,28 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       let resourcesCreatedInTheMiddle = xhrMem.resourcesCreatedInTheMiddle;
       let entries;
       if (resourcesCreatedInTheMiddle) {
-        entries = resourcesCreatedInTheMiddle.entries.slice();
+        entries = resourcesCreatedInTheMiddle.entries;
       }
       if (typeof callbackToRemoveEvents === 'function') {
         callbackToRemoveEvents();
       }
-      const currentSpan = xhrMem.span;
-      if (currentSpan) {
-        plugin._findResourceAndAddNetworkEvents(currentSpan, entries);
-        currentSpan.addEvent(eventName);
 
-        const url = currentSpan.attributes[AttributeNames.HTTP_URL];
-        if (typeof url === 'string') {
-          const parsedUrl = parseUrl(url);
+      const { span, spanUrl, sendStartTime } = xhrMem;
 
-          currentSpan.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhr.status);
-          currentSpan.setAttribute(
-            AttributeNames.HTTP_STATUS_TEXT,
-            xhr.statusText
-          );
-          currentSpan.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
-          currentSpan.setAttribute(
-            AttributeNames.HTTP_SCHEME,
-            parsedUrl.protocol.replace(':', '')
-          );
-
-          // @TODO do we want to collect this or it will be collected earlier once only or
-          //    maybe when parent span is not available ?
-          currentSpan.setAttribute(
-            AttributeNames.HTTP_USER_AGENT,
-            navigator.userAgent
-          );
-        }
-
-        currentSpan.end();
+      if (span) {
+        plugin._findResourceAndAddNetworkEvents(
+          span,
+          spanUrl,
+          sendStartTime,
+          entries
+        );
+        span.addEvent(eventName);
+        plugin._addFinalSpanAttributes(span, xhr, spanUrl);
+        span.end();
         plugin._tasksCount--;
       }
+
+      plugin._xhrMem.delete(xhr);
       plugin._clearResources();
     }
 
@@ -393,7 +425,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       xhr.removeEventListener('timeout', onTimeout);
       const xhrMem = plugin._xhrMem.get(xhr);
       if (xhrMem) {
-        delete xhrMem.callbackToRemoveEvents;
+        xhrMem.callbackToRemoveEvents = undefined;
       }
     }
 
@@ -403,12 +435,13 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         if (!xhrMem) {
           return;
         }
-        const currentSpan: types.Span = xhrMem.span;
+        const currentSpan = xhrMem.span;
+        const spanUrl = xhrMem.spanUrl;
 
-        if (currentSpan) {
+        if (currentSpan && spanUrl) {
           plugin._tasksCount++;
+          xhrMem.sendStartTime = hrTime();
           currentSpan.addEvent(EventNames.METHOD_SEND);
-          const spanName = (currentSpan as tracing.Span).name;
 
           this.addEventListener('load', onLoad);
           this.addEventListener('error', onError);
@@ -418,11 +451,11 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
             unregister(this);
             if (xhrMem.resourcesCreatedInTheMiddle) {
               xhrMem.resourcesCreatedInTheMiddle.observer.disconnect();
-              delete xhrMem.resourcesCreatedInTheMiddle;
+              xhrMem.resourcesCreatedInTheMiddle = undefined;
             }
           };
-          plugin._addHeaders(this, currentSpan);
-          plugin._addPossibleCorsPreflightResourceObserver(this, spanName);
+          plugin._addHeaders(this, currentSpan, spanUrl);
+          plugin._addPossibleCorsPreflightResourceObserver(this, spanUrl);
         }
         return original.call(this, body);
       };
@@ -459,5 +492,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
     shimmer.unwrap(XMLHttpRequest.prototype, 'open');
     shimmer.unwrap(XMLHttpRequest.prototype, 'send');
+
+    this._tasksCount = 0;
+    this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
+    this._usedResources = new WeakSet<PerformanceResourceTiming>();
   }
 }
