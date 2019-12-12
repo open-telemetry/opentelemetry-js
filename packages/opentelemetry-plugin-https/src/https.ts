@@ -17,6 +17,7 @@
 import { HttpPlugin, Func, HttpRequestArgs } from '@opentelemetry/plugin-http';
 import * as http from 'http';
 import * as https from 'https';
+import { URL } from 'url';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as utils from './utils';
@@ -81,12 +82,13 @@ export class HttpsPlugin extends HttpPlugin {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       const plugin = this;
       return function httpsOutgoingRequest(
-        options,
+        options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
         // Makes sure options will have default HTTPS parameters
-        if (typeof options === 'object') {
-          utils.setDefaultOptions(options);
+        if (typeof options === 'object' && !(options instanceof URL)) {
+          options = Object.assign({}, options);
+          utils.setDefaultOptions(options as https.RequestOptions);
         }
         return plugin._getPatchOutgoingRequestFunction()(original)(
           options,
@@ -105,17 +107,9 @@ export class HttpsPlugin extends HttpPlugin {
   ) {
     return (original: Func<http.ClientRequest>): Func<http.ClientRequest> => {
       return function httpsOutgoingRequest(
-        options: https.RequestOptions | string,
+        options: https.RequestOptions | string | URL,
         ...args: HttpRequestArgs
       ): http.ClientRequest {
-        const optionsType = typeof options;
-        // Makes sure options will have default HTTPS parameters
-        if (optionsType === 'object') {
-          utils.setDefaultOptions(options as https.RequestOptions);
-        } else if (typeof args[0] === 'object' && optionsType === 'string') {
-          utils.setDefaultOptions(args[0] as https.RequestOptions);
-        }
-
         return plugin._getPatchOutgoingGetFunction(clientRequest)(original)(
           options,
           ...args

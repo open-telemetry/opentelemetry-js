@@ -14,24 +14,25 @@
  * limitations under the License.
  */
 
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
 import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
-import { Span, SpanKind } from '@opentelemetry/types';
+import { SpanKind, Span } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as https from 'https';
-import * as url from 'url';
 import { plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
+import * as url from 'url';
 import * as utils from '../utils/utils';
+import { NodeTracer } from '@opentelemetry/node';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 
+const protocol = 'https';
 const serverPort = 42345;
 const hostname = 'localhost';
 const memoryExporter = new InMemorySpanExporter();
@@ -71,7 +72,7 @@ describe('HttpsPlugin Integration tests', () => {
 
     before(() => {
       const ignoreConfig = [
-        `https://${hostname}:${serverPort}/ignored/string`,
+        `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
@@ -94,7 +95,9 @@ describe('HttpsPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpsRequest.get(`https://google.fr/?query=test`);
+      const result = await httpsRequest.get(
+        `${protocol}://google.fr/?query=test`
+      );
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -114,8 +117,62 @@ describe('HttpsPlugin Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
+    it('should create a rootSpan for GET requests and add propagation headers if URL is used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpsRequest.get(
+        new url.URL(`${protocol}://google.fr/?query=test`)
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
+    it('should create a rootSpan for GET requests and add propagation headers if URL and options are used', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const result = await httpsRequest.get(
+        new url.URL(`${protocol}://google.fr/?query=test`),
+        { headers: { 'x-foo': 'foo' } }
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      const validations = {
+        hostname: 'google.fr',
+        httpStatusCode: result.statusCode!,
+        httpMethod: 'GET',
+        pathname: '/',
+        path: '/?query=test',
+        resHeaders: result.resHeaders,
+        reqHeaders: result.reqHeaders,
+        component: plugin.component,
+      };
+
+      assert.strictEqual(spans.length, 1);
+      assert.ok(span.name.indexOf('GET /') >= 0);
+      assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
+      assertSpan(span, SpanKind.CLIENT, validations);
+    });
+
     it('custom attributes should show up on client spans', async () => {
-      const result = await httpsRequest.get(`https://google.fr/`);
+      const result = await httpsRequest.get(`${protocol}://google.fr/`);
       const spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -139,7 +196,7 @@ describe('HttpsPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
         { headers: { Expect: '100-continue' } },
-        url.parse('https://google.fr/')
+        url.parse(`${protocol}://google.fr/`)
       );
 
       const result = await httpsRequest.get(options);
@@ -170,7 +227,7 @@ describe('HttpsPlugin Integration tests', () => {
       { Expect: '100-continue', 'user-agent': 'https-plugin-test' },
       { 'user-agent': 'https-plugin-test' },
     ]) {
-      it(`should create a span for GET requests and add propagation when using the following signature: https.get(url, options, callback) and following headers: ${JSON.stringify(
+      it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
       )}`, done => {
         let validations: {
@@ -186,7 +243,7 @@ describe('HttpsPlugin Integration tests', () => {
         assert.strictEqual(spans.length, 0);
         const options = { headers };
         const req = https.get(
-          'https://google.fr/',
+          `${protocol}://google.fr/`,
           options,
           (resp: http.IncomingMessage) => {
             const res = (resp as unknown) as http.IncomingMessage & {
@@ -212,6 +269,7 @@ describe('HttpsPlugin Integration tests', () => {
             });
           }
         );
+
         req.on('close', () => {
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);

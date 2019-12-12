@@ -16,59 +16,56 @@
 
 import * as http from 'http';
 import * as https from 'https';
-import { RequestOptions } from 'https';
-import * as url from 'url';
+import { URL } from 'url';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-export const httpsRequest = {
-  get: (
-    options: string | RequestOptions
-  ): Promise<{
-    data: string;
-    statusCode: number | undefined;
-    resHeaders: http.IncomingHttpHeaders;
-    reqHeaders: http.OutgoingHttpHeaders;
-    method: string | undefined;
-  }> => {
-    const _options =
-      typeof options === 'string'
-        ? Object.assign(url.parse(options), {
-            headers: {
-              'user-agent': 'https-plugin-test',
-            },
-          })
-        : options;
-    return new Promise((resolve, reject) => {
-      const req = https.get(_options, (resp: http.IncomingMessage) => {
-        const res = (resp as unknown) as http.IncomingMessage & {
-          req: http.IncomingMessage;
-        };
-        let data = '';
-        resp.on('data', chunk => {
-          data += chunk;
-        });
-        resp.on('end', () => {
-          resolve({
-            data,
-            statusCode: res.statusCode,
-            /* tslint:disable:no-any */
-            reqHeaders: (res.req as any).getHeaders
-              ? (res.req as any).getHeaders()
-              : (res.req as any)._headers,
-            /* tslint:enable:no-any */
-            resHeaders: res.headers,
-            method: res.req.method,
-          });
-        });
-        resp.on('error', err => {
-          reject(err);
+type GetResult = Promise<{
+  data: string;
+  statusCode: number | undefined;
+  resHeaders: http.IncomingHttpHeaders;
+  reqHeaders: http.OutgoingHttpHeaders;
+  method: string | undefined;
+}>;
+
+function get(input: string | URL, options?: https.RequestOptions): GetResult;
+function get(input: https.RequestOptions): GetResult;
+function get(input: any, options?: any): GetResult {
+  return new Promise((resolve, reject) => {
+    let req: http.ClientRequest;
+
+    function onGetResponseCb(resp: http.IncomingMessage): void {
+      const res = (resp as unknown) as http.IncomingMessage & {
+        req: http.IncomingMessage;
+      };
+      let data = '';
+      resp.on('data', chunk => {
+        data += chunk;
+      });
+      resp.on('end', () => {
+        resolve({
+          data,
+          statusCode: res.statusCode,
+          reqHeaders: req.getHeaders ? req.getHeaders() : (req as any)._headers,
+          resHeaders: res.headers,
+          method: res.req.method,
         });
       });
-      req.on('error', err => {
+      resp.on('error', err => {
         reject(err);
       });
-      return req;
+    }
+    req =
+      options != null
+        ? https.get(input, options, onGetResponseCb)
+        : https.get(input, onGetResponseCb);
+    req.on('error', err => {
+      reject(err);
     });
-  },
+    return req;
+  });
+}
+
+export const httpsRequest = {
+  get,
 };
