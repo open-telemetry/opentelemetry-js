@@ -26,6 +26,7 @@ export interface IORedisCommand {
 }
 
 export interface IORedisPluginClientTypes {
+  // https://github.com/luin/ioredis/blob/master/API.md
   options?: {
     host: string;
     port: number;
