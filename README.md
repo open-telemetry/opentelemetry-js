@@ -70,7 +70,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
-- [Daniel Khan](https://github.com/danielkhan), Dynatrace
+- [Daniel Dyla](https://github.com/dyladan), Dynatrace
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
