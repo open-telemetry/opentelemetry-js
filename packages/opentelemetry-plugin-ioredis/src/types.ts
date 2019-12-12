@@ -28,6 +28,6 @@ export interface IORedisCommand {
 export interface IORedisPluginClientTypes {
   options?: {
     host: string;
-    port: string;
+    port: number;
   };
 }
