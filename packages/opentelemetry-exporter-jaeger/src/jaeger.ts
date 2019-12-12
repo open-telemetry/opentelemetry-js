@@ -53,7 +53,9 @@ export class JaegerExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ): void {
     this._logger.debug('Jaeger exporter export');
-    return this._sendSpans(spans, resultCallback);
+    this._sendSpans(spans, resultCallback).catch(err => {
+      this._logger.error(`JaegerExporter failed to export: ${err}`);
+    });
   }
 
   /** Shutdown exporter. */
@@ -69,31 +71,48 @@ export class JaegerExporter implements SpanExporter {
   }
 
   /** Transform spans and sends to Jaeger service. */
-  private _sendSpans(
+  private async _sendSpans(
     spans: ReadableSpan[],
     done?: (result: ExportResult) => void
   ) {
     const thriftSpan = spans.map(span => spanToThrift(span));
     for (const span of thriftSpan) {
-      this._sender.append(span, (numSpans: number, err?: string) => {
-        if (err) {
-          // @todo: decide whether to break out the loop on first error.
-          this._logger.error(`failed to append span: ${err}`);
-          if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
-        }
-      });
+      try {
+        await this._append(span);
+      } catch (err) {
+        this._logger.error(`failed to append span: ${err}`);
+        if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
+      }
     }
-    // @todo: We should wait for all the callbacks of the append calls to
-    // complete before it calls done with success.
     this._logger.debug('successful append for : %s', thriftSpan.length);
+
+    // Flush all spans on each export. No-op if span buffer is empty
+    await this._flush();
+
     if (done) return done(ExportResult.SUCCESS);
   }
 
-  private _flush(): void {
-    this._sender.flush((numSpans: number, err?: string) => {
-      if (err) {
-        this._logger.error(`failed to flush ${numSpans} spans: ${err}`);
-      }
+  private async _append(span: jaegerTypes.ThriftSpan): Promise<number> {
+    return new Promise((resolve, reject) => {
+      this._sender.append(span, (count: number, err?: string) => {
+        if (err) {
+          return reject(new Error(err));
+        }
+
+        resolve(count);
+      });
+    });
+  }
+
+  private async _flush(): Promise<void> {
+    await new Promise((resolve, reject) => {
+      this._sender.flush((_count: number, err?: string) => {
+        if (err) {
+          return reject(new Error(err));
+        }
+        this._logger.debug('successful flush for %s spans', _count);
+        resolve();
+      });
     });
   }
 }
