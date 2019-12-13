@@ -36,7 +36,6 @@ import { Format } from './enums/Format';
 import {
   OpenFunction,
   PropagateTraceHeaderCorsUrls,
-  SendBody,
   SendFunction,
   XhrMem,
 } from './types';
@@ -113,7 +112,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           return true;
         }
       }
-      this._logger.warn('Cannot set headers on different origin');
       return false;
     }
   }
@@ -346,17 +344,19 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   protected _patchOpen() {
     return (original: OpenFunction): OpenFunction => {
       const plugin = this;
-      return function patchOpen(
-        this: XMLHttpRequest,
-        method: string,
-        url: string,
-        async?: boolean,
-        user?: string | null,
-        pass?: string | null
-      ): void {
-        plugin._createSpan(this, url, method);
+      return function patchOpen(this: XMLHttpRequest, ...args): void {
+        const method: string = args[0];
+        const url: string = args[1];
+        const async: boolean = !!args[2];
+        if (async) {
+          plugin._createSpan(this, url, method);
+        } else {
+          plugin._logger.debug(
+            'tracing support for synchronous is not supported'
+          );
+        }
 
-        return original.call(this, method, url, true, user, pass);
+        return original.apply(this, args);
       };
     };
   }
@@ -430,7 +430,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
 
     return (original: SendFunction): SendFunction => {
-      return function patchSend(this: XMLHttpRequest, body?: SendBody): void {
+      return function patchSend(this: XMLHttpRequest, ...args): void {
         const xhrMem = plugin._xhrMem.get(this);
         if (!xhrMem) {
           return;
@@ -457,7 +457,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           plugin._addHeaders(this, currentSpan, spanUrl);
           plugin._addPossibleCorsPreflightResourceObserver(this, spanUrl);
         }
-        return original.call(this, body);
+        return original.apply(this, args);
       };
     };
   }
