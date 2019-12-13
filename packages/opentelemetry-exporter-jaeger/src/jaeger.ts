@@ -52,6 +52,9 @@ export class JaegerExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
+    if (spans.length === 0) {
+      return resultCallback(ExportResult.SUCCESS);
+    }
     this._logger.debug('Jaeger exporter export');
     this._sendSpans(spans, resultCallback).catch(err => {
       this._logger.error(`JaegerExporter failed to export: ${err}`);
@@ -81,6 +84,7 @@ export class JaegerExporter implements SpanExporter {
         await this._append(span);
       } catch (err) {
         this._logger.error(`failed to append span: ${err}`);
+        // TODO right now we break out on first error, is that desirable?
         if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
       }
     }
@@ -98,7 +102,6 @@ export class JaegerExporter implements SpanExporter {
         if (err) {
           return reject(new Error(err));
         }
-
         resolve(count);
       });
     });
