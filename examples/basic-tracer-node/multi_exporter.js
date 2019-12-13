@@ -9,8 +9,6 @@ const tracer = new BasicTracer();
 const zipkinExporter = new ZipkinExporter({serviceName: 'basic-service'});
 const jaegerExporter = new JaegerExporter({
   serviceName: 'basic-service',
-  // The default flush interval is 5 seconds.
-  flushInterval: 2000
 });
 const collectorExporter = new CollectorExporter({serviceName: 'basic-service'});
 
