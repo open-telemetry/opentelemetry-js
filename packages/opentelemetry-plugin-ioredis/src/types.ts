@@ -27,7 +27,5 @@ export interface IORedisCommand {
 
 export interface IORedisPluginClientTypes {
   // https://github.com/luin/ioredis/blob/master/API.md
-  host?: string,
-  port?: number,
-  options?: ioredisTypes.RedisOptions
+  options: ioredisTypes.RedisOptions;
 }
