@@ -52,14 +52,13 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
         },
       });
 
-      if (this.options) {
-        const { host, port } = this.options;
-        span.setAttributes({
-          [AttributeNames.PEER_HOSTNAME]: host,
-          [AttributeNames.PEER_PORT]: port,
-          [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
-        });
-      }
+      const { host, port } = this.options;
+
+      span.setAttributes({
+        [AttributeNames.PEER_HOSTNAME]: host,
+        [AttributeNames.PEER_PORT]: port,
+        [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
+      });
 
       const result = original.apply(this, arguments);
       return result
