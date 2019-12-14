@@ -70,5 +70,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-prometheus
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-prometheus
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-prometheus&type=dev
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-collprometheusector
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-prometheus
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-prometheus.svg
