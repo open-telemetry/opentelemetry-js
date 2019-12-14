@@ -211,6 +211,45 @@ describe('ioredis', () => {
         });
       });
 
+      it('should create a child span for streamify scanning', async () => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_STATEMENT]: 'scan 0',
+        };
+        const span = tracer.startSpan('test span');
+        await tracer.withSpan(span, async () => {
+          const stream = client.scanStream();
+          stream
+            .on('data', resultKeys => {
+              // `resultKeys` is an array of strings representing key names.
+              // Note that resultKeys may contain 0 keys, and that it will sometimes
+              // contain duplicates due to SCAN's implementation in Redis.
+              for (var i = 0; i < resultKeys.length; i++) {
+                console.log(resultKeys[i]);
+              }
+            })
+            .on('end', () => {
+              console.log('all keys have been visited');
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+              span.end();
+              const endedSpans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(endedSpans.length, 2);
+              assert.strictEqual(endedSpans[0].name, `scan`);
+              assertionUtils.assertSpan(
+                endedSpans[0],
+                SpanKind.CLIENT,
+                attributes,
+                [],
+                okStatus
+              );
+              assertionUtils.assertPropagation(endedSpans[0], span);
+            })
+            .on('error', error => {
+              assert.ifError(error);
+            });
+        });
+      });
+
       it('should create a child span for get promise', async () => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
