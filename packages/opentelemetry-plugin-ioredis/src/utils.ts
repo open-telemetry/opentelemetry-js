@@ -39,7 +39,7 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
   ) {
     const parentSpan = tracer.getCurrentSpan();
 
-    if (arguments.length === 1 && typeof cmd === 'object') {
+    if (arguments.length >= 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(cmd.name, {
         kind: SpanKind.CLIENT,
         parent: parentSpan,
