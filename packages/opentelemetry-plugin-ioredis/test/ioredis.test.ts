@@ -156,7 +156,9 @@ describe('ioredis', () => {
         it(`should create a child span for cb style ${command.description}`, done => {
           const attributes = {
             ...DEFAULT_ATTRIBUTES,
-            [AttributeNames.DB_STATEMENT]: `${command.name} ${command.args.join(' ')}`,
+            [AttributeNames.DB_STATEMENT]: `${command.name} ${command.args.join(
+              ' '
+            )}`,
           };
           const span = tracer.startSpan('test span');
           tracer.withSpan(span, () => {

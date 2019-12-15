@@ -60,37 +60,14 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
         [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
       });
 
-      // Callback style invocations
-      const originalCallback = arguments[0].callback;
-      if (originalCallback) {
-        (arguments[0] as IORedisCommand).callback = function callback<T>(
-          this: unknown,
-          err: NodeJS.ErrnoException | null | undefined,
-          _result: T
-        ) {
-          endSpan(span, err);
-          return originalCallback.apply(this, arguments);
-        };
-        try {
-          // Span will be ended in callback
-          return original.apply(this, arguments);
-        } catch (err) {
-          endSpan(span, err);
-          throw err;
-        }
+      try {
+        const result = original.apply(this, arguments);
+        endSpan(span, null);
+        return result;
+      } catch (error) {
+        endSpan(span, error);
+        throw error;
       }
-
-      // Promise style invocations
-      const result = original.apply(this, arguments);
-      return result
-        .then((res: unknown) => {
-          endSpan(span, null);
-          return res;
-        })
-        .catch((error: Error) => {
-          endSpan(span, error);
-          throw error;
-        });
     } else return original.apply(this, arguments);
   };
 };
