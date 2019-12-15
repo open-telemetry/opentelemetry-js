@@ -292,7 +292,7 @@ describe('ioredis', () => {
       it(`should create a child span for multi/transaction`, done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
-          [AttributeNames.DB_STATEMENT]: 'ok',
+          [AttributeNames.DB_STATEMENT]: 'multi',
         };
 
         const span = tracer.startSpan('test span');
@@ -304,11 +304,14 @@ describe('ioredis', () => {
             .exec((err, _results) => {
               assert.ifError(err);
 
-              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 4);
               span.end();
               const endedSpans = memoryExporter.getFinishedSpans();
-              assert.strictEqual(endedSpans.length, 2);
-              assert.strictEqual(endedSpans[0].name, 'okokok');
+              assert.strictEqual(endedSpans.length, 5);
+              assert.strictEqual(endedSpans[0].name, 'multi');
+              assert.strictEqual(endedSpans[1].name, 'set');
+              assert.strictEqual(endedSpans[2].name, 'get');
+              assert.strictEqual(endedSpans[3].name, 'exec');
               assertionUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
@@ -321,6 +324,40 @@ describe('ioredis', () => {
             });
         });
       });
+
+      it(`should create a child span for pipeline`, done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_STATEMENT]: 'set foo bar',
+        };
+
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, () => {
+          const pipeline = client.pipeline();
+          pipeline.set("foo", "bar");
+          pipeline.del("cc");
+          pipeline.exec((err, results) => {
+            assert.ifError(err);
+
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 3);
+            assert.strictEqual(endedSpans[0].name, 'set');
+            assert.strictEqual(endedSpans[1].name, 'del');
+            assert.strictEqual(endedSpans[2].name, 'test span');
+            assertionUtils.assertSpan(
+              endedSpans[0],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+            done();
+          });
+      });
+    });
 
       it('should create a child span for get promise', async () => {
         const attributes = {
