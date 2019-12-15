@@ -159,24 +159,22 @@ describe('ioredis', () => {
           tracer.withSpan(span, () => {
             operation.method((err, _result) => {
               assert.ifError(err);
-              (_result: string | number) => {
-                assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
-                span.end();
-                const endedSpans = memoryExporter.getFinishedSpans();
-                assert.strictEqual(endedSpans.length, 2);
-                assert.strictEqual(
-                  endedSpans[0].name,
-                  `redis-${operation.command}`
-                );
-                assertionUtils.assertSpan(
-                  endedSpans[0],
-                  SpanKind.CLIENT,
-                  attributes,
-                  [],
-                  okStatus
-                );
-                assertionUtils.assertPropagation(endedSpans[0], span);
-              };
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+              span.end();
+              const endedSpans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(endedSpans.length, 2);
+              assert.strictEqual(
+                endedSpans[0].name,
+                `redis-${operation.command}`
+              );
+              assertionUtils.assertSpan(
+                endedSpans[0],
+                SpanKind.CLIENT,
+                attributes,
+                [],
+                okStatus
+              );
+              assertionUtils.assertPropagation(endedSpans[0], span);
               done();
             });
           });
@@ -264,7 +262,6 @@ describe('ioredis', () => {
             numberOfKeys: 1,
             lua: 'return {KEYS[1],ARGV[1]}',
           });
-
           // Now `echo` can be used just like any other ordinary command,
           // and ioredis will try to use `EVALSHA` internally when possible for better performance.
           client.echo('test', (err, result) => {
@@ -287,6 +284,39 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
             done();
           });
+        });
+      });
+
+      it(`should create a child span for multi/transaction`, done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_STATEMENT]: 'ok',
+        };
+
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, () => {
+          client
+            .multi()
+            .set('foo', 'bar')
+            .get('foo')
+            .exec((err, _results) => {
+              assert.ifError(err);
+
+              assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+              span.end();
+              const endedSpans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(endedSpans.length, 2);
+              assert.strictEqual(endedSpans[0].name, 'okokok');
+              assertionUtils.assertSpan(
+                endedSpans[0],
+                SpanKind.CLIENT,
+                attributes,
+                [],
+                okStatus
+              );
+              assertionUtils.assertPropagation(endedSpans[0], span);
+              done();
+            });
         });
       });
 
