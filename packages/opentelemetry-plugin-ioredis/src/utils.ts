@@ -20,7 +20,7 @@ import { IORedisPluginClientTypes, IORedisCommand } from './types';
 import { IORedisPlugin } from './ioredis';
 import { AttributeNames } from './enums';
 
-const endSpan = (span: Span, err: Error | null) => {
+const endSpan = (span: Span, err: NodeJS.ErrnoException | null | undefined) => {
   if (err) {
     span.setStatus({
       code: CanonicalCode.UNKNOWN,
@@ -60,6 +60,27 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
         [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
       });
 
+      // Callback style invocations
+      const originalCallback = arguments[0].callback;
+      if (originalCallback) {
+        (arguments[0] as IORedisCommand).callback = function callback<T>(
+          this: unknown,
+          err: NodeJS.ErrnoException | null | undefined,
+          _result: T
+        ) {
+          endSpan(span, err);
+          return originalCallback.apply(this, arguments);
+        };
+        try {
+          // Span will be ended in callback
+          return original.apply(this, arguments);
+        } catch (err) {
+          endSpan(span, err);
+          throw err;
+        }
+      }
+
+      // Promise style invocations
       const result = original.apply(this, arguments);
       return result
         .then((res: unknown) => {

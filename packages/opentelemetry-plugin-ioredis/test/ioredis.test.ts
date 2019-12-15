@@ -109,18 +109,21 @@ describe('ioredis', () => {
 
     const IOREDIS_CALLBACK_OPERATIONS: Array<{
       description: string;
-      command: string;
+      name: string;
+      args: Array<string>;
       method: (cb: ioredisTypes.CallbackFunction<unknown>) => unknown;
     }> = [
       {
         description: 'insert',
-        command: 'hset',
+        name: 'hset',
+        args: ['hash', 'testField', 'testValue'],
         method: (cb: ioredisTypes.CallbackFunction<number>) =>
           client.hset('hash', 'testField', 'testValue', cb),
       },
       {
         description: 'get',
-        command: 'get',
+        name: 'get',
+        args: ['test'],
         method: (cb: ioredisTypes.CallbackFunction<string | null>) =>
           client.get('test', cb),
       },
@@ -149,24 +152,21 @@ describe('ioredis', () => {
     });
 
     describe('Instrumenting query operations', () => {
-      IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
-        it(`should create a child span for cb style ${operation.description}`, done => {
+      IOREDIS_CALLBACK_OPERATIONS.forEach(command => {
+        it(`should create a child span for cb style ${command.description}`, done => {
           const attributes = {
             ...DEFAULT_ATTRIBUTES,
-            [AttributeNames.DB_STATEMENT]: operation.command,
+            [AttributeNames.DB_STATEMENT]: `${command.name} ${command.args.join(' ')}`,
           };
           const span = tracer.startSpan('test span');
           tracer.withSpan(span, () => {
-            operation.method((err, _result) => {
+            command.method((err, _result) => {
               assert.ifError(err);
               assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
               span.end();
               const endedSpans = memoryExporter.getFinishedSpans();
               assert.strictEqual(endedSpans.length, 2);
-              assert.strictEqual(
-                endedSpans[0].name,
-                `redis-${operation.command}`
-              );
+              assert.strictEqual(endedSpans[0].name, command.name);
               assertionUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
