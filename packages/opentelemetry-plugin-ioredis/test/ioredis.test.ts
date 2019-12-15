@@ -211,13 +211,13 @@ describe('ioredis', () => {
         });
       });
 
-      it('should create a child span for streamify scanning', async () => {
+      it('should create a child span for streamify scanning', done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'scan 0',
         };
         const span = tracer.startSpan('test span');
-        await tracer.withSpan(span, async () => {
+        tracer.withSpan(span, () => {
           const stream = client.scanStream();
           stream
             .on('data', resultKeys => {
@@ -243,10 +243,50 @@ describe('ioredis', () => {
                 okStatus
               );
               assertionUtils.assertPropagation(endedSpans[0], span);
+              done();
             })
-            .on('error', error => {
-              assert.ifError(error);
+            .on('error', err => {
+              done(err);
             });
+        });
+      });
+
+      it(`should create a child span for lua`, done => {
+        const attributes = {
+          ...DEFAULT_ATTRIBUTES,
+          [AttributeNames.DB_STATEMENT]: 'eval return {KEYS[1],ARGV[1]} 1 test',
+        };
+
+        const span = tracer.startSpan('test span');
+        tracer.withSpan(span, () => {
+          // This will define a command echo:
+          client.defineCommand('echo', {
+            numberOfKeys: 1,
+            lua: 'return {KEYS[1],ARGV[1]}',
+          });
+
+          // Now `echo` can be used just like any other ordinary command,
+          // and ioredis will try to use `EVALSHA` internally when possible for better performance.
+          client.echo('test', (err, result) => {
+            assert.ifError(err);
+
+            assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+            span.end();
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 3);
+            assert.strictEqual(endedSpans[2].name, 'test span');
+            assert.strictEqual(endedSpans[1].name, 'eval');
+            assert.strictEqual(endedSpans[0].name, 'evalsha');
+            assertionUtils.assertSpan(
+              endedSpans[1],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+            done();
+          });
         });
       });
 
