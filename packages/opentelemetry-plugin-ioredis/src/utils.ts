@@ -46,9 +46,10 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
           [AttributeNames.DB_TYPE]: IORedisPlugin.DB_TYPE,
-          [AttributeNames.DB_STATEMENT]: Array.isArray(cmd.args)
-            ? `${cmd.name} ${cmd.args.join(' ')}`
-            : cmd.name,
+          [AttributeNames.DB_STATEMENT]:
+            Array.isArray(cmd.args) && cmd.args.length
+              ? `${cmd.name} ${cmd.args.join(' ')}`
+              : cmd.name,
         },
       });
 
