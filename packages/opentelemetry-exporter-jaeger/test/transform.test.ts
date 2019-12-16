@@ -35,6 +35,7 @@ describe('transform', () => {
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
           code: types.CanonicalCode.OK,
         },
@@ -131,6 +132,7 @@ describe('transform', () => {
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
           code: types.CanonicalCode.DATA_LOSS,
           message: 'data loss',
@@ -187,6 +189,7 @@ describe('transform', () => {
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
           code: types.CanonicalCode.OK,
         },

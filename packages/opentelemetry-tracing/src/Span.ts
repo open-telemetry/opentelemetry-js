@@ -172,12 +172,20 @@ export class Span implements types.Span, ReadableSpan {
     return true;
   }
 
+  isEnded(): boolean {
+    return this._ended;
+  }
+
   toReadableSpan(): ReadableSpan {
     return this;
   }
 
   get duration(): types.HrTime {
     return this._duration;
+  }
+
+  get ended(): boolean {
+    return this._ended;
   }
 
   private _isSpanEnded(): boolean {

@@ -75,12 +75,20 @@ export class NoopSpan implements Span {
   }
 
   // By default does nothing
-  end(endTime?: TimeInput): void {}
+  end(endTime?: TimeInput): void {
+    this._ended = true;
+  }
 
   // isRecording always returns false for noopSpan.
   isRecording(): boolean {
     return false;
   }
+
+  isEnded(): boolean {
+    return this._ended;
+  }
+
+  private _ended: boolean = false;
 }
 
 export const NOOP_SPAN = new NoopSpan();
