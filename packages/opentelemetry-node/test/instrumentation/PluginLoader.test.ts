@@ -205,13 +205,10 @@ describe('PluginLoader', () => {
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
-      assert.deepStrictEqual(
-        (pluginLoader['_plugins'][0] as any)._config,
-        {
-          sharedPluginOption: 1,
-          httpPluginOverrideOption: 2
-        }
-      );
+      assert.deepStrictEqual((pluginLoader['_plugins'][0] as any)._config, {
+        sharedPluginOption: 1,
+        httpPluginOverrideOption: 2,
+      });
       assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();
     });
