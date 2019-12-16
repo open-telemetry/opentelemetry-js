@@ -15,15 +15,15 @@
  */
 
 import {
-  Tracer,
-  Plugin,
   Logger,
-  PluginConfig,
+  Plugin,
   PluginInternalFiles,
   PluginInternalFilesVersion,
+  PluginOptions,
+  Tracer,
 } from '@opentelemetry/types';
-import * as semver from 'semver';
 import * as path from 'path';
+import * as semver from 'semver';
 
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
@@ -37,19 +37,19 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected _logger!: Logger;
   protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
-  protected _config!: PluginConfig;
+  protected _config: PluginOptions = {};
 
   enable(
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: PluginConfig
+    config: PluginOptions
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
-    if (config) this._config = config;
+    this._config = config;
     return this.patch();
   }
 

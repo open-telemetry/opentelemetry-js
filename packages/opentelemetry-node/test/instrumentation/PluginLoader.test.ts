@@ -30,8 +30,6 @@ const simplePlugins: Plugins = {
   'simple-module': {
     enabled: true,
     path: '@opentelemetry/plugin-simple-module',
-    ignoreMethods: [],
-    ignoreUrls: [],
   },
 };
 
@@ -39,8 +37,9 @@ const httpPlugins: Plugins = {
   http: {
     enabled: true,
     path: '@opentelemetry/plugin-http-module',
-    ignoreMethods: [],
-    ignoreUrls: [],
+    options: {
+      httpPluginOverrideOption: 2,
+    },
   },
 };
 
@@ -107,14 +106,14 @@ describe('PluginLoader', () => {
 
     it('transitions from UNINITIALIZED to ENABLED', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
-      pluginLoader.load(simplePlugins);
+      pluginLoader.load({ plugins: simplePlugins });
       assert.strictEqual(pluginLoader['_hookState'], HookState.ENABLED);
       pluginLoader.unload();
     });
 
     it('transitions from ENABLED to DISABLED', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
-      pluginLoader.load(simplePlugins).unload();
+      pluginLoader.load({ plugins: simplePlugins }).unload();
       assert.strictEqual(pluginLoader['_hookState'], HookState.DISABLED);
     });
   });
@@ -140,7 +139,7 @@ describe('PluginLoader', () => {
     it('should load a plugin and patch the target modules', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(simplePlugins);
+      pluginLoader.load({ plugins: simplePlugins });
       // The hook is only called the first time the module is loaded.
       const simpleModule = require('simple-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
@@ -152,10 +151,67 @@ describe('PluginLoader', () => {
     it('should load a plugin and patch the core module', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(httpPlugins);
+      pluginLoader.load({ plugins: httpPlugins });
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(httpModule.get(), 'patched');
+      pluginLoader.unload();
+    });
+
+    it('should set shared options on plugins', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load({
+        plugins: httpPlugins,
+        sharedPluginOptions: { sharedPluginOption: 1 },
+      });
+      // The hook is only called the first time the module is loaded.
+      const httpModule = require('http');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(
+        (pluginLoader['_plugins'][0] as any)._config.sharedPluginOption,
+        1
+      );
+      assert.strictEqual(httpModule.get(), 'patched');
+      pluginLoader.unload();
+    });
+
+    it('should override shared options with explicit ones', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load({
+        plugins: httpPlugins,
+        sharedPluginOptions: { httpPluginOverrideOption: 1 },
+      });
+      // The hook is only called the first time the module is loaded.
+      const httpModule = require('http');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(
+        (pluginLoader['_plugins'][0] as any)._config.httpPluginOverrideOption,
+        2
+      );
+      assert.strictEqual(httpModule.get(), 'patched');
+      pluginLoader.unload();
+    });
+
+    it('should merge shared and explicit options', () => {
+      const pluginLoader = new PluginLoader(tracer, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load({
+        plugins: httpPlugins,
+        sharedPluginOptions: { sharedPluginOption: 1 },
+      });
+      // The hook is only called the first time the module is loaded.
+      const httpModule = require('http');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.deepStrictEqual(
+        (pluginLoader['_plugins'][0] as any)._config,
+        {
+          sharedPluginOption: 1,
+          httpPluginOverrideOption: 2
+        }
+      );
       assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();
     });
@@ -163,7 +219,7 @@ describe('PluginLoader', () => {
     it('should not load the plugin when supported versions does not match', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(notSupportedVersionPlugins);
+      pluginLoader.load({ plugins: notSupportedVersionPlugins });
       // The hook is only called the first time the module is loaded.
       require('notsupported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
@@ -173,7 +229,7 @@ describe('PluginLoader', () => {
     it('should load a plugin and patch the target modules when supported versions match', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(supportedVersionPlugins);
+      pluginLoader.load({ plugins: supportedVersionPlugins });
       // The hook is only called the first time the module is loaded.
       const simpleModule = require('supported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
@@ -185,7 +241,7 @@ describe('PluginLoader', () => {
     it('should not load a plugin when value is false', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(disablePlugins);
+      pluginLoader.load({ plugins: disablePlugins });
       const simpleModule = require('simple-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       assert.strictEqual(simpleModule.value(), 0);
@@ -196,7 +252,7 @@ describe('PluginLoader', () => {
     it('should not load a plugin when value is true but path is missing', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(missingPathPlugins);
+      pluginLoader.load({ plugins: missingPathPlugins });
       const simpleModule = require('simple-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       assert.strictEqual(simpleModule.value(), 0);
@@ -207,14 +263,14 @@ describe('PluginLoader', () => {
     it('should not load a non existing plugin', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(nonexistentPlugins);
+      pluginLoader.load({ plugins: nonexistentPlugins });
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.unload();
     });
 
     it(`doesn't patch modules for which plugins aren't specified`, () => {
       const pluginLoader = new PluginLoader(tracer, logger);
-      pluginLoader.load({});
+      pluginLoader.load({ plugins: {} });
       assert.strictEqual(require('simple-module').value(), 0);
       pluginLoader.unload();
     });
@@ -224,7 +280,7 @@ describe('PluginLoader', () => {
     it('should unload the plugins and unpatch the target module when unloads', () => {
       const pluginLoader = new PluginLoader(tracer, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
-      pluginLoader.load(simplePlugins);
+      pluginLoader.load({ plugins: simplePlugins });
       // The hook is only called the first time the module is loaded.
       const simpleModule = require('simple-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);

@@ -17,7 +17,7 @@
 import { BasicTracer } from '@opentelemetry/tracing';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { PluginLoader } from './instrumentation/PluginLoader';
-import { NodeTracerConfig, DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
+import { NodeTracerConfig } from './config';
 
 /**
  * This class represents a node tracer with `async_hooks` module.
@@ -36,7 +36,7 @@ export class NodeTracer extends BasicTracer {
     super(Object.assign({ scopeManager: config.scopeManager }, config));
 
     this._pluginLoader = new PluginLoader(this, this.logger);
-    this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);
+    this._pluginLoader.load(config);
   }
 
   stop() {

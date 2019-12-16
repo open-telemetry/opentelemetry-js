@@ -29,7 +29,11 @@ const tracer = new NodeTracer({
       enabled: true,
       // You may use a package name or absolute path to the file.
       path: '@opentelemetry/plugin-mongodb-core',
+      // mongodb-core plugin options
+      options: {}
     }
+    // shared plugin options
+    sharedPluginOptions: {}
   }
 });
 ```

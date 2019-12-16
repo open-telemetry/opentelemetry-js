@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { Logger, Plugin, Tracer, PluginConfig } from '@opentelemetry/types';
+import { Logger, Plugin, PluginConfig, Tracer } from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
+import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from '../config';
 import * as utils from './utils';
 
 // States for the Plugin Loader
@@ -65,7 +66,40 @@ export class PluginLoader {
    * @param Plugins an object whose keys are plugin names and whose
    *     {@link PluginConfig} values indicate several configuration options.
    */
-  load(plugins: Plugins): PluginLoader {
+  load(tracerConfig: NodeTracerConfig): PluginLoader {
+    // const plugins = Object.assign({}, DEFAULT_INSTRUMENTATION_PLUGINS, tracerConfig.plugins);
+
+    const configuredPluginModuleNames = Array.from(
+      new Set([
+        ...Object.keys(tracerConfig.plugins || {}),
+        ...Object.keys(DEFAULT_INSTRUMENTATION_PLUGINS),
+      ])
+    );
+
+    const plugins: Plugins = {};
+    for (const pluginModuleName of configuredPluginModuleNames) {
+      const defaultConfig =
+        DEFAULT_INSTRUMENTATION_PLUGINS[pluginModuleName] || {};
+      const config =
+        (tracerConfig.plugins && tracerConfig.plugins[pluginModuleName]) || {};
+
+      const enabled =
+        typeof config.enabled === 'boolean'
+          ? config.enabled
+          : defaultConfig.enabled;
+
+      plugins[pluginModuleName] = {
+        path: config.path || defaultConfig.path,
+        enabled: typeof enabled === 'boolean' ? enabled : true,
+        options: Object.assign(
+          {},
+          defaultConfig.options,
+          tracerConfig.sharedPluginOptions,
+          config.options
+        ),
+      };
+    }
+
     if (this._hookState === HookState.UNINITIALIZED) {
       const pluginsToLoad = filterPlugins(plugins);
       const modulesToHook = Object.keys(pluginsToLoad);
@@ -113,9 +147,14 @@ export class PluginLoader {
             return exports;
           }
 
+          const options = Object.assign(
+            {},
+            tracerConfig.sharedPluginOptions,
+            config.options
+          );
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer, this.logger, config);
+          return plugin.enable(exports, this.tracer, this.logger, options);
         } catch (e) {
           this.logger.error(
             `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`

@@ -18,7 +18,6 @@ import { Tracer } from '../tracer';
 import { Logger } from '../../common/Logger';
 
 /** Interface Plugin to apply patch. */
-// tslint:disable-next-line:no-any
 export interface Plugin<T = any> {
   /**
    * Contains all supported versions.
@@ -40,7 +39,7 @@ export interface Plugin<T = any> {
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: PluginConfig
+    config?: PluginOptions
   ): T;
 
   /** Method to disable the instrumentation  */
@@ -61,29 +60,31 @@ export interface PluginConfig {
   path?: string;
 
   /**
-   * Request methods that match any string in ignoreMethods will not be traced.
+   * Configuration options for an individual plugin
    */
-  ignoreMethods?: string[];
+  options?: PluginOptions;
+}
 
-  /**
-   * URLs that partially match any regex in ignoreUrls will not be traced.
-   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
-   * also not be traced.
-   */
-  ignoreUrls?: Array<string | RegExp>;
-
-  /**
-   * List of internal files that need patch and are not exported by
-   * default.
-   */
-  internalFilesExports?: PluginInternalFiles;
-
+export interface PluginOptions {
   /**
    * If true, additional information about query parameters and
    * results will be attached (as `attributes`) to spans representing
    * database operations.
    */
   enhancedDatabaseReporting?: boolean;
+
+  /**
+   * URLs that match any regex in ignoreUrls will not be traced.
+   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
+   * also not be traced.
+   */
+  ignoreUrls?: Array<string | RegExp>;
+
+  /**
+   * This is an untyped configuration section where plugin authors
+   * can define their own custom configuration options
+   */
+  [key: string]: any;
 }
 
 export interface PluginInternalFilesVersion {

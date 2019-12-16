@@ -64,8 +64,11 @@ const tracer = new NodeTracer({
       // You may use a package name or absolute path to the file.
       path: '@opentelemetry/plugin-http',
       // http plugin options
+      options: {},
     }
-  }
+  },
+  // shared plugin options
+  sharedPluginOptions: {}
 });
 
 // Initialize the tracer
