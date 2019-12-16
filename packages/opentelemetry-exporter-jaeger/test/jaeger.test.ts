@@ -61,8 +61,8 @@ describe('JaegerExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.ok(exporter['_forceFlush']);
-      assert.strictEqual(exporter['_flushTimeout'], 5000);
+      assert.ok(exporter['_forceFlushOnShutdown']);
+      assert.strictEqual(exporter['_onShutdownFlushTimeout'], 5000);
     });
 
     it('should construct an exporter without forceFlush and flushTimeout', () => {
@@ -72,8 +72,8 @@ describe('JaegerExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.ok(exporter['_forceFlush']);
-      assert.strictEqual(exporter['_flushTimeout'], 2000);
+      assert.ok(exporter['_forceFlushOnShutdown']);
+      assert.strictEqual(exporter['_onShutdownFlushTimeout'], 2000);
     });
 
     it('should construct an exporter with forceFlush = false', () => {
@@ -84,7 +84,7 @@ describe('JaegerExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.ok(!exporter['_forceFlush']);
+      assert.ok(!exporter['_forceFlushOnShutdown']);
     });
   });
 

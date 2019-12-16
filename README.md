@@ -35,6 +35,14 @@ includes:
 - Document Load for web
 - Metrics SDK (`Counter` and `Gauge` support) - Export work is underway.
 
+The [v0.3 alpha
+release](https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.3.0)
+includes:
+
+- Prometheus Metric Exporter
+- OpenTelemetry Collector Exporter
+- mongodb, redis, mysql Instrumentations
+
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
 for details on upcoming releases. The dates and features described here are
@@ -44,10 +52,10 @@ Future release targets include:
 
 | Component                   | Version    | Target Date        |
 | --------------------------- | ---------- | ------------------ |
-| Prometheus Metrics Exporter | Alpha v0.3 | November 15 2019   |
-| mongodb Instrumentation     | Alpha v0.3 | November 15 2019   |
-| postgres Instrumentation    | Alpha v0.3 | November 15 2019   |
-| OpenCensus Bridge           | Alpha v0.3 | tbd                |
+| Support for Tags/Baggage    | Alpha v0.4 | December 31 2019   |
+| Metrics Aggregation         | Alpha v0.4 | December 31 2019   |
+| Metrics SDK (Complete)      | Alpha v0.4 | December 31 2019   |
+| OpenCensus Bridge           | Alpha v0.4 | December 31 2019   |
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
@@ -70,7 +78,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)):
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
-- [Daniel Khan](https://github.com/danielkhan), Dynatrace
+- [Daniel Dyla](https://github.com/dyladan), Dynatrace
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 

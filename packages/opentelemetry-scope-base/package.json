@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-base",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "OpenTelemetry Base Scope Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
