@@ -26,8 +26,6 @@ function setupTracerAndExporters(service) {
   } else {
     exporter = new JaegerExporter({
       serviceName: service,
-      // The default flush interval is 5 seconds.
-      flushInterval: 2000
     });
   }
 
