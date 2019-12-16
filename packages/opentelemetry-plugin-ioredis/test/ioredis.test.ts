@@ -334,8 +334,8 @@ describe('ioredis', () => {
         const span = tracer.startSpan('test span');
         tracer.withSpan(span, () => {
           const pipeline = client.pipeline();
-          pipeline.set("foo", "bar");
-          pipeline.del("cc");
+          pipeline.set('foo', 'bar');
+          pipeline.del('cc');
           pipeline.exec((err, results) => {
             assert.ifError(err);
 
@@ -356,8 +356,8 @@ describe('ioredis', () => {
             assertionUtils.assertPropagation(endedSpans[0], span);
             done();
           });
+        });
       });
-    });
 
       it('should create a child span for get promise', async () => {
         const attributes = {
