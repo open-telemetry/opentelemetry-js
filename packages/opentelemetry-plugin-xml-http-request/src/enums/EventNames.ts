@@ -17,7 +17,8 @@
 export enum EventNames {
   METHOD_OPEN = 'open',
   METHOD_SEND = 'send',
-  EVENT_LOAD = 'loaded',
+  EVENT_ABORT = 'abort',
   EVENT_ERROR = 'error',
+  EVENT_LOAD = 'loaded',
   EVENT_TIMEOUT = 'timeout',
 }

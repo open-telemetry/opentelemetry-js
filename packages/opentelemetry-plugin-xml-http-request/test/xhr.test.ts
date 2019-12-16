@@ -92,21 +92,9 @@ function createResource(resource = {}): PerformanceResourceTiming {
 
 describe('xhr', () => {
   let sandbox: sinon.SinonSandbox;
-  let fakeXhr: any;
   let requests: any[] = [];
   let prepareData: any;
   let clearData: any;
-  beforeEach(() => {
-    fakeXhr = sinon.useFakeXMLHttpRequest();
-    fakeXhr.onCreate = function(xhr: any) {
-      requests.push(xhr);
-    };
-  });
-
-  afterEach(() => {
-    fakeXhr.restore();
-    requests = [];
-  });
 
   describe('when request is successful', () => {
     let webTracerWithZone: WebTracer;
@@ -129,6 +117,12 @@ describe('xhr', () => {
       propagateTraceHeaderCorsUrls?: any
     ) => {
       sandbox = sinon.createSandbox();
+      const fakeXhr = sandbox.useFakeXMLHttpRequest();
+      fakeXhr.onCreate = function(xhr: any) {
+        requests.push(xhr);
+      };
+      sandbox.useFakeTimers();
+
       sandbox.stub(performance, 'timeOrigin').value(0);
       sandbox.stub(performance, 'now').callsFake(() => fakeNow);
 
@@ -139,7 +133,7 @@ describe('xhr', () => {
         })
       );
 
-      spyEntries = sinon.stub(window.performance, 'getEntriesByType');
+      spyEntries = sandbox.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
 
       webTracerWithZone = new WebTracer({
@@ -165,16 +159,16 @@ describe('xhr', () => {
           fakeNow = 100;
         }).then(() => {
           fakeNow = 0;
+          sandbox.clock.tick(1000);
           done();
         });
         assert.strictEqual(requests.length, 1, 'request not called');
-        setTimeout(() => {
-          requests[0].respond(
-            200,
-            { 'Content-Type': 'application/json' },
-            '{"foo":"bar"}'
-          );
-        });
+
+        requests[0].respond(
+          200,
+          { 'Content-Type': 'application/json' },
+          '{"foo":"bar"}'
+        );
       });
     };
 
@@ -417,8 +411,16 @@ describe('xhr', () => {
     const url =
       'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
     let fakeNow = 0;
+
     beforeEach(done => {
       sandbox = sinon.createSandbox();
+      const fakeXhr = sandbox.useFakeXMLHttpRequest();
+      fakeXhr.onCreate = function(xhr: any) {
+        requests.push(xhr);
+      };
+
+      sandbox.useFakeTimers();
+
       sandbox.stub(performance, 'timeOrigin').value(0);
       sandbox.stub(performance, 'now').callsFake(() => fakeNow);
 
@@ -429,7 +431,7 @@ describe('xhr', () => {
         })
       );
 
-      spyEntries = sinon.stub(window.performance, 'getEntriesByType');
+      spyEntries = sandbox.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
 
       webTracerWithZone = new WebTracer({
@@ -450,22 +452,20 @@ describe('xhr', () => {
           fakeNow = 100;
         }).then(() => {
           fakeNow = 0;
+          sandbox.clock.tick(1000);
           done();
         });
         assert.strictEqual(requests.length, 1, 'request not called');
-        setTimeout(() => {
-          requests[0].respond(
-            400,
-            { 'Content-Type': 'text/plain' },
-            'Bad Request'
-          );
-        });
+        requests[0].respond(
+          400,
+          { 'Content-Type': 'text/plain' },
+          'Bad Request'
+        );
       });
     });
 
     afterEach(() => {
-      sandbox.restore();
-      spyEntries.restore();
+      clearData();
     });
 
     it('span should have correct attributes', () => {

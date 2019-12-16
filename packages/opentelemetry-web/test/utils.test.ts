@@ -168,16 +168,20 @@ describe('utils', () => {
     describe('when resources are empty', () => {
       it('should return undefined', () => {
         const spanStartTime = createHrTime(startTime, 1);
+        const spanEndTime = createHrTime(startTime, 100);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
-        const resource = getResource(spanUrl, spanStartTime, resources);
+        const resource = getResource(
+          spanUrl,
+          spanStartTime,
+          spanEndTime,
+          resources
+        );
 
         assert.deepStrictEqual(
-          resource,
-          {
-            mainRequest: undefined,
-          },
+          resource.mainRequest,
+          undefined,
           'main request should be undefined'
         );
       });
@@ -186,6 +190,7 @@ describe('utils', () => {
     describe('when resources has correct entry', () => {
       it('should return the closest one', () => {
         const spanStartTime = createHrTime(startTime, 1);
+        const spanEndTime = createHrTime(startTime, 402);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -222,7 +227,12 @@ describe('utils', () => {
           )
         );
 
-        const resource = getResource(spanUrl, spanStartTime, resources);
+        const resource = getResource(
+          spanUrl,
+          spanStartTime,
+          spanEndTime,
+          resources
+        );
 
         assert.deepStrictEqual(
           resource.mainRequest,
@@ -233,6 +243,7 @@ describe('utils', () => {
       describe('But one resource has been already used', () => {
         it('should return the next closest', () => {
           const spanStartTime = createHrTime(startTime, 1);
+          const spanEndTime = createHrTime(startTime, 402);
           const spanUrl = 'http://foo.com/bar.json';
           const resources: PerformanceResourceTiming[] = [];
 
@@ -285,6 +296,7 @@ describe('utils', () => {
           const resource = getResource(
             spanUrl,
             spanStartTime,
+            spanEndTime,
             resources,
             ignoredResources
           );
@@ -299,8 +311,9 @@ describe('utils', () => {
     });
 
     describe('when there are multiple resources from CorsPreflight requests', () => {
-      it('should', () => {
+      it('should return main request and cors preflight request', () => {
         const spanStartTime = createHrTime(startTime, 1);
+        const spanEndTime = createHrTime(startTime, 182);
         const spanUrl = 'http://foo.com/bar.json';
         const resources: PerformanceResourceTiming[] = [];
 
@@ -337,27 +350,35 @@ describe('utils', () => {
           )
         );
 
-        const maybeCors: PerformanceResourceTiming[] = [];
-        maybeCors.push(resources[0]);
-        maybeCors.push(resources[1]);
+        // this one finished after span
+        resources.push(
+          createResource(
+            {
+              name: 'http://foo.com/bar.json',
+            },
+            createHrTime(startTime, 50),
+            130
+          )
+        );
 
         const resource = getResource(
           spanUrl,
           spanStartTime,
+          spanEndTime,
           resources,
-          undefined,
-          maybeCors
+          undefined
         );
 
-        assert.deepStrictEqual(
-          resource.mainRequest,
-          resources[2],
-          'main request should be defined'
-        );
         assert.deepStrictEqual(
           resource.corsPreFlightRequest,
           resources[0],
           'cors preflight request should be defined'
+        );
+
+        assert.deepStrictEqual(
+          resource.mainRequest,
+          resources[3],
+          'main request should be defined'
         );
       });
     });

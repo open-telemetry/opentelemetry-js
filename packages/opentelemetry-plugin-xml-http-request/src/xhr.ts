@@ -40,10 +40,22 @@ import {
   XhrMem,
 } from './types';
 
+// how long to wait for observer to collect information about resources
+// this is needed as event "load" is called before observer
+// hard to say how long it should really wait, seems like 300ms is
+// safe enough
+const OBSERVER_WAIT_TIME_MS = 300;
+
 /**
  * XMLHttpRequest config
  */
 export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
+  // the number of timing resources is limited, after the limit
+  // (chrome 250, safari 150) the information is not collected anymore
+  // the only way to prevent that is to regularly clean the resources
+  // whenever it is possible, this is needed only when PerformanceObserver
+  // is not available
+  clearTimingResources?: boolean;
   // urls which should include trace headers when origin doesn't match
   propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
 }
@@ -141,16 +153,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param spanUrl
    * @private
    */
-  _addFinalSpanAttributes(
-    span: types.Span,
-    xhr: XMLHttpRequest,
-    spanUrl?: string
-  ) {
+  _addFinalSpanAttributes(span: types.Span, xhrMem: XhrMem, spanUrl?: string) {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
 
-      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhr.status);
-      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhr.statusText);
+      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhrMem.status);
+      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
       span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
         AttributeNames.HTTP_SCHEME,
@@ -186,46 +194,45 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   /**
    * will collect information about all resources created
-   * between "send" and "end"
+   * between "send" and "end" with additional waiting for main resource
    * @param xhr
-   * @param spanName
+   * @param spanUrl
    * @private
    */
-  private _addPossibleCorsPreflightResourceObserver(
-    xhr: XMLHttpRequest,
-    spanName: string
-  ) {
+  private _addResourceObserver(xhr: XMLHttpRequest, spanUrl: string) {
     const xhrMem = this._xhrMem.get(xhr);
-    if (!xhrMem) {
+    if (!xhrMem || typeof window.PerformanceObserver === 'undefined') {
       return;
     }
-    xhrMem.resourcesCreatedInTheMiddle = {
+    xhrMem.createdResources = {
       observer: new PerformanceObserver(list => {
         const entries = list.getEntries() as PerformanceResourceTiming[];
         entries.forEach(entry => {
           if (
             entry.initiatorType === 'xmlhttprequest' &&
-            entry.name === spanName
+            entry.name === spanUrl
           ) {
-            if (xhrMem.resourcesCreatedInTheMiddle) {
-              xhrMem.resourcesCreatedInTheMiddle.entries.push(entry);
+            if (xhrMem.createdResources) {
+              xhrMem.createdResources.entries.push(entry);
             }
           }
         });
       }),
       entries: [],
     };
-    xhrMem.resourcesCreatedInTheMiddle.observer.observe({
+    xhrMem.createdResources.observer.observe({
       entryTypes: ['resource'],
     });
   }
 
   /**
-   * clear all resources assigned with spans
+   * Clears the resource timings and all resources assigned with spans
+   *     when {@link XMLHttpRequestPluginConfig.clearTimingResources} is
+   *     set to true (default false)
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0) {
+    if (this._tasksCount === 0 && this._config.clearTimingResources) {
       ((otperformance as unknown) as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -237,25 +244,34 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param span
    */
   private _findResourceAndAddNetworkEvents(
+    xhrMem: XhrMem,
     span: types.Span,
     spanUrl?: string,
     startTime?: types.HrTime,
-    maybeCors: PerformanceResourceTiming[] = []
+    endTime?: types.HrTime
   ): void {
-    if (!spanUrl || !startTime) {
+    if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
       return;
     }
 
-    const resources: PerformanceResourceTiming[] = otperformance.getEntriesByType(
-      'resource'
-    ) as PerformanceResourceTiming[];
+    let resources: PerformanceResourceTiming[] =
+      xhrMem.createdResources.entries;
+
+    if (!resources || !resources.length) {
+      // fallback - either Observer is not available or it took longer
+      // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
+      // information
+      resources = otperformance.getEntriesByType(
+        'resource'
+      ) as PerformanceResourceTiming[];
+    }
 
     const resource = getResource(
       spanUrl,
       startTime,
+      endTime,
       resources,
-      this._usedResources,
-      maybeCors
+      this._usedResources
     );
 
     if (resource.mainRequest) {
@@ -265,7 +281,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       const corsPreFlightRequest = resource.corsPreFlightRequest;
       if (corsPreFlightRequest) {
         this._addChildSpan(span, corsPreFlightRequest);
-        this._markResourceAsUsed(mainRequest);
+        this._markResourceAsUsed(corsPreFlightRequest);
       }
       this._addSpanNetworkEvents(span, mainRequest);
     }
@@ -368,18 +384,13 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   protected _patchSend() {
     const plugin = this;
 
-    function endSpan(xhr: XMLHttpRequest, eventName: string) {
-      const xhrMem = plugin._xhrMem.get(xhr);
-      if (!xhrMem) {
-        return;
-      }
+    function endSpanTimeout(
+      eventName: string,
+      xhrMem: XhrMem,
+      endTime: types.HrTime
+    ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
-      let resourcesCreatedInTheMiddle = xhrMem.resourcesCreatedInTheMiddle;
-      let entries;
-      if (resourcesCreatedInTheMiddle) {
-        entries = resourcesCreatedInTheMiddle.entries;
-      }
       if (typeof callbackToRemoveEvents === 'function') {
         callbackToRemoveEvents();
       }
@@ -388,40 +399,62 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
       if (span) {
         plugin._findResourceAndAddNetworkEvents(
+          xhrMem,
           span,
           spanUrl,
           sendStartTime,
-          entries
+          endTime
         );
-        span.addEvent(eventName);
-        plugin._addFinalSpanAttributes(span, xhr, spanUrl);
-        span.end();
+        span.addEvent(eventName, endTime);
+        plugin._addFinalSpanAttributes(span, xhrMem, spanUrl);
+        span.end(endTime);
         plugin._tasksCount--;
       }
-
-      plugin._xhrMem.delete(xhr);
       plugin._clearResources();
     }
 
+    function endSpan(eventName: string, xhr: XMLHttpRequest) {
+      const xhrMem = plugin._xhrMem.get(xhr);
+      if (!xhrMem) {
+        return;
+      }
+      xhrMem.status = xhr.status;
+      xhrMem.statusText = xhr.statusText;
+      plugin._xhrMem.delete(xhr);
+      const endTime = hrTime();
+
+      // the timeout is needed as observer doesn't have yet information
+      // when event "load" is called. Also the time may differ depends on
+      // browser and speed of computer
+      setTimeout(() => {
+        endSpanTimeout(eventName, xhrMem, endTime);
+      }, OBSERVER_WAIT_TIME_MS);
+    }
+
     function onError(this: XMLHttpRequest) {
-      endSpan(this, EventNames.EVENT_ERROR);
+      endSpan(EventNames.EVENT_ERROR, this);
+    }
+
+    function onAbort(this: XMLHttpRequest) {
+      endSpan(EventNames.EVENT_ABORT, this);
     }
 
     function onTimeout(this: XMLHttpRequest) {
-      endSpan(this, EventNames.EVENT_TIMEOUT);
+      endSpan(EventNames.EVENT_TIMEOUT, this);
     }
 
     function onLoad(this: XMLHttpRequest) {
       if (this.status < 299) {
-        endSpan(this, EventNames.EVENT_LOAD);
+        endSpan(EventNames.EVENT_LOAD, this);
       } else {
-        endSpan(this, EventNames.EVENT_ERROR);
+        endSpan(EventNames.EVENT_ERROR, this);
       }
     }
 
     function unregister(xhr: XMLHttpRequest) {
-      xhr.removeEventListener('load', onLoad);
+      xhr.removeEventListener('abort', onAbort);
       xhr.removeEventListener('error', onError);
+      xhr.removeEventListener('load', onLoad);
       xhr.removeEventListener('timeout', onTimeout);
       const xhrMem = plugin._xhrMem.get(xhr);
       if (xhrMem) {
@@ -443,19 +476,19 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           xhrMem.sendStartTime = hrTime();
           currentSpan.addEvent(EventNames.METHOD_SEND);
 
-          this.addEventListener('load', onLoad);
+          this.addEventListener('abort', onAbort);
           this.addEventListener('error', onError);
+          this.addEventListener('load', onLoad);
           this.addEventListener('timeout', onTimeout);
 
           xhrMem.callbackToRemoveEvents = () => {
             unregister(this);
-            if (xhrMem.resourcesCreatedInTheMiddle) {
-              xhrMem.resourcesCreatedInTheMiddle.observer.disconnect();
-              xhrMem.resourcesCreatedInTheMiddle = undefined;
+            if (xhrMem.createdResources) {
+              xhrMem.createdResources.observer.disconnect();
             }
           };
           plugin._addHeaders(this, currentSpan, spanUrl);
-          plugin._addPossibleCorsPreflightResourceObserver(this, spanUrl);
+          plugin._addResourceObserver(this, spanUrl);
         }
         return original.apply(this, args);
       };
