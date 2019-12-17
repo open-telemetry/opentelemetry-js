@@ -32,6 +32,23 @@ const tracer = new NodeTracer({
 });
 ```
 
+### Zipkin
+
+If you use Zipkin, you must use `ignoreHostnames` in order to not trace those calls. If the server is local. You can set :
+
+```
+const tracer = new NodeTracer({
+  plugins: {
+    dns: {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-dns',
+      ignoreHostnames: ['localhost']
+    }
+  }
+});
+```
+
 ### Dns Plugin Options
 
 Dns plugin has currently one option. You can set the following:

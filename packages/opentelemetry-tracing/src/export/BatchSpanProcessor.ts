@@ -45,7 +45,7 @@ export class BatchSpanProcessor implements SpanProcessor {
         : DEFAULT_BUFFER_TIMEOUT_MS;
 
     this._timer = setInterval(() => {
-      if (Date.now() - this._lastSpanFlush >= this._bufferTimeout) {
+      if (this._shouldFlush()) {
         this._flush();
       }
     }, this._bufferTimeout);
@@ -71,6 +71,13 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._finishedSpans.length > this._bufferSize) {
       this._flush();
     }
+  }
+
+  private _shouldFlush(): boolean {
+    return (
+      this._finishedSpans.length >= 0 &&
+      Date.now() - this._lastSpanFlush >= this._bufferTimeout
+    );
   }
 
   /** Send the span data list to exporter */
