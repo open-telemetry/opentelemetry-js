@@ -160,8 +160,8 @@ describe('MongoDBPlugin', () => {
     it('should create a child span for insert', done => {
       const insertData = [{ a: 1 }, { a: 2 }, { a: 3 }];
 
-      const span = registry.getTracer().startSpan(`insertRootSpan`);
-      registry.getTracer().withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan(`insertRootSpan`);
+      registry.getTracer('default').withSpan(span, () => {
         collection.insertMany(insertData, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -176,8 +176,8 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should create a child span for update', done => {
-      const span = registry.getTracer().startSpan('updateRootSpan');
-      registry.getTracer().withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('updateRootSpan');
+      registry.getTracer('default').withSpan(span, () => {
         collection.updateOne({ a: 2 }, { $set: { b: 1 } }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -192,8 +192,8 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should create a child span for remove', done => {
-      const span = registry.getTracer().startSpan('removeRootSpan');
-      registry.getTracer().withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('removeRootSpan');
+      registry.getTracer('default').withSpan(span, () => {
         collection.deleteOne({ a: 3 }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -211,8 +211,8 @@ describe('MongoDBPlugin', () => {
   /** Should intercept cursor */
   describe('Instrumenting cursor operations', () => {
     it('should create a child span for find', done => {
-      const span = registry.getTracer().startSpan('findRootSpan');
-      registry.getTracer().withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('findRootSpan');
+      registry.getTracer('default').withSpan(span, () => {
         collection.find({}).toArray((err, result) => {
           span.end();
           assert.ifError(err);
@@ -230,8 +230,8 @@ describe('MongoDBPlugin', () => {
   /** Should intercept command */
   describe('Instrumenting command operations', () => {
     it('should create a child span for create index', done => {
-      const span = registry.getTracer().startSpan('indexRootSpan');
-      registry.getTracer().withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('indexRootSpan');
+      registry.getTracer('default').withSpan(span, () => {
         collection.createIndex({ a: 1 }, (err, result) => {
           span.end();
           assert.ifError(err);
@@ -257,7 +257,7 @@ describe('MongoDBPlugin', () => {
     it('should not create a child span for query', done => {
       const insertData = [{ a: 1 }, { a: 2 }, { a: 3 }];
 
-      const span = registry.getTracer().startSpan('insertRootSpan');
+      const span = registry.getTracer('default').startSpan('insertRootSpan');
       collection.insertMany(insertData, (err, result) => {
         span.end();
         assert.ifError(err);
@@ -267,7 +267,7 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should not create a child span for cursor', done => {
-      const span = registry.getTracer().startSpan('findRootSpan');
+      const span = registry.getTracer('default').startSpan('findRootSpan');
       collection.find({}).toArray((err, result) => {
         span.end();
         assert.ifError(err);
@@ -277,7 +277,7 @@ describe('MongoDBPlugin', () => {
     });
 
     it('should not create a child span for command', done => {
-      const span = registry.getTracer().startSpan('indexRootSpan');
+      const span = registry.getTracer('default').startSpan('indexRootSpan');
       collection.createIndex({ a: 1 }, (err, result) => {
         span.end();
         assert.ifError(err);

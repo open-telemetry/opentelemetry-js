@@ -23,7 +23,7 @@ import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
   const registry = new BasicTracerRegistry();
-  const shimTracer: opentracing.Tracer = new TracerShim(registry.getTracer());
+  const shimTracer: opentracing.Tracer = new TracerShim(registry.getTracer('default'));
   opentracing.initGlobalTracer(shimTracer);
 
   describe('TracerShim', () => {

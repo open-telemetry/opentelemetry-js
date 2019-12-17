@@ -30,7 +30,7 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
-  const tracer = new BasicTracerRegistry().getTracer();
+  const tracer = new BasicTracerRegistry().getTracer('default');
   const span = tracer.startSpan('one');
 
   it('should handle empty span processor', () => {

@@ -19,7 +19,6 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
 import {
   Http,
   HttpPluginConfig,
@@ -35,6 +34,7 @@ import { HttpsPlugin, plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 
 let server: https.Server;
 const serverPort = 32345;
@@ -77,11 +77,11 @@ describe('HttpsPlugin', () => {
   describe('enable()', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -100,7 +100,7 @@ describe('HttpsPlugin', () => {
         ],
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
+      plugin.enable((https as unknown) as Http, registry, registry.logger, config);
       server = https.createServer(
         {
           key: fs.readFileSync('test/fixtures/server-key.pem'),
@@ -126,8 +126,8 @@ describe('HttpsPlugin', () => {
     it("should not patch if it's not a http module", () => {
       const httpNotPatched = new HttpsPlugin(process.versions.node).enable(
         {} as Http,
-        tracer,
-        tracer.logger,
+        registry,
+        registry.logger,
         {}
       );
       assert.strictEqual(Object.keys(httpNotPatched).length, 0);
@@ -213,6 +213,7 @@ describe('HttpsPlugin', () => {
       const testPath = '/outgoing/rootSpan/childs/1';
       doNock(hostname, testPath, 200, 'Ok');
       const name = 'TestRootSpan';
+      const tracer = registry.getTracer("test-https");
       const span = tracer.startSpan(name);
       return tracer.withSpan(span, async () => {
         const result = await httpsRequest.get(
@@ -256,6 +257,7 @@ describe('HttpsPlugin', () => {
           httpErrorCodes[i].toString()
         );
         const name = 'TestRootSpan';
+        const tracer = registry.getTracer("test-https");
         const span = tracer.startSpan(name);
         return tracer.withSpan(span, async () => {
           const result = await httpsRequest.get(
@@ -295,6 +297,7 @@ describe('HttpsPlugin', () => {
       const num = 5;
       doNock(hostname, testPath, 200, 'Ok', num);
       const name = 'TestRootSpan';
+      const tracer = registry.getTracer("test-https");
       const span = tracer.startSpan(name);
       await tracer.withSpan(span, async () => {
         for (let i = 0; i < num; i++) {

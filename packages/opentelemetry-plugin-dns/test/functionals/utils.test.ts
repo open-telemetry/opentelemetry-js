@@ -162,7 +162,7 @@ describe('Utility', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
       const span = new Span(
-        new BasicTracerRegistry().getTracer(),
+        new BasicTracerRegistry().getTracer('default'),
         'test',
         { spanId: '', traceId: '' },
         SpanKind.INTERNAL

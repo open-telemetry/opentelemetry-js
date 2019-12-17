@@ -82,7 +82,7 @@ describe('globaltracer-utils', () => {
     }
 
     class TestTracerRegistry extends NoopTracerRegistry {
-      getTracer() {
+      getTracer(_name: string, version?: string) {
         return new TestTracer();
       }
     }

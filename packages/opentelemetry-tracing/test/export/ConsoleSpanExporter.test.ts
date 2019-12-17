@@ -49,7 +49,7 @@ describe('ConsoleSpanExporter', () => {
           new SimpleSpanProcessor(consoleExporter)
         );
 
-        const span = basicTracerRegistry.getTracer().startSpan('foo');
+        const span = basicTracerRegistry.getTracer('default').startSpan('foo');
         span.addEvent('foobar');
         span.end();
 

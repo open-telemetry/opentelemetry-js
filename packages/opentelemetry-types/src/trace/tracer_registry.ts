@@ -27,5 +27,5 @@ export interface TracerRegistry {
    *
    * @returns Tracer A Tracer with the given name and version
    */
-  getTracer(name?: string, version?: string): Tracer;
+  getTracer(name: string, version?: string): Tracer;
 }

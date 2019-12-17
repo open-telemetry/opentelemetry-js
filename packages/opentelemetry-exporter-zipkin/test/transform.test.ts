@@ -34,7 +34,7 @@ import * as zipkinTypes from '../src/types';
 const logger = new NoopLogger();
 const tracer = new BasicTracerRegistry({
   logger,
-}).getTracer();
+}).getTracer('default');
 const parentId = '5c1c63257de34c67';
 const spanContext: types.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
