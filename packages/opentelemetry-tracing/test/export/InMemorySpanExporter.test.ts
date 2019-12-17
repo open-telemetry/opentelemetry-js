@@ -34,7 +34,9 @@ describe('InMemorySpanExporter', () => {
 
   it('should get finished spans', () => {
     const root = registry.getTracer('default').startSpan('root');
-    const child = registry.getTracer('default').startSpan('child', { parent: root });
+    const child = registry
+      .getTracer('default')
+      .startSpan('child', { parent: root });
     const grandChild = registry
       .getTracer('default')
       .startSpan('grand-child', { parent: child });

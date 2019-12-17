@@ -100,7 +100,12 @@ describe('HttpsPlugin', () => {
         ],
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable((https as unknown) as Http, registry, registry.logger, config);
+      plugin.enable(
+        (https as unknown) as Http,
+        registry,
+        registry.logger,
+        config
+      );
       server = https.createServer(
         {
           key: fs.readFileSync('test/fixtures/server-key.pem'),
@@ -213,7 +218,7 @@ describe('HttpsPlugin', () => {
       const testPath = '/outgoing/rootSpan/childs/1';
       doNock(hostname, testPath, 200, 'Ok');
       const name = 'TestRootSpan';
-      const tracer = registry.getTracer("test-https");
+      const tracer = registry.getTracer('test-https');
       const span = tracer.startSpan(name);
       return tracer.withSpan(span, async () => {
         const result = await httpsRequest.get(
@@ -257,7 +262,7 @@ describe('HttpsPlugin', () => {
           httpErrorCodes[i].toString()
         );
         const name = 'TestRootSpan';
-        const tracer = registry.getTracer("test-https");
+        const tracer = registry.getTracer('test-https');
         const span = tracer.startSpan(name);
         return tracer.withSpan(span, async () => {
           const result = await httpsRequest.get(
@@ -297,7 +302,7 @@ describe('HttpsPlugin', () => {
       const num = 5;
       doNock(hostname, testPath, 200, 'Ok', num);
       const name = 'TestRootSpan';
-      const tracer = registry.getTracer("test-https");
+      const tracer = registry.getTracer('test-https');
       const span = tracer.startSpan(name);
       await tracer.withSpan(span, async () => {
         for (let i = 0; i < num; i++) {

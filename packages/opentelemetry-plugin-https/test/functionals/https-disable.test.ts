@@ -26,7 +26,7 @@ import { plugin } from '../../src/https';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 import { NodeTracerRegistry } from '@opentelemetry/node';
-import * as types from "@opentelemetry/types"
+import * as types from '@opentelemetry/types';
 
 describe('HttpsPlugin', () => {
   let server: https.Server;
@@ -46,7 +46,7 @@ describe('HttpsPlugin', () => {
       nock.enableNetConnect();
 
       plugin.enable((https as unknown) as Http, registry, registry.logger);
-      tracer = plugin["_tracer"];
+      tracer = plugin['_tracer'];
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);
       server = https.createServer(
