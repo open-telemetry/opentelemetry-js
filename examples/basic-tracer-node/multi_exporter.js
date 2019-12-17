@@ -26,9 +26,10 @@ tracer.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
 opentelemetry.initGlobalTracer(tracer);
+const tracer = opentelemetry.getTracer('default');
 
 // Create a span. A span must be closed.
-const span = opentelemetry.getTracer().startSpan('main');
+const span = tracer.startSpan('main');
 for (let i = 0; i < 10; i++) {
   doWork(span);
 }
@@ -43,7 +44,7 @@ collectorExporter.shutdown();
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const span = opentelemetry.getTracer().startSpan('doWork', {
+  const span = tracer.startSpan('doWork', {
     parent: parent
   });
 
