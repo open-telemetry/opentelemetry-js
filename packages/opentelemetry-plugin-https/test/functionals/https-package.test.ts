@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as https from 'https';
 import * as http from 'http';
@@ -34,13 +34,12 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { Http } from '@opentelemetry/plugin-http';
+
+import { Http, HttpPluginConfig } from '@opentelemetry/plugin-http';
+import { customAttributeFunction } from './https-enable.test';
 
 const memoryExporter = new InMemorySpanExporter();
-
-export const customAttributeFunction = (span: Span): void => {
-  span.setAttribute('span kind', SpanKind.CLIENT);
-};
+const protocol = 'https';
 
 describe('Packages', () => {
   describe('get', () => {
@@ -57,7 +56,10 @@ describe('Packages', () => {
     });
 
     before(() => {
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger);
+      const config: HttpPluginConfig = {
+        applyCustomAttributesOnSpan: customAttributeFunction,
+      };
+      plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
     });
 
     after(() => {
@@ -93,8 +95,8 @@ describe('Packages', () => {
               // https://github.com/nock/nock/pull/1551
               // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
               // TODO: check if this is still the case when new version
-              'https://www.google.com'
-            : `https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
+              `${protocol}://www.google.com`
+            : `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {

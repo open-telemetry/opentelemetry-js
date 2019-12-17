@@ -4,6 +4,92 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.0
+
+Released 2019-12-13
+
+#### :rocket: (Enhancement)
+* `opentelemetry-core`, `opentelemetry-node`, `opentelemetry-plugin-dns`, `opentelemetry-plugin-document-load`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-postgres`, `opentelemetry-plugin-redis`, `opentelemetry-tracing`, `opentelemetry-types`
+  * [#569](https://github.com/open-telemetry/opentelemetry-js/pull/569) chore: allow parent span to be null
+* `opentelemetry-plugin-document-load`
+  * [#546](https://github.com/open-telemetry/opentelemetry-js/pull/546) chore: fixing issue when metric time is 0 in document-load plugin
+  * [#469](https://github.com/open-telemetry/opentelemetry-js/pull/469) chore: fixing problem with load event and performance for loadend
+* `opentelemetry-plugin-http`, `opentelemetry-plugin-https`
+  * [#548](https://github.com/open-telemetry/opentelemetry-js/pull/548) fix(plugin-http): adapt to current @types/node
+* Other
+  * [#510](https://github.com/open-telemetry/opentelemetry-js/pull/510) chore(circleci): remove duplicate compile step
+  * [#514](https://github.com/open-telemetry/opentelemetry-js/pull/514) ci: enumerate caching paths manually
+  * [#470](https://github.com/open-telemetry/opentelemetry-js/pull/470) chore: remove examples from lerna packages
+* `opentelemetry-core`, `opentelemetry-metrics`, `opentelemetry-types`
+  * [#507](https://github.com/open-telemetry/opentelemetry-js/pull/507) feat: direct calling of metric instruments
+  * [#517](https://github.com/open-telemetry/opentelemetry-js/pull/517) chore: update dependencies gts and codecov
+  * [#497](https://github.com/open-telemetry/opentelemetry-js/pull/497) chore: bump typescript version to ^3.7.2
+* `opentelemetry-metrics`
+  * [#475](https://github.com/open-telemetry/opentelemetry-js/pull/475) add shutdown method on MetricExporter interface
+* `opentelemetry-core`, `opentelemetry-plugin-document-load`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#466](https://github.com/open-telemetry/opentelemetry-js/pull/466) chore: fixing coverage for karma using istanbul
+
+#### :bug: (Bug Fix)
+* `opentelemetry-exporter-jaeger`
+  * [#609](https://github.com/open-telemetry/opentelemetry-js/pull/609) Jaeger no flush interval
+* `opentelemetry-plugin-dns`
+  * [#613](https://github.com/open-telemetry/opentelemetry-js/pull/613) fix(plugin-dns): remove from default plugin list
+* `opentelemetry-plugin-http`
+  * [#589](https://github.com/open-telemetry/opentelemetry-js/pull/589) fix(plugin-http): correct handling of WHATWG urls
+  * [#580](https://github.com/open-telemetry/opentelemetry-js/pull/580) fix(plugin-http): http.url attribute
+* `opentelemetry-shim-opentracing`
+  * [#577](https://github.com/open-telemetry/opentelemetry-js/pull/577) fix: add missing `main` in package.json
+* `opentelemetry-exporter-zipkin`
+  * [#526](https://github.com/open-telemetry/opentelemetry-js/pull/526) fix: zipkin-exporter: don't export after shutdown
+* `opentelemetry-plugin-grpc`
+  * [#487](https://github.com/open-telemetry/opentelemetry-js/pull/487) fix(grpc): use correct supportedVersions
+* `opentelemetry-core`
+  * [#472](https://github.com/open-telemetry/opentelemetry-js/pull/472) fix(core): add missing semver dependency
+
+#### :books: (Refine Doc)
+* Other
+  * [#574](https://github.com/open-telemetry/opentelemetry-js/pull/574) chore: add CHANGELOG.md
+  * [#575](https://github.com/open-telemetry/opentelemetry-js/pull/575) Add exporter guide
+  * [#534](https://github.com/open-telemetry/opentelemetry-js/pull/534) feat: add redis plugin example
+  * [#562](https://github.com/open-telemetry/opentelemetry-js/pull/562) chore(web-example): Added a README for the existing example
+  * [#537](https://github.com/open-telemetry/opentelemetry-js/pull/537) examples(tracing): add multi exporter example
+  * [#484](https://github.com/open-telemetry/opentelemetry-js/pull/484) chore: update README for new milestones
+* `opentelemetry-plugin-mongodb-core`
+  * [#564](https://github.com/open-telemetry/opentelemetry-js/pull/564) docs: add usage for mongodb-core plugin #543)
+* `opentelemetry-metrics`
+  * [#490](https://github.com/open-telemetry/opentelemetry-js/pull/490) chore: update metrics README
+* `opentelemetry-plugin-redis`
+  * [#551](https://github.com/open-telemetry/opentelemetry-js/pull/551) chore: fix minor typo
+* `opentelemetry-exporter-prometheus`
+  * [#521](https://github.com/open-telemetry/opentelemetry-js/pull/521) chore: update prometheus exporter readme with usage and links
+* `opentelemetry-types`
+  * [#512](https://github.com/open-telemetry/opentelemetry-js/pull/512) chore: minor name change
+* `opentelemetry-plugin-postgres`
+  * [#473](https://github.com/open-telemetry/opentelemetry-js/pull/473) chore(plugin): postgres-pool plugin skeleton
+
+#### :sparkles: (Feature)
+* `opentelemetry-core`, `opentelemetry-exporter-collector`
+  * [#552](https://github.com/open-telemetry/opentelemetry-js/pull/552) Collector exporter
+* `opentelemetry-node`, `opentelemetry-plugin-mysql`
+  * [#525](https://github.com/open-telemetry/opentelemetry-js/pull/525) feat: mysql support
+* `opentelemetry-plugin-redis`
+  * [#503](https://github.com/open-telemetry/opentelemetry-js/pull/503) feat(plugin): implement redis plugin
+* `opentelemetry-plugin-mongodb-core`
+  * [#205](https://github.com/open-telemetry/opentelemetry-js/pull/205) feat: add mongodb plugin
+* `opentelemetry-exporter-prometheus`
+  * [#483](https://github.com/open-telemetry/opentelemetry-js/pull/483) feat: Add prometheus exporter
+* `opentelemetry-metrics`
+  * [#500](https://github.com/open-telemetry/opentelemetry-js/pull/500) feat: add ConsoleMetricExporter
+  * [#468](https://github.com/open-telemetry/opentelemetry-js/pull/468) feat: validate metric names
+* `opentelemetry-scope-zone-peer-dep`, `opentelemetry-scope-zone`, `opentelemetry-web`
+  * [#461](https://github.com/open-telemetry/opentelemetry-js/pull/461) feat(scope-zone): new scope manager to support async operations in web
+* `opentelemetry-core`, `opentelemetry-plugin-document-load`
+  * [#477](https://github.com/open-telemetry/opentelemetry-js/pull/477) feat(traceparent): setting parent span from server
+* `opentelemetry-core`, `opentelemetry-metrics`, `opentelemetry-types`
+  * [#463](https://github.com/open-telemetry/opentelemetry-js/pull/463) feat: implement labelset
+* `opentelemetry-metrics`, `opentelemetry-types`
+  * [#437](https://github.com/open-telemetry/opentelemetry-js/pull/437) feat(metrics): add registerMetric and getMetrics
+
 ## 0.2.0
 
 Released 2019-11-04

@@ -18,7 +18,7 @@ import * as types from './types';
 
 export class NoopScopeManager implements types.ScopeManager {
   active(): unknown {
-    return null;
+    return undefined;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
