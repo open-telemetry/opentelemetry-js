@@ -1,0 +1,42 @@
+{
+  "name": "opentracing-shim",
+  "private": true,
+  "version": "0.2.0",
+  "description": "Example of using @opentelemetry/shim-opentracing in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
+    "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
+    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js",
+    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "tracing",
+    "opentracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/exporter-jaeger": "^0.2.0",
+    "@opentelemetry/exporter-zipkin": "^0.2.0",
+    "@opentelemetry/node": "^0.2.0",
+    "@opentelemetry/shim-opentracing": "^0.2.0",
+    "opentracing": "^0.14.4"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}
