@@ -328,24 +328,31 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       ) {
         // tslint:disable-next-line:no-any
         const client = original.apply(this, arguments as any);
-        const methodsToWrap = [
-          ...Object.keys(methods),
-          ...(Object.keys(methods)
-            .map(methodName => methods[methodName].originalName)
-            .filter(
-              originalName =>
-                !!originalName && client.prototype.hasOwnProperty(originalName)
-            ) as string[]),
-        ];
         shimmer.massWrap(
           client.prototype as never,
-          methodsToWrap as never[],
+          plugin._getMethodsToWrap(client, methods) as never[],
           // tslint:disable-next-line:no-any
           plugin._getPatchedClientMethods() as any
         );
         return client;
       } as never;
     };
+  }
+
+  private _getMethodsToWrap(
+    client: typeof grpcTypes.Client,
+    methods: { [key: string]: { originalName?: string } }
+  ): string[] {
+    const methodsToWrap = [
+      ...Object.keys(methods),
+      ...(Object.keys(methods)
+        .map(methodName => methods[methodName].originalName)
+        .filter(
+          originalName =>
+            !!originalName && client.prototype.hasOwnProperty(originalName)
+        ) as string[]),
+    ];
+    return methodsToWrap;
   }
 
   private _getPatchedClientMethods() {
@@ -361,9 +368,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             parent: plugin._tracer.getCurrentSpan(),
           })
           .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-        return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
-          span
-        );
+        return plugin._makeGrpcClientRemoteCall(
+          original,
+          args,
+          this,
+          plugin
+        )(span);
       };
     };
   }
