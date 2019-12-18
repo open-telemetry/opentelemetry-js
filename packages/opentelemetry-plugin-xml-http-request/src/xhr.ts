@@ -368,7 +368,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
           plugin._createSpan(this, url, method);
         } else {
           plugin._logger.debug(
-            'tracing support for synchronous is not supported'
+            'tracing support for synchronous XMLHttpRequest calls is not' +
+              ' supported'
           );
         }
 
@@ -466,7 +467,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return function patchSend(this: XMLHttpRequest, ...args): void {
         const xhrMem = plugin._xhrMem.get(this);
         if (!xhrMem) {
-          return;
+          return original.apply(this, args);
         }
         const currentSpan = xhrMem.span;
         const spanUrl = xhrMem.spanUrl;
