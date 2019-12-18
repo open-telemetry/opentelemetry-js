@@ -91,4 +91,3 @@ export type LookupCallbackSignature = LookupSimpleCallback &
     address: string | dns.LookupAddress[],
     family: number
   ) => void);
-

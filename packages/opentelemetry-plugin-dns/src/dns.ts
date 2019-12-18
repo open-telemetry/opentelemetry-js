@@ -18,7 +18,12 @@ import * as shimmer from 'shimmer';
 import * as semver from 'semver';
 import * as utils from './utils';
 import { BasePlugin } from '@opentelemetry/core';
-import { PluginOptions, SpanOptions, SpanKind, Span } from '@opentelemetry/types';
+import {
+  PluginOptions,
+  SpanOptions,
+  SpanKind,
+  Span,
+} from '@opentelemetry/types';
 import {
   Dns,
   LookupPromiseSignature,

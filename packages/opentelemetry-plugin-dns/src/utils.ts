@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Attributes, CanonicalCode, IgnoreMatcher, Span, Status } from '@opentelemetry/types';
+import {
+  Attributes,
+  CanonicalCode,
+  IgnoreMatcher,
+  Span,
+  Status,
+} from '@opentelemetry/types';
 import * as dns from 'dns';
 import { AddressFamily } from './enums/AddressFamily';
 import { AttributeNames } from './enums/AttributeNames';
