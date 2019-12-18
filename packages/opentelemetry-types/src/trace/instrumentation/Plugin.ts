@@ -65,6 +65,8 @@ export interface PluginConfig {
   options?: PluginOptions;
 }
 
+export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
+
 export interface PluginOptions {
   /**
    * If true, additional information about query parameters and
@@ -79,6 +81,13 @@ export interface PluginOptions {
    * also not be traced.
    */
   ignoreUrls?: Array<string | RegExp>;
+
+  /**
+   * Used by dns plugin. Ignores tracing for host names which match one of
+   * the configured matchers by either being an exact string match, matching
+   * a regular expression, or evaluating to true.
+   */
+  ignoreHostnames?: IgnoreMatcher[];
 
   /**
    * This is an untyped configuration section where plugin authors

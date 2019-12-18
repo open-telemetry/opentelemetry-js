@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode, Status, Attributes } from '@opentelemetry/types';
-import { AttributeNames } from './enums/AttributeNames';
-import { AddressFamily } from './enums/AddressFamily';
+import { Attributes, CanonicalCode, IgnoreMatcher, Span, Status } from '@opentelemetry/types';
 import * as dns from 'dns';
-import { IgnoreMatcher } from './types';
+import { AddressFamily } from './enums/AddressFamily';
+import { AttributeNames } from './enums/AttributeNames';
 
 /**
  * Set error attributes on the span passed in params

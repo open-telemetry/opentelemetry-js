@@ -15,11 +15,8 @@
  */
 
 import * as dns from 'dns';
-import { PluginConfig } from '@opentelemetry/types';
 
 export type Dns = typeof dns;
-
-export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 
 export type LookupFunction = ((
   hostname: string,
@@ -95,6 +92,3 @@ export type LookupCallbackSignature = LookupSimpleCallback &
     family: number
   ) => void);
 
-export interface DnsPluginConfig extends PluginConfig {
-  ignoreHostnames?: IgnoreMatcher[];
-}

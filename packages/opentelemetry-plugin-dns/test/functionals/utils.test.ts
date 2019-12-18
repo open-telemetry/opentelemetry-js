@@ -16,8 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
-import { IgnoreMatcher } from '../../src/types';
+import { CanonicalCode, IgnoreMatcher, SpanKind } from '@opentelemetry/types';
 import * as utils from '../../src/utils';
 import { Span, BasicTracer } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';

@@ -18,14 +18,13 @@ import * as shimmer from 'shimmer';
 import * as semver from 'semver';
 import * as utils from './utils';
 import { BasePlugin } from '@opentelemetry/core';
-import { SpanOptions, SpanKind, Span } from '@opentelemetry/types';
+import { PluginOptions, SpanOptions, SpanKind, Span } from '@opentelemetry/types';
 import {
   Dns,
   LookupPromiseSignature,
   LookupFunction,
   LookupFunctionSignature,
   LookupCallbackSignature,
-  DnsPluginConfig,
 } from './types';
 import { AttributeNames } from './enums/AttributeNames';
 import { AddressFamily } from './enums/AddressFamily';
@@ -36,7 +35,7 @@ import { LookupAddress } from 'dns';
  */
 export class DnsPlugin extends BasePlugin<Dns> {
   readonly component: string;
-  protected _config!: DnsPluginConfig;
+  protected _config!: PluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
