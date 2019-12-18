@@ -234,7 +234,7 @@ workflows:
             - lint_&_docs
           filters:
             tags:
-              only: /^v\d+\.\d+\.\d+$/
+              only: /^v\d+\.\d+\.0$/
             branches:
               ignore: /.*/
       - node8
