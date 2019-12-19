@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ConsoleMetricExporter, Meter, GaugeMetric } from '../../src';
+import { ConsoleMetricExporter, Meter } from '../../src';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -41,11 +41,11 @@ describe('ConsoleMetricExporter', () => {
       const gauge = meter.createGauge('gauge', {
         description: 'a test description',
         labelKeys: ['key1', 'key2'],
-      }) as GaugeMetric;
-      const handle = gauge.getHandle(
+      });
+      const boundGauge = gauge.bind(
         meter.labels({ key1: 'labelValue1', key2: 'labelValue2' })
       );
-      handle.set(10);
+      boundGauge.set(10);
       const [descriptor, timeseries] = spyConsole.args;
       assert.deepStrictEqual(descriptor, [
         { description: 'a test description', name: 'gauge' },

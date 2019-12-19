@@ -15,7 +15,7 @@
  */
 
 import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
-import { CounterHandle, GaugeHandle, MeasureHandle } from './Handle';
+import { BoundCounter, BoundGauge, BoundMeasure } from './BoundInstrument';
 
 /**
  * An interface to allow the recording metrics.
@@ -30,7 +30,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle>;
+  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure>;
 
   /**
    * Creates a new counter metric. Generally, this kind of metric when the
@@ -39,7 +39,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<CounterHandle>;
+  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter>;
 
   // TODO: Measurements can have a long or double type. However, it looks like
   // the metric timeseries API (according to spec) accepts values instead of
@@ -57,7 +57,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle>;
+  createGauge(name: string, options?: MetricOptions): Metric<BoundGauge>;
 
   /**
    * Provide a pre-computed re-useable LabelSet by
