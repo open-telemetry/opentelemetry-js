@@ -87,9 +87,32 @@ describe('ioredis', () => {
     it('should propagate the current span to event handlers', done => {
       const span = tracer.startSpan('test span');
       let client: ioredisTypes.Redis;
+      const attributes = {
+        ...DEFAULT_ATTRIBUTES,
+        [AttributeNames.DB_STATEMENT]: 'info',
+      };
       const readyHandler = () => {
+        const endedSpans = memoryExporter.getFinishedSpans();
+
         assert.strictEqual(tracer.getCurrentSpan(), span);
+        assert.strictEqual(endedSpans.length, 1);
+        assert.strictEqual(endedSpans[0].name, `info`);
+        assertionUtils.assertPropagation(endedSpans[0], span);
+
+        assertionUtils.assertSpan(
+          endedSpans[0],
+          SpanKind.CLIENT,
+          attributes,
+          [],
+          okStatus
+        );
+        span.end();
+        assert.strictEqual(endedSpans.length, 2);
+        assert.strictEqual(endedSpans[1].name, `test span`);
+
         client.quit(done);
+        assert.strictEqual(endedSpans.length, 3);
+        assert.strictEqual(endedSpans[2].name, `quit`);
       };
       const errorHandler = (err: Error) => {
         assert.ifError(err);
