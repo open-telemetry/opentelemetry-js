@@ -21,8 +21,11 @@ import {
   Meter,
   Metric,
   MetricOptions,
+  MetricUtils,
   MeasureHandle,
   SpanContext,
+  LabelSet,
+  Labels,
 } from '@opentelemetry/types';
 
 /**
@@ -58,6 +61,10 @@ export class NoopMeter implements Meter {
   createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle> {
     return NOOP_GAUGE_METRIC;
   }
+
+  labels(labels: Labels): LabelSet {
+    return NOOP_LABEL_SET;
+  }
 }
 
 export class NoopMetric<T> implements Metric<T> {
@@ -67,12 +74,12 @@ export class NoopMetric<T> implements Metric<T> {
     this._handle = handle;
   }
   /**
-   * Returns a Handle associated with specified label values.
+   * Returns a Handle associated with specified LabelSet.
    * It is recommended to keep a reference to the Handle instead of always
    * calling this method for every operations.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  getHandle(labelValues: string[]): T {
+  getHandle(labels: LabelSet): T {
     return this._handle;
   }
 
@@ -85,9 +92,10 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Handle from the metric, if it is present.
-   * @param labelValues the list of label values.
+   * @param labels the canonicalized LabelSet used to associate with this metric handle.
    */
-  removeHandle(labelValues: string[]): void {
+  removeHandle(labels: LabelSet): void {
+    // @todo: implement this method
     return;
   }
 
@@ -100,6 +108,38 @@ export class NoopMetric<T> implements Metric<T> {
 
   setCallback(fn: () => void): void {
     return;
+  }
+}
+
+export class NoopCounterMetric extends NoopMetric<CounterHandle>
+  implements Pick<MetricUtils, 'add'> {
+  add(value: number, labelSet: LabelSet) {
+    this.getHandle(labelSet).add(value);
+  }
+}
+
+export class NoopGaugeMetric extends NoopMetric<GaugeHandle>
+  implements Pick<MetricUtils, 'set'> {
+  set(value: number, labelSet: LabelSet) {
+    this.getHandle(labelSet).set(value);
+  }
+}
+
+export class NoopMeasureMetric extends NoopMetric<MeasureHandle>
+  implements Pick<MetricUtils, 'record'> {
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
+  ) {
+    if (typeof distContext === 'undefined') {
+      this.getHandle(labelSet).record(value);
+    } else if (typeof spanContext === 'undefined') {
+      this.getHandle(labelSet).record(value, distContext);
+    } else {
+      this.getHandle(labelSet).record(value, distContext, spanContext);
+    }
   }
 }
 
@@ -126,14 +166,12 @@ export class NoopMeasureHandle implements MeasureHandle {
 }
 
 export const NOOP_GAUGE_HANDLE = new NoopGaugeHandle();
-export const NOOP_GAUGE_METRIC = new NoopMetric<GaugeHandle>(NOOP_GAUGE_HANDLE);
+export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_GAUGE_HANDLE);
 
 export const NOOP_COUNTER_HANDLE = new NoopCounterHandle();
-export const NOOP_COUNTER_METRIC = new NoopMetric<CounterHandle>(
-  NOOP_COUNTER_HANDLE
-);
+export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_COUNTER_HANDLE);
 
 export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
-export const NOOP_MEASURE_METRIC = new NoopMetric<MeasureHandle>(
-  NOOP_MEASURE_HANDLE
-);
+export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_MEASURE_HANDLE);
+
+export const NOOP_LABEL_SET = {} as LabelSet;

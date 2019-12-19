@@ -23,12 +23,13 @@ import { NodeTracer } from '@opentelemetry/node';
 import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as path from 'path';
 import * as nock from 'nock';
 import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import * as utils from '../../src/utils';
+import { OT_REQUEST_HEADER } from '../../src/utils';
 import { HttpPluginConfig, Http } from '../../src/types';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 
@@ -76,8 +77,8 @@ describe('HttpPlugin', () => {
     assert.strictEqual(process.versions.node, plugin.version);
   });
 
-  it('moduleName should be http', () => {
-    assert.strictEqual('http', plugin.moduleName);
+  it(`moduleName should be ${protocol}`, () => {
+    assert.strictEqual(protocol, plugin.moduleName);
   });
 
   describe('enable()', () => {
@@ -122,7 +123,7 @@ describe('HttpPlugin', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpRequest.get(
-          `http://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -141,14 +142,14 @@ describe('HttpPlugin', () => {
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
       });
 
-      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
@@ -170,7 +171,7 @@ describe('HttpPlugin', () => {
             (url: string) => url.endsWith(`/ignored/function`),
           ],
           ignoreOutgoingUrls: [
-            `http://${hostname}:${serverPort}/ignored/string`,
+            `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
             (url: string) => url.endsWith(`/ignored/function`),
           ],
@@ -189,11 +190,11 @@ describe('HttpPlugin', () => {
         plugin.disable();
       });
 
-      it('http module should be patched', () => {
+      it(`${protocol} module should be patched`, () => {
         assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       });
 
-      it("should not patch if it's not a http module", () => {
+      it(`should not patch if it's not a ${protocol} module`, () => {
         const httpNotPatched = new HttpPlugin(
           plugin.component,
           process.versions.node
@@ -203,7 +204,7 @@ describe('HttpPlugin', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpRequest.get(
-          `http://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -222,14 +223,14 @@ describe('HttpPlugin', () => {
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
       });
 
-      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
@@ -393,14 +394,14 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of ['string', '', {}, new Date()]) {
-        it(`should be tracable and not throw exception in http plugin when passing the following argument ${JSON.stringify(
+      for (const arg of ['string', {}, new Date()]) {
+        it(`should be tracable and not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
             await httpRequest.get(arg);
           } catch (error) {
-            // http request has been made
+            // request has been made
             // nock throw
             assert.ok(error.message.startsWith('Nock: No match for request'));
           }
@@ -409,18 +410,20 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of [true, 1, false, 0]) {
-        it(`should not throw exception in http plugin when passing the following argument ${JSON.stringify(
+      for (const arg of [true, 1, false, 0, '']) {
+        it(`should not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
             // @ts-ignore
             await httpRequest.get(arg);
           } catch (error) {
-            // http request has been made
+            // request has been made
             // nock throw
             assert.ok(
-              error.stack.indexOf('/node_modules/nock/lib/intercept.js') > 0
+              error.stack.indexOf(
+                path.normalize('/node_modules/nock/lib/intercept.js')
+              ) > 0
             );
           }
           const spans = memoryExporter.getFinishedSpans();
@@ -444,7 +447,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            `http://${hostname}${testPath}`,
+            `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -485,7 +488,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            `http://${hostname}${testPath}`,
+            `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -509,14 +512,14 @@ describe('HttpPlugin', () => {
       });
 
       it('should have 1 ended span when request is aborted', async () => {
-        nock('http://my.server.com')
+        nock(`${protocol}://my.server.com`)
           .get('/')
           .socketDelay(50)
           .reply(200, '<html></html>');
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            'http://my.server.com',
+            `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {

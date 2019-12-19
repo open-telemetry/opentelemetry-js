@@ -40,13 +40,15 @@ export const getAbsoluteUrl = (
   const port = (reqUrlObject.port || '').toString();
   const path = reqUrlObject.path || '/';
   let host =
-    headers.host || reqUrlObject.hostname || headers.host || 'localhost';
+    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
 
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
   if (
     (host as string).indexOf(':') === -1 &&
-    (port && port !== '80' && port !== '443')
+    port &&
+    port !== '80' &&
+    port !== '443'
   ) {
     host += `:${port}`;
   }
@@ -198,12 +200,12 @@ export const setSpanWithError = (
  * @param [extraOptions] additional options for the request
  */
 export const getRequestInfo = (
-  options: RequestOptions | string,
+  options: url.URL | RequestOptions | string,
   extraOptions?: RequestOptions
 ) => {
   let pathname = '/';
   let origin = '';
-  let optionsParsed: url.URL | url.UrlWithStringQuery | RequestOptions;
+  let optionsParsed: RequestOptions;
   if (typeof options === 'string') {
     optionsParsed = url.parse(options);
     pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
@@ -211,8 +213,28 @@ export const getRequestInfo = (
     if (extraOptions !== undefined) {
       Object.assign(optionsParsed, extraOptions);
     }
+  } else if (options instanceof url.URL) {
+    optionsParsed = {
+      protocol: options.protocol,
+      hostname:
+        typeof options.hostname === 'string' && options.hostname.startsWith('[')
+          ? options.hostname.slice(1, -1)
+          : options.hostname,
+      path: `${options.pathname || ''}${options.search || ''}`,
+    };
+    if (options.port !== '') {
+      optionsParsed.port = Number(options.port);
+    }
+    if (options.username || options.password) {
+      optionsParsed.auth = `${options.username}:${options.password}`;
+    }
+    pathname = options.pathname;
+    origin = options.origin;
+    if (extraOptions !== undefined) {
+      Object.assign(optionsParsed, extraOptions);
+    }
   } else {
-    optionsParsed = options as RequestOptions;
+    optionsParsed = Object.assign({}, options);
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';
@@ -222,17 +244,15 @@ export const getRequestInfo = (
   }
 
   if (hasExpectHeader(optionsParsed)) {
-    (optionsParsed as RequestOptions).headers = Object.assign(
-      {},
-      (optionsParsed as RequestOptions).headers
-    );
-  } else if (!(optionsParsed as RequestOptions).headers) {
-    (optionsParsed as RequestOptions).headers = {};
+    optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+  } else if (!optionsParsed.headers) {
+    optionsParsed.headers = {};
   }
   // some packages return method in lowercase..
   // ensure upperCase for consistency
-  let method = (optionsParsed as RequestOptions).method;
-  method = method ? method.toUpperCase() : 'GET';
+  const method = optionsParsed.method
+    ? optionsParsed.method.toUpperCase()
+    : 'GET';
 
   return { origin, pathname, method, optionsParsed };
 };

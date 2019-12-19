@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { BasePlugin, otperformance } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  otperformance,
+  parseTraceParent,
+  TRACE_PARENT_HEADER,
+} from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
@@ -61,7 +66,9 @@ export class DocumentLoad extends BasePlugin<unknown> {
     ) as PerformanceResourceTiming[];
     if (resources) {
       resources.forEach(resource => {
-        this._initResourceSpan(rootSpan, resource);
+        this._initResourceSpan(resource, {
+          parent: rootSpan,
+        });
       });
     }
   }
@@ -81,7 +88,12 @@ export class DocumentLoad extends BasePlugin<unknown> {
       hasKey(entries, performanceName) &&
       typeof entries[performanceName] === 'number'
     ) {
-      span.addEvent(performanceName, undefined, entries[performanceName]);
+      // some metrics are available but have value 0 which means they are invalid
+      // for example "secureConnectionStart" is 0 which makes the events to be wrongly interpreted
+      if (entries[performanceName] === 0) {
+        return undefined;
+      }
+      span.addEvent(performanceName, entries[performanceName]);
       return span;
     }
     return undefined;
@@ -106,12 +118,17 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * Collects information about performance and creates appropriate spans
    */
   private _collectPerformance() {
+    const metaElement = [...document.getElementsByTagName('meta')].find(
+      e => e.getAttribute('name') === TRACE_PARENT_HEADER
+    );
+
     const entries = this._getEntries();
 
     const rootSpan = this._startSpan(
       AttributeNames.DOCUMENT_LOAD,
       PTN.FETCH_START,
-      entries
+      entries,
+      { parent: parseTraceParent((metaElement && metaElement.content) || '') }
     );
     if (!rootSpan) {
       return;
@@ -186,7 +203,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
       });
     } else {
       // // fallback to previous version
-      const perf: (typeof otperformance) & PerformanceLegacy = otperformance;
+      const perf: typeof otperformance & PerformanceLegacy = otperformance;
       const performanceTiming = perf.timing;
       if (performanceTiming) {
         const keys = Object.values(PTN);
@@ -205,16 +222,19 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
   /**
    * Creates and ends a span with network information about resource added as timed events
-   * @param rootSpan
    * @param resource
+   * @param spanOptions
    */
   private _initResourceSpan(
-    rootSpan: Span,
-    resource: PerformanceResourceTiming
+    resource: PerformanceResourceTiming,
+    spanOptions: SpanOptions = {}
   ) {
-    const span = this._startSpan(resource.name, PTN.FETCH_START, resource, {
-      parent: rootSpan,
-    });
+    const span = this._startSpan(
+      resource.name,
+      PTN.FETCH_START,
+      resource,
+      spanOptions
+    );
     if (span) {
       this._addSpanNetworkEvents(span, resource);
       this._endSpan(span, PTN.RESPONSE_END, resource);

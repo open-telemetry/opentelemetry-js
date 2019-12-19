@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/types",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "TypeScript types for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -11,7 +11,6 @@
     "precompile": "tsc --version",
     "compile": "tsc -p .",
     "fix": "gts fix",
-    "test": "npm run compile && npm run check",
     "docs-test": "linkinator docs/out",
     "docs": "typedoc --tsconfig tsconfig.json",
     "prepare": "npm run compile"
@@ -42,11 +41,11 @@
     "access": "public"
   },
   "devDependencies": {
-    "gts": "^1.0.0",
+    "gts": "^1.1.0",
     "linkinator": "^1.5.0",
     "tslint-consistent-codestyle": "^1.15.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "typedoc": "^0.15.0",
-    "typescript": "3.6.4"
+    "typescript": "3.7.2"
   }
 }

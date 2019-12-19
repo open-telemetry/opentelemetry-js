@@ -38,8 +38,6 @@ describe('dns.promises.lookup()', () => {
     // skip tests if node version is not supported
     if (semver.lte(process.versions.node, '10.6.0')) {
       this.skip();
-      done();
-      return;
     }
 
     // if node version is supported, it's mandatory for CI
@@ -52,7 +50,7 @@ describe('dns.promises.lookup()', () => {
     utils.checkInternet(isConnected => {
       if (!isConnected) {
         this.skip();
-        // don't disturbe people
+        // don't disturb people
       }
       done();
     });
