@@ -45,7 +45,7 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
       'connect',
       this._getPoolConnectPatch() as never
     );
-  
+
     return this._moduleExports;
   }
 
