@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-export * from './WebTracer';
-export * from './StackScopeManager';
-export * from './enums/PerformanceTimingNames';
-export * from './types';
-export * from './utils';
+export enum EventNames {
+  METHOD_OPEN = 'open',
+  METHOD_SEND = 'send',
+  EVENT_ABORT = 'abort',
+  EVENT_ERROR = 'error',
+  EVENT_LOAD = 'loaded',
+  EVENT_TIMEOUT = 'timeout',
+}

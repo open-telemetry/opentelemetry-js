@@ -48,7 +48,7 @@ export class WebTracer extends BasicTracer {
     config.scopeManager.enable();
 
     for (const plugin of config.plugins) {
-      plugin.enable([], this, this.logger, {});
+      plugin.enable([], this, this.logger);
     }
   }
 }
