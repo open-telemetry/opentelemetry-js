@@ -32,7 +32,7 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   static readonly COMPONENT = 'pg-pool';
   static readonly DB_TYPE = 'sql';
 
-  readonly supportedVersions = ['^2.0.7'];
+  readonly supportedVersions = ['2.*'];
 
   constructor(readonly moduleName: string) {
     super();
@@ -40,20 +40,17 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   }
 
   protected patch(): typeof pgPoolTypes {
-    if (this._moduleExports.prototype.connect) {
-      shimmer.wrap(
-        this._moduleExports.prototype,
-        'connect',
-        this._getPoolConnectPatch() as never
-      );
-    }
+    shimmer.wrap(
+      this._moduleExports.prototype,
+      'connect',
+      this._getPoolConnectPatch() as never
+    );
+  
     return this._moduleExports;
   }
 
   protected unpatch(): void {
-    if (this._moduleExports.prototype.connect) {
-      shimmer.unwrap(this._moduleExports.prototype, 'connect');
-    }
+    shimmer.unwrap(this._moduleExports.prototype, 'connect');
   }
 
   private _getPoolConnectPatch() {
