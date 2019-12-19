@@ -89,14 +89,15 @@ describe('ioredis', () => {
       let client: ioredisTypes.Redis;
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'info',
+        [AttributeNames.DB_STATEMENT]: 'connect',
       };
       const readyHandler = () => {
         const endedSpans = memoryExporter.getFinishedSpans();
 
         assert.strictEqual(tracer.getCurrentSpan(), span);
-        assert.strictEqual(endedSpans.length, 1);
-        assert.strictEqual(endedSpans[0].name, `info`);
+        assert.strictEqual(endedSpans.length, 2);
+        assert.strictEqual(endedSpans[0].name, `connect`);
+        assert.strictEqual(endedSpans[1].name, `info`);
         assertionUtils.assertPropagation(endedSpans[0], span);
 
         assertionUtils.assertSpan(
@@ -107,12 +108,12 @@ describe('ioredis', () => {
           okStatus
         );
         span.end();
-        assert.strictEqual(endedSpans.length, 2);
-        assert.strictEqual(endedSpans[1].name, `test span`);
+        assert.strictEqual(endedSpans.length, 3);
+        assert.strictEqual(endedSpans[2].name, `test span`);
 
         client.quit(done);
-        assert.strictEqual(endedSpans.length, 3);
-        assert.strictEqual(endedSpans[2].name, `quit`);
+        assert.strictEqual(endedSpans.length, 4);
+        assert.strictEqual(endedSpans[3].name, `quit`);
       };
       const errorHandler = (err: Error) => {
         assert.ifError(err);

@@ -32,6 +32,36 @@ const endSpan = (span: Span, err: NodeJS.ErrnoException | null | undefined) => {
   span.end();
 };
 
+export const traceConnection = (tracer: Tracer, original: Function) => {
+  return function(this: ioredisTypes.Redis & IORedisPluginClientTypes) {
+    const parentSpan = tracer.getCurrentSpan();
+    const span = tracer.startSpan('connect', {
+      kind: SpanKind.CLIENT,
+      parent: parentSpan,
+      attributes: {
+        [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
+        [AttributeNames.DB_TYPE]: IORedisPlugin.DB_TYPE,
+        [AttributeNames.DB_STATEMENT]: 'connect',
+      },
+    });
+    const { host, port } = this.options;
+
+    span.setAttributes({
+      [AttributeNames.PEER_HOSTNAME]: host,
+      [AttributeNames.PEER_PORT]: port,
+      [AttributeNames.PEER_ADDRESS]: `redis://${host}:${port}`,
+    });
+    try {
+      const client = original.apply(this, arguments);
+      endSpan(span, null);
+      return client;
+    } catch (error) {
+      endSpan(span, error);
+      throw error;
+    }
+  };
+};
+
 export const traceSendCommand = (tracer: Tracer, original: Function) => {
   return function(
     this: ioredisTypes.Redis & IORedisPluginClientTypes,
