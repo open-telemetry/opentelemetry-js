@@ -45,6 +45,8 @@ type TestGrpcClient = grpc.Client & {
   // tslint:disable-next-line:no-any
   unaryMethod: any;
   // tslint:disable-next-line:no-any
+  UnaryMethod: any;
+  // tslint:disable-next-line:no-any
   clientStreamMethod: any;
   // tslint:disable-next-line:no-any
   serverStreamMethod: any;
@@ -81,6 +83,24 @@ const grpcClient = {
   ): Promise<TestRequestResponse> => {
     return new Promise((resolve, reject) => {
       return client.unaryMethod(
+        request,
+        (err: grpc.ServiceError, response: TestRequestResponse) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response);
+          }
+        }
+      );
+    });
+  },
+
+  UnaryMethod: (
+    client: TestGrpcClient,
+    request: TestRequestResponse
+  ): Promise<TestRequestResponse> => {
+    return new Promise((resolve, reject) => {
+      return client.UnaryMethod(
         request,
         (err: grpc.ServiceError, response: TestRequestResponse) => {
           if (err) {
@@ -315,6 +335,13 @@ describe('GrpcPlugin', () => {
       description: 'unary call',
       methodName: 'UnaryMethod',
       method: grpcClient.unaryMethod,
+      request: requestList[0],
+      result: requestList[0],
+    },
+    {
+      description: 'Unary call',
+      methodName: 'UnaryMethod',
+      method: grpcClient.UnaryMethod,
       request: requestList[0],
       result: requestList[0],
     },
