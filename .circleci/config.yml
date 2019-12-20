@@ -166,6 +166,29 @@ jobs:
       - run:
           name: Docs tests
           command: yarn docs-test
+      - persist_to_workspace:
+          root: packages/opentelemetry-types/docs
+          paths:
+            - out
+  docs-deploy:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - attach_workspace:
+          at: packages/opentelemetry-types/docs
+      - run:
+          name: Install and configure dependencies
+          command: |
+            npm install --silent --no-save gh-pages
+            git config user.email noreply@opentelemetry.io
+            git config user.name "ci-build"
+      - add_ssh_keys:
+          fingerprints:
+            - "1d:a3:60:b5:b4:8d:e7:8a:96:ce:6a:0a:e9:58:4c:54"
+      - run:
+          name: Deploy docs to gh-pages branch
+          command: gh-pages --dist packages/opentelemetry-types/docs/out
   node8:
     docker:
       - image: node:8
@@ -202,7 +225,18 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint_&_docs
+      - lint_&_docs:
+          filters:
+            branches:
+              only: /.*/
+      - docs-deploy:
+          requires:
+            - lint_&_docs
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.0$/
+            branches:
+              ignore: /.*/
       - node8
       - node10
       - node12
