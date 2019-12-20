@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
-
 /**
  * Performance metrics
  */
+import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
+
 export type PerformanceEntries = {
   [PerformanceTimingNames.CONNECT_END]?: number;
   [PerformanceTimingNames.CONNECT_START]?: number;
@@ -47,4 +47,13 @@ export type PerformanceEntries = {
  */
 export interface PerformanceLegacy {
   timing?: PerformanceEntries;
+}
+
+/**
+ * This interface is used in {@link getResource} function to return
+ *     main request and it's corresponding PreFlight request
+ */
+export interface PerformanceResourceTimingInfo {
+  corsPreFlightRequest?: PerformanceResourceTiming;
+  mainRequest?: PerformanceResourceTiming;
 }

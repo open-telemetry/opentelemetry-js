@@ -14,11 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Helper function to be able to use enum as typed key in type and in interface when using forEach
- * @param obj
- * @param key
- */
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
-  return key in obj;
-}
+export * from './xhr';

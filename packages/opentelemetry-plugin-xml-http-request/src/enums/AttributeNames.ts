@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-export * from './WebTracer';
-export * from './StackScopeManager';
-export * from './enums/PerformanceTimingNames';
-export * from './types';
-export * from './utils';
+/**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes
+ */
+export enum AttributeNames {
+  COMPONENT = 'component',
+  HTTP_HOST = 'http.host',
+  HTTP_FLAVOR = 'http.flavor',
+  HTTP_METHOD = 'http.method',
+  HTTP_SCHEME = 'http.scheme',
+  HTTP_STATUS_CODE = 'http.status_code',
+  HTTP_STATUS_TEXT = 'http.status_text',
+  HTTP_URL = 'http.url',
+  // NOT ON OFFICIAL SPEC
+  HTTP_USER_AGENT = 'http.user_agent',
+}
