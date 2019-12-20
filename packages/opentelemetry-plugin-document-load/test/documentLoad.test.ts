@@ -32,7 +32,7 @@ import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
 
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
-import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
+import { PerformanceTimingNames as PTN } from '@opentelemetry/web';
 
 export class DummyExporter implements SpanExporter {
   export(
