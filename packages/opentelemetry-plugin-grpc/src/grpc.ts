@@ -320,9 +320,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
       plugin._logger.debug('patching client');
-      return function makeClientConstructor<ImplementationType>(
+      return function makeClientConstructor(
         this: typeof grpcTypes.Client,
-        methods: grpcTypes.ServiceDefinition<ImplementationType>,
+        methods: { [key: string]: { originalName?: string } },
         serviceName: string,
         options: grpcTypes.GenericClientOptions
       ) {
@@ -330,13 +330,29 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const client = original.apply(this, arguments as any);
         shimmer.massWrap(
           client.prototype as never,
-          Object.keys(methods) as never[],
+          plugin._getMethodsToWrap(client, methods) as never[],
           // tslint:disable-next-line:no-any
           plugin._getPatchedClientMethods() as any
         );
         return client;
       } as never;
     };
+  }
+
+  private _getMethodsToWrap(
+    client: typeof grpcTypes.Client,
+    methods: { [key: string]: { originalName?: string } }
+  ): string[] {
+    const methodsToWrap = [
+      ...Object.keys(methods),
+      ...(Object.keys(methods)
+        .map(methodName => methods[methodName].originalName)
+        .filter(
+          originalName =>
+            !!originalName && client.prototype.hasOwnProperty(originalName)
+        ) as string[]),
+    ];
+    return methodsToWrap;
   }
 
   private _getPatchedClientMethods() {
