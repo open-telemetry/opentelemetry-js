@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-pg",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry postgres automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -61,10 +61,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.0",
-    "@opentelemetry/node": "^0.3.0",
-    "@opentelemetry/tracing": "^0.3.0",
-    "@opentelemetry/types": "^0.3.0",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/node": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
     "shimmer": "^1.2.1"
   }
 }
