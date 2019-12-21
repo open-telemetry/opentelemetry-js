@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-mongodb-core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry mongodb-core automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -40,8 +40,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.3.0",
-    "@opentelemetry/tracing": "^0.3.0",
+    "@opentelemetry/node": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
     "@types/mocha": "^5.2.7",
     "@types/mongodb": "^3.2.3",
     "@types/node": "^12.7.2",
@@ -59,8 +59,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.0",
-    "@opentelemetry/types": "^0.3.0",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
     "shimmer": "^1.2.1"
   }
 }
