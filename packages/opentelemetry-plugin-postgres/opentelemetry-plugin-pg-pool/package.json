@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-pg-pool",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry postgres pool automatic instrumentation package.",
   "private": true,
   "main": "build/src/index.js",
@@ -46,7 +46,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/plugin-pg": "^0.3.0",
+    "@opentelemetry/plugin-pg": "^0.3.1",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/pg": "^7.11.2",
@@ -66,10 +66,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.0",
-    "@opentelemetry/node": "^0.3.0",
-    "@opentelemetry/tracing": "^0.3.0",
-    "@opentelemetry/types": "^0.3.0",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/node": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
     "shimmer": "^1.2.1"
   }
 }
