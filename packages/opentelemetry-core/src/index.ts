@@ -33,3 +33,5 @@ export * from './trace/spancontext-utils';
 export * from './trace/TracerDelegate';
 export * from './trace/TraceState';
 export * from './metrics/NoopMeter';
+export * from './utils/url';
+export * from './utils/wrap';

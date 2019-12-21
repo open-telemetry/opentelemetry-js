@@ -1,7 +1,6 @@
 # Overview
 
-This example shows how to use [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) to instrument your JavaScript code running in the browser.
-This example uses the `ConsoleSpanExporter()` to export spans to the browser console output.
+This example shows how to use [@opentelemetry/web](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web) with different plugins and setup to instrument your JavaScript code running in the browser.
 
 ## Installation
 
@@ -19,11 +18,23 @@ $ npm start
 
 By default, the application will run on port `8090`.
 
-To see the results, open the browser at <http://localhost:8090/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
+## Examples
+
+### Document Load
+
+To see the results, open the browser at <http://localhost:8090/document-load/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
 
 The screen will look as follows:
 
-![Screenshot of the running example](images/traces.png)
+![Screenshot of the running example](images/document-load.png)
+
+### XMLHttpRequest
+
+To see the results, open the browser at <http://localhost:8090/xml-http-request/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
+The screen will look as follows:
+
+![Screenshot of the running example](images/xml-http-request.png)
+
 
 ## Useful links
 
