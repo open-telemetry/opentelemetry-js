@@ -275,6 +275,58 @@ describe('ioredis', () => {
         });
       });
 
+      it('should create a child span for pubsub', async () => {
+        const span = tracer.startSpan('test span');
+        await tracer.withSpan(span, async () => {
+          try {
+            const pub = new ioredis(URL);
+            const sub = new ioredis(URL);
+            await sub.subscribe('news', 'music');
+            await pub.publish('news', 'Hello world!');
+            await pub.publish('music', 'Hello again!');
+            await sub.unsubscribe('news', 'music');
+            await sub.disconnect(); // No span
+            await pub.disconnect(); // No span
+            const endedSpans = memoryExporter.getFinishedSpans();
+            assert.strictEqual(endedSpans.length, 9);
+            span.end();
+            assert.strictEqual(endedSpans.length, 10);
+            const spanNames = [
+              'connect',
+              'connect',
+              'subscribe',
+              'info',
+              'info',
+              'subscribe',
+              'publish',
+              'publish',
+              'unsubscribe',
+              'test span',
+            ];
+            let i = 0;
+            while (i < 10) {
+              assert.strictEqual(endedSpans[i].name, spanNames[i]);
+              i++;
+            }
+
+            const attributes = {
+              ...DEFAULT_ATTRIBUTES,
+              [AttributeNames.DB_STATEMENT]: 'subscribe news music',
+            };
+            assertionUtils.assertSpan(
+              endedSpans[5],
+              SpanKind.CLIENT,
+              attributes,
+              [],
+              okStatus
+            );
+            assertionUtils.assertPropagation(endedSpans[0], span);
+          } catch (error) {
+            assert.ifError(error);
+          }
+        });
+      });
+
       it(`should create a child span for lua`, done => {
         const attributes = {
           ...DEFAULT_ATTRIBUTES,
