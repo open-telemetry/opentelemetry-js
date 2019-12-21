@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.1
+
+Released 2019-12-20
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-grpc`
+  * [#631](https://github.com/open-telemetry/opentelemetry-js/pull/631) fix(grpc): patch original client methods
+  * [#593](https://github.com/open-telemetry/opentelemetry-js/pull/593) fix: transpile to es2017 as esnext may result in unsupported JS code
+
+#### :books: (Refine Doc)
+* Other
+  * [#629](https://github.com/open-telemetry/opentelemetry-js/pull/629) ci: deploy documentation on releases
+  * [#581](https://github.com/open-telemetry/opentelemetry-js/pull/581) feat: add OpenTracing example
+
+#### :rocket: (Enhancement)
+ * [#633](https://github.com/open-telemetry/opentelemetry-js/pull/633) chore: enable incremental builds
+
+#### :sparkles: (Feature)
+* `opentelemetry-plugin-xml-http-request`
+  * [#595](https://github.com/open-telemetry/opentelemetry-js/pull/595) feat: implement XMLHttpRequest plugin
+
 ## 0.3.0
 
 Released 2019-12-13
