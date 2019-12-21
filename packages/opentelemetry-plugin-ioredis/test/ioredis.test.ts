@@ -285,12 +285,12 @@ describe('ioredis', () => {
             await pub.publish('news', 'Hello world!');
             await pub.publish('music', 'Hello again!');
             await sub.unsubscribe('news', 'music');
-            await sub.disconnect(); // No span
-            await pub.disconnect(); // No span
+            await sub.quit();
+            await pub.quit();
             const endedSpans = memoryExporter.getFinishedSpans();
-            assert.strictEqual(endedSpans.length, 9);
+            assert.strictEqual(endedSpans.length, 11);
             span.end();
-            assert.strictEqual(endedSpans.length, 10);
+            assert.strictEqual(endedSpans.length, 12);
             const spanNames = [
               'connect',
               'connect',
@@ -301,10 +301,12 @@ describe('ioredis', () => {
               'publish',
               'publish',
               'unsubscribe',
+              'quit',
+              'quit',
               'test span',
             ];
             let i = 0;
-            while (i < 10) {
+            while (i < 12) {
               assert.strictEqual(endedSpans[i].name, spanNames[i]);
               i++;
             }
