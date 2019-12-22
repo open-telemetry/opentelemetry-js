@@ -23,7 +23,7 @@ import { NodeTracer } from '@opentelemetry/node';
 import { plugin, RedisPlugin } from '../src';
 import * as redisTypes from 'redis';
 import { NoopLogger } from '@opentelemetry/core';
-import * as dockerUtils from './testUtils';
+import * as dockerUtils from '@opentelemetry/test-utils';
 import * as assertionUtils from './assertionUtils';
 import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from '../src/enums';
@@ -64,7 +64,7 @@ describe('redis@2.x', () => {
     }
 
     if (shouldTestLocal) {
-      dockerUtils.startDocker();
+      dockerUtils.startDocker('redis');
     }
 
     redis = require('redis');
@@ -74,7 +74,7 @@ describe('redis@2.x', () => {
 
   after(() => {
     if (shouldTestLocal) {
-      dockerUtils.cleanUpDocker();
+      dockerUtils.cleanUpDocker('redis');
     }
   });
 

@@ -33,7 +33,7 @@ import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
 import * as assertionUtils from './assertionUtils';
-import * as testUtils from './testUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -103,7 +103,7 @@ describe('pg@7.x', () => {
     }
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
-      testUtils.startDocker();
+      testUtils.startDocker('postgres');
     }
 
     client = new pg.Client(CONFIG);
@@ -116,7 +116,7 @@ describe('pg@7.x', () => {
 
   after(async () => {
     if (testPostgresLocally) {
-      testUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('postgres');
     }
     await client.end();
   });

@@ -15,10 +15,23 @@
  */
 
 import * as childProcess from 'child_process';
-export function startDocker() {
-  const tasks = [
-    run('docker run -d -p 63790:6379 --name otjsredis redis:alpine'),
-  ];
+export function startDocker(db: 'redis' | 'mysql' | 'postgres') {
+  let dockerRunCmd;
+  switch (db) {
+    case 'redis':
+      dockerRunCmd = `docker run -d -p 63790:6379 --name ot${db} ${db}:alpine`;
+      break;
+
+    case 'mysql':
+      dockerRunCmd = `docker run --rm -d -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=test_db -e MYSQL_USER=otel -e MYSQL_PASSWORD=secret -p 33306:3306 --name ot${db} circleci/${db}:5.7`;
+      break;
+
+    case 'postgres':
+      dockerRunCmd = `docker run -d -p 54320:5432 --name ot${db} ${db}:alpine`;
+      break;
+  }
+
+  const tasks = [run(dockerRunCmd)];
 
   for (let i = 0; i < tasks.length; i++) {
     const task = tasks[i];
@@ -31,9 +44,9 @@ export function startDocker() {
   return true;
 }
 
-export function cleanUpDocker() {
-  run('docker stop otjsredis');
-  run('docker rm otjsredis');
+export function cleanUpDocker(db: 'redis' | 'mysql' | 'postgres') {
+  run(`docker stop ot${db}`);
+  run(`docker rm ot${db}`);
 }
 
 function run(cmd: string) {
