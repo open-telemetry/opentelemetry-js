@@ -172,10 +172,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               const self = this;
 
               const spanName = `grpc.${name.replace('/', '')}`;
-              const parentSpan = plugin._getSpanContext(call.metadata);
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
-                parent: parentSpan || undefined,
+                parent: plugin._getSpanContext(call.metadata),
               };
 
               plugin._logger.debug(
@@ -321,9 +320,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     const plugin = this;
     return (original: typeof grpcTypes.makeGenericClientConstructor): never => {
       plugin._logger.debug('patching client');
-      return function makeClientConstructor<ImplementationType>(
+      return function makeClientConstructor(
         this: typeof grpcTypes.Client,
-        methods: grpcTypes.ServiceDefinition<ImplementationType>,
+        methods: { [key: string]: { originalName?: string } },
         serviceName: string,
         options: grpcTypes.GenericClientOptions
       ) {
@@ -331,13 +330,29 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const client = original.apply(this, arguments as any);
         shimmer.massWrap(
           client.prototype as never,
-          Object.keys(methods) as never[],
+          plugin._getMethodsToWrap(client, methods) as never[],
           // tslint:disable-next-line:no-any
           plugin._getPatchedClientMethods() as any
         );
         return client;
       } as never;
     };
+  }
+
+  private _getMethodsToWrap(
+    client: typeof grpcTypes.Client,
+    methods: { [key: string]: { originalName?: string } }
+  ): string[] {
+    const methodsToWrap = [
+      ...Object.keys(methods),
+      ...(Object.keys(methods)
+        .map(methodName => methods[methodName].originalName)
+        .filter(
+          originalName =>
+            !!originalName && client.prototype.hasOwnProperty(originalName)
+        ) as string[]),
+    ];
+    return methodsToWrap;
   }
 
   private _getPatchedClientMethods() {
@@ -347,11 +362,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
-        const currentSpan = plugin._tracer.getCurrentSpan();
         const span = plugin._tracer
           .startSpan(name, {
             kind: SpanKind.CLIENT,
-            parent: currentSpan || undefined,
+            parent: plugin._tracer.getCurrentSpan(),
           })
           .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
         return plugin._makeGrpcClientRemoteCall(

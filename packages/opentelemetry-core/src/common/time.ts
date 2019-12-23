@@ -21,7 +21,10 @@ import { TimeOriginLegacy } from './types';
 const NANOSECOND_DIGITS = 9;
 const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
 
-// Converts a number to HrTime
+/**
+ * Converts a number to HrTime
+ * @param epochMillis
+ */
 function numberToHrtime(epochMillis: number): types.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
@@ -42,7 +45,10 @@ function getTimeOrigin(): number {
   return timeOrigin;
 }
 
-// Returns an hrtime calculated via performance component.
+/**
+ * Returns an hrtime calculated via performance component.
+ * @param performanceNow
+ */
 export function hrTime(performanceNow?: number): types.HrTime {
   const timeOrigin = numberToHrtime(getTimeOrigin());
   const now = numberToHrtime(
@@ -61,7 +67,11 @@ export function hrTime(performanceNow?: number): types.HrTime {
   return [seconds, nanos];
 }
 
-// Converts a TimeInput to an HrTime, defaults to _hrtime().
+/**
+ *
+ * Converts a TimeInput to an HrTime, defaults to _hrtime().
+ * @param time
+ */
 export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
   // process.hrtime
   if (isTimeInputHrTime(time)) {
@@ -81,7 +91,11 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
   }
 }
 
-// Returns a duration of two hrTime.
+/**
+ * Returns a duration of two hrTime.
+ * @param startTime
+ * @param endTime
+ */
 export function hrTimeDuration(
   startTime: types.HrTime,
   endTime: types.HrTime
@@ -99,21 +113,46 @@ export function hrTimeDuration(
   return [seconds, nanos];
 }
 
-// Convert hrTime to nanoseconds.
+/**
+ * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
+ * @param hrTime
+ */
+export function hrTimeToTimeStamp(hrTime: types.HrTime): string {
+  const precision = NANOSECOND_DIGITS;
+  const tmp = `${'0'.repeat(precision)}${hrTime[1]}Z`;
+  const nanoString = tmp.substr(tmp.length - precision - 1);
+  const date = new Date(hrTime[0] * 1000).toISOString();
+  return date.replace('000Z', nanoString);
+}
+
+/**
+ * Convert hrTime to nanoseconds.
+ * @param hrTime
+ */
 export function hrTimeToNanoseconds(hrTime: types.HrTime): number {
   return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
 }
 
-// Convert hrTime to milliseconds.
+/**
+ * Convert hrTime to milliseconds.
+ * @param hrTime
+ */
 export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
   return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
 }
 
-// Convert hrTime to microseconds.
+/**
+ * Convert hrTime to microseconds.
+ * @param hrTime
+ */
 export function hrTimeToMicroseconds(hrTime: types.HrTime): number {
   return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
 }
 
+/**
+ * check if time is HrTime
+ * @param value
+ */
 export function isTimeInputHrTime(value: unknown) {
   return (
     Array.isArray(value) &&
@@ -123,7 +162,10 @@ export function isTimeInputHrTime(value: unknown) {
   );
 }
 
-// check if input value is a correct types.TimeInput
+/**
+ * check if input value is a correct types.TimeInput
+ * @param value
+ */
 export function isTimeInput(value: unknown) {
   return (
     isTimeInputHrTime(value) ||

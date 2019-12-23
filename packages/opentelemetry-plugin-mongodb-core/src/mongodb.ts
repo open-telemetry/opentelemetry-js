@@ -106,7 +106,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
         const resultHandler =
           typeof options === 'function' ? options : callback;
         if (
-          currentSpan === null ||
+          currentSpan === undefined ||
           typeof resultHandler !== 'function' ||
           typeof commands !== 'object'
         ) {
@@ -141,8 +141,6 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   /**
    * Get the mongodb command type from the object.
    * @param command Internal mongodb command object
-   * @param defaulType the default type to return if we could not find a
-   *  specific command.
    */
   private _getCommandType(command: MongoInternalCommand): MongodbCommandType {
     if (command.createIndexes !== undefined) {
@@ -210,7 +208,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
       ): mongodb.Cursor {
         const currentSpan = plugin._tracer.getCurrentSpan();
         const resultHandler = args[0];
-        if (currentSpan === null || typeof resultHandler !== 'function') {
+        if (currentSpan === undefined || typeof resultHandler !== 'function') {
           return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(`mongodb.query`, {

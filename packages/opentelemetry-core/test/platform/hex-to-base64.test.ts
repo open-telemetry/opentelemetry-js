@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-/**
- * Helper function to be able to use enum as typed key in type and in interface when using forEach
- * @param obj
- * @param key
- */
-export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
-  return key in obj;
-}
+import * as assert from 'assert';
+import { hexToBase64 } from '../../src/platform';
+
+describe('hexToBase64', () => {
+  it('convert hex to base64', () => {
+    const id1 = '7deb739e02e44ef2';
+    const id2 = '46cef837b919a16ff26e608c8cf42c80';
+    assert.strictEqual(hexToBase64(id1), 'fetzngLkTvI=');
+    assert.strictEqual(hexToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
+  });
+});

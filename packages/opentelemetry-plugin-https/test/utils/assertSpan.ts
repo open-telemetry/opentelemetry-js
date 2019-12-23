@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind, Status } from '@opentelemetry/types';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
-import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   AttributeNames,
   parseResponseStatus,
 } from '@opentelemetry/plugin-http';
+import { DummyPropagation } from './DummyPropagation';
+import { ReadableSpan } from '@opentelemetry/tracing';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -36,6 +36,7 @@ export const assertSpan = (
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
+    forceStatus?: Status;
     component: string;
   }
 ) => {
@@ -70,14 +71,22 @@ export const assertSpan = (
     span.attributes[AttributeNames.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
-  assert.ok(span.endTime);
+
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
+
   assert.deepStrictEqual(
     span.status,
-    parseResponseStatus(validations.httpStatusCode)
+    validations.forceStatus || parseResponseStatus(validations.httpStatusCode)
   );
 
+  assert.ok(
+    (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
+      span.attributes[AttributeNames.HTTP_HOSTNAME] as string
+    ) > -1,
+    'should be consistent'
+  );
+  assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
   if (validations.reqHeaders) {
