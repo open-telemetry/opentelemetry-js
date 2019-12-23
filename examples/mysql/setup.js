@@ -27,7 +27,7 @@ function setupTracerAndExporters(service) {
     serviceName: service,
   })));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+  // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
   opentelemetry.initGlobalTracerRegistry(registry);
 }
 

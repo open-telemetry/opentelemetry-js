@@ -33,7 +33,7 @@ function setupTracerAndExporters(service) {
   // and optimization, especially in production.
   registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+  // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
   opentelemetry.initGlobalTracerRegistry(registry);
 }
 
