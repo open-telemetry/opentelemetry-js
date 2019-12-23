@@ -4,8 +4,10 @@
   "description": "Test utilities.",
   "main": "build/testUtils.js",
   "scripts": {
-    "precompile": "tsc --version",
+    "check": "gts check",
     "compile": "tsc -p .",
+    "fix": "gts fix",
+    "precompile": "tsc --version",
     "prepare": "npm run compile"
   },
   "repository": "open-telemetry/opentelemetry-js",
