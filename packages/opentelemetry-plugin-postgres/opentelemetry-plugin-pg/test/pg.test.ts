@@ -32,7 +32,6 @@ import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
-import * as assertionUtils from './assertionUtils';
 import * as testUtils from '@opentelemetry/test-utils';
 
 const memoryExporter = new InMemorySpanExporter();
@@ -74,7 +73,7 @@ const runCallbackTest = (
   const spans = memoryExporter.getFinishedSpans();
   assert.strictEqual(spans.length, spansLength);
   const pgSpan = spans[spansIndex];
-  assertionUtils.assertSpan(
+  testUtils.assertSpan(
     pgSpan,
     SpanKind.CLIENT,
     attributes,
@@ -82,7 +81,7 @@ const runCallbackTest = (
     status
   );
   if (span) {
-    assertionUtils.assertPropagation(pgSpan, span);
+    testUtils.assertPropagation(pgSpan, span);
   }
 };
 
