@@ -91,12 +91,13 @@ export const assertSpan = (
   if (span.kind === SpanKind.CLIENT) {
     assert.strictEqual(
       span.attributes[AttributeNames.NET_PEER_NAME],
-      validations.hostname
+      validations.hostname,
+      'must be consistent (PEER_NAME and hostname)'
     );
-    assert.ok(span.attributes[AttributeNames.NET_PEER_IP], 'must have PEER IP');
+    assert.ok(span.attributes[AttributeNames.NET_PEER_IP], 'must have PEER_IP');
     assert.ok(
       span.attributes[AttributeNames.NET_PEER_PORT],
-      'must have PEER PORT'
+      'must have PEER_PORT'
     );
     assert.ok(
       (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
@@ -111,6 +112,14 @@ export const assertSpan = (
         span.attributes[AttributeNames.HTTP_SERVER_NAME],
         validations.serverName,
         ' must have serverName attribute'
+      );
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_PORT],
+        'must have HOST_PORT'
+      );
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_IP],
+        'must have HOST_IP'
       );
     }
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);

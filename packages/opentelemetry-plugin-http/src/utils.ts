@@ -346,10 +346,11 @@ export const getOutgoingRequestAttributesOnResponse = (
   options: { hostname: string }
 ): Attributes => {
   const { statusCode, statusMessage, httpVersion, socket } = response;
+  const { remoteAddress, remotePort } = socket;
   const attributes: Attributes = {
-    [AttributeNames.NET_PEER_IP]: socket.remoteAddress,
-    [AttributeNames.NET_PEER_PORT]: socket.remotePort,
-    [AttributeNames.HTTP_HOST]: `${options.hostname}:${socket.remotePort}`,
+    [AttributeNames.NET_PEER_IP]: remoteAddress,
+    [AttributeNames.NET_PEER_PORT]: remotePort,
+    [AttributeNames.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
 
   if (statusCode) {
@@ -360,7 +361,6 @@ export const getOutgoingRequestAttributesOnResponse = (
   }
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-
   return Object.assign(attributes, httpKindAttributes);
 };
 
@@ -374,6 +374,8 @@ export const getIncomingRequestAttributes = (
   options: { component: string; serverName?: string }
 ): Attributes => {
   const headers = request.headers;
+  const userAgent = headers['user-agent'];
+  const ips = headers['x-forwarded-for'];
   const method = request.method || 'GET';
   const httpVersion = request.httpVersion;
   const requestUrl = request.url ? url.parse(request.url) : null;
@@ -382,8 +384,6 @@ export const getIncomingRequestAttributes = (
     requestUrl?.hostname ||
     host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
     'localhost';
-  const userAgent = headers['user-agent'];
-  const ipsOrFalse = headers && headers['x-forwarded-for'];
   const serverName = options.serverName;
   const attributes: Attributes = {
     [AttributeNames.HTTP_URL]: getAbsoluteUrl(
@@ -396,8 +396,8 @@ export const getIncomingRequestAttributes = (
     [AttributeNames.HTTP_METHOD]: method,
   };
 
-  if (ipsOrFalse && typeof ipsOrFalse === 'string') {
-    attributes[AttributeNames.HTTP_CLIENT_IP] = ipsOrFalse.split(',')[0];
+  if (typeof ips === 'string') {
+    attributes[AttributeNames.HTTP_CLIENT_IP] = ips.split(',')[0];
   }
 
   if (typeof serverName === 'string') {
@@ -414,7 +414,6 @@ export const getIncomingRequestAttributes = (
   }
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
-
   return Object.assign(attributes, httpKindAttributes);
 };
 
@@ -426,11 +425,13 @@ export const getIncomingRequestAttributesOnResponse = (
   response: ServerResponse & { socket: Socket }
 ): Attributes => {
   const { statusCode, statusMessage, socket } = response;
+  const { localAddress, localPort, remoteAddress, remotePort } = socket;
+
   return {
-    [AttributeNames.NET_HOST_IP]: socket.localAddress,
-    [AttributeNames.NET_HOST_PORT]: socket.remotePort,
-    [AttributeNames.NET_PEER_IP]: socket.remoteAddress,
-    [AttributeNames.NET_PEER_PORT]: socket.remotePort,
+    [AttributeNames.NET_HOST_IP]: localAddress,
+    [AttributeNames.NET_HOST_PORT]: localPort,
+    [AttributeNames.NET_PEER_IP]: remoteAddress,
+    [AttributeNames.NET_PEER_PORT]: remotePort,
     [AttributeNames.HTTP_STATUS_CODE]: statusCode,
     [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
   };
