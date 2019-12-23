@@ -73,13 +73,7 @@ const runCallbackTest = (
   const spans = memoryExporter.getFinishedSpans();
   assert.strictEqual(spans.length, spansLength);
   const pgSpan = spans[spansIndex];
-  testUtils.assertSpan(
-    pgSpan,
-    SpanKind.CLIENT,
-    attributes,
-    events,
-    status
-  );
+  testUtils.assertSpan(pgSpan, SpanKind.CLIENT, attributes, events, status);
   if (span) {
     testUtils.assertPropagation(pgSpan, span);
   }
