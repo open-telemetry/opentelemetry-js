@@ -28,7 +28,7 @@ import * as assert from 'assert';
 import * as pg from 'pg';
 import * as pgPool from 'pg-pool';
 import * as assertionUtils from './assertionUtils';
-import * as testUtils from './testUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -97,14 +97,14 @@ describe('pg-pool@2.x', () => {
     pool = new pgPool(CONFIG);
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
-      testUtils.startDocker();
+      testUtils.startDocker('postgres');
     }
     done();
   });
 
   after(function(done) {
     if (testPostgresLocally) {
-      testUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('postgres');
     }
     pool.end(() => {
       done();
