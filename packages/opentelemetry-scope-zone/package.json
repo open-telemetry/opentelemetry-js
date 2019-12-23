@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-zone",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry Scope Zone",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -65,7 +65,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/scope-zone-peer-dep": "^0.3.0",
+    "@opentelemetry/scope-zone-peer-dep": "^0.3.1",
     "zone.js": "^0.10.2"
   },
   "sideEffects": true
