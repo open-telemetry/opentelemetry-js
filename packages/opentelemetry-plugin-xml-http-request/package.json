@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-xml-http-request",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry XMLHttpRequest automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,6 +43,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
+    "@opentelemetry/scope-zone": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
     "@types/shimmer": "^1.0.1",
@@ -70,15 +72,13 @@
     "typescript": "3.6.4",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
-    "webpack-merge": "^4.2.2",
-    "@opentelemetry/scope-zone": "^0.3.0",
-    "@opentelemetry/tracing": "^0.3.0"
+    "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.0",
-    "@opentelemetry/core": "^0.3.0",
-    "@opentelemetry/types": "^0.3.0",
-    "@opentelemetry/web": "^0.3.0",
+    "@opentelemetry/base": "^0.3.1",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
+    "@opentelemetry/web": "^0.3.1",
     "shimmer": "^1.2.1"
   }
 }
