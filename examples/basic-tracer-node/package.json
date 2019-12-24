@@ -7,6 +7,7 @@
   "scripts": {
     "zipkin:basic": "cross-env EXPORTER=zipkin node ./index.js",
     "jaeger:basic": "cross-env EXPORTER=jaeger node ./index.js",
+    "stackdriver:basic": "cross-env EXPORTER=stackdriver node ./index.js",
     "collector:basic": "cross-env EXPORTER=collector node ./index.js",
     "collector:docker:ot": "cd ./docker/ot && docker-compose down && docker-compose up",
     "collector:docker:stop": "cd ./docker/ot && docker-compose down",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@opentelemetry/core": "^0.3.1",
     "@opentelemetry/exporter-collector": "^0.3.1",
+    "@opentelemetry/exporter-stackdriver-trace": "../../packages/opentelemetry-exporter-stackdriver-trace",
     "@opentelemetry/exporter-jaeger": "^0.3.1",
     "@opentelemetry/exporter-zipkin": "^0.3.1",
     "@opentelemetry/tracing": "^0.3.1"

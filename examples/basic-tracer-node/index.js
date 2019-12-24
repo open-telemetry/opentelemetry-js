@@ -2,10 +2,12 @@ const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
+const { CollectorExporter } = require('@opentelemetry/exporter-collector');
 
 const options = {
-  serviceName: 'basic-service'
+  serviceName: 'basic-service',
+  logger: new opentelemetry.ConsoleLogger(),
 };
 
 // Initialize an exporter depending on how we were started
@@ -16,6 +18,11 @@ if (EXPORTER.toLowerCase().startsWith('z')) {
   exporter = new ZipkinExporter(options);
 } else if (EXPORTER.toLowerCase().startsWith('j')) {
   exporter = new JaegerExporter(options);
+} else if (EXPORTER.toLowerCase().startsWith('s')) {
+  exporter = new StackdriverTraceExporter(Object.assign({}, options, {
+    keyFile: './service_account_key.json',
+    projectId: require('./service_account_key.json').project_id
+  }));
 } else {
   exporter = new CollectorExporter(options);
 }
@@ -31,7 +38,7 @@ opentelemetry.initGlobalTracer(tracer);
 // Create a span. A span must be closed.
 const span = opentelemetry.getTracer().startSpan('main');
 for (let i = 0; i < 10; i++) {
-  doWork(span);
+  doWork(span, i);
 }
 // Be sure to end the span.
 span.end();
@@ -39,18 +46,22 @@ span.end();
 // flush and close the connection.
 exporter.shutdown();
 
-function doWork(parent) {
+function doWork(parent, index) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
   const span = opentelemetry.getTracer().startSpan('doWork', {
     parent: parent
   });
 
+  const countTo = Math.random() * 40000000;
+
   // simulate some random work.
-  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i++) { }
+  for (let i = 0; i <= Math.floor(countTo); i++) { }
 
   // Set attributes to the span.
-  span.setAttribute('key', 'value');
+  span.setAttribute('index', index);
+  span.setAttribute('count to', countTo);
+  span.setAttribute('invald', { object: 'not allowed' })
 
   // Annotate our span to capture metadata about our operation
   span.addEvent('invoking doWork').end();

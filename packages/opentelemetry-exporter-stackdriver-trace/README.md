@@ -1,0 +1,73 @@
+# OpenTelemetry Stackdriver Trace Exporter
+[![Gitter chat][gitter-image]][gitter-url]
+[![NPM Published Version][npm-img]][npm-url]
+[![dependencies][dependencies-image]][dependencies-url]
+[![devDependencies][devDependencies-image]][devDependencies-url]
+[![Apache License][license-image]][license-image]
+
+OpenTelemetry Stackdriver Trace Exporter allows the user to send collected traces to Zipkin.
+
+[Stackdriver Trace](https://cloud.google.com/trace) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
+
+## Setup
+
+Stackdriver Trace is a managed service provided by Google Cloud Platform.
+
+## Usage
+
+Install the exporter on your application and pass the options, it must contain a service name and the project id of your GCP project.
+
+```js
+const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
+
+const options = {
+  serviceName: 'your-application-name',
+  projectId: 'your-gcp-project-id',
+
+  /** One of the following three keys is required */
+  keyFile: './service_account_key.json',
+  keyFileName: './service_account_key.json',
+  credentials: {
+    client_email: string,
+    private_key: string,
+  },
+}
+
+const exporter = new StackdriverTraceExporter(options);
+```
+
+Now, register the exporter and start tracing.
+
+```js
+tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
+```
+
+You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your own.
+
+- [SimpleSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#simple-processor): The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
+- [BatchSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#batching-processor): The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
+
+## Viewing your traces
+
+Visit the google cloud trace UI at https://console.cloud.google.com/traces/list?project=your-gcp-project-id
+
+## Useful links
+- For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
+- For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
+- Learn more about Stackdriver Trace at https://cloud.google.com/trace
+- For help or feedback on this project, join us on [gitter][gitter-url]
+
+## License
+
+Apache 2.0 - See [LICENSE][license-url] for more information.
+
+[gitter-image]: https://badges.gitter.im/open-telemetry/opentelemetry-js.svg
+[gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+[license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-exporter-stackdriver-trace
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-stackdriver-trace
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-exporter-stackdriver-trace
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-exporter-stackdriver-trace&type=dev
+[npm-url]: https://www.npmjs.com/package/@opentelemetry/exporter-stackdriver-trace
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fexporter-stackdriver-trace.svg

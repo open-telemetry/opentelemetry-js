@@ -15,6 +15,8 @@ or
 Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
 or
 Setup [Collector Exporter](https://github.com/open-telemetry/opentelemetry-exporter-collector)
+or
+Setup [Stackdriver Trace](https://cloud.google.com/trace/)
 
 
 ## Run the Application
@@ -72,8 +74,19 @@ For that please make sure you have [docker](https://docs.docker.com/) installed
    $ npm run collector:docker:stop
    ```
 
+### Stackdriver Trace
+- Create a Google cloud project
+- Create a service account with permissions to your new project
+- Download the service account key JSON and save it as `service_account_key.json` in the root of this project
+- Run the sample
+
+  ```sh
+  $ # from this directory
+  $ npm run stackdriver:basic
+  ```
+
 #### Collector Exporter - Zipkin UI
-The [opentelemetry-collector][opentelemetry-collector-url] 
+The [opentelemetry-collector][opentelemetry-collector-url]
 docker container is using [Zipkin Exporter](#zipkin).
 You can define more exporters without changing the instrumented code.
 To use default [Zipkin Exporter](#zipkin) please follow the section [Zipkin UI](#zipkin-ui) only
