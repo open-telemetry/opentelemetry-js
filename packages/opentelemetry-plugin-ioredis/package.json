@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-ioredis",
-  "version": "0.2.0",
+  "version": "0.3.1",
   "description": "OpenTelemetry ioredis automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,28 +43,29 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.3.0",
-    "@opentelemetry/tracing": "^0.3.0",
-    "@types/ioredis": "^4.14.2",
+    "@opentelemetry/node": "^0.3.1",
+    "@opentelemetry/test-utils": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@types/ioredis": "^4.14.3",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.12.17",
+    "@types/node": "^13.1.0",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
     "cross-env": "^6.0.3",
     "gts": "^1.1.2",
     "ioredis": "^4.14.1",
     "mocha": "^6.2.2",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.5.4",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.7.3"
+    "typescript": "3.7.4"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.0",
-    "@opentelemetry/types": "^0.3.0",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
     "shimmer": "^1.2.1"
   }
 }
