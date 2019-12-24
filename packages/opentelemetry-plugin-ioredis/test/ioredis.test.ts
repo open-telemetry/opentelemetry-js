@@ -23,8 +23,7 @@ import { NodeTracer } from '@opentelemetry/node';
 import { plugin, IORedisPlugin } from '../src';
 import * as ioredisTypes from 'ioredis';
 import { NoopLogger } from '@opentelemetry/core';
-import * as dockerUtils from './testUtils';
-import * as assertionUtils from './assertionUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from '../src/enums';
 
@@ -65,7 +64,7 @@ describe('ioredis', () => {
     }
 
     if (shouldTestLocal) {
-      dockerUtils.startDocker();
+      testUtils.startDocker('redis');
     }
 
     ioredis = require('ioredis');
@@ -75,7 +74,7 @@ describe('ioredis', () => {
 
   after(() => {
     if (shouldTestLocal) {
-      dockerUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('redis');
     }
   });
 
@@ -98,9 +97,9 @@ describe('ioredis', () => {
         assert.strictEqual(endedSpans.length, 2);
         assert.strictEqual(endedSpans[0].name, `connect`);
         assert.strictEqual(endedSpans[1].name, `info`);
-        assertionUtils.assertPropagation(endedSpans[0], span);
+        testUtils.assertPropagation(endedSpans[0], span);
 
-        assertionUtils.assertSpan(
+        testUtils.assertSpan(
           endedSpans[0],
           SpanKind.CLIENT,
           attributes,
@@ -193,14 +192,14 @@ describe('ioredis', () => {
               const endedSpans = memoryExporter.getFinishedSpans();
               assert.strictEqual(endedSpans.length, 2);
               assert.strictEqual(endedSpans[0].name, command.name);
-              assertionUtils.assertSpan(
+              testUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
                 attributes,
                 [],
                 okStatus
               );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              testUtils.assertPropagation(endedSpans[0], span);
               done();
             });
           });
@@ -221,14 +220,14 @@ describe('ioredis', () => {
             const endedSpans = memoryExporter.getFinishedSpans();
             assert.strictEqual(endedSpans.length, 2);
             assert.strictEqual(endedSpans[0].name, `hset`);
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[0],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
           }
@@ -259,14 +258,14 @@ describe('ioredis', () => {
               const endedSpans = memoryExporter.getFinishedSpans();
               assert.strictEqual(endedSpans.length, 2);
               assert.strictEqual(endedSpans[0].name, `scan`);
-              assertionUtils.assertSpan(
+              testUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
                 attributes,
                 [],
                 okStatus
               );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              testUtils.assertPropagation(endedSpans[0], span);
               done();
             })
             .on('error', err => {
@@ -315,14 +314,14 @@ describe('ioredis', () => {
               ...DEFAULT_ATTRIBUTES,
               [AttributeNames.DB_STATEMENT]: 'subscribe news music',
             };
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[5],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
           }
@@ -354,14 +353,14 @@ describe('ioredis', () => {
             assert.strictEqual(endedSpans[2].name, 'test span');
             assert.strictEqual(endedSpans[1].name, 'eval');
             assert.strictEqual(endedSpans[0].name, 'evalsha');
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[1],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
             done();
           });
         });
@@ -390,14 +389,14 @@ describe('ioredis', () => {
               assert.strictEqual(endedSpans[1].name, 'set');
               assert.strictEqual(endedSpans[2].name, 'get');
               assert.strictEqual(endedSpans[3].name, 'exec');
-              assertionUtils.assertSpan(
+              testUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
                 attributes,
                 [],
                 okStatus
               );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              testUtils.assertPropagation(endedSpans[0], span);
               done();
             });
         });
@@ -424,14 +423,14 @@ describe('ioredis', () => {
             assert.strictEqual(endedSpans[0].name, 'set');
             assert.strictEqual(endedSpans[1].name, 'del');
             assert.strictEqual(endedSpans[2].name, 'test span');
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[0],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
             done();
           });
         });
@@ -452,14 +451,14 @@ describe('ioredis', () => {
             const endedSpans = memoryExporter.getFinishedSpans();
             assert.strictEqual(endedSpans.length, 2);
             assert.strictEqual(endedSpans[0].name, `get`);
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[0],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
           }
@@ -481,14 +480,14 @@ describe('ioredis', () => {
             const endedSpans = memoryExporter.getFinishedSpans();
             assert.strictEqual(endedSpans.length, 2);
             assert.strictEqual(endedSpans[0].name, 'del');
-            assertionUtils.assertSpan(
+            testUtils.assertSpan(
               endedSpans[0],
               SpanKind.CLIENT,
               attributes,
               [],
               okStatus
             );
-            assertionUtils.assertPropagation(endedSpans[0], span);
+            testUtils.assertPropagation(endedSpans[0], span);
           } catch (error) {
             assert.ifError(error);
           }
