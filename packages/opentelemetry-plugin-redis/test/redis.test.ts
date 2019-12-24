@@ -23,8 +23,7 @@ import { NodeTracer } from '@opentelemetry/node';
 import { plugin, RedisPlugin } from '../src';
 import * as redisTypes from 'redis';
 import { NoopLogger } from '@opentelemetry/core';
-import * as dockerUtils from './testUtils';
-import * as assertionUtils from './assertionUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from '../src/enums';
 
@@ -64,7 +63,7 @@ describe('redis@2.x', () => {
     }
 
     if (shouldTestLocal) {
-      dockerUtils.startDocker();
+      testUtils.startDocker('redis');
     }
 
     redis = require('redis');
@@ -74,7 +73,7 @@ describe('redis@2.x', () => {
 
   after(() => {
     if (shouldTestLocal) {
-      dockerUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('redis');
     }
   });
 
@@ -174,14 +173,14 @@ describe('redis@2.x', () => {
                 endedSpans[0].name,
                 `redis-${operation.command}`
               );
-              assertionUtils.assertSpan(
+              testUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
                 attributes,
                 [],
                 okStatus
               );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              testUtils.assertPropagation(endedSpans[0], span);
               done();
             });
           });
