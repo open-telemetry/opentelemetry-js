@@ -24,7 +24,7 @@ import {
 import * as assert from 'assert';
 import * as mysql from 'mysql';
 import { MysqlPlugin, plugin } from '../src';
-import * as testUtils from './testUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 import { AttributeNames } from '../src/enums';
 import { CanonicalCode } from '@opentelemetry/types';
 
@@ -54,7 +54,7 @@ describe('mysql@2.x', () => {
     }
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testMysqlLocally) {
-      testUtils.startDocker();
+      testUtils.startDocker('mysql');
       // wait 15 seconds for docker container to start
       this.timeout(20000);
       setTimeout(done, 15000);
@@ -66,7 +66,7 @@ describe('mysql@2.x', () => {
   after(function() {
     if (testMysqlLocally) {
       this.timeout(5000);
-      testUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('mysql');
     }
   });
 
