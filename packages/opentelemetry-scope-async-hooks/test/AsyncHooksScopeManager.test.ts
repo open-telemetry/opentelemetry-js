@@ -135,7 +135,7 @@ describe('AsyncHooksScopeManager', () => {
         setTimeout(() => {
           assert.strictEqual(
             scopeManager.active(),
-            null,
+            undefined,
             'should have no scope'
           );
           return done();
@@ -228,7 +228,7 @@ describe('AsyncHooksScopeManager', () => {
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         setImmediate(() => {
-          assert.deepStrictEqual(scopeManager.active(), null);
+          assert.deepStrictEqual(scopeManager.active(), undefined);
           patchedEe.removeAllListeners('test');
           assert.strictEqual(patchedEe.listeners('test').length, 0);
           return done();

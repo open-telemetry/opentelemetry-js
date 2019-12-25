@@ -25,8 +25,6 @@ function setupTracerAndExporters(service) {
   })));
   tracer.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
     serviceName: service,
-    // The default flush interval is 5 seconds.
-    flushInterval: 2000
   })));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings

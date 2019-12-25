@@ -1,0 +1,35 @@
+{
+  "name": "@opentelemetry/test-utils",
+  "version": "0.3.1",
+  "description": "Test utilities.",
+  "main": "build/testUtils.js",
+  "scripts": {
+    "check": "gts check",
+    "compile": "tsc -p .",
+    "fix": "gts fix",
+    "precompile": "tsc --version",
+    "prepare": "npm run compile"
+  },
+  "repository": "open-telemetry/opentelemetry-js",
+  "keywords": [
+    "opentelemetry",
+    "test-utils"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
+    "gts": "^1.1.2",
+    "ts-node": "^8.5.4",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.7.4"
+  },
+  "dependencies": {}
+}

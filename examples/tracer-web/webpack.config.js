@@ -1,12 +1,19 @@
 const webpack = require('webpack');
 const webpackMerge = require('webpack-merge');
 const path = require('path');
-const mainPath = path.resolve('');
 const directory = path.resolve(__dirname);
 
 const common = {
   mode: 'development',
-  entry: 'index.js',
+  entry: {
+    'document-load': 'examples/document-load/index.js',
+    'xml-http-request': 'examples/xml-http-request/index.js'
+  },
+  output: {
+    path: path.resolve(__dirname, 'dist'),
+    filename: '[name].js',
+    sourceMapFilename: '[file].map'
+  },
   target: 'web',
   module: {
     rules: [
@@ -28,7 +35,6 @@ const common = {
   },
   resolve: {
     modules: [
-      path.resolve(mainPath, 'src'),
       path.resolve(directory),
       'node_modules'
     ],
@@ -38,12 +44,8 @@ const common = {
 
 module.exports = webpackMerge(common, {
   devtool: 'eval-source-map',
-  output: {
-    filename: 'bundle.js',
-    sourceMapFilename: '[file].map'
-  },
   devServer: {
-    contentBase: path.resolve(__dirname),
+    contentBase: path.resolve(__dirname)
   },
   plugins: [
     new webpack.DefinePlugin({
