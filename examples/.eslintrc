@@ -8,6 +8,6 @@
   },
   "rules": {
     "strict": ["error", "global"],
-    "no-use-before-define": "off"
+    "no-use-before-define": ["error", "nofunc"]
   }
 }
