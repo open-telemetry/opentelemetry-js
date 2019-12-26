@@ -124,7 +124,5 @@ function valueToAttributeValue(
       return { boolValue: value };
     case 'string':
       return { stringValue: stringToTruncatableString(value) };
-    default:
-      throw new Error(`Unsupported type : ${typeof value}`);
   }
 }
