@@ -173,7 +173,7 @@ jobs:
             - out
       - run:
           name: Lint examples
-          command: yarn run lint-examples
+          command: eslint ./examples/*/**.js
   docs-deploy:
     docker:
       - image: node:12
