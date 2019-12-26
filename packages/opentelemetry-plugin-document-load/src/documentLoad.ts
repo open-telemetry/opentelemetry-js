@@ -22,9 +22,13 @@ import {
 } from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
-import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import { PerformanceEntries, PerformanceLegacy } from './types';
-import { hasKey } from './utils';
+import {
+  addSpanNetworkEvent,
+  hasKey,
+  PerformanceEntries,
+  PerformanceLegacy,
+  PerformanceTimingNames as PTN,
+} from '@opentelemetry/web';
 
 /**
  * This class represents a document load plugin
@@ -74,44 +78,18 @@ export class DocumentLoad extends BasePlugin<unknown> {
   }
 
   /**
-   * Helper function for starting an event
-   * @param span
-   * @param performanceName name of performance entry for time start
-   * @param entries
-   */
-  private _addSpanEvent(
-    span: Span,
-    performanceName: string,
-    entries: PerformanceEntries
-  ): Span | undefined {
-    if (
-      hasKey(entries, performanceName) &&
-      typeof entries[performanceName] === 'number'
-    ) {
-      // some metrics are available but have value 0 which means they are invalid
-      // for example "secureConnectionStart" is 0 which makes the events to be wrongly interpreted
-      if (entries[performanceName] === 0) {
-        return undefined;
-      }
-      span.addEvent(performanceName, entries[performanceName]);
-      return span;
-    }
-    return undefined;
-  }
-
-  /**
    * Adds span network events
    * @param span
    * @param entries entries that contains performance information about resource
    */
   private _addSpanNetworkEvents(span: Span, entries: PerformanceEntries) {
-    this._addSpanEvent(span, PTN.DOMAIN_LOOKUP_START, entries);
-    this._addSpanEvent(span, PTN.DOMAIN_LOOKUP_END, entries);
-    this._addSpanEvent(span, PTN.CONNECT_START, entries);
-    this._addSpanEvent(span, PTN.SECURE_CONNECTION_START, entries);
-    this._addSpanEvent(span, PTN.CONNECT_END, entries);
-    this._addSpanEvent(span, PTN.REQUEST_START, entries);
-    this._addSpanEvent(span, PTN.RESPONSE_START, entries);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, entries);
+    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, entries);
+    addSpanNetworkEvent(span, PTN.CONNECT_START, entries);
+    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, entries);
+    addSpanNetworkEvent(span, PTN.CONNECT_END, entries);
+    addSpanNetworkEvent(span, PTN.REQUEST_START, entries);
+    addSpanNetworkEvent(span, PTN.RESPONSE_START, entries);
   }
 
   /**
@@ -148,13 +126,13 @@ export class DocumentLoad extends BasePlugin<unknown> {
 
     this._addResourcesSpans(rootSpan);
 
-    this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
-    this._addSpanEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
-    this._addSpanEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
-    this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_START, entries);
-    this._addSpanEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
-    this._addSpanEvent(rootSpan, PTN.DOM_COMPLETE, entries);
-    this._addSpanEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
+    addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
+    addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
+    addSpanNetworkEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
+    addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_START, entries);
+    addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
+    addSpanNetworkEvent(rootSpan, PTN.DOM_COMPLETE, entries);
+    addSpanNetworkEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
 
     this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
   }
@@ -173,7 +151,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     // span can be undefined when entries are missing the certain performance - the span will not be created
     if (span) {
       if (hasKey(entries, performanceName)) {
-        this._addSpanEvent(span, performanceName, entries);
+        addSpanNetworkEvent(span, performanceName, entries);
         span.end(entries[performanceName]);
       } else {
         // just end span
@@ -269,7 +247,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
         )
       );
       span.setAttribute(AttributeNames.COMPONENT, this.component);
-      this._addSpanEvent(span, performanceName, entries);
+      addSpanNetworkEvent(span, performanceName, entries);
       return span;
     }
     return undefined;
