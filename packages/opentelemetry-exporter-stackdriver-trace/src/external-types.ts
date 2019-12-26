@@ -15,7 +15,6 @@
  */
 
 import { Logger } from '@opentelemetry/types';
-import { CredentialBody } from 'google-auth-library';
 
 export interface StackdriverExporterOptions {
   /**
@@ -41,5 +40,10 @@ export interface StackdriverExporterOptions {
   /**
    * Object containing client_email and private_key properties
    */
-  credentials?: CredentialBody;
+  credentials?: Credentials;
+}
+
+export interface Credentials {
+  client_email?: string;
+  private_key?: string;
 }
