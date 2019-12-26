@@ -2,13 +2,14 @@
 
 // Setup opentelemetry tracer first so that built-in plugins can hook onto their corresponding modules
 const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
+
 config.setupTracerAndExporters('redis-server-service');
 const tracer = opentelemetry.getTracer();
 
 // Require in rest of modules
 const express = require('express');
 const axios = require('axios').default;
+const config = require('./setup');
 const tracerHandlers = require('./express-tracer-handlers');
 
 // Setup express
@@ -44,7 +45,7 @@ async function setupRoutes() {
     redis[cmd].call(redis, ...args, (err, result) => {
       if (err) {
         res.sendStatus(400);
-      } else if(result) {
+      } else if (result) {
         res.status(200).send(result);
       } else {
         throw new Error('Empty redis response');
@@ -58,5 +59,5 @@ app.use(tracerHandlers.getMiddlewareTracer(tracer));
 setupRoutes().then(() => {
   app.use(tracerHandlers.getErrorTracer(tracer));
   app.listen(PORT);
-  console.log(`Listening on http://localhost:${PORT}`)
+  console.log(`Listening on http://localhost:${PORT}`);
 });

@@ -5,6 +5,7 @@ const { NodeTracer } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+
 const EXPORTER = process.env.EXPORTER || '';
 
 function setupTracerAndExporters(service) {
@@ -13,9 +14,9 @@ function setupTracerAndExporters(service) {
       grpc: {
         enabled: true,
         // You may use a package name or absolute path to the file.
-        path: '@opentelemetry/plugin-grpc'
-      }
-    }
+        path: '@opentelemetry/plugin-grpc',
+      },
+    },
   });
 
   let exporter;

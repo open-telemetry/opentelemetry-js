@@ -11,13 +11,13 @@ function setupTracerAndExporters(service) {
     plugins: {
       mysql: {
         enabled: true,
-        path: "@opentelemetry/plugin-mysql"
+        path: '@opentelemetry/plugin-mysql',
       },
       http: {
         enabled: true,
-        path: "@opentelemetry/plugin-http"
-      }
-    }
+        path: '@opentelemetry/plugin-http',
+      },
+    },
   });
 
   tracer.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({

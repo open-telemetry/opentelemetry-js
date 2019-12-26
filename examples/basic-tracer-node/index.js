@@ -2,10 +2,10 @@ const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorExporter } = require('@opentelemetry/exporter-collector');
 
 const options = {
-  serviceName: 'basic-service'
+  serviceName: 'basic-service',
 };
 
 // Initialize an exporter depending on how we were started
@@ -43,7 +43,7 @@ function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
   const span = opentelemetry.getTracer().startSpan('doWork', {
-    parent: parent
+    parent,
   });
 
   // simulate some random work.

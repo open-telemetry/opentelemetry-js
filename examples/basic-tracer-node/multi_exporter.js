@@ -2,20 +2,20 @@ const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, BatchSpanProcessor, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorExporter } = require('@opentelemetry/exporter-collector');
 
 const tracer = new BasicTracer();
 
-const zipkinExporter = new ZipkinExporter({serviceName: 'basic-service'});
+const zipkinExporter = new ZipkinExporter({ serviceName: 'basic-service' });
 const jaegerExporter = new JaegerExporter({
   serviceName: 'basic-service',
 });
-const collectorExporter = new CollectorExporter({serviceName: 'basic-service'});
+const collectorExporter = new CollectorExporter({ serviceName: 'basic-service' });
 
 // It is recommended to use this BatchSpanProcessor for better performance
 // and optimization, especially in production.
 tracer.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
-  bufferSize: 10 // This is added for example, default size is 100.
+  bufferSize: 10, // This is added for example, default size is 100.
 }));
 
 // It is recommended to use SimpleSpanProcessor in case of Jaeger exporter as
@@ -44,7 +44,7 @@ function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
   const span = opentelemetry.getTracer().startSpan('doWork', {
-    parent: parent
+    parent,
   });
 
   // simulate some random work.

@@ -13,6 +13,7 @@ const grpc = require('grpc');
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
+
 const PORT = 50051;
 const tracer = opentelemetry.getTracer();
 
@@ -26,7 +27,7 @@ function main() {
     console.log('Client traceId ', span.context().traceId);
     const client = new services.GreeterClient(
       `localhost:${PORT}`,
-      grpc.credentials.createInsecure()
+      grpc.credentials.createInsecure(),
     );
     const request = new messages.HelloRequest();
     let user;
@@ -36,7 +37,7 @@ function main() {
       user = 'world';
     }
     request.setName(user);
-    client.sayHello(request, function(err, response) {
+    client.sayHello(request, (err, response) => {
       span.end();
       if (err) throw err;
       console.log('Greeting:', response.getMessage());
@@ -46,7 +47,7 @@ function main() {
   // The process must live for at least the interval past any traces that
   // must be exported, or some risk being lost if they are recorded after the
   // last export.
-  console.log('Sleeping 5 seconds before shutdown to ensure all records are flushed.')
+  console.log('Sleeping 5 seconds before shutdown to ensure all records are flushed.');
   setTimeout(() => { console.log('Completed.'); }, 5000);
 }
 

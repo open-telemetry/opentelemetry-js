@@ -5,6 +5,7 @@ const { NodeTracer } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
+
 const EXPORTER = process.env.EXPORTER || '';
 
 function setupTracerAndExporters(service) {
@@ -13,17 +14,17 @@ function setupTracerAndExporters(service) {
       pg: {
         enabled: true,
         // if it can't find the module, put the absolute path since the packages are not published yet
-        path: '@opentelemetry/plugin-pg'
+        path: '@opentelemetry/plugin-pg',
       },
       'pg-pool': {
         enabled: true,
-        path: '@opentelemetry/plugin-pg-pool'
+        path: '@opentelemetry/plugin-pg-pool',
       },
       http: {
         enabled: true,
-        path: '@opentelemetry/plugin-http'
-      }
-    }
+        path: '@opentelemetry/plugin-http',
+      },
+    },
   });
 
   let exporter;
@@ -35,7 +36,7 @@ function setupTracerAndExporters(service) {
     exporter = new JaegerExporter({
       serviceName: service,
       // The default flush interval is 5 seconds.
-      flushInterval: 2000
+      flushInterval: 2000,
     });
   }
 

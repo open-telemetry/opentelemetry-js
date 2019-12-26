@@ -7,15 +7,17 @@ const opentelemetry = require('@opentelemetry/core');
  * The trace instance needs to be initialized first, if you want to enable
  * automatic tracing for built-in plugins (gRPC in this case).
  */
-const config = require('./setup');
 config.setupTracerAndExporters('grpc-server-service');
 
 const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
+const config = require('./setup');
 
 const PROTO_PATH = path.join(__dirname, 'protos/defs.proto');
-const PROTO_OPTIONS = { keepCase: true, enums: String, defaults: true, oneofs: true };
+const PROTO_OPTIONS = {
+  keepCase: true, enums: String, defaults: true, oneofs: true,
+};
 const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
 const rpcProto = grpc.loadPackageDefinition(definition).rpc;
 
@@ -45,7 +47,7 @@ function capitalize(call, callback) {
  */
 function main() {
   const server = new grpc.Server();
-  server.addService(rpcProto.Fetch.service, { capitalize: capitalize });
+  server.addService(rpcProto.Fetch.service, { capitalize });
   server.bind('0.0.0.0:50051', grpc.ServerCredentials.createInsecure());
   server.start();
 }

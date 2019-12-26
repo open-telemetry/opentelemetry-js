@@ -171,6 +171,9 @@ jobs:
           root: packages/opentelemetry-types/docs
           paths:
             - out
+      - run:
+          name: Lint examples
+          command: eslint examples/*/**.js
   docs-deploy:
     docker:
       - image: node:12
