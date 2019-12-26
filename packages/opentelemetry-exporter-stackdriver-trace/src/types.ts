@@ -24,6 +24,8 @@ export interface Span {
   startTime?: string;
   endTime?: string;
   attributes?: Attributes;
+  // This property is currently unused. keeping it here as it is part
+  // of the stack driver trace types and may be used in the future
   stackTrace?: StackTrace;
   timeEvents?: TimeEvents;
   links?: Links;
@@ -90,6 +92,7 @@ export interface Module {
 }
 
 export interface Status {
+  /** gRPC status code */
   code?: number;
   message?: string;
 }
@@ -102,8 +105,10 @@ export interface TimeEvents {
 
 export interface TimeEvent {
   annotation?: Annotation;
-  messageEvent?: MessageEvent;
   time?: string;
+  // This property is currently unused. keeping it here as it is part
+  // of the stack driver trace types and may be used in the future
+  messageEvent?: MessageEvent;
 }
 
 export interface Annotation {
