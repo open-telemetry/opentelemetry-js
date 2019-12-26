@@ -39,11 +39,7 @@ export class StackdriverTraceExporter implements SpanExporter {
 
   constructor(options: StackdriverExporterOptions) {
     this._logger = options.logger || new NoopLogger();
-    // we include a fallback service name because the user may forget to include it
-    this._serviceName =
-      typeof options.serviceName === 'string'
-        ? options.serviceName
-        : 'service-name-missing';
+    this._serviceName = options.serviceName;
 
     this._auth = new GoogleAuth({
       credentials: options.credentials,
