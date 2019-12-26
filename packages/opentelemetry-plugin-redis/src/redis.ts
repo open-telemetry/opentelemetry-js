@@ -22,13 +22,14 @@ import {
   getTracedCreateStreamTrace,
   getTracedInternalSendCommand,
 } from './utils';
+import { VERSION } from './version';
 
 export class RedisPlugin extends BasePlugin<typeof redisTypes> {
   static readonly COMPONENT = 'redis';
   readonly supportedVersions = ['^2.6.0']; // equivalent to >= 2.6.0 <3
 
   constructor(readonly moduleName: string) {
-    super("@opentelemetry/plugin-redis", "0.3.1");
+    super('@opentelemetry/plugin-redis', VERSION);
   }
 
   protected patch() {

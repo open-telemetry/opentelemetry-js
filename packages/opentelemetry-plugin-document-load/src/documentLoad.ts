@@ -21,7 +21,6 @@ import {
   TRACE_PARENT_HEADER,
 } from '@opentelemetry/core';
 import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   addSpanNetworkEvent,
   hasKey,
@@ -29,6 +28,8 @@ import {
   PerformanceLegacy,
   PerformanceTimingNames as PTN,
 } from '@opentelemetry/web';
+import { AttributeNames } from './enums/AttributeNames';
+import { VERSION } from './version';
 
 /**
  * This class represents a document load plugin
@@ -44,7 +45,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * @param config
    */
   constructor(config: PluginConfig = {}) {
-    super('@opentelemetry/plugin-document-load', '0.3.1');
+    super('@opentelemetry/plugin-document-load', VERSION);
     this._onDocumentLoaded = this._onDocumentLoaded.bind(this);
     this._config = config;
   }

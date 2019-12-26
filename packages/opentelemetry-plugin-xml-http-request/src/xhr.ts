@@ -39,6 +39,7 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
+import { VERSION } from './version';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -72,7 +73,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(protected _config: XMLHttpRequestPluginConfig = {}) {
-    super('@opentelemetry/plugin-xml-http-request', '0.3.1');
+    super('@opentelemetry/plugin-xml-http-request', VERSION);
   }
 
   /**

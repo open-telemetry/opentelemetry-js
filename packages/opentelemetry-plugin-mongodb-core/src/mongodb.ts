@@ -18,16 +18,17 @@
 /* tslint:disable:deprecation */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { Span, SpanKind, CanonicalCode } from '@opentelemetry/types';
-import {
-  Func,
-  MongoInternalCommand,
-  MongoInternalTopology,
-  AttributeNames,
-  MongodbCommandType,
-} from './types';
+import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
+import {
+  AttributeNames,
+  Func,
+  MongodbCommandType,
+  MongoInternalCommand,
+  MongoInternalTopology,
+} from './types';
+import { VERSION } from './version';
 
 /** MongoDBCore instrumentation plugin for OpenTelemetry */
 export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
@@ -40,7 +41,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   readonly supportedVersions = ['>=2 <3'];
 
   constructor(readonly moduleName: string) {
-    super('@opentelemetry/plugin-mongodb-core', '0.3.1');
+    super('@opentelemetry/plugin-mongodb-core', VERSION);
   }
 
   /**

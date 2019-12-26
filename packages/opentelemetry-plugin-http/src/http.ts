@@ -16,11 +16,11 @@
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
 import {
+  Attributes,
+  CanonicalCode,
   Span,
   SpanKind,
   SpanOptions,
-  Attributes,
-  CanonicalCode,
   Status,
 } from '@opentelemetry/types';
 import {
@@ -33,18 +33,19 @@ import {
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import {
-  HttpPluginConfig,
-  Http,
-  Func,
-  ResponseEndArgs,
-  ParsedRequestOptions,
-  HttpRequestArgs,
-  Err,
-} from './types';
-import { Format } from './enums/Format';
 import { AttributeNames } from './enums/AttributeNames';
+import { Format } from './enums/Format';
+import {
+  Err,
+  Func,
+  Http,
+  HttpPluginConfig,
+  HttpRequestArgs,
+  ParsedRequestOptions,
+  ResponseEndArgs,
+} from './types';
 import * as utils from './utils';
+import { VERSION } from './version';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -56,7 +57,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   private readonly _spanNotEnded: WeakSet<Span>;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super(`@opentelemetry/plugin-${moduleName}`, '0.3.1');
+    super(`@opentelemetry/plugin-${moduleName}`, VERSION);
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
     this._spanNotEnded = new WeakSet<Span>();

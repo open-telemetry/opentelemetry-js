@@ -20,6 +20,7 @@ import * as mysqlTypes from 'mysql';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums';
 import { getConnectionAttributes, getSpanName } from './utils';
+import { VERSION } from './version';
 
 export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   readonly supportedVersions = ['2.*'];
@@ -36,7 +37,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   private _enabled = false;
 
   constructor(readonly moduleName: string) {
-    super('@opentelemetry/plugin-mysql', '0.3.1');
+    super('@opentelemetry/plugin-mysql', VERSION);
   }
 
   protected patch(): typeof mysqlTypes {
