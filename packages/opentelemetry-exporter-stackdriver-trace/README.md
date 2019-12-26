@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-OpenTelemetry Stackdriver Trace Exporter allows the user to send collected traces to Zipkin.
+OpenTelemetry Stackdriver Trace Exporter allows the user to send collected traces to Stackdriver.
 
 [Stackdriver Trace](https://cloud.google.com/trace) is a distributed tracing system. It helps gather timing data needed to troubleshoot latency problems in microservice architectures. It manages both the collection and lookup of this data.
 
