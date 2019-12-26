@@ -1,9 +1,8 @@
 'use strict';
 
-
-
 const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CanonicalCode } = require('@opentelemetry/types');
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
 // Initialize an exporter
@@ -21,12 +20,21 @@ tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 opentelemetry.initGlobalTracer(tracer);
 
 // Create a span. A span must be closed.
-const span = opentelemetry.getTracer().startSpan('main');
+const root = opentelemetry.getTracer().startSpan('main');
+const related = opentelemetry.getTracer().startSpan('related', {
+  links: [{ spanContext: root.context() }]
+});
+
 for (let i = 0; i < 10; i++) {
-  doWork(span);
+  doWork(root);
+  doWork(related);
 }
 // Be sure to end the span.
-span.end();
+root.setStatus({
+  code: CanonicalCode.UNKNOWN
+})
+root.end();
+related.end();
 
 // flush and close the connection.
 exporter.shutdown();
@@ -39,7 +47,14 @@ function doWork(parent) {
   });
 
   // simulate some random work.
-  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i++) { }
+  const work = Math.floor(Math.random() * 40000000);
+  for (let i = 0; i <= work; i++) { }
+
+  if (work % 2 === 1) {
+    span.setStatus({
+      code: CanonicalCode.UNKNOWN
+    })
+  }
 
   // Set attributes to the span.
   span.setAttribute('key', 'value');
