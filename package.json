@@ -23,7 +23,7 @@
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
     "docs-deploy": "gh-pages --dist packages/opentelemetry-types/docs/out",
-    "lint:examples": "node_modules/.bin/eslint ./examples/*/**.js"
+    "lint-examples": "node_modules/.bin/eslint ./examples/*/**.js"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
