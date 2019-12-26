@@ -20,15 +20,21 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { SpanKind, Attributes, TimedEvent, Span } from '@opentelemetry/types';
+import {
+  SpanKind,
+  Attributes,
+  TimedEvent,
+  Span,
+  CanonicalCode,
+  Status,
+} from '@opentelemetry/types';
 import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
 import { plugin, PostgresPoolPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
 import * as pgPool from 'pg-pool';
-import * as assertionUtils from './assertionUtils';
-import * as testUtils from './testUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -65,18 +71,23 @@ const DEFAULT_PG_ATTRIBUTES = {
   [AttributeNames.DB_USER]: CONFIG.user,
 };
 
+const okStatus: Status = {
+  code: CanonicalCode.OK,
+};
+
 const runCallbackTest = (
   parentSpan: Span,
   attributes: Attributes,
   events: TimedEvent[],
+  status: Status = okStatus,
   spansLength = 1,
   spansIndex = 0
 ) => {
   const spans = memoryExporter.getFinishedSpans();
   assert.strictEqual(spans.length, spansLength);
   const pgSpan = spans[spansIndex];
-  assertionUtils.assertSpan(pgSpan, SpanKind.CLIENT, attributes, events);
-  assertionUtils.assertPropagation(pgSpan, parentSpan);
+  testUtils.assertSpan(pgSpan, SpanKind.CLIENT, attributes, events, status);
+  testUtils.assertPropagation(pgSpan, parentSpan);
 };
 
 describe('pg-pool@2.x', () => {
@@ -97,14 +108,14 @@ describe('pg-pool@2.x', () => {
     pool = new pgPool(CONFIG);
     tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
-      testUtils.startDocker();
+      testUtils.startDocker('postgres');
     }
     done();
   });
 
   after(function(done) {
     if (testPostgresLocally) {
-      testUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('postgres');
     }
     pool.end(() => {
       done();
@@ -144,11 +155,11 @@ describe('pg-pool@2.x', () => {
       const span = tracer.startSpan('test span');
       await tracer.withSpan(span, async () => {
         const client = await pool.connect();
-        runCallbackTest(span, pgPoolattributes, events, 1, 0);
+        runCallbackTest(span, pgPoolattributes, events, okStatus, 1, 0);
         assert.ok(client, 'pool.connect() returns a promise');
         try {
           await client.query('SELECT NOW()');
-          runCallbackTest(span, pgAttributes, events, 2, 1);
+          runCallbackTest(span, pgAttributes, events, okStatus, 2, 1);
         } catch (e) {
           throw e;
         } finally {
@@ -175,13 +186,13 @@ describe('pg-pool@2.x', () => {
           }
           release();
           assert.ok(client);
-          runCallbackTest(parentSpan, pgPoolattributes, events, 1, 0);
+          runCallbackTest(parentSpan, pgPoolattributes, events, okStatus, 1, 0);
           client.query('SELECT NOW()', (err, ret) => {
             if (err) {
               return done(err);
             }
             assert.ok(ret);
-            runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
+            runCallbackTest(parentSpan, pgAttributes, events, okStatus, 2, 1);
             done();
           });
         });
@@ -205,8 +216,8 @@ describe('pg-pool@2.x', () => {
       await tracer.withSpan(span, async () => {
         try {
           const result = await pool.query('SELECT NOW()');
-          runCallbackTest(span, pgPoolattributes, events, 2, 0);
-          runCallbackTest(span, pgAttributes, events, 2, 1);
+          runCallbackTest(span, pgPoolattributes, events, okStatus, 2, 0);
+          runCallbackTest(span, pgAttributes, events, okStatus, 2, 1);
           assert.ok(result, 'pool.query() returns a promise');
         } catch (e) {
           throw e;
@@ -230,8 +241,8 @@ describe('pg-pool@2.x', () => {
           if (err) {
             return done(err);
           }
-          runCallbackTest(parentSpan, pgPoolattributes, events, 2, 0);
-          runCallbackTest(parentSpan, pgAttributes, events, 2, 1);
+          runCallbackTest(parentSpan, pgPoolattributes, events, okStatus, 2, 0);
+          runCallbackTest(parentSpan, pgAttributes, events, okStatus, 2, 1);
           done();
         });
         assert.strictEqual(resNoPromise, undefined, 'No promise is returned');
