@@ -140,12 +140,3 @@ export interface SpansWithCredentials {
   resource: { spans: {} };
   auth: JWT | OAuth2Client | Compute;
 }
-
-/** Resource information. */
-export interface MonitoredResource {
-  /** Type identifier for the resource. */
-  type: string;
-
-  /** Set of labels that describe the resource. */
-  labels: { [key: string]: string };
-}
