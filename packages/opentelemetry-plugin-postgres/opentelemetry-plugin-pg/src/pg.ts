@@ -37,7 +37,7 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
   readonly supportedVersions = ['7.*'];
 
   constructor(readonly moduleName: string) {
-    super(`opentelemetry.${moduleName}`, '0.2.0');
+    super('@opentelemetry/plugin-pg', '0.3.1');
     this._config = {};
   }
 

@@ -36,7 +36,7 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   private _enabled = false;
 
   constructor(readonly moduleName: string) {
-    super(`opentelemetry.${moduleName}`, '0.2.0');
+    super('@opentelemetry/plugin-mysql', '0.3.1');
   }
 
   protected patch(): typeof mysqlTypes {

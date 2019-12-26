@@ -72,7 +72,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
   constructor(protected _config: XMLHttpRequestPluginConfig = {}) {
-    super('@opentelemetry/plugin-xml-http-request', '0.2.0');
+    super('@opentelemetry/plugin-xml-http-request', '0.3.1');
   }
 
   /**

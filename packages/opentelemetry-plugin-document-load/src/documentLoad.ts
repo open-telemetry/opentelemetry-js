@@ -44,7 +44,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
    * @param config
    */
   constructor(config: PluginConfig = {}) {
-    super('opentelemetry.document-load', '0.2.0');
+    super('@opentelemetry/plugin-document-load', '0.3.1');
     this._onDocumentLoaded = this._onDocumentLoaded.bind(this);
     this._config = config;
   }

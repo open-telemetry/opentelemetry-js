@@ -56,7 +56,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super(`opentelemetry.${moduleName}`, '0.2.0');
+    super('@opentelemetry/plugin-grpc', '0.3.1');
     this._config = {};
   }
 
