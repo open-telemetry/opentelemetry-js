@@ -66,18 +66,13 @@ export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
   // @TODO align this with all packages #600
-  readonly version: string = '0.3.0';
-  moduleName = this.component;
-
-  protected _config!: XMLHttpRequestPluginConfig;
 
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config: XMLHttpRequestPluginConfig = {}) {
-    super();
-    this._config = config;
+  constructor(protected _config: XMLHttpRequestPluginConfig = {}) {
+    super('@opentelemetry/plugin-xml-http-request', '0.2.0');
   }
 
   /**
