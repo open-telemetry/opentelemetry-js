@@ -157,7 +157,7 @@ jobs:
       - checkout
       - run:
           name: Install minimal doc and lint modules globally
-          command: yarn global add lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
+          command: yarn global add lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib eslint eslint-plugin-import eslint-airbnb-base
       - run:
           name: Symlink global modules into all lerna packages
           command: lerna exec 'ln -s $(yarn global dir)/node_modules node_modules'
@@ -173,7 +173,7 @@ jobs:
             - out
       - run:
           name: Lint examples
-          command: npm i --only=dev && npm run lint:examples
+          command: eslint ./examples/*/**.js
   docs-deploy:
     docker:
       - image: node:12
