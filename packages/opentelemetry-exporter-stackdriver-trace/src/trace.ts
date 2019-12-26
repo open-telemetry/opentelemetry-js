@@ -30,11 +30,12 @@ google.options({ headers: { 'x-opentelemetry-outgoing-request': 1 } });
  * Format and sends span information to StackDriver Trace.
  */
 export class StackdriverTraceExporter implements SpanExporter {
-  private _projectId?: string;
-  private _serviceName: string;
-  private _logger: Logger;
-  private _auth: GoogleAuth;
-  private static _cloudTrace = google.cloudtrace('v2');
+  private readonly _projectId?: string;
+  private readonly _serviceName: string;
+  private readonly _logger: Logger;
+  private readonly _auth: GoogleAuth;
+
+  private static readonly _cloudTrace = google.cloudtrace('v2');
 
   constructor(options: StackdriverExporterOptions) {
     this._logger = options.logger || new NoopLogger();
