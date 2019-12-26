@@ -18,13 +18,13 @@ import { Logger } from '@opentelemetry/types';
 
 export interface StackdriverExporterOptions {
   /**
-   * Google Cloud Platform project ID. required
-   */
-  projectId: string;
-  /**
    * Name of the service being monitored. required
    */
   serviceName: string;
+  /**
+   * Google Cloud Platform project ID
+   */
+  projectId?: string;
   /**
    * Object implementing the logger interface
    */

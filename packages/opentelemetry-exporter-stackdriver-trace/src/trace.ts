@@ -30,7 +30,7 @@ google.options({ headers: { 'x-opentelemetry-outgoing-request': 1 } });
  * Format and sends span information to StackDriver Trace.
  */
 export class StackdriverTraceExporter implements SpanExporter {
-  private readonly _projectId?: string;
+  private _projectId: string | void | Promise<string | void>;
   private readonly _serviceName: string;
   private readonly _logger: Logger;
   private readonly _auth: GoogleAuth;
@@ -39,7 +39,6 @@ export class StackdriverTraceExporter implements SpanExporter {
 
   constructor(options: StackdriverExporterOptions) {
     this._logger = options.logger || new NoopLogger();
-    this._projectId = options.projectId;
     // we include a fallback service name because the user may forget to include it
     this._serviceName =
       typeof options.serviceName === 'string'
@@ -50,7 +49,14 @@ export class StackdriverTraceExporter implements SpanExporter {
       credentials: options.credentials,
       keyFile: options.keyFile,
       keyFilename: options.keyFilename,
+      projectId: options.projectId,
       scopes: ['https://www.googleapis.com/auth/cloud-platform'],
+    });
+
+    // Start this async process as early as possible. It will be
+    // awaited on the first export because constructors are synchronous
+    this._projectId = this._auth.getProjectId().catch(err => {
+      this._logger.error(err);
     });
   }
 
@@ -62,10 +68,14 @@ export class StackdriverTraceExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): Promise<void> {
+    if (this._projectId instanceof Promise) {
+      this._projectId = await this._projectId;
+    }
+
     if (!this._projectId) {
-      this._logger.error('Stackdriver Trace failed export: missing project id');
       return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
     }
+
     this._logger.debug('StackDriver Trace export');
     const authorizedSpans = await this._authorize(
       spans.map(getReadableSpanTransformer(this._projectId, this._serviceName))
