@@ -20,11 +20,31 @@ npm install --save @opentelemetry/plugin-mysql
 
 ## Usage
 
-```js
-const opentelemetry = require('@opentelemetry/plugin-mysql');
+OpenTelemetry MySQL Instrumentation allows the user to automatically collect trace data and export them to the backend of choice, to give observability to distributed systems when working with [mysql](https://www.npmjs.com/package/mysql).
 
-// TODO: DEMONSTRATE API
+To load a specific plugin (**MySQL** in this case), specify it in the Node Tracer's configuration
+```js
+const { NodeTracer } = require('@opentelemetry/node');
+
+const tracer = new NodeTracer({
+  plugins: {
+    mysql: {
+      enabled: true,
+      // You may use a package name or absolute path to the file.
+      path: '@opentelemetry/plugin-mysql',
+    }
+  }
+});
 ```
+
+To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+```js
+const { NodeTracer } = require('@opentelemetry/node');
+
+const tracer = new NodeTracer();
+```
+
+See [examples/mysql](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/mysql) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

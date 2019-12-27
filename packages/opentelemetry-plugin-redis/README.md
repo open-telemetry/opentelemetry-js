@@ -44,7 +44,7 @@ const { NodeTracer } = require('@opentelemetry/node');
 const tracer = new NodeTracer();
 ```
 
-<!-- See [examples/redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/redis) for a short example. -->
+See [examples/redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/redis) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
