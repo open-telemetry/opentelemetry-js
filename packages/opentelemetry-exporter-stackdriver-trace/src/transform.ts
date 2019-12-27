@@ -51,12 +51,13 @@ export function getReadableSpanTransformer(
       startTime: hrTimeToTimeStamp(span.startTime),
       name: `projects/${projectId}/traces/${span.spanContext.traceId}/spans/${span.spanContext.spanId}`,
       spanId: span.spanContext.spanId,
+      sameProcessAsParentSpan: !span.spanContext.isRemote,
       status: span.status,
       timeEvents: {
         timeEvent: span.events.map(e => ({
           time: hrTimeToTimeStamp(e.time),
           annotation: {
-            attributes: e.attributes,
+            attributes: transformAttributes(e.attributes),
             description: stringToTruncatableString(e.name),
           },
         })),
@@ -89,13 +90,11 @@ function transformAttributes(
   return {
     attributeMap: attributeMap,
     droppedAttributesCount:
-      Object.keys(attributes || {}).length - Object.keys(attributeMap).length,
+      Object.keys(attributes).length - Object.keys(attributeMap).length,
   };
 }
 
-function transformAttributeValues(
-  attributes: ot.Attributes = {}
-): AttributeMap {
+function transformAttributeValues(attributes: ot.Attributes): AttributeMap {
   const out: AttributeMap = {};
   for (const [key, value] of Object.entries(attributes)) {
     switch (typeof value) {
