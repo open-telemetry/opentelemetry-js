@@ -25,7 +25,7 @@ function makeRequest() {
       path: '/helloworld',
     }, (response) => {
       const body = [];
-      response.on('data', chunk => body.push(chunk));
+      response.on('data', (chunk) => body.push(chunk));
       response.on('end', () => {
         console.log(body.toString());
         span.end();

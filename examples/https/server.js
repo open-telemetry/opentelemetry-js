@@ -44,8 +44,8 @@ function handleRequest(request, response) {
   span.addEvent('invoking handleRequest');
   try {
     const body = [];
-    request.on('error', err => console.log(err));
-    request.on('data', chunk => body.push(chunk));
+    request.on('error', (err) => console.log(err));
+    request.on('data', (chunk) => body.push(chunk));
     request.on('end', () => {
       // deliberately sleeping to mock some action.
       setTimeout(() => {

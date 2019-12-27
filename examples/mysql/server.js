@@ -59,8 +59,8 @@ function handleRequest(request, response) {
   console.log(`Zipkin URL: http://localhost:9411/zipkin/traces/${traceId}`);
   try {
     const body = [];
-    request.on('error', err => console.log(err));
-    request.on('data', chunk => body.push(chunk));
+    request.on('error', (err) => console.log(err));
+    request.on('data', (chunk) => body.push(chunk));
     request.on('end', () => {
       if (request.url === '/connection/query') {
         handleConnectionQuery(response);

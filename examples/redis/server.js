@@ -40,7 +40,7 @@ async function setupRoutes() {
       return;
     }
 
-    const cmd = req.params.cmd;
+    const { cmd } = req.params;
     const args = req.query.args.split(',');
     redis[cmd].call(redis, ...args, (err, result) => {
       if (err) {

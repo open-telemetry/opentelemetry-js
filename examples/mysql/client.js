@@ -31,7 +31,7 @@ function makeRequest() {
       path: '/connection/query',
     }, (response) => {
       const body = [];
-      response.on('data', chunk => body.push(chunk));
+      response.on('data', (chunk) => body.push(chunk));
       response.on('end', () => {
         responses += 1;
         console.log(body.toString());
@@ -47,7 +47,7 @@ function makeRequest() {
       path: '/pool/query',
     }, (response) => {
       const body = [];
-      response.on('data', chunk => body.push(chunk));
+      response.on('data', (chunk) => body.push(chunk));
       response.on('end', () => {
         responses += 1;
         console.log(body.toString());
@@ -63,7 +63,7 @@ function makeRequest() {
       path: '/cluster/query',
     }, (response) => {
       const body = [];
-      response.on('data', chunk => body.push(chunk));
+      response.on('data', (chunk) => body.push(chunk));
       response.on('end', () => {
         responses += 1;
         console.log(body.toString());
