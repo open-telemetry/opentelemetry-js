@@ -25,7 +25,7 @@ const webTracerWithZone = new WebTracer({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new XMLHttpRequestPlugin({
-      propagateTraceHeaderCorsUrls: ['http://localhost:8090']    
+      propagateTraceHeaderCorsUrls: ['http://localhost:8090']
     })
   ]
 });
@@ -42,6 +42,8 @@ req.send();
 ![Screenshot of the running example](images/main.jpg)
 ![Screenshot of the running example](images/request.jpg)
 ![Screenshot of the running example](images/cors.jpg)
+
+See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
