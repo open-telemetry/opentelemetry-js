@@ -17,6 +17,10 @@
 import * as types from '@opentelemetry/types';
 import { noopTracer } from './NoopTracer';
 
+/**
+ * An implementation of the {@link TracerRegistry} which returns an impotent Tracer
+ * for all calls to `getTracer`
+ */
 export class NoopTracerRegistry implements types.TracerRegistry {
   getTracer(_name?: string, _version?: string): types.Tracer {
     return noopTracer;
