@@ -1,16 +1,7 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (HTTP in this case).
- */
-config.setupTracerAndExporters('http-server-service');
-
 const http = require('http');
-
-const tracer = opentelemetry.getTracer();
+const tracer = require('./tracer');
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer(port) {
@@ -49,7 +40,7 @@ function handleRequest(request, response) {
       }, 2000);
     });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     span.end();
   }
 }
