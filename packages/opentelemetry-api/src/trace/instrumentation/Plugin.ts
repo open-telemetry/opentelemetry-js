@@ -29,6 +29,11 @@ export interface Plugin<T = any> {
   supportedVersions?: string[];
 
   /**
+   * Name of the module that the plugin instrument.
+   */
+  moduleName: string;
+
+  /**
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.

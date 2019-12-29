@@ -29,7 +29,7 @@ import * as path from 'path';
 /** This class represent the base to patch plugin. */
 export abstract class BasePlugin<T> implements Plugin<T> {
   supportedVersions?: string[];
-  readonly moduleName?: string; // required for internalFilesExports
+  abstract readonly moduleName: string; // required for internalFilesExports
   readonly version?: string; // required for internalFilesExports
   protected readonly _basedir?: string; // required for internalFilesExports
 
