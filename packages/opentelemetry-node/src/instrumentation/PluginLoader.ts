@@ -83,6 +83,16 @@ export class PluginLoader {
         return this;
       }
 
+      const alreadyRequiredModules = Object.keys(require.cache);
+      const requiredModulesToHook = modulesToHook.filter(name =>
+        alreadyRequiredModules.some(cached => cached.includes(name))
+      );
+      if (requiredModulesToHook.length > 0) {
+        this.logger.warn(
+          `Some modules (${requiredModulesToHook}) were already required when their respective plugin were loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`
+        );
+      }
+
       // Enable the require hook.
       hook(modulesToHook, (exports, name, baseDir) => {
         if (this._hookState !== HookState.ENABLED) return exports;
