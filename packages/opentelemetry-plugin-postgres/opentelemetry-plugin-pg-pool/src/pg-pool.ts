@@ -36,7 +36,7 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   readonly supportedVersions = ['2.*'];
 
   constructor(readonly moduleName: string) {
-    super("@opentelemetry/plugin-pg-pool", VERSION);
+    super('@opentelemetry/plugin-pg-pool', VERSION);
     this._config = {};
   }
 

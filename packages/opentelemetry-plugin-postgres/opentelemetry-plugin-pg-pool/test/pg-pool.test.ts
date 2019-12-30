@@ -152,8 +152,8 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const span = registry.getTracer("test-pg-pool").startSpan('test span');
-      await registry.getTracer("test-pg-pool").withSpan(span, async () => {
+      const span = registry.getTracer('test-pg-pool').startSpan('test span');
+      await registry.getTracer('test-pg-pool').withSpan(span, async () => {
         const client = await pool.connect();
         runCallbackTest(span, pgPoolattributes, events, okStatus, 1, 0);
         assert.ok(client, 'pool.connect() returns a promise');
@@ -178,8 +178,10 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const parentSpan = registry.getTracer("test-pg-pool").startSpan('test span');
-      registry.getTracer("test-pg-pool").withSpan(parentSpan, () => {
+      const parentSpan = registry
+        .getTracer('test-pg-pool')
+        .startSpan('test span');
+      registry.getTracer('test-pg-pool').withSpan(parentSpan, () => {
         const resNoPromise = pool.connect((err, client, release) => {
           if (err) {
             return done(err);
@@ -212,8 +214,8 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const span = registry.getTracer("test-pg-pool").startSpan('test span');
-      await registry.getTracer("test-pg-pool").withSpan(span, async () => {
+      const span = registry.getTracer('test-pg-pool').startSpan('test span');
+      await registry.getTracer('test-pg-pool').withSpan(span, async () => {
         try {
           const result = await pool.query('SELECT NOW()');
           runCallbackTest(span, pgPoolattributes, events, okStatus, 2, 0);
@@ -235,8 +237,10 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const parentSpan = registry.getTracer("test-pg-pool").startSpan('test span');
-      registry.getTracer("test-pg-pool").withSpan(parentSpan, () => {
+      const parentSpan = registry
+        .getTracer('test-pg-pool')
+        .startSpan('test span');
+      registry.getTracer('test-pg-pool').withSpan(parentSpan, () => {
         const resNoPromise = pool.query('SELECT NOW()', (err, result) => {
           if (err) {
             return done(err);
