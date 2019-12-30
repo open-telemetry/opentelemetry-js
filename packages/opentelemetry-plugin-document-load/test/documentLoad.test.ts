@@ -25,7 +25,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
-import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
+import { PerformanceTimingNames as PTN } from '@opentelemetry/web';
 
 
 

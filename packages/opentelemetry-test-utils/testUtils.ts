@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import * as childProcess from 'child_process';
 import {
   SpanKind,
   Attributes,
@@ -22,13 +23,62 @@ import {
   Status,
 } from '@opentelemetry/types';
 import * as assert from 'assert';
-import { PostgresPlugin } from '../src';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import { AttributeNames } from '../src/enums';
+
+export function startDocker(db: 'redis' | 'mysql' | 'postgres') {
+  let dockerRunCmd;
+  switch (db) {
+    case 'redis':
+      dockerRunCmd = `docker run -d -p 63790:6379 --name ot${db} ${db}:alpine`;
+      break;
+
+    case 'mysql':
+      dockerRunCmd = `docker run --rm -d -e MYSQL_ROOT_PASSWORD=rootpw -e MYSQL_DATABASE=test_db -e MYSQL_USER=otel -e MYSQL_PASSWORD=secret -p 33306:3306 --name ot${db} circleci/${db}:5.7`;
+      break;
+
+    case 'postgres':
+      dockerRunCmd = `docker run -d -p 54320:5432 --name ot${db} ${db}:alpine`;
+      break;
+  }
+
+  const tasks = [run(dockerRunCmd)];
+
+  for (let i = 0; i < tasks.length; i++) {
+    const task = tasks[i];
+    if (task && task.code !== 0) {
+      console.error('Failed to start container!');
+      console.error(task.output);
+      return false;
+    }
+  }
+  return true;
+}
+
+export function cleanUpDocker(db: 'redis' | 'mysql' | 'postgres') {
+  run(`docker stop ot${db}`);
+  run(`docker rm ot${db}`);
+}
+
+function run(cmd: string) {
+  try {
+    const proc = childProcess.spawnSync(cmd, {
+      shell: true,
+    });
+    return {
+      code: proc.status,
+      output: proc.output
+        .map(v => String.fromCharCode.apply(null, v as any))
+        .join(''),
+    };
+  } catch (e) {
+    console.log(e);
+    return;
+  }
+}
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -41,10 +91,6 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.strictEqual(
-    span.attributes[AttributeNames.COMPONENT],
-    PostgresPlugin.COMPONENT
-  );
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
 
@@ -65,7 +111,7 @@ export const assertSpan = (
   }
 };
 
-// Check if sourceSpan was propagated to targetSpan
+// Check if childSpan was propagated from parentSpan
 export const assertPropagation = (
   childSpan: ReadableSpan,
   parentSpan: Span
