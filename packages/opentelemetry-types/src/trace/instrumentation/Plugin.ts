@@ -112,6 +112,26 @@ export interface HttpPluginOptions {
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
 }
 
+export type PropagateTraceHeaderCorsUrl = string | RegExp;
+
+export type PropagateTraceHeaderCorsUrls =
+  | PropagateTraceHeaderCorsUrl
+  | PropagateTraceHeaderCorsUrl[];
+
+/**
+ * XMLHttpRequest config
+ */
+export interface XMLHttpRequestPluginOptions {
+  // the number of timing resources is limited, after the limit
+  // (chrome 250, safari 150) the information is not collected anymore
+  // the only way to prevent that is to regularly clean the resources
+  // whenever it is possible, this is needed only when PerformanceObserver
+  // is not available
+  clearTimingResources?: boolean;
+  // urls which should include trace headers when origin doesn't match
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
+}
+
 /**
  * This is a configuration section where plugin authors
  * can define their own custom configuration options.
@@ -124,6 +144,7 @@ export interface PluginOptions {
   database?: DatabasePluginOptions;
   dns?: DNSPluginOptions;
   http?: HttpPluginOptions;
+  xhr?: XMLHttpRequestPluginOptions;
   custom?: CustomPluginOptions;
 }
 

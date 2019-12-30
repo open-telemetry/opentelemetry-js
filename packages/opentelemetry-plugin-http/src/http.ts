@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin, isValid } from '@opentelemetry/core';
+import { BasePlugin, isValid, isIgnored } from '@opentelemetry/core';
 import { Attributes, CanonicalCode, PluginOptions, Span, SpanKind, SpanOptions, Status } from '@opentelemetry/types';
 import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
 import * as semver from 'semver';
@@ -268,11 +268,9 @@ export class HttpPlugin extends BasePlugin<Http> {
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (
-        utils.isIgnored(
+        isIgnored(
           pathname,
-          plugin._config.http && plugin._config.http.ignoreIncomingPaths,
-          (e: Error) =>
-            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+          plugin._config.http && plugin._config.http.ignoreIncomingPaths
         )
       ) {
         return original.apply(this, [event, ...args]);
@@ -395,11 +393,9 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       if (
         utils.isOpenTelemetryRequest(options) ||
-        utils.isIgnored(
+        isIgnored(
           origin + pathname,
-          plugin._config.http && plugin._config.http.ignoreOutgoingUrls,
-          (e: Error) =>
-            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+          plugin._config.http && plugin._config.http.ignoreOutgoingUrls
         )
       ) {
         return original.apply(this, [options, ...args]);

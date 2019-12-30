@@ -14,35 +14,83 @@
  * limitations under the License.
  */
 
-/**
- * Check if {@param url} matches {@param urlToMatch}
- * @param url
- * @param urlToMatch
- */
-export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
-  if (typeof urlToMatch === 'string') {
-    return url === urlToMatch;
-  } else {
-    return !!url.match(urlToMatch);
-  }
-}
+import { IgnoreMatcher } from "@opentelemetry/types";
+
+// /**
+//  * Check if {@param url} matches {@param urlToMatch}
+//  * @param url
+//  * @param urlToMatch
+//  */
+// export function urlMatches(url: string, urlToMatch: string | RegExp): boolean {
+//   if (typeof urlToMatch === 'string') {
+//     return url === urlToMatch;
+//   } else {
+//     return !!url.match(urlToMatch);
+//   }
+// }
+// /**
+//  * @param url
+//  * @param ignoredUrls
+//  */
+// export function isUrlIgnored(
+//   url: string,
+//   ignoredUrls?: Array<string | RegExp>
+// ): boolean {
+//   if (!ignoredUrls) {
+//     return false;
+//   }
+
+//   for (const ignoreUrl of ignoredUrls) {
+//     if (urlMatches(url, ignoreUrl)) {
+//       return true;
+//     }
+//   }
+//   return false;
+// }
+
+
+
 /**
  * Check if {@param url} should be ignored when comparing against {@param ignoredUrls}
- * @param url
- * @param ignoredUrls
+ *
+ * @param url e.g URL of request
+ * @param pattern Match pattern
  */
-export function isUrlIgnored(
+export function isIgnored<T>(
   url: string,
-  ignoredUrls?: Array<string | RegExp>
+  pattern?: IgnoreMatcher | IgnoreMatcher[],
+  catcher?: (err: Error) => void
 ): boolean {
-  if (!ignoredUrls) {
+  if (!pattern) {
     return false;
   }
 
-  for (const ignoreUrl of ignoredUrls) {
-    if (urlMatches(url, ignoreUrl)) {
-      return true;
+  if (Array.isArray(pattern)) {
+    for (const p of pattern) {
+      if (isIgnored(url, p)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  if (typeof pattern === 'string') {
+    return pattern === url;
+  }
+
+  if (pattern instanceof RegExp) {
+    return pattern.test(url);
+  }
+
+  if (typeof pattern === 'function') {
+    try {
+      return pattern(url);
+    } catch (err) {
+      if (catcher) {
+        catcher(err);
+      }
     }
   }
+
   return false;
-}
+};

@@ -33,9 +33,9 @@ import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
 
 class DummySpanExporter implements tracing.SpanExporter {
-  export(spans: any) {}
+  export(spans: any) { }
 
-  shutdown() {}
+  shutdown() { }
 }
 
 const getData = (url: string, callbackAfterSend: Function) => {
@@ -43,15 +43,15 @@ const getData = (url: string, callbackAfterSend: Function) => {
     const req = new XMLHttpRequest();
     req.open('GET', url, true);
     req.send();
-    req.onload = function() {
+    req.onload = function () {
       resolve();
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       resolve();
     };
 
-    req.ontimeout = function() {
+    req.ontimeout = function () {
       resolve();
     };
 
@@ -118,7 +118,7 @@ describe('xhr', () => {
     ) => {
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function (xhr: any) {
         requests.push(xhr);
       };
       sandbox.useFakeTimers();
@@ -142,7 +142,9 @@ describe('xhr', () => {
         scopeManager: new ZoneScopeManager(),
         plugins: [
           new XMLHttpRequestPlugin({
-            propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
+            xhr: {
+              propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
+            }
           }),
         ],
       });
@@ -340,7 +342,7 @@ describe('xhr', () => {
 
     describe(
       'AND origin does NOT match window.location but match with' +
-        ' propagateTraceHeaderCorsUrls',
+      ' propagateTraceHeaderCorsUrls',
       () => {
         beforeEach(done => {
           clearData();
@@ -372,7 +374,7 @@ describe('xhr', () => {
     );
     describe(
       'AND origin does NOT match window.location And does NOT match' +
-        ' with propagateTraceHeaderCorsUrls',
+      ' with propagateTraceHeaderCorsUrls',
       () => {
         beforeEach(done => {
           clearData();
@@ -415,7 +417,7 @@ describe('xhr', () => {
     beforeEach(done => {
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function (xhr: any) {
         requests.push(xhr);
       };
 

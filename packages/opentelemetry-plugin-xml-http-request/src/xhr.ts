@@ -14,31 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  BasePlugin,
-  hrTime,
-  isUrlIgnored,
-  isWrapped,
-  otperformance,
-  urlMatches,
-} from '@opentelemetry/core';
+import { BasePlugin, hrTime, isWrapped, otperformance, isIgnored } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import {
-  addSpanNetworkEvent,
-  getResource,
-  parseUrl,
-  PerformanceTimingNames as PTN,
-} from '@opentelemetry/web';
+import { PluginOptions, XMLHttpRequestPluginOptions, IgnoreMatcher } from '@opentelemetry/types';
+import { addSpanNetworkEvent, getResource, parseUrl, PerformanceTimingNames as PTN } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import { Format } from './enums/Format';
-import {
-  OpenFunction,
-  PropagateTraceHeaderCorsUrls,
-  SendFunction,
-  XhrMem,
-} from './types';
+import { OpenFunction, SendFunction, XhrMem } from './types';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -46,19 +30,6 @@ import {
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
 
-/**
- * XMLHttpRequest config
- */
-export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
-  // the number of timing resources is limited, after the limit
-  // (chrome 250, safari 150) the information is not collected anymore
-  // the only way to prevent that is to regularly clean the resources
-  // whenever it is possible, this is needed only when PerformanceObserver
-  // is not available
-  clearTimingResources?: boolean;
-  // urls which should include trace headers when origin doesn't match
-  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls;
-}
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
@@ -69,15 +40,19 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly version: string = '0.3.0';
   moduleName = this.component;
 
-  protected _config!: XMLHttpRequestPluginConfig;
+  protected _config!: PluginOptions;
+  private _xhrOptions: XMLHttpRequestPluginOptions;
+  private _ignoreOutgoingUrls: IgnoreMatcher[];
 
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config: XMLHttpRequestPluginConfig = {}) {
+  constructor(config: PluginOptions = {}) {
     super();
     this._config = config;
+    this._xhrOptions = config.xhr || {};
+    this._ignoreOutgoingUrls = config.http && config.http.ignoreOutgoingUrls || [];
   }
 
   /**
@@ -107,7 +82,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    */
   _shouldPropagateTraceHeaders(spanUrl: string) {
     let propagateTraceHeaderUrls =
-      this._config.propagateTraceHeaderCorsUrls || [];
+      this._xhrOptions.propagateTraceHeaderCorsUrls || [];
     if (
       typeof propagateTraceHeaderUrls === 'string' ||
       propagateTraceHeaderUrls instanceof RegExp
@@ -120,7 +95,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return true;
     } else {
       for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (urlMatches(spanUrl, propagateTraceHeaderUrl)) {
+        if (isIgnored(spanUrl, propagateTraceHeaderUrl)) {
           return true;
         }
       }
@@ -232,7 +207,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _clearResources() {
-    if (this._tasksCount === 0 && this._config.clearTimingResources) {
+    if (this._tasksCount === 0 && this._xhrOptions.clearTimingResources) {
       ((otperformance as unknown) as Performance).clearResourceTimings();
       this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
@@ -316,7 +291,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     url: string,
     method: string
   ): types.Span | undefined {
-    if (isUrlIgnored(url, this._config.ignoreUrls)) {
+    if (isIgnored(url, this._ignoreOutgoingUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }

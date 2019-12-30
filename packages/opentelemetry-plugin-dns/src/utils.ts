@@ -17,7 +17,6 @@
 import {
   Attributes,
   CanonicalCode,
-  IgnoreMatcher,
   Span,
   Status,
 } from '@opentelemetry/types';
@@ -161,56 +160,3 @@ export const setLookupAttributes = (
   span.setAttributes(attributes);
 };
 
-/**
- * Check whether the given obj match pattern
- * @param constant e.g URL of request
- * @param obj obj to inspect
- * @param pattern Match pattern
- */
-export const satisfiesPattern = <T>(
-  constant: string,
-  pattern: IgnoreMatcher
-): boolean => {
-  if (typeof pattern === 'string') {
-    return pattern === constant;
-  } else if (pattern instanceof RegExp) {
-    return pattern.test(constant);
-  } else if (typeof pattern === 'function') {
-    return pattern(constant);
-  } else {
-    throw new TypeError('Pattern is in unsupported datatype');
-  }
-};
-
-/**
- * Check whether the given dns request is ignored by configuration
- * It will not re-throw exceptions from `list` provided by the client
- * @param constant e.g URL of request
- * @param [list] List of ignore patterns
- * @param [onException] callback for doing something when an exception has
- *     occurred
- */
-export const isIgnored = (
-  constant: string,
-  list?: IgnoreMatcher[],
-  onException?: (error: Error) => void
-): boolean => {
-  if (!list) {
-    // No ignored urls - trace everything
-    return false;
-  }
-  // Try/catch outside the loop for failing fast
-  try {
-    for (const pattern of list) {
-      if (satisfiesPattern(constant, pattern)) {
-        return true;
-      }
-    }
-  } catch (e) {
-    if (onException) {
-      onException(e);
-    }
-  }
-
-  return false;
-};

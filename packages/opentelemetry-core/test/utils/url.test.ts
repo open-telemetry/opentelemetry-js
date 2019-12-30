@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 
-import { isUrlIgnored } from '../../src';
+import { isIgnored } from '../../src';
 
 const urlIgnored = 'url should be ignored';
 const urlNotIgnored = 'url should NOT be ignored';
@@ -24,21 +24,21 @@ const urlNotIgnored = 'url should NOT be ignored';
 const urlToTest = 'http://myaddress.com/somepath';
 
 describe('BasePlugin - Utils', () => {
-  describe('isUrlIgnored', () => {
+  describe('isIgnored', () => {
     describe('when ignored urls are undefined', () => {
       it('should return false', () => {
-        assert.strictEqual(isUrlIgnored(urlToTest), false, urlNotIgnored);
+        assert.strictEqual(isIgnored(urlToTest), false, urlNotIgnored);
       });
     });
     describe('when ignored urls are empty', () => {
       it('should return false', () => {
-        assert.strictEqual(isUrlIgnored(urlToTest, []), false, urlNotIgnored);
+        assert.strictEqual(isIgnored(urlToTest, []), false, urlNotIgnored);
       });
     });
     describe('when ignored urls is the same as url', () => {
       it('should return true', () => {
         assert.strictEqual(
-          isUrlIgnored(urlToTest, ['http://myaddress.com/somepath']),
+          isIgnored(urlToTest, ['http://myaddress.com/somepath']),
           true,
           urlIgnored
         );
@@ -47,7 +47,7 @@ describe('BasePlugin - Utils', () => {
     describe('when url is part of ignored urls', () => {
       it('should return false', () => {
         assert.strictEqual(
-          isUrlIgnored(urlToTest, ['http://myaddress.com/some']),
+          isIgnored(urlToTest, ['http://myaddress.com/some']),
           false,
           urlNotIgnored
         );
@@ -56,7 +56,7 @@ describe('BasePlugin - Utils', () => {
     describe('when ignored urls is part of url - REGEXP', () => {
       it('should return true', () => {
         assert.strictEqual(
-          isUrlIgnored(urlToTest, [/.+?myaddress\.com/]),
+          isIgnored(urlToTest, [/.+?myaddress\.com/]),
           true,
           urlIgnored
         );
@@ -65,7 +65,7 @@ describe('BasePlugin - Utils', () => {
     describe('when url is part of ignored urls - REGEXP', () => {
       it('should return false', () => {
         assert.strictEqual(
-          isUrlIgnored(urlToTest, [/http:\/\/myaddress\.com\/somepath2/]),
+          isIgnored(urlToTest, [/http:\/\/myaddress\.com\/somepath2/]),
           false,
           urlNotIgnored
         );

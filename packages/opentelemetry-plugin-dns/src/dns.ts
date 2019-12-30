@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-import * as shimmer from 'shimmer';
-import * as semver from 'semver';
-import * as utils from './utils';
-import { BasePlugin } from '@opentelemetry/core';
-import {
-  PluginOptions,
-  SpanOptions,
-  SpanKind,
-  Span,
-} from '@opentelemetry/types';
-import {
-  Dns,
-  LookupPromiseSignature,
-  LookupFunction,
-  LookupFunctionSignature,
-  LookupCallbackSignature,
-} from './types';
-import { AttributeNames } from './enums/AttributeNames';
-import { AddressFamily } from './enums/AddressFamily';
+import { BasePlugin, isIgnored } from '@opentelemetry/core';
+import { PluginOptions, Span, SpanKind, SpanOptions } from '@opentelemetry/types';
 import { LookupAddress } from 'dns';
+import * as semver from 'semver';
+import * as shimmer from 'shimmer';
+import { AddressFamily } from './enums/AddressFamily';
+import { AttributeNames } from './enums/AttributeNames';
+import { Dns, LookupCallbackSignature, LookupFunction, LookupFunctionSignature, LookupPromiseSignature } from './types';
+import * as utils from './utils';
 
 /**
  * Dns instrumentation plugin for Opentelemetry
@@ -109,9 +98,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
       ...args: unknown[]
     ) {
       if (
-        utils.isIgnored(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames, (e: Error) =>
-          plugin._logger.error('caught ignoreHostname error: ', e)
-        )
+        isIgnored(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames)
       ) {
         return original.apply(this, [hostname, ...args]);
       }

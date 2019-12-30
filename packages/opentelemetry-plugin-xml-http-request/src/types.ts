@@ -64,9 +64,3 @@ export interface XhrMem {
   // callback to remove events from xhr once the span ends
   callbackToRemoveEvents?: Function;
 }
-
-export type PropagateTraceHeaderCorsUrl = string | RegExp;
-
-export type PropagateTraceHeaderCorsUrls =
-  | PropagateTraceHeaderCorsUrl
-  | PropagateTraceHeaderCorsUrl[];

@@ -15,11 +15,9 @@
  */
 
 import * as assert from 'assert';
-import * as sinon from 'sinon';
-import { CanonicalCode, IgnoreMatcher, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import * as utils from '../../src/utils';
 import { Span, BasicTracer } from '@opentelemetry/tracing';
-import { NoopLogger } from '@opentelemetry/core';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 
 describe('Utility', () => {
@@ -29,131 +27,6 @@ describe('Utility', () => {
         const status = utils.parseErrorCode(code);
         assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
       });
-    });
-  });
-
-  describe('satisfiesPattern()', () => {
-    it('string pattern', () => {
-      const answer1 = utils.satisfiesPattern('localhost', 'localhost');
-      assert.strictEqual(answer1, true);
-      const answer2 = utils.satisfiesPattern('hostname', 'localhost');
-      assert.strictEqual(answer2, false);
-    });
-
-    it('regex pattern', () => {
-      const answer1 = utils.satisfiesPattern('LocalHost', /localhost/i);
-      assert.strictEqual(answer1, true);
-      const answer2 = utils.satisfiesPattern('Montreal.ca', /montreal.ca/);
-      assert.strictEqual(answer2, false);
-    });
-
-    it('should throw if type is unknown', () => {
-      try {
-        utils.satisfiesPattern(
-          'google.com',
-          (true as unknown) as IgnoreMatcher
-        );
-        assert.fail();
-      } catch (error) {
-        assert.strictEqual(error instanceof TypeError, true);
-      }
-    });
-
-    it('function pattern', () => {
-      const answer1 = utils.satisfiesPattern(
-        'montreal.ca',
-        (url: string) => url === 'montreal.ca'
-      );
-      assert.strictEqual(answer1, true);
-      const answer2 = utils.satisfiesPattern(
-        'montreal.ca',
-        (url: string) => url !== 'montreal.ca'
-      );
-      assert.strictEqual(answer2, false);
-    });
-  });
-
-  describe('isIgnored()', () => {
-    let satisfiesPatternStub: sinon.SinonSpy<[string, IgnoreMatcher], boolean>;
-    beforeEach(() => {
-      satisfiesPatternStub = sinon.spy(utils, 'satisfiesPattern');
-    });
-
-    afterEach(() => {
-      satisfiesPatternStub.restore();
-    });
-
-    it('should call isSatisfyPattern, n match', () => {
-      const answer1 = utils.isIgnored('localhost', ['test']);
-      assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
-      );
-    });
-
-    it('should call isSatisfyPattern, match for function', () => {
-      satisfiesPatternStub.restore();
-      const answer1 = utils.isIgnored('api.montreal.ca', [
-        url => url.endsWith('montreal.ca'),
-      ]);
-      assert.strictEqual(answer1, true);
-    });
-
-    it('should not re-throw when function throws an exception', () => {
-      satisfiesPatternStub.restore();
-      const log = new NoopLogger();
-      const onException = (e: Error) => {
-        log.error('error', e);
-      };
-      for (const callback of [undefined, onException]) {
-        assert.doesNotThrow(() =>
-          utils.isIgnored(
-            'test',
-            [
-              url => {
-                throw new Error('test');
-              },
-            ],
-            callback
-          )
-        );
-      }
-    });
-
-    it('should call onException when function throws an exception', () => {
-      satisfiesPatternStub.restore();
-      const onException = sinon.spy();
-      assert.doesNotThrow(() =>
-        utils.isIgnored(
-          'test',
-          [
-            url => {
-              throw new Error('test');
-            },
-          ],
-          onException
-        )
-      );
-      assert.strictEqual((onException as sinon.SinonSpy).callCount, 1);
-    });
-
-    it('should not call isSatisfyPattern', () => {
-      utils.isIgnored('test', []);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        0
-      );
-    });
-
-    it('should return false on empty list', () => {
-      const answer1 = utils.isIgnored('test', []);
-      assert.strictEqual(answer1, false);
-    });
-
-    it('should not throw and return false when list is undefined', () => {
-      const answer2 = utils.isIgnored('test', undefined);
-      assert.strictEqual(answer2, false);
     });
   });
 
