@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-import { Status, CanonicalCode, Span } from '@opentelemetry/types';
-import {
-  RequestOptions,
-  IncomingMessage,
-  ClientRequest,
-  IncomingHttpHeaders,
-  OutgoingHttpHeaders,
-} from 'http';
-import { IgnoreMatcher, Err, ParsedRequestOptions } from './types';
-import { AttributeNames } from './enums/AttributeNames';
+import { CanonicalCode, IgnoreMatcher, Span, Status } from '@opentelemetry/types';
+import { ClientRequest, IncomingHttpHeaders, IncomingMessage, OutgoingHttpHeaders, RequestOptions } from 'http';
 import * as url from 'url';
+import { AttributeNames } from './enums/AttributeNames';
+import { Err, ParsedRequestOptions } from './types';
 
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
 /**

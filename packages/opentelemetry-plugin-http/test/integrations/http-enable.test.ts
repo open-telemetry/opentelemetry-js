@@ -15,21 +15,17 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { NodeTracer } from '@opentelemetry/node';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { Span, SpanKind, PluginOptions } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as url from 'url';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import * as url from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracer } from '@opentelemetry/node';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
-import { HttpPluginConfig } from '../../src/types';
 const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -41,7 +37,7 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('HttpPlugin Integration tests', () => {
   describe('enable()', () => {
-    before(function(done) {
+    before(function (done) {
       // mandatory
       if (process.env.CI) {
         done();
@@ -74,14 +70,16 @@ describe('HttpPlugin Integration tests', () => {
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
-      const config: HttpPluginConfig = {
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
-        applyCustomAttributesOnSpan: customAttributeFunction,
+      const config: PluginOptions = {
+        http: {
+          ignoreIncomingPaths: ignoreConfig,
+          ignoreOutgoingUrls: ignoreConfig,
+          applyCustomAttributesOnSpan: customAttributeFunction,
+        }
       };
       try {
         plugin.disable();
-      } catch (e) {}
+      } catch (e) { }
       plugin.enable(http, tracer, tracer.logger, config);
     });
 

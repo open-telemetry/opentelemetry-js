@@ -34,7 +34,7 @@ const tracer = new NodeTracer({
       options: {}
     }
     // shared plugin options
-    sharedPluginOptions: {}
+    options: {}
   }
 });
 ```

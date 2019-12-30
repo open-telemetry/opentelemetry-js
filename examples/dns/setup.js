@@ -14,8 +14,10 @@ function setupTracerAndExporters(service) {
         enabled: true,
         path: '@opentelemetry/plugin-dns',
         options: {
-          // Avoid dns lookup loop with http zipkin calls
-          ignoreHostnames: ['localhost']
+          dns: {
+            // Avoid dns lookup loop with http zipkin calls
+            ignoreHostnames: ['localhost']
+          }
         }
       }
     }

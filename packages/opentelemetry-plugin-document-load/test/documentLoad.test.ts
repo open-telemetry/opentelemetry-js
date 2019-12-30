@@ -18,21 +18,16 @@
  * Can't use Sinon Fake Time here as then cannot stub the performance getEntriesByType with desired metrics
  */
 
+import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
+import { BasicTracer, ReadableSpan, SimpleSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
+import { Logger, PluginOptions, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
-import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
-import {
-  BasicTracer,
-  ReadableSpan,
-  SimpleSpanProcessor,
-  SpanExporter,
-} from '@opentelemetry/tracing';
-import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
-
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
+
+
 
 export class DummyExporter implements SpanExporter {
   export(
@@ -195,7 +190,7 @@ describe('DocumentLoad Plugin', () => {
   let moduleExports: any;
   let tracer: BasicTracer;
   let logger: Logger;
-  let config: PluginConfig;
+  let config: PluginOptions;
   let spanProcessor: SimpleSpanProcessor;
   let dummyExporter: DummyExporter;
 

@@ -14,24 +14,21 @@
  * limitations under the License.
  */
 
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { CanonicalCode, PluginOptions, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
-import * as path from 'path';
 import * as nock from 'nock';
+import * as path from 'path';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin, plugin } from '../../src/http';
+import { Http } from '../../src/types';
+import { OT_REQUEST_HEADER } from '../../src/utils';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { OT_REQUEST_HEADER } from '../../src/utils';
-import { HttpPluginConfig, Http } from '../../src/types';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -89,20 +86,22 @@ describe('HttpPlugin', () => {
       });
 
       before(() => {
-        const config: HttpPluginConfig = {
-          ignoreIncomingPaths: [
-            (url: string) => {
-              throw new Error('bad ignoreIncomingPaths function');
+        const config: PluginOptions = {
+          http: {
+            ignoreIncomingPaths: [
+              (url: string) => {
+                throw new Error('bad ignoreIncomingPaths function');
+              },
+            ],
+            ignoreOutgoingUrls: [
+              (url: string) => {
+                throw new Error('bad ignoreOutgoingUrls function');
+              },
+            ],
+            applyCustomAttributesOnSpan: () => {
+              throw new Error(applyCustomAttributesOnSpanErrorMessage);
             },
-          ],
-          ignoreOutgoingUrls: [
-            (url: string) => {
-              throw new Error('bad ignoreOutgoingUrls function');
-            },
-          ],
-          applyCustomAttributesOnSpan: () => {
-            throw new Error(applyCustomAttributesOnSpanErrorMessage);
-          },
+          }
         };
         pluginWithBadOptions = new HttpPlugin(
           plugin.component,
@@ -164,18 +163,20 @@ describe('HttpPlugin', () => {
       });
 
       before(() => {
-        const config: HttpPluginConfig = {
-          ignoreIncomingPaths: [
-            `/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
-          ],
-          ignoreOutgoingUrls: [
-            `${protocol}://${hostname}:${serverPort}/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
-          ],
-          applyCustomAttributesOnSpan: customAttributeFunction,
+        const config: PluginOptions = {
+          http: {
+            ignoreIncomingPaths: [
+              `/ignored/string`,
+              /\/ignored\/regexp$/i,
+              (url: string) => url.endsWith(`/ignored/function`),
+            ],
+            ignoreOutgoingUrls: [
+              `${protocol}://${hostname}:${serverPort}/ignored/string`,
+              /\/ignored\/regexp$/i,
+              (url: string) => url.endsWith(`/ignored/function`),
+            ],
+            applyCustomAttributesOnSpan: customAttributeFunction,
+          }
         };
         plugin.enable(http, tracer, tracer.logger, config);
         server = http.createServer((request, response) => {
@@ -608,7 +609,7 @@ describe('HttpPlugin', () => {
           .reply(404);
         const req = http.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => {});
+          response.on('data', () => { });
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;

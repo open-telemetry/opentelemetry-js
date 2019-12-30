@@ -68,7 +68,7 @@ const tracer = new NodeTracer({
     }
   },
   // shared plugin options
-  sharedPluginOptions: {}
+  options: {}
 });
 
 // Initialize the tracer

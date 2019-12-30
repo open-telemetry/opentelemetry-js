@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/core';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { BasicTracer, Span } from '@opentelemetry/tracing';
+import { CanonicalCode, IgnoreMatcher, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
+import * as http from 'http';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { IgnoreMatcher } from '../../src/types';
-import * as utils from '../../src/utils';
-import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
-import { NoopLogger } from '@opentelemetry/core';
+import * as utils from '../../src/utils';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -54,7 +53,7 @@ describe('Utility', () => {
       try {
         utils.hasExpectHeader('' as http.RequestOptions);
         assert.fail();
-      } catch (ignore) {}
+      } catch (ignore) { }
     });
 
     it('should not throw if no headers', () => {

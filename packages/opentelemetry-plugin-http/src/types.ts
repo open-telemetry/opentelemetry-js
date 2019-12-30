@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-import { Span, PluginConfig } from '@opentelemetry/types';
-import * as url from 'url';
-import {
-  ClientRequest,
-  IncomingMessage,
-  ServerResponse,
-  request,
-  get,
-} from 'http';
 import * as http from 'http';
+import { get, IncomingMessage, request } from 'http';
+import * as url from 'url';
 
-export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
 export type RequestFunction = typeof request;
 export type GetFunction = typeof get;
@@ -49,19 +41,6 @@ export type ResponseEndArgs =
   | [unknown, ((() => void) | undefined)?]
   | [unknown, string, ((() => void) | undefined)?];
 
-export interface HttpCustomAttributeFunction {
-  (
-    span: Span,
-    request: ClientRequest | IncomingMessage,
-    response: IncomingMessage | ServerResponse
-  ): void;
-}
-
-export interface HttpPluginConfig extends PluginConfig {
-  ignoreIncomingPaths?: IgnoreMatcher[];
-  ignoreOutgoingUrls?: IgnoreMatcher[];
-  applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
-}
 
 export interface Err extends Error {
   errno?: number;

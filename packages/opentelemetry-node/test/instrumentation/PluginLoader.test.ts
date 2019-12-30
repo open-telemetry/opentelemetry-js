@@ -38,7 +38,9 @@ const httpPlugins: Plugins = {
     enabled: true,
     path: '@opentelemetry/plugin-http-module',
     options: {
-      httpPluginOverrideOption: 2,
+      http: {
+        ignoreOutgoingUrls: ["plugin specific option"]
+      },
     },
   },
 };
@@ -164,14 +166,14 @@ describe('PluginLoader', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load({
         plugins: httpPlugins,
-        sharedPluginOptions: { sharedPluginOption: 1 },
+        options: { dns: { ignoreHostnames: ['shared option'] } },
       });
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
-      assert.strictEqual(
-        (pluginLoader['_plugins'][0] as any)._config.sharedPluginOption,
-        1
+      assert.deepStrictEqual(
+        (pluginLoader['_plugins'][0] as any)._config.dns.ignoreHostnames,
+        ['shared option']
       );
       assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();
@@ -182,14 +184,14 @@ describe('PluginLoader', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load({
         plugins: httpPlugins,
-        sharedPluginOptions: { httpPluginOverrideOption: 1 },
+        options: { http: { ignoreOutgoingUrls: ["shared"] } },
       });
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
-      assert.strictEqual(
-        (pluginLoader['_plugins'][0] as any)._config.httpPluginOverrideOption,
-        2
+      assert.deepStrictEqual(
+        (pluginLoader['_plugins'][0] as any)._config.http.ignoreOutgoingUrls,
+        ["plugin specific option"]
       );
       assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();
@@ -200,14 +202,14 @@ describe('PluginLoader', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load({
         plugins: httpPlugins,
-        sharedPluginOptions: { sharedPluginOption: 1 },
+        options: { dns: { ignoreHostnames: ["shared"] } },
       });
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       assert.deepStrictEqual((pluginLoader['_plugins'][0] as any)._config, {
-        sharedPluginOption: 1,
-        httpPluginOverrideOption: 2,
+        dns: { ignoreHostnames: ["shared"] },
+        http: { ignoreOutgoingUrls: ["plugin specific option"] },
       });
       assert.strictEqual(httpModule.get(), 'patched');
       pluginLoader.unload();

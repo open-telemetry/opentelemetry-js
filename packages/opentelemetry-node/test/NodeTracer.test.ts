@@ -97,8 +97,12 @@ describe('NodeTracer', () => {
             enabled: true,
             path: '@opentelemetry/plugin-supported-module',
             options: {
-              enhancedDatabaseReporting: false,
-              ignoreUrls: [],
+              database: {
+                enhancedDatabaseReporting: false,
+              },
+              http: {
+                ignoreOutgoingUrls: [],
+              }
             },
           },
         },

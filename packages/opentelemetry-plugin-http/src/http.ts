@@ -15,35 +15,14 @@
  */
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
-import {
-  Span,
-  SpanKind,
-  SpanOptions,
-  Attributes,
-  CanonicalCode,
-  Status,
-} from '@opentelemetry/types';
-import {
-  ClientRequest,
-  IncomingMessage,
-  request,
-  RequestOptions,
-  ServerResponse,
-} from 'http';
+import { Attributes, CanonicalCode, PluginOptions, Span, SpanKind, SpanOptions, Status } from '@opentelemetry/types';
+import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import {
-  HttpPluginConfig,
-  Http,
-  Func,
-  ResponseEndArgs,
-  ParsedRequestOptions,
-  HttpRequestArgs,
-  Err,
-} from './types';
-import { Format } from './enums/Format';
 import { AttributeNames } from './enums/AttributeNames';
+import { Format } from './enums/Format';
+import { Err, Func, Http, HttpRequestArgs, ParsedRequestOptions, ResponseEndArgs } from './types';
 import * as utils from './utils';
 
 /**
@@ -51,7 +30,7 @@ import * as utils from './utils';
  */
 export class HttpPlugin extends BasePlugin<Http> {
   readonly component: string;
-  protected _config!: HttpPluginConfig;
+  protected _config!: PluginOptions;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
 
@@ -229,11 +208,11 @@ export class HttpPlugin extends BasePlugin<Http> {
 
             span.setStatus(status);
 
-            if (this._config.applyCustomAttributesOnSpan) {
+            if (this._config.http && this._config.http.applyCustomAttributesOnSpan) {
               this._safeExecute(
                 span,
                 () =>
-                  this._config.applyCustomAttributesOnSpan!(
+                  this._config.http!.applyCustomAttributesOnSpan!(
                     span,
                     request,
                     response
@@ -291,7 +270,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       if (
         utils.isIgnored(
           pathname,
-          plugin._config.ignoreIncomingPaths,
+          plugin._config.http && plugin._config.http.ignoreIncomingPaths,
           (e: Error) =>
             plugin._logger.error('caught ignoreIncomingPaths error: ', e)
         )
@@ -363,11 +342,11 @@ export class HttpPlugin extends BasePlugin<Http> {
             .setAttributes(attributes)
             .setStatus(utils.parseResponseStatus(response.statusCode));
 
-          if (plugin._config.applyCustomAttributesOnSpan) {
+          if (plugin._config.http && plugin._config.http.applyCustomAttributesOnSpan) {
             plugin._safeExecute(
               span,
               () =>
-                plugin._config.applyCustomAttributesOnSpan!(
+                plugin._config.http!.applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
@@ -418,7 +397,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         utils.isOpenTelemetryRequest(options) ||
         utils.isIgnored(
           origin + pathname,
-          plugin._config.ignoreOutgoingUrls,
+          plugin._config.http && plugin._config.http.ignoreOutgoingUrls,
           (e: Error) =>
             plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
         )

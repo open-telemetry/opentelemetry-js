@@ -14,25 +14,17 @@
  * limitations under the License.
  */
 
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node';
-import {
-  Http,
-  HttpPluginConfig,
-  OT_REQUEST_HEADER,
-  AttributeNames,
-} from '@opentelemetry/plugin-http';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import { AttributeNames, Http, OT_REQUEST_HEADER } from '@opentelemetry/plugin-http';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { CanonicalCode, PluginOptions, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
-import * as path from 'path';
 import * as nock from 'nock';
+import * as path from 'path';
 import { HttpsPlugin, plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
@@ -94,20 +86,22 @@ describe('HttpsPlugin', () => {
       });
 
       before(() => {
-        const config: HttpPluginConfig = {
-          ignoreIncomingPaths: [
-            (url: string) => {
-              throw new Error('bad ignoreIncomingPaths function');
+        const config: PluginOptions = {
+          http: {
+            ignoreIncomingPaths: [
+              (url: string) => {
+                throw new Error('bad ignoreIncomingPaths function');
+              },
+            ],
+            ignoreOutgoingUrls: [
+              (url: string) => {
+                throw new Error('bad ignoreOutgoingUrls function');
+              },
+            ],
+            applyCustomAttributesOnSpan: () => {
+              throw new Error(applyCustomAttributesOnSpanErrorMessage);
             },
-          ],
-          ignoreOutgoingUrls: [
-            (url: string) => {
-              throw new Error('bad ignoreOutgoingUrls function');
-            },
-          ],
-          applyCustomAttributesOnSpan: () => {
-            throw new Error(applyCustomAttributesOnSpanErrorMessage);
-          },
+          }
         };
         pluginWithBadOptions = new HttpsPlugin(process.versions.node);
         pluginWithBadOptions.enable(
@@ -177,18 +171,20 @@ describe('HttpsPlugin', () => {
       });
 
       before(() => {
-        const config: HttpPluginConfig = {
-          ignoreIncomingPaths: [
-            `/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
-          ],
-          ignoreOutgoingUrls: [
-            `${protocol}://${hostname}:${serverPort}/ignored/string`,
-            /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
-          ],
-          applyCustomAttributesOnSpan: customAttributeFunction,
+        const config: PluginOptions = {
+          http: {
+            ignoreIncomingPaths: [
+              `/ignored/string`,
+              /\/ignored\/regexp$/i,
+              (url: string) => url.endsWith(`/ignored/function`),
+            ],
+            ignoreOutgoingUrls: [
+              `${protocol}://${hostname}:${serverPort}/ignored/string`,
+              /\/ignored\/regexp$/i,
+              (url: string) => url.endsWith(`/ignored/function`),
+            ],
+            applyCustomAttributesOnSpan: customAttributeFunction,
+          }
         };
         plugin.enable(
           (https as unknown) as Http,
@@ -620,7 +616,7 @@ describe('HttpsPlugin', () => {
           .reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => {});
+          response.on('data', () => { });
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;

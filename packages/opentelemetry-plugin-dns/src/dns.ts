@@ -109,7 +109,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
       ...args: unknown[]
     ) {
       if (
-        utils.isIgnored(hostname, plugin._config.ignoreHostnames, (e: Error) =>
+        utils.isIgnored(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames, (e: Error) =>
           plugin._logger.error('caught ignoreHostname error: ', e)
         )
       ) {

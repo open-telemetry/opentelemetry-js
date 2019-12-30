@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { Tracer } from '../tracer';
+import { ClientRequest, IncomingMessage, ServerResponse } from "http";
 import { Logger } from '../../common/Logger';
+import { Span } from '../span';
+import { Tracer } from '../tracer';
+
 
 /** Interface Plugin to apply patch. */
 export interface Plugin<T = any> {
@@ -60,40 +63,68 @@ export interface PluginConfig {
   path?: string;
 
   /**
-   * Configuration options for an individual plugin
+   * These plugin options override the values provided in the
+   * shared plugin options section.
    */
   options?: PluginOptions;
 }
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 
-export interface PluginOptions {
+/**
+ * These options are used by database plugins like mysql, pg, and mongodb.
+ */
+export interface DatabasePluginOptions {
   /**
    * If true, additional information about query parameters and
    * results will be attached (as `attributes`) to spans representing
    * database operations.
    */
   enhancedDatabaseReporting?: boolean;
+}
 
-  /**
-   * URLs that match any regex in ignoreUrls will not be traced.
-   * In addition, URLs that are _exact matches_ of strings in ignoreUrls will
-   * also not be traced.
-   */
-  ignoreUrls?: Array<string | RegExp>;
-
+/**
+ * These options are used by dns module plugins.
+ */
+export interface DNSPluginOptions {
   /**
    * Used by dns plugin. Ignores tracing for host names which match one of
    * the configured matchers by either being an exact string match, matching
    * a regular expression, or evaluating to true.
    */
   ignoreHostnames?: IgnoreMatcher[];
+}
 
-  /**
-   * This is an untyped configuration section where plugin authors
-   * can define their own custom configuration options
-   */
-  [key: string]: any;
+export interface HttpCustomAttributeFunction {
+  (
+    span: Span,
+    request: ClientRequest | IncomingMessage,
+    response: IncomingMessage | ServerResponse
+  ): void;
+}
+
+/**
+ * These options are used by http plugins like http, https, and http2.
+ */
+export interface HttpPluginOptions {
+  ignoreIncomingPaths?: IgnoreMatcher[];
+  ignoreOutgoingUrls?: IgnoreMatcher[];
+  applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+}
+
+/**
+ * This is a configuration section where plugin authors
+ * can define their own custom configuration options.
+ */
+export interface CustomPluginOptions {
+  [key: string]: number | string | boolean | undefined;
+}
+
+export interface PluginOptions {
+  database?: DatabasePluginOptions;
+  dns?: DNSPluginOptions;
+  http?: HttpPluginOptions;
+  custom?: CustomPluginOptions;
 }
 
 export interface PluginInternalFilesVersion {

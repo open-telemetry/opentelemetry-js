@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/types';
+import { Logger, PluginOptions } from '@opentelemetry/types';
 import * as path from 'path';
 import * as semver from 'semver';
 
@@ -71,4 +71,36 @@ export function isSupportedVersion(
  */
 export function searchPathForTest(searchPath: string) {
   module.paths.push(searchPath);
+}
+
+/**
+ * Merge plugin options. Rightmost options take precedence.
+ *
+ * @param options config objects to merge
+ */
+export function mergeOptions(
+  ...options: (PluginOptions | undefined)[]
+): PluginOptions {
+  const out: PluginOptions = {};
+  for (const config of options) {
+    if (!config) {
+      continue;
+    }
+    for (const type of keys(config)) {
+      for (const option of keys(config[type])) {
+        const value = config[type]![option]!;
+
+        if (!out[type]) {
+          out[type] = {};
+        }
+
+        out[type]![option] = value;
+      }
+    }
+  }
+  return out;
+}
+
+function keys<T>(obj: T): Array<keyof T> {
+  return Object.keys(obj) as Array<keyof T>;
 }

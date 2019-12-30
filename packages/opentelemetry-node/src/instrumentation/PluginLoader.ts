@@ -90,11 +90,10 @@ export class PluginLoader {
 
       plugins[pluginModuleName] = {
         path: config.path || defaultConfig.path,
-        enabled: typeof enabled === 'boolean' ? enabled : true,
-        options: Object.assign(
-          {},
+        enabled: enabled !== false,
+        options: utils.mergeOptions(
           defaultConfig.options,
-          tracerConfig.sharedPluginOptions,
+          tracerConfig.options,
           config.options
         ),
       };
@@ -147,14 +146,9 @@ export class PluginLoader {
             return exports;
           }
 
-          const options = Object.assign(
-            {},
-            tracerConfig.sharedPluginOptions,
-            config.options
-          );
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer, this.logger, options);
+          return plugin.enable(exports, this.tracer, this.logger, config.options);
         } catch (e) {
           this.logger.error(
             `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`

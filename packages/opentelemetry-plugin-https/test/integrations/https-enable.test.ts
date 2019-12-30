@@ -15,22 +15,19 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { NodeTracer } from '@opentelemetry/node';
+import { Http } from '@opentelemetry/plugin-http';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { PluginOptions, Span, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as https from 'https';
+import * as url from 'url';
 import { plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
-import * as url from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracer } from '@opentelemetry/node';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
 
 const protocol = 'https';
 const serverPort = 42345;
@@ -43,7 +40,7 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('HttpsPlugin Integration tests', () => {
   describe('enable()', () => {
-    before(function(done) {
+    before(function (done) {
       // mandatory
       if (process.env.CI) {
         done();
@@ -76,14 +73,16 @@ describe('HttpsPlugin Integration tests', () => {
         /\/ignored\/regexp$/i,
         (url: string) => url.endsWith(`/ignored/function`),
       ];
-      const config: HttpPluginConfig = {
-        ignoreIncomingPaths: ignoreConfig,
-        ignoreOutgoingUrls: ignoreConfig,
-        applyCustomAttributesOnSpan: customAttributeFunction,
+      const config: PluginOptions = {
+        http: {
+          ignoreIncomingPaths: ignoreConfig,
+          ignoreOutgoingUrls: ignoreConfig,
+          applyCustomAttributesOnSpan: customAttributeFunction,
+        }
       };
       try {
         plugin.disable();
-      } catch (e) {}
+      } catch (e) { }
       plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
     });
 

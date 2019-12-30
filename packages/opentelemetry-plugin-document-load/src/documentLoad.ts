@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  BasePlugin,
-  otperformance,
-  parseTraceParent,
-  TRACE_PARENT_HEADER,
-} from '@opentelemetry/core';
-import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
+import { BasePlugin, otperformance, parseTraceParent, TRACE_PARENT_HEADER } from '@opentelemetry/core';
+import { PluginOptions, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import { PerformanceEntries, PerformanceLegacy } from './types';
@@ -33,13 +28,13 @@ export class DocumentLoad extends BasePlugin<unknown> {
   readonly component: string = 'document-load';
   readonly version: string = '1';
   moduleName = this.component;
-  protected _config!: PluginConfig;
+  protected _config!: PluginOptions;
 
   /**
    *
    * @param config
    */
-  constructor(config: PluginConfig = {}) {
+  constructor(config: PluginOptions = {}) {
     super();
     this._onDocumentLoaded = this._onDocumentLoaded.bind(this);
     this._config = config;
