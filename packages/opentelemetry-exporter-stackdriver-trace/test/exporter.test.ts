@@ -19,18 +19,18 @@ import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
 import * as assert from 'assert';
-import { BASE_PATH, HEADERS, HOST_ADDRESS } from 'gcp-metadata';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { StackdriverTraceExporter } from '../src';
 
-nock.disableNetConnect();
-
 describe('Stackdriver Trace Exporter', () => {
+  beforeEach(() => {
+    process.env.GCLOUD_PROJECT = 'not-real';
+    nock.disableNetConnect();
+  });
+
   describe('constructor', () => {
     it('should construct an exporter', async () => {
-      const scope = createGetProjectIdNock();
-
       const exporter = new StackdriverTraceExporter({
         serviceName: 'service-name',
         credentials: {
@@ -42,14 +42,12 @@ describe('Stackdriver Trace Exporter', () => {
       assert(exporter);
       return (exporter['_projectId'] as Promise<string>).then(id => {
         assert.deepStrictEqual(id, 'not-real');
-        scope.done();
       });
     });
   });
 
   describe('export', () => {
     let exporter: StackdriverTraceExporter;
-    let scope: nock.Scope;
     let logger: ConsoleLogger;
     let batchWrite: sinon.SinonSpy<[any, any], any>;
     let debug: sinon.SinonSpy;
@@ -62,14 +60,12 @@ describe('Stackdriver Trace Exporter', () => {
     beforeEach(() => {
       getClientShouldFail = false;
       batchWriteShouldFail = false;
-      scope = createGetProjectIdNock();
       logger = new ConsoleLogger(LogLevel.ERROR);
       exporter = new StackdriverTraceExporter({
         serviceName: 'service-name',
         logger,
       });
 
-      // batchWriteSpans = sinon.spy();
       batchWrite = sinon.spy(
         (spans: any, callback: (err: Error | null) => void): any => {
           if (batchWriteShouldFail) {
@@ -104,7 +100,7 @@ describe('Stackdriver Trace Exporter', () => {
     });
 
     afterEach(() => {
-      scope.done();
+      nock.restore();
       sinon.restore();
     });
 
@@ -231,9 +227,3 @@ describe('Stackdriver Trace Exporter', () => {
     });
   });
 });
-
-function createGetProjectIdNock(projectId = 'not-real') {
-  return nock(HOST_ADDRESS)
-    .get(`${BASE_PATH}/project/project-id`)
-    .reply(200, projectId, HEADERS);
-}
