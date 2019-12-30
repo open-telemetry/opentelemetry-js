@@ -12,7 +12,7 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "version:update": "node scripts/version-update.js",
+    "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"

@@ -13,7 +13,7 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "prepare": "npm run compile",
-    "version:update": "node scripts/version-update.js",
+    "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix"
   },
