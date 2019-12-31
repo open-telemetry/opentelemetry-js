@@ -3,7 +3,7 @@
 const types = require('@opentelemetry/types');
 
 function getMiddlewareTracer(tracer) {
-  return function (req, res, next) {
+  return (req, res, next) => {
     const span = tracer.startSpan(`express.middleware.tracer(${req.method} ${req.path})`, {
       parent: tracer.getCurrentSpan(),
       kind: types.SpanKind.SERVER,
@@ -11,9 +11,9 @@ function getMiddlewareTracer(tracer) {
 
     // End this span before sending out the response
     const originalSend = res.send;
-    res.send = function send() {
+    res.send = function send(...args) {
       span.end();
-      originalSend.apply(res, arguments);
+      originalSend.apply(res, args);
     };
 
     tracer.withSpan(span, next);
@@ -21,8 +21,8 @@ function getMiddlewareTracer(tracer) {
 }
 
 function getErrorTracer(tracer) {
-  return function (err, _req, res, _next) {
-    console.log('Caught error', err.message);
+  return (err, _req, res, _next) => {
+    console.error('Caught error', err.message);
     const span = tracer.getCurrentSpan();
     if (span) {
       span.setStatus({ code: types.CanonicalCode.INTERNAL, message: err.message });

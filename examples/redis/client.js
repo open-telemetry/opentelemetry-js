@@ -1,12 +1,9 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
 const types = require('@opentelemetry/types');
-const config = require('./setup');
-
-config.setupTracerAndExporters('redis-client-service');
-const tracer = opentelemetry.getTracer();
 const axios = require('axios').default;
+const tracer = require('./tracer');
+
 
 function makeRequest() {
   const span = tracer.startSpan('client.makeRequest()', {

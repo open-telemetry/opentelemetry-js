@@ -1,17 +1,8 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (HTTP and MySQL in this case).
- */
-config.setupTracerAndExporters('http-mysql-server-service');
-
 const mysql = require('mysql');
 const http = require('http');
-const config = require('./setup');
-
-const tracer = opentelemetry.getTracer();
+const tracer = require('./tracer');
 
 const pool = mysql.createPool({
   host: 'localhost',

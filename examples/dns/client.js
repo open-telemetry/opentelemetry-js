@@ -1,17 +1,7 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
-
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (DNS in this case).
- */
-config.setupTracerAndExporters('dns-client-service');
-
 const dns = require('dns').promises;
-
-const tracer = opentelemetry.getTracer();
+const tracer = require('./tracer');
 
 /** A function which makes a dns lookup and handles response. */
 function makeLookup() {

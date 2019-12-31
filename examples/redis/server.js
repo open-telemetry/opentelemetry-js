@@ -1,16 +1,11 @@
 'use strict';
 
-// Setup opentelemetry tracer first so that built-in plugins can hook onto their corresponding modules
-const opentelemetry = require('@opentelemetry/core');
-
-config.setupTracerAndExporters('redis-server-service');
-const tracer = opentelemetry.getTracer();
-
 // Require in rest of modules
 const express = require('express');
 const axios = require('axios').default;
-const config = require('./setup');
+const tracer = require('./tracer');
 const tracerHandlers = require('./express-tracer-handlers');
+const redisPromise = require('./setup-redis').redis;
 
 // Setup express
 const app = express();
@@ -20,10 +15,15 @@ const PORT = 8080;
  * Redis Routes are set up async since we resolve the client once it is successfully connected
  */
 async function setupRoutes() {
-  const redis = await require('./setup-redis').redis;
+  const redis = await redisPromise;
 
   app.get('/run_test', async (req, res) => {
-    const uuid = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+    const uuid = Math.random()
+      .toString(36)
+      .substring(2, 15)
+      + Math.random()
+        .toString(36)
+        .substring(2, 15);
     await axios.get(`http://localhost:${PORT}/set?args=uuid,${uuid}`);
     const body = await axios.get(`http://localhost:${PORT}/get?args=uuid`);
 

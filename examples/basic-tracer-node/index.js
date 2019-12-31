@@ -1,3 +1,5 @@
+'use strict';
+
 const opentelemetry = require('@opentelemetry/core');
 const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
@@ -29,12 +31,12 @@ tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 opentelemetry.initGlobalTracer(tracer);
 
 // Create a span. A span must be closed.
-const span = opentelemetry.getTracer().startSpan('main');
-for (let i = 0; i < 10; i++) {
-  doWork(span);
+const parentSpan = opentelemetry.getTracer().startSpan('main');
+for (let i = 0; i < 10; i += 1) {
+  doWork(parentSpan);
 }
 // Be sure to end the span.
-span.end();
+parentSpan.end();
 
 // flush and close the connection.
 exporter.shutdown();
@@ -47,7 +49,9 @@ function doWork(parent) {
   });
 
   // simulate some random work.
-  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i++) { }
+  for (let i = 0; i <= Math.floor(Math.random() * 40000000); i += 1) {
+    // empty
+  }
 
   // Set attributes to the span.
   span.setAttribute('key', 'value');
