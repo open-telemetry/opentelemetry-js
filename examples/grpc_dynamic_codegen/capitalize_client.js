@@ -1,19 +1,9 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (gRPC in this case).
- */
-config.setupTracerAndExporters('grpc-client-service');
-
 const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
-const config = require('./setup');
-
-const tracer = opentelemetry.getTracer();
+const tracer = require('./tracer')('grpc-client-service');
 
 const PROTO_PATH = path.join(__dirname, 'protos/defs.proto');
 const PROTO_OPTIONS = {

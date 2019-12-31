@@ -1,18 +1,10 @@
 'use strict';
 
 const { SpanKind } = require('@opentelemetry/types');
-const opentelemetry = require('@opentelemetry/core');
-
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (gRPC in this case).
- */
-config.setupTracerAndExporters('grpc-server-service');
-
 const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');
-const config = require('./setup');
+const tracer = require('./tracer')('grpc-server-service');
 
 const PROTO_PATH = path.join(__dirname, 'protos/defs.proto');
 const PROTO_OPTIONS = {
@@ -21,7 +13,6 @@ const PROTO_OPTIONS = {
 const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
 const rpcProto = grpc.loadPackageDefinition(definition).rpc;
 
-const tracer = opentelemetry.getTracer();
 
 /** Implements the Capitalize RPC method. */
 function capitalize(call, callback) {
@@ -36,7 +27,9 @@ function capitalize(call, callback) {
 
   const data = call.request.data.toString('utf8');
   const capitalized = data.toUpperCase();
-  for (let i = 0; i < 100000000; i++) {}
+  for (let i = 0; i < 100000000; i += 1) {
+    // empty
+  }
   span.end();
   callback(null, { data: Buffer.from(capitalized) });
 }

@@ -2,7 +2,7 @@
 
 const mysql = require('mysql');
 const http = require('http');
-const tracer = require('./tracer');
+const tracer = require('./tracer')('http-mysql-server-service');
 
 const pool = mysql.createPool({
   host: 'localhost',
@@ -72,8 +72,8 @@ startServer(8080);
 
 function handlePoolQuery(response) {
   const query = 'SELECT 1 + 1 as pool_solution';
-  pool.getConnection((err, conn) => {
-    conn.query(query, (err, results, fields) => {
+  pool.getConnection((connErr, conn) => {
+    conn.query(query, (err, results) => {
       tracer.getCurrentSpan().addEvent('results');
       if (err) {
         console.log('Error code:', err.code);
@@ -87,7 +87,7 @@ function handlePoolQuery(response) {
 
 function handleConnectionQuery(response) {
   const query = 'SELECT 1 + 1 as solution';
-  connection.query(query, (err, results, fields) => {
+  connection.query(query, (err, results) => {
     if (err) {
       console.log('Error code:', err.code);
       response.end(err.message);
@@ -99,8 +99,8 @@ function handleConnectionQuery(response) {
 
 function handleClusterQuery(response) {
   const query = 'SELECT 1 + 1 as cluster_solution';
-  cluster.getConnection((err, conn) => {
-    conn.query(query, (err, results, fields) => {
+  cluster.getConnection((connErr, conn) => {
+    conn.query(query, (err, results) => {
       tracer.getCurrentSpan().addEvent('results');
       if (err) {
         console.log('Error code:', err.code);
