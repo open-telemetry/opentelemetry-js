@@ -1,3 +1,5 @@
+'use strict';
+
 const { Pool } = require('pg');
 
 // create new pool for psql
@@ -13,12 +15,13 @@ const CONFIG = {
 function startPsql() {
   const pool = new Pool(CONFIG);
 
-  pool.connect((err, client, release) => {
-    if (err) throw err;
+  pool.connect((connectErr, client, release) => {
+    if (connectErr) throw connectErr;
     release();
     const queryText = 'CREATE TABLE IF NOT EXISTS test(id SERIAL PRIMARY KEY, text VARCHAR(40) not null)';
     client.query(queryText, (err, res) => {
       if (err) throw err;
+      console.log(res.rows[0]);
     });
   });
 

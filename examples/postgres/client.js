@@ -1,13 +1,7 @@
 'use strict';
 
-// set up ot
-const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
-
-config.setupTracerAndExporters('postgres-client-service');
 const http = require('http');
-
-const tracer = opentelemetry.getTracer();
+const tracer = require('./tracer');
 
 function makeRequest() {
   const span = tracer.startSpan('makeRequest');
