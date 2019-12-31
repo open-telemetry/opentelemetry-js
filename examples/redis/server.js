@@ -3,7 +3,7 @@
 // Require in rest of modules
 const express = require('express');
 const axios = require('axios').default;
-const tracer = require('./tracer');
+const tracer = require('./tracer')('redis-server-service');
 const tracerHandlers = require('./express-tracer-handlers');
 const redisPromise = require('./setup-redis').redis;
 

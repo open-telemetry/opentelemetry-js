@@ -1,7 +1,7 @@
 'use strict';
 
 const http = require('http');
-const tracer = require('./tracer');
+const tracer = require('./tracer')('http-server-service');
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer(port) {

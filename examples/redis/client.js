@@ -2,7 +2,7 @@
 
 const types = require('@opentelemetry/types');
 const axios = require('axios').default;
-const tracer = require('./tracer');
+const tracer = require('./tracer')('redis-client-service');
 
 
 function makeRequest() {

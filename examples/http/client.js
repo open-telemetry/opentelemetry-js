@@ -1,7 +1,7 @@
 'use strict';
 
 const http = require('http');
-const tracer = require('./tracer');
+const tracer = require('./tracer')('http-client-service');
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

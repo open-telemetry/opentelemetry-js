@@ -7,24 +7,26 @@ const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 const EXPORTER = process.env.EXPORTER || '';
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const tracer = new NodeTracer();
+module.exports = (service) => {
+  const tracer = new NodeTracer();
 
-let exporter;
-const service = 'https-server-service';
-if (EXPORTER.toLowerCase().startsWith('z')) {
-  exporter = new ZipkinExporter({
-    serviceName: service,
-  });
-} else {
-  exporter = new JaegerExporter({
-    serviceName: service,
-  });
-}
+  let exporter;
+  if (EXPORTER.toLowerCase().startsWith('z')) {
+    exporter = new ZipkinExporter({
+      serviceName: service,
+    });
+  } else {
+    exporter = new JaegerExporter({
+      serviceName: service,
+    });
+  }
 
-tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracer(tracer);
+  // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+  opentelemetry.initGlobalTracer(tracer);
 
-module.exports = opentelemetry.getTracer();
+  return opentelemetry.getTracer();
+};

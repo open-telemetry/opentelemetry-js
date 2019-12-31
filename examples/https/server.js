@@ -2,7 +2,7 @@
 
 const fs = require('fs');
 const https = require('https');
-const tracer = require('./tracer');
+const tracer = require('./tracer')('https-server-service');
 
 /** Starts a HTTPs server that receives requests on sample server port. */
 function startServer(port) {

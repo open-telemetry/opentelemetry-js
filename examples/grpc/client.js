@@ -1,21 +1,12 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
-
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (gRPC in this case).
- */
-config.setupTracerAndExporters('grpc-client-service');
-
 const grpc = require('grpc');
+const tracer = require('./tracer')('grpc-client-service');
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
 
 const PORT = 50051;
-const tracer = opentelemetry.getTracer();
 
 /** A function which makes requests and handles response. */
 function main() {
@@ -32,6 +23,7 @@ function main() {
     const request = new messages.HelloRequest();
     let user;
     if (process.argv.length >= 3) {
+      // eslint-disable-next-line prefer-destructuring
       user = process.argv[2];
     } else {
       user = 'world';

@@ -1,7 +1,7 @@
 'use strict';
 
 const https = require('https');
-const tracer = require('./tracer');
+const tracer = require('./tracer')('https-client-service');
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

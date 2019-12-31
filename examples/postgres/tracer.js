@@ -8,45 +8,45 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 const EXPORTER = process.env.EXPORTER || '';
 
-const tracer = new NodeTracer({
-  plugins: {
-    pg: {
-      enabled: true,
-      /*
+module.exports = (service) => {
+  const tracer = new NodeTracer({
+    plugins: {
+      pg: {
+        enabled: true,
+        /*
         if it can't find the module,
         put the absolute path since the packages are not published yet
         */
-      path: '@opentelemetry/plugin-pg',
+        path: '@opentelemetry/plugin-pg',
+      },
+      'pg-pool': {
+        enabled: true,
+        path: '@opentelemetry/plugin-pg-pool',
+      },
+      http: {
+        enabled: true,
+        path: '@opentelemetry/plugin-http',
+      },
     },
-    'pg-pool': {
-      enabled: true,
-      path: '@opentelemetry/plugin-pg-pool',
-    },
-    http: {
-      enabled: true,
-      path: '@opentelemetry/plugin-http',
-    },
-  },
-});
-
-let exporter;
-const service = 'postgres-server-service';
-if (EXPORTER.toLowerCase().startsWith('z')) {
-  exporter = new ZipkinExporter({
-    serviceName: service,
   });
-} else {
-  exporter = new JaegerExporter({
-    serviceName: service,
-    // The default flush interval is 5 seconds.
-    flushInterval: 2000,
-  });
-}
 
-tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  let exporter;
+  if (EXPORTER.toLowerCase().startsWith('z')) {
+    exporter = new ZipkinExporter({
+      serviceName: service,
+    });
+  } else {
+    exporter = new JaegerExporter({
+      serviceName: service,
+      // The default flush interval is 5 seconds.
+      flushInterval: 2000,
+    });
+  }
 
-// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracer(tracer);
+  tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
+  // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
+  opentelemetry.initGlobalTracer(tracer);
 
-module.exports = opentelemetry.getTracer();
+  return opentelemetry.getTracer();
+};
