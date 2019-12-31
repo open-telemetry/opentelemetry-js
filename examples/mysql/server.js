@@ -72,7 +72,7 @@ startServer(8080);
 
 function handlePoolQuery(response) {
   const query = 'SELECT 1 + 1 as pool_solution';
-  pool.getConnection((connErr, conn) => {
+  pool.getConnection((connErr, conn, _fields) => {
     conn.query(query, (err, results) => {
       tracer.getCurrentSpan().addEvent('results');
       if (err) {
@@ -87,7 +87,7 @@ function handlePoolQuery(response) {
 
 function handleConnectionQuery(response) {
   const query = 'SELECT 1 + 1 as solution';
-  connection.query(query, (err, results) => {
+  connection.query(query, (err, results, _fields) => {
     if (err) {
       console.log('Error code:', err.code);
       response.end(err.message);
@@ -100,7 +100,7 @@ function handleConnectionQuery(response) {
 function handleClusterQuery(response) {
   const query = 'SELECT 1 + 1 as cluster_solution';
   cluster.getConnection((connErr, conn) => {
-    conn.query(query, (err, results) => {
+    conn.query(query, (err, results, _fields) => {
       tracer.getCurrentSpan().addEvent('results');
       if (err) {
         console.log('Error code:', err.code);

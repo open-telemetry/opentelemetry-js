@@ -10,6 +10,7 @@
     "strict": ["error", "global"],
     "no-use-before-define": ["error", "nofunc"],
     "no-console": "off",
-    "import/no-unresolved": "off"
+    "import/no-unresolved": "off",
+    "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
   }
 }
