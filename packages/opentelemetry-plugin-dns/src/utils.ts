@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  Attributes,
-  CanonicalCode,
-  Span,
-  Status,
-} from '@opentelemetry/types';
+import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/types';
 import * as dns from 'dns';
 import { AddressFamily } from './enums/AddressFamily';
 import { AttributeNames } from './enums/AttributeNames';
@@ -159,4 +154,3 @@ export const setLookupAttributes = (
 
   span.setAttributes(attributes);
 };
-

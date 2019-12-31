@@ -15,14 +15,35 @@
  */
 
 import { BasePlugin, isValid, matchesAnyPattern } from '@opentelemetry/core';
-import { Attributes, CanonicalCode, PluginOptions, Span, SpanKind, SpanOptions, Status } from '@opentelemetry/types';
-import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
+import {
+  Attributes,
+  CanonicalCode,
+  PluginOptions,
+  Span,
+  SpanKind,
+  SpanOptions,
+  Status,
+} from '@opentelemetry/types';
+import {
+  ClientRequest,
+  IncomingMessage,
+  request,
+  RequestOptions,
+  ServerResponse,
+} from 'http';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Format } from './enums/Format';
-import { Err, Func, Http, HttpRequestArgs, ParsedRequestOptions, ResponseEndArgs } from './types';
+import {
+  Err,
+  Func,
+  Http,
+  HttpRequestArgs,
+  ParsedRequestOptions,
+  ResponseEndArgs,
+} from './types';
 import * as utils from './utils';
 
 /**
@@ -208,7 +229,10 @@ export class HttpPlugin extends BasePlugin<Http> {
 
             span.setStatus(status);
 
-            if (this._config.http && this._config.http.applyCustomAttributesOnSpan) {
+            if (
+              this._config.http &&
+              this._config.http.applyCustomAttributesOnSpan
+            ) {
               this._safeExecute(
                 span,
                 () =>
@@ -340,7 +364,10 @@ export class HttpPlugin extends BasePlugin<Http> {
             .setAttributes(attributes)
             .setStatus(utils.parseResponseStatus(response.statusCode));
 
-          if (plugin._config.http && plugin._config.http.applyCustomAttributesOnSpan) {
+          if (
+            plugin._config.http &&
+            plugin._config.http.applyCustomAttributesOnSpan
+          ) {
             plugin._safeExecute(
               span,
               () =>

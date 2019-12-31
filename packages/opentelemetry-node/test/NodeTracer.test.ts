@@ -102,7 +102,7 @@ describe('NodeTracer', () => {
               },
               http: {
                 ignoreOutgoingUrls: [],
-              }
+              },
             },
           },
         },

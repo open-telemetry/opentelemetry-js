@@ -41,7 +41,6 @@ export type ResponseEndArgs =
   | [unknown, ((() => void) | undefined)?]
   | [unknown, string, ((() => void) | undefined)?];
 
-
 export interface Err extends Error {
   errno?: number;
   code?: string;

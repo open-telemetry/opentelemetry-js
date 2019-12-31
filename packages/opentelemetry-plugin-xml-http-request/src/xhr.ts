@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-import { BasePlugin, hrTime, isWrapped, otperformance, matchesAnyPattern, matchesPattern } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  hrTime,
+  isWrapped,
+  otperformance,
+  matchesAnyPattern,
+  matchesPattern,
+} from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { addSpanNetworkEvent, getResource, parseUrl, PerformanceTimingNames as PTN } from '@opentelemetry/web';
+import {
+  addSpanNetworkEvent,
+  getResource,
+  parseUrl,
+  PerformanceTimingNames as PTN,
+} from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
@@ -28,7 +40,6 @@ import { OpenFunction, SendFunction, XhrMem } from './types';
 // hard to say how long it should really wait, seems like 300ms is
 // safe enough
 const OBSERVER_WAIT_TIME_MS = 300;
-
 
 /**
  * This class represents a XMLHttpRequest plugin for auto instrumentation
@@ -51,7 +62,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     super();
     this._config = config;
     this._xhrOptions = config.xhr || {};
-    this._ignoreOutgoingUrls = config.http && config.http.ignoreOutgoingUrls || [];
+    this._ignoreOutgoingUrls =
+      (config.http && config.http.ignoreOutgoingUrls) || [];
   }
 
   /**

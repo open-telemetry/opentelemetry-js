@@ -16,9 +16,21 @@
 
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node';
-import { AttributeNames, Http, OT_REQUEST_HEADER } from '@opentelemetry/plugin-http';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { CanonicalCode, PluginOptions, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import {
+  AttributeNames,
+  Http,
+  OT_REQUEST_HEADER,
+} from '@opentelemetry/plugin-http';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
+import {
+  CanonicalCode,
+  PluginOptions,
+  Span as ISpan,
+  SpanKind,
+} from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as http from 'http';
@@ -101,7 +113,7 @@ describe('HttpsPlugin', () => {
             applyCustomAttributesOnSpan: () => {
               throw new Error(applyCustomAttributesOnSpanErrorMessage);
             },
-          }
+          },
         };
         pluginWithBadOptions = new HttpsPlugin(process.versions.node);
         pluginWithBadOptions.enable(
@@ -184,7 +196,7 @@ describe('HttpsPlugin', () => {
               (url: string) => url.endsWith(`/ignored/function`),
             ],
             applyCustomAttributesOnSpan: customAttributeFunction,
-          }
+          },
         };
         plugin.enable(
           (https as unknown) as Http,
@@ -616,7 +628,7 @@ describe('HttpsPlugin', () => {
           .reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => { });
+          response.on('data', () => {});
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;

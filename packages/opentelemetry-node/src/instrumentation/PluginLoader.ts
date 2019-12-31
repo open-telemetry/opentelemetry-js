@@ -148,7 +148,12 @@ export class PluginLoader {
 
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer, this.logger, config.options);
+          return plugin.enable(
+            exports,
+            this.tracer,
+            this.logger,
+            config.options
+          );
         } catch (e) {
           this.logger.error(
             `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`

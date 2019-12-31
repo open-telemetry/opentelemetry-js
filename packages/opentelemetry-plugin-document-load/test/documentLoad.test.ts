@@ -19,15 +19,18 @@
  */
 
 import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
-import { BasicTracer, ReadableSpan, SimpleSpanProcessor, SpanExporter } from '@opentelemetry/tracing';
+import {
+  BasicTracer,
+  ReadableSpan,
+  SimpleSpanProcessor,
+  SpanExporter,
+} from '@opentelemetry/tracing';
 import { Logger, PluginOptions, TimedEvent } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
 import { PerformanceTimingNames as PTN } from '@opentelemetry/web';
-
-
 
 export class DummyExporter implements SpanExporter {
   export(

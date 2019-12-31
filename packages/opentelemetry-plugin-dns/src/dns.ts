@@ -15,13 +15,24 @@
  */
 
 import { BasePlugin, matchesAnyPattern } from '@opentelemetry/core';
-import { PluginOptions, Span, SpanKind, SpanOptions } from '@opentelemetry/types';
+import {
+  PluginOptions,
+  Span,
+  SpanKind,
+  SpanOptions,
+} from '@opentelemetry/types';
 import { LookupAddress } from 'dns';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import { AddressFamily } from './enums/AddressFamily';
 import { AttributeNames } from './enums/AttributeNames';
-import { Dns, LookupCallbackSignature, LookupFunction, LookupFunctionSignature, LookupPromiseSignature } from './types';
+import {
+  Dns,
+  LookupCallbackSignature,
+  LookupFunction,
+  LookupFunctionSignature,
+  LookupPromiseSignature,
+} from './types';
 import * as utils from './utils';
 
 /**
@@ -98,7 +109,10 @@ export class DnsPlugin extends BasePlugin<Dns> {
       ...args: unknown[]
     ) {
       if (
-        matchesAnyPattern(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames)
+        matchesAnyPattern(
+          hostname,
+          plugin._config.dns && plugin._config.dns.ignoreHostnames
+        )
       ) {
         return original.apply(this, [hostname, ...args]);
       }

@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import { ClientRequest, IncomingMessage, ServerResponse } from "http";
+import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 import { Logger } from '../../common/Logger';
 import { Span } from '../span';
 import { Tracer } from '../tracer';
-
 
 /** Interface Plugin to apply patch. */
 export interface Plugin<T = any> {

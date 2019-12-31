@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { BasePlugin, otperformance, parseTraceParent, TRACE_PARENT_HEADER } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  otperformance,
+  parseTraceParent,
+  TRACE_PARENT_HEADER,
+} from '@opentelemetry/core';
 import { PluginOptions, Span, SpanOptions } from '@opentelemetry/types';
 import { AttributeNames } from './enums/AttributeNames';
 import {

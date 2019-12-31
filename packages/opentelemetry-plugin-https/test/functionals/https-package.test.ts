@@ -17,7 +17,10 @@
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import { PluginOptions, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
@@ -33,7 +36,6 @@ import { plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { customAttributeFunction } from './https-enable.test';
-
 
 const memoryExporter = new InMemorySpanExporter();
 const protocol = 'https';
@@ -56,7 +58,7 @@ describe('Packages', () => {
       const config: PluginOptions = {
         http: {
           applyCustomAttributesOnSpan: customAttributeFunction,
-        }
+        },
       };
       plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
     });
@@ -91,10 +93,10 @@ describe('Packages', () => {
         const urlparsed = url.parse(
           name === 'got' && process.versions.node.startsWith('12')
             ? // there is an issue with got 9.6 version and node 12 when redirecting so url above will not work
-            // https://github.com/nock/nock/pull/1551
-            // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
-            // TODO: check if this is still the case when new version
-            `${protocol}://www.google.com`
+              // https://github.com/nock/nock/pull/1551
+              // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
+              // TODO: check if this is still the case when new version
+              `${protocol}://www.google.com`
             : `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
         );
         const result = await httpPackage.get(urlparsed.href!);
