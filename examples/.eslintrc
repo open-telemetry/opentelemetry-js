@@ -9,6 +9,7 @@
   "rules": {
     "strict": ["error", "global"],
     "no-use-before-define": ["error", "nofunc"],
-    "no-console": "off"
+    "no-console": "off",
+    "import/no-unresolved": "off"
   }
 }
