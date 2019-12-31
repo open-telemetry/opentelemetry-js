@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin, isIgnored } from '@opentelemetry/core';
+import { BasePlugin, matchesAnyPattern } from '@opentelemetry/core';
 import { PluginOptions, Span, SpanKind, SpanOptions } from '@opentelemetry/types';
 import { LookupAddress } from 'dns';
 import * as semver from 'semver';
@@ -98,7 +98,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
       ...args: unknown[]
     ) {
       if (
-        isIgnored(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames)
+        matchesAnyPattern(hostname, plugin._config.dns && plugin._config.dns.ignoreHostnames)
       ) {
         return original.apply(this, [hostname, ...args]);
       }

@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 
-import { isIgnored } from '../../src';
+import { matchesAnyPattern, matchesPattern } from '../../src';
 
 const urlIgnored = 'url should be ignored';
 const urlNotIgnored = 'url should NOT be ignored';
@@ -24,30 +24,95 @@ const urlNotIgnored = 'url should NOT be ignored';
 const urlToTest = 'http://myaddress.com/somepath';
 
 describe('BasePlugin - Utils', () => {
-  describe('isIgnored', () => {
+  describe('matchesPattern', () => {
+    describe('when a pattern is a string', () => {
+      describe('and an exact case insensitive match', () => {
+        it('should return true', () => {
+          assert.strictEqual(matchesPattern('http://url', 'http://URL'), true);
+        });
+      });
+      describe('and not an exact case insensitive match', () => {
+        it('should return false', () => {
+          assert.strictEqual(
+            matchesPattern('http://url', 'http://URL.com'),
+            false
+          );
+        });
+      });
+    });
+    describe('when a pattern is a regular expression', () => {
+      describe('and a match', () => {
+        it('should return true', () => {
+          assert.strictEqual(matchesPattern('http://url', /url/), true);
+        });
+      });
+      describe('and not a match', () => {
+        it('should return false', () => {
+          assert.strictEqual(matchesPattern('http://url', /noturl/), false);
+        });
+      });
+    });
+    describe('when a pattern is a function', () => {
+      describe('that throws', () => {
+        it('should return false', () => {
+          assert.strictEqual(
+            matchesPattern('http://url', () => {
+              throw new Error();
+            }),
+            false
+          );
+        });
+      });
+      describe('that returns a false value', () => {
+        it('should return false', () => {
+          assert.strictEqual(
+            matchesPattern('http://url', url => {
+              return url === 'noturl';
+            }),
+            false
+          );
+        });
+      });
+      describe('that returns a true value', () => {
+        it('should return true', () => {
+          assert.strictEqual(
+            matchesPattern('http://url', url => {
+              return url === 'http://url';
+            }),
+            true
+          );
+        });
+      });
+    });
+  });
+  describe('matchesAnyPattern', () => {
     describe('when ignored urls are undefined', () => {
       it('should return false', () => {
-        assert.strictEqual(isIgnored(urlToTest), false, urlNotIgnored);
+        assert.strictEqual(matchesAnyPattern(urlToTest), false, urlNotIgnored);
       });
     });
     describe('when ignored urls are empty', () => {
       it('should return false', () => {
-        assert.strictEqual(isIgnored(urlToTest, []), false, urlNotIgnored);
+        assert.strictEqual(
+          matchesAnyPattern(urlToTest, []),
+          false,
+          urlNotIgnored
+        );
       });
     });
-    describe('when ignored urls is the same as url', () => {
+    describe('when ignored urls contain the url', () => {
       it('should return true', () => {
         assert.strictEqual(
-          isIgnored(urlToTest, ['http://myaddress.com/somepath']),
+          matchesAnyPattern(urlToTest, ['http://myaddress.com/somepath']),
           true,
           urlIgnored
         );
       });
     });
-    describe('when url is part of ignored urls', () => {
+    describe('when ignored urls does not contain the url', () => {
       it('should return false', () => {
         assert.strictEqual(
-          isIgnored(urlToTest, ['http://myaddress.com/some']),
+          matchesAnyPattern(urlToTest, ['http://myaddress.com/some']),
           false,
           urlNotIgnored
         );
@@ -56,16 +121,16 @@ describe('BasePlugin - Utils', () => {
     describe('when ignored urls is part of url - REGEXP', () => {
       it('should return true', () => {
         assert.strictEqual(
-          isIgnored(urlToTest, [/.+?myaddress\.com/]),
+          matchesAnyPattern(urlToTest, [/.+?myaddress\.com/]),
           true,
           urlIgnored
         );
       });
     });
-    describe('when url is part of ignored urls - REGEXP', () => {
+    describe('when url is not part of ignored urls - REGEXP', () => {
       it('should return false', () => {
         assert.strictEqual(
-          isIgnored(urlToTest, [/http:\/\/myaddress\.com\/somepath2/]),
+          matchesAnyPattern(urlToTest, [/http:\/\/myaddress\.com\/somepath2/]),
           false,
           urlNotIgnored
         );

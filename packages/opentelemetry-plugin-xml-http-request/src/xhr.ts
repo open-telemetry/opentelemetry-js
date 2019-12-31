@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { BasePlugin, hrTime, isWrapped, otperformance, isIgnored } from '@opentelemetry/core';
+import { BasePlugin, hrTime, isWrapped, otperformance, matchesAnyPattern, matchesPattern } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { PluginOptions, XMLHttpRequestPluginOptions, IgnoreMatcher } from '@opentelemetry/types';
 import { addSpanNetworkEvent, getResource, parseUrl, PerformanceTimingNames as PTN } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
@@ -40,15 +39,15 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly version: string = '0.3.0';
   moduleName = this.component;
 
-  protected _config!: PluginOptions;
-  private _xhrOptions: XMLHttpRequestPluginOptions;
-  private _ignoreOutgoingUrls: IgnoreMatcher[];
+  protected _config!: types.PluginOptions;
+  private _xhrOptions: types.XMLHttpRequestPluginOptions;
+  private _ignoreOutgoingUrls: types.IgnoreMatcher[];
 
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config: PluginOptions = {}) {
+  constructor(config: types.PluginOptions = {}) {
     super();
     this._config = config;
     this._xhrOptions = config.xhr || {};
@@ -95,7 +94,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return true;
     } else {
       for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (isIgnored(spanUrl, propagateTraceHeaderUrl)) {
+        if (matchesPattern(spanUrl, propagateTraceHeaderUrl)) {
           return true;
         }
       }
@@ -291,7 +290,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     url: string,
     method: string
   ): types.Span | undefined {
-    if (isIgnored(url, this._ignoreOutgoingUrls)) {
+    if (matchesAnyPattern(url, this._ignoreOutgoingUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }

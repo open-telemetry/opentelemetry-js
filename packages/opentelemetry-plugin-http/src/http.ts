@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin, isValid, isIgnored } from '@opentelemetry/core';
+import { BasePlugin, isValid, matchesAnyPattern } from '@opentelemetry/core';
 import { Attributes, CanonicalCode, PluginOptions, Span, SpanKind, SpanOptions, Status } from '@opentelemetry/types';
 import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
 import * as semver from 'semver';
@@ -268,7 +268,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (
-        isIgnored(
+        matchesAnyPattern(
           pathname,
           plugin._config.http && plugin._config.http.ignoreIncomingPaths
         )
@@ -393,7 +393,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       if (
         utils.isOpenTelemetryRequest(options) ||
-        isIgnored(
+        matchesAnyPattern(
           origin + pathname,
           plugin._config.http && plugin._config.http.ignoreOutgoingUrls
         )
