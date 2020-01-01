@@ -1,7 +1,7 @@
 'use strict';
 
-const dns = require('dns').promises;
 const tracer = require('./tracer')('dns-client-service');
+const dns = require('dns').promises;
 
 /** A function which makes a dns lookup and handles response. */
 function makeLookup() {

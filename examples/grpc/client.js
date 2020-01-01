@@ -1,8 +1,7 @@
 'use strict';
 
-const grpc = require('grpc');
 const tracer = require('./tracer')('grpc-client-service');
-
+const grpc = require('grpc');
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
 

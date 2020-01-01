@@ -1,8 +1,8 @@
 'use strict';
 
+const tracer = require('./tracer')('postgres-server-service');
 const { SpanKind, CanonicalCode } = require('@opentelemetry/types');
 const express = require('express');
-const tracer = require('./tracer')('postgres-server-service');
 const setupPg = require('./setupPsql');
 
 const pool = setupPg.startPsql();

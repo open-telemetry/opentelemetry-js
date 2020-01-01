@@ -1,7 +1,7 @@
 'use strict';
 
-const http = require('http');
 const tracer = require('./tracer')('http-mysql-client-service');
+const http = require('http');
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

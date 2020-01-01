@@ -1,7 +1,7 @@
 'use strict';
 
-const http = require('http');
 const tracer = require('./tracer')('postgres-client-service');
+const http = require('http');
 
 function makeRequest() {
   const span = tracer.startSpan('makeRequest');

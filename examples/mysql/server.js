@@ -1,8 +1,8 @@
 'use strict';
 
+const tracer = require('./tracer')('http-mysql-server-service');
 const mysql = require('mysql');
 const http = require('http');
-const tracer = require('./tracer')('http-mysql-server-service');
 
 const pool = mysql.createPool({
   host: 'localhost',
