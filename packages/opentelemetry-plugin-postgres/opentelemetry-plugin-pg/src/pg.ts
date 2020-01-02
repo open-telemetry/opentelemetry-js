@@ -17,7 +17,6 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { CanonicalCode, Span } from '@opentelemetry/types';
 import {
-  PostgresPluginOptions,
   PgClientExtended,
   PgPluginQueryConfig,
   PostgresCallback,
@@ -27,8 +26,6 @@ import * as shimmer from 'shimmer';
 import * as utils from './utils';
 
 export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
-  protected _config: PostgresPluginOptions;
-
   static readonly COMPONENT = 'pg';
   static readonly DB_TYPE = 'sql';
 
@@ -38,7 +35,6 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
   constructor(readonly moduleName: string) {
     super();
-    this._config = {};
   }
 
   protected patch(): typeof pgTypes {

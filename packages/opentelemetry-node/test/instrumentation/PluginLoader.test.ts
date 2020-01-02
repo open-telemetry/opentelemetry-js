@@ -172,7 +172,7 @@ describe('PluginLoader', () => {
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       assert.deepStrictEqual(
-        (pluginLoader['_plugins'][0] as any)._config.dns.ignoreHostnames,
+        (pluginLoader['_plugins'][0] as any)._options.dns.ignoreHostnames,
         ['shared option']
       );
       assert.strictEqual(httpModule.get(), 'patched');
@@ -190,7 +190,7 @@ describe('PluginLoader', () => {
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       assert.deepStrictEqual(
-        (pluginLoader['_plugins'][0] as any)._config.http.ignoreOutgoingUrls,
+        (pluginLoader['_plugins'][0] as any)._options.http.ignoreOutgoingUrls,
         ['plugin specific option']
       );
       assert.strictEqual(httpModule.get(), 'patched');
@@ -207,7 +207,7 @@ describe('PluginLoader', () => {
       // The hook is only called the first time the module is loaded.
       const httpModule = require('http');
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
-      assert.deepStrictEqual((pluginLoader['_plugins'][0] as any)._config, {
+      assert.deepStrictEqual((pluginLoader['_plugins'][0] as any)._options, {
         dns: { ignoreHostnames: ['shared'] },
         http: { ignoreOutgoingUrls: ['plugin specific option'] },
       });

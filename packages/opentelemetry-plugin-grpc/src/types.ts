@@ -27,8 +27,6 @@ export type SendUnaryDataCallback = (
   flags?: grpcModule.writeFlags
 ) => void;
 
-export interface GrpcPluginOptions {}
-
 interface GrpcStatus {
   code: number;
   details: string;

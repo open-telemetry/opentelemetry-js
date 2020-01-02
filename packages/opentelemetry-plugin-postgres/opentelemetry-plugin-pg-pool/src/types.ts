@@ -17,8 +17,6 @@
 import * as pgTypes from 'pg';
 import * as pgPoolTypes from 'pg-pool';
 
-export interface PostgresPoolPluginOptions {}
-
 export type PgPoolCallback = (
   err: Error,
   client: any,

@@ -16,7 +16,6 @@
 
 import { BasePlugin, matchesAnyPattern } from '@opentelemetry/core';
 import {
-  PluginOptions,
   Span,
   SpanKind,
   SpanOptions,
@@ -40,13 +39,11 @@ import * as utils from './utils';
  */
 export class DnsPlugin extends BasePlugin<Dns> {
   readonly component: string;
-  protected _config!: PluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
     super();
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
-    this._config = {};
   }
 
   /** Patches DNS functions. */
@@ -111,7 +108,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
       if (
         matchesAnyPattern(
           hostname,
-          plugin._config.dns && plugin._config.dns.ignoreHostnames
+          plugin._options.dns && plugin._options.dns.ignoreHostnames
         )
       ) {
         return original.apply(this, [hostname, ...args]);

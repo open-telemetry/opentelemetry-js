@@ -20,15 +20,12 @@ import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
 import * as pgPoolTypes from 'pg-pool';
 import {
-  PostgresPoolPluginOptions,
   PgPoolCallback,
   PgPoolExtended,
 } from './types';
 import * as utils from './utils';
 
 export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
-  protected _config: PostgresPoolPluginOptions;
-
   static readonly COMPONENT = 'pg-pool';
   static readonly DB_TYPE = 'sql';
 
@@ -36,7 +33,6 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
 
   constructor(readonly moduleName: string) {
     super();
-    this._config = {};
   }
 
   protected patch(): typeof pgPoolTypes {

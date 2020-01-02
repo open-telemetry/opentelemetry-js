@@ -53,11 +53,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   static readonly component = 'grpc';
   readonly supportedVersions = ['1.*'];
 
-  protected _config!: GrpcPluginOptions;
-
   constructor(readonly moduleName: string, readonly version: string) {
     super();
-    this._config = {};
   }
 
   protected readonly _internalFilesList: ModuleExportsMapping = {

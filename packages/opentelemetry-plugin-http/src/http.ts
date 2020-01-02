@@ -51,7 +51,6 @@ import { Socket } from 'net';
  */
 export class HttpPlugin extends BasePlugin<Http> {
   readonly component: string;
-  protected _config!: PluginOptions;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
 
@@ -60,7 +59,6 @@ export class HttpPlugin extends BasePlugin<Http> {
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
     this._spanNotEnded = new WeakSet<Span>();
-    this._config = {};
   }
 
   /** Patches HTTP incoming and outcoming request functions. */
@@ -217,13 +215,13 @@ export class HttpPlugin extends BasePlugin<Http> {
             span.setStatus(status);
 
             if (
-              this._config.http &&
-              this._config.http.applyCustomAttributesOnSpan
+              this._options.http &&
+              this._options.http.applyCustomAttributesOnSpan
             ) {
               this._safeExecute(
                 span,
                 () =>
-                  this._config.http!.applyCustomAttributesOnSpan!(
+                  this._options.http!.applyCustomAttributesOnSpan!(
                     span,
                     request,
                     response
@@ -281,7 +279,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       if (
         matchesAnyPattern(
           pathname,
-          plugin._config.http && plugin._config.http.ignoreIncomingPaths
+          plugin._options.http && plugin._options.http.ignoreIncomingPaths
         )
       ) {
         return original.apply(this, [event, ...args]);
@@ -294,7 +292,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.SERVER,
         attributes: utils.getIncomingRequestAttributes(request, {
           component: plugin.component,
-          serverName: plugin._config.http && plugin._config.http.serverName,
+          serverName: plugin._options.http && plugin._options.http.serverName,
         }),
       };
 
@@ -335,13 +333,13 @@ export class HttpPlugin extends BasePlugin<Http> {
             .setStatus(utils.parseResponseStatus(response.statusCode));
 
           if (
-            plugin._config.http &&
-            plugin._config.http.applyCustomAttributesOnSpan
+            plugin._options.http &&
+            plugin._options.http.applyCustomAttributesOnSpan
           ) {
             plugin._safeExecute(
               span,
               () =>
-                plugin._config.http!.applyCustomAttributesOnSpan!(
+                plugin._options.http!.applyCustomAttributesOnSpan!(
                   span,
                   request,
                   response
@@ -392,7 +390,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         utils.isOpenTelemetryRequest(options) ||
         matchesAnyPattern(
           origin + pathname,
-          plugin._config.http && plugin._config.http.ignoreOutgoingUrls
+          plugin._options.http && plugin._options.http.ignoreOutgoingUrls
         )
       ) {
         return original.apply(this, [options, ...args]);

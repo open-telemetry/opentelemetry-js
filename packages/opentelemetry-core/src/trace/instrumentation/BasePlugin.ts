@@ -37,19 +37,19 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected _logger!: Logger;
   protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
-  protected _config: PluginOptions = {};
+  protected _options: PluginOptions = {};
 
   enable(
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    config?: PluginOptions
+    options: PluginOptions = {};
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
-    this._config = config || {};
+    this._options = options
     return this.patch();
   }
 

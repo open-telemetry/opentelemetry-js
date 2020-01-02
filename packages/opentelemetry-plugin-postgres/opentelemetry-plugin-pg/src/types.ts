@@ -16,8 +16,6 @@
 
 import * as pgTypes from 'pg';
 
-export interface PostgresPluginOptions {}
-
 export type PostgresCallback = (err: Error, res: object) => unknown;
 
 // These are not included in @types/pg, so manually define them.

@@ -50,7 +50,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly version: string = VERSION;
   moduleName = this.component;
 
-  protected _config!: types.PluginOptions;
   private _xhrOptions: types.XMLHttpRequestPluginOptions;
   private _ignoreOutgoingUrls: types.IgnoreMatcher[];
 
@@ -60,7 +59,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
 
   constructor(config: types.PluginOptions = {}) {
     super();
-    this._config = config;
+    this._options = config;
     this._xhrOptions = config.xhr || {};
     this._ignoreOutgoingUrls =
       (config.http && config.http.ignoreOutgoingUrls) || [];
