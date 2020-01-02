@@ -26,10 +26,10 @@ import {
   Span,
   TruncatableString,
 } from './types';
+import { VERSION } from './version';
 
 const AGENT_LABEL_KEY = 'g.co/agent';
-// TODO update exporter version to use version.ts file when #651 merges
-const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-exporter [0.3.1]`;
+const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-exporter [${VERSION}]`;
 
 export function getReadableSpanTransformer(
   projectId: string,
