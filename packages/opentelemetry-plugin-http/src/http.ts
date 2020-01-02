@@ -17,7 +17,6 @@
 import { BasePlugin, isValid, matchesAnyPattern } from '@opentelemetry/core';
 import {
   CanonicalCode,
-  PluginOptions,
   Span,
   SpanKind,
   SpanOptions,
