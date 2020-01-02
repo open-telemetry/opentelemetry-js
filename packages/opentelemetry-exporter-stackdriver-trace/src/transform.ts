@@ -33,12 +33,10 @@ const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-
 
 export function getReadableSpanTransformer(
   projectId: string,
-  serviceName: string
 ): (span: ReadableSpan) => Span {
   return span => {
     const attributes = transformAttributes(span.attributes, {
       project_id: projectId,
-      service: serviceName,
       [AGENT_LABEL_KEY]: AGENT_LABEL_VALUE,
     });
 

@@ -31,7 +31,6 @@ google.options({ headers: { 'x-opentelemetry-outgoing-request': 1 } });
  */
 export class StackdriverTraceExporter implements SpanExporter {
   private _projectId: string | void | Promise<string | void>;
-  private readonly _serviceName: string;
   private readonly _logger: Logger;
   private readonly _auth: GoogleAuth;
 
@@ -39,7 +38,6 @@ export class StackdriverTraceExporter implements SpanExporter {
 
   constructor(options: StackdriverExporterOptions) {
     this._logger = options.logger || new NoopLogger();
-    this._serviceName = options.serviceName;
 
     this._auth = new GoogleAuth({
       credentials: options.credentials,
@@ -74,7 +72,7 @@ export class StackdriverTraceExporter implements SpanExporter {
 
     this._logger.debug('StackDriver Trace export');
     const authorizedSpans = await this._authorize(
-      spans.map(getReadableSpanTransformer(this._projectId, this._serviceName))
+      spans.map(getReadableSpanTransformer(this._projectId))
     );
 
     if (!authorizedSpans) {
