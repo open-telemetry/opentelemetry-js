@@ -16,7 +16,6 @@
 
 import { BasePlugin, isValid, matchesAnyPattern } from '@opentelemetry/core';
 import {
-  Attributes,
   CanonicalCode,
   PluginOptions,
   Span,
@@ -45,6 +44,7 @@ import {
   ResponseEndArgs,
 } from './types';
 import * as utils from './utils';
+import { Socket } from 'net';
 
 /**
  * Http instrumentation plugin for Opentelemetry
@@ -183,37 +183,24 @@ export class HttpPlugin extends BasePlugin<Http> {
     return (): ClientRequest => {
       this._logger.debug('makeRequestTrace by injecting context into header');
 
-      const host = options.hostname || options.host || 'localhost';
-      const method = options.method ? options.method.toUpperCase() : 'GET';
-      const headers = options.headers || {};
-      const userAgent = headers['user-agent'];
-
-      span.setAttributes({
-        [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
-          options,
-          headers,
-          `${this.component}:`
-        ),
-        [AttributeNames.HTTP_HOSTNAME]: host,
-        [AttributeNames.HTTP_METHOD]: method,
-        [AttributeNames.HTTP_PATH]: options.path || '/',
+      const hostname =
+        options.hostname ||
+        options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+        'localhost';
+      const attributes = utils.getOutgoingRequestAttributes(options, {
+        component: this.component,
+        hostname,
       });
-
-      if (userAgent !== undefined) {
-        span.setAttribute(AttributeNames.HTTP_USER_AGENT, userAgent);
-      }
+      span.setAttributes(attributes);
 
       request.on(
         'response',
-        (
-          response: IncomingMessage & { aborted?: boolean; req: ClientRequest }
-        ) => {
-          if (response.statusCode) {
-            span.setAttributes({
-              [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
-              [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
-            });
-          }
+        (response: IncomingMessage & { aborted?: boolean }) => {
+          const attributes = utils.getOutgoingRequestAttributesOnResponse(
+            response,
+            { hostname }
+          );
+          span.setAttributes(attributes);
 
           this._tracer.bind(response);
           this._logger.debug('outgoingRequest on response()');
@@ -283,7 +270,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       const request = args[0] as IncomingMessage;
-      const response = args[1] as ServerResponse;
+      const response = args[1] as ServerResponse & { socket: Socket };
       const pathname = request.url
         ? url.parse(request.url).pathname || '/'
         : '/';
@@ -302,8 +289,13 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const propagation = plugin._tracer.getHttpTextFormat();
       const headers = request.headers;
+
       const spanOptions: SpanOptions = {
         kind: SpanKind.SERVER,
+        attributes: utils.getIncomingRequestAttributes(request, {
+          component: plugin.component,
+          serverName: plugin._config.http && plugin._config.http.serverName,
+        }),
       };
 
       const spanContext = propagation.extract(Format.HTTP, headers);
@@ -320,7 +312,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         // Wraps end (inspired by:
         // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
         const originalEnd = response.end;
-        response.end = function(
+        response.end = function (
           this: ServerResponse,
           ...args: ResponseEndArgs
         ) {
@@ -333,32 +325,10 @@ export class HttpPlugin extends BasePlugin<Http> {
             () => response.end.apply(this, arguments as any),
             true
           );
-          const requestUrl = request.url ? url.parse(request.url) : null;
-          const hostname = headers.host
-            ? headers.host.replace(/^(.*)(\:[0-9]{1,5})/, '$1')
-            : 'localhost';
-          const userAgent = headers['user-agent'];
 
-          const attributes: Attributes = {
-            [AttributeNames.HTTP_URL]: utils.getAbsoluteUrl(
-              requestUrl,
-              headers,
-              `${plugin.component}:`
-            ),
-            [AttributeNames.HTTP_HOSTNAME]: hostname,
-            [AttributeNames.HTTP_METHOD]: method,
-            [AttributeNames.HTTP_STATUS_CODE]: response.statusCode,
-            [AttributeNames.HTTP_STATUS_TEXT]: response.statusMessage,
-          };
-
-          if (requestUrl) {
-            attributes[AttributeNames.HTTP_PATH] = requestUrl.path || '/';
-            attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
-          }
-
-          if (userAgent !== undefined) {
-            attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
-          }
+          const attributes = utils.getIncomingRequestAttributesOnResponse(
+            response
+          );
 
           span
             .setAttributes(attributes)
@@ -408,7 +378,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const extraOptions =
         typeof args[0] === 'object' &&
-        (typeof options === 'string' || options instanceof url.URL)
+          (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as RequestOptions)
           : undefined;
       const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(

@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-import {
-  BasePlugin,
-  hrTime,
-  isWrapped,
-  otperformance,
-  matchesAnyPattern,
-  matchesPattern,
-} from '@opentelemetry/core';
+import { BasePlugin, hrTime, isWrapped, matchesAnyPattern, matchesPattern, otperformance } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import {
-  addSpanNetworkEvent,
-  getResource,
-  parseUrl,
-  PerformanceTimingNames as PTN,
-} from '@opentelemetry/web';
+import { addSpanNetworkEvent, getResource, parseUrl, PerformanceTimingNames as PTN } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import { Format } from './enums/Format';
 import { OpenFunction, SendFunction, XhrMem } from './types';
+import { VERSION } from './version';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -46,8 +35,7 @@ const OBSERVER_WAIT_TIME_MS = 300;
  */
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
-  // @TODO align this with all packages #600
-  readonly version: string = '0.3.0';
+  readonly version: string = VERSION;
   moduleName = this.component;
 
   protected _config!: types.PluginOptions;
@@ -87,7 +75,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   }
 
   /**
-   * checks if trace headers shoudl be propagated
+   * checks if trace headers should be propagated
    * @param spanUrl
    * @private
    */

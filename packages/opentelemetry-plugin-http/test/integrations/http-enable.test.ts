@@ -16,14 +16,12 @@
 
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracer } from '@opentelemetry/node';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
-import { Span, SpanKind, PluginOptions } from '@opentelemetry/types';
+import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { PluginOptions, Span, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as url from 'url';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
@@ -142,7 +140,7 @@ describe('HttpPlugin Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
-    it('should create a rootSpan for GET requests and add propagation headers if URL and options are used', async () => {
+    it('should create a valid rootSpan with propagation headers for GET requests if URL and options are used', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -167,6 +165,11 @@ describe('HttpPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 1);
       assert.ok(span.name.indexOf('GET /') >= 0);
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
+      assert.strictEqual(span.attributes[AttributeNames.HTTP_FLAVOR], '1.1');
+      assert.strictEqual(
+        span.attributes[AttributeNames.NET_TRANSPORT],
+        AttributeNames.IP_TCP
+      );
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
