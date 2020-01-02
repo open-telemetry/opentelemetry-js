@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-const karmaWebpackConfig = require('../../karma.webpack');
-const karmaBaseConfig = require('../../karma.base');
+// This file is the webpack entry point for the browser Karma tests. It requires
+// all modules ending in "test" from the current folder and all its subfolders.
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-module.exports = (config) => {
-  config.set(Object.assign({}, karmaBaseConfig, {
-    frameworks: karmaBaseConfig.frameworks.concat(['jquery-1.8.3']),
-    webpack: karmaWebpackConfig
-  }))
-};
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

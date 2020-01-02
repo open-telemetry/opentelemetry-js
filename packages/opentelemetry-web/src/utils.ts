@@ -230,3 +230,75 @@ export function parseUrl(url: string): HTMLAnchorElement {
   a.href = url;
   return a;
 }
+
+/**
+ * Get element XPath
+ * @param target
+ * @param optimised
+ */
+export function getElementXPath(target: any, optimised?: boolean) {
+  if (target.nodeType === Node.DOCUMENT_NODE) {
+    return '/';
+  }
+  let xpath = '';
+  const targetValue = getNodeValue(target, optimised);
+  if (optimised && targetValue.indexOf('@id') > 0) {
+    return targetValue;
+  }
+  if (target.parentNode) {
+    xpath += getElementXPath(target.parentNode, false);
+  }
+  xpath += targetValue;
+
+  return xpath;
+}
+
+function getNodeIndex(target: HTMLElement): number {
+  if (!target.parentNode) {
+    return 0;
+  }
+  let elements = Array.from(target.parentNode.childNodes);
+  const allowedTypes = [target.nodeType];
+  if (target.nodeType === Node.CDATA_SECTION_NODE) {
+    allowedTypes.push(Node.TEXT_NODE);
+  }
+  elements = elements.filter((element: Node) => {
+    const localName = (element as HTMLElement).localName;
+    return (
+      allowedTypes.indexOf(element.nodeType) >= 0 &&
+      localName === target.localName
+    );
+  });
+  if (elements.length >= 1) {
+    return elements.indexOf(target) + 1; // xpath starts from 1
+  }
+  // if there are no other similar child xpath doesn't need index
+  return 0;
+}
+
+function getNodeValue(target: HTMLElement, optimised?: boolean): string {
+  const nodeType = target.nodeType;
+  const index = getNodeIndex(target);
+  let nodeValue = '';
+  if (nodeType === Node.ELEMENT_NODE) {
+    const id = target.getAttribute('id');
+    if (optimised && id) {
+      return `//*[@id="${id}"]`;
+    }
+    nodeValue = target.localName;
+  } else if (
+    nodeType === Node.TEXT_NODE ||
+    nodeType === Node.CDATA_SECTION_NODE
+  ) {
+    nodeValue = 'text()';
+  } else if (nodeType === Node.COMMENT_NODE) {
+    nodeValue = 'comment()';
+  } else {
+    return '';
+  }
+  // if index is 1 it can be omitted in xpath
+  if (nodeValue && index > 1) {
+    return `/${nodeValue}[${index}]`;
+  }
+  return `/${nodeValue}`;
+}
