@@ -7,7 +7,7 @@ const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 
-module.exports = (service) => {
+module.exports = (serviceName) => {
   const tracer = new NodeTracer({
     plugins: {
       mysql: {
@@ -22,10 +22,10 @@ module.exports = (service) => {
   });
 
   tracer.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
-    serviceName: service,
+    serviceName,
   })));
   tracer.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
-    serviceName: service,
+    serviceName,
   })));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings

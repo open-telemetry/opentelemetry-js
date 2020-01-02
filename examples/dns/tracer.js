@@ -8,7 +8,7 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 const EXPORTER = process.env.EXPORTER || '';
 
-module.exports = (service) => {
+module.exports = (serviceName) => {
   const tracer = new NodeTracer({
     plugins: {
       dns: {
@@ -23,11 +23,11 @@ module.exports = (service) => {
   let exporter;
   if (EXPORTER.toLowerCase().startsWith('z')) {
     exporter = new ZipkinExporter({
-      serviceName: service,
+      serviceName,
     });
   } else {
     exporter = new JaegerExporter({
-      serviceName: service,
+      serviceName,
     });
   }
 
