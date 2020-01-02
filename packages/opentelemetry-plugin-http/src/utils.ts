@@ -14,17 +14,19 @@
  * limitations under the License.
  */
 
-import { Status, CanonicalCode, Span } from '@opentelemetry/types';
+import { Status, CanonicalCode, Span, Attributes } from '@opentelemetry/types';
 import {
   RequestOptions,
   IncomingMessage,
   ClientRequest,
   IncomingHttpHeaders,
   OutgoingHttpHeaders,
+  ServerResponse,
 } from 'http';
 import { IgnoreMatcher, Err, ParsedRequestOptions } from './types';
 import { AttributeNames } from './enums/AttributeNames';
 import * as url from 'url';
+import { Socket } from 'net';
 
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
 /**
@@ -279,4 +281,158 @@ export const isValidOptionsType = (options: unknown): boolean => {
  */
 export const isOpenTelemetryRequest = (options: RequestOptions) => {
   return !!(options && options.headers && options.headers[OT_REQUEST_HEADER]);
+};
+
+/**
+ * Returns outgoing request attributes scoped to the options passed to the request
+ * @param {ParsedRequestOptions} requestOptions the same options used to make the request
+ * @param {{ component: string, hostname: string }} options used to pass data needed to create attributes
+ */
+export const getOutgoingRequestAttributes = (
+  requestOptions: ParsedRequestOptions,
+  options: { component: string; hostname: string }
+): Attributes => {
+  const host = requestOptions.host;
+  const hostname =
+    requestOptions.hostname ||
+    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+    'localhost';
+  const requestMethod = requestOptions.method;
+  const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
+  const headers = requestOptions.headers || {};
+  const userAgent = headers['user-agent'];
+
+  const attributes: Attributes = {
+    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
+      requestOptions,
+      headers,
+      `${options.component}:`
+    ),
+    [AttributeNames.HTTP_METHOD]: method,
+    [AttributeNames.HTTP_TARGET]: requestOptions.path || '/',
+    [AttributeNames.NET_PEER_NAME]: hostname,
+  };
+
+  if (userAgent !== undefined) {
+    attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
+  }
+  return attributes;
+};
+
+/**
+ * Returns attributes related to the kind of HTTP protocol used
+ * @param {string} [kind] Kind of HTTP protocol used: "1.0", "1.1", "2", "SPDY" or "QUIC".
+ */
+export const getAttributesFromHttpKind = (kind?: string): Attributes => {
+  const attributes: Attributes = {};
+  if (kind) {
+    attributes[AttributeNames.HTTP_FLAVOR] = kind;
+    if (kind.toUpperCase() !== 'QUIC') {
+      attributes[AttributeNames.NET_TRANSPORT] = AttributeNames.IP_TCP;
+    } else {
+      attributes[AttributeNames.NET_TRANSPORT] = AttributeNames.IP_UDP;
+    }
+  }
+  return attributes;
+};
+
+/**
+ * Returns outgoing request attributes scoped to the response data
+ * @param {IncomingMessage} response the response object
+ * @param {{ hostname: string }} options used to pass data needed to create attributes
+ */
+export const getOutgoingRequestAttributesOnResponse = (
+  response: IncomingMessage,
+  options: { hostname: string }
+): Attributes => {
+  const { statusCode, statusMessage, httpVersion, socket } = response;
+  const { remoteAddress, remotePort } = socket;
+  const attributes: Attributes = {
+    [AttributeNames.NET_PEER_IP]: remoteAddress,
+    [AttributeNames.NET_PEER_PORT]: remotePort,
+    [AttributeNames.HTTP_HOST]: `${options.hostname}:${remotePort}`,
+  };
+
+  if (statusCode) {
+    attributes[AttributeNames.HTTP_STATUS_CODE] = statusCode;
+    attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+      statusMessage || ''
+    ).toUpperCase();
+  }
+
+  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
+  return Object.assign(attributes, httpKindAttributes);
+};
+
+/**
+ * Returns incoming request attributes scoped to the request data
+ * @param {IncomingMessage} request the request object
+ * @param {{ component: string, serverName?: string }} options used to pass data needed to create attributes
+ */
+export const getIncomingRequestAttributes = (
+  request: IncomingMessage,
+  options: { component: string; serverName?: string }
+): Attributes => {
+  const headers = request.headers;
+  const userAgent = headers['user-agent'];
+  const ips = headers['x-forwarded-for'];
+  const method = request.method || 'GET';
+  const httpVersion = request.httpVersion;
+  const requestUrl = request.url ? url.parse(request.url) : null;
+  const host = requestUrl?.host || headers.host;
+  const hostname =
+    requestUrl?.hostname ||
+    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+    'localhost';
+  const serverName = options.serverName;
+  const attributes: Attributes = {
+    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
+      requestUrl,
+      headers,
+      `${options.component}:`
+    ),
+    [AttributeNames.HTTP_HOST]: host,
+    [AttributeNames.NET_HOST_NAME]: hostname,
+    [AttributeNames.HTTP_METHOD]: method,
+  };
+
+  if (typeof ips === 'string') {
+    attributes[AttributeNames.HTTP_CLIENT_IP] = ips.split(',')[0];
+  }
+
+  if (typeof serverName === 'string') {
+    attributes[AttributeNames.HTTP_SERVER_NAME] = serverName;
+  }
+
+  if (requestUrl) {
+    attributes[AttributeNames.HTTP_TARGET] = requestUrl.path || '/';
+    attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
+  }
+
+  if (userAgent !== undefined) {
+    attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
+  }
+
+  const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
+  return Object.assign(attributes, httpKindAttributes);
+};
+
+/**
+ * Returns incoming request attributes scoped to the response data
+ * @param {(ServerResponse & { socket: Socket; })} response the response object
+ */
+export const getIncomingRequestAttributesOnResponse = (
+  response: ServerResponse & { socket: Socket }
+): Attributes => {
+  const { statusCode, statusMessage, socket } = response;
+  const { localAddress, localPort, remoteAddress, remotePort } = socket;
+
+  return {
+    [AttributeNames.NET_HOST_IP]: localAddress,
+    [AttributeNames.NET_HOST_PORT]: localPort,
+    [AttributeNames.NET_PEER_IP]: remoteAddress,
+    [AttributeNames.NET_PEER_PORT]: remotePort,
+    [AttributeNames.HTTP_STATUS_CODE]: statusCode,
+    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+  };
 };
