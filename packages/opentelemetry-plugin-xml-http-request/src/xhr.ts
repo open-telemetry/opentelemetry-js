@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
-import { BasePlugin, hrTime, isWrapped, matchesAnyPattern, matchesPattern, otperformance } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  hrTime,
+  isWrapped,
+  matchesAnyPattern,
+  matchesPattern,
+  otperformance,
+} from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { addSpanNetworkEvent, getResource, parseUrl, PerformanceTimingNames as PTN } from '@opentelemetry/web';
+import {
+  addSpanNetworkEvent,
+  getResource,
+  parseUrl,
+  PerformanceTimingNames as PTN,
+} from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';

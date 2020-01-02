@@ -15,7 +15,14 @@
  */
 
 import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/types';
-import { ClientRequest, IncomingHttpHeaders, IncomingMessage, OutgoingHttpHeaders, RequestOptions, ServerResponse } from 'http';
+import {
+  ClientRequest,
+  IncomingHttpHeaders,
+  IncomingMessage,
+  OutgoingHttpHeaders,
+  RequestOptions,
+  ServerResponse,
+} from 'http';
 import { Socket } from 'net';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';

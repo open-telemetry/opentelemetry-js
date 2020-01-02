@@ -312,7 +312,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         // Wraps end (inspired by:
         // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
         const originalEnd = response.end;
-        response.end = function (
+        response.end = function(
           this: ServerResponse,
           ...args: ResponseEndArgs
         ) {
@@ -378,7 +378,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const extraOptions =
         typeof args[0] === 'object' &&
-          (typeof options === 'string' || options instanceof url.URL)
+        (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as RequestOptions)
           : undefined;
       const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(

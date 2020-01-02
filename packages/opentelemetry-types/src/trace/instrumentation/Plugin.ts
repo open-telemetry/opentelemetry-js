@@ -106,9 +106,14 @@ export interface HttpCustomAttributeFunction {
  * These options are used by http plugins like http, https, and http2.
  */
 export interface HttpPluginOptions {
+  /** Not trace all incoming requests that match paths */
   ignoreIncomingPaths?: IgnoreMatcher[];
+  /** Not trace all outgoing requests that match urls */
   ignoreOutgoingUrls?: IgnoreMatcher[];
+  /** Function for adding custom attributes */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+  /** The primary server name of the matched virtual host. */
+  serverName?: string;
 }
 
 export type PropagateTraceHeaderCorsUrl = string | RegExp;

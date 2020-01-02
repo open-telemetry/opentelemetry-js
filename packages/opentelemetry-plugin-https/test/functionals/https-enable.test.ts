@@ -670,7 +670,7 @@ describe('HttpsPlugin', () => {
           .reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => { });
+          response.on('data', () => {});
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;
