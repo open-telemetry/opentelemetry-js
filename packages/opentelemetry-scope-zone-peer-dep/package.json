@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-zone-peer-dep",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "OpenTelemetry Scope Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -72,7 +72,7 @@
     "zone.js": "^0.10.2"
   },
   "dependencies": {
-    "@opentelemetry/scope-base": "^0.3.1"
+    "@opentelemetry/scope-base": "^0.3.2"
   },
   "peerDependencies": {
     "zone.js": "^0.10.2"

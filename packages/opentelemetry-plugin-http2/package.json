@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-http2",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "OpenTelemetry http2 automatic instrumentation package.",
   "private": true,
   "main": "build/src/index.js",
@@ -55,8 +55,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.1",
-    "@opentelemetry/node": "^0.3.1",
-    "@opentelemetry/types": "^0.3.1"
+    "@opentelemetry/core": "^0.3.2",
+    "@opentelemetry/node": "^0.3.2",
+    "@opentelemetry/types": "^0.3.2"
   }
 }
