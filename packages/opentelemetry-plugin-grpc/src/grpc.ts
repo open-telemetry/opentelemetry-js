@@ -27,7 +27,6 @@ import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
   ModuleExportsMapping,
-  GrpcPluginOptions,
   ServerCallWithMeta,
   SendUnaryDataCallback,
   GrpcClientFunc,
