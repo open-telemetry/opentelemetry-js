@@ -15,11 +15,7 @@
  */
 
 import { BasePlugin, matchesAnyPattern } from '@opentelemetry/core';
-import {
-  Span,
-  SpanKind,
-  SpanOptions,
-} from '@opentelemetry/types';
+import { Span, SpanKind, SpanOptions } from '@opentelemetry/types';
 import { LookupAddress } from 'dns';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';

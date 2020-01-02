@@ -19,10 +19,7 @@ import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
 import * as pgPoolTypes from 'pg-pool';
-import {
-  PgPoolCallback,
-  PgPoolExtended,
-} from './types';
+import { PgPoolCallback, PgPoolExtended } from './types';
 import * as utils from './utils';
 
 export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
