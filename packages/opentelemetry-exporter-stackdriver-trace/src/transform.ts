@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hrTimeToTimeStamp, VERSION } from '@opentelemetry/core';
+import { hrTimeToTimeStamp, VERSION as COREVERSION } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as ot from '@opentelemetry/types';
 import {
@@ -28,7 +28,8 @@ import {
 } from './types';
 
 const AGENT_LABEL_KEY = 'g.co/agent';
-const AGENT_LABEL_VALUE = `opentelemetry-version [${VERSION}]`;
+// TODO update exporter version to use version.ts file when #651 merges
+const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-exporter [0.3.1]`;
 
 export function getReadableSpanTransformer(
   projectId: string,
