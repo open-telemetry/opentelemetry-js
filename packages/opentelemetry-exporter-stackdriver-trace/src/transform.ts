@@ -90,6 +90,7 @@ function transformAttributes(
   const attributeMap = transformAttributeValues(attributes);
   return {
     attributeMap: attributeMap,
+    // TODO: get dropped attribute count from sdk ReadableSpan
     droppedAttributesCount:
       Object.keys(attributes).length - Object.keys(attributeMap).length,
   };
