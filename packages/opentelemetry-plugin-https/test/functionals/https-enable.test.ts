@@ -45,6 +45,7 @@ let server: https.Server;
 const serverPort = 32345;
 const protocol = 'https';
 const hostname = 'localhost';
+const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
 const httpTextFormat = new DummyPropagation();
@@ -153,6 +154,14 @@ describe('HttpsPlugin', () => {
         assert.strictEqual(spans.length, 2);
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          serverPort
+        );
       });
 
       it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
@@ -189,6 +198,7 @@ describe('HttpsPlugin', () => {
             (url: string) => url.endsWith(`/ignored/function`),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
+          serverName,
         };
         plugin.enable(
           (https as unknown) as Http,
@@ -230,7 +240,13 @@ describe('HttpsPlugin', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpsRequest.get(
-          `${protocol}://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`,
+          {
+            headers: {
+              'x-forwarded-for': '<client>, <proxy1>, <proxy2>',
+              'user-agent': 'chrome',
+            },
+          }
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -242,11 +258,37 @@ describe('HttpsPlugin', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: plugin.component,
+          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
-        assertSpan(incomingSpan, SpanKind.SERVER, validations);
-        assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.HTTP_CLIENT_IP],
+          '<client>'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          serverPort
+        );
+
+        [
+          { span: incomingSpan, kind: SpanKind.SERVER },
+          { span: outgoingSpan, kind: SpanKind.CLIENT },
+        ].forEach(({ span, kind }) => {
+          assert.strictEqual(
+            span.attributes[AttributeNames.HTTP_FLAVOR],
+            '1.1'
+          );
+          assert.strictEqual(
+            span.attributes[AttributeNames.NET_TRANSPORT],
+            AttributeNames.IP_TCP
+          );
+          assertSpan(span, kind, validations);
+        });
       });
 
       it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
@@ -571,7 +613,7 @@ describe('HttpsPlugin', () => {
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
-          assert.ok(Object.keys(span.attributes).length > 6);
+          assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
 

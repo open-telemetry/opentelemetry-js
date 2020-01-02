@@ -15,17 +15,29 @@
  */
 
 /**
- * Attributes Names according to [OpenTelemetry attributes specs](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md#semantic-conventions)
+ * Attributes Names according to [OpenTelemetry attributes specs](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes)
  */
 export enum AttributeNames {
-  HTTP_HOSTNAME = 'http.hostname',
+  HTTP_HOST = 'http.host',
   COMPONENT = 'component',
   HTTP_METHOD = 'http.method',
-  HTTP_PATH = 'http.path',
+  HTTP_TARGET = 'http.target',
   HTTP_ROUTE = 'http.route',
   HTTP_URL = 'http.url',
   HTTP_STATUS_CODE = 'http.status_code',
   HTTP_STATUS_TEXT = 'http.status_text',
+  HTTP_FLAVOR = 'http.flavor',
+  NET_PEER_IP = 'net.peer.ip',
+  NET_PEER_PORT = 'net.peer.port',
+  NET_PEER_NAME = 'net.peer.name',
+  NET_HOST_IP = 'net.host.ip',
+  NET_HOST_PORT = 'net.host.port',
+  NET_HOST_NAME = 'net.host.name',
+  NET_TRANSPORT = 'net.transport',
+  IP_TCP = 'IP.TCP',
+  IP_UDP = 'IP.UDP',
+  HTTP_SERVER_NAME = 'http.server_name',
+  HTTP_CLIENT_IP = 'http.client_ip',
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME = 'http.error_name',
   HTTP_ERROR_MESSAGE = 'http.error_message',
