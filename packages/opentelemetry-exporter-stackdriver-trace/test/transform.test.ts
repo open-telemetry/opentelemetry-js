@@ -58,7 +58,7 @@ describe('transform', () => {
           project_id: { stringValue: { value: 'project-id' } },
           service: { stringValue: { value: 'service-name' } },
           'g.co/agent': {
-            stringValue: { value: 'opentelemetry-version [0.3.1]' },
+            stringValue: { value: 'opentelemetry-js [0.3.1]; stackdriver-trace-exporter [0.3.1]' },
           },
         },
         droppedAttributesCount: 0,
