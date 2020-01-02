@@ -21,7 +21,7 @@
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
-    "version:update": "node scripts/version-update.js",
+    "version:update": "node ../../scripts/version-update.js",
     "watch": "tsc -w"
   },
   "keywords": [
