@@ -43,13 +43,13 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     moduleExports: T,
     tracer: Tracer,
     logger: Logger,
-    options: PluginOptions = {};
+    options: PluginOptions = {}
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracer;
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
-    this._options = options
+    this._options = options;
     return this.patch();
   }
 
