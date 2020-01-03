@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/types",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "TypeScript types for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
