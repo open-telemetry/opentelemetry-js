@@ -12,6 +12,7 @@ Release Process:
 * [Merge and pull](#merge-and-pull)
 * [Publish all packages](#publish-all-packages)
 * [Publish the GitHub Release](#publish-the-github-release)
+* [Update CHANGELOG](#update-changelog)
 
 ## Update to latest locally
 
@@ -73,7 +74,7 @@ On [GitHub Releases](https://github.com/open-telemetry/opentelemetry-js/releases
 
 ## Create a new PR
 
-Create a pull request titled "chore: x.y.z release proposal". The commit body should just be a link to the draft notes. Someone who can access draft notes should approve it, looking in particular for test passing, and whether the draft notes are satisfactory.
+Create a pull request titled `chore: x.y.z release proposal`. The commit body should just be a link to the draft notes. Someone who can access draft notes should approve it, looking in particular for test passing, and whether the draft notes are satisfactory.
 
 ## Merge and pull
 
@@ -81,7 +82,7 @@ Merge the PR, and pull the changes locally (using the commands in the first step
 
 ## Publish all packages
 
-Go into each directory and use `npm publish` to publish the package. You can use the following script to automate this.
+Go into each directory and use `npm publish` (requires permissions) to publish the package. You can use the following script to automate this.
 
 ```bash
 #!/bin/bash
@@ -97,3 +98,9 @@ Check your e-mail and make sure the number of “you’ve published this module�
 
 ## Publish the GitHub Release
 Publish the GitHub release, ensuring that the tag points to the newly landed commit corresponding to release proposal `x.y.z`.
+
+## Update CHANGELOG
+
+* After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
+* Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
+* Go through PR review and merge it to GitHub master branch.
