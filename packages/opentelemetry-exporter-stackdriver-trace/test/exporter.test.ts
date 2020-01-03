@@ -32,7 +32,6 @@ describe('Stackdriver Trace Exporter', () => {
   describe('constructor', () => {
     it('should construct an exporter', async () => {
       const exporter = new StackdriverTraceExporter({
-        serviceName: 'service-name',
         credentials: {
           client_email: 'noreply@fake.example.com',
           private_key: 'this is a key',
@@ -62,7 +61,6 @@ describe('Stackdriver Trace Exporter', () => {
       batchWriteShouldFail = false;
       logger = new ConsoleLogger(LogLevel.ERROR);
       exporter = new StackdriverTraceExporter({
-        serviceName: 'service-name',
         logger,
       });
 

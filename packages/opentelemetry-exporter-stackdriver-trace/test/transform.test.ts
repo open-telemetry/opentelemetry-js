@@ -33,7 +33,7 @@ describe('transform', () => {
       isRemote: true,
     };
 
-    transformer = getReadableSpanTransformer('project-id', 'service-name');
+    transformer = getReadableSpanTransformer('project-id');
 
     readableSpan = {
       attributes: {},
@@ -56,7 +56,6 @@ describe('transform', () => {
       attributes: {
         attributeMap: {
           project_id: { stringValue: { value: 'project-id' } },
-          service: { stringValue: { value: 'service-name' } },
           'g.co/agent': {
             stringValue: {
               value:
@@ -126,7 +125,7 @@ describe('transform', () => {
     assert.deepStrictEqual(result.attributes!.droppedAttributesCount, 1);
     assert.deepStrictEqual(
       Object.keys(result.attributes!.attributeMap!).length,
-      3
+      2
     );
   });
 
