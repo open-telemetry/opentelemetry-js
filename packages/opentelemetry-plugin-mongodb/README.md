@@ -14,6 +14,8 @@ For automatic instrumentation see the
 ```bash
 npm install --save @opentelemetry/plugin-mongodb
 ```
+### Supported Versions
+ - `'>=2.0.0 <4`
 
 ## Usage
 
