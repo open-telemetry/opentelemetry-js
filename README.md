@@ -117,21 +117,20 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 OpenTelemetry can collect tracing data automatically using plugins. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:
 
 #### Node Plugins
-- [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns)
 - [@opentelemetry/plugin-grpc](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc)
 - [@opentelemetry/plugin-http](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http)
 - [@opentelemetry/plugin-https](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https)
 - [@opentelemetry/plugin-mongodb-core](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mongodb-core)
 - [@opentelemetry/plugin-mysql](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-mysql)
 - [@opentelemetry/plugin-pg](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg)
-- [@opentelemetry/plugin-redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis)
-
-##### WIP Plugins
 - [@opentelemetry/plugin-pg-pool](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool)
+- [@opentelemetry/plugin-redis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis)
 - [@opentelemetry/plugin-ioredis](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-ioredis)
+- [@opentelemetry/plugin-dns](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-dns) - By default, this plugin is not loaded [#612](https://github.com/open-telemetry/opentelemetry-js/issues/612)
 
 #### Web Plugins
 - [@opentelemetry/plugin-document-load](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-document-load)
+- [@opentelemetry/plugin-xml-http-request](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request)
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
 
