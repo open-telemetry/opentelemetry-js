@@ -2,7 +2,6 @@
   "name": "@opentelemetry/plugin-pg-pool",
   "version": "0.3.2",
   "description": "OpenTelemetry postgres pool automatic instrumentation package.",
-  "private": true,
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
