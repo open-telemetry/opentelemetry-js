@@ -63,4 +63,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-xml-http-request
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-xml-http-request&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-xml-http-request
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%plugin-xml-http-request.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-xml-http-request.svg
