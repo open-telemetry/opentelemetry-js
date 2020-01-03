@@ -12,10 +12,10 @@
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
-    "version:update": "node scripts/version-update.js",
+    "prepare": "npm run compile",
+    "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
-    "prepare": "npm run compile"
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",

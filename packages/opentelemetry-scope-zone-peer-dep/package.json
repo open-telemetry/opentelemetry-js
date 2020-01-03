@@ -9,7 +9,7 @@
     "check": "gts check",
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "version:update": "node scripts/version-update.js",
+    "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",

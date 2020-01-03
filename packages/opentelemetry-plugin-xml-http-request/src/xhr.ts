@@ -66,7 +66,8 @@ export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
  */
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
-  // @TODO align this with all packages #600
+  readonly version: string = VERSION;
+  moduleName = this.component;
 
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
