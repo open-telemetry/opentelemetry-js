@@ -130,7 +130,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param task
    */
   private _getClickedElement(task: AsyncTask): HTMLElement | undefined {
-    if (task.eventName && task.eventName === 'click') {
+    if (task.eventName === 'click') {
       return task.target;
     }
     return undefined;
