@@ -25,7 +25,7 @@ const webTracerWithZone = new WebTracer({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new XMLHttpRequestPlugin({
-      propagateTraceHeaderCorsUrls: ['http://localhost:8090']    
+      propagateTraceHeaderCorsUrls: ['http://localhost:8090']
     })
   ]
 });
@@ -42,6 +42,8 @@ req.send();
 ![Screenshot of the running example](images/main.jpg)
 ![Screenshot of the running example](images/request.jpg)
 ![Screenshot of the running example](images/cors.jpg)
+
+See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a short example.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
@@ -61,4 +63,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-xml-http-request
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-xml-http-request&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-xml-http-request
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%plugin-xml-http-request.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-xml-http-request.svg

@@ -39,6 +39,7 @@ import {
   SendFunction,
   XhrMem,
 } from './types';
+import { VERSION } from './version';
 
 // how long to wait for observer to collect information about resources
 // this is needed as event "load" is called before observer
@@ -65,8 +66,7 @@ export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
  */
 export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly component: string = 'xml-http-request';
-  // @TODO align this with all packages #600
-  readonly version: string = '0.3.0';
+  readonly version: string = VERSION;
   moduleName = this.component;
 
   protected _config!: XMLHttpRequestPluginConfig;

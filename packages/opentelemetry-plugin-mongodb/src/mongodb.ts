@@ -30,14 +30,14 @@ import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 
 /** MongoDBCore instrumentation plugin for OpenTelemetry */
-export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
+export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
   private readonly _SERVER_METHODS = ['insert', 'update', 'remove', 'command'];
   private readonly _CURSOR_METHODS = ['_next', 'next'];
 
-  private readonly _COMPONENT = 'mongodb-core';
+  private readonly _COMPONENT = 'mongodb';
   private readonly _DB_TYPE = 'mongodb';
 
-  readonly supportedVersions = ['>=2 <3'];
+  readonly supportedVersions = ['>=2 <4'];
 
   constructor(readonly moduleName: string) {
     super();
@@ -51,7 +51,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
 
     if (this._moduleExports.Server) {
       for (const fn of this._SERVER_METHODS) {
-        this._logger.debug(`patching mongodb-core.Server.prototype.${fn}`);
+        this._logger.debug(`patching mongodb.Server.prototype.${fn}`);
         shimmer.wrap(
           this._moduleExports.Server.prototype,
           // Forced to ignore due to incomplete typings
@@ -65,7 +65,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
 
     if (this._moduleExports.Cursor) {
       this._logger.debug(
-        'patching mongodb-core.Cursor.prototype functions:',
+        'patching mongodb.Cursor.prototype functions:',
         this._CURSOR_METHODS
       );
       shimmer.massWrap(
@@ -170,10 +170,12 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
     topology: MongoInternalTopology
   ) {
     // add network attributes to determine the remote server
-    if (topology && topology.s && topology.s.options) {
+    if (topology && topology.s) {
       span.setAttributes({
-        [AttributeNames.PEER_HOSTNAME]: `${topology.s.options.host}`,
-        [AttributeNames.PEER_PORT]: `${topology.s.options.port}`,
+        [AttributeNames.PEER_HOSTNAME]: `${topology.s.options?.host ??
+          topology.s.host}`,
+        [AttributeNames.PEER_PORT]: `${topology.s.options?.port ??
+          topology.s.port}`,
       });
     }
     // add database related attributes
@@ -184,7 +186,7 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
     });
 
     if (command === undefined) return;
-    const query = Object.keys(command.query || command.q || {}).reduce(
+    const query = Object.keys(command.query ?? command.q ?? command).reduce(
       (obj, key) => {
         obj[key] = '?';
         return obj;
@@ -246,4 +248,4 @@ export class MongoDBCorePlugin extends BasePlugin<typeof mongodb> {
   }
 }
 
-export const plugin = new MongoDBCorePlugin('mongodb-core');
+export const plugin = new MongoDBPlugin('mongodb');
