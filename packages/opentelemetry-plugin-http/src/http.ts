@@ -15,15 +15,35 @@
  */
 
 import { BasePlugin, isValid } from '@opentelemetry/core';
-import { CanonicalCode, Span, SpanKind, SpanOptions, Status } from '@opentelemetry/types';
-import { ClientRequest, IncomingMessage, request, RequestOptions, ServerResponse } from 'http';
+import {
+  CanonicalCode,
+  Span,
+  SpanKind,
+  SpanOptions,
+  Status,
+} from '@opentelemetry/types';
+import {
+  ClientRequest,
+  IncomingMessage,
+  request,
+  RequestOptions,
+  ServerResponse,
+} from 'http';
 import { Socket } from 'net';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Format } from './enums/Format';
-import { Err, Func, Http, HttpPluginConfig, HttpRequestArgs, ParsedRequestOptions, ResponseEndArgs } from './types';
+import {
+  Err,
+  Func,
+  Http,
+  HttpPluginConfig,
+  HttpRequestArgs,
+  ParsedRequestOptions,
+  ResponseEndArgs,
+} from './types';
 import * as utils from './utils';
 import { VERSION } from './version';
 

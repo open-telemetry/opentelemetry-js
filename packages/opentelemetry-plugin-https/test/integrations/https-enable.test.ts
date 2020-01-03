@@ -88,7 +88,12 @@ describe('HttpsPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable((https as unknown) as Http, registry, registry.logger, config);
+      plugin.enable(
+        (https as unknown) as Http,
+        registry,
+        registry.logger,
+        config
+      );
     });
 
     after(() => {
