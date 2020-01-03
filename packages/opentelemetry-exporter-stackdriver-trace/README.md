@@ -33,8 +33,6 @@ If you are not running in a GCP environment, you will need to give the service a
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
 const exporter = new StackdriverTraceExporter({
-  serviceName: 'your-application-name',
-
   /** option 1. provide a service account key json */
   keyFile: './service_account_key.json',
   keyFileName: './service_account_key.json',
@@ -49,21 +47,16 @@ const exporter = new StackdriverTraceExporter({
 
 ## Usage
 
-Install the exporter on your application and pass the service name.
+Install the exporter on your application, register the exporter, and start tracing.
 
 ```js
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
 const exporter = new StackdriverTraceExporter({
-  serviceName: 'your-application-name',
   // If you are not in a GCP environment, you will need to provide your
   // service account key here.
 });
-```
 
-Now, register the exporter and start tracing.
-
-```js
 tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
 ```
 
