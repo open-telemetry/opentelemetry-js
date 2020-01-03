@@ -104,3 +104,8 @@ Publish the GitHub release, ensuring that the tag points to the newly landed com
 * After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
 * Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
 * Go through PR review and merge it to GitHub master branch.
+
+
+## Known Issues
+
+* The `examples/` and `getting-started/` folders are not part of lerna packages, we need to manually bump the version in `package.json`.
