@@ -36,10 +36,10 @@ meter.addExporter(exporter);
 const counter = meter.createCounter('metric_name');
 counter.add(10, meter.labels({ [key]: 'value' }));
 
-// Record data using Handle: It is recommended to keep a reference to the Handle instead of
-// always calling `getHandle()` method for every operations.
-const handle = counter.getHandle(meter.labels({ [key]: 'value' }));
-handle.add(10);
+// Record data using Instrument: It is recommended to keep a reference to the Bound Instrument instead of
+// always calling `bind()` method for every operations.
+const boundCounter = counter.bind(meter.labels({ [key]: 'value' }));
+boundCounter.add(10);
 
 // .. some other work
 

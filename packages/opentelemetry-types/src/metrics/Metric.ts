@@ -73,23 +73,23 @@ export enum ValueType {
  */
 export interface Metric<T> {
   /**
-   * Returns a Handle associated with specified LabelSet.
-   * It is recommended to keep a reference to the Handle instead of always
+   * Returns a Instrument associated with specified LabelSet.
+   * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
    */
-  getHandle(labels: LabelSet): T;
+  bind(labels: LabelSet): T;
 
   /**
-   * Returns a Handle for a metric with all labels not set.
+   * Returns a Instrument for a metric with all labels not set.
    */
-  getDefaultHandle(): T;
+  getDefaultBound(): T;
 
   /**
-   * Removes the Handle from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * Removes the Instrument from the metric, if it is present.
+   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
    */
-  removeHandle(labels: LabelSet): void;
+  unbind(labels: LabelSet): void;
 
   /**
    * Clears all timeseries from the Metric.

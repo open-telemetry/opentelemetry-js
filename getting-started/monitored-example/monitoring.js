@@ -22,17 +22,17 @@ const requestCount = meter.createCounter("requests", {
   description: "Count all incoming requests"
 });
 
-const handles = new Map();
+const boundInstruments = new Map();
 
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
-    if (!handles.has(req.path)) {
+    if (!boundInstruments.has(req.path)) {
       const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.getHandle(labelSet);
-      handles.set(req.path, handle);
+      const boundCounter = requestCount.bind(labelSet);
+      boundInstruments.set(req.path, boundCounter);
     }
 
-    handles.get(req.path).add(1);
+    boundInstruments.get(req.path).add(1);
     next();
   };
 };
