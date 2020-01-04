@@ -12,7 +12,7 @@
     "test:local": "cross-env RUN_POSTGRES_TESTS_LOCAL=true yarn test",
     "tdd": "yarn test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../../",
     "check": "gts check",
     "precompile": "tsc --version",
     "version:update": "node ../../../scripts/version-update.js",
