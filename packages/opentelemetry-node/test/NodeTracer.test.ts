@@ -181,7 +181,7 @@ describe('NodeTracer', () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), span);
         return done();
       });
-      // @todo: below check is not running.a
+      // @todo: below check is not running.
       assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
     });
 

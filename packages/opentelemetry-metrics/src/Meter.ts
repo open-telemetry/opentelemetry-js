@@ -202,7 +202,6 @@ export class Meter implements types.Meter {
     metric: Metric<T>
   ): void {
     if (this._metrics.has(name)) {
-      // @todo (issue/474): decide how to handle already registered metric
       this._logger.error(
         `A metric with the name ${name} has already been registered.`
       );
