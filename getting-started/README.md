@@ -82,6 +82,20 @@ const tracer = new NodeTracer({
 opentelemetry.initGlobalTracer(tracer);
 ```
 
+##### TypeScript
+
+```typescript
+import * as opentelemetry from "@opentelemetry/core";
+import { NodeTracer } from "@opentelemetry/node";
+import { Span, Tracer } from "@opentelemetry/types";
+
+const tracer: Tracer = new NodeTracer({
+  logLevel: opentelemetry.LogLevel.ERROR
+});
+
+opentelemetry.initGlobalTracer(tracer);
+```
+
 If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
 
 If you wish to see a completed trace, however, there is one more step. You must register an exporter to send traces to a tracing backend.
