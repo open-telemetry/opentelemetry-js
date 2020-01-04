@@ -43,6 +43,8 @@ This guide uses the example application provided in the `example` directory, but
 #### Install the required OpenTelemetry libraries
 To create traces on NodeJS, you will need `@opentelemetry/node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/plugin-http`.
 
+##### JavaScript
+
 ```sh
 $ npm install \
   @opentelemetry/core \
@@ -50,10 +52,22 @@ $ npm install \
   @opentelemetry/plugin-http
 ```
 
+##### TypeScript
+
+```sh
+$ npm install \
+  @opentelemetry/core \
+  @opentelemetry/node \
+  @opentelemetry/plugin-http \
+  @opentelemetry/types
+```
+
 #### Initialize a global tracer
 All tracing initialization should happen before your application’s code runs. The easiest way to do this is to initialize tracing in a separate file that is required using node’s `-r` option before application code runs.
 
 Create a file named `tracing.js` and add the following code:
+
+##### JavaScript
 
 ```javascript
 'use strict';
