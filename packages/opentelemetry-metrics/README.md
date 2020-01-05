@@ -31,9 +31,9 @@ const counter = meter.createCounter('metric_name', {
 
 const labels = meter.labels({ pid: process.pid });
 
-// Create a Handle associated with specified label values.
-const handle = counter.getHandle(labels);
-handle.add(10);
+// Create a BoundInstrument associated with specified label values.
+const boundCounter = counter.bind(labels);
+boundCounter.add(10);
 ```
 
 ### Gauge
@@ -52,9 +52,9 @@ const gauge = meter.createGauge('metric_name', {
 
 const labels = meter.labels({ pid: process.pid });
 
-// Create a Handle associated with specified label values.
-const handle = gauge.getHandle(labels);
-handle.set(10); // Set to 10
+// Create a BoundInstrument associated with specified label values.
+const boundGauge = gauge.bind(labels);
+boundGauge.set(10); // Set to 10
 ```
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
