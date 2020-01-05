@@ -89,7 +89,9 @@ export class PluginLoader {
       );
       if (requiredModulesToHook.length > 0) {
         this.logger.warn(
-          `Some modules (${requiredModulesToHook}) were already required when their respective plugin were loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`
+          `Some modules (${requiredModulesToHook.join(
+            ', '
+          )}) were already required when their respective plugin was loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`
         );
       }
 

@@ -239,7 +239,7 @@ describe('PluginLoader', () => {
         },
       };
       require('already-require-module');
-      const pluginLoader = new PluginLoader(tracer, verifyWarnLogger);
+      const pluginLoader = new PluginLoader(registry, verifyWarnLogger);
       pluginLoader.load(alreadyRequiredPlugins);
       pluginLoader.unload();
     });
