@@ -32,6 +32,7 @@
     "@opentelemetry/exporter-jaeger": "^0.3.2",
     "@opentelemetry/exporter-zipkin": "^0.3.2",
     "@opentelemetry/node": "^0.3.2",
+    "@opentelemetry/shim-opentracing": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
     "opentracing": "^0.14.4"
   },
