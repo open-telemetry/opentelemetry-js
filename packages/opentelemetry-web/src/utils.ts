@@ -233,8 +233,9 @@ export function parseUrl(url: string): HTMLAnchorElement {
 
 /**
  * Get element XPath
- * @param target
- * @param optimised
+ * @param target - target element
+ * @param optimised - when id attribute of element is present the xpath can be
+ * simplified to contain id
  */
 export function getElementXPath(target: any, optimised?: boolean) {
   if (target.nodeType === Node.DOCUMENT_NODE) {

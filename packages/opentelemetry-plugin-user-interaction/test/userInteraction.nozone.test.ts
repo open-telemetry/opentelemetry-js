@@ -63,8 +63,8 @@ describe('UserInteractionPlugin', () => {
       userInteractionPlugin = new UserInteractionPlugin();
 
       sinon
-        .stub(userInteractionPlugin, 'isZoneAvailable')
-        .callsFake(() => false);
+        .stub(userInteractionPlugin, 'getZoneWithPrototype')
+        .callsFake(() => undefined);
 
       webTracer = new WebTracer({
         logLevel: LogLevel.ERROR,

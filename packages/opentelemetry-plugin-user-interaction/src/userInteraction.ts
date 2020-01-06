@@ -21,7 +21,8 @@ import { getElementXPath } from '@opentelemetry/web';
 import {
   AsyncTask,
   RunTaskFunction,
-  UIMem,
+  SpanData,
+  WindowWithZone,
   ZoneTypeWithPrototype,
 } from './types';
 import { AttributeNames } from './enums/AttributeNames';
@@ -40,7 +41,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
   // @TODO align this with all packages #600
   readonly version: string = '0.3.1';
   moduleName = this.component;
-  private _uiMem = new WeakMap<types.Span, UIMem>();
+  private _spansData = new WeakMap<types.Span, SpanData>();
   private _zonePatched = false;
 
   /**
@@ -52,15 +53,15 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param span
    */
   private _checkForTimeout(task: AsyncTask, span: types.Span) {
-    const uiMem = this._uiMem.get(span);
-    if (uiMem) {
+    const spanData = this._spansData.get(span);
+    if (spanData) {
       if (task.source === 'setTimeout') {
-        uiMem.hrTimeLastTimeout = hrTime();
+        spanData.hrTimeLastTimeout = hrTime();
       } else if (
         task.source !== 'Promise.then' &&
         task.source !== 'setTimeout'
       ) {
-        uiMem.hrTimeLastTimeout = undefined;
+        spanData.hrTimeLastTimeout = undefined;
       }
     }
   }
@@ -95,7 +96,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         links: [],
       });
 
-      this._uiMem.set(span, {
+      this._spansData.set(span, {
         taskCount: 0,
       });
 
@@ -112,15 +113,11 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param span
    */
   private _decrementTask(span: types.Span) {
-    const uiMem = this._uiMem.get(span);
-    if (uiMem) {
-      uiMem.taskCount--;
-      if (uiMem.taskCount === 0) {
-        let endTime;
-        if (uiMem.hrTimeLastTimeout) {
-          endTime = uiMem.hrTimeLastTimeout;
-        }
-        this._tryToEndSpan(span, endTime);
+    const spanData = this._spansData.get(span);
+    if (spanData) {
+      spanData.taskCount--;
+      if (spanData.taskCount === 0) {
+        this._tryToEndSpan(span, spanData.hrTimeLastTimeout);
       }
     }
   }
@@ -142,9 +139,9 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param span
    */
   private _incrementTask(span: types.Span) {
-    const uiMem = this._uiMem.get(span);
-    if (uiMem) {
-      uiMem.taskCount++;
+    const spanData = this._spansData.get(span);
+    if (spanData) {
+      spanData.taskCount++;
     }
   }
 
@@ -340,7 +337,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
     if (!currentSpan) {
       return false;
     }
-    if (!this._uiMem.get(currentSpan)) {
+    if (!this._spansData.get(currentSpan)) {
       return false;
     }
     return task.type === 'macroTask' || task.type === 'microTask';
@@ -354,10 +351,10 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    */
   private _tryToEndSpan(span: types.Span, endTime?: types.HrTime) {
     if (span) {
-      const uiMem = this._uiMem.get(span);
-      if (uiMem) {
+      const spanData = this._spansData.get(span);
+      if (spanData) {
         span.end(endTime);
-        this._uiMem.delete(span);
+        this._spansData.delete(span);
       }
     }
   }
@@ -366,16 +363,15 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * implements patch function
    */
   protected patch() {
-    const _window = window as any;
+    const ZoneWithPrototype = this.getZoneWithPrototype();
     this._logger.debug(
       'applying patch to',
       this.moduleName,
       this.version,
       'zone:',
-      !!_window.Zone
+      !!ZoneWithPrototype
     );
-    if (this.isZoneAvailable()) {
-      const ZoneWithPrototype = (_window.Zone as unknown) as ZoneTypeWithPrototype;
+    if (ZoneWithPrototype) {
       if (isWrapped(ZoneWithPrototype.prototype.runTask)) {
         shimmer.unwrap(ZoneWithPrototype.prototype, 'runTask');
         this._logger.debug('removing previous patch from method runTask');
@@ -428,16 +424,15 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * implements unpatch function
    */
   protected unpatch() {
-    const _window = window as any;
+    const ZoneWithPrototype = this.getZoneWithPrototype();
     this._logger.debug(
       'removing patch from',
       this.moduleName,
       this.version,
       'zone:',
-      !!_window.Zone
+      !!ZoneWithPrototype
     );
-    if (this.isZoneAvailable() && this._zonePatched) {
-      const ZoneWithPrototype = (_window.Zone as unknown) as ZoneTypeWithPrototype;
+    if (ZoneWithPrototype && this._zonePatched) {
       shimmer.unwrap(ZoneWithPrototype.prototype, 'runTask');
       shimmer.unwrap(ZoneWithPrototype.prototype, 'scheduleTask');
       shimmer.unwrap(ZoneWithPrototype.prototype, 'cancelTask');
@@ -448,10 +443,10 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
   }
 
   /**
-   * returns true if zone.js is available
+   * returns Zone
    */
-  isZoneAvailable() {
-    const _window = window as any;
+  getZoneWithPrototype(): ZoneTypeWithPrototype | undefined {
+    const _window: WindowWithZone = (window as unknown) as WindowWithZone;
     return _window.Zone;
   }
 }

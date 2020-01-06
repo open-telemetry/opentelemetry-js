@@ -36,11 +36,18 @@ export type RunTaskFunction = (
 ) => Zone;
 
 /**
- * interface to store information in weak map about spans
+ * interface to store information in weak map per span
  */
-export interface UIMem {
+export interface SpanData {
   hrTimeLastTimeout?: types.HrTime;
   taskCount: number;
+}
+
+/**
+ * interface to be able to check Zone presence on window
+ */
+export interface WindowWithZone {
+  Zone: ZoneTypeWithPrototype;
 }
 
 /**
