@@ -1,6 +1,8 @@
 import * as express from "express";
 import axios from "axios";
 
+import { countAllRequests } from "./monitoring";
+
 const PORT: string = process.env.PORT || "8080";
 
 const app = express();
@@ -34,6 +36,8 @@ app.get("/middle-tier", (req, res) => {
 app.get("/backend", (req, res) => {
   res.send("Hello from the backend");
 });
+
+app.use(countAllRequests());
 
 app.listen(parseInt(PORT, 10), () => {
   console.log(`Listening for requests on http://localhost:${PORT}`);

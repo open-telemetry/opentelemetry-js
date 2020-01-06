@@ -219,10 +219,10 @@ Open a command line and `cd` into the directory where you downloaded the Prometh
 $ cd Downloads
 
 $ # Replace the file name below with your downloaded tarball
-$ tar xvfz prometheus-2.15.2.darwin-amd64.tar
+$ tar xvfz prometheus-2.14.0.darwin-amd64.tar
 
 $ # Replace the dir below with your created directory
-$ cd prometheus-2.15.2.darwin-amd64
+$ cd prometheus-2.14.0.darwin-amd64
 
 $ ls
 LICENSE           console_libraries data              prometheus.yml    tsdb
@@ -270,6 +270,8 @@ An example application which can be used with this guide can be found at in the 
 
 To create metrics on NodeJS, you will need `@opentelemetry/metrics`.
 
+##### JavaScript & TypeScript
+
 ```sh
 $ npm install \
   @opentelemetry/metrics
@@ -278,6 +280,8 @@ $ npm install \
 #### Initialize a meter and collect metrics
 
 In order to create and monitor metrics, we will need a `Meter`. In OpenTelemetry, a `Meter` is the mechanism used to create and manage metrics, labels, and metric exporters.
+
+##### JavaScript
 
 Create a file named `monitoring.js` and add the following code:
 
@@ -310,7 +314,7 @@ module.exports.countAllRequests = () => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
       const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.getHandle(labelSet);
+      const handle = requestCount.bind(labelSet);
       handles.set(req.path, handle);
     }
 
@@ -328,6 +332,54 @@ const app = express();
 app.use(countAllRequests());
 ```
 
+##### TypeScript
+
+Create a file named `monitoring.ts` and add the following code:
+
+```typescript
+import { Meter } from "@opentelemetry/metrics";
+
+const meter = new Meter();
+```
+
+Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.ts` file a middleware function that express can use to count all requests by route. Modify the `monitoring.ts` file so that it looks like this:
+
+```typescript
+import { Meter } from "@opentelemetry/metrics";
+import { Metric, BoundCounter } from "@opentelemetry/types";
+
+const meter = new Meter();
+
+const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
+  monotonic: true,
+  labelKeys: ["route"],
+  description: "Count all incoming requests"
+});
+
+const handles = new Map();
+
+export const countAllRequests = () => {
+  return (req, res, next) => {
+    if (!handles.has(req.path)) {
+      const labelSet = meter.labels({ route: req.path });
+      const handle = requestCount.bind(labelSet);
+      handles.set(req.path, handle);
+    }
+
+    handles.get(req.path).add(1);
+    next();
+  };
+};
+```
+
+Now let's import and use this middleware in our application code:
+
+```typescript
+import { countAllRequests } from "./monitoring";
+const app = express();
+app.use(countAllRequests());
+```
+
 Now, when we make requests to our service our meter will count all requests.
 
 **Note**: Creating a new `labelSet` and `handle` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why handles are created and stored in a `Map` according to the route key.
@@ -336,9 +388,13 @@ Now, when we make requests to our service our meter will count all requests.
 
 Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
 
+##### JavaScript & TypeScript
+
 ```sh
 $ npm install @opentelemetry/exporter-prometheus
 ```
+
+##### JavaScript
 
 Next, modify your `monitoring.js` file to look like this:
 
@@ -368,7 +424,46 @@ module.exports.countAllRequests = () => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
       const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.getHandle(labelSet);
+      const handle = requestCount.bind(labelSet);
+      handles.set(req.path, handle);
+    }
+
+    handles.get(req.path).add(1);
+    next();
+  };
+};
+```
+
+##### TypeScript
+
+Next, modify your `monitoring.ts` file to look like this:
+
+```typescript
+import { Meter } from "@opentelemetry/metrics";
+import { Metric, BoundCounter } from "@opentelemetry/types";
+import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
+
+const meter = new Meter();
+
+meter.addExporter(
+  new PrometheusExporter({ startServer: true }, () => {
+    console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
+  })
+);
+
+const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
+  monotonic: true,
+  labelKeys: ["route"],
+  description: "Count all incoming requests"
+});
+
+const handles = new Map();
+
+export const countAllRequests = () => {
+  return (req, res, next) => {
+    if (!handles.has(req.path)) {
+      const labelSet = meter.labels({ route: req.path });
+      const handle = requestCount.bind(labelSet);
       handles.set(req.path, handle);
     }
 
@@ -380,11 +475,25 @@ module.exports.countAllRequests = () => {
 
 Ensure prometheus is running by running the `prometheus` binary from earlier and start your application.
 
+##### JavaScript
+
 ```sh
 $ npm start
 
 > @opentelemetry/getting-started@1.0.0 start /App/opentelemetry-js/getting-started/monitored-example
 > node app.js
+
+prometheus scrape endpoint: http://localhost:9464/metrics
+Listening for requests on http://localhost:8080
+```
+
+##### TypeScript
+
+```sh
+$ npm start
+
+> @opentelemetry/getting-started@1.0.0 start /Users/nina/Works/opentelemetry-js/getting-started/example/ts
+> ts-node app.ts
 
 prometheus scrape endpoint: http://localhost:9464/metrics
 Listening for requests on http://localhost:8080

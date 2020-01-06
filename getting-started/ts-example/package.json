@@ -1,0 +1,16 @@
+{
+  "name": "@opentelemetry/getting-started",
+  "version": "1.0.0",
+  "description": "This repository provides everything required to follow the OpenTelemetry Getting Started Guide",
+  "main": "app.js",
+  "scripts": {
+    "start": "ts-node app.ts"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentelemetry/exporter-prometheus": "^0.3.2",
+    "axios": "^0.19.0",
+    "express": "^4.17.1"
+  }
+}
