@@ -18,10 +18,10 @@ import * as types from '@opentelemetry/types';
 import { TimeSeries } from './export/types';
 
 /**
- * This class represent the base to handle, which is responsible for generating
+ * This class represent the base to BoundInstrument, which is responsible for generating
  * the TimeSeries.
  */
-export class BaseHandle {
+export class BaseBoundInstrument {
   protected _data = 0;
   protected _labelSet: types.LabelSet;
 
@@ -32,7 +32,7 @@ export class BaseHandle {
   /**
    * Returns the TimeSeries with one or more Point.
    *
-   * @param timestamp The time at which the handle is recorded.
+   * @param timestamp The time at which the instrument is recorded.
    * @returns The TimeSeries.
    */
   getTimeSeries(timestamp: types.HrTime): TimeSeries {
@@ -46,10 +46,11 @@ export class BaseHandle {
 }
 
 /**
- * CounterHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Counter` associated with specified LabelSet.
+ * BoundCounter allows the SDK to observe/record a single metric event. The
+ * value of single instrument in the `Counter` associated with specified LabelSet.
  */
-export class CounterHandle extends BaseHandle implements types.CounterHandle {
+export class BoundCounter extends BaseBoundInstrument
+  implements types.BoundCounter {
   constructor(
     labelSet: types.LabelSet,
     private readonly _disabled: boolean,
@@ -86,10 +87,11 @@ export class CounterHandle extends BaseHandle implements types.CounterHandle {
 }
 
 /**
- * GaugeHandle allows the SDK to observe/record a single metric event. The
- * value of single handle in the `Gauge` associated with specified LabelSet.
+ * BoundGauge allows the SDK to observe/record a single metric event. The
+ * value of single instrument in the `Gauge` associated with specified LabelSet.
  */
-export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
+export class BoundGauge extends BaseBoundInstrument
+  implements types.BoundGauge {
   constructor(
     labelSet: types.LabelSet,
     private readonly _disabled: boolean,
@@ -127,9 +129,10 @@ export class GaugeHandle extends BaseHandle implements types.GaugeHandle {
 }
 
 /**
- * MeasureHandle is an implementation of the {@link MeasureHandle} interface.
+ * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class MeasureHandle extends BaseHandle implements types.MeasureHandle {
+export class BoundMeasure extends BaseBoundInstrument
+  implements types.BoundMeasure {
   record(
     value: number,
     distContext?: types.DistributedContext,

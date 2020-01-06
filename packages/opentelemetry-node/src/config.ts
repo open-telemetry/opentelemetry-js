@@ -27,7 +27,7 @@ export interface NodeTracerConfig extends BasicTracerConfig {
 
 /** List of all default supported plugins */
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
-  'mongodb-core': { enabled: true, path: '@opentelemetry/plugin-mongodb-core' },
+  mongodb: { enabled: true, path: '@opentelemetry/plugin-mongodb' },
   grpc: { enabled: true, path: '@opentelemetry/plugin-grpc' },
   http: { enabled: true, path: '@opentelemetry/plugin-http' },
   https: { enabled: true, path: '@opentelemetry/plugin-https' },
@@ -35,4 +35,5 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   pg: { enabled: true, path: '@opentelemetry/plugin-pg' },
   redis: { enabled: true, path: '@opentelemetry/plugin-redis' },
   ioredis: { enabled: true, path: '@opentelemetry/plugin-ioredis' },
+  'pg-pool': { enabled: true, path: '@opentelemetry/plugin-pg-pool' },
 };

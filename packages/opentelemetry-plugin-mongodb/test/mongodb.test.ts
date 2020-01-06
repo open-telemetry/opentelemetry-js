@@ -77,7 +77,7 @@ function assertSpans(
   assert.strictEqual(mongoSpan.kind, expectedKind);
   assert.strictEqual(
     mongoSpan.attributes[AttributeNames.COMPONENT],
-    'mongodb-core'
+    'mongodb'
   );
   assert.strictEqual(
     mongoSpan.attributes[AttributeNames.PEER_HOSTNAME],
