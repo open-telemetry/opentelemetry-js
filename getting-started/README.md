@@ -227,17 +227,17 @@ const requestCount = meter.createCounter("requests", {
   description: "Count all incoming requests"
 });
 
-const handles = new Map();
+const boundInstruments = new Map();
 
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
-    if (!handles.has(req.path)) {
+    if (!boundInstruments.has(req.path)) {
       const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.getHandle(labelSet);
-      handles.set(req.path, handle);
+      const boundCounter = requestCount.bind(labelSet);
+      boundInstruments.set(req.path, boundCounter);
     }
 
-    handles.get(req.path).add(1);
+    boundInstruments.get(req.path).add(1);
     next();
   };
 };
@@ -253,7 +253,7 @@ app.use(countAllRequests());
 
 Now, when we make requests to our service our meter will count all requests.
 
-**Note**: Creating a new `labelSet` and `handle` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why handles are created and stored in a `Map` according to the route key.
+**Note**: Creating a new `labelSet` and `binding` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why instruments are created and stored in a `Map` according to the route key.
 
 #### Initialize and register a metrics exporter
 Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
@@ -287,17 +287,17 @@ const requestCount = meter.createCounter("requests", {
   description: "Count all incoming requests"
 });
 
-const handles = new Map();
+const boundInstruments = new Map();
 
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
-    if (!handles.has(req.path)) {
+    if (!boundInstruments.has(req.path)) {
       const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.getHandle(labelSet);
-      handles.set(req.path, handle);
+      const boundCounter = requestCount.bind(labelSet);
+      boundInstruments.set(req.path, boundCounter);
     }
 
-    handles.get(req.path).add(1);
+    boundInstruments.get(req.path).add(1);
     next();
   };
 };

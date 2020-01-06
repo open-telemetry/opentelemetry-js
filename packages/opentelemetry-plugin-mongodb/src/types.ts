@@ -20,18 +20,23 @@ export type MongoInternalCommand = {
   createIndexes: boolean;
   count: boolean;
   ismaster: boolean;
+  indexes?: unknown[];
   query?: { [key: string]: unknown };
   q?: { [key: string]: unknown };
 };
-//
-// https://github.com/mongodb-js/mongodb-core/blob/master/lib/topologies/server.js#L117
+
+// https://github.com/mongodb/node-mongodb-native/blob/master/lib/topologies/server.js#L179
 export type MongoInternalTopology = {
   s?: {
+    // those are for mongodb@3
     options?: {
       host?: string;
       port?: number;
       servername?: string;
     };
+    // those are for mongodb@2
+    host?: string;
+    port?: number;
   };
 };
 

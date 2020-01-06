@@ -1,7 +1,7 @@
 {
   "name": "web-tracer-example",
   "private": true,
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Example of using @opentelemetry/web in browser",
   "main": "index.js",
   "scripts": {
@@ -34,12 +34,12 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/exporter-collector": "^0.3.1",
-    "@opentelemetry/plugin-document-load": "^0.3.1",
-    "@opentelemetry/plugin-xml-http-request": "^0.3.1",
-    "@opentelemetry/scope-zone": "^0.3.1",
-    "@opentelemetry/tracing": "^0.3.1",
-    "@opentelemetry/web": "^0.3.1"
+    "@opentelemetry/exporter-collector": "^0.3.2",
+    "@opentelemetry/plugin-document-load": "^0.3.2",
+    "@opentelemetry/plugin-xml-http-request": "^0.3.2",
+    "@opentelemetry/scope-zone": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.2",
+    "@opentelemetry/web": "^0.3.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

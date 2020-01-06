@@ -16,7 +16,11 @@
 
 import * as types from '@opentelemetry/types';
 import { hrTime } from '@opentelemetry/core';
-import { CounterHandle, GaugeHandle, BaseHandle } from './Handle';
+import {
+  BoundCounter,
+  BoundGauge,
+  BaseBoundInstrument,
+} from './BoundInstrument';
 import { MetricOptions } from './types';
 import {
   ReadableMetric,
@@ -25,13 +29,14 @@ import {
 } from './export/types';
 
 /** This is a SDK implementation of {@link Metric} interface. */
-export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
+export abstract class Metric<T extends BaseBoundInstrument>
+  implements types.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _valueType: types.ValueType;
   protected readonly _logger: types.Logger;
   private readonly _metricDescriptor: MetricDescriptor;
-  private readonly _handles: Map<string, T> = new Map();
+  private readonly _instruments: Map<string, T> = new Map();
 
   constructor(
     private readonly _name: string,
@@ -46,42 +51,42 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
   }
 
   /**
-   * Returns a Handle associated with specified LabelSet.
-   * It is recommended to keep a reference to the Handle instead of always
+   * Returns an Instrument associated with specified LabelSet.
+   * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for each operation.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric instrument.
    */
-  getHandle(labelSet: types.LabelSet): T {
-    if (this._handles.has(labelSet.identifier))
-      return this._handles.get(labelSet.identifier)!;
+  bind(labelSet: types.LabelSet): T {
+    if (this._instruments.has(labelSet.identifier))
+      return this._instruments.get(labelSet.identifier)!;
 
-    const handle = this._makeHandle(labelSet);
-    this._handles.set(labelSet.identifier, handle);
-    return handle;
+    const instrument = this._makeInstrument(labelSet);
+    this._instruments.set(labelSet.identifier, instrument);
+    return instrument;
   }
 
   /**
-   * Returns a Handle for a metric with all labels not set.
+   * Returns a Instrument for a metric with all labels not set.
    */
-  getDefaultHandle(): T {
+  getDefaultBound(): T {
     // @todo: implement this method
     this._logger.error('not implemented yet');
     throw new Error('not implemented yet');
   }
 
   /**
-   * Removes the Handle from the metric, if it is present.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric handle.
+   * Removes the Instrument from the metric, if it is present.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric instrument.
    */
-  removeHandle(labelSet: types.LabelSet): void {
-    this._handles.delete(labelSet.identifier);
+  unbind(labelSet: types.LabelSet): void {
+    this._instruments.delete(labelSet.identifier);
   }
 
   /**
-   * Clears all Handles from the Metric.
+   * Clears all Instruments from the Metric.
    */
   clear(): void {
-    this._handles.clear();
+    this._instruments.clear();
   }
 
   setCallback(fn: () => void): void {
@@ -96,13 +101,13 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
    *     Metric.
    */
   get(): ReadableMetric | null {
-    if (this._handles.size === 0) return null;
+    if (this._instruments.size === 0) return null;
 
     const timestamp = hrTime();
     return {
       descriptor: this._metricDescriptor,
-      timeseries: Array.from(this._handles, ([_, handle]) =>
-        handle.getTimeSeries(timestamp)
+      timeseries: Array.from(this._instruments, ([_, instrument]) =>
+        instrument.getTimeSeries(timestamp)
       ),
     };
   }
@@ -118,11 +123,11 @@ export abstract class Metric<T extends BaseHandle> implements types.Metric<T> {
     };
   }
 
-  protected abstract _makeHandle(labelSet: types.LabelSet): T;
+  protected abstract _makeInstrument(labelSet: types.LabelSet): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<CounterHandle>
+export class CounterMetric extends Metric<BoundCounter>
   implements Pick<types.MetricUtils, 'add'> {
   constructor(
     name: string,
@@ -137,8 +142,8 @@ export class CounterMetric extends Metric<CounterHandle>
         : MetricDescriptorType.COUNTER_INT64
     );
   }
-  protected _makeHandle(labelSet: types.LabelSet): CounterHandle {
-    return new CounterHandle(
+  protected _makeInstrument(labelSet: types.LabelSet): BoundCounter {
+    return new BoundCounter(
       labelSet,
       this._disabled,
       this._monotonic,
@@ -151,15 +156,15 @@ export class CounterMetric extends Metric<CounterHandle>
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric's handle.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric's instrument.
    */
   add(value: number, labelSet: types.LabelSet) {
-    this.getHandle(labelSet).add(value);
+    this.bind(labelSet).add(value);
   }
 }
 
 /** This is a SDK implementation of Gauge Metric. */
-export class GaugeMetric extends Metric<GaugeHandle>
+export class GaugeMetric extends Metric<BoundGauge>
   implements Pick<types.MetricUtils, 'set'> {
   constructor(
     name: string,
@@ -174,8 +179,8 @@ export class GaugeMetric extends Metric<GaugeHandle>
         : MetricDescriptorType.GAUGE_INT64
     );
   }
-  protected _makeHandle(labelSet: types.LabelSet): GaugeHandle {
-    return new GaugeHandle(
+  protected _makeInstrument(labelSet: types.LabelSet): BoundGauge {
+    return new BoundGauge(
       labelSet,
       this._disabled,
       this._monotonic,
@@ -188,9 +193,9 @@ export class GaugeMetric extends Metric<GaugeHandle>
   /**
    * Sets the given value. Values can be negative.
    * @param value the new value.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric's handle.
+   * @param labelSet the canonicalized LabelSet used to associate with this metric's instrument.
    */
   set(value: number, labelSet: types.LabelSet) {
-    this.getHandle(labelSet).set(value);
+    this.bind(labelSet).set(value);
   }
 }
