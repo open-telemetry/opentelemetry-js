@@ -12,6 +12,7 @@
     "precompile": "tsc --version",
     "version:update": "lerna run version:update",
     "compile": "lerna run compile",
+    "check-plugin-supported-versions": "scripts/check-plugin-supported-versions.sh",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
     "bootstrap": "lerna bootstrap",

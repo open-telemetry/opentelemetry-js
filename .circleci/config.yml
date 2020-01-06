@@ -150,6 +150,20 @@ browsers_unit_tests: &browsers_unit_tests
         command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then yarn codecov:browser; fi
 
 jobs:
+  check-plugin-supported-versions:
+    docker:
+      - image: node:12
+    steps:
+      - checkout
+      - run:
+          name: Install Dependencies
+          command: yarn install
+      - run:
+          name: Compile code
+          command: yarn compile
+      - run:
+          name: Check plugin supported versions
+          command: yarn check-plugin-supported-versions
   lint_&_docs:
     docker:
       - image: node:12
@@ -224,6 +238,16 @@ jobs:
 
 workflows:
   version: 2
+  nightly:
+    jobs:
+      - check-plugin-supported-versions
+    triggers:
+      - schedule:
+          cron: "0 0 * * *"
+          filters:
+            branches:
+              only:
+                - master
   build:
     jobs:
       - lint_&_docs:
