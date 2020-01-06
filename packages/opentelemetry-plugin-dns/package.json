@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-dns",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "OpenTelemetry dns automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,9 +12,10 @@
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
-    "compile": "tsc -p .",
-    "fix": "gts fix",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "fix": "gts fix"
   },
   "keywords": [
     "opentelemetry",
@@ -40,8 +41,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.3.1",
-    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/node": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.2",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.12",
     "@types/shimmer": "^1.0.1",
@@ -59,8 +60,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.1",
-    "@opentelemetry/types": "^0.3.1",
+    "@opentelemetry/core": "^0.3.2",
+    "@opentelemetry/types": "^0.3.2",
     "semver": "^6.3.0",
     "shimmer": "^1.2.1"
   }

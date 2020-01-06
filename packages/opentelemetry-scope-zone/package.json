@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-zone",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "OpenTelemetry Scope Zone",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -8,7 +8,8 @@
   "scripts": {
     "check": "gts check",
     "clean": "rimraf build/*",
-    "compile": "tsc -p .",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
     "watch": "tsc -w"
@@ -65,7 +66,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/scope-zone-peer-dep": "^0.3.1",
+    "@opentelemetry/scope-zone-peer-dep": "^0.3.2",
     "zone.js": "^0.10.2"
   },
   "sideEffects": true

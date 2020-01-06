@@ -21,7 +21,7 @@ import {
   NOOP_GAUGE_METRIC,
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
-import { BaseHandle } from './Handle';
+import { BaseBoundInstrument } from './BoundInstrument';
 import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
   MetricOptions,
@@ -39,7 +39,7 @@ import { ExportResult } from '@opentelemetry/base';
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
-  private readonly _metrics = new Map<string, Metric<BaseHandle>>();
+  private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _exporters: MetricExporter[] = [];
 
   readonly labels = Meter.labels;
@@ -59,7 +59,7 @@ export class Meter implements types.Meter {
   createMeasure(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.MeasureHandle> {
+  ): types.Metric<types.BoundMeasure> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -80,7 +80,7 @@ export class Meter implements types.Meter {
   createCounter(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.CounterHandle> {
+  ): types.Metric<types.BoundCounter> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -112,7 +112,7 @@ export class Meter implements types.Meter {
   createGauge(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.GaugeHandle> {
+  ): types.Metric<types.BoundGauge> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -197,7 +197,7 @@ export class Meter implements types.Meter {
    * @param name The name of the metric.
    * @param metric The metric to register.
    */
-  private _registerMetric<T extends BaseHandle>(
+  private _registerMetric<T extends BaseBoundInstrument>(
     name: string,
     metric: Metric<T>
   ): void {

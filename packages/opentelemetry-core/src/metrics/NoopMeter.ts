@@ -15,14 +15,14 @@
  */
 
 import {
-  CounterHandle,
+  BoundCounter,
   DistributedContext,
-  GaugeHandle,
+  BoundGauge,
   Meter,
   Metric,
   MetricOptions,
   MetricUtils,
-  MeasureHandle,
+  BoundMeasure,
   SpanContext,
   LabelSet,
   Labels,
@@ -40,7 +40,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<MeasureHandle> {
+  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure> {
     return NOOP_MEASURE_METRIC;
   }
 
@@ -49,7 +49,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<CounterHandle> {
+  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter> {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -58,7 +58,7 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createGauge(name: string, options?: MetricOptions): Metric<GaugeHandle> {
+  createGauge(name: string, options?: MetricOptions): Metric<BoundGauge> {
     return NOOP_GAUGE_METRIC;
   }
 
@@ -68,33 +68,33 @@ export class NoopMeter implements Meter {
 }
 
 export class NoopMetric<T> implements Metric<T> {
-  private readonly _handle: T;
+  private readonly _instrument: T;
 
-  constructor(handle: T) {
-    this._handle = handle;
+  constructor(instrument: T) {
+    this._instrument = instrument;
   }
   /**
-   * Returns a Handle associated with specified LabelSet.
-   * It is recommended to keep a reference to the Handle instead of always
+   * Returns a Bound Instrument associated with specified LabelSet.
+   * It is recommended to keep a reference to the Bound Instrument instead of always
    * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
    */
-  getHandle(labels: LabelSet): T {
-    return this._handle;
+  bind(labels: LabelSet): T {
+    return this._instrument;
   }
 
   /**
-   * Returns a Handle for a metric with all labels not set.
+   * Returns a Bound Instrument for a metric with all labels not set.
    */
-  getDefaultHandle(): T {
-    return this._handle;
+  getDefaultBound(): T {
+    return this._instrument;
   }
 
   /**
-   * Removes the Handle from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric handle.
+   * Removes the Binding from the metric, if it is present.
+   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
    */
-  removeHandle(labels: LabelSet): void {
+  unbind(labels: LabelSet): void {
     // @todo: implement this method
     return;
   }
@@ -111,21 +111,21 @@ export class NoopMetric<T> implements Metric<T> {
   }
 }
 
-export class NoopCounterMetric extends NoopMetric<CounterHandle>
+export class NoopCounterMetric extends NoopMetric<BoundCounter>
   implements Pick<MetricUtils, 'add'> {
   add(value: number, labelSet: LabelSet) {
-    this.getHandle(labelSet).add(value);
+    this.bind(labelSet).add(value);
   }
 }
 
-export class NoopGaugeMetric extends NoopMetric<GaugeHandle>
+export class NoopGaugeMetric extends NoopMetric<BoundGauge>
   implements Pick<MetricUtils, 'set'> {
   set(value: number, labelSet: LabelSet) {
-    this.getHandle(labelSet).set(value);
+    this.bind(labelSet).set(value);
   }
 }
 
-export class NoopMeasureMetric extends NoopMetric<MeasureHandle>
+export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   implements Pick<MetricUtils, 'record'> {
   record(
     value: number,
@@ -134,28 +134,28 @@ export class NoopMeasureMetric extends NoopMetric<MeasureHandle>
     spanContext?: SpanContext
   ) {
     if (typeof distContext === 'undefined') {
-      this.getHandle(labelSet).record(value);
+      this.bind(labelSet).record(value);
     } else if (typeof spanContext === 'undefined') {
-      this.getHandle(labelSet).record(value, distContext);
+      this.bind(labelSet).record(value, distContext);
     } else {
-      this.getHandle(labelSet).record(value, distContext, spanContext);
+      this.bind(labelSet).record(value, distContext, spanContext);
     }
   }
 }
 
-export class NoopCounterHandle implements CounterHandle {
+export class NoopBoundCounter implements BoundCounter {
   add(value: number): void {
     return;
   }
 }
 
-export class NoopGaugeHandle implements GaugeHandle {
+export class NoopBoundGauge implements BoundGauge {
   set(value: number): void {
     return;
   }
 }
 
-export class NoopMeasureHandle implements MeasureHandle {
+export class NoopBoundMeasure implements BoundMeasure {
   record(
     value: number,
     distContext?: DistributedContext,
@@ -165,13 +165,13 @@ export class NoopMeasureHandle implements MeasureHandle {
   }
 }
 
-export const NOOP_GAUGE_HANDLE = new NoopGaugeHandle();
-export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_GAUGE_HANDLE);
+export const NOOP_BOUND_GAUGE = new NoopBoundGauge();
+export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_BOUND_GAUGE);
 
-export const NOOP_COUNTER_HANDLE = new NoopCounterHandle();
-export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_COUNTER_HANDLE);
+export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
+export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_MEASURE_HANDLE = new NoopMeasureHandle();
-export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_MEASURE_HANDLE);
+export const NOOP_BOUND_MEASURE = new NoopBoundMeasure();
+export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
 
 export const NOOP_LABEL_SET = {} as LabelSet;

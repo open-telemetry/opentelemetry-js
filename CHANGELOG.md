@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.2
+
+Released 2020-01-03
+
+#### :rocket: (Enhancement)
+* `opentelemetry-plugin-http`, `opentelemetry-plugin-https`
+  * [#643](https://github.com/open-telemetry/opentelemetry-js/pull/643) feat(plugin-http): add/modify attributes
+  * [#651](https://github.com/open-telemetry/opentelemetry-js/pull/651) chore: add version script to all packages
+* `opentelemetry-plugin-mongodb`
+  * [#652](https://github.com/open-telemetry/opentelemetry-js/pull/652) feat: port mongodb-core plugin to mongodb
+* `opentelemetry-metrics`
+  * [#634](https://github.com/open-telemetry/opentelemetry-js/pull/634) Rename metric handle to bound instrument
+* `opentelemetry-test-utils`
+  * [#644](https://github.com/open-telemetry/opentelemetry-js/pull/644) feat: test-utils
+
+#### :sparkles: (Feature)
+* `opentelemetry-plugin-ioredis`
+  * [#558](https://github.com/open-telemetry/opentelemetry-js/pull/558) feat(plugin): add ioredis plugin
+
+#### :books: (Refine Doc)
+* `opentelemetry-node`, `opentelemetry-plugin-xml-http-request`
+  * [#646](https://github.com/open-telemetry/opentelemetry-js/pull/646) chore: update default plugins list and fix npm badge
+* `opentelemetry-plugin-document-load`, `opentelemetry-plugin-mysql`, `opentelemetry-plugin-redis`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-shim-opentracing`
+  * [#647](https://github.com/open-telemetry/opentelemetry-js/pull/647) chore: update plugin readme with example links
+* `opentelemetry-plugin-postgres`
+  * [#539](https://github.com/open-telemetry/opentelemetry-js/pull/539) chore(docs:postgres): add usage instructions
+* Other
+  * [#645](https://github.com/open-telemetry/opentelemetry-js/pull/645) chore(plugin-pg): move dev dependencies out of `dependencies` in package.json
+
 ## 0.3.1
 
 Released 2019-12-20
