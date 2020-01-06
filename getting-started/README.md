@@ -87,21 +87,22 @@ const tracer = new NodeTracer({
 opentelemetry.initGlobalTracer(tracer);
 ```
 
+If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
+
 ##### TypeScript
 
 ```typescript
 import * as opentelemetry from "@opentelemetry/core";
 import { NodeTracer } from "@opentelemetry/node";
-import { Span, Tracer } from "@opentelemetry/types";
 
-const tracer: Tracer = new NodeTracer({
+const tracer: NodeTracer = new NodeTracer({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
 opentelemetry.initGlobalTracer(tracer);
 ```
 
-If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
+If you run your application now with `ts-node -r ./tracing.ts app.ts`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
 
 If you wish to see a completed trace, however, there is one more step. You must register an exporter to send traces to a tracing backend.
 
@@ -218,10 +219,10 @@ Open a command line and `cd` into the directory where you downloaded the Prometh
 $ cd Downloads
 
 $ # Replace the file name below with your downloaded tarball
-$ tar xvfz prometheus-2.14.0.darwin-amd64.tar
+$ tar xvfz prometheus-2.15.2.darwin-amd64.tar
 
 $ # Replace the dir below with your created directory
-$ cd prometheus-2.14.0.darwin-amd64
+$ cd prometheus-2.15.2.darwin-amd64
 
 $ ls
 LICENSE           console_libraries data              prometheus.yml    tsdb
