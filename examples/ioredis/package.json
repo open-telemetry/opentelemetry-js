@@ -7,10 +7,7 @@
   "scripts": {
     "docker:start": "docker run -d -p 6379:6379 --name otjsredis redis:alpine",
     "docker:stop": "docker stop otjsredis && docker rm otjsredis",
-    "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
-    "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
-    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
-    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js"
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -35,12 +32,8 @@
     "@opentelemetry/exporter-jaeger": "^0.3.2",
     "@opentelemetry/exporter-zipkin": "^0.3.2",
     "@opentelemetry/node": "^0.3.2",
-    "@opentelemetry/plugin-http": "^0.3.2",
     "@opentelemetry/plugin-ioredis": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
-    "axios": "^0.19.0",
-    "express": "^4.17.1",
     "ioredis": "^4.14.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
