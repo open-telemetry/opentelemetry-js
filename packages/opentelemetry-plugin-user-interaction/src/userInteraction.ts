@@ -26,6 +26,7 @@ import {
   ZoneTypeWithPrototype,
 } from './types';
 import { AttributeNames } from './enums/AttributeNames';
+import { VERSION } from './version';
 
 const ZONE_SCOPE_KEY = 'OT_ZONE_SCOPE';
 const EVENT_CLICK_NAME = 'event_click:';
@@ -38,8 +39,7 @@ const EVENT_NAVIGATION_NAME = 'Navigation:';
  */
 export class UserInteractionPlugin extends BasePlugin<unknown> {
   readonly component: string = 'user-interaction';
-  // @TODO align this with all packages #600
-  readonly version: string = '0.3.1';
+  readonly version = VERSION;
   moduleName = this.component;
   private _spansData = new WeakMap<types.Span, SpanData>();
   private _zonePatched = false;
