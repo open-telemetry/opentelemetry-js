@@ -79,10 +79,7 @@ function assertSpans(
   const [mongoSpan] = spans;
   assert.strictEqual(mongoSpan.name, expectedName);
   assert.strictEqual(mongoSpan.kind, expectedKind);
-  assert.strictEqual(
-    mongoSpan.attributes[AttributeNames.COMPONENT],
-    'mongodb'
-  );
+  assert.strictEqual(mongoSpan.attributes[AttributeNames.COMPONENT], 'mongodb');
   assert.strictEqual(
     mongoSpan.attributes[AttributeNames.PEER_HOSTNAME],
     process.env.MONGODB_HOST || 'localhost'
