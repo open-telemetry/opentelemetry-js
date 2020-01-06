@@ -289,8 +289,7 @@ describe('UserInteractionPlugin', () => {
       });
 
       it('it should not create span when error occurred during span creation', () => {
-        // @ts-ignore
-        userInteractionPlugin._tracer.startSpan = function() {
+        userInteractionPlugin["_tracer"].startSpan = function() {
           throw 'foo';
         };
         const span = createSpan(
