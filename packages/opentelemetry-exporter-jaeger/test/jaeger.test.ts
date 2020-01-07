@@ -124,6 +124,7 @@ describe('JaegerExporter', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
+        numberOfChildren: 0,
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {

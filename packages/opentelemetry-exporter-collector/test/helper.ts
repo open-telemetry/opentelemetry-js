@@ -67,6 +67,7 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   duration: [0, 8885000],
+  numberOfChildren: 1,
 };
 
 export function ensureSpanIsCorrect(span: collectorTypes.Span) {
@@ -79,6 +80,7 @@ export function ensureSpanIsCorrect(span: collectorTypes.Span) {
     kind: 0,
     startTime: '2019-11-18T23:36:05.429803070Z',
     endTime: '2019-11-18T23:36:05.438688070Z',
+    childSpanCount: 1,
     attributes: {
       droppedAttributesCount: 0,
       attributeMap: {

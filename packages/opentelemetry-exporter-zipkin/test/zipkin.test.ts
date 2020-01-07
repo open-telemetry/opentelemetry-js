@@ -45,6 +45,7 @@ function getReadableSpan() {
     attributes: {},
     links: [],
     events: [],
+    numberOfChildren: 0,
   };
   return readableSpan;
 }
@@ -157,6 +158,7 @@ describe('ZipkinExporter', () => {
             attributes: { key3: 'value3' },
           },
         ],
+        numberOfChildren: 0,
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -174,6 +176,7 @@ describe('ZipkinExporter', () => {
         attributes: {},
         links: [],
         events: [],
+        numberOfChildren: 0,
       };
 
       const exporter = new ZipkinExporter({

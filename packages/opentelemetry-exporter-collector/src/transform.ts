@@ -197,7 +197,7 @@ export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
     status: span.status,
     sameProcessAsParentSpan: !!span.parentSpanId,
     links: toCollectorLinks(span),
-    // childSpanCount: // not implemented
+    childSpanCount: span.numberOfChildren,
   };
 }
 

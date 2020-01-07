@@ -211,6 +211,33 @@ describe('BasicTracer', () => {
       childSpan.end();
     });
 
+    it('should record the child count spans', () => {
+      const tracer = new BasicTracer();
+      const span = tracer.startSpan('my-span');
+      const childSpan = tracer.startSpan('child-span', {
+        parent: span,
+      });
+      assert.strictEqual((span as Span).numberOfChildren, 1);
+      const grandChildSpan = tracer.startSpan('grand-child-span', {
+        parent: span,
+      });
+      assert.strictEqual((span as Span).numberOfChildren, 2);
+      grandChildSpan.end();
+      span.end();
+      childSpan.end();
+    });
+
+    it('should not record the child span count when span is ended', () => {
+      const tracer = new BasicTracer();
+      const span = tracer.startSpan('my-span');
+      span.end();
+      const childSpan = tracer.startSpan('child-span', {
+        parent: span,
+      });
+      childSpan.end();
+      assert.strictEqual((span as Span).numberOfChildren, 0);
+    });
+
     it('should start a span with name and with invalid parent span', () => {
       const tracer = new BasicTracer();
       const span = tracer.startSpan('my-span', {

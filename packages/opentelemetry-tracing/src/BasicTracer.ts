@@ -184,6 +184,7 @@ export class BasicTracer implements types.Tracer {
     }
 
     if (typeof (parent as types.Span).context === 'function') {
+      (parent as Span).addChild();
       return (parent as Span).context();
     }
     return undefined;

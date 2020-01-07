@@ -66,6 +66,7 @@ describe('transform', () => {
           },
         ],
         duration: [32, 800000000],
+        numberOfChildren: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -139,6 +140,7 @@ describe('transform', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
+        numberOfChildren: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -202,6 +204,7 @@ describe('transform', () => {
         ],
         events: [],
         duration: [32, 800000000],
+        numberOfChildren: 0,
       };
 
       const thriftSpan = spanToThrift(readableSpan);

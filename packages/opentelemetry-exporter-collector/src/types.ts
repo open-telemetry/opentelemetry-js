@@ -371,12 +371,12 @@ export interface Span {
    */
   sameProcessAsParentSpan?: boolean;
 
-  //@TODO - do we use it in opentelemetry or it is not needed?
-  // /**
-  //  * An optional number of child spans that were generated while this span was
-  //  * active. If set, allows an implementation to detect missing child spans.
-  //  */
-  // childSpanCount?: number;
+  /**
+   * An optional number of child spans that were generated while this span was
+   * active. If set, allows an implementation to detect missing child spans.
+   */
+  childSpanCount?: number;
+
   /**
    * The included links.
    */

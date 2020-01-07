@@ -44,6 +44,7 @@ export class Span implements types.Span, ReadableSpan {
     code: types.CanonicalCode.OK,
   };
   endTime: types.HrTime = [0, 0];
+  numberOfChildren: number = 0;
   private _ended = false;
   private _duration: types.HrTime = [-1, -1];
   private readonly _logger: types.Logger;
@@ -178,6 +179,11 @@ export class Span implements types.Span, ReadableSpan {
 
   get duration(): types.HrTime {
     return this._duration;
+  }
+
+  addChild(): void {
+    if (this._ended) return;
+    this.numberOfChildren++;
   }
 
   private _isSpanEnded(): boolean {
