@@ -15,7 +15,7 @@ This guide will walk you through the setup and configuration process for a traci
       2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
       3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
 
-## Tracing Your Application with OpenTelemetry
+## Tracing Your Application with OpenTelemetry ([TS version](ts-example/#tracing-your-application-with-opentelemetry))
 
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
 
