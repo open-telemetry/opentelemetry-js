@@ -309,9 +309,9 @@ const meter = new Meter();
 meter.addExporter(
   new PrometheusExporter(
     { startServer: true },
-	() => {
+    () => {
       console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-  	}
+    }
   )
 );
 
