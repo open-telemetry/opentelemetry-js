@@ -276,7 +276,7 @@ const app = express();
 app.use(countAllRequests());
 ```
 
-Now, when we make requests to our service our meter will count all requests.
+Now, when we make requests to service our meter will count all requests.
 
 **Note**: Creating a new `labelSet` and `handle` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why handles are created and stored in a `Map` according to the route key.
 
