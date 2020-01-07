@@ -221,7 +221,6 @@ To create metrics on NodeJS, you will need `@opentelemetry/metrics`.
 
 ```sh
 $ npm install @opentelemetry/metrics
-  @opentelemetry/metrics
 ```
 
 #### Initialize a meter and collect metrics
@@ -276,7 +275,7 @@ const app = express();
 app.use(countAllRequests());
 ```
 
-Now, when we make requests to service our meter will count all requests.
+Now, when we make requests to our service our meter will count all requests.
 
 **Note**: Creating a new `labelSet` and `handle` on every request is not ideal as creating the `labelSet` can often be an expensive operation. This is why handles are created and stored in a `Map` according to the route key.
 
@@ -284,7 +283,7 @@ Now, when we make requests to service our meter will count all requests.
 
 ([link to JavaScipt version](../README.md#initialize-and-register-a-metrics-exporter))
 
-Counting metrics are only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First, we will need to install the Prometheus exporter.
+Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
 
 ```sh
 $ npm install @opentelemetry/exporter-prometheus
