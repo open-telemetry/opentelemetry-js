@@ -1,19 +1,19 @@
 # Getting Started with OpenTelemetry JS
 
-This guide will walk you through the setup and configuration process for a tracing backend (in this case [Zipkin](https://zipkin.io), but [Jaeger](https://www.jaegertracing.io) would be simple to use as well), a metrics backend like [Prometheus](https://prometheus.io), and auto-instrumentation of NodeJS. [The guide for TypeScript is here](ts-example/README.md#getting-started-with-opentelemetry-js-typescript).
+This guide will walk you through the setup and configuration process for a tracing backend (in this case [Zipkin](https://zipkin.io), but [Jaeger](https://www.jaegertracing.io) would be simple to use as well), a metrics backend like [Prometheus](https://prometheus.io), and auto-instrumentation of NodeJS. [You can find the guide for TypeScript here](ts-example/README.md#getting-started-with-opentelemetry-js-typescript).
 
 1. [Tracing Your Application with OpenTelemetry](#tracing-your-application-with-opentelemetry)
-   1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
-   2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
-      1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
-      2. [Initialize a global tracer](#initialize-a-global-tracer)
-      3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
+  1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
+  2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
+    1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
+    2. [Initialize a global tracer](#initialize-a-global-tracer)
+    3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
 2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
-   1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
-   2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
-      1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
-      2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
-      3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
+  1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
+  2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+    1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
+    2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
+    3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
 
 ## Tracing Your Application with OpenTelemetry
 
@@ -71,7 +71,7 @@ All tracing initialization should happen before your application’s code runs. 
 Create a file named `tracing.js` and add the following code:
 
 ```javascript
-"use strict";
+'use strict';
 
 const opentelemetry = require("@opentelemetry/core");
 const { NodeTracer } = require("@opentelemetry/node");
@@ -107,7 +107,7 @@ $ # npm install @opentelemetry/exporter-jaeger
 After these dependencies are installed, we will need to initialize and register them. Modify `tracing.js` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
 
 ```javascript
-"use strict";
+'use strict';
 
 const opentelemetry = require("@opentelemetry/core");
 const { NodeTracer } = require("@opentelemetry/node");
@@ -124,7 +124,7 @@ opentelemetry.initGlobalTracer(tracer);
 tracer.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
-      serviceName: "getting-started"
+      serviceName: "getting-started",
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
       // exporter config.
@@ -199,11 +199,11 @@ global:
   scrape_interval: 15s # Set the scrape interval to every 15 seconds.
 
 scrape_configs:
-  - job_name: "opentelemetry"
+  - job_name: 'opentelemetry'
     # metrics_path defaults to '/metrics'
     # scheme defaults to 'http'.
     static_configs:
-      - targets: ["localhost:9464"]
+      - targets: ['localhost:9464']
 ```
 
 ### Monitor Your NodeJS Application
@@ -236,7 +236,7 @@ In order to create and monitor metrics, we will need a `Meter`. In OpenTelemetry
 Create a file named `monitoring.js` and add the following code:
 
 ```javascript
-"use strict";
+'use strict';
 
 const { Meter } = require("@opentelemetry/metrics");
 
@@ -246,7 +246,7 @@ const meter = new Meter();
 Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so that it looks like this:
 
 ```javascript
-"use strict";
+'use strict';
 
 const { Meter } = require("@opentelemetry/metrics");
 
@@ -307,8 +307,10 @@ const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 const meter = new Meter();
 
 meter.addExporter(
-  new PrometheusExporter({ startServer: true }, () => {
-    console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
+  new PrometheusExporter(
+    { startServer: true },
+	() => {
+      console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
   })
 );
 
