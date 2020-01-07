@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './Handle';
+export * from './BoundInstrument';
 export * from './Meter';
 export * from './Metric';
 export * from './export/ConsoleMetricExporter';

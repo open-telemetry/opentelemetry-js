@@ -17,11 +17,11 @@
 import * as assert from 'assert';
 import {
   NoopMeter,
-  NOOP_GAUGE_HANDLE,
+  NOOP_BOUND_GAUGE,
   NOOP_GAUGE_METRIC,
-  NOOP_COUNTER_HANDLE,
+  NOOP_BOUND_COUNTER,
   NOOP_COUNTER_METRIC,
-  NOOP_MEASURE_HANDLE,
+  NOOP_BOUND_MEASURE,
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
 import { Labels } from '@opentelemetry/types';
@@ -37,20 +37,20 @@ describe('NoopMeter', () => {
     counter.setCallback(() => {
       assert.fail('callback occurred');
     });
-    counter.getHandle(labelSet).add(1);
-    counter.getDefaultHandle().add(1);
-    counter.removeHandle(labelSet);
+    counter.bind(labelSet).add(1);
+    counter.getDefaultBound().add(1);
+    counter.unbind(labelSet);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(counter.getHandle(labelSet), NOOP_COUNTER_HANDLE);
-    assert.strictEqual(counter.getDefaultHandle(), NOOP_COUNTER_HANDLE);
+    assert.strictEqual(counter.bind(labelSet), NOOP_BOUND_COUNTER);
+    assert.strictEqual(counter.getDefaultBound(), NOOP_BOUND_COUNTER);
     counter.clear();
 
     const measure = meter.createMeasure('some-name');
-    measure.getDefaultHandle().record(1);
-    measure.getDefaultHandle().record(1, { key: { value: 'value' } });
-    measure.getDefaultHandle().record(
+    measure.getDefaultBound().record(1);
+    measure.getDefaultBound().record(1, { key: { value: 'value' } });
+    measure.getDefaultBound().record(
       1,
       { key: { value: 'value' } },
       {
@@ -61,16 +61,16 @@ describe('NoopMeter', () => {
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
-    assert.strictEqual(measure.getDefaultHandle(), NOOP_MEASURE_HANDLE);
-    assert.strictEqual(measure.getHandle(labelSet), NOOP_MEASURE_HANDLE);
+    assert.strictEqual(measure.getDefaultBound(), NOOP_BOUND_MEASURE);
+    assert.strictEqual(measure.bind(labelSet), NOOP_BOUND_MEASURE);
 
     const gauge = meter.createGauge('some-name');
-    gauge.getDefaultHandle().set(1);
+    gauge.getDefaultBound().set(1);
 
     // ensure the correct noop const is returned
     assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
-    assert.strictEqual(gauge.getDefaultHandle(), NOOP_GAUGE_HANDLE);
-    assert.strictEqual(gauge.getHandle(labelSet), NOOP_GAUGE_HANDLE);
+    assert.strictEqual(gauge.getDefaultBound(), NOOP_BOUND_GAUGE);
+    assert.strictEqual(gauge.bind(labelSet), NOOP_BOUND_GAUGE);
 
     const options = {
       component: 'tests',

@@ -23,12 +23,13 @@ import { NodeTracer } from '@opentelemetry/node';
 import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as path from 'path';
 import * as nock from 'nock';
 import { HttpPlugin, plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import * as utils from '../../src/utils';
+import { OT_REQUEST_HEADER } from '../../src/utils';
 import { HttpPluginConfig, Http } from '../../src/types';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 
@@ -40,6 +41,7 @@ const serverPort = 22345;
 const protocol = 'http';
 const hostname = 'localhost';
 const pathname = '/test';
+const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const httpTextFormat = new DummyPropagation();
 const logger = new NoopLogger();
@@ -76,8 +78,8 @@ describe('HttpPlugin', () => {
     assert.strictEqual(process.versions.node, plugin.version);
   });
 
-  it('moduleName should be http', () => {
-    assert.strictEqual('http', plugin.moduleName);
+  it(`moduleName should be ${protocol}`, () => {
+    assert.strictEqual(protocol, plugin.moduleName);
   });
 
   describe('enable()', () => {
@@ -122,7 +124,7 @@ describe('HttpPlugin', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpRequest.get(
-          `http://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -139,16 +141,24 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 2);
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          serverPort
+        );
       });
 
-      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
@@ -170,11 +180,12 @@ describe('HttpPlugin', () => {
             (url: string) => url.endsWith(`/ignored/function`),
           ],
           ignoreOutgoingUrls: [
-            `http://${hostname}:${serverPort}/ignored/string`,
+            `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
             (url: string) => url.endsWith(`/ignored/function`),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
+          serverName,
         };
         plugin.enable(http, tracer, tracer.logger, config);
         server = http.createServer((request, response) => {
@@ -189,11 +200,11 @@ describe('HttpPlugin', () => {
         plugin.disable();
       });
 
-      it('http module should be patched', () => {
+      it(`${protocol} module should be patched`, () => {
         assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       });
 
-      it("should not patch if it's not a http module", () => {
+      it(`should not patch if it's not a ${protocol} module`, () => {
         const httpNotPatched = new HttpPlugin(
           plugin.component,
           process.versions.node
@@ -203,7 +214,13 @@ describe('HttpPlugin', () => {
 
       it('should generate valid spans (client side and server side)', async () => {
         const result = await httpRequest.get(
-          `http://${hostname}:${serverPort}${pathname}`
+          `${protocol}://${hostname}:${serverPort}${pathname}`,
+          {
+            headers: {
+              'x-forwarded-for': '<client>, <proxy1>, <proxy2>',
+              'user-agent': 'chrome',
+            },
+          }
         );
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
@@ -215,21 +232,46 @@ describe('HttpPlugin', () => {
           resHeaders: result.resHeaders,
           reqHeaders: result.reqHeaders,
           component: plugin.component,
+          serverName,
         };
 
         assert.strictEqual(spans.length, 2);
-        assertSpan(incomingSpan, SpanKind.SERVER, validations);
-        assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.HTTP_CLIENT_IP],
+          '<client>'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          serverPort
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          serverPort
+        );
+        [
+          { span: incomingSpan, kind: SpanKind.SERVER },
+          { span: outgoingSpan, kind: SpanKind.CLIENT },
+        ].forEach(({ span, kind }) => {
+          assert.strictEqual(
+            span.attributes[AttributeNames.HTTP_FLAVOR],
+            '1.1'
+          );
+          assert.strictEqual(
+            span.attributes[AttributeNames.NET_TRANSPORT],
+            AttributeNames.IP_TCP
+          );
+          assertSpan(span, kind, validations);
+        });
       });
 
-      it(`should not trace requests with '${utils.OT_REQUEST_HEADER}' header`, async () => {
+      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
         const testPath = '/outgoing/do-not-trace';
         doNock(hostname, testPath, 200, 'Ok');
 
         const options = {
           host: hostname,
           path: testPath,
-          headers: { [utils.OT_REQUEST_HEADER]: 1 },
+          headers: { [OT_REQUEST_HEADER]: 1 },
         };
 
         const result = await httpRequest.get(options);
@@ -393,14 +435,14 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of ['string', '', {}, new Date()]) {
-        it(`should be tracable and not throw exception in http plugin when passing the following argument ${JSON.stringify(
+      for (const arg of ['string', {}, new Date()]) {
+        it(`should be tracable and not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
             await httpRequest.get(arg);
           } catch (error) {
-            // http request has been made
+            // request has been made
             // nock throw
             assert.ok(error.message.startsWith('Nock: No match for request'));
           }
@@ -409,18 +451,20 @@ describe('HttpPlugin', () => {
         });
       }
 
-      for (const arg of [true, 1, false, 0]) {
-        it(`should not throw exception in http plugin when passing the following argument ${JSON.stringify(
+      for (const arg of [true, 1, false, 0, '']) {
+        it(`should not throw exception in ${protocol} plugin when passing the following argument ${JSON.stringify(
           arg
         )}`, async () => {
           try {
             // @ts-ignore
             await httpRequest.get(arg);
           } catch (error) {
-            // http request has been made
+            // request has been made
             // nock throw
             assert.ok(
-              error.stack.indexOf('/node_modules/nock/lib/intercept.js') > 0
+              error.stack.indexOf(
+                path.normalize('/node_modules/nock/lib/intercept.js')
+              ) > 0
             );
           }
           const spans = memoryExporter.getFinishedSpans();
@@ -444,7 +488,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            `http://${hostname}${testPath}`,
+            `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -485,7 +529,7 @@ describe('HttpPlugin', () => {
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            `http://${hostname}${testPath}`,
+            `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -509,14 +553,14 @@ describe('HttpPlugin', () => {
       });
 
       it('should have 1 ended span when request is aborted', async () => {
-        nock('http://my.server.com')
+        nock(`${protocol}://my.server.com`)
           .get('/')
           .socketDelay(50)
           .reply(200, '<html></html>');
 
         const promiseRequest = new Promise((resolve, reject) => {
           const req = http.request(
-            'http://my.server.com',
+            `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
               resp.on('data', chunk => {
@@ -542,7 +586,7 @@ describe('HttpPlugin', () => {
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
           assert.strictEqual(span.status.code, CanonicalCode.ABORTED);
-          assert.ok(Object.keys(span.attributes).length > 6);
+          assert.ok(Object.keys(span.attributes).length >= 6);
         }
       });
 
