@@ -311,7 +311,8 @@ meter.addExporter(
     { startServer: true },
 	() => {
       console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-  })
+  	}
+  )
 );
 
 const requestCount = meter.createCounter("requests", {
