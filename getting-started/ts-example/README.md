@@ -103,7 +103,7 @@ $ # for jaeger you would run this command:
 $ # npm install @opentelemetry/exporter-jaeger
 ```
 
-After these dependencies are installed, we will need to initialize and register them. Modify `tracing.js` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
+After these dependencies are installed, we will need to initialize and register them. Modify `tracing.ts` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
 
 ```typescript
 import * as opentelemetry from "@opentelemetry/core";
@@ -332,7 +332,7 @@ Ensure prometheus is running by running the `prometheus` binary from earlier and
 ```sh
 $ npm start
 
-> @opentelemetry/getting-started@1.0.0 start /Users/nina/Works/opentelemetry-js/getting-started/example/ts
+> @opentelemetry/getting-started@1.0.0 start /Users/.../opentelemetry-js/getting-started/example/ts
 > ts-node app.ts
 
 prometheus scrape endpoint: http://localhost:9464/metrics
