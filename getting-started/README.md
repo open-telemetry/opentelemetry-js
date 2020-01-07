@@ -3,17 +3,17 @@
 This guide will walk you through the setup and configuration process for a tracing backend (in this case [Zipkin](https://zipkin.io), but [Jaeger](https://www.jaegertracing.io) would be simple to use as well), a metrics backend like [Prometheus](https://prometheus.io), and auto-instrumentation of NodeJS. [You can find the guide for TypeScript here](ts-example/README.md#getting-started-with-opentelemetry-js-typescript).
 
 1. [Tracing Your Application with OpenTelemetry](#tracing-your-application-with-opentelemetry)
-  1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
-  2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
-    1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
-    2. [Initialize a global tracer](#initialize-a-global-tracer)
-    3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
+   1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
+   2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
+     1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
+     2. [Initialize a global tracer](#initialize-a-global-tracer)
+     3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
 2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
-  1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
-  2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
-    1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
-    2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
-    3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
+   1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
+   2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+     1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
+     2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
+     3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
 
 ## Tracing Your Application with OpenTelemetry
 
