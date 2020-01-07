@@ -21,7 +21,7 @@ This TypeScript guide will walk you through the setup and configuration process 
 
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
 
-An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with tracing enabled in the [traced-example directory](traced-example).
+An example application which can be used with this guide can be found at in the same directory.
 
 ### Setting up a Tracing Backend
 
@@ -37,7 +37,7 @@ $ docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin
 
 Browse to <http://localhost:9411> to ensure that you can see the Zipkin UI.
 
-<p align="center"><img src="./images/zipkin.png?raw=true"/></p>
+<p align="center"><img src="../images/zipkin.png?raw=true"/></p>
 
 ### Trace Your NodeJS Application
 
@@ -138,7 +138,7 @@ Now if you run your application with the `tracing.ts` file loaded, and you send 
 $ ts-node -r ./tracing.ts app.ts
 ```
 
-<p align="center"><img src="./images/zipkin-trace.png?raw=true"/></p>
+<p align="center"><img src="../images/zipkin-trace.png?raw=true"/></p>
 
 **Note:** Some spans appear to be duplicated, but they are not. This is because the sample application is both the client and the server for these requests. You see one span that is the client side request timing, and one span that is the server side request timing. Anywhere they don’t overlap is network time.
 
@@ -186,7 +186,7 @@ level=info ts=2019-11-21T20:39:40.262Z caller=web.go:496 component=web msg="Star
 level=info ts=2019-11-21T20:39:40.383Z caller=main.go:626 msg="Server is ready to receive web requests."
 ```
 
-<p align="center"><img src="./images/prometheus.png?raw=true"/></p>
+<p align="center"><img src="../images/prometheus.png?raw=true"/></p>
 
 Once we know prometheus starts, replace the contents of `prometheus.yml` with the following:
 
@@ -207,7 +207,7 @@ scrape_configs:
 
 ([link to JS version](../README.md#monitor-your-nodejs-application))
 
-An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with metric monitoring enabled in the [monitored-example directory](monitored-example).
+An example application which can be used with this guide can be found at in the current directory.
 
 1. Install the required OpenTelemetry metrics libraries
 2. Initialize a meter and collect metrics
@@ -351,4 +351,4 @@ requests{route="/backend"} 4
 
 You should also be able to see gathered metrics in your prometheus web UI.
 
-<p align="center"><img src="./images/prometheus-graph.png?raw=true"/></p>
+<p align="center"><img src="../images/prometheus-graph.png?raw=true"/></p>
