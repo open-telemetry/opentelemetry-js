@@ -284,7 +284,7 @@ Now, when we make requests to service our meter will count all requests.
 
 ([link to JavaScipt version](../README.md#initialize-and-register-a-metrics-exporter))
 
-Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
+Counting metrics are only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First, we will need to install the Prometheus exporter.
 
 ```sh
 $ npm install @opentelemetry/exporter-prometheus
