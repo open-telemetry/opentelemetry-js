@@ -220,7 +220,7 @@ An example application which can be used with this guide can be found at in the 
 To create metrics on NodeJS, you will need `@opentelemetry/metrics`.
 
 ```sh
-$ npm install \
+$ npm install @opentelemetry/metrics
   @opentelemetry/metrics
 ```
 
