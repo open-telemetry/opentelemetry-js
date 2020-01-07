@@ -46,10 +46,10 @@ setInterval(() => {
 
   currentMonotonicGaugeValue += Math.random();
 
-  monotonicCounter.getHandle(labels).add(1);
-  nonMonotonicCounter.getHandle(labels).add(Math.random() > 0.5 ? 1 : -1);
-  monotonicGauge.getHandle(labels).set(currentMonotonicGaugeValue);
+  monotonicCounter.bind(labels).add(1);
+  nonMonotonicCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+  monotonicGauge.bind(labels).set(currentMonotonicGaugeValue);
   nonMonotonicGauge
-    .getHandle(labels)
+    .bind(labels)
     .set(Math.random() > 0.5 ? Math.random() * 10 : -Math.random() * 10);
 }, 1000);

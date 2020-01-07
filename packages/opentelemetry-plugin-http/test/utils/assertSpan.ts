@@ -35,6 +35,7 @@ export const assertSpan = (
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
     forceStatus?: Status;
+    serverName?: string;
     component: string;
   }
 ) => {
@@ -54,15 +55,11 @@ export const assertSpan = (
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_HOSTNAME],
-    validations.hostname
-  );
-  assert.strictEqual(
     span.attributes[AttributeNames.HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_PATH],
+    span.attributes[AttributeNames.HTTP_TARGET],
     validations.path || validations.pathname
   );
   assert.strictEqual(
@@ -79,12 +76,6 @@ export const assertSpan = (
       utils.parseResponseStatus(validations.httpStatusCode)
   );
 
-  assert.ok(
-    (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
-      span.attributes[AttributeNames.HTTP_HOSTNAME] as string
-    ) > -1,
-    'should be consistent'
-  );
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
 
@@ -97,8 +88,40 @@ export const assertSpan = (
       );
     }
   }
-
+  if (span.kind === SpanKind.CLIENT) {
+    assert.strictEqual(
+      span.attributes[AttributeNames.NET_PEER_NAME],
+      validations.hostname,
+      'must be consistent (PEER_NAME and hostname)'
+    );
+    assert.ok(span.attributes[AttributeNames.NET_PEER_IP], 'must have PEER_IP');
+    assert.ok(
+      span.attributes[AttributeNames.NET_PEER_PORT],
+      'must have PEER_PORT'
+    );
+    assert.ok(
+      (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
+        span.attributes[AttributeNames.NET_PEER_NAME] as string
+      ) > -1,
+      'must be consistent'
+    );
+  }
   if (span.kind === SpanKind.SERVER) {
+    if (validations.serverName) {
+      assert.strictEqual(
+        span.attributes[AttributeNames.HTTP_SERVER_NAME],
+        validations.serverName,
+        ' must have serverName attribute'
+      );
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_PORT],
+        'must have HOST_PORT'
+      );
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_IP],
+        'must have HOST_IP'
+      );
+    }
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);

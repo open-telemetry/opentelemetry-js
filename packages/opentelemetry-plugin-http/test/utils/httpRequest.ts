@@ -15,57 +15,54 @@
  */
 
 import * as http from 'http';
-import * as url from 'url';
-import { RequestOptions } from 'https';
+import { URL } from 'url';
 
-export const httpRequest = {
-  get: (
-    options: string | RequestOptions
-  ): Promise<{
-    data: string;
-    statusCode: number | undefined;
-    resHeaders: http.IncomingHttpHeaders;
-    reqHeaders: http.OutgoingHttpHeaders;
-    method: string | undefined;
-  }> => {
-    const _options =
-      typeof options === 'string'
-        ? Object.assign(url.parse(options), {
-            headers: {
-              'user-agent': 'http-plugin-test',
-            },
-          })
-        : options;
-    return new Promise((resolve, reject) => {
-      const req = http.get(_options, (resp: http.IncomingMessage) => {
-        const res = (resp as unknown) as http.IncomingMessage & {
-          req: http.IncomingMessage;
-        };
-        let data = '';
-        resp.on('data', chunk => {
-          data += chunk;
-        });
-        resp.on('end', () => {
-          resolve({
-            data,
-            statusCode: res.statusCode,
-            /* tslint:disable:no-any */
-            reqHeaders: (res.req as any).getHeaders
-              ? (res.req as any).getHeaders()
-              : (res.req as any)._headers,
-            /* tslint:enable:no-any */
-            resHeaders: res.headers,
-            method: res.req.method,
-          });
-        });
-        resp.on('error', err => {
-          reject(err);
+type GetResult = Promise<{
+  data: string;
+  statusCode: number | undefined;
+  resHeaders: http.IncomingHttpHeaders;
+  reqHeaders: http.OutgoingHttpHeaders;
+  method: string | undefined;
+}>;
+
+function get(input: string | URL, options?: http.RequestOptions): GetResult;
+function get(input: http.RequestOptions): GetResult;
+function get(input: any, options?: any): GetResult {
+  return new Promise((resolve, reject) => {
+    let req: http.ClientRequest;
+
+    function onGetResponseCb(resp: http.IncomingMessage): void {
+      const res = (resp as unknown) as http.IncomingMessage & {
+        req: http.IncomingMessage;
+      };
+      let data = '';
+      resp.on('data', chunk => {
+        data += chunk;
+      });
+      resp.on('end', () => {
+        resolve({
+          data,
+          statusCode: res.statusCode,
+          reqHeaders: req.getHeaders ? req.getHeaders() : (req as any)._headers,
+          resHeaders: res.headers,
+          method: res.req.method,
         });
       });
-      req.on('error', err => {
+      resp.on('error', err => {
         reject(err);
       });
-      return req;
+    }
+    req =
+      options != null
+        ? http.get(input, options, onGetResponseCb)
+        : http.get(input, onGetResponseCb);
+    req.on('error', err => {
+      reject(err);
     });
-  },
+    return req;
+  });
+}
+
+export const httpRequest = {
+  get,
 };
