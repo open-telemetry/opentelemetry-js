@@ -123,8 +123,8 @@ opentelemetry.initGlobalTracer(tracer);
 tracer.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
-	// For Jaeger, use the following line instead:
-	// new JaegerExporter({
+    // For Jaeger, use the following line instead:
+    // new JaegerExporter({
       serviceName: "getting-started"
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
