@@ -18,7 +18,7 @@ import * as tracing from '@opentelemetry/tracing';
 import * as assert from 'assert';
 
 export class DummySpanExporter implements tracing.SpanExporter {
-  export(spans: any) {}
+  export(spans: tracing.ReadableSpan[]) {}
 
   shutdown() {}
 }
@@ -36,12 +36,7 @@ export function fakeInteraction(
   callback: Function = function() {},
   elem?: HTMLElement
 ) {
-  let element: HTMLElement;
-  if (elem) {
-    element = elem;
-  } else {
-    element = createButton();
-  }
+  const element: HTMLElement = elem || createButton();
 
   element.addEventListener('click', () => {
     callback();
@@ -67,17 +62,10 @@ export function getData(url: string, callbackAfterSend: Function) {
     const req = new XMLHttpRequest();
     req.open('GET', url, true);
     req.send();
-    req.onload = function() {
-      resolve();
-    };
 
-    req.onerror = function() {
-      resolve();
-    };
-
-    req.ontimeout = function() {
-      resolve();
-    };
+    req.onload = resolve;
+    req.onerror = reject;
+    req.ontimeout = reject;
 
     callbackAfterSend();
   });

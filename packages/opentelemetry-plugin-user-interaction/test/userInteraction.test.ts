@@ -28,7 +28,7 @@ import { WebTracer } from '@opentelemetry/web';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '../src';
-import { ZoneTypeWithPrototype } from '../src/types';
+import { WindowWithZone } from '../src/types';
 import {
   assertClickSpan,
   createButton,
@@ -79,8 +79,7 @@ describe('UserInteractionPlugin', () => {
 
       // this is needed as window is treated as scope and karma is adding
       // context which is then detected as spanContext
-      // @ts-ignore
-      window.context = undefined;
+      (window as { context?: {} }).context = undefined;
     });
     afterEach(() => {
       requests = [];
@@ -304,8 +303,8 @@ describe('UserInteractionPlugin', () => {
     });
 
     it('should handle unpatch', () => {
-      const _window = window as any;
-      const ZoneWithPrototype = (_window.Zone as unknown) as ZoneTypeWithPrototype;
+      const _window: WindowWithZone = (window as unknown) as WindowWithZone;
+      const ZoneWithPrototype = _window.Zone;
       assert.strictEqual(
         isWrapped(ZoneWithPrototype.prototype.runTask),
         true,

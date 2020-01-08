@@ -79,8 +79,7 @@ describe('UserInteractionPlugin', () => {
 
       // this is needed as window is treated as scope and karma is adding
       // context which is then detected as spanContext
-      // @ts-ignore
-      window.context = undefined;
+      (window as { context?: {} }).context = undefined;
     });
     afterEach(() => {
       requests = [];
