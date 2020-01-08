@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
+import { VERSION as CORE_VERSION } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
 import * as assert from 'assert';
 import { getReadableSpanTransformer } from '../src/transform';
 import { LinkType, Span } from '../src/types';
+import { VERSION } from '../src/version';
 
 describe('transform', () => {
   let readableSpan: ReadableSpan;
   let transformer: (readableSpan: ReadableSpan) => Span;
-  let spanContext: SpanContext;
+  let spanContext: types.SpanContext;
 
   beforeEach(() => {
     spanContext = {
@@ -58,8 +59,7 @@ describe('transform', () => {
           project_id: { stringValue: { value: 'project-id' } },
           'g.co/agent': {
             stringValue: {
-              value:
-                'opentelemetry-js [0.3.1]; stackdriver-trace-exporter [0.3.1]',
+              value: `opentelemetry-js [${CORE_VERSION}]; stackdriver-trace-exporter [${VERSION}]`,
             },
           },
         },
@@ -135,7 +135,7 @@ describe('transform', () => {
         traceId: 'a4cda95b652f4a1592b449d5929fda1b',
         spanId: '3e0c63257de34c92',
         isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
+        traceFlags: types.TraceFlags.SAMPLED,
       },
     });
 
@@ -162,7 +162,7 @@ describe('transform', () => {
         traceId: 'a4cda95b652f4a1592b449d5929fda1b',
         spanId: '3e0c63257de34c92',
         isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
+        traceFlags: types.TraceFlags.SAMPLED,
       },
       attributes: {
         testAttr: 'value',

@@ -32,7 +32,7 @@ const AGENT_LABEL_KEY = 'g.co/agent';
 const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-exporter [${VERSION}]`;
 
 export function getReadableSpanTransformer(
-  projectId: string,
+  projectId: string
 ): (span: ReadableSpan) => Span {
   return span => {
     const attributes = transformAttributes(span.attributes, {
