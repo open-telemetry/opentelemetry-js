@@ -58,7 +58,7 @@ function accessCollection(
 
 /**
  * Asserts root spans attributes.
- * @param spans Readable spans that we need to asert.
+ * @param spans Readable spans that we need to assert.
  * @param expectedName The expected name of the first root span.
  * @param expectedKind The expected kind of the first root span.
  */
@@ -126,8 +126,8 @@ describe('MongoDBPlugin', () => {
   });
 
   beforeEach(function mongoBeforeEach(done) {
-    // Skiping all tests in beforeEach() is a workarround. Mocha does not work
-    // properly when skiping tests in before() on nested describe() calls.
+    // Skipping all tests in beforeEach() is a workaround. Mocha does not work
+    // properly when skipping tests in before() on nested describe() calls.
     // https://github.com/mochajs/mocha/issues/2819
     if (!shouldTest) {
       this.skip();
