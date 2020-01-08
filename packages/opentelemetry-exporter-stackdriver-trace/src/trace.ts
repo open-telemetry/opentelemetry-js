@@ -24,7 +24,8 @@ import { StackdriverExporterOptions } from './external-types';
 import { getReadableSpanTransformer } from './transform';
 import { Span, SpansWithCredentials } from './types';
 
-google.options({ headers: { 'x-opentelemetry-outgoing-request': 1 } });
+const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+google.options({ headers: { [OT_REQUEST_HEADER]: 1 } });
 
 /**
  * Format and sends span information to StackDriver Trace.
@@ -100,7 +101,7 @@ export class StackdriverTraceExporter implements SpanExporter {
     this._logger.debug('StackDriver Trace batch writing traces');
 
     return new Promise((resolve, reject) => {
-      // TODO: Consider to use gRPC call (BatchWriteSpansRequest) for sending
+      // @todo Consider to use gRPC call (BatchWriteSpansRequest) for sending
       // data to backend :
       // https://cloud.google.com/trace/docs/reference/v2/rpc/google.devtools.
       // cloudtrace.v2#google.devtools.cloudtrace.v2.TraceService

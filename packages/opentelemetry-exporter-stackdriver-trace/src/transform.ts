@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { hrTimeToTimeStamp, VERSION as COREVERSION } from '@opentelemetry/core';
+import {
+  hrTimeToTimeStamp,
+  VERSION as CORE_VERSION,
+} from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as ot from '@opentelemetry/types';
 import {
@@ -29,7 +32,7 @@ import {
 import { VERSION } from './version';
 
 const AGENT_LABEL_KEY = 'g.co/agent';
-const AGENT_LABEL_VALUE = `opentelemetry-js [${COREVERSION}]; stackdriver-trace-exporter [${VERSION}]`;
+const AGENT_LABEL_VALUE = `opentelemetry-js [${CORE_VERSION}]; stackdriver-trace-exporter [${VERSION}]`;
 
 export function getReadableSpanTransformer(
   projectId: string
@@ -88,7 +91,7 @@ function transformAttributes(
   const attributeMap = transformAttributeValues(attributes);
   return {
     attributeMap: attributeMap,
-    // TODO: get dropped attribute count from sdk ReadableSpan
+    // @todo get dropped attribute count from sdk ReadableSpan
     droppedAttributesCount:
       Object.keys(attributes).length - Object.keys(attributeMap).length,
   };
