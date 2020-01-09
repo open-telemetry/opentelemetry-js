@@ -28,6 +28,8 @@ export const DEFAULT_MAX_EVENTS_PER_SPAN = 128;
 export const DEFAULT_MAX_ATTRIBUTES_PER_SPAN = 32;
 /** Default limit for Links per span */
 export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
+/** Default name of the tracer */
+export const DEFAULT_TRACER_NAME = 'default';
 
 /**
  * Default configuration. For fields with primitive values, any user-provided
