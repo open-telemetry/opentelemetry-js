@@ -43,7 +43,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        registry.getTracer(),
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -66,7 +66,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.UNSAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        registry.getTracer(),
         'span-name',
         spanContext,
         SpanKind.CLIENT

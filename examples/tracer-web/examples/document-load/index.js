@@ -20,7 +20,7 @@ const registryWithZone = new WebTracerRegistry({
 registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
-const tracerWithZone = registryWithZone.getTracer('example-tracer-web');
+const tracerWithZone = registryWithZone.getTracer();
 console.log('Current span is window', tracerWithZone.getCurrentSpan() === window);
 
 // example of keeping track of scope between async operations

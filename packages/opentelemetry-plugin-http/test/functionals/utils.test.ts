@@ -250,7 +250,7 @@ describe('Utility', () => {
         const span = new Span(
           new BasicTracerRegistry({
             scopeManager: new NoopScopeManager(),
-          }).getTracer('default'),
+          }).getTracer(),
           'test',
           { spanId: '', traceId: '' },
           SpanKind.INTERNAL

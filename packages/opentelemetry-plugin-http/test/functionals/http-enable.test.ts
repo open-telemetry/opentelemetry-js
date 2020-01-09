@@ -323,8 +323,8 @@ describe('HttpPlugin', () => {
         const testPath = '/outgoing/rootSpan/childs/1';
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
-        const span = registry.getTracer('default').startSpan(name);
-        return registry.getTracer('default').withSpan(span, async () => {
+        const span = registry.getTracer().startSpan(name);
+        return registry.getTracer().withSpan(span, async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -366,8 +366,8 @@ describe('HttpPlugin', () => {
             httpErrorCodes[i].toString()
           );
           const name = 'TestRootSpan';
-          const span = registry.getTracer('default').startSpan(name);
-          return registry.getTracer('default').withSpan(span, async () => {
+          const span = registry.getTracer().startSpan(name);
+          return registry.getTracer().withSpan(span, async () => {
             const result = await httpRequest.get(
               `${protocol}://${hostname}${testPath}`
             );
@@ -405,8 +405,8 @@ describe('HttpPlugin', () => {
         const num = 5;
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
-        const span = registry.getTracer('default').startSpan(name);
-        await registry.getTracer('default').withSpan(span, async () => {
+        const span = registry.getTracer().startSpan(name);
+        await registry.getTracer().withSpan(span, async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();

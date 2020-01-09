@@ -126,7 +126,7 @@ describe('NodeTracerRegistry', () => {
       registry = new NodeTracerRegistry({
         logger: new NoopLogger(),
       });
-      const span = registry.getTracer('default').startSpan('my-span');
+      const span = registry.getTracer().startSpan('my-span');
       assert.ok(span);
     });
 
@@ -134,7 +134,7 @@ describe('NodeTracerRegistry', () => {
       registry = new NodeTracerRegistry({
         logger: new NoopLogger(),
       });
-      const span = registry.getTracer('default').startSpan('my-span', {});
+      const span = registry.getTracer().startSpan('my-span', {});
       assert.ok(span);
     });
 
@@ -143,7 +143,7 @@ describe('NodeTracerRegistry', () => {
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       });
-      const span = registry.getTracer('default').startSpan('my-span');
+      const span = registry.getTracer().startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
       assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
       assert.strictEqual(span.isRecording(), false);
@@ -160,7 +160,7 @@ describe('NodeTracerRegistry', () => {
         defaultAttributes,
       });
 
-      const span = registry.getTracer('default').startSpan('my-span') as Span;
+      const span = registry.getTracer().startSpan('my-span') as Span;
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
@@ -169,47 +169,32 @@ describe('NodeTracerRegistry', () => {
   describe('.getCurrentSpan()', () => {
     it('should return undefined with AsyncHooksScopeManager when no span started', () => {
       registry = new NodeTracerRegistry({});
-      assert.deepStrictEqual(
-        registry.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
   });
 
   describe('.withSpan()', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
       registry = new NodeTracerRegistry({});
-      const span = registry.getTracer('default').startSpan('my-span');
-      registry.getTracer('default').withSpan(span, () => {
-        assert.deepStrictEqual(
-          registry.getTracer('default').getCurrentSpan(),
-          span
-        );
+      const span = registry.getTracer().startSpan('my-span');
+      registry.getTracer().withSpan(span, () => {
+        assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
         return done();
       });
-      assert.deepStrictEqual(
-        registry.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
 
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
       registry = new NodeTracerRegistry({});
-      const span = registry.getTracer('default').startSpan('my-span');
-      registry.getTracer('default').withSpan(span, () => {
-        assert.deepStrictEqual(
-          registry.getTracer('default').getCurrentSpan(),
-          span
-        );
+      const span = registry.getTracer().startSpan('my-span');
+      registry.getTracer().withSpan(span, () => {
+        assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
 
         const span1 = registry
-          .getTracer('default')
+          .getTracer()
           .startSpan('my-span1', { parent: span });
-        registry.getTracer('default').withSpan(span1, () => {
-          assert.deepStrictEqual(
-            registry.getTracer('default').getCurrentSpan(),
-            span1
-          );
+        registry.getTracer().withSpan(span1, () => {
+          assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span1);
           assert.deepStrictEqual(
             span1.context().traceId,
             span.context().traceId
@@ -219,45 +204,33 @@ describe('NodeTracerRegistry', () => {
       });
       // when span ended.
       // @todo: below check is not running.
-      assert.deepStrictEqual(
-        registry.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
 
     it('should find correct scope with promises', done => {
       registry = new NodeTracerRegistry({});
-      const span = registry.getTracer('default').startSpan('my-span');
-      registry.getTracer('default').withSpan(span, async () => {
+      const span = registry.getTracer().startSpan('my-span');
+      registry.getTracer().withSpan(span, async () => {
         for (let i = 0; i < 3; i++) {
           await sleep(5).then(() => {
-            assert.deepStrictEqual(
-              registry.getTracer('default').getCurrentSpan(),
-              span
-            );
+            assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
           });
         }
         return done();
       });
-      assert.deepStrictEqual(
-        registry.getTracer('default').getCurrentSpan(),
-        undefined
-      );
+      assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), undefined);
     });
   });
 
   describe('.bind()', () => {
     it('should bind scope with AsyncHooksScopeManager scope manager', done => {
       const registry = new NodeTracerRegistry({});
-      const span = registry.getTracer('default').startSpan('my-span');
+      const span = registry.getTracer().startSpan('my-span');
       const fn = () => {
-        assert.deepStrictEqual(
-          registry.getTracer('default').getCurrentSpan(),
-          span
-        );
+        assert.deepStrictEqual(registry.getTracer().getCurrentSpan(), span);
         return done();
       };
-      const patchedFn = registry.getTracer('default').bind(fn, span);
+      const patchedFn = registry.getTracer().bind(fn, span);
       return patchedFn();
     });
   });
@@ -266,8 +239,7 @@ describe('NodeTracerRegistry', () => {
     it('should get default binary formatter', () => {
       registry = new NodeTracerRegistry({});
       assert.ok(
-        registry.getTracer('default').getBinaryFormat() instanceof
-          BinaryTraceContext
+        registry.getTracer().getBinaryFormat() instanceof BinaryTraceContext
       );
     });
   });
@@ -276,8 +248,7 @@ describe('NodeTracerRegistry', () => {
     it('should get default HTTP text formatter', () => {
       registry = new NodeTracerRegistry({});
       assert.ok(
-        registry.getTracer('default').getHttpTextFormat() instanceof
-          HttpTraceContext
+        registry.getTracer().getHttpTextFormat() instanceof HttpTraceContext
       );
     });
   });

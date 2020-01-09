@@ -11,7 +11,7 @@ function shim(serviceName) {
 
   registry.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
 
-  return new TracerShim(registry.getTracer("opentracing-shim"));
+  return new TracerShim(registry.getTracer());
 }
 
 function getExporter(serviceName) {

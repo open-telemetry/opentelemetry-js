@@ -33,12 +33,10 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should get finished spans', () => {
-    const root = registry.getTracer('default').startSpan('root');
-    const child = registry
-      .getTracer('default')
-      .startSpan('child', { parent: root });
+    const root = registry.getTracer().startSpan('root');
+    const child = registry.getTracer().startSpan('child', { parent: root });
     const grandChild = registry
-      .getTracer('default')
+      .getTracer()
       .startSpan('grand-child', { parent: child });
 
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
@@ -60,9 +58,9 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should shutdown the exorter', () => {
-    const root = registry.getTracer('default').startSpan('root');
+    const root = registry.getTracer().startSpan('root');
     registry
-      .getTracer('default')
+      .getTracer()
       .startSpan('child', { parent: root })
       .end();
     root.end();
@@ -72,7 +70,7 @@ describe('InMemorySpanExporter', () => {
 
     // after shutdown no new spans are accepted
     registry
-      .getTracer('default')
+      .getTracer()
       .startSpan('child1', { parent: root })
       .end();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);

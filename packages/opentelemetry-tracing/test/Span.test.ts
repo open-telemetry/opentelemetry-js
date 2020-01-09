@@ -35,7 +35,7 @@ const performanceTimeOrigin = hrTime();
 describe('Span', () => {
   const tracer = new BasicTracerRegistry({
     logger: new NoopLogger(),
-  }).getTracer('default');
+  }).getTracer();
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',

@@ -9,7 +9,7 @@ const config = require('./setup');
 config.setupTracerAndExporters('https-client-service');
 
 const https = require('https');
-const tracer = opentelemetry.getTracer('example-https-client');
+const tracer = opentelemetry.getTracer();
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

@@ -26,7 +26,7 @@ registry.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
 opentelemetry.initGlobalTracerRegistry(registry);
-const tracer = opentelemetry.getTracer('default');
+const tracer = opentelemetry.getTracer();
 
 // Create a span. A span must be closed.
 const span = tracer.startSpan('main');

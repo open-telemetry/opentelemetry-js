@@ -9,7 +9,7 @@ const config = require('./setup');
 config.setupTracerAndExporters('http-server-service');
 
 const http = require('http');
-const tracer = opentelemetry.getTracer('example-http-server');
+const tracer = opentelemetry.getTracer();
 
 /** Starts a HTTP server that receives requests on sample server port. */
 function startServer (port) {

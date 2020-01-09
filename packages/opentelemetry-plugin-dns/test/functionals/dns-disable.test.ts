@@ -28,7 +28,7 @@ import * as dns from 'dns';
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();
 const registry = new NodeTracerRegistry({ logger });
-const tracer = registry.getTracer('default');
+const tracer = registry.getTracer();
 registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 describe('DnsPlugin', () => {

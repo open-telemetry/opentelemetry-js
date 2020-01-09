@@ -39,7 +39,10 @@ export function getTracerRegistry(): types.TracerRegistry {
 /**
  * Returns a tracer from the global tracer registry.
  */
-export function getTracer(name: string, version?: string): types.Tracer {
+export function getTracer(
+  name: string = 'default',
+  version?: string
+): types.Tracer {
   // Return the global tracer registry
   return globalTracerRegistry.getTracer(name, version);
 }

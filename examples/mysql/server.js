@@ -11,7 +11,7 @@ config.setupTracerAndExporters('http-mysql-server-service');
 const mysql = require('mysql');
 const http = require('http');
 
-const tracer = opentelemetry.getTracer('example-mysql-http-server');
+const tracer = opentelemetry.getTracer();
 
 const pool = mysql.createPool({
   host     : 'localhost',
@@ -127,4 +127,3 @@ function handleClusterQuery(response) {
 function handleNotFound(response) {
   response.end("not found");
 }
-

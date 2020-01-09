@@ -409,10 +409,10 @@ describe('GrpcPlugin', () => {
       assert.strictEqual(expectEmpty.length, 0);
 
       const span = registry
-        .getTracer('default')
+        .getTracer()
         .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-      return registry.getTracer('default').withSpan(span, async () => {
-        const rootSpan = registry.getTracer('default').getCurrentSpan();
+      return registry.getTracer().withSpan(span, async () => {
+        const rootSpan = registry.getTracer().getCurrentSpan();
         if (!rootSpan) {
           assert.ok(false);
           return; // return so typechecking passes for rootSpan.end()
@@ -504,10 +504,10 @@ describe('GrpcPlugin', () => {
       assert.strictEqual(expectEmpty.length, 0);
 
       const span = registry
-        .getTracer('default')
+        .getTracer()
         .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-      return registry.getTracer('default').withSpan(span, async () => {
-        const rootSpan = registry.getTracer('default').getCurrentSpan();
+      return registry.getTracer().withSpan(span, async () => {
+        const rootSpan = registry.getTracer().getCurrentSpan();
         if (!rootSpan) {
           assert.ok(false);
           return; // return so typechecking passes for rootSpan.end()

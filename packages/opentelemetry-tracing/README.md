@@ -32,7 +32,7 @@ const { BasicTracerRegistry } = require('@opentelemetry/tracing');
 opentelemetry.initGlobalTracer(new BasicTracerRegistry());
 
 // To create a span in a trace, we used the global singleton tracer to start a new span.
-const span = opentelemetry.getTracer('default').startSpan('foo');
+const span = opentelemetry.getTracer().startSpan('foo');
 
 // Set a span attribute
 span.setAttribute('key', 'value');

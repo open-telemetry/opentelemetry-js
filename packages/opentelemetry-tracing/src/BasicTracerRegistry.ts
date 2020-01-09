@@ -37,7 +37,11 @@ export class BasicTracerRegistry implements types.TracerRegistry {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
   }
 
-  getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
+  getTracer(
+    name: string = 'default',
+    version = '*',
+    config?: TracerConfig
+  ): Tracer {
     const key = `${name}@${version}`;
     if (!this._tracers.has(key)) {
       this._tracers.set(key, new Tracer(config || this._config, this));

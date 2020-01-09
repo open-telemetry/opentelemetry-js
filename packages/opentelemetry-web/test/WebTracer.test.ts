@@ -44,7 +44,7 @@ describe('WebTracer', () => {
     it('should construct an instance with required only options', () => {
       const tracer = new WebTracerRegistry(
         Object.assign({}, defaultOptions)
-      ).getTracer('default');
+      ).getTracer();
       assert.ok(tracer instanceof Tracer);
     });
 
@@ -87,7 +87,7 @@ describe('WebTracer', () => {
       it('should correctly return the scopes for 2 parallel actions', () => {
         const webTracerWithZone = new WebTracerRegistry({
           scopeManager: new ZoneScopeManager(),
-        }).getTracer('default');
+        }).getTracer();
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 
