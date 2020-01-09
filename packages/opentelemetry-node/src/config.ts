@@ -35,4 +35,5 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   pg: { enabled: true, path: '@opentelemetry/plugin-pg' },
   redis: { enabled: true, path: '@opentelemetry/plugin-redis' },
   ioredis: { enabled: true, path: '@opentelemetry/plugin-ioredis' },
+  'pg-pool': { enabled: true, path: '@opentelemetry/plugin-pg-pool' },
 };
