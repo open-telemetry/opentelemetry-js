@@ -28,19 +28,17 @@ import {
   TraceFlags,
   Logger,
 } from '@opentelemetry/types';
-import { BasicTracerConfig, TraceParams } from './types';
+import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
-import { SpanProcessor } from './SpanProcessor';
-import { NoopSpanProcessor } from './NoopSpanProcessor';
-import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { DEFAULT_CONFIG } from './config';
+import { BasicTracerRegistry } from './BasicTracerRegistry';
 
 /**
  * This class represents a basic tracer.
  */
-export class BasicTracer implements types.Tracer {
+export class Tracer implements types.Tracer {
   private readonly _defaultAttributes: types.Attributes;
   private readonly _binaryFormat: types.BinaryFormat;
   private readonly _httpTextFormat: types.HttpTextFormat;
@@ -48,13 +46,14 @@ export class BasicTracer implements types.Tracer {
   private readonly _scopeManager: ScopeManager;
   private readonly _traceParams: TraceParams;
   readonly logger: Logger;
-  private readonly _registeredSpanProcessor: SpanProcessor[] = [];
-  activeSpanProcessor = new NoopSpanProcessor();
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig = DEFAULT_CONFIG) {
+  constructor(
+    config: TracerConfig = DEFAULT_CONFIG,
+    private _tracerRegistry: BasicTracerRegistry
+  ) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;
@@ -162,15 +161,8 @@ export class BasicTracer implements types.Tracer {
     return this._traceParams;
   }
 
-  /**
-   * Adds a new {@link SpanProcessor} to this tracer.
-   * @param spanProcessor the new SpanProcessor to be added.
-   */
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    this._registeredSpanProcessor.push(spanProcessor);
-    this.activeSpanProcessor = new MultiSpanProcessor(
-      this._registeredSpanProcessor
-    );
+  getActiveSpanProcessor() {
+    return this._tracerRegistry.getActiveSpanProcessor();
   }
 
   private _getParentSpanContext(

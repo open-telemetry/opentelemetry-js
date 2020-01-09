@@ -10,7 +10,7 @@ const config = require('./setup');
 config.setupTracerAndExporters('grpc-server-service');
 
 const grpc = require('grpc');
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-grpc-server');
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');

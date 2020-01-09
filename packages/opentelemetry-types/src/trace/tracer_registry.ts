@@ -14,4 +14,18 @@
  * limitations under the License.
  */
 
-export * from './NodeTracerRegistry';
+import { Tracer } from './tracer';
+
+/**
+ * TracerRegistry provides an interface for creating {@link Tracer}s
+ */
+export interface TracerRegistry {
+  /**
+   * Returns a Tracer, creating one if one with the given name and version is not already created
+   *
+   * If there is no Span associated with the current context, null is returned.
+   *
+   * @returns Tracer A Tracer with the given name and version
+   */
+  getTracer(name: string, version?: string): Tracer;
+}

@@ -15,22 +15,23 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
+import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { Tracer, TracerConfig } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { BasicTracerConfig } from '@opentelemetry/tracing';
 import { WebTracerConfig } from '../src';
 import { StackScopeManager } from '../src/StackScopeManager';
-import { WebTracer } from '../src/WebTracer';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { WebTracerRegistry } from '../src/WebTracerRegistry';
 
 class DummyPlugin extends BasePlugin<unknown> {
+  constructor() {
+    super('dummy');
+  }
   patch() {}
-
   unpatch() {}
 }
 
 describe('WebTracer', () => {
-  let tracer: WebTracer;
   describe('constructor', () => {
     let defaultOptions: WebTracerConfig;
 
@@ -41,17 +42,19 @@ describe('WebTracer', () => {
     });
 
     it('should construct an instance with required only options', () => {
-      tracer = new WebTracer(Object.assign({}, defaultOptions));
-      assert.ok(tracer instanceof WebTracer);
+      const tracer = new WebTracerRegistry(
+        Object.assign({}, defaultOptions)
+      ).getTracer('default');
+      assert.ok(tracer instanceof Tracer);
     });
 
     it('should enable the scope manager', () => {
-      let options: BasicTracerConfig;
+      let options: TracerConfig;
       const scopeManager = new StackScopeManager();
       options = { scopeManager };
 
       const spy = sinon.spy(scopeManager, 'enable');
-      tracer = new WebTracer(options);
+      new WebTracerRegistry(options);
 
       assert.ok(spy.calledOnce === true);
     });
@@ -68,7 +71,7 @@ describe('WebTracer', () => {
       const plugins = [dummyPlugin1, dummyPlugin2];
 
       options = { plugins, scopeManager };
-      tracer = new WebTracer(options);
+      new WebTracerRegistry(options);
 
       assert.ok(spyEnable1.calledOnce === true);
       assert.ok(spyEnable2.calledOnce === true);
@@ -76,15 +79,15 @@ describe('WebTracer', () => {
 
     it('should work without default scope manager', () => {
       assert.doesNotThrow(() => {
-        tracer = new WebTracer({});
+        new WebTracerRegistry({});
       });
     });
 
     describe('when scopeManager is "ZoneScopeManager"', () => {
       it('should correctly return the scopes for 2 parallel actions', () => {
-        const webTracerWithZone = new WebTracer({
+        const webTracerWithZone = new WebTracerRegistry({
           scopeManager: new ZoneScopeManager(),
-        });
+        }).getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 

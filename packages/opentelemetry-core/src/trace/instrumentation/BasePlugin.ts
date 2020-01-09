@@ -21,6 +21,7 @@ import {
   PluginConfig,
   PluginInternalFiles,
   PluginInternalFilesVersion,
+  TracerRegistry,
 } from '@opentelemetry/types';
 import * as semver from 'semver';
 import * as path from 'path';
@@ -39,14 +40,22 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
 
+  constructor(
+    protected readonly _tracerName: string,
+    protected readonly _tracerVersion?: string
+  ) {}
+
   enable(
     moduleExports: T,
-    tracer: Tracer,
+    tracerRegistry: TracerRegistry,
     logger: Logger,
     config?: PluginConfig
   ): T {
     this._moduleExports = moduleExports;
-    this._tracer = tracer;
+    this._tracer = tracerRegistry.getTracer(
+      this._tracerName,
+      this._tracerVersion
+    );
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
