@@ -1,0 +1,24 @@
+{
+  "name": "@opentelemetry/getting-started-ts",
+  "version": "1.0.0",
+  "description": "This repository provides everything required to follow the OpenTelemetry Getting Started Guide",
+  "main": "app.ts",
+  "scripts": {
+    "start": "ts-node app.ts",
+    "start-tracing": "ts-node -r ./tracing.ts app.ts",
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@opentelemetry/core": "^0.3.2",
+    "@opentelemetry/exporter-prometheus": "^0.3.2",
+    "@opentelemetry/exporter-zipkin": "^0.3.2",
+    "@opentelemetry/metrics": "^0.3.2",
+    "@opentelemetry/node": "^0.3.2",
+    "@opentelemetry/plugin-http": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.2",
+    "@opentelemetry/types": "^0.3.2",
+    "axios": "^0.19.0",
+    "express": "^4.17.1"
+  }
+}
