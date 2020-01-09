@@ -71,6 +71,7 @@ docs
 
 #lerna
 .changelog
+package.json.lerna_backup
 
 # OS generated files
 .DS_Store
