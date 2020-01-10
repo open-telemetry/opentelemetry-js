@@ -241,11 +241,11 @@ export function getElementXPath(target: any, optimised?: boolean) {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
   }
-  let xpath = '';
   const targetValue = getNodeValue(target, optimised);
   if (optimised && targetValue.indexOf('@id') > 0) {
     return targetValue;
   }
+  let xpath = '';
   if (target.parentNode) {
     xpath += getElementXPath(target.parentNode, false);
   }
@@ -258,11 +258,11 @@ function getNodeIndex(target: HTMLElement): number {
   if (!target.parentNode) {
     return 0;
   }
-  let elements = Array.from(target.parentNode.childNodes);
   const allowedTypes = [target.nodeType];
   if (target.nodeType === Node.CDATA_SECTION_NODE) {
     allowedTypes.push(Node.TEXT_NODE);
   }
+  let elements = Array.from(target.parentNode.childNodes);
   elements = elements.filter((element: Node) => {
     const localName = (element as HTMLElement).localName;
     return (

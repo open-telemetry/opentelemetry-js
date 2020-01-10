@@ -93,7 +93,6 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
           [AttributeNames.HTTP_USER_AGENT]: navigator.userAgent,
         },
         parent: this._tracer.getCurrentSpan(),
-        links: [],
       });
 
       this._spansData.set(span, {
@@ -109,7 +108,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
 
   /**
    * Decrement number of tasks that left in zone,
-   *     This is needed to be able to end span when no more tasks left
+   * This is needed to be able to end span when no more tasks left
    * @param span
    */
   private _decrementTask(span: types.Span) {
