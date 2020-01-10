@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/node",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "OpenTelemetry Node SDK provides automatic telemetry (tracing, metrics, etc) for Node.js applications",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -58,10 +58,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/scope-async-hooks": "^0.3.2",
-    "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/scope-async-hooks": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3",
     "require-in-the-middle": "^5.0.0",
     "semver": "^6.2.0"
   }
