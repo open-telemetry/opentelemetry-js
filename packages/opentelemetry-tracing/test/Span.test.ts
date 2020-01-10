@@ -21,7 +21,7 @@ import {
   TraceFlags,
   SpanContext,
 } from '@opentelemetry/types';
-import { BasicTracer, Span } from '../src';
+import { BasicTracerRegistry, Span } from '../src';
 import {
   hrTime,
   hrTimeToNanoseconds,
@@ -33,9 +33,9 @@ import {
 const performanceTimeOrigin = hrTime();
 
 describe('Span', () => {
-  const tracer = new BasicTracer({
+  const tracer = new BasicTracerRegistry({
     logger: new NoopLogger(),
-  });
+  }).getTracer('default');
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',

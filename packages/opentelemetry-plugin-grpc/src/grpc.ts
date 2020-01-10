@@ -16,33 +16,33 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import {
+  CanonicalCode,
+  Span,
+  SpanContext,
   SpanKind,
   SpanOptions,
-  Span,
   Status,
-  CanonicalCode,
-  SpanContext,
 } from '@opentelemetry/types';
+import * as events from 'events';
+import * as grpcTypes from 'grpc';
+import * as path from 'path';
+import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
-  ModuleExportsMapping,
-  GrpcPluginOptions,
-  ServerCallWithMeta,
-  SendUnaryDataCallback,
   GrpcClientFunc,
   GrpcInternalClientTypes,
+  GrpcPluginOptions,
+  ModuleExportsMapping,
+  SendUnaryDataCallback,
+  ServerCallWithMeta,
 } from './types';
 import {
   findIndex,
   _grpcStatusCodeToCanonicalCode,
   _grpcStatusCodeToSpanStatus,
 } from './utils';
-
-import * as events from 'events';
-import * as grpcTypes from 'grpc';
-import * as shimmer from 'shimmer';
-import * as path from 'path';
+import { VERSION } from './version';
 
 /** The metadata key under which span context is stored as a binary value. */
 export const GRPC_TRACE_KEY = 'grpc-trace-bin';
@@ -56,7 +56,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super();
+    super('@opentelemetry/plugin-grpc', VERSION);
     this._config = {};
   }
 

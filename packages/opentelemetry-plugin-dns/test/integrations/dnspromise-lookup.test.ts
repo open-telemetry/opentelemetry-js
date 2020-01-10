@@ -20,7 +20,7 @@ import {
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import { plugin } from '../../src/dns';
 import * as dns from 'dns';
 import * as utils from '../utils/utils';
@@ -30,8 +30,8 @@ import { CanonicalCode } from '@opentelemetry/types';
 
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();
-const tracer = new NodeTracer({ logger });
-tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+const registry = new NodeTracerRegistry({ logger });
+registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 describe('dns.promises.lookup()', () => {
   before(function(done) {
@@ -42,7 +42,7 @@ describe('dns.promises.lookup()', () => {
 
     // if node version is supported, it's mandatory for CI
     if (process.env.CI) {
-      plugin.enable(dns, tracer, tracer.logger);
+      plugin.enable(dns, registry, registry.logger);
       done();
       return;
     }
@@ -54,7 +54,7 @@ describe('dns.promises.lookup()', () => {
       }
       done();
     });
-    plugin.enable(dns, tracer, tracer.logger);
+    plugin.enable(dns, registry, registry.logger);
   });
 
   afterEach(() => {

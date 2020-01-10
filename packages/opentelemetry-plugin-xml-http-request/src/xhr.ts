@@ -69,15 +69,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   readonly version: string = VERSION;
   moduleName = this.component;
 
-  protected _config!: XMLHttpRequestPluginConfig;
-
   private _tasksCount = 0;
   private _xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
   private _usedResources = new WeakSet<PerformanceResourceTiming>();
 
-  constructor(config: XMLHttpRequestPluginConfig = {}) {
-    super();
-    this._config = config;
+  constructor(protected _config: XMLHttpRequestPluginConfig = {}) {
+    super('@opentelemetry/plugin-xml-http-request', VERSION);
   }
 
   /**

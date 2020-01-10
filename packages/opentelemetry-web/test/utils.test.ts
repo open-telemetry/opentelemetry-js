@@ -90,7 +90,7 @@ function createResource(
 ): PerformanceResourceTiming {
   const fetchStart = core.hrTimeToNanoseconds(startTime) + 1;
   const responseEnd = fetchStart + addToStart;
-  const milion = 1000 * 1000; // used to convert nano to milli
+  const million = 1000 * 1000; // used to convert nano to milli
   const defaultResource = {
     connectEnd: 0,
     connectStart: 0,
@@ -98,13 +98,13 @@ function createResource(
     domainLookupEnd: 0,
     domainLookupStart: 0,
     encodedBodySize: 0,
-    fetchStart: fetchStart / milion,
+    fetchStart: fetchStart / million,
     initiatorType: 'xmlhttprequest',
     nextHopProtocol: '',
     redirectEnd: 0,
     redirectStart: 0,
     requestStart: 0,
-    responseEnd: responseEnd / milion,
+    responseEnd: responseEnd / million,
     responseStart: 0,
     secureConnectionStart: 0,
     transferSize: 0,

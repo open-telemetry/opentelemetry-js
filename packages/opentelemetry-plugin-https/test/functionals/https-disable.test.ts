@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/core';
+import { Http } from '@opentelemetry/plugin-http';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as https from 'https';
+import { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
-
 import { plugin } from '../../src/https';
-import { NodeTracer } from '@opentelemetry/node';
-import { NoopLogger } from '@opentelemetry/core';
-import { Http } from '@opentelemetry/plugin-http';
-import { AddressInfo } from 'net';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
+import { NodeTracerRegistry } from '@opentelemetry/node';
+import * as types from '@opentelemetry/types';
 
 describe('HttpsPlugin', () => {
   let server: https.Server;
@@ -35,15 +35,18 @@ describe('HttpsPlugin', () => {
   describe('disable()', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
+    // const tracer = registry.getTracer('test-https')
+    let tracer: types.Tracer;
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger);
+      plugin.enable((https as unknown) as Http, registry, registry.logger);
+      tracer = plugin['_tracer'];
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);
       server = https.createServer(
