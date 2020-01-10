@@ -21,7 +21,8 @@ const setups = [
 
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
-  const tracer = setup.registry.getTracer("benchmark");
+  const registry = setup.registry;
+  const tracer = registry.getTracer("benchmark");
   const suite = benchmark()
     .add('#startSpan', function () {
       const span = tracer.startSpan('op');
