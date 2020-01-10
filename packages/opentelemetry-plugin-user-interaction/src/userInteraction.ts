@@ -44,6 +44,10 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
   private _spansData = new WeakMap<types.Span, SpanData>();
   private _zonePatched = false;
 
+  constructor() {
+    super('@opentelemetry/plugin-user-interaction', VERSION);
+  }
+
   /**
    * This will check if last task was timeout and will save the time to
    * fix the user interaction when nothing happens

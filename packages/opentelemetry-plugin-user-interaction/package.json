@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-user-interaction",
-  "version": "0.4.0",
+  "version": "0.3.2",
   "description": "OpenTelemetry UserInteraction automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",

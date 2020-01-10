@@ -1,13 +1,13 @@
 'use strict';
 
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerRegistry } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 import { B3Format } from '@opentelemetry/core';
 
-const webTracerWithZone = new WebTracer({
+const webTracerRegistryWithZone = new WebTracerRegistry({
   httpTextFormat: new B3Format(),
   scopeManager: new ZoneScopeManager(),
   plugins: [
@@ -20,8 +20,10 @@ const webTracerWithZone = new WebTracer({
   ]
 });
 
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+webTracerRegistryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+webTracerRegistryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+
+const webTracerWithZone = webTracerRegistryWithZone.getTracer();
 
 // example of keeping track of scope between async operations
 const prepareClickEvent = () => {

@@ -24,7 +24,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { isWrapped, LogLevel } from '@opentelemetry/core';
 import * as tracing from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerRegistry } from '@opentelemetry/web';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '../src';
@@ -44,7 +44,7 @@ describe('UserInteractionPlugin', () => {
   describe('when zone.js is available', () => {
     let userInteractionPlugin: UserInteractionPlugin;
     let sandbox: sinon.SinonSandbox;
-    let webTracer: WebTracer;
+    let webTracerRegistry: WebTracerRegistry;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
     let requests: any[] = [];
@@ -66,14 +66,14 @@ describe('UserInteractionPlugin', () => {
       sandbox.useFakeTimers();
 
       userInteractionPlugin = new UserInteractionPlugin();
-      webTracer = new WebTracer({
+      webTracerRegistry = new WebTracerRegistry({
         logLevel: LogLevel.ERROR,
         scopeManager: new ZoneScopeManager(),
         plugins: [userInteractionPlugin, new XMLHttpRequestPlugin()],
       });
       dummySpanExporter = new DummySpanExporter();
       exportSpy = sandbox.stub(dummySpanExporter, 'export');
-      webTracer.addSpanProcessor(
+      webTracerRegistry.addSpanProcessor(
         new tracing.SimpleSpanProcessor(dummySpanExporter)
       );
 
