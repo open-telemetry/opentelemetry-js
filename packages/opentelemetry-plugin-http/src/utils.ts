@@ -443,10 +443,22 @@ export const getIncomingRequestAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
+  request: IncomingMessage,
   response: ServerResponse & { socket: Socket }
 ): Attributes => {
   const { statusCode, statusMessage, socket } = response;
   const { localAddress, localPort, remoteAddress, remotePort } = socket;
+  const { __ot_middlewares } = (request as unknown) as {
+    [key: string]: unknown;
+  };
+  const route = Array.isArray(__ot_middlewares)
+    ? __ot_middlewares
+        .filter(path => path !== '/')
+        .map(path => {
+          return path[0] === '/' ? path : '/' + path;
+        })
+        .join('')
+    : undefined;
 
   return {
     [AttributeNames.NET_HOST_IP]: localAddress,
@@ -455,5 +467,6 @@ export const getIncomingRequestAttributesOnResponse = (
     [AttributeNames.NET_PEER_PORT]: remotePort,
     [AttributeNames.HTTP_STATUS_CODE]: statusCode,
     [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+    [AttributeNames.HTTP_ROUTE]: route,
   };
 };

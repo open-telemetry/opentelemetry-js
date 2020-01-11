@@ -317,4 +317,25 @@ describe('Utility', () => {
       });
     }
   });
+
+  describe('getIncomingRequestAttributesOnResponse()', () => {
+    it('should correctly parse the middleware stack if present', () => {
+      const request = {
+        __ot_middlewares: ['/test', '/toto', '/'],
+      };
+      // @ts-ignore we just want to check that the parsing of express middlewares
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      });
+      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], '/test/toto');
+    });
+    it('should succesfully process without middleware stack', () => {
+      const request = {};
+      // @ts-ignore we just want to check that the parsing of express middlewares
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      });
+      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], undefined);
+    });
+  });
 });
