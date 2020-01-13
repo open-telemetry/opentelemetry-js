@@ -17,6 +17,7 @@
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Tracer,
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
@@ -54,7 +55,7 @@ const registry = new NodeTracerRegistry({
   logger,
   httpTextFormat,
 });
-const tracer = registry.getTracer('test-https');
+const tracer = registry.getTracer('test-https') as Tracer;
 registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 function doNock(

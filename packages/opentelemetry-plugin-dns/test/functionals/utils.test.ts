@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
+import { BasicTracerRegistry, Span, Tracer } from '@opentelemetry/tracing';
 import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -162,7 +162,7 @@ describe('Utility', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
       const span = new Span(
-        new BasicTracerRegistry().getTracer('default'),
+        new BasicTracerRegistry().getTracer('default') as Tracer,
         'test',
         { spanId: '', traceId: '' },
         SpanKind.INTERNAL

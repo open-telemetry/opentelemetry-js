@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
+import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
 import * as assert from 'assert';
 import {
-  Span,
   BasicTracerRegistry,
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Span,
+  Tracer,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
 
 describe('SimpleSpanProcessor', () => {
   const registry = new BasicTracerRegistry();
@@ -43,7 +44,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        registry.getTracer('default') as Tracer,
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -66,7 +67,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.UNSAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        registry.getTracer('default') as Tracer,
         'span-name',
         spanContext,
         SpanKind.CLIENT

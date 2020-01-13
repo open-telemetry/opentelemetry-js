@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import {
-  SpanKind,
-  CanonicalCode,
-  TraceFlags,
-  SpanContext,
-} from '@opentelemetry/types';
-import { BasicTracerRegistry, Span } from '../src';
 import {
   hrTime,
-  hrTimeToNanoseconds,
-  hrTimeToMilliseconds,
-  NoopLogger,
   hrTimeDuration,
+  hrTimeToMilliseconds,
+  hrTimeToNanoseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
+import {
+  CanonicalCode,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/types';
+import * as assert from 'assert';
+import { BasicTracerRegistry, Span, Tracer } from '../src';
 
 const performanceTimeOrigin = hrTime();
 
 describe('Span', () => {
   const tracer = new BasicTracerRegistry({
     logger: new NoopLogger(),
-  }).getTracer('default');
+  }).getTracer('default') as Tracer;
   const name = 'span1';
   const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',

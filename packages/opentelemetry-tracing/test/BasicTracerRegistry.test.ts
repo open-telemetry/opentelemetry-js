@@ -26,7 +26,7 @@ import {
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
 import { TraceFlags } from '@opentelemetry/types';
 import * as assert from 'assert';
-import { BasicTracerRegistry, Span } from '../src';
+import { BasicTracerRegistry, Span, Tracer } from '../src';
 
 describe('BasicTracerRegistry', () => {
   describe('constructor', () => {
@@ -69,7 +69,7 @@ describe('BasicTracerRegistry', () => {
     it('should construct an instance with default trace params', () => {
       const tracer = new BasicTracerRegistry({
         scopeManager: new NoopScopeManager(),
-      }).getTracer('default');
+      }).getTracer('default') as Tracer;
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
         numberOfAttributesPerSpan: 32,
         numberOfEventsPerSpan: 128,
@@ -83,7 +83,7 @@ describe('BasicTracerRegistry', () => {
         traceParams: {
           numberOfAttributesPerSpan: 100,
         },
-      }).getTracer('default');
+      }).getTracer('default') as Tracer;
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
         numberOfAttributesPerSpan: 100,
         numberOfEventsPerSpan: 128,
@@ -97,7 +97,7 @@ describe('BasicTracerRegistry', () => {
         traceParams: {
           numberOfEventsPerSpan: 300,
         },
-      }).getTracer('default');
+      }).getTracer('default') as Tracer;
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
         numberOfAttributesPerSpan: 32,
         numberOfEventsPerSpan: 300,
@@ -111,7 +111,7 @@ describe('BasicTracerRegistry', () => {
         traceParams: {
           numberOfLinksPerSpan: 10,
         },
-      }).getTracer('default');
+      }).getTracer('default') as Tracer;
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
         numberOfAttributesPerSpan: 32,
         numberOfEventsPerSpan: 128,

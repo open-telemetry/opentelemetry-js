@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/core';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
+  Tracer,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
-import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
-import { plugin } from '../../src/dns';
-import * as sinon from 'sinon';
 import * as dns from 'dns';
+import * as sinon from 'sinon';
+import { plugin } from '../../src/dns';
 
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();
 const registry = new NodeTracerRegistry({ logger });
-const tracer = registry.getTracer('default');
+const tracer = registry.getTracer('default') as Tracer;
 registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 describe('DnsPlugin', () => {

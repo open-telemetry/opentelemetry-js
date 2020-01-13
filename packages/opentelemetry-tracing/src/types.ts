@@ -23,6 +23,7 @@ import {
   Sampler,
 } from '@opentelemetry/types';
 import { LogLevel } from '@opentelemetry/core';
+import { Range } from 'semver';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -64,6 +65,24 @@ export interface TracerConfig {
 
   /** Trace Parameters */
   traceParams?: TraceParams;
+
+  /**
+   * A list of instrumentation library specifiers. A library which calls
+   * getTracer with a name and version which matches an entry in this list
+   * will receive a no-op tracer.
+   */
+  disabledLibraries?: InstrumentationLibrarySpecifier[];
+}
+
+export interface InstrumentationLibrarySpecifier {
+  /** The name of an instrumentation library */
+  name: string;
+  /**
+   * The version of an instrumentation library represented as a
+   * semver string. If version is omitted, it will be considered
+   * a match for all versions.
+   */
+  version?: string | Range;
 }
 
 /** Global configuration of trace service */

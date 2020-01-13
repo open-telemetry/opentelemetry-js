@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
+import { Span, BasicTracerRegistry, Tracer } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -250,7 +250,7 @@ describe('Utility', () => {
         const span = new Span(
           new BasicTracerRegistry({
             scopeManager: new NoopScopeManager(),
-          }).getTracer('default'),
+          }).getTracer('default') as Tracer,
           'test',
           { spanId: '', traceId: '' },
           SpanKind.INTERNAL
