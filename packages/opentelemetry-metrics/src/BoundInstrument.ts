@@ -131,7 +131,8 @@ export class BoundGauge extends BaseBoundInstrument
 /**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class BoundMeasure extends BaseBoundInstrument implements types.BoundMeasure {
+export class BoundMeasure extends BaseBoundInstrument
+  implements types.BoundMeasure {
   constructor(
     labelSet: types.LabelSet,
     private readonly _disabled: boolean,

@@ -20,7 +20,7 @@ import {
   BoundCounter,
   BoundGauge,
   BaseBoundInstrument,
-  BoundMeasure
+  BoundMeasure,
 } from './BoundInstrument';
 import { MetricOptions } from './types';
 import {
