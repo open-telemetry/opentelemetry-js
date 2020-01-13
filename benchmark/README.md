@@ -3,15 +3,15 @@
 ## How to run
 
 To run your benchmark, just:
-```
+```sh
 $ npm run bench
 ```
 
-If you're interested in writing benchmarking for other APIs, please write a benchmark in the `benchmark/index.js` module. Please refer to the `benchmark/tracer.js` or `benchmark/propagator.js` for more comprehensive examples.
+> NOTE: If you're interested in writing benchmarking for other APIs, please write a benchmark in the `benchmark/index.js` module. Please refer to the `benchmark/tracer.js` or `benchmark/propagator.js` for more comprehensive examples.
 
 ## Results
 
-# `0.3.3` release
+### `v0.3.3` release
 
 ```
 Beginning BasicTracerRegistry Benchmark...
