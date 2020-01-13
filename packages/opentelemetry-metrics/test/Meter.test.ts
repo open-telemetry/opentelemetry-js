@@ -416,10 +416,10 @@ describe('Meter', () => {
       });
     });
 
-    describe('.getHandle()', () => {
+    describe('.bind()', () => {
       it('should create a measure handle', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle = measure.getHandle(labelSet);
+        const handle = measure.bind(labelSet);
         assert.doesNotThrow(() => handle.record(10));
       });
 
@@ -435,7 +435,7 @@ describe('Meter', () => {
         const measure = meter.createMeasure('name', {
           disabled: true,
         }) as MeasureMetric;
-        const handle = measure.getHandle(labelSet);
+        const handle = measure.bind(labelSet);
         handle.record(10);
         assert.strictEqual(handle['_data'], 0);
       });
@@ -446,9 +446,9 @@ describe('Meter', () => {
 
       it('should return same handle on same label values', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle1 = measure.getHandle(labelSet);
+        const handle1 = measure.bind(labelSet);
         handle1.record(10);
-        const handle2 = measure.getHandle(labelSet);
+        const handle2 = measure.bind(labelSet);
         handle2.record(100);
         // @todo: re-add once record is implemented
         // assert.strictEqual(handle1['_data'], 100);
@@ -456,29 +456,29 @@ describe('Meter', () => {
       });
     });
 
-    describe('.removeHandle()', () => {
+    describe('.unbind()', () => {
       it('should remove the measure handle', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle = measure.getHandle(labelSet);
-        assert.strictEqual(measure['_handles'].size, 1);
-        measure.removeHandle(labelSet);
-        assert.strictEqual(measure['_handles'].size, 0);
-        const handle1 = measure.getHandle(labelSet);
-        assert.strictEqual(measure['_handles'].size, 1);
+        const handle = measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
+        measure.unbind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 0);
+        const handle1 = measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
         assert.notStrictEqual(handle, handle1);
       });
 
       it('should not fail when removing non existing handle', () => {
         const measure = meter.createMeasure('name');
-        measure.removeHandle(new LabelSet('nonexistant', {}));
+        measure.unbind(new LabelSet('nonexistant', {}));
       });
 
       it('should clear all handles', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        measure.getHandle(labelSet);
-        assert.strictEqual(measure['_handles'].size, 1);
+        measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
         measure.clear();
-        assert.strictEqual(measure['_handles'].size, 0);
+        assert.strictEqual(measure['_instruments'].size, 0);
       });
     });
   });

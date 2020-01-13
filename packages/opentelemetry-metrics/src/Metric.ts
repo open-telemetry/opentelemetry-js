@@ -201,7 +201,7 @@ export class GaugeMetric extends Metric<BoundGauge>
   }
 }
 
-export class MeasureMetric extends Metric<MeasureHandle>
+export class MeasureMetric extends Metric<BoundMeasure>
   implements Pick<types.MetricUtils, 'record'> {
   protected readonly _absolute: boolean;
 
@@ -220,8 +220,8 @@ export class MeasureMetric extends Metric<MeasureHandle>
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
-  protected _makeHandle(labelSet: types.LabelSet): MeasureHandle {
-    return new MeasureHandle(
+  protected _makeInstrument(labelSet: types.LabelSet): BoundMeasure {
+    return new BoundMeasure(
       labelSet,
       this._disabled,
       this._absolute,
@@ -232,6 +232,6 @@ export class MeasureMetric extends Metric<MeasureHandle>
   }
 
   record(value: number, labelSet: types.LabelSet) {
-    this.getHandle(labelSet).record(value);
+    this.bind(labelSet).record(value);
   }
 }
