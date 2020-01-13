@@ -42,12 +42,12 @@ describe('UserInteractionPlugin', () => {
     let sandbox: sinon.SinonSandbox;
     let webTracerRegistry: WebTracerRegistry;
     let dummySpanExporter: DummySpanExporter;
-    let exportSpy: any;
-    let requests: any[] = [];
+    let exportSpy: sinon.SinonSpy;
+    let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function(xhr: sinon.SinonFakeXMLHttpRequest) {
         requests.push(xhr);
         setTimeout(() => {
           requests[requests.length - 1].respond(
@@ -101,6 +101,62 @@ describe('UserInteractionPlugin', () => {
 
           assert.equal(exportSpy.args.length, 1, 'should export one span');
           assertClickSpan(spanClick);
+          done();
+        });
+      });
+      sandbox.clock.tick(10);
+    });
+
+    it('should handle target without function getAttribute', done => {
+      let callback: Function;
+      const btn: any = {
+        addEventListener: function(name: string, callbackF: Function) {
+          callback = callbackF;
+        },
+        click: function() {
+          callback();
+        },
+      };
+      fakeInteraction(() => {
+        originalSetTimeout(() => {
+          assert.equal(exportSpy.args.length, 0, 'should NOT export any span');
+          done();
+        });
+      }, btn);
+      sandbox.clock.tick(10);
+    });
+
+    it('should not create span when element has attribute disabled', done => {
+      let callback: Function;
+      const btn: any = {
+        addEventListener: function(name: string, callbackF: Function) {
+          callback = callbackF;
+        },
+        click: function() {
+          callback();
+        },
+        getAttribute: function() {},
+        hasAttribute: function(name: string) {
+          return name === 'disabled' ? true : false;
+        },
+      };
+      fakeInteraction(() => {
+        originalSetTimeout(() => {
+          assert.equal(exportSpy.args.length, 0, 'should NOT export any span');
+          done();
+        });
+      }, btn);
+      sandbox.clock.tick(10);
+    });
+
+    it('should not create span when start span fails', done => {
+      userInteractionPlugin['_tracer'].startSpan = function() {
+        throw 'foo';
+      };
+
+      fakeInteraction(() => {
+        originalSetTimeout(() => {
+          assert.equal(exportSpy.args.length, 0, 'should NOT export any span');
           done();
         });
       });

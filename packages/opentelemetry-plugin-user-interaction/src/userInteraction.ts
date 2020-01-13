@@ -172,6 +172,8 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
               span.end();
               return result;
             });
+          } else {
+            return listener.apply(target, args);
           }
         };
         return original.call(this, type, patchedListener, useCapture);

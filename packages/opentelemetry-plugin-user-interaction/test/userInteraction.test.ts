@@ -46,13 +46,13 @@ describe('UserInteractionPlugin', () => {
     let sandbox: sinon.SinonSandbox;
     let webTracerRegistry: WebTracerRegistry;
     let dummySpanExporter: DummySpanExporter;
-    let exportSpy: any;
-    let requests: any[] = [];
+    let exportSpy: sinon.SinonSpy;
+    let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
       sandbox = sinon.createSandbox();
       history.pushState({ test: 'testing' }, '', `${location.pathname}`);
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function(xhr: sinon.SinonFakeXMLHttpRequest) {
         requests.push(xhr);
         setTimeout(() => {
           requests[requests.length - 1].respond(
@@ -265,40 +265,6 @@ describe('UserInteractionPlugin', () => {
         );
 
         done();
-      });
-    });
-
-    describe('_createSpan', () => {
-      let createSpan: any;
-      beforeEach(() => {
-        createSpan = userInteractionPlugin['_createSpan'].bind(
-          userInteractionPlugin
-        );
-      });
-
-      it('it should not create span when element has no getAttribute', () => {
-        const span = createSpan({} as any, '');
-        assert.strictEqual(span, undefined, 'span should not be created');
-      });
-
-      it('it should not create span when element is disabled', () => {
-        const btn = createButton(true);
-        const span = createSpan(btn, '');
-        assert.strictEqual(span, undefined, 'span should not be created');
-      });
-
-      it('it should not create span when error occurred during span creation', () => {
-        userInteractionPlugin['_tracer'].startSpan = function() {
-          throw 'foo';
-        };
-        const span = createSpan(
-          {
-            getAttribute: function() {},
-            hasAttribute: function() {},
-          } as any,
-          ''
-        );
-        assert.strictEqual(span, undefined, 'span should not be created');
       });
     });
 
