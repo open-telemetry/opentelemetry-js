@@ -28,7 +28,7 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -38,17 +38,18 @@ import { HttpPluginConfig } from '../../src/types';
 import { customAttributeFunction } from './http-enable.test';
 
 const memoryExporter = new InMemorySpanExporter();
+const protocol = 'http';
 
 describe('Packages', () => {
   describe('get', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -57,7 +58,7 @@ describe('Packages', () => {
       const config: HttpPluginConfig = {
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable(http, tracer, tracer.logger, config);
+      plugin.enable(http, registry, registry.logger, config);
     });
 
     after(() => {
@@ -93,8 +94,8 @@ describe('Packages', () => {
               // https://github.com/nock/nock/pull/1551
               // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
               // TODO: check if this is still the case when new version
-              'http://info.cern.ch/'
-            : `http://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
+              `${protocol}://info.cern.ch/`
+            : `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {

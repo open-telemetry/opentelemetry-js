@@ -29,12 +29,12 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { Http } from '@opentelemetry/plugin-http';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -47,17 +47,17 @@ describe('Packages', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger);
+      plugin.enable((https as unknown) as Http, registry, registry.logger);
     });
 
     after(() => {

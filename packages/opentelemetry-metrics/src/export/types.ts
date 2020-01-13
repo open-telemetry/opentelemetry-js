@@ -61,6 +61,13 @@ export interface MetricDescriptor {
   readonly unit: string;
   /** MetricDescriptor type */
   readonly type: MetricDescriptorType;
+  /**
+   * Metric may only increase
+   *
+   * This property is not in the .proto file, but is included here because
+   * it is required for correct export of prometheus metrics
+   */
+  readonly monotonic: boolean;
   /** The label keys associated with the metric descriptor. */
   readonly labelKeys: string[];
 }
@@ -320,30 +327,6 @@ export interface ValueAtPercentile {
   readonly percentile: number;
   /** The value at the given percentile of a distribution. */
   readonly value: number;
-}
-
-/**
- * Keeps a set of MetricProducer that is used by exporters to determine the
- * metrics that need to be exported.
- */
-export interface MetricProducerManager {
-  /** Adds the MetricProducer to the manager */
-  add(metricProducer: MetricProducer): void;
-  /** Removes the MetricProducer to the manager */
-  remove(metricProducer: MetricProducer): void;
-  /** Clears all MetricProducers */
-  removeAll(): void;
-  /** Gets all registered MetricProducers that should be exported */
-  getAllMetricProducer(): Set<MetricProducer>;
-}
-
-/**
- * A MetricProducer producer that can be registered for exporting using
- * MetricProducerManager.
- */
-export interface MetricProducer {
-  /** Gets a collection of produced Metric`s to be exported */
-  getMetrics(): ReadableMetric[];
 }
 
 /**

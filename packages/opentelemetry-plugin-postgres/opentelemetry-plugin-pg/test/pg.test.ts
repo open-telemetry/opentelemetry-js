@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -32,8 +32,7 @@ import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
-import * as assertionUtils from './assertionUtils';
-import * as testUtils from './testUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -74,21 +73,16 @@ const runCallbackTest = (
   const spans = memoryExporter.getFinishedSpans();
   assert.strictEqual(spans.length, spansLength);
   const pgSpan = spans[spansIndex];
-  assertionUtils.assertSpan(
-    pgSpan,
-    SpanKind.CLIENT,
-    attributes,
-    events,
-    status
-  );
+  testUtils.assertSpan(pgSpan, SpanKind.CLIENT, attributes, events, status);
   if (span) {
-    assertionUtils.assertPropagation(pgSpan, span);
+    testUtils.assertPropagation(pgSpan, span);
   }
 };
 
 describe('pg@7.x', () => {
   let client: pg.Client;
-  const tracer = new NodeTracer();
+  const registry = new NodeTracerRegistry();
+  const tracer = registry.getTracer('external');
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker
@@ -101,9 +95,9 @@ describe('pg@7.x', () => {
       this.test!.parent!.pending = true;
       this.skip();
     }
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
-      testUtils.startDocker();
+      testUtils.startDocker('postgres');
     }
 
     client = new pg.Client(CONFIG);
@@ -116,13 +110,13 @@ describe('pg@7.x', () => {
 
   after(async () => {
     if (testPostgresLocally) {
-      testUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('postgres');
     }
     await client.end();
   });
 
   beforeEach(function() {
-    plugin.enable(pg, tracer, logger);
+    plugin.enable(pg, registry, logger);
   });
 
   afterEach(() => {
@@ -396,7 +390,7 @@ describe('pg@7.x', () => {
 
     it('should preserve correct context even when using the same callback in client.query()', done => {
       const spans = [tracer.startSpan('span 1'), tracer.startSpan('span 2')];
-      const currentSpans: (Span | null)[] = [];
+      const currentSpans: (Span | undefined)[] = [];
       const queryHandler = () => {
         currentSpans.push(tracer.getCurrentSpan());
         if (currentSpans.length === 2) {
@@ -415,7 +409,7 @@ describe('pg@7.x', () => {
 
     it('should preserve correct context even when using the same promise resolver in client.query()', done => {
       const spans = [tracer.startSpan('span 1'), tracer.startSpan('span 2')];
-      const currentSpans: (Span | null)[] = [];
+      const currentSpans: (Span | undefined)[] = [];
       const queryHandler = () => {
         currentSpans.push(tracer.getCurrentSpan());
         if (currentSpans.length === 2) {

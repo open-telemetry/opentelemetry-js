@@ -22,7 +22,7 @@ import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 import * as http from 'http';
-import { Span, BasicTracer } from '@opentelemetry/tracing';
+import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
 import { AttributeNames } from '../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -74,18 +74,25 @@ describe('Utility', () => {
 
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
-      const webUrl = 'http://google.fr/';
+      const webUrl = 'http://u:p@google.fr/aPath?qu=ry';
       const urlParsed = url.parse(webUrl);
       const urlParsedWithoutPathname = {
         ...urlParsed,
         pathname: undefined,
       };
-      for (const param of [webUrl, urlParsed, urlParsedWithoutPathname]) {
+      const whatWgUrl = new url.URL(webUrl);
+      for (const param of [
+        webUrl,
+        urlParsed,
+        urlParsedWithoutPathname,
+        whatWgUrl,
+      ]) {
         const result = utils.getRequestInfo(param);
         assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
         assert.strictEqual(result.optionsParsed.protocol, 'http:');
-        assert.strictEqual(result.optionsParsed.path, '/');
-        assert.strictEqual(result.pathname, '/');
+        assert.strictEqual(result.optionsParsed.path, '/aPath?qu=ry');
+        assert.strictEqual(result.pathname, '/aPath');
+        assert.strictEqual(result.origin, 'http://google.fr');
       }
     });
   });
@@ -241,9 +248,9 @@ describe('Utility', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracer({
+          new BasicTracerRegistry({
             scopeManager: new NoopScopeManager(),
-          }),
+          }).getTracer('default'),
           'test',
           { spanId: '', traceId: '' },
           SpanKind.INTERNAL

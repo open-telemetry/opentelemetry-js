@@ -15,32 +15,25 @@
  */
 
 import { Plugins } from './instrumentation/PluginLoader';
-import { BasicTracerConfig } from '@opentelemetry/tracing';
+import { TracerConfig } from '@opentelemetry/tracing';
 
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
  */
-export interface NodeTracerConfig extends BasicTracerConfig {
+export interface NodeTracerConfig extends TracerConfig {
   /** Plugins options. */
   plugins?: Plugins;
 }
 
 /** List of all default supported plugins */
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
-  http: {
-    enabled: true,
-    path: '@opentelemetry/plugin-http',
-  },
-  grpc: {
-    enabled: true,
-    path: '@opentelemetry/plugin-grpc',
-  },
-  https: {
-    enabled: true,
-    path: '@opentelemetry/plugin-https',
-  },
-  dns: {
-    enabled: true,
-    path: '@opentelemetry/plugin-dns',
-  },
+  mongodb: { enabled: true, path: '@opentelemetry/plugin-mongodb' },
+  grpc: { enabled: true, path: '@opentelemetry/plugin-grpc' },
+  http: { enabled: true, path: '@opentelemetry/plugin-http' },
+  https: { enabled: true, path: '@opentelemetry/plugin-https' },
+  mysql: { enabled: true, path: '@opentelemetry/plugin-mysql' },
+  pg: { enabled: true, path: '@opentelemetry/plugin-pg' },
+  redis: { enabled: true, path: '@opentelemetry/plugin-redis' },
+  ioredis: { enabled: true, path: '@opentelemetry/plugin-ioredis' },
+  'pg-pool': { enabled: true, path: '@opentelemetry/plugin-pg-pool' },
 };

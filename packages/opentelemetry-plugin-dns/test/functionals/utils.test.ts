@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/core';
+import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
+import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
-import { Span, BasicTracer } from '@opentelemetry/tracing';
-import { NoopLogger } from '@opentelemetry/core';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -162,7 +162,7 @@ describe('Utility', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
       const span = new Span(
-        new BasicTracer(),
+        new BasicTracerRegistry().getTracer('default'),
         'test',
         { spanId: '', traceId: '' },
         SpanKind.INTERNAL

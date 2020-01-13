@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-async-hooks",
-  "version": "0.2.0",
+  "version": "0.3.2",
   "description": "OpenTelemetry AsyncHooks-based Scope Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,7 +12,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "compile": "tsc -p .",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"
   },
@@ -55,6 +56,6 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/scope-base": "^0.2.0"
+    "@opentelemetry/scope-base": "^0.3.2"
   }
 }

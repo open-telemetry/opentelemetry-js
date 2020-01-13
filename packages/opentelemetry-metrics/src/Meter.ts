@@ -21,7 +21,7 @@ import {
   NOOP_GAUGE_METRIC,
   NOOP_MEASURE_METRIC,
 } from '@opentelemetry/core';
-import { BaseHandle } from './Handle';
+import { BaseBoundInstrument } from './BoundInstrument';
 import { Metric, CounterMetric, GaugeMetric, MeasureMetric } from './Metric';
 import {
   MetricOptions,
@@ -39,8 +39,10 @@ import { ExportResult } from '@opentelemetry/base';
  */
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
-  private readonly _metrics = new Map<string, Metric<BaseHandle>>();
+  private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _exporters: MetricExporter[] = [];
+
+  readonly labels = Meter.labels;
 
   /**
    * Constructs a new Meter instance.
@@ -57,7 +59,7 @@ export class Meter implements types.Meter {
   createMeasure(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.MeasureHandle> {
+  ): types.Metric<types.BoundMeasure> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -90,7 +92,7 @@ export class Meter implements types.Meter {
   createCounter(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.CounterHandle> {
+  ): types.Metric<types.BoundCounter> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -123,7 +125,7 @@ export class Meter implements types.Meter {
   createGauge(
     name: string,
     options?: types.MetricOptions
-  ): types.Metric<types.GaugeHandle> {
+  ): types.Metric<types.BoundGauge> {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -165,6 +167,27 @@ export class Meter implements types.Meter {
   }
 
   /**
+   * Provide a pre-computed re-useable LabelSet by
+   * converting the unordered labels into a canonicalized
+   * set of lables with an unique identifier, useful for pre-aggregation.
+   * @param labels user provided unordered Labels.
+   */
+  static labels(labels: types.Labels): types.LabelSet {
+    const keys = Object.keys(labels).sort();
+    const identifier = keys.reduce((result, key) => {
+      if (result.length > 2) {
+        result += ',';
+      }
+      return (result += key + ':' + labels[key]);
+    }, '|#');
+    const sortedLabels: types.Labels = {};
+    keys.forEach(key => {
+      sortedLabels[key] = labels[key];
+    });
+    return new LabelSet(identifier, sortedLabels);
+  }
+
+  /**
    * Send a single metric by name to all registered exporters
    */
   private _exportOneMetric(name: string) {
@@ -188,39 +211,17 @@ export class Meter implements types.Meter {
    * @param name The name of the metric.
    * @param metric The metric to register.
    */
-  private _registerMetric<T extends BaseHandle>(
+  private _registerMetric<T extends BaseBoundInstrument>(
     name: string,
     metric: Metric<T>
   ): void {
     if (this._metrics.has(name)) {
-      // @todo (issue/474): decide how to handle already registered metric
       this._logger.error(
         `A metric with the name ${name} has already been registered.`
       );
       return;
     }
     this._metrics.set(name, metric);
-  }
-
-  /**
-   * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered labels into a canonicalized
-   * set of lables with an unique identifier, useful for pre-aggregation.
-   * @param labels user provided unordered Labels.
-   */
-  labels(labels: types.Labels): types.LabelSet {
-    const keys = Object.keys(labels).sort();
-    const identifier = keys.reduce((result, key) => {
-      if (result.length > 2) {
-        result += ',';
-      }
-      return (result += key + ':' + labels[key]);
-    }, '|#');
-    const sortedLabels: types.Labels = {};
-    keys.forEach(key => {
-      sortedLabels[key] = labels[key];
-    });
-    return new LabelSet(identifier, sortedLabels);
   }
 
   /**

@@ -19,12 +19,11 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import { plugin, RedisPlugin } from '../src';
 import * as redisTypes from 'redis';
 import { NoopLogger } from '@opentelemetry/core';
-import * as dockerUtils from './testUtils';
-import * as assertionUtils from './assertionUtils';
+import * as testUtils from '@opentelemetry/test-utils';
 import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
 import { AttributeNames } from '../src/enums';
 
@@ -49,7 +48,8 @@ const okStatus: Status = {
 };
 
 describe('redis@2.x', () => {
-  const tracer = new NodeTracer();
+  const registry = new NodeTracerRegistry();
+  const tracer = registry.getTracer('external');
   let redis: typeof redisTypes;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
@@ -64,17 +64,17 @@ describe('redis@2.x', () => {
     }
 
     if (shouldTestLocal) {
-      dockerUtils.startDocker();
+      testUtils.startDocker('redis');
     }
 
     redis = require('redis');
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    plugin.enable(redis, tracer, new NoopLogger());
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    plugin.enable(redis, registry, new NoopLogger());
   });
 
   after(() => {
     if (shouldTestLocal) {
-      dockerUtils.cleanUpDocker();
+      testUtils.cleanUpDocker('redis');
     }
   });
 
@@ -174,14 +174,14 @@ describe('redis@2.x', () => {
                 endedSpans[0].name,
                 `redis-${operation.command}`
               );
-              assertionUtils.assertSpan(
+              testUtils.assertSpan(
                 endedSpans[0],
                 SpanKind.CLIENT,
                 attributes,
                 [],
                 okStatus
               );
-              assertionUtils.assertPropagation(endedSpans[0], span);
+              testUtils.assertPropagation(endedSpans[0], span);
               done();
             });
           });

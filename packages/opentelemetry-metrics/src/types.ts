@@ -37,7 +37,7 @@ export interface MetricOptions {
   /** Indicates the metric is a verbose metric that is disabled by default. */
   disabled: boolean;
 
-  /** Asserts that this metric can only increase (e.g. time spent). */
+  /** Monotonic metrics may only increase. */
   monotonic: boolean;
 
   /** (Measure only) Asserts that this metric will only accept non-negative values. */

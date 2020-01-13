@@ -22,9 +22,9 @@ OpenTelemetry HTTP Instrumentation allows the user to automatically collect trac
 
 To load a specific plugin (HTTP in this case), specify it in the Node Tracer's configuration.
 ```js
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 
-const tracer = new NodeTracer({
+const registry = new NodeTracerRegistry({
   plugins: {
     http: {
       enabled: true,
@@ -38,9 +38,9 @@ const tracer = new NodeTracer({
 
 To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 
-const tracer = new NodeTracer();
+const registry = new NodeTracerRegistry();
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) for a short example.
@@ -54,7 +54,7 @@ Http plugin has few options available to choose from. You can set the following:
 | [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L52) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
 | [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
 | [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
-
+| [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `string` | The primary server name of the matched virtual host. |
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>

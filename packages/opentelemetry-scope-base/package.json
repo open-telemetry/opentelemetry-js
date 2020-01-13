@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/scope-base",
-  "version": "0.2.0",
+  "version": "0.3.2",
   "description": "OpenTelemetry Base Scope Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -12,7 +12,8 @@
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
-    "compile": "tsc -p .",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile"
   },

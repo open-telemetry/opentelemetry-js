@@ -10,7 +10,7 @@ const config = require('./setup');
 config.setupTracerAndExporters('https-server-service');
 
 const https = require('https');
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-https-server');
 
 /** Starts a HTTPs server that receives requests on sample server port. */
 function startServer (port) {
