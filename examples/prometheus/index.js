@@ -1,9 +1,9 @@
 "use strict";
 
-const { BasicMeterRegistry } = require("@opentelemetry/metrics");
+const { MeterRegistry } = require("@opentelemetry/metrics");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 
-const meter = new BasicMeterRegistry().getMeter();
+const meter = new MeterRegistry().getMeter();
 
 const exporter = new PrometheusExporter(
   {

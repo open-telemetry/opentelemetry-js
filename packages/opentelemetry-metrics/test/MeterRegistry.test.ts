@@ -16,45 +16,45 @@
 
 import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { BasicMeterRegistry, Meter } from '../src';
+import { MeterRegistry, Meter } from '../src';
 
-describe('BasicMeterRegistry', () => {
+describe('MeterRegistry', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
-      const registry = new BasicMeterRegistry();
-      assert.ok(registry instanceof BasicMeterRegistry);
+      const registry = new MeterRegistry();
+      assert.ok(registry instanceof MeterRegistry);
     });
 
     it('should construct an instance with logger', () => {
-      const registry = new BasicMeterRegistry({
+      const registry = new MeterRegistry({
         logger: new NoopLogger(),
       });
-      assert.ok(registry instanceof BasicMeterRegistry);
+      assert.ok(registry instanceof MeterRegistry);
     });
   });
 
   describe('getMeter', () => {
     it('should return an instance of Meter', () => {
-      const meter = new BasicMeterRegistry().getMeter();
+      const meter = new MeterRegistry().getMeter();
       assert.ok(meter instanceof Meter);
     });
 
     it('should return the meter with default name and version without any options', () => {
-      const registry = new BasicMeterRegistry();
+      const registry = new MeterRegistry();
       const meter1 = registry.getMeter();
       const meter2 = registry.getMeter('default', '*');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return the same Meter instance with same name & version', () => {
-      const registry = new BasicMeterRegistry();
+      const registry = new MeterRegistry();
       const meter1 = registry.getMeter('meter1', 'ver1');
       const meter2 = registry.getMeter('meter1', 'ver1');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return different Meter instance with different name or version', () => {
-      const registry = new BasicMeterRegistry();
+      const registry = new MeterRegistry();
 
       const meter1 = registry.getMeter('meter1', 'ver1');
       const meter2 = registry.getMeter('meter1');

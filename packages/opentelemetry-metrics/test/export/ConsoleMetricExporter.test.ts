@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter } from '../../src';
-import { BasicMeterRegistry } from '../../src/BasicMeterRegistry';
+import { MeterRegistry } from '../../src/MeterRegistry';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -37,7 +37,7 @@ describe('ConsoleMetricExporter', () => {
     it('should export information about metrics', () => {
       const spyConsole = sinon.spy(console, 'log');
 
-      const meter = new BasicMeterRegistry().getMeter('default');
+      const meter = new MeterRegistry().getMeter('default');
       meter.addExporter(consoleExporter);
       const gauge = meter.createGauge('gauge', {
         description: 'a test description',
