@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
-import { SpanProcessor, Span, BasicTracer } from '../src';
+import { SpanProcessor, Span, BasicTracerRegistry } from '../src';
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
@@ -30,7 +30,7 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
-  const tracer = new BasicTracer();
+  const tracer = new BasicTracerRegistry().getTracer('default');
   const span = tracer.startSpan('one');
 
   it('should handle empty span processor', () => {

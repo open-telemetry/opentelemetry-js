@@ -1,17 +1,17 @@
 "use strict";
 
-const { NodeTracer } = require("@opentelemetry/node");
+const { NodeTracerRegistry } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 const { TracerShim } = require("@opentelemetry/shim-opentracing");
 
 function shim(serviceName) {
-  const tracer = new NodeTracer();
+  const registry = new NodeTracerRegistry();
 
-  tracer.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
+  registry.addSpanProcessor(new SimpleSpanProcessor(getExporter(serviceName)));
 
-  return new TracerShim(tracer);
+  return new TracerShim(registry.getTracer("opentracing-shim"));
 }
 
 function getExporter(serviceName) {

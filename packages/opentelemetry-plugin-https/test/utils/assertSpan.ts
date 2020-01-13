@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Status } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/types';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -36,7 +36,6 @@ export const assertSpan = (
     pathname: string;
     reqHeaders?: http.OutgoingHttpHeaders;
     path?: string | null;
-    forceStatus?: Status;
     serverName?: string;
     component: string;
   }
@@ -68,13 +67,12 @@ export const assertSpan = (
     span.attributes[AttributeNames.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
-
+  assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
-
   assert.deepStrictEqual(
     span.status,
-    validations.forceStatus || parseResponseStatus(validations.httpStatusCode)
+    parseResponseStatus(validations.httpStatusCode)
   );
 
   assert.ok(span.endTime, 'must be finished');
