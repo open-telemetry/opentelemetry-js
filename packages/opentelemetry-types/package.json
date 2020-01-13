@@ -12,7 +12,7 @@
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
-    "docs-test": "linkinator docs/out",
+    "docs-test": "linkinator docs/out --skip david-dm.org",
     "docs": "typedoc --tsconfig tsconfig.json",
     "prepare": "npm run compile"
   },
