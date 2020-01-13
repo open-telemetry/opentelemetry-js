@@ -7,7 +7,9 @@ To run your benchmark, just:
 $ npm run bench
 ```
 
-> NOTE: If you're interested in writing benchmarking for other APIs, please write a benchmark in the `benchmark/index.js` module. Please refer to the `benchmark/tracer.js` or `benchmark/propagator.js` for more comprehensive examples.
+The minimum sample size is set to 10 to perform statistical analysis on benchmark, you can re-configure that in `benchmark.js`.
+
+> NOTE: If you're interested in writing benchmark for other APIs, please write a benchmark in the `benchmark/index.js` module. Please refer to the `benchmark/tracer.js` or `benchmark/propagator.js` for more comprehensive examples.
 
 ## Results
 
