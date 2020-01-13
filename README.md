@@ -52,10 +52,10 @@ Future release targets include:
 
 | Component                   | Version    | Target Date        |
 | --------------------------- | ---------- | ------------------ |
-| Support for Tags/Baggage    | Alpha v0.4 | December 31 2019   |
-| Metrics Aggregation         | Alpha v0.4 | December 31 2019   |
-| Metrics SDK (Complete)      | Alpha v0.4 | December 31 2019   |
-| OpenCensus Bridge           | Alpha v0.4 | December 31 2019   |
+| Support for Tags/Baggage    | Alpha v0.4 | January 31 2020    |
+| Metrics Aggregation         | Alpha v0.4 | January 31 2020    |
+| Metrics SDK (Complete)      | Alpha v0.4 | January 31 2020    |
+| OpenCensus Bridge           | Alpha v0.4 | January 31 2020    |
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
