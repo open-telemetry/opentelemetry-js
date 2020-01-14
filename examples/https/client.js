@@ -1,6 +1,7 @@
 'use strict';
 
-const tracer = require('./tracer')('https-client-service');
+const tracer = require('./tracer')('example-https-client');
+// eslint-disable-next-line import/order
 const https = require('https');
 
 /** A function which makes requests and handles response. */

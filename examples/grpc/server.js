@@ -1,7 +1,9 @@
 'use strict';
 
-const tracer = require('./tracer')('grpc-server-service');
+const tracer = require('./tracer')(('example-grpc-server'));
+// eslint-disable-next-line import/order
 const grpc = require('grpc');
+
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
 

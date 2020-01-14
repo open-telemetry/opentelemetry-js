@@ -27,10 +27,14 @@ import {
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import * as tracing from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
-import { PerformanceTimingNames as PTN, WebTracer } from '@opentelemetry/web';
+import {
+  PerformanceTimingNames as PTN,
+  WebTracerRegistry,
+} from '@opentelemetry/web';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
+import { Tracer } from '@opentelemetry/types';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -97,7 +101,8 @@ describe('xhr', () => {
   let clearData: any;
 
   describe('when request is successful', () => {
-    let webTracerWithZone: WebTracer;
+    let webTracerWithZone: Tracer;
+    let webTracerRegistryWithZone: WebTracerRegistry;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
     let rootSpan: types.Span;
@@ -136,7 +141,7 @@ describe('xhr', () => {
       spyEntries = sandbox.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
 
-      webTracerWithZone = new WebTracer({
+      webTracerRegistryWithZone = new WebTracerRegistry({
         logLevel: LogLevel.ERROR,
         httpTextFormat: new B3Format(),
         scopeManager: new ZoneScopeManager(),
@@ -146,9 +151,10 @@ describe('xhr', () => {
           }),
         ],
       });
+      webTracerWithZone = webTracerRegistryWithZone.getTracer('xhr-test');
       dummySpanExporter = new DummySpanExporter();
       exportSpy = sinon.stub(dummySpanExporter, 'export');
-      webTracerWithZone.addSpanProcessor(
+      webTracerRegistryWithZone.addSpanProcessor(
         new tracing.SimpleSpanProcessor(dummySpanExporter)
       );
 
@@ -403,7 +409,8 @@ describe('xhr', () => {
   });
 
   describe('when request is NOT successful', () => {
-    let webTracerWithZone: WebTracer;
+    let webTracerWithZoneRegistry: WebTracerRegistry;
+    let webTracerWithZone: Tracer;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
     let rootSpan: types.Span;
@@ -434,16 +441,17 @@ describe('xhr', () => {
       spyEntries = sandbox.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
 
-      webTracerWithZone = new WebTracer({
+      webTracerWithZoneRegistry = new WebTracerRegistry({
         logLevel: LogLevel.ERROR,
         scopeManager: new ZoneScopeManager(),
         plugins: [new XMLHttpRequestPlugin()],
       });
       dummySpanExporter = new DummySpanExporter();
       exportSpy = sinon.stub(dummySpanExporter, 'export');
-      webTracerWithZone.addSpanProcessor(
+      webTracerWithZoneRegistry.addSpanProcessor(
         new tracing.SimpleSpanProcessor(dummySpanExporter)
       );
+      webTracerWithZone = webTracerWithZoneRegistry.getTracer('xhr-test');
 
       rootSpan = webTracerWithZone.startSpan('root');
 

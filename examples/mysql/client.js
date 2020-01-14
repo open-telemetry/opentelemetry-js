@@ -1,6 +1,7 @@
 'use strict';
 
-const tracer = require('./tracer')('http-mysql-client-service');
+const tracer = require('./tracer')('example-mysql-http-client');
+// eslint-disable-next-line import/order
 const http = require('http');
 
 /** A function which makes requests and handles response. */

@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -92,7 +92,7 @@ const runCallbackTest = (
 
 describe('pg-pool@2.x', () => {
   let pool: pgPool<pg.Client>;
-  const tracer = new NodeTracer();
+  const registry = new NodeTracerRegistry();
   const logger = new NoopLogger();
   const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
@@ -106,7 +106,7 @@ describe('pg-pool@2.x', () => {
       this.skip();
     }
     pool = new pgPool(CONFIG);
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
       testUtils.startDocker('postgres');
     }
@@ -123,8 +123,8 @@ describe('pg-pool@2.x', () => {
   });
 
   beforeEach(function() {
-    plugin.enable(pgPool, tracer, logger);
-    pgPlugin.enable(pg, tracer, logger);
+    plugin.enable(pgPool, registry, logger);
+    pgPlugin.enable(pg, registry, logger);
   });
 
   afterEach(() => {
@@ -152,8 +152,8 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      await tracer.withSpan(span, async () => {
+      const span = registry.getTracer('test-pg-pool').startSpan('test span');
+      await registry.getTracer('test-pg-pool').withSpan(span, async () => {
         const client = await pool.connect();
         runCallbackTest(span, pgPoolattributes, events, okStatus, 1, 0);
         assert.ok(client, 'pool.connect() returns a promise');
@@ -178,8 +178,10 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const parentSpan = tracer.startSpan('test span');
-      tracer.withSpan(parentSpan, () => {
+      const parentSpan = registry
+        .getTracer('test-pg-pool')
+        .startSpan('test span');
+      registry.getTracer('test-pg-pool').withSpan(parentSpan, () => {
         const resNoPromise = pool.connect((err, client, release) => {
           if (err) {
             return done(err);
@@ -212,8 +214,8 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const span = tracer.startSpan('test span');
-      await tracer.withSpan(span, async () => {
+      const span = registry.getTracer('test-pg-pool').startSpan('test span');
+      await registry.getTracer('test-pg-pool').withSpan(span, async () => {
         try {
           const result = await pool.query('SELECT NOW()');
           runCallbackTest(span, pgPoolattributes, events, okStatus, 2, 0);
@@ -235,8 +237,10 @@ describe('pg-pool@2.x', () => {
         [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
-      const parentSpan = tracer.startSpan('test span');
-      tracer.withSpan(parentSpan, () => {
+      const parentSpan = registry
+        .getTracer('test-pg-pool')
+        .startSpan('test span');
+      registry.getTracer('test-pg-pool').withSpan(parentSpan, () => {
         const resNoPromise = pool.query('SELECT NOW()', (err, result) => {
           if (err) {
             return done(err);

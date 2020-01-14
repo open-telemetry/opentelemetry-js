@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-import * as shimmer from 'shimmer';
-import * as semver from 'semver';
-import * as utils from './utils';
 import { BasePlugin } from '@opentelemetry/core';
-import { SpanOptions, SpanKind, Span } from '@opentelemetry/types';
+import { Span, SpanKind, SpanOptions } from '@opentelemetry/types';
+import { LookupAddress } from 'dns';
+import * as semver from 'semver';
+import * as shimmer from 'shimmer';
+import { AddressFamily } from './enums/AddressFamily';
+import { AttributeNames } from './enums/AttributeNames';
 import {
   Dns,
-  LookupPromiseSignature,
+  DnsPluginConfig,
+  LookupCallbackSignature,
   LookupFunction,
   LookupFunctionSignature,
-  LookupCallbackSignature,
-  DnsPluginConfig,
+  LookupPromiseSignature,
 } from './types';
-import { AttributeNames } from './enums/AttributeNames';
-import { AddressFamily } from './enums/AddressFamily';
-import { LookupAddress } from 'dns';
+import * as utils from './utils';
+import { VERSION } from './version';
 
 /**
  * Dns instrumentation plugin for Opentelemetry
@@ -39,7 +40,7 @@ export class DnsPlugin extends BasePlugin<Dns> {
   protected _config!: DnsPluginConfig;
 
   constructor(readonly moduleName: string, readonly version: string) {
-    super();
+    super('@opentelemetry/plugin-dns', VERSION);
     // For now component is equal to moduleName but it can change in the future.
     this.component = this.moduleName;
     this._config = {};

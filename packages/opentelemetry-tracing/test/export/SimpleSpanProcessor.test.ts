@@ -17,14 +17,14 @@
 import * as assert from 'assert';
 import {
   Span,
-  BasicTracer,
+  BasicTracerRegistry,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
 import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
 
 describe('SimpleSpanProcessor', () => {
-  const tracer = new BasicTracer();
+  const registry = new BasicTracerRegistry();
   const exporter = new InMemorySpanExporter();
 
   describe('constructor', () => {
@@ -42,7 +42,12 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
       };
-      const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
+      const span = new Span(
+        registry.getTracer('default'),
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
       processor.onStart(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -60,7 +65,12 @@ describe('SimpleSpanProcessor', () => {
         spanId: '5e0c63257de34c92',
         traceFlags: TraceFlags.UNSAMPLED,
       };
-      const span = new Span(tracer, 'span-name', spanContext, SpanKind.CLIENT);
+      const span = new Span(
+        registry.getTracer('default'),
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
       processor.onStart(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 

@@ -1,6 +1,7 @@
 'use strict';
 
-const tracer = require('./tracer')('grpc-server-service');
+// eslint-disable-next-line import/order
+const tracer = require('./tracer')('example-grpc-capitalize-server');
 const { SpanKind } = require('@opentelemetry/types');
 const path = require('path');
 const grpc = require('grpc');
@@ -12,7 +13,6 @@ const PROTO_OPTIONS = {
 };
 const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
 const rpcProto = grpc.loadPackageDefinition(definition).rpc;
-
 
 /** Implements the Capitalize RPC method. */
 function capitalize(call, callback) {

@@ -1,6 +1,6 @@
 'use strict';
 
-const tracer = require('./tracer')('redis-client-service');
+const tracer = require('./tracer')('example-redis-client');
 const types = require('@opentelemetry/types');
 const axios = require('axios').default;
 

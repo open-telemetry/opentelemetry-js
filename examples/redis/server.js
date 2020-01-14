@@ -1,6 +1,7 @@
 'use strict';
 
-const tracer = require('./tracer')('redis-server-service');
+// eslint-disable-next-line import/order
+const tracer = require('./tracer')('example-redis-server');
 
 // Require in rest of modules
 const express = require('express');

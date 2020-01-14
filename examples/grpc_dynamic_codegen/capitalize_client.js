@@ -1,6 +1,7 @@
 'use strict';
 
-const tracer = require('./tracer')('grpc-client-service');
+// eslint-disable-next-line import/order
+const tracer = require('./tracer')('example-grpc-capitalize-client');
 const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');

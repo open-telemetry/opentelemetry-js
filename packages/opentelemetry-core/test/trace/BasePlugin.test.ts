@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { BasePlugin, NoopTracer, NoopLogger } from '../../src';
 import * as assert from 'assert';
 import * as path from 'path';
+import { BasePlugin, NoopLogger } from '../../src';
+import { NoopTracerRegistry } from '../../src/trace/NoopTracerRegistry';
 import * as types from './fixtures/test-package/foo/bar/internal';
 
-const tracer = new NoopTracer();
+const registry = new NoopTracerRegistry();
 const logger = new NoopLogger();
 
 describe('BasePlugin', () => {
@@ -28,7 +29,7 @@ describe('BasePlugin', () => {
       const testPackage = require('./fixtures/test-package');
       const plugin = new TestPlugin();
       assert.doesNotThrow(() => {
-        plugin.enable(testPackage, tracer, logger);
+        plugin.enable(testPackage, registry, logger);
       });
 
       // @TODO: https://github.com/open-telemetry/opentelemetry-js/issues/285
@@ -60,6 +61,10 @@ class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   readonly moduleName = 'test-package';
   readonly version = '0.1.0';
   readonly _basedir = basedir;
+
+  constructor() {
+    super('test-package.opentelemetry');
+  }
 
   protected readonly _internalFilesList = {
     '0.1.0': {

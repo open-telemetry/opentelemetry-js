@@ -15,12 +15,12 @@
  */
 
 import { Plugins } from './instrumentation/PluginLoader';
-import { BasicTracerConfig } from '@opentelemetry/tracing';
+import { TracerConfig } from '@opentelemetry/tracing';
 
 /**
  * NodeTracerConfig provides an interface for configuring a Node Tracer.
  */
-export interface NodeTracerConfig extends BasicTracerConfig {
+export interface NodeTracerConfig extends TracerConfig {
   /** Plugins options. */
   plugins?: Plugins;
 }
@@ -35,4 +35,5 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   pg: { enabled: true, path: '@opentelemetry/plugin-pg' },
   redis: { enabled: true, path: '@opentelemetry/plugin-redis' },
   ioredis: { enabled: true, path: '@opentelemetry/plugin-ioredis' },
+  'pg-pool': { enabled: true, path: '@opentelemetry/plugin-pg-pool' },
 };
