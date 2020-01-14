@@ -23,9 +23,9 @@ OpenTelemetry Mongodb Instrumentation allows the user to automatically collect t
 
 To load a specific plugin (mongodb in this case), specify it in the Node Tracer's configuration.
 ```js
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 
-const tracer = new NodeTracer({
+const registry = new NodeTracerRegistry({
   plugins: {
     mongodb: {
       enabled: true,
@@ -38,9 +38,9 @@ const tracer = new NodeTracer({
 
 To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 
-const tracer = new NodeTracer();
+const registry = new NodeTracerRegistry();
 ```
 
 See [examples/mongodb](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/mongodb) for a short example.

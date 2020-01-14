@@ -15,13 +15,13 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { BasicTracer, BasicTracerConfig } from '@opentelemetry/tracing';
+import { BasicTracerRegistry, TracerConfig } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
  */
-export interface WebTracerConfig extends BasicTracerConfig {
+export interface WebTracerConfig extends TracerConfig {
   /**
    * plugins to be used with tracer, they will be enabled automatically
    */
@@ -31,7 +31,7 @@ export interface WebTracerConfig extends BasicTracerConfig {
 /**
  * This class represents a web tracer with {@link StackScopeManager}
  */
-export class WebTracer extends BasicTracer {
+export class WebTracerRegistry extends BasicTracerRegistry {
   /**
    * Constructs a new Tracer instance.
    * @param config Web Tracer config

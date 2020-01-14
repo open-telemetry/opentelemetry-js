@@ -11,7 +11,7 @@ config.setupTracerAndExporters('http-mysql-server-service');
 const mysql = require('mysql');
 const http = require('http');
 
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-mysql-http-server');
 
 const pool = mysql.createPool({
   host     : 'localhost',

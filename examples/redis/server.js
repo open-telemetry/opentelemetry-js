@@ -4,7 +4,7 @@
 const opentelemetry = require('@opentelemetry/core');
 const config = require('./setup');
 config.setupTracerAndExporters('redis-server-service');
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-redis-server');
 
 // Require in rest of modules
 const express = require('express');

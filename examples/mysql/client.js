@@ -10,7 +10,7 @@ const config = require('./setup');
 config.setupTracerAndExporters('http-client-service');
 
 const http = require('http');
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-mysql-http-client');
 
 /** A function which makes requests and handles response. */
 function makeRequest() {

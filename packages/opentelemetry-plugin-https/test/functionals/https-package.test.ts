@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind, Span } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as https from 'https';
 import * as http from 'http';
@@ -29,37 +29,35 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracer } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-
-import { Http, HttpPluginConfig } from '@opentelemetry/plugin-http';
-import { customAttributeFunction } from './https-enable.test';
+import { Http } from '@opentelemetry/plugin-http';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 
 const memoryExporter = new InMemorySpanExporter();
-const protocol = 'https';
+
+export const customAttributeFunction = (span: Span): void => {
+  span.setAttribute('span kind', SpanKind.CLIENT);
+};
 
 describe('Packages', () => {
   describe('get', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const tracer = new NodeTracer({
+    const registry = new NodeTracerRegistry({
       logger,
       httpTextFormat,
     });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      const config: HttpPluginConfig = {
-        applyCustomAttributesOnSpan: customAttributeFunction,
-      };
-      plugin.enable((https as unknown) as Http, tracer, tracer.logger, config);
+      plugin.enable((https as unknown) as Http, registry, registry.logger);
     });
 
     after(() => {
@@ -95,8 +93,8 @@ describe('Packages', () => {
               // https://github.com/nock/nock/pull/1551
               // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
               // TODO: check if this is still the case when new version
-              `${protocol}://www.google.com`
-            : `${protocol}://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
+              'https://www.google.com'
+            : `https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {
