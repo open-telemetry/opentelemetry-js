@@ -37,7 +37,9 @@ describe('ConsoleMetricExporter', () => {
     it('should export information about metrics', () => {
       const spyConsole = sinon.spy(console, 'log');
 
-      const meter = new MeterRegistry().getMeter('test-console-metric-exporter');
+      const meter = new MeterRegistry().getMeter(
+        'test-console-metric-exporter'
+      );
       meter.addExporter(consoleExporter);
       const gauge = meter.createGauge('gauge', {
         description: 'a test description',
