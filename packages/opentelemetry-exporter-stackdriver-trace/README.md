@@ -21,11 +21,36 @@ Install the npm package `@opentelemetry/exporter-stackdriver-trace`
 $ npm install @opentelemetry/exporter-stackdriver-trace
 ```
 
-### Authentication
+## Usage
+
+Install the exporter on your application, register the exporter, and start tracing. If you are running in a GCP environment, the exporter will automatically authenticate using the environment's service account. If not, you will need to follow the instructions in [Authentication](#Authentication).
+
+```js
+const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
+
+const exporter = new StackdriverTraceExporter({
+  // If you are not in a GCP environment, you will need to provide your
+  // service account key here. See the Authentication section below.
+});
+
+tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
+```
+
+You can use the built-in `SimpleSpanProcessor` or `BatchSpanProcessor`, or write your own.
+
+- [SimpleSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#simple-processor): The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
+- [BatchSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#batching-processor): The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
+
+## Viewing your traces
+
+Visit the google cloud trace UI at https://console.cloud.google.com/traces/list?project=your-gcp-project-id
+
+
+## Authentication
 
 The Stackdriver Trace exporter supports authentication using service accounts. These can either be defined in a keyfile (usually called `service_account_key.json` or similar), or by the environment. If your application runs in a GCP environment, such as Compute Engine, you don't need to provide any application credentials. The client library will find the credentials by itself. For more information, go to <https://cloud.google.com/docs/authentication/>.
 
-#### Service account key
+### Service account key
 
 If you are not running in a GCP environment, you will need to give the service account credentials to the exporter.
 
@@ -44,30 +69,6 @@ const exporter = new StackdriverTraceExporter({
   },
 });
 ```
-
-## Usage
-
-Install the exporter on your application, register the exporter, and start tracing.
-
-```js
-const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
-
-const exporter = new StackdriverTraceExporter({
-  // If you are not in a GCP environment, you will need to provide your
-  // service account key here.
-});
-
-tracer.addSpanProcessor(new BatchSpanProcessor(exporter));
-```
-
-You can use the built-in `SimpleSpanProcessor` or `BatchSpanProcessor`, or write your own.
-
-- [SimpleSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#simple-processor): The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
-- [BatchSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#batching-processor): The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
-
-## Viewing your traces
-
-Visit the google cloud trace UI at https://console.cloud.google.com/traces/list?project=your-gcp-project-id
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

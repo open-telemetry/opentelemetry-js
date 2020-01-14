@@ -18,7 +18,9 @@ import { Logger } from '@opentelemetry/types';
 
 export interface StackdriverExporterOptions {
   /**
-   * Google Cloud Platform project ID
+   * Google Cloud Platform project ID where your traces will be stored.
+   * This is optional and will be inferred from your authentication
+   * credentials or from the GCP environment when not specified.
    */
   projectId?: string;
   /**
@@ -26,11 +28,15 @@ export interface StackdriverExporterOptions {
    */
   logger?: Logger;
   /**
-   * Path to a .json, .pem, or .p12 key file
+   * Path to a .json, .pem, or .p12 key file. This is optional and
+   * authentication keys will be inferred from the environment if you
+   * are running on GCP.
    */
   keyFilename?: string;
   /**
-   * Path to a .json, .pem, or .p12 key file
+   * Path to a .json, .pem, or .p12 key file. This is optional and
+   * authentication keys will be inferred from the environment if you
+   * are running on GCP.
    */
   keyFile?: string;
   /**

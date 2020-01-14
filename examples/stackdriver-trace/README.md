@@ -11,7 +11,9 @@ $ npm install
 
 ## Authenticate
 
-You will need to create a service account and save the service account key json in the root of this example named `service_account_key.json`. For more information, visit <https://cloud.google.com/docs/authentication/>.
+If you are running in a GCP environment, the exporter will automatically authenticate as the service account of your environment. Please make sure that it has permission to access stackdriver trace.
+
+If you are not running in a GCP environment you will need to create a service account and save the service account key json in the root of this example named `service_account_key.json`. For more information, visit <https://cloud.google.com/docs/authentication/>.
 
 ## Run the Application
 
