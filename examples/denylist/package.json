@@ -1,0 +1,29 @@
+{
+  "name": "denylist-example",
+  "private": true,
+  "version": "0.3.2",
+  "description": "Example of disabling named tracers using a deny list",
+  "main": "index.js",
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "grpc",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "file:../../packages/opentelemetry-core",
+    "@opentelemetry/tracing": "file:../../packages/opentelemetry-tracing"
+  }
+}
