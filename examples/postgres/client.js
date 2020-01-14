@@ -1,6 +1,7 @@
 'use strict';
 
 const tracer = require('./tracer')('postgres-client-service');
+// eslint-disable-next-line import/order
 const http = require('http');
 
 function makeRequest() {

@@ -39,7 +39,8 @@
     "@opentelemetry/plugin-xml-http-request": "^0.3.2",
     "@opentelemetry/scope-zone": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/web": "^0.3.2"
+    "@opentelemetry/web": "^0.3.2",
+    "@opentelemetry/core": "^0.3.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

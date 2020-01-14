@@ -1,5 +1,6 @@
 'use strict';
 
+// eslint-disable-next-line import/order
 const tracer = require('./tracer')('example-redis-client');
 const types = require('@opentelemetry/types');
 const axios = require('axios').default;
