@@ -22,7 +22,7 @@ Choose this kind of metric when the value is a quantity, the sum is of primary i
 const { MeterRegistry } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new MeterRegistry().getMeter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
   labelKeys: ["pid"],
@@ -43,7 +43,7 @@ Gauge metrics express a pre-calculated value. Generally, this kind of metric sho
 const { MeterRegistry } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new MeterRegistry().getMeter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const gauge = meter.createGauge('metric_name', {
   labelKeys: ["pid"],

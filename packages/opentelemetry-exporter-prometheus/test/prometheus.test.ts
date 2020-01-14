@@ -171,7 +171,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterRegistry().getMeter();
+      meter = new MeterRegistry().getMeter('test-prometheus');
       exporter.startServer(done);
     });
 
@@ -387,7 +387,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new MeterRegistry().getMeter();
+      meter = new MeterRegistry().getMeter('test-prometheus');
       gauge = meter.createGauge('gauge') as GaugeMetric;
       gauge.bind(meter.labels({ key1: 'labelValue1' })).set(10);
     });

@@ -3,7 +3,7 @@
 const { MeterRegistry } = require("@opentelemetry/metrics");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 
-const meter = new MeterRegistry().getMeter();
+const meter = new MeterRegistry().getMeter('example-prometheus');
 
 const exporter = new PrometheusExporter(
   {

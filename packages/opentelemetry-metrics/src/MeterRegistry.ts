@@ -31,11 +31,7 @@ export class MeterRegistry implements types.MeterRegistry {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
   }
 
-  getMeter(
-    name: string = 'default',
-    version = '*',
-    config?: MeterConfig
-  ): Meter {
+  getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
       this._meters.set(key, new Meter(config || this._config));

@@ -28,7 +28,7 @@ import { NoopMeterRegistry } from '../../src/metrics/NoopMeterRegistry';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
-    const meter = new NoopMeterRegistry().getMeter();
+    const meter = new NoopMeterRegistry().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
     const labels = {} as Labels;
     const labelSet = meter.labels(labels);

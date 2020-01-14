@@ -35,14 +35,14 @@ describe('MeterRegistry', () => {
 
   describe('getMeter', () => {
     it('should return an instance of Meter', () => {
-      const meter = new MeterRegistry().getMeter();
+      const meter = new MeterRegistry().getMeter('test-meter-registry');
       assert.ok(meter instanceof Meter);
     });
 
-    it('should return the meter with default name and version without any options', () => {
+    it('should return the meter with default version without version option', () => {
       const registry = new MeterRegistry();
-      const meter1 = registry.getMeter();
-      const meter2 = registry.getMeter('default', '*');
+      const meter1 = registry.getMeter('test');
+      const meter2 = registry.getMeter('test', '*');
       assert.deepEqual(meter1, meter2);
     });
 

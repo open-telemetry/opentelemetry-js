@@ -29,7 +29,7 @@ const options = {port: 9464, startServer: true};
 const exporter = new PrometheusExporter(options);
 
 // Register the exporter
-const meter = new MeterRegistry().getMeter();
+const meter = new MeterRegistry().getMeter('exporter-prometheus');
 meter.addExporter(exporter);
 
 // Now, start recording data

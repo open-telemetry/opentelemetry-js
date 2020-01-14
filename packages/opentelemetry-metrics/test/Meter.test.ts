@@ -46,7 +46,7 @@ describe('Meter', () => {
   beforeEach(() => {
     meter = new MeterRegistry({
       logger: new NoopLogger(),
-    }).getMeter('default');
+    }).getMeter('test-meter');
     labelSet = meter.labels(labels);
   });
 
