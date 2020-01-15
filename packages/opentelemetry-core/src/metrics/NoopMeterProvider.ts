@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterProvider';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+import * as types from '@opentelemetry/types';
+import { noopMeter } from './NoopMeter';
+
+/**
+ * An implementation of the {@link MeterProvider} which returns an impotent Meter
+ * for all calls to `getMeter`
+ */
+export class NoopMeterProvider implements types.MeterProvider {
+  getMeter(_name?: string, _version?: string): types.Meter {
+    return noopMeter;
+  }
+}

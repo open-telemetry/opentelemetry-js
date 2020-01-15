@@ -1,9 +1,9 @@
 "use strict";
 
-const { Meter } = require("@opentelemetry/metrics");
+const { MeterProvider } = require("@opentelemetry/metrics");
 const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 
-const meter = new Meter();
+const meter = new MeterProvider().getMeter('example-monitored');
 
 meter.addExporter(
   new PrometheusExporter(
