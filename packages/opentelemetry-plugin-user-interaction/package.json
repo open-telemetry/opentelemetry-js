@@ -43,9 +43,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@opentelemetry/plugin-xml-http-request": "^0.3.1",
-    "@opentelemetry/scope-zone-peer-dep": "^0.3.1",
-    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/plugin-xml-http-request": "^0.3.2",
+    "@opentelemetry/scope-zone-peer-dep": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.2",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
@@ -70,7 +70,7 @@
     "sinon": "^7.5.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
-    "ts-node": "^8.0.0",
+    "ts-node": "^8.6.2",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.6.4",
@@ -79,9 +79,9 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.1",
-    "@opentelemetry/types": "^0.3.1",
-    "@opentelemetry/web": "^0.3.1",
+    "@opentelemetry/core": "^0.3.2",
+    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/web": "^0.3.2",
     "shimmer": "^1.2.1"
   },
   "peerDependencies": {
