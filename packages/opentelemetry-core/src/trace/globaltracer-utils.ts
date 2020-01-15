@@ -15,31 +15,31 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { NoopTracerRegistry } from './NoopTracerRegistry';
+import { NoopTracerProvider } from './NoopTracerProvider';
 
-let globalTracerRegistry: types.TracerRegistry = new NoopTracerRegistry();
+let globalTracerProvider: types.TracerProvider = new NoopTracerProvider();
 
 /**
  * Set the current global tracer. Returns the initialized global tracer
  */
-export function initGlobalTracerRegistry(
-  tracerRegistry: types.TracerRegistry
-): types.TracerRegistry {
-  return (globalTracerRegistry = tracerRegistry);
+export function initGlobalTracerProvider(
+  tracerProvider: types.TracerProvider
+): types.TracerProvider {
+  return (globalTracerProvider = tracerProvider);
 }
 
 /**
- * Returns the global tracer registry.
+ * Returns the global tracer provider.
  */
-export function getTracerRegistry(): types.TracerRegistry {
-  // Return the global tracer registry
-  return globalTracerRegistry;
+export function getTracerProvider(): types.TracerProvider {
+  // Return the global tracer provider
+  return globalTracerProvider;
 }
 
 /**
- * Returns a tracer from the global tracer registry.
+ * Returns a tracer from the global tracer provider.
  */
 export function getTracer(name: string, version?: string): types.Tracer {
-  // Return the global tracer registry
-  return globalTracerRegistry.getTracer(name, version);
+  // Return the global tracer provider
+  return globalTracerProvider.getTracer(name, version);
 }

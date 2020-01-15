@@ -19,7 +19,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import { plugin, IORedisPlugin } from '../src';
 import * as ioredisTypes from 'ioredis';
 import { NoopLogger } from '@opentelemetry/core';
@@ -49,7 +49,7 @@ const okStatus: Status = {
 };
 
 describe('ioredis', () => {
-  const registry = new NodeTracerRegistry();
+  const provider = new NodeTracerProvider();
   let ioredis: typeof ioredisTypes;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
@@ -68,8 +68,8 @@ describe('ioredis', () => {
     }
 
     ioredis = require('ioredis');
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    plugin.enable(ioredis, registry, new NoopLogger());
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    plugin.enable(ioredis, provider, new NoopLogger());
   });
 
   after(() => {
@@ -84,7 +84,7 @@ describe('ioredis', () => {
 
   describe('#createClient()', () => {
     it('should propagate the current span to event handlers', done => {
-      const span = registry.getTracer('ioredis-test').startSpan('test span');
+      const span = provider.getTracer('ioredis-test').startSpan('test span');
       let client: ioredisTypes.Redis;
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
@@ -94,7 +94,7 @@ describe('ioredis', () => {
         const endedSpans = memoryExporter.getFinishedSpans();
 
         assert.strictEqual(
-          registry.getTracer('ioredis-test').getCurrentSpan(),
+          provider.getTracer('ioredis-test').getCurrentSpan(),
           span
         );
         assert.strictEqual(endedSpans.length, 2);
@@ -122,7 +122,7 @@ describe('ioredis', () => {
         client.quit(done);
       };
 
-      registry.getTracer('ioredis-test').withSpan(span, () => {
+      provider.getTracer('ioredis-test').withSpan(span, () => {
         client = new ioredis(URL);
         client.on('ready', readyHandler);
         client.on('error', errorHandler);
@@ -186,10 +186,10 @@ describe('ioredis', () => {
               ' '
             )}`,
           };
-          const span = registry
+          const span = provider
             .getTracer('ioredis-test')
             .startSpan('test span');
-          registry.getTracer('ioredis-test').withSpan(span, () => {
+          provider.getTracer('ioredis-test').withSpan(span, () => {
             command.method((err, _result) => {
               assert.ifError(err);
               assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
@@ -216,8 +216,8 @@ describe('ioredis', () => {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'hset hash random random',
         };
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        await registry.getTracer('ioredis-test').withSpan(span, async () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        await provider.getTracer('ioredis-test').withSpan(span, async () => {
           try {
             await client.hset('hash', 'random', 'random');
             assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
@@ -244,8 +244,8 @@ describe('ioredis', () => {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'scan 0',
         };
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        registry.getTracer('ioredis-test').withSpan(span, () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        provider.getTracer('ioredis-test').withSpan(span, () => {
           const stream = client.scanStream();
           stream
             .on('data', resultKeys => {
@@ -280,8 +280,8 @@ describe('ioredis', () => {
       });
 
       it('should create a child span for pubsub', async () => {
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        await registry.getTracer('ioredis-test').withSpan(span, async () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        await provider.getTracer('ioredis-test').withSpan(span, async () => {
           try {
             const pub = new ioredis(URL);
             const sub = new ioredis(URL);
@@ -339,8 +339,8 @@ describe('ioredis', () => {
           [AttributeNames.DB_STATEMENT]: 'eval return {KEYS[1],ARGV[1]} 1 test',
         };
 
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        registry.getTracer('ioredis-test').withSpan(span, () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        provider.getTracer('ioredis-test').withSpan(span, () => {
           // This will define a command echo:
           client.defineCommand('echo', {
             numberOfKeys: 1,
@@ -377,8 +377,8 @@ describe('ioredis', () => {
           [AttributeNames.DB_STATEMENT]: 'multi',
         };
 
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        registry.getTracer('ioredis-test').withSpan(span, () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        provider.getTracer('ioredis-test').withSpan(span, () => {
           client
             .multi()
             .set('foo', 'bar')
@@ -413,8 +413,8 @@ describe('ioredis', () => {
           [AttributeNames.DB_STATEMENT]: 'set foo bar',
         };
 
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        registry.getTracer('ioredis-test').withSpan(span, () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        provider.getTracer('ioredis-test').withSpan(span, () => {
           const pipeline = client.pipeline();
           pipeline.set('foo', 'bar');
           pipeline.del('cc');
@@ -446,8 +446,8 @@ describe('ioredis', () => {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'get test',
         };
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        await registry.getTracer('ioredis-test').withSpan(span, async () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        await provider.getTracer('ioredis-test').withSpan(span, async () => {
           try {
             const value = await client.get('test');
             assert.strictEqual(value, 'data');
@@ -475,8 +475,8 @@ describe('ioredis', () => {
           ...DEFAULT_ATTRIBUTES,
           [AttributeNames.DB_STATEMENT]: 'del test',
         };
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        await registry.getTracer('ioredis-test').withSpan(span, async () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        await provider.getTracer('ioredis-test').withSpan(span, async () => {
           try {
             const result = await client.del('test');
             assert.strictEqual(result, 1);
@@ -507,10 +507,10 @@ describe('ioredis', () => {
 
       IOREDIS_CALLBACK_OPERATIONS.forEach(operation => {
         it(`should not create a child span for cb style ${operation.description}`, done => {
-          const span = registry
+          const span = provider
             .getTracer('ioredis-test')
             .startSpan('test span');
-          registry.getTracer('ioredis-test').withSpan(span, () => {
+          provider.getTracer('ioredis-test').withSpan(span, () => {
             operation.method((err, _) => {
               assert.ifError(err);
               assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
@@ -525,8 +525,8 @@ describe('ioredis', () => {
       });
 
       it('should not create a child span for hset promise upon error', async () => {
-        const span = registry.getTracer('ioredis-test').startSpan('test span');
-        await registry.getTracer('ioredis-test').withSpan(span, async () => {
+        const span = provider.getTracer('ioredis-test').startSpan('test span');
+        await provider.getTracer('ioredis-test').withSpan(span, async () => {
           try {
             await client.hset('hash', 'random', 'random');
             assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);

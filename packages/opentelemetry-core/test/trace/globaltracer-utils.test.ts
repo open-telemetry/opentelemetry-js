@@ -17,12 +17,12 @@
 import * as assert from 'assert';
 import * as types from '@opentelemetry/types';
 import {
-  getTracerRegistry,
-  initGlobalTracerRegistry,
+  getTracerProvider,
+  initGlobalTracerProvider,
 } from '../../src/trace/globaltracer-utils';
 import { NoopTracer, NoopSpan } from '../../src';
 import { TraceFlags } from '@opentelemetry/types';
-import { NoopTracerRegistry } from '../../src/trace/NoopTracerRegistry';
+import { NoopTracerProvider } from '../../src/trace/NoopTracerProvider';
 
 describe('globaltracer-utils', () => {
   const functions = [
@@ -33,13 +33,13 @@ describe('globaltracer-utils', () => {
     'getHttpTextFormat',
   ];
 
-  it('should expose a tracer registry via getTracerRegistry', () => {
-    const tracer = getTracerRegistry();
+  it('should expose a tracer provider via getTracerProvider', () => {
+    const tracer = getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
   });
 
-  describe('GlobalTracerRegistry', () => {
+  describe('GlobalTracerProvider', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -48,12 +48,12 @@ describe('globaltracer-utils', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      initGlobalTracerRegistry(new NoopTracerRegistry());
+      initGlobalTracerProvider(new NoopTracerProvider());
     });
 
     it('should not crash', () => {
       functions.forEach(fn => {
-        const tracer = getTracerRegistry();
+        const tracer = getTracerProvider();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -65,9 +65,9 @@ describe('globaltracer-utils', () => {
       });
     });
 
-    it('should use the global tracer registry', () => {
-      initGlobalTracerRegistry(new TestTracerRegistry());
-      const tracer = getTracerRegistry().getTracer('name');
+    it('should use the global tracer provider', () => {
+      initGlobalTracerProvider(new TestTracerProvider());
+      const tracer = getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
@@ -81,7 +81,7 @@ describe('globaltracer-utils', () => {
       }
     }
 
-    class TestTracerRegistry extends NoopTracerRegistry {
+    class TestTracerProvider extends NoopTracerProvider {
       getTracer(_name: string, version?: string) {
         return new TestTracer();
       }

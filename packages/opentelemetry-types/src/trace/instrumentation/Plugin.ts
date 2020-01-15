@@ -15,7 +15,7 @@
  */
 
 import { Logger } from '../../common/Logger';
-import { TracerRegistry } from '../tracer_registry';
+import { TracerProvider } from '../tracer_provider';
 
 /** Interface Plugin to apply patch. */
 // tslint:disable-next-line:no-any
@@ -32,13 +32,13 @@ export interface Plugin<T = any> {
    * Method that enables the instrumentation patch.
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
-   * @param TracerRegistry a tracer registry.
+   * @param TracerProvider a tracer provider.
    * @param logger a logger instance.
    * @param [config] an object to configure the plugin.
    */
   enable(
     moduleExports: T,
-    TracerRegistry: TracerRegistry,
+    TracerProvider: TracerProvider,
     logger: Logger,
     config?: PluginConfig
   ): T;

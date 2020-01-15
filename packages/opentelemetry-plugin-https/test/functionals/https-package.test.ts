@@ -34,7 +34,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { Http } from '@opentelemetry/plugin-http';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -47,17 +47,17 @@ describe('Packages', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const registry = new NodeTracerRegistry({
+    const provider = new NodeTracerProvider({
       logger,
       httpTextFormat,
     });
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      plugin.enable((https as unknown) as Http, registry, registry.logger);
+      plugin.enable((https as unknown) as Http, provider, provider.logger);
     });
 
     after(() => {

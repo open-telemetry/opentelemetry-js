@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-import { Tracer } from './tracer';
+import * as types from '@opentelemetry/types';
+import { noopTracer } from './NoopTracer';
 
 /**
- * TracerRegistry provides an interface for creating {@link Tracer}s
+ * An implementation of the {@link TracerProvider} which returns an impotent Tracer
+ * for all calls to `getTracer`
  */
-export interface TracerRegistry {
-  /**
-   * Returns a Tracer, creating one if one with the given name and version is not already created
-   *
-   * If there is no Span associated with the current context, null is returned.
-   *
-   * @returns Tracer A Tracer with the given name and version
-   */
-  getTracer(name: string, version?: string): Tracer;
+export class NoopTracerProvider implements types.TracerProvider {
+  getTracer(_name?: string, _version?: string): types.Tracer {
+    return noopTracer;
+  }
 }

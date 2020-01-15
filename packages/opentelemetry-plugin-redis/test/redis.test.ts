@@ -19,7 +19,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import { plugin, RedisPlugin } from '../src';
 import * as redisTypes from 'redis';
 import { NoopLogger } from '@opentelemetry/core';
@@ -48,8 +48,8 @@ const okStatus: Status = {
 };
 
 describe('redis@2.x', () => {
-  const registry = new NodeTracerRegistry();
-  const tracer = registry.getTracer('external');
+  const provider = new NodeTracerProvider();
+  const tracer = provider.getTracer('external');
   let redis: typeof redisTypes;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
@@ -68,8 +68,8 @@ describe('redis@2.x', () => {
     }
 
     redis = require('redis');
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-    plugin.enable(redis, registry, new NoopLogger());
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    plugin.enable(redis, provider, new NoopLogger());
   });
 
   after(() => {

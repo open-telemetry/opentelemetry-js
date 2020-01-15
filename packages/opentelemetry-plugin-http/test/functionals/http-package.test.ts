@@ -28,7 +28,7 @@ import * as superagent from 'superagent';
 import * as got from 'got';
 import * as request from 'request-promise-native';
 import * as path from 'path';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -45,11 +45,11 @@ describe('Packages', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
-    const registry = new NodeTracerRegistry({
+    const provider = new NodeTracerProvider({
       logger,
       httpTextFormat,
     });
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -58,7 +58,7 @@ describe('Packages', () => {
       const config: HttpPluginConfig = {
         applyCustomAttributesOnSpan: customAttributeFunction,
       };
-      plugin.enable(http, registry, registry.logger, config);
+      plugin.enable(http, provider, provider.logger, config);
     });
 
     after(() => {

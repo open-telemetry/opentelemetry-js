@@ -18,9 +18,9 @@ npm install --save @opentelemetry/plugin-dns
 ## Usage
 
 ```js
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     dns: {
       enabled: true,
@@ -37,7 +37,7 @@ const registry = new NodeTracerRegistry({
 If you use Zipkin, you must use `ignoreHostnames` in order to not trace those calls. If the server is local. You can set :
 
 ```
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     dns: {
       enabled: true,

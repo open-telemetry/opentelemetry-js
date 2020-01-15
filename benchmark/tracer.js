@@ -2,26 +2,26 @@
 
 const benchmark = require('./benchmark');
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracerRegistry, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { BasicTracerProvider, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
 const exporter = new InMemorySpanExporter();
 const logger = new opentelemetry.NoopLogger();
 
 const setups = [
   {
-    name: 'BasicTracerRegistry',
-    registry: new BasicTracerRegistry({ logger })
+    name: 'BasicTracerProvider',
+    provider: new BasicTracerProvider({ logger })
   },
   {
-    name: 'NodeTracerRegistry',
-    registry: new NodeTracerRegistry({ logger })
+    name: 'NodeTracerProvider',
+    provider: new NodeTracerProvider({ logger })
   }
 ];
 
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
-  const tracer = setup.registry.getTracer("benchmark");
+  const tracer = setup.provider.getTracer("benchmark");
   const suite = benchmark()
     .add('#startSpan', function () {
       const span = tracer.startSpan('op');
@@ -55,7 +55,7 @@ for (const setup of setups) {
     .add('#startSpan with SimpleSpanProcessor', function () {
       const simpleSpanProcessor = new SimpleSpanProcessor(exporter);
 
-      registry.addSpanProcessor(simpleSpanProcessor);
+      provider.addSpanProcessor(simpleSpanProcessor);
       const span = tracer.startSpan('op');
       span.end();
 
@@ -64,7 +64,7 @@ for (const setup of setups) {
     .add('#startSpan with BatchSpanProcessor', function () {
       const batchSpanProcessor = new BatchSpanProcessor(exporter);
 
-      registry.addSpanProcessor(batchSpanProcessor);
+      provider.addSpanProcessor(batchSpanProcessor);
       const span = tracer.startSpan('op');
       span.end();
       batchSpanProcessor.shutdown();

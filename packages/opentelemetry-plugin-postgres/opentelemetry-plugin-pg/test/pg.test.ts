@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -81,8 +81,8 @@ const runCallbackTest = (
 
 describe('pg@7.x', () => {
   let client: pg.Client;
-  const registry = new NodeTracerRegistry();
-  const tracer = registry.getTracer('external');
+  const provider = new NodeTracerProvider();
+  const tracer = provider.getTracer('external');
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
   const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker
@@ -95,7 +95,7 @@ describe('pg@7.x', () => {
       this.test!.parent!.pending = true;
       this.skip();
     }
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testPostgresLocally) {
       testUtils.startDocker('postgres');
     }
@@ -116,7 +116,7 @@ describe('pg@7.x', () => {
   });
 
   beforeEach(function() {
-    plugin.enable(pg, registry, logger);
+    plugin.enable(pg, provider, logger);
   });
 
   afterEach(() => {

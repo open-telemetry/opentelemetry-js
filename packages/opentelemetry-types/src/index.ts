@@ -35,6 +35,6 @@ export * from './trace/span_kind';
 export * from './trace/status';
 export * from './trace/TimedEvent';
 export * from './trace/tracer';
-export * from './trace/tracer_registry';
+export * from './trace/tracer_provider';
 export * from './trace/trace_flags';
 export * from './trace/trace_state';

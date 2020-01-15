@@ -35,18 +35,18 @@ opentelemetry.initGlobalTracer(tracer);
 ## Usage in Node
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracerRegistry, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
 };
 
-const registry = new BasicTracerRegistry();
+const provider = new BasicTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
-registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.initGlobalTracerRegistry(registry);
+opentelemetry.initGlobalTracerProvider(provider);
 
 ```
 

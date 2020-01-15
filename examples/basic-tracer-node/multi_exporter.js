@@ -1,10 +1,10 @@
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracerRegistry, BatchSpanProcessor, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, BatchSpanProcessor, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
-const registry = new BasicTracerRegistry();
+const provider = new BasicTracerProvider();
 
 const zipkinExporter = new ZipkinExporter({serviceName: 'basic-service'});
 const jaegerExporter = new JaegerExporter({
@@ -14,18 +14,18 @@ const collectorExporter = new CollectorExporter({serviceName: 'basic-service'});
 
 // It is recommended to use this BatchSpanProcessor for better performance
 // and optimization, especially in production.
-registry.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
+provider.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
   bufferSize: 10 // This is added for example, default size is 100.
 }));
 
 // It is recommended to use SimpleSpanProcessor in case of Jaeger exporter as
 // it's internal client already handles the spans with batching logic.
-registry.addSpanProcessor(new SimpleSpanProcessor(jaegerExporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(jaegerExporter));
 
-registry.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
-opentelemetry.initGlobalTracerRegistry(registry);
+// Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
+opentelemetry.initGlobalTracerProvider(provider);
 const tracer = opentelemetry.getTracer('default');
 
 // Create a span. A span must be closed.

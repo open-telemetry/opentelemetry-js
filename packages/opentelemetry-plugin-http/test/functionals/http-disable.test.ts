@@ -22,7 +22,7 @@ import * as sinon from 'sinon';
 import { plugin } from '../../src/http';
 import {
   NoopLogger,
-  NoopTracerRegistry,
+  NoopTracerProvider,
   noopTracer,
 } from '@opentelemetry/core';
 import { AddressInfo } from 'net';
@@ -34,12 +34,12 @@ describe('HttpPlugin', () => {
 
   describe('disable()', () => {
     const logger = new NoopLogger();
-    const registry = new NoopTracerRegistry();
+    const provider = new NoopTracerProvider();
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable(http, registry, logger);
+      plugin.enable(http, provider, logger);
       // Ensure that http module is patched.
       assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       server = http.createServer((request, response) => {
@@ -65,7 +65,7 @@ describe('HttpPlugin', () => {
       server.close();
     });
     describe('unpatch()', () => {
-      it('should not call registry methods for creating span', async () => {
+      it('should not call provider methods for creating span', async () => {
         plugin.disable();
         const testPath = '/incoming/unpatch/';
 
