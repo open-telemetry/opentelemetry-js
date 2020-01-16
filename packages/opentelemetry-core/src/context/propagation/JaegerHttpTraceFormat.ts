@@ -38,7 +38,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     format: string,
     carrier: { [key: string]: unknown }
   ) {
-    const flags = TraceFlags.SAMPLED;
+    const flags = spanContext.traceFlags || TraceFlags.UNSAMPLED;
 
     carrier[
       UBER_TRACE_ID_HEADER
