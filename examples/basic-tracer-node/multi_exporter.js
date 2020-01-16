@@ -17,10 +17,9 @@ const collectorExporter = new CollectorExporter({serviceName: 'basic-service'});
 registry.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
   bufferSize: 10 // This is added for example, default size is 100.
 }));
-
-// It is recommended to use SimpleSpanProcessor in case of Jaeger exporter as
-// it's internal client already handles the spans with batching logic.
-registry.addSpanProcessor(new SimpleSpanProcessor(jaegerExporter));
+tracer.addSpanProcessor(new BatchSpanProcessor(jaegerExporter), {
+  bufferSize: 10
+});
 
 registry.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
