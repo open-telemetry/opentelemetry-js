@@ -18,10 +18,10 @@ import * as types from '@opentelemetry/types';
 import { noopMeter } from './NoopMeter';
 
 /**
- * An implementation of the {@link MeterProvider} which returns an impotent Meter
+ * An implementation of the {@link MeterRegistry} which returns an impotent Meter
  * for all calls to `getMeter`
  */
-export class NoopMeterProvider implements types.MeterProvider {
+export class NoopMeterRegistry implements types.MeterRegistry {
   getMeter(_name?: string, _version?: string): types.Meter {
     return noopMeter;
   }

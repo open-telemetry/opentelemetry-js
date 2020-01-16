@@ -17,9 +17,9 @@
 import { Meter } from './Meter';
 
 /**
- * MeterProvider provides an interface for creating {@link Meter}s
+ * MeterRegistry provides an interface for creating {@link Meter}s
  */
-export interface MeterProvider {
+export interface MeterRegistry {
   /**
    * Returns a Meter, creating one if one with the given name and version is not already created
    *

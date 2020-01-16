@@ -21,9 +21,9 @@ import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 
 /**
- * This class represents a meter provider which platform libraries can extend
+ * This class represents a meter registry which platform libraries can extend
  */
-export class MeterProvider implements types.MeterProvider {
+export class MeterRegistry implements types.MeterRegistry {
   private readonly _meters: Map<string, Meter> = new Map();
   readonly logger: Logger;
 
@@ -31,11 +31,7 @@ export class MeterProvider implements types.MeterProvider {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
   }
 
-  getMeter(
-    name: string = 'default',
-    version = '*',
-    config?: MeterConfig
-  ): Meter {
+  getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
       this._meters.set(key, new Meter(config || this._config));

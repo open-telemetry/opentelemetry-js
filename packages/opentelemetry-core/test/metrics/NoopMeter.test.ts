@@ -24,11 +24,11 @@ import {
   NOOP_MEASURE_METRIC,
 } from '../../src/metrics/NoopMeter';
 import { Labels } from '@opentelemetry/types';
-import { NoopMeterProvider } from '../../src/metrics/NoopMeterProvider';
+import { NoopMeterRegistry } from '../../src/metrics/NoopMeterRegistry';
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
-    const meter = new NoopMeterProvider().getMeter('test-noop');
+    const meter = new NoopMeterRegistry().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
     const labels = {} as Labels;
     const labelSet = meter.labels(labels);
