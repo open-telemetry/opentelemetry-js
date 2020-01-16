@@ -1,4 +1,4 @@
-# OpenTelemetry Propagation Jaeger
+# OpenTelemetry Propagator Jaeger
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -9,7 +9,7 @@ OpenTelemetry propagation Jaeger provide HTTP header propagation for systems tha
 Example of usage:
 ```javascript
 const { NodeTracerRegistry } = require('@opentelemetry/node');
-const { JaegerHttpTraceFormat } = require('@opentelemetry/propagation-jaeger');
+const { JaegerHttpTraceFormat } = require('@opentelemetry/propagator-jaeger');
 
 const registry = new NodeTracerRegistry({
   httpTextFormat: new JaegerHttpTraceFormat()

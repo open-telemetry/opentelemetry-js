@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/propagation-jaeger",
+  "name": "@opentelemetry/propagator-jaeger",
   "version": "0.3.2",
-  "description": "OpenTelemetry propagation Jaeger provide HTTP header propagation for systems that using Jaeger HTTP header format",
+  "description": "OpenTelemetry propagator Jaeger provide HTTP header propagation for systems that using Jaeger HTTP header format",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
