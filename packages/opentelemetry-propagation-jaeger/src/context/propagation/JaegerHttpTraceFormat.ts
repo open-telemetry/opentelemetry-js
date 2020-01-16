@@ -33,6 +33,12 @@ export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
  * Inspired by jaeger-client-node project
  */
 export class JaegerHttpTraceFormat implements HttpTextFormat {
+  private readonly _jaegerTraceHeader: string;
+
+  constructor(customTraceHeader?: string) {
+    this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
+  }
+
   inject(
     spanContext: SpanContext,
     format: string,
@@ -43,7 +49,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     ).toString(16)}`;
 
     carrier[
-      UBER_TRACE_ID_HEADER
+      this._jaegerTraceHeader
     ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
@@ -51,7 +57,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     format: string,
     carrier: { [key: string]: unknown }
   ): SpanContext | null {
-    const uberTraceIdHeader = carrier[UBER_TRACE_ID_HEADER];
+    const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
     if (!uberTraceIdHeader) return null;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]

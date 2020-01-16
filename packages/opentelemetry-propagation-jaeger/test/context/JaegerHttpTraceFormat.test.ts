@@ -23,6 +23,8 @@ import { SpanContext, TraceFlags } from '@opentelemetry/types';
 
 describe('JaegerHttpTraceFormat', () => {
   const jaegerHttpTraceFormat = new JaegerHttpTraceFormat();
+  const customHeader = 'new-header';
+  const customJaegerHttpTraceFormat = new JaegerHttpTraceFormat(customHeader);
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
@@ -43,6 +45,20 @@ describe('JaegerHttpTraceFormat', () => {
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01'
       );
     });
+
+    it('should use custom header if provided', () => {
+      const spanContext: SpanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      customJaegerHttpTraceFormat.inject(spanContext, '', carrier);
+      assert.deepStrictEqual(
+        carrier[customHeader],
+        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01'
+      );
+    });
   });
 
   describe('.extract()', () => {
@@ -50,6 +66,22 @@ describe('JaegerHttpTraceFormat', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '6e0c63257de34c92',
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
+    it('should use custom header if provided', () => {
+      carrier[customHeader] =
+        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
+      const extractedSpanContext = customJaegerHttpTraceFormat.extract(
+        '',
+        carrier
+      );
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '6e0c63257de34c92',
