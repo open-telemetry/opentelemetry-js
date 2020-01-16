@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from "@opentelemetry/types";
+import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
 
-export const UBER_TRACE_ID_HEADER = "uber-trace-id";
+export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
 /**
  * Propagates {@link SpanContext} through Trace Context format propagation.
@@ -64,7 +64,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
  * @return {string} - returns the input string without leading zeros.
  **/
 function removeLeadingZeros(input: string): string {
-  return input.replace(/^0+/, "");
+  return input.replace(/^0+/, '');
 }
 
 /**
@@ -72,7 +72,7 @@ function removeLeadingZeros(input: string): string {
  * @return {SpanContext} - returns a span context represented by the serializedString.
  **/
 function deserializeSpanContext(serializedString: string): SpanContext | null {
-  let headers = serializedString.split(":");
+  let headers = serializedString.split(':');
   if (headers.length !== 4) {
     return null;
   }
