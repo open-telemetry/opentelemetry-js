@@ -8,11 +8,12 @@
 OpenTelemetry propagation Jaeger provide HTTP header propagation for systems that using Jaeger HTTP header format.
 Example of usage:
 ```javascript
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 const { JaegerHttpTraceFormat } = require('@opentelemetry/propagation-jaeger');
-new NodeTracer({
+
+const registry = new NodeTracerRegistry({
   httpTextFormat: new JaegerHttpTraceFormat()
-})
+});
 ```
 
 
