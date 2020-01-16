@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import {
   JaegerHttpTraceFormat,
-  UBER_TRACE_ID_HEADER
+  UBER_TRACE_ID_HEADER,
 } from '../../src/context/propagation/JaegerHttpTraceFormat';
 import { SpanContext, TraceFlags } from '@opentelemetry/types';
 
@@ -49,10 +49,7 @@ describe('JaegerHttpTraceFormat', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:1';
-      const extractedSpanContext = jaegerHttpTraceFormat.extract(
-        '',
-        carrier
-      );
+      const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '6e0c63257de34c92',
@@ -63,10 +60,7 @@ describe('JaegerHttpTraceFormat', () => {
     });
 
     it('returns null if UBER_TRACE_ID_HEADER header is missing', () => {
-      assert.deepStrictEqual(
-        jaegerHttpTraceFormat.extract('', carrier),
-        null
-      );
+      assert.deepStrictEqual(jaegerHttpTraceFormat.extract('', carrier), null);
     });
 
     it('returns null if UBER_TRACE_ID_HEADER header is invalid', () => {

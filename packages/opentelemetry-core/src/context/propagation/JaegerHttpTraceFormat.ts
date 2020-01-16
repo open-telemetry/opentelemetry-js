@@ -55,7 +55,9 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     const parentSpanId = '0';
     const flags = TraceFlags.SAMPLED;
 
-    carrier[UBER_TRACE_ID_HEADER] = `${hexTraceId}:${hexSpanId}:${parentSpanId}:${flags}`;
+    carrier[
+      UBER_TRACE_ID_HEADER
+    ] = `${hexTraceId}:${hexSpanId}:${parentSpanId}:${flags}`;
   }
 
   extract(
@@ -70,7 +72,6 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
 
     return deserializeSpanContext(uberTraceId);
   }
-
 }
 
 /**
@@ -102,15 +103,10 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
   }
   const [traceId, spanId, , flags] = headers;
 
-  const traceFlags = Number(
-    '0x' +
-    (isNaN(Number(flags))
-      ? 1
-      : Number(flags))
-  ) & 1;
+  const traceFlags =
+    Number('0x' + (isNaN(Number(flags)) ? 1 : Number(flags))) & 1;
 
   const isRemote = true;
 
   return { traceId, spanId, isRemote, traceFlags };
 }
-
