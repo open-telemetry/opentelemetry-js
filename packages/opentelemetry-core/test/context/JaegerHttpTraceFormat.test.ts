@@ -40,7 +40,7 @@ describe('JaegerHttpTraceFormat', () => {
       jaegerHttpTraceFormat.inject(spanContext, '', carrier);
       assert.deepStrictEqual(
         carrier[UBER_TRACE_ID_HEADER],
-        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:1'
+        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01'
       );
     });
   });
@@ -48,7 +48,7 @@ describe('JaegerHttpTraceFormat', () => {
   describe('.extract()', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
-        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:1';
+        'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
