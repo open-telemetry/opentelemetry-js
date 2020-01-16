@@ -38,11 +38,13 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     format: string,
     carrier: { [key: string]: unknown }
   ) {
-    const flags = spanContext.traceFlags || TraceFlags.UNSAMPLED;
+    const traceFlags = `0${(
+      spanContext.traceFlags || TraceFlags.UNSAMPLED
+    ).toString(16)}`;
 
     carrier[
       UBER_TRACE_ID_HEADER
-    ] = `${spanContext.traceId}:${spanContext.spanId}:0:${flags}`;
+    ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
   extract(
