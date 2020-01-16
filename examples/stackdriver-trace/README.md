@@ -26,6 +26,8 @@ $ npm start
 
 https://console.cloud.google.com/traces/list?project=your-project-id
 
+<p align="center"><img src="images/trace.png?raw=true"/></p>
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
