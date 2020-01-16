@@ -187,10 +187,10 @@ describe('pg-pool@2.x', () => {
             return done(err);
           }
           if (!release) {
-            throw new Error("Did not receive release function")
+            throw new Error('Did not receive release function');
           }
           if (!client) {
-            throw new Error("No client received")
+            throw new Error('No client received');
           }
           release();
           assert.ok(client);
