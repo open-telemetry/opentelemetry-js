@@ -38,11 +38,11 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     format: string,
     carrier: { [key: string]: unknown }
   ) {
-    const hexTraceId = removeLeadingZeros(spanContext.traceId);
-    const hexSpanId = removeLeadingZeros(spanContext.spanId);
     const flags = TraceFlags.SAMPLED;
 
-    carrier[UBER_TRACE_ID_HEADER] = `${hexTraceId}:${hexSpanId}:0:${flags}`;
+    carrier[
+      UBER_TRACE_ID_HEADER
+    ] = `${spanContext.traceId}:${spanContext.spanId}:0:${flags}`;
   }
 
   extract(
@@ -57,14 +57,6 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
 
     return deserializeSpanContext(uberTraceId);
   }
-}
-
-/**
- * @param {string} input - the input for which leading zeros should be removed.
- * @return {string} - returns the input string without leading zeros.
- **/
-function removeLeadingZeros(input: string): string {
-  return input.replace(/^0+/, '');
 }
 
 /**
