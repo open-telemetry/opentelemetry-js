@@ -1,4 +1,4 @@
-# OpenTelemetry Core
+# OpenTelemetry Propagation Jaeger
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
