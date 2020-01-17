@@ -16,7 +16,6 @@
 
 import { ConsoleLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { Logger } from '@opentelemetry/types';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 
@@ -25,7 +24,7 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
  */
 export class MeterRegistry implements types.MeterRegistry {
   private readonly _meters: Map<string, Meter> = new Map();
-  readonly logger: Logger;
+  readonly logger: types.Logger;
 
   constructor(private _config: MeterConfig = DEFAULT_CONFIG) {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
