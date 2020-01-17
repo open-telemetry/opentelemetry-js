@@ -42,7 +42,11 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
     return null;
   }
 
-  return { traceId: match[1], spanId: match[2], traceFlags: parseInt(match[3], 16) };
+  return {
+    traceId: match[1],
+    spanId: match[2],
+    traceFlags: parseInt(match[3], 16),
+  };
 }
 
 /**
@@ -59,7 +63,7 @@ export class HttpTraceContext implements HttpTextFormat {
   ) {
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
-      }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
+    }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
 
     carrier[TRACE_PARENT_HEADER] = traceParent;
     if (spanContext.traceState) {
