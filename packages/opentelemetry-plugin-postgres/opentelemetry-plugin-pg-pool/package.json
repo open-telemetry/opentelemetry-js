@@ -54,6 +54,7 @@
     "@types/pg-pool": "^2.0.1",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
+    "cross-env": "^6.0.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
     "nyc": "^14.1.1",
