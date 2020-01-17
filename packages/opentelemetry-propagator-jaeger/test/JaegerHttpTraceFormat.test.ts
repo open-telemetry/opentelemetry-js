@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import {
   JaegerHttpTraceFormat,
   UBER_TRACE_ID_HEADER,
-} from '../../src/context/propagation/JaegerHttpTraceFormat';
+} from '../src/JaegerHttpTraceFormat';
 import { SpanContext, TraceFlags } from '@opentelemetry/types';
 
 describe('JaegerHttpTraceFormat', () => {

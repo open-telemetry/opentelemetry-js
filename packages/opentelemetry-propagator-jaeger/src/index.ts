@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export * from './context/propagation/JaegerHttpTraceFormat';
+export * from './JaegerHttpTraceFormat';
