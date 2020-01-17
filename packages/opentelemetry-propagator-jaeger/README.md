@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-OpenTelemetry propagator-jaeger provide HTTP header propagation for systems that using Jaeger HTTP header format.
+OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.
 
 Format:
 {trace-id}:{span-id}:{parent-span-id}:{flags}
