@@ -238,7 +238,7 @@ Create a file named `monitoring.js` and add the following code:
 ```javascript
 'use strict';
 
-const { MeterRegistry } = require("@opentelemetry/metrics");
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
 const meter = new MeterRegistry().getMeter('your-meter-name');
 ```
@@ -248,7 +248,7 @@ Now, you can require this file from your application code and use the `Meter` to
 ```javascript
 'use strict';
 
-const { MeterRegistry } = require("@opentelemetry/metrics");
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
 const meter = new MeterRegistry().getMeter('your-meter-name');
 
@@ -301,8 +301,8 @@ Next, modify your `monitoring.js` file to look like this:
 ```javascript
 "use strict";
 
-const { MeterRegistry } = require("@opentelemetry/metrics");
-const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+const { MeterRegistry } = require('@opentelemetry/metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const meter = new MeterRegistry().getMeter('your-meter-name');
 

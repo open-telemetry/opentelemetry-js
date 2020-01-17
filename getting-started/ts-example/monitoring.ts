@@ -1,6 +1,6 @@
-import { MeterRegistry } from "@opentelemetry/metrics";
-import { Metric, BoundCounter } from "@opentelemetry/types";
-import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
+import { MeterRegistry } from '@opentelemetry/metrics';
+import { Metric, BoundCounter } from '@opentelemetry/types';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 const meter = new MeterRegistry().getMeter('example-ts');
 

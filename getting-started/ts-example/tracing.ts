@@ -1,8 +1,8 @@
-import * as opentelemetry from "@opentelemetry/core";
-import { NodeTracer } from "@opentelemetry/node";
+import * as opentelemetry from '@opentelemetry/core';
+import { NodeTracer } from '@opentelemetry/node';
 
-import { SimpleSpanProcessor } from "@opentelemetry/tracing";
-import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
+import { SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 
 const tracer: NodeTracer = new NodeTracer({
   logLevel: opentelemetry.LogLevel.ERROR

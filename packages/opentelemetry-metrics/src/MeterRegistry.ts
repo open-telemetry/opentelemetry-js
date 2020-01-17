@@ -30,6 +30,11 @@ export class MeterRegistry implements types.MeterRegistry {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
   }
 
+  /**
+   * Returns a Meter, creating one if one with the given name and version is not already created
+   *
+   * @returns Meter A Meter with the given name and version
+   */
   getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
