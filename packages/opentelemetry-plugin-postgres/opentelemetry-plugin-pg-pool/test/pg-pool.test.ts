@@ -94,8 +94,8 @@ describe('pg-pool@2.x', () => {
   let pool: pgPool<pg.Client>;
   const registry = new NodeTracerRegistry();
   const logger = new NoopLogger();
-  const testPostgres = process.env.TEST_POSTGRES; // For CI: assumes local postgres db is already available
-  const testPostgresLocally = process.env.TEST_POSTGRES_LOCAL; // For local: spins up local postgres db via docker
+  const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
+  const testPostgresLocally = process.env.RUN_POSTGRES_TESTS_LOCAL; // For local: spins up local postgres db via docker
   const shouldTest = testPostgres || testPostgresLocally; // Skips these tests if false (default)
 
   before(function(done) {
@@ -192,10 +192,10 @@ describe('pg-pool@2.x', () => {
           if (!client) {
             throw new Error('No client received');
           }
-          release();
           assert.ok(client);
           runCallbackTest(parentSpan, pgPoolattributes, events, okStatus, 1, 0);
           client.query('SELECT NOW()', (err, ret) => {
+            release();
             if (err) {
               return done(err);
             }
