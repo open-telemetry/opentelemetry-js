@@ -75,6 +75,19 @@ describe('JaegerHttpTraceFormat', () => {
       });
     });
 
+    it('should extract context of a sampled span from carrier with 1 bit flag', () => {
+      carrier[UBER_TRACE_ID_HEADER] =
+        '9c41e35aeb6d1272:45fd2a9709dadcf1:a13699e3fb724f40:1';
+      const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '45fd2a9709dadcf1',
+        traceId: '9c41e35aeb6d1272',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
     it('should use custom header if provided', () => {
       carrier[customHeader] =
         'd4cda95b652f4a1592b449d5929fda1b:6e0c63257de34c92:0:01';
