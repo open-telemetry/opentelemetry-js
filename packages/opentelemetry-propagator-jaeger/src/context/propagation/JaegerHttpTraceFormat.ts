@@ -22,23 +22,32 @@ export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
  * Propagates {@link SpanContext} through Trace Context format propagation.
  * {trace-id}:{span-id}:{parent-span-id}:{flags}
  * {trace-id}
- * 64-bit or 128-bit random number in base16 format
- * Can be variable length, shorter values are 0-padded on the left
- * Value of 0 is invalid
+ * 64-bit or 128-bit random number in base16 format.
+ * Can be variable length, shorter values are 0-padded on the left.
+ * Value of 0 is invalid.
  * {span-id}
- * 64-bit random number in base16 format
- * {parent-span-id} set to 0 because this field is deprecated
+ * 64-bit random number in base16 format.
+ * {parent-span-id}
+ * Set to 0 because this field is deprecated.
  * {flags}
- * One byte bitmap, as two hex digits
- * Inspired by jaeger-client-node project
+ * One byte bitmap, as two hex digits.
+ * Inspired by jaeger-client-node project.
  */
 export class JaegerHttpTraceFormat implements HttpTextFormat {
   private readonly _jaegerTraceHeader: string;
 
+  /**
+   * @param {string} [customTraceHeader="uber-trace-id"] - HTTP header to inject\extract trace from.
+   **/
   constructor(customTraceHeader?: string) {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
+  /**
+   * @param {SpanContext} spanContext - context from which we take information to inject in carrier.
+   * @param {string} format - unused.
+   * @param { [key: string]: unknown } carrier - a carrier to which span information will be injected.
+   **/
   inject(
     spanContext: SpanContext,
     format: string,
@@ -53,6 +62,11 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
+  /**
+   * @param {string} format - unused.
+   * @param { [key: string]: unknown } carrier - a carrier from which span context will be constructed.
+   * @return {SpanContext} - returns a span context extracted from carrier.
+   **/
   extract(
     format: string,
     carrier: { [key: string]: unknown }
