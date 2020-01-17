@@ -186,12 +186,16 @@ describe('pg-pool@2.x', () => {
           if (err) {
             return done(err);
           }
+          if (!release) {
+            throw new Error('Did not receive release function');
+          }
+          if (!client) {
+            throw new Error('No client received');
+          }
           assert.ok(client);
           runCallbackTest(parentSpan, pgPoolattributes, events, okStatus, 1, 0);
           client.query('SELECT NOW()', (err, ret) => {
-            if (release) {
-              release();
-            }
+            release();
             if (err) {
               return done(err);
             }
