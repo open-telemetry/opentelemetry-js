@@ -1,0 +1,37 @@
+{
+  "name": "example-stackdriver-trace",
+  "private": true,
+  "version": "0.3.1",
+  "description": "Example of using @opentelemetry/exporter-stackdriver-trace in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "cross-env GOOGLE_APPLICATION_CREDENTIALS=service_account_key.json node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "http",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/exporter-stackdriver-trace": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}
