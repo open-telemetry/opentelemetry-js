@@ -73,6 +73,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-mysql/node_modules
     - packages/opentelemetry-exporter-collector/node_modules
     - packages/opentelemetry-plugin-xml-http-request/node_modules
+    - packages/opentelemetry-exporter-stackdriver-trace/node_modules
 
 node_unit_tests: &node_unit_tests
   steps:
