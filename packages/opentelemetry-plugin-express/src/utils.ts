@@ -21,6 +21,8 @@ import {
   PatchedRequest,
   _MIDDLEWARES_STORE_PROPERTY,
   ExpressLayerType,
+  IgnoreMatcher,
+  ExpressPluginConfig,
 } from './types';
 
 /**
@@ -62,6 +64,7 @@ export const getLayerMetadata = (
   } else if (layer.name === 'bound dispatch') {
     return {
       attributes: {
+        [AttributeNames.EXPRESS_NAME]: layerPath ?? 'request handler',
         [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.REQUEST_HANDLER,
       },
       name: 'request handler',
@@ -98,4 +101,56 @@ export const patchEnd = (span: Span, resultHandler: Function): Function => {
     span.end();
     return resultHandler.apply(this, args);
   };
+};
+
+/**
+ * Check whether the given obj match pattern
+ * @param constant e.g URL of request
+ * @param obj obj to inspect
+ * @param pattern Match pattern
+ */
+const satisfiesPattern = <T>(
+  constant: string,
+  pattern: IgnoreMatcher
+): boolean => {
+  if (typeof pattern === 'string') {
+    return pattern === constant;
+  } else if (pattern instanceof RegExp) {
+    return pattern.test(constant);
+  } else if (typeof pattern === 'function') {
+    return pattern(constant);
+  } else {
+    throw new TypeError('Pattern is in unsupported datatype');
+  }
+};
+
+/**
+ * Check whether the given request is ignored by configuration
+ * It will not re-throw exceptions from `list` provided by the client
+ * @param constant e.g URL of request
+ * @param [list] List of ignore patterns
+ * @param [onException] callback for doing something when an exception has
+ *     occurred
+ */
+export const isLayerIgnored = (
+  name: string,
+  type: ExpressLayerType,
+  config?: ExpressPluginConfig
+): boolean => {
+  if (
+    Array.isArray(config?.ignoreLayersType) &&
+    config?.ignoreLayersType?.includes(type)
+  ) {
+    return true;
+  }
+  if (Array.isArray(config?.ignoreLayers) === false) return false;
+  try {
+    for (const pattern of config!.ignoreLayers!) {
+      if (satisfiesPattern(name, pattern)) {
+        return true;
+      }
+    }
+  } catch (e) {}
+
+  return false;
 };

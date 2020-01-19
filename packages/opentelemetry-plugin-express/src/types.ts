@@ -16,6 +16,7 @@
 
 import { kLayerPatched } from './express';
 import { Request } from 'express';
+import { PluginConfig, Attributes } from '@opentelemetry/types';
 
 export const _MIDDLEWARES_STORE_PROPERTY = '__ot_middlewares';
 
@@ -45,6 +46,11 @@ export type ExpressLayer = {
   regexp: RegExp;
 };
 
+export type LayerMetadata = {
+  attributes: Attributes;
+  name: string;
+};
+
 // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md#databases-client-calls
 export enum AttributeNames {
   COMPONENT = 'component',
@@ -57,4 +63,16 @@ export enum ExpressLayerType {
   ROUTER = 'router',
   MIDDLEWARE = 'middleware',
   REQUEST_HANDLER = 'request_handler',
+}
+
+export type IgnoreMatcher = string | RegExp | ((name: string) => boolean);
+
+/**
+ * Options available for the Express Plugin (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-express#express-plugin-options))
+ */
+export interface ExpressPluginConfig extends PluginConfig {
+  /** Ingore specific based on their name */
+  ignoreLayers?: IgnoreMatcher[];
+  /** Ignore specific layers based on their type */
+  ignoreLayersType?: ExpressLayerType[];
 }

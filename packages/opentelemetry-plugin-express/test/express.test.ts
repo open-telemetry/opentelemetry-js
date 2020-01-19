@@ -25,7 +25,11 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { AttributeNames } from '../src/types';
+import {
+  AttributeNames,
+  ExpressPluginConfig,
+  ExpressLayerType,
+} from '../src/types';
 
 const httpRequest = {
   get: (options: http.ClientRequestArgs | string) => {
@@ -56,6 +60,10 @@ describe('Express Plugin', () => {
 
   before(() => {
     plugin.enable(express, registry, logger);
+  });
+
+  afterEach(() => {
+    memoryExporter.reset();
   });
 
   describe('Instrumenting normal get operations', () => {
@@ -117,6 +125,78 @@ describe('Express Plugin', () => {
             .getFinishedSpans()
             .find(span => span.name === 'rootSpan');
           assert(exportedRootSpan !== undefined);
+          server.close();
+          return done();
+        });
+      });
+    });
+  });
+
+  describe('Instrumenting with specific config', () => {
+    it('should ignore specific middlewares based on config', done => {
+      plugin.disable();
+      const config: ExpressPluginConfig = {
+        ignoreLayersType: [ExpressLayerType.MIDDLEWARE],
+      };
+      plugin.enable(express, registry, logger, config);
+      const rootSpan = tracer.startSpan('rootSpan');
+      const app = express();
+      app.use(express.json());
+      app.use(function customMiddleware(req, res, next) {
+        for (let i = 0; i < 1000; i++) {
+          continue;
+        }
+        return next();
+      });
+      const server = http.createServer(app);
+      server.listen(0, () => {
+        const port = (server.address() as AddressInfo).port;
+        assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+        tracer.withSpan(rootSpan, async () => {
+          await httpRequest.get(`http://localhost:${port}/toto/tata`);
+          rootSpan.end();
+          assert.deepEqual(
+            memoryExporter
+              .getFinishedSpans()
+              .filter(
+                span =>
+                  span.attributes[AttributeNames.EXPRESS_TYPE] ===
+                  ExpressLayerType.MIDDLEWARE
+              ).length,
+            0
+          );
+          let exportedRootSpan = memoryExporter
+            .getFinishedSpans()
+            .find(span => span.name === 'rootSpan');
+          assert(exportedRootSpan !== undefined);
+          server.close();
+          return done();
+        });
+      });
+    });
+  });
+
+  describe('Disabling plugin', () => {
+    it('should not create new spans', done => {
+      plugin.disable();
+      const rootSpan = tracer.startSpan('rootSpan');
+      const app = express();
+      app.use(express.json());
+      app.use(function customMiddleware(req, res, next) {
+        for (let i = 0; i < 1000; i++) {
+          continue;
+        }
+        return next();
+      });
+      const server = http.createServer(app);
+      server.listen(0, () => {
+        const port = (server.address() as AddressInfo).port;
+        assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+        tracer.withSpan(rootSpan, async () => {
+          await httpRequest.get(`http://localhost:${port}/toto/tata`);
+          rootSpan.end();
+          assert.deepEqual(memoryExporter.getFinishedSpans().length, 1);
+          assert(memoryExporter.getFinishedSpans()[0] !== undefined);
           server.close();
           return done();
         });

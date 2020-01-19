@@ -27,8 +27,15 @@ import {
   Parameters,
   PathParams,
   _MIDDLEWARES_STORE_PROPERTY,
+  ExpressPluginConfig,
+  ExpressLayerType,
 } from './types';
-import { getLayerMetadata, storeLayerPath, patchEnd } from './utils';
+import {
+  getLayerMetadata,
+  storeLayerPath,
+  patchEnd,
+  isLayerIgnored,
+} from './utils';
 import { VERSION } from './version';
 
 /**
@@ -41,6 +48,7 @@ export const kLayerPatched: unique symbol = Symbol('express-layer-patched');
 export class ExpressPlugin extends BasePlugin<typeof express> {
   readonly _COMPONENT = 'express';
   readonly supportedVersions = ['^4.0.0'];
+  protected _config!: ExpressPluginConfig;
 
   constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-express', VERSION);
@@ -72,6 +80,15 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
     );
 
     return this._moduleExports;
+  }
+
+  /** Unpatches all Express patched functions. */
+  unpatch(): void {
+    const routerProto = (this._moduleExports
+      .Router as unknown) as express.Router;
+    shimmer.unwrap(routerProto, 'use');
+    shimmer.unwrap(routerProto, 'route');
+    shimmer.unwrap(this._moduleExports.application, 'use');
   }
 
   /**
@@ -141,13 +158,6 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
     } as any;
   }
 
-  /** Unpatches all Express patched functions. */
-  unpatch(): void {
-    shimmer.unwrap(this._moduleExports.Router.prototype, 'use');
-    shimmer.unwrap(this._moduleExports.Router.prototype, 'route');
-    shimmer.unwrap(this._moduleExports.application, 'use');
-  }
-
   /** Patch each express layer to create span and propagate scope */
   private _applyPatch(layer: ExpressLayer, layerPath?: string) {
     const plugin = this;
@@ -170,7 +180,13 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           [AttributeNames.HTTP_ROUTE]: route.length > 0 ? route : undefined,
         };
         const metadata = getLayerMetadata(layer, layerPath);
-
+        const type = metadata.attributes[
+          AttributeNames.EXPRESS_TYPE
+        ] as ExpressLayerType;
+        // verify against the config if the layer should be ignored
+        if (isLayerIgnored(metadata.name, type, plugin._config)) {
+          return original.apply(this, arguments);
+        }
         const span = plugin._tracer.startSpan(metadata.name, {
           parent: plugin._tracer.getCurrentSpan(),
           attributes: Object.assign(attributes, metadata.attributes),

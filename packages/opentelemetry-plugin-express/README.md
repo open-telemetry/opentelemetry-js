@@ -45,6 +45,20 @@ const registry = new NodeTracerRegistry();
 
 See [examples/express](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/express) for a short example.
 
+### Express Plugin Options
+
+Express plugin has few options available to choose from. You can set the following:
+
+| Options | Type | Description |
+| ------- | ---- | ----------- |
+| `ignoreLayers` | `IgnoreMatcher[]` | Express plugin will not trace all layers that match. |
+| `ignoreLayersType`| `ExpressLayerType[]` | Express plugin will ignore the layers that match based on their type. |
+
+For reference, here are the three different layer type:
+  - `router` is the name of `express.Router()`
+  - `middleware`
+  - `request_handler` is the name for anything thats not a router or a middleware.
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
