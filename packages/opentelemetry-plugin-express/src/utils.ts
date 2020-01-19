@@ -20,7 +20,7 @@ import {
   AttributeNames,
   PatchedRequest,
   _MIDDLEWARES_STORE_PROPERTY,
-  ExpressLayerType
+  ExpressLayerType,
 } from './types';
 
 /**
@@ -37,42 +37,45 @@ export const storeLayerPath = (request: PatchedRequest, value?: string) => {
   }
   if (value === undefined) return;
   (request[_MIDDLEWARES_STORE_PROPERTY] as string[]).push(value);
-}
+};
 
 /**
  * Parse express layer context to retrieve a name and attributes.
  * @param layer Express layer
  * @param [layerPath] if present, the path on which the layer has been mounted
  */
-export const getLayerMetadata = (layer: ExpressLayer, layerPath?: string): {
-  attributes: Attributes,
-  name: string
+export const getLayerMetadata = (
+  layer: ExpressLayer,
+  layerPath?: string
+): {
+  attributes: Attributes;
+  name: string;
 } => {
   if (layer.name === 'router') {
     return {
       attributes: {
         [AttributeNames.EXPRESS_NAME]: layerPath,
-        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.ROUTER
+        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.ROUTER,
       },
-      name: `router - ${layerPath}`
-    }
+      name: `router - ${layerPath}`,
+    };
   } else if (layer.name === 'bound dispatch') {
     return {
       attributes: {
-        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.REQUEST_HANDLER
+        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.REQUEST_HANDLER,
       },
-      name: 'request handler'
-    }
+      name: 'request handler',
+    };
   } else {
     return {
       attributes: {
         [AttributeNames.EXPRESS_NAME]: layer.name,
-        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.MIDDLEWARE
+        [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.MIDDLEWARE,
       },
-      name: `middleware - ${layer.name}`
-    }
+      name: `middleware - ${layer.name}`,
+    };
   }
-}
+};
 
 /**
  * Ends a created span.
@@ -95,4 +98,4 @@ export const patchEnd = (span: Span, resultHandler: Function): Function => {
     span.end();
     return resultHandler.apply(this, args);
   };
-}
+};

@@ -17,10 +17,12 @@
 import { kLayerPatched } from './express';
 import { Request } from 'express';
 
-export const _MIDDLEWARES_STORE_PROPERTY = '__ot_middlewares'
+export const _MIDDLEWARES_STORE_PROPERTY = '__ot_middlewares';
 
 export type Parameters<T> = T extends (...args: infer T) => any ? T : unknown[];
-export type PatchedRequest = { [_MIDDLEWARES_STORE_PROPERTY]?: string[] } & Request;
+export type PatchedRequest = {
+  [_MIDDLEWARES_STORE_PROPERTY]?: string[];
+} & Request;
 export type PathParams = string | RegExp | Array<string | RegExp>;
 
 // https://github.com/expressjs/express/blob/master/lib/router/index.js#L53
@@ -54,5 +56,5 @@ export enum AttributeNames {
 export enum ExpressLayerType {
   ROUTER = 'router',
   MIDDLEWARE = 'middleware',
-  REQUEST_HANDLER = 'request_handler'
+  REQUEST_HANDLER = 'request_handler',
 }

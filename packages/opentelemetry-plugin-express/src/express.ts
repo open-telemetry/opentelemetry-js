@@ -17,7 +17,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { Attributes } from '@opentelemetry/types';
 import * as express from 'express';
-import * as core from "express-serve-static-core";
+import * as core from 'express-serve-static-core';
 import * as shimmer from 'shimmer';
 import {
   ExpressLayer,
@@ -26,13 +26,9 @@ import {
   PatchedRequest,
   Parameters,
   PathParams,
-  _MIDDLEWARES_STORE_PROPERTY
+  _MIDDLEWARES_STORE_PROPERTY,
 } from './types';
-import {
-  getLayerMetadata,
-  storeLayerPath,
-  patchEnd,
-} from './utils'
+import { getLayerMetadata, storeLayerPath, patchEnd } from './utils';
 import { VERSION } from './version';
 
 /**
@@ -59,7 +55,8 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
     if (this._moduleExports === undefined || this._moduleExports === null) {
       return this._moduleExports;
     }
-    const routerProto = (this._moduleExports.Router as unknown) as express.Router;
+    const routerProto = (this._moduleExports
+      .Router as unknown) as express.Router;
 
     this._logger.debug('patching express.Router.prototype.route');
     shimmer.wrap(routerProto, 'route', this._getRoutePatch.bind(this));
@@ -68,52 +65,67 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
     shimmer.wrap(routerProto, 'use', this._getRouterUsePatch.bind(this));
 
     this._logger.debug('patching express.Application.use');
-    shimmer.wrap(this._moduleExports.application, 'use', this._getAppUsePatch.bind(this));
+    shimmer.wrap(
+      this._moduleExports.application,
+      'use',
+      this._getAppUsePatch.bind(this)
+    );
 
     return this._moduleExports;
   }
 
   /**
    * Get the patch for Router.route function
-   * @param original 
+   * @param original
    */
-  private _getRoutePatch (original: (path: PathParams) => express.IRoute) {
-    const plugin = this
+  private _getRoutePatch(original: (path: PathParams) => express.IRoute) {
+    const plugin = this;
     return function route_trace(
       this: ExpressRouter,
       ...args: Parameters<typeof original>
     ) {
       const route = original.apply(this, args);
       const layer = this.stack[this.stack.length - 1] as ExpressLayer;
-      plugin._applyPatch(layer, typeof args[0] === 'string' ? args[0] : undefined);
+      plugin._applyPatch(
+        layer,
+        typeof args[0] === 'string' ? args[0] : undefined
+      );
       return route;
     };
   }
 
   /**
    * Get the patch for Router.use function
-   * @param original 
+   * @param original
    */
-  private _getRouterUsePatch (original: express.IRouterHandler<express.Router> & express.IRouterMatcher<express.Router>) {
-    const plugin = this
+  private _getRouterUsePatch(
+    original: express.IRouterHandler<express.Router> &
+      express.IRouterMatcher<express.Router>
+  ) {
+    const plugin = this;
     return function use(
       this: express.Application,
       ...args: Parameters<typeof original>
     ) {
       const route = original.apply(this, args);
       const layer = this.stack[this.stack.length - 1] as ExpressLayer;
-      plugin._applyPatch(layer, typeof args[0] === 'string' ? args[0] : undefined);
+      plugin._applyPatch(
+        layer,
+        typeof args[0] === 'string' ? args[0] : undefined
+      );
       return route;
       // tslint:disable-next-line:no-any
-    } as any
+    } as any;
   }
 
   /**
    * Get the patch for Application.use function
-   * @param original 
+   * @param original
    */
-  private _getAppUsePatch (original: core.ApplicationRequestHandler<express.Application>) {
-    const plugin = this
+  private _getAppUsePatch(
+    original: core.ApplicationRequestHandler<express.Application>
+  ) {
+    const plugin = this;
     return function use(
       this: { _router: ExpressRouter },
       ...args: Parameters<typeof original>
@@ -157,8 +169,8 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           [AttributeNames.COMPONENT]: plugin._COMPONENT,
           [AttributeNames.HTTP_ROUTE]: route.length > 0 ? route : undefined,
         };
-        const metadata = getLayerMetadata(layer, layerPath)
-        
+        const metadata = getLayerMetadata(layer, layerPath);
+
         const span = plugin._tracer.startSpan(metadata.name, {
           parent: plugin._tracer.getCurrentSpan(),
           attributes: Object.assign(attributes, metadata.attributes),

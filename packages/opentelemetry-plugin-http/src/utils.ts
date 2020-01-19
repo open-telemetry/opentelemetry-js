@@ -472,5 +472,5 @@ export const getIncomingRequestAttributesOnResponse = (
   if (route !== undefined) {
     attributes[AttributeNames.HTTP_ROUTE] = route;
   }
-  return attributes; 
+  return attributes;
 };
