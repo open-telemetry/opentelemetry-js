@@ -460,13 +460,17 @@ export const getIncomingRequestAttributesOnResponse = (
         .join('')
     : undefined;
 
-  return {
+  const attributes: Attributes = {
     [AttributeNames.NET_HOST_IP]: localAddress,
     [AttributeNames.NET_HOST_PORT]: localPort,
     [AttributeNames.NET_PEER_IP]: remoteAddress,
     [AttributeNames.NET_PEER_PORT]: remotePort,
     [AttributeNames.HTTP_STATUS_CODE]: statusCode,
     [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
-    [AttributeNames.HTTP_ROUTE]: route,
   };
+
+  if (route !== undefined) {
+    attributes[AttributeNames.HTTP_ROUTE] = route;
+  }
+  return attributes; 
 };

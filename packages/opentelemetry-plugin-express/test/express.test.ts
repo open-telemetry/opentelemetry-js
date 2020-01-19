@@ -99,7 +99,7 @@ describe('Express Plugin', () => {
           );
           const requestHandlerSpan = memoryExporter
             .getFinishedSpans()
-            .find(span => span.name.includes('express request handler'));
+            .find(span => span.name.includes('request handler'));
           assert(requestHandlerSpan !== undefined);
           assert(
             requestHandlerSpan?.attributes[AttributeNames.COMPONENT] ===

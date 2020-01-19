@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import { kPatched } from './express';
+import { kLayerPatched } from './express';
 import { Request } from 'express';
 
-export type PatchedRequest = { ['__ot_middlewares']?: string[] } & Request;
+export const _MIDDLEWARES_STORE_PROPERTY = '__ot_middlewares'
+
+export type Parameters<T> = T extends (...args: infer T) => any ? T : unknown[];
+export type PatchedRequest = { [_MIDDLEWARES_STORE_PROPERTY]?: string[] } & Request;
+export type PathParams = string | RegExp | Array<string | RegExp>;
 
 // https://github.com/expressjs/express/blob/master/lib/router/index.js#L53
 export type ExpressRouter = {
@@ -32,7 +36,7 @@ export type ExpressRouter = {
 // https://github.com/expressjs/express/blob/master/lib/router/layer.js#L33
 export type ExpressLayer = {
   handle: Function;
-  [kPatched]?: boolean;
+  [kLayerPatched]?: boolean;
   name: string;
   params: { [key: string]: string };
   path: string;
@@ -45,4 +49,10 @@ export enum AttributeNames {
   HTTP_ROUTE = 'http.route',
   EXPRESS_TYPE = 'express.type',
   EXPRESS_NAME = 'express.name',
+}
+
+export enum ExpressLayerType {
+  ROUTER = 'router',
+  MIDDLEWARE = 'middleware',
+  REQUEST_HANDLER = 'request_handler'
 }

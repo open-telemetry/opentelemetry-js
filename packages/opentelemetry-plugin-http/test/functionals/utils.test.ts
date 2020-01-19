@@ -323,7 +323,8 @@ describe('Utility', () => {
       const request = {
         __ot_middlewares: ['/test', '/toto', '/'],
       };
-      // @ts-ignore we just want to check that the parsing of express middlewares
+      // @ts-ignore ignore error about invalid request types since we only want to
+      // check the parsing of the `__ot_middlewares` property
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       });
@@ -331,7 +332,8 @@ describe('Utility', () => {
     });
     it('should succesfully process without middleware stack', () => {
       const request = {};
-      // @ts-ignore we just want to check that the parsing of express middlewares
+      // @ts-ignore ignore error about invalid request types since we only want to
+      // check the parsing of the `__ot_middlewares` property
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       });

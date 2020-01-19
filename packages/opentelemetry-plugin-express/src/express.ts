@@ -14,27 +14,36 @@
  * limitations under the License.
  */
 
-// mongodb.Server type is deprecated so every use trigger a lint error
-/* tslint:disable:deprecation */
-
 import { BasePlugin } from '@opentelemetry/core';
-import { CanonicalCode, Span, Attributes } from '@opentelemetry/types';
+import { Attributes } from '@opentelemetry/types';
 import * as express from 'express';
+import * as core from "express-serve-static-core";
 import * as shimmer from 'shimmer';
 import {
   ExpressLayer,
   ExpressRouter,
   AttributeNames,
   PatchedRequest,
+  Parameters,
+  PathParams,
+  _MIDDLEWARES_STORE_PROPERTY
 } from './types';
+import {
+  getLayerMetadata,
+  storeLayerPath,
+  patchEnd,
+} from './utils'
 import { VERSION } from './version';
 
-export const kPatched: unique symbol = Symbol('express-layer-patched');
+/**
+ * This symbol is used to mark express layer as being already instrumented
+ * since its possible to use a given layer multiple times (ex: middlewares)
+ */
+export const kLayerPatched: unique symbol = Symbol('express-layer-patched');
 
 /** Express instrumentation plugin for OpenTelemetry */
 export class ExpressPlugin extends BasePlugin<typeof express> {
-  private readonly _COMPONENT = 'express';
-
+  readonly _COMPONENT = 'express';
   readonly supportedVersions = ['^4.0.0'];
 
   constructor(readonly moduleName: string) {
@@ -47,87 +56,91 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
   protected patch() {
     this._logger.debug('Patching Express');
 
-    if (this._moduleExports) {
-      const routerProto = (this._moduleExports
-        .Router as unknown) as express.Router;
-      const plugin = this;
-
-      this._logger.debug('patching express.Router.prototype.route');
-      shimmer.wrap(routerProto, 'route', (original: Function) => {
-        return function route_trace(
-          this: ExpressRouter,
-          arg: string | Function
-        ) {
-          const route = original.apply(this, arguments);
-          const layer = this.stack[this.stack.length - 1] as ExpressLayer;
-          plugin._applyPatch(layer, typeof arg === 'string' ? arg : undefined);
-          return route;
-          // tslint:disable-next-line:no-any
-        } as any;
-      });
-      this._logger.debug('patching express.Router.prototype.use');
-      shimmer.wrap(routerProto, 'use', (original: Function) => {
-        return function use(this: express.Application, arg: string | Function) {
-          const route = original.apply(this, arguments);
-          const layer = this.stack[this.stack.length - 1] as ExpressLayer;
-          plugin._applyPatch(layer, typeof arg === 'string' ? arg : undefined);
-          return route;
-          // tslint:disable-next-line:no-any
-        } as any;
-      });
-      this._logger.debug('patching express.Application.use');
-      shimmer.wrap(
-        this._moduleExports.application,
-        'use',
-        (original: Function) => {
-          return function use(
-            this: { _router: ExpressRouter },
-            arg: string | Function
-          ) {
-            const route = original.apply(this, arguments);
-            const layer = this._router.stack[this._router.stack.length - 1];
-            plugin._applyPatch(
-              layer,
-              typeof arg === 'string' ? arg : undefined
-            );
-            return route;
-            // tslint:disable-next-line:no-any
-          } as any;
-        }
-      );
+    if (this._moduleExports === undefined || this._moduleExports === null) {
+      return this._moduleExports;
     }
+    const routerProto = (this._moduleExports.Router as unknown) as express.Router;
+
+    this._logger.debug('patching express.Router.prototype.route');
+    shimmer.wrap(routerProto, 'route', this._getRoutePatch.bind(this));
+
+    this._logger.debug('patching express.Router.prototype.use');
+    shimmer.wrap(routerProto, 'use', this._getRouterUsePatch.bind(this));
+
+    this._logger.debug('patching express.Application.use');
+    shimmer.wrap(this._moduleExports.application, 'use', this._getAppUsePatch.bind(this));
 
     return this._moduleExports;
   }
 
-  /** Unpatches all MongoDB patched functions. */
+  /**
+   * Get the patch for Router.route function
+   * @param original 
+   */
+  private _getRoutePatch (original: (path: PathParams) => express.IRoute) {
+    const plugin = this
+    return function route_trace(
+      this: ExpressRouter,
+      ...args: Parameters<typeof original>
+    ) {
+      const route = original.apply(this, args);
+      const layer = this.stack[this.stack.length - 1] as ExpressLayer;
+      plugin._applyPatch(layer, typeof args[0] === 'string' ? args[0] : undefined);
+      return route;
+    };
+  }
+
+  /**
+   * Get the patch for Router.use function
+   * @param original 
+   */
+  private _getRouterUsePatch (original: express.IRouterHandler<express.Router> & express.IRouterMatcher<express.Router>) {
+    const plugin = this
+    return function use(
+      this: express.Application,
+      ...args: Parameters<typeof original>
+    ) {
+      const route = original.apply(this, args);
+      const layer = this.stack[this.stack.length - 1] as ExpressLayer;
+      plugin._applyPatch(layer, typeof args[0] === 'string' ? args[0] : undefined);
+      return route;
+      // tslint:disable-next-line:no-any
+    } as any
+  }
+
+  /**
+   * Get the patch for Application.use function
+   * @param original 
+   */
+  private _getAppUsePatch (original: core.ApplicationRequestHandler<express.Application>) {
+    const plugin = this
+    return function use(
+      this: { _router: ExpressRouter },
+      ...args: Parameters<typeof original>
+    ) {
+      const route = original.apply(this, args);
+      const layer = this._router.stack[this._router.stack.length - 1];
+      plugin._applyPatch(
+        layer,
+        typeof args[0] === 'string' ? args[0] : undefined
+      );
+      return route;
+      // tslint:disable-next-line:no-any
+    } as any;
+  }
+
+  /** Unpatches all Express patched functions. */
   unpatch(): void {
     shimmer.unwrap(this._moduleExports.Router.prototype, 'use');
     shimmer.unwrap(this._moduleExports.Router.prototype, 'route');
     shimmer.unwrap(this._moduleExports.application, 'use');
   }
 
-  /**
-   * Store layers path in the request to be able to construct route later
-   * @param request The request where
-   * @param value the value to push into the array
-   */
-  private _storeLayerPath(request: PatchedRequest, value?: string) {
-    if (Array.isArray(request.__ot_middlewares) === false) {
-      Object.defineProperty(request, '__ot_middlewares', {
-        enumerable: false,
-        value: [],
-      });
-    }
-    if (value === undefined) return;
-    (request.__ot_middlewares as string[]).push(value);
-  }
-
-  /** Creates spans for Cursor operations */
+  /** Patch each express layer to create span and propagate scope */
   private _applyPatch(layer: ExpressLayer, layerPath?: string) {
     const plugin = this;
-    if (layer[kPatched] === true) return;
-    layer[kPatched] = true;
+    if (layer[kLayerPatched] === true) return;
+    layer[kLayerPatched] = true;
     this._logger.debug('patching express.Router.Layer.handle');
     shimmer.wrap(layer, 'handle', function(original: Function) {
       if (original.length === 4) return original;
@@ -138,31 +151,18 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
         res: express.Response,
         next: express.NextFunction
       ) {
-        plugin._storeLayerPath(req, layerPath);
-        const route = (req.__ot_middlewares as string[]).join('');
+        storeLayerPath(req, layerPath);
+        const route = (req[_MIDDLEWARES_STORE_PROPERTY] as string[]).join('');
         const attributes: Attributes = {
           [AttributeNames.COMPONENT]: plugin._COMPONENT,
           [AttributeNames.HTTP_ROUTE]: route.length > 0 ? route : undefined,
         };
-        let spanName = '';
-        if (layer.name === 'router') {
-          spanName = `express router - ${layerPath}`;
-          attributes[AttributeNames.EXPRESS_NAME] = layerPath;
-          attributes[AttributeNames.EXPRESS_TYPE] = 'router';
-        } else if (layer.name === 'bound dispatch') {
-          spanName = `express request handler`;
-          attributes[AttributeNames.EXPRESS_TYPE] = 'request_handler';
-        } else {
-          spanName = `express middleware - ${layer.name}`;
-          attributes[AttributeNames.EXPRESS_NAME] = layer.name;
-          attributes[AttributeNames.EXPRESS_TYPE] = 'middleware';
-        }
-        const span = plugin._tracer.startSpan(spanName, {
+        const metadata = getLayerMetadata(layer, layerPath)
+        
+        const span = plugin._tracer.startSpan(metadata.name, {
           parent: plugin._tracer.getCurrentSpan(),
-          attributes,
+          attributes: Object.assign(attributes, metadata.attributes),
         });
-        // if we cant create a span, abort
-        if (span === null) return original.apply(this, arguments);
         // verify we have a callback
         let callbackIdx = Array.from(arguments).findIndex(
           arg => typeof arg === 'function'
@@ -172,9 +172,9 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           arguments[callbackIdx] = function() {
             callbackHasBeenCalled = true;
             if (!(req.route && arguments[0] instanceof Error)) {
-              (req.__ot_middlewares as string[]).pop();
+              (req[_MIDDLEWARES_STORE_PROPERTY] as string[]).pop();
             }
-            return plugin._patchEnd(span, plugin._tracer.bind(next))();
+            return patchEnd(span, plugin._tracer.bind(next))();
           };
         }
         const result = original.apply(this, arguments);
@@ -186,29 +186,6 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
         return result;
       };
     });
-  }
-
-  /**
-   * Ends a created span.
-   * @param span The created span to end.
-   * @param resultHandler A callback function.
-   */
-  private _patchEnd(span: Span, resultHandler: Function): Function {
-    return function patchedEnd(this: {}, ...args: unknown[]) {
-      const error = args[0];
-      if (error instanceof Error) {
-        span.setStatus({
-          code: CanonicalCode.INTERNAL,
-          message: error.message,
-        });
-      } else {
-        span.setStatus({
-          code: CanonicalCode.OK,
-        });
-      }
-      span.end();
-      return resultHandler.apply(this, args);
-    };
   }
 }
 
