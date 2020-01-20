@@ -1,0 +1,75 @@
+{
+  "name": "@opentelemetry/propagator-jaeger",
+  "version": "0.3.2",
+  "description": "OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
+    "test:browser": "nyc karma start --single-run",
+    "tdd": "yarn tdd:node",
+    "tdd:node": "yarn test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "clean": "rimraf build/*",
+    "check": "gts check",
+    "precompile": "tsc --version",
+    "compile": "npm run version:update && tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "version:update": "node ../../scripts/version-update.js",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "tracing",
+    "profiling",
+    "jaeger"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^12.6.8",
+    "@types/sinon": "^7.0.13",
+    "@types/webpack-env": "1.13.9",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "karma": "^4.4.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage-istanbul-reporter": "^2.1.0",
+    "karma-mocha": "^1.3.0",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-webpack": "^4.0.2",
+    "mocha": "^6.1.0",
+    "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
+    "sinon": "^7.5.0",
+    "ts-loader": "^6.0.4",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.6.2",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.7.2",
+    "webpack": "^4.35.2"
+  },
+  "dependencies": {
+    "@opentelemetry/types": "^0.3.2"
+  }
+}
