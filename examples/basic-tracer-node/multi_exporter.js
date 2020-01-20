@@ -20,15 +20,17 @@ registry.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
   // This is added for example, default size is 100.
   bufferSize: 10,
 }));
+
+const tracer = opentelemetry.getTracer('default');
+
 tracer.addSpanProcessor(new BatchSpanProcessor(jaegerExporter), {
-  bufferSize: 10
+  bufferSize: 10,
 });
 
 registry.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
 opentelemetry.initGlobalTracerRegistry(registry);
-const tracer = opentelemetry.getTracer('default');
 
 // Create a span. A span must be closed.
 const parentSpan = tracer.startSpan('main');
