@@ -22,6 +22,7 @@ export * from './distributed_context/DistributedContext';
 export * from './distributed_context/EntryValue';
 export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
+export * from './metrics/MeterRegistry';
 export * from './metrics/Metric';
 export * from './trace/attributes';
 export * from './trace/Event';
