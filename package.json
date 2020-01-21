@@ -36,16 +36,16 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^8.3.4",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
-    "gh-pages": "^2.1.1",
-    "gts": "^1.1.0",
-    "husky": "^3.0.9",
-    "lerna": "^3.17.0",
-    "lerna-changelog": "^0.8.2",
-    "typescript": "^3.7.2"
+    "gh-pages": "^2.2.0",
+    "gts": "^1.1.2",
+    "husky": "^4.0.10",
+    "lerna": "^3.20.2",
+    "lerna-changelog": "^1.0.0",
+    "typescript": "^3.7.5"
   },
   "husky": {
     "hooks": {
