@@ -16,7 +16,6 @@
 
 import { ConsoleLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
-import { Logger } from '@opentelemetry/types';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
@@ -31,7 +30,7 @@ export class BasicTracerRegistry implements types.TracerRegistry {
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   activeSpanProcessor = new NoopSpanProcessor();
-  readonly logger: Logger;
+  readonly logger: types.Logger;
 
   constructor(private _config: TracerConfig = DEFAULT_CONFIG) {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);

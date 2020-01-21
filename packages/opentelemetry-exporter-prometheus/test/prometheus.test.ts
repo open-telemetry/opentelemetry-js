@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { CounterMetric, GaugeMetric, Meter } from '@opentelemetry/metrics';
+import {
+  CounterMetric,
+  GaugeMetric,
+  Meter,
+  MeterRegistry,
+} from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
@@ -166,7 +171,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new Meter();
+      meter = new MeterRegistry().getMeter('test-prometheus');
       exporter.startServer(done);
     });
 
@@ -382,7 +387,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new Meter();
+      meter = new MeterRegistry().getMeter('test-prometheus');
       gauge = meter.createGauge('gauge') as GaugeMetric;
       gauge.bind(meter.labels({ key1: 'labelValue1' })).set(10);
     });
