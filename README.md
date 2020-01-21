@@ -52,10 +52,10 @@ Future release targets include:
 
 | Component                   | Version    | Target Date        |
 | --------------------------- | ---------- | ------------------ |
-| Support for Tags/Baggage    | Alpha v0.4 | December 31 2019   |
-| Metrics Aggregation         | Alpha v0.4 | December 31 2019   |
-| Metrics SDK (Complete)      | Alpha v0.4 | December 31 2019   |
-| OpenCensus Bridge           | Alpha v0.4 | December 31 2019   |
+| Support for Tags/Baggage    | Alpha v0.4 | January 31 2020    |
+| Metrics Aggregation         | Alpha v0.4 | January 31 2020    |
+| Metrics SDK (Complete)      | Alpha v0.4 | January 31 2020    |
+| OpenCensus Bridge           | Alpha v0.4 | January 31 2020    |
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
@@ -108,6 +108,7 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 #### Trace Exporters
 - [@opentelemetry/exporter-jaeger](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-jaeger)
 - [@opentelemetry/exporter-zipkin](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-zipkin)
+- [@opentelemetry/exporter-stackdriver-trace](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-stackdriver-trace)
 - [@opentelemetry/exporter-collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector)
 
 #### Metric Exporters
