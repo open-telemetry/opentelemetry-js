@@ -18,7 +18,7 @@ import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
-import { Socket } from "dgram";
+import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
 
