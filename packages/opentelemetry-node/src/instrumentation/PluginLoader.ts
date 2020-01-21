@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Logger, Plugin, Tracer, PluginConfig } from '@opentelemetry/types';
+import {
+  Logger,
+  Plugin,
+  PluginConfig,
+  TracerRegistry,
+} from '@opentelemetry/types';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 
@@ -55,7 +60,7 @@ export class PluginLoader {
   private _hookState = HookState.UNINITIALIZED;
 
   /** Constructs a new PluginLoader instance. */
-  constructor(readonly tracer: Tracer, readonly logger: Logger) {}
+  constructor(readonly registry: TracerRegistry, readonly logger: Logger) {}
 
   /**
    * Loads a list of plugins. Each plugin module should implement the core
@@ -115,7 +120,7 @@ export class PluginLoader {
 
           this._plugins.push(plugin);
           // Enable each supported plugin.
-          return plugin.enable(exports, this.tracer, this.logger, config);
+          return plugin.enable(exports, this.registry, this.logger, config);
         } catch (e) {
           this.logger.error(
             `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`

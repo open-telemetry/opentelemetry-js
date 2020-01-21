@@ -19,7 +19,7 @@ const PROTO_OPTIONS = { keepCase: true, enums: String, defaults: true, oneofs: t
 const definition = protoLoader.loadSync(PROTO_PATH, PROTO_OPTIONS);
 const rpcProto = grpc.loadPackageDefinition(definition).rpc;
 
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-grpc-capitalize-server');
 
 /** Implements the Capitalize RPC method. */
 function capitalize(call, callback) {

@@ -25,6 +25,7 @@ import {
   PgPoolExtended,
 } from './types';
 import * as utils from './utils';
+import { VERSION } from './version';
 
 export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   protected _config: PostgresPoolPluginOptions;
@@ -35,7 +36,7 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   readonly supportedVersions = ['2.*'];
 
   constructor(readonly moduleName: string) {
-    super();
+    super('@opentelemetry/plugin-pg-pool', VERSION);
     this._config = {};
   }
 

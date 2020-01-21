@@ -16,14 +16,16 @@
 
 import * as assert from 'assert';
 import * as opentracing from 'opentracing';
-import { BasicTracer, Span } from '@opentelemetry/tracing';
+import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
 import { INVALID_SPAN_CONTEXT, timeInputToHrTime } from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
-  const tracer = new BasicTracer();
-  const shimTracer: opentracing.Tracer = new TracerShim(tracer);
+  const registry = new BasicTracerRegistry();
+  const shimTracer: opentracing.Tracer = new TracerShim(
+    registry.getTracer('default')
+  );
   opentracing.initGlobalTracer(shimTracer);
 
   describe('TracerShim', () => {

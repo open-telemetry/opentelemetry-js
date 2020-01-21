@@ -20,10 +20,12 @@ import * as nock from 'nock';
 import * as sinon from 'sinon';
 
 import { plugin } from '../../src/http';
-import { NodeTracer } from '@opentelemetry/node';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  NoopTracerRegistry,
+  noopTracer,
+} from '@opentelemetry/core';
 import { AddressInfo } from 'net';
-import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 
 describe('HttpPlugin', () => {
@@ -31,17 +33,13 @@ describe('HttpPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({
-      logger,
-      httpTextFormat,
-    });
+    const registry = new NoopTracerRegistry();
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable(http, tracer, tracer.logger);
+      plugin.enable(http, registry, logger);
       // Ensure that http module is patched.
       assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
       server = http.createServer((request, response) => {
@@ -55,8 +53,8 @@ describe('HttpPlugin', () => {
     });
 
     beforeEach(() => {
-      tracer.startSpan = sinon.spy();
-      tracer.withSpan = sinon.spy();
+      noopTracer.startSpan = sinon.spy();
+      noopTracer.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -67,7 +65,7 @@ describe('HttpPlugin', () => {
       server.close();
     });
     describe('unpatch()', () => {
-      it('should not call tracer methods for creating span', async () => {
+      it('should not call registry methods for creating span', async () => {
         plugin.disable();
         const testPath = '/incoming/unpatch/';
 
@@ -75,12 +73,15 @@ describe('HttpPlugin', () => {
 
         await httpRequest.get(options).then(result => {
           assert.strictEqual(
-            (tracer.startSpan as sinon.SinonSpy).called,
+            (noopTracer.startSpan as sinon.SinonSpy).called,
             false
           );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
+          assert.strictEqual(
+            (noopTracer.withSpan as sinon.SinonSpy).called,
+            false
+          );
         });
       });
     });
