@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterRegistry';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+import { Meter } from './Meter';
+
+/**
+ * MeterRegistry provides an interface for creating {@link Meter}s
+ */
+export interface MeterRegistry {
+  /**
+   * Returns a Meter, creating one if one with the given name and version is not already created
+   *
+   * @returns Meter A Meter with the given name and version
+   */
+  getMeter(name: string, version?: string): Meter;
+}

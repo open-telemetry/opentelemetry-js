@@ -15,7 +15,6 @@
  */
 
 import * as types from '@opentelemetry/types';
-import { SpanContext } from '@opentelemetry/types';
 import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
 
 /**
@@ -25,7 +24,7 @@ import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
  */
 export class NoopSpan implements types.Span {
   constructor(
-    private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
+    private readonly _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT
   ) {}
 
   // Returns a SpanContext.
