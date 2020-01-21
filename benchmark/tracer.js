@@ -1,11 +1,9 @@
 'use strict';
 
 const benchmark = require('./benchmark');
-const opentelemetry = require('@opentelemetry/core');
-const { BasicTracerRegistry, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const opentelemetry = require('../packages/opentelemetry-core');
+const { BasicTracerRegistry, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
 
-const exporter = new InMemorySpanExporter();
 const logger = new opentelemetry.NoopLogger();
 
 const setups = [
@@ -14,16 +12,23 @@ const setups = [
     registry: new BasicTracerRegistry({ logger })
   },
   {
-    name: 'NodeTracerRegistry',
-    registry: new NodeTracerRegistry({ logger })
+    name: 'BasicTracerRegistry with SimpleSpanProcessor',
+    registry: getRegistry(new SimpleSpanProcessor(new InMemorySpanExporter()))
+  },
+  {
+    name: 'BasicTracerRegistry with BatchSpanProcessor',
+    registry: getRegistry(new BatchSpanProcessor(new InMemorySpanExporter()))
+  },
+  {
+    name: 'NoopTracerRegistry',
+    registry: opentelemetry.getTracerRegistry()
   }
 ];
 
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
-  const registry = setup.registry;
-  const tracer = registry.getTracer("benchmark");
-  const suite = benchmark()
+  const tracer = setup.registry.getTracer("benchmark");
+  const suite = benchmark(20)
     .add('#startSpan', function () {
       const span = tracer.startSpan('op');
       span.end();
@@ -52,25 +57,14 @@ for (const setup of setups) {
         span.setAttribute('attr-key-' + j, 'attr-value-' + j);
       }
       span.end();
-    })
-    .add('#startSpan with SimpleSpanProcessor', function () {
-      const simpleSpanProcessor = new SimpleSpanProcessor(exporter);
-
-      registry.addSpanProcessor(simpleSpanProcessor);
-      const span = tracer.startSpan('op');
-      span.end();
-
-      simpleSpanProcessor.shutdown();
-    })
-    .add('#startSpan with BatchSpanProcessor', function () {
-      const batchSpanProcessor = new BatchSpanProcessor(exporter);
-
-      registry.addSpanProcessor(batchSpanProcessor);
-      const span = tracer.startSpan('op');
-      span.end();
-      batchSpanProcessor.shutdown();
     });
 
   // run async
   suite.run({ async: false });
 }
+function getRegistry(processor) {
+  const registry = new BasicTracerRegistry({ logger });
+  registry.addSpanProcessor(processor);
+  return registry;
+}
+
