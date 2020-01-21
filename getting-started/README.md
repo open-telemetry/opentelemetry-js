@@ -74,13 +74,13 @@ Create a file named `tracing.js` and add the following code:
 'use strict';
 
 const opentelemetry = require("@opentelemetry/core");
-const { NodeTracer } = require("@opentelemetry/node");
+const { NodeTracerRegistry } = require("@opentelemetry/node");
 
-const tracer = new NodeTracer({
+const tracerRegistry = new NodeTracerRegistry({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
-opentelemetry.initGlobalTracer(tracer);
+opentelemetry.initGlobalTracerRegistry(tracerRegistry);
 ```
 
 If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -110,18 +110,18 @@ After these dependencies are installed, we will need to initialize and register 
 'use strict';
 
 const opentelemetry = require("@opentelemetry/core");
-const { NodeTracer } = require("@opentelemetry/node");
+const { NodeTracerRegistry } = require("@opentelemetry/node");
 
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 
-const tracer = new NodeTracer({
+const tracerRegistry = new NodeTracerRegistry({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
-opentelemetry.initGlobalTracer(tracer);
+opentelemetry.initGlobalTracerRegistry(tracerRegistry);
 
-tracer.addSpanProcessor(
+tracerRegistry.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
       serviceName: "getting-started",

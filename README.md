@@ -68,7 +68,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 
 - [Roch Devost](https://github.com/rochdev), DataDog
 - [Brandon Gonzalez](https://github.com/bg451), LightStep
-- [Olivier Albertini](https://github.com/OlivierAlbertini), VilledeMontreal
+- [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
