@@ -22,14 +22,14 @@ Create & register the exporter on your application.
 
 ```js
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { Meter }  = require('@opentelemetry/metrics');
+const { MeterRegistry }  = require('@opentelemetry/metrics');
 
 // Add your port and startServer to the Prometheus options
 const options = {port: 9464, startServer: true};
 const exporter = new PrometheusExporter(options);
 
 // Register the exporter
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('exporter-prometheus');
 meter.addExporter(exporter);
 
 // Now, start recording data

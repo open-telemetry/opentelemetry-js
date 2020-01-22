@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterRegistry';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+import * as types from '@opentelemetry/types';
+import { noopMeter } from './NoopMeter';
+
+/**
+ * An implementation of the {@link MeterRegistry} which returns an impotent Meter
+ * for all calls to `getMeter`
+ */
+export class NoopMeterRegistry implements types.MeterRegistry {
+  getMeter(_name?: string, _version?: string): types.Meter {
+    return noopMeter;
+  }
+}
