@@ -18,16 +18,17 @@
 /* tslint:disable:deprecation */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { Span, SpanKind, CanonicalCode } from '@opentelemetry/types';
-import {
-  Func,
-  MongoInternalCommand,
-  MongoInternalTopology,
-  AttributeNames,
-  MongodbCommandType,
-} from './types';
+import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
+import {
+  AttributeNames,
+  Func,
+  MongodbCommandType,
+  MongoInternalCommand,
+  MongoInternalTopology,
+} from './types';
+import { VERSION } from './version';
 
 /** MongoDBCore instrumentation plugin for OpenTelemetry */
 export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
@@ -40,7 +41,7 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
   readonly supportedVersions = ['>=2 <4'];
 
   constructor(readonly moduleName: string) {
-    super();
+    super('@opentelemetry/plugin-mongodb-core', VERSION);
   }
 
   /**
@@ -106,7 +107,7 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         const resultHandler =
           typeof options === 'function' ? options : callback;
         if (
-          currentSpan === undefined ||
+          !currentSpan ||
           typeof resultHandler !== 'function' ||
           typeof commands !== 'object'
         ) {
@@ -210,7 +211,7 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
       ): mongodb.Cursor {
         const currentSpan = plugin._tracer.getCurrentSpan();
         const resultHandler = args[0];
-        if (currentSpan === undefined || typeof resultHandler !== 'function') {
+        if (!currentSpan || typeof resultHandler !== 'function') {
           return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(`mongodb.query`, {

@@ -1,29 +1,29 @@
 {
-  "name": "@opentelemetry/plugin-http2",
-  "version": "0.3.2",
-  "description": "OpenTelemetry http2 automatic instrumentation package.",
-  "private": true,
+  "name": "@opentelemetry/exporter-stackdriver-trace",
+  "version": "0.3.1",
+  "description": "OpenTelemetry StackDriver Trace Exporter allows the user to send collected traces to StackDriver Trace.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
-    "clean": "rimraf build/*",
     "check": "gts check",
-    "precompile": "tsc --version",
+    "clean": "rimraf build/*",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
-    "prepare": "npm run compile"
+    "precompile": "tsc --version",
+    "prepare": "npm run compile",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'"
   },
   "keywords": [
     "opentelemetry",
-    "http2",
     "nodejs",
     "tracing",
     "profiling",
-    "plugin"
+    "stackdriver",
+    "stackdriver-trace"
   ],
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
@@ -42,12 +42,16 @@
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
+    "@types/nock": "^11.1.0",
     "@types/node": "^12.6.9",
+    "@types/sinon": "^7.5.1",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
+    "nock": "^11.7.0",
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
+    "sinon": "^8.0.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
     "tslint-consistent-codestyle": "^1.15.1",
@@ -55,8 +59,11 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/node": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2"
+    "@opentelemetry/base": "^0.3.1",
+    "@opentelemetry/core": "^0.3.1",
+    "@opentelemetry/tracing": "^0.3.1",
+    "@opentelemetry/types": "^0.3.1",
+    "google-auth-library": "^5.7.0",
+    "googleapis": "^46.0.0"
   }
 }

@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-import { NoopLogger, NoopTracer } from '@opentelemetry/core';
+import { NoopLogger, NoopTracerRegistry } from '@opentelemetry/core';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { SpanKind, Tracer } from '@opentelemetry/types';
-import { NodeTracer } from '@opentelemetry/node';
-
-import { assertSpan, assertPropagation } from './utils/assertionUtils';
+import { SpanKind } from '@opentelemetry/types';
+import * as assert from 'assert';
+import * as grpc from 'grpc';
+import * as semver from 'semver';
+import * as sinon from 'sinon';
 import { GrpcPlugin, plugin } from '../src';
 import { SendUnaryDataCallback } from '../src/types';
-
-import * as assert from 'assert';
-import * as semver from 'semver';
-import * as grpc from 'grpc';
-import * as sinon from 'sinon';
+import { assertPropagation, assertSpan } from './utils/assertionUtils';
 
 const PROTO_PATH = __dirname + '/fixtures/grpc-test.proto';
 const memoryExporter = new InMemorySpanExporter();
@@ -318,7 +316,7 @@ describe('GrpcPlugin', () => {
     });
 
     it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-      plugin.enable(grpc, new NoopTracer(), new NoopLogger());
+      plugin.enable(grpc, new NoopTracerRegistry(), new NoopLogger());
       (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
       assert.strictEqual(clientPatchStub.callCount, 1);
     });
@@ -370,7 +368,7 @@ describe('GrpcPlugin', () => {
 
   const runTest = (
     method: typeof methodList[0],
-    tracer: Tracer,
+    registry: NodeTracerRegistry,
     checkSpans = true
   ) => {
     it(`should ${
@@ -410,9 +408,11 @@ describe('GrpcPlugin', () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-      return tracer.withSpan(span, async () => {
-        const rootSpan = tracer.getCurrentSpan();
+      const span = registry
+        .getTracer('default')
+        .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      return registry.getTracer('default').withSpan(span, async () => {
+        const rootSpan = registry.getTracer('default').getCurrentSpan();
         if (!rootSpan) {
           assert.ok(false);
           return; // return so typechecking passes for rootSpan.end()
@@ -465,7 +465,7 @@ describe('GrpcPlugin', () => {
     method: typeof methodList[0],
     key: string,
     errorCode: number,
-    tracer: Tracer
+    registry: NodeTracerRegistry
   ) => {
     it(`should raise an error for client/server rootSpans: method=${method.methodName}, status=${key}`, async () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
@@ -503,9 +503,11 @@ describe('GrpcPlugin', () => {
       const expectEmpty = memoryExporter.getFinishedSpans();
       assert.strictEqual(expectEmpty.length, 0);
 
-      const span = tracer.startSpan('TestSpan', { kind: SpanKind.PRODUCER });
-      return tracer.withSpan(span, async () => {
-        const rootSpan = tracer.getCurrentSpan();
+      const span = registry
+        .getTracer('default')
+        .startSpan('TestSpan', { kind: SpanKind.PRODUCER });
+      return registry.getTracer('default').withSpan(span, async () => {
+        const rootSpan = registry.getTracer('default').getCurrentSpan();
         if (!rootSpan) {
           assert.ok(false);
           return; // return so typechecking passes for rootSpan.end()
@@ -552,8 +554,8 @@ describe('GrpcPlugin', () => {
 
   describe('enable()', () => {
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({ logger });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const registry = new NodeTracerRegistry({ logger });
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -562,7 +564,7 @@ describe('GrpcPlugin', () => {
       const config = {
         // TODO: add plugin options here once supported
       };
-      plugin.enable(grpc, tracer, logger, config);
+      plugin.enable(grpc, registry, logger, config);
 
       const proto = grpc.load(PROTO_PATH).pkg_test;
       server = startServer(grpc, proto);
@@ -579,7 +581,7 @@ describe('GrpcPlugin', () => {
 
     methodList.forEach(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
-        runTest(method, tracer);
+        runTest(method, registry);
       });
     });
 
@@ -589,7 +591,7 @@ describe('GrpcPlugin', () => {
           // tslint:disable-next-line:no-any
           const errorCode = Number(grpc.status[statusKey as any]);
           if (errorCode > grpc.status.OK) {
-            runErrorTest(method, statusKey, errorCode, tracer);
+            runErrorTest(method, statusKey, errorCode, registry);
           }
         });
       });
@@ -598,14 +600,14 @@ describe('GrpcPlugin', () => {
 
   describe('disable()', () => {
     const logger = new NoopLogger();
-    const tracer = new NodeTracer({ logger });
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    const registry = new NodeTracerRegistry({ logger });
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
 
     before(() => {
-      plugin.enable(grpc, tracer, logger);
+      plugin.enable(grpc, registry, logger);
       plugin.disable();
 
       const proto = grpc.load(PROTO_PATH).pkg_test;
@@ -622,7 +624,7 @@ describe('GrpcPlugin', () => {
 
     methodList.map(method => {
       describe(`Test automatic tracing for grpc remote method ${method.description}`, () => {
-        runTest(method, tracer, false);
+        runTest(method, registry, false);
       });
     });
   });
