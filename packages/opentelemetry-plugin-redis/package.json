@@ -45,6 +45,7 @@
   "devDependencies": {
     "@opentelemetry/node": "^0.3.3",
     "@opentelemetry/test-utils": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/redis": "^2.8.14",
