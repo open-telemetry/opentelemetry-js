@@ -16,6 +16,7 @@
 
 import { NOOP_TRACER_REGISTRY } from '../trace/NoopTracerRegistry';
 import { TracerRegistry } from '../trace/tracer_registry';
+import { Tracer } from '../trace/tracer';
 
 export class TracingAPI {
   private static _instance?: TracingAPI;
@@ -37,5 +38,9 @@ export class TracingAPI {
 
   public getTracerRegistry(): TracerRegistry {
     return this._tracerRegistry;
+  }
+
+  public getTracer(name: string, version?: string): Tracer {
+    return this.getTracerRegistry().getTracer(name, version);
   }
 }
