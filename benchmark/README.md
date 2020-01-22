@@ -16,38 +16,52 @@ The minimum sample size is set to 10 to perform statistical analysis on benchmar
 ### `v0.3.3` release
 
 ```
+Beginning NoopTracerRegistry Benchmark...
+  5 tests completed.
+
+  #startSpan                     x 731,516,636 ops/sec ±2.57% (20 runs sampled)
+  #startSpan:parent              x 744,353,590 ops/sec ±3.03% (20 runs sampled)
+  #startSpan with attribute      x 737,451,332 ops/sec ±3.75% (20 runs sampled)
+  #startSpan with 30 attributes  x   1,658,688 ops/sec ±1.23% (20 runs sampled)
+  #startSpan with 100 attributes x     535,082 ops/sec ±1.55% (20 runs sampled)
+
 Beginning BasicTracerRegistry Benchmark...
-  7 tests completed.
+  5 tests completed.
 
-  #startSpan                          x 79,704 ops/sec ±4.46% (10 runs sampled)
-  #startSpan:parent                   x 55,975 ops/sec ±1.90% (10 runs sampled)
-  #startSpan with attribute           x 84,479 ops/sec ±2.82% (10 runs sampled)
-  #startSpan with 30 attributes       x 36,239 ops/sec ±2.67% (10 runs sampled)
-  #startSpan with 100 attributes      x  3,716 ops/sec ±1.92% (10 runs sampled)
-  #startSpan with SimpleSpanProcessor x  5,440 ops/sec ±39.90% (10 runs sampled)
-  #startSpan with BatchSpanProcessor  x  2,284 ops/sec ±6.51% (10 runs sampled)
+  #startSpan                     x 80,633 ops/sec ±3.57% (20 runs sampled)
+  #startSpan:parent              x 56,228 ops/sec ±2.18% (20 runs sampled)
+  #startSpan with attribute      x 86,710 ops/sec ±1.80% (20 runs sampled)
+  #startSpan with 30 attributes  x 36,331 ops/sec ±1.29% (20 runs sampled)
+  #startSpan with 100 attributes x  3,549 ops/sec ±3.59% (20 runs sampled)
 
-Beginning NodeTracerRegistry Benchmark...
-  7 tests completed.
+Beginning BasicTracerRegistry with SimpleSpanProcessor Benchmark...
+  5 tests completed.
 
-  #startSpan                          x 81,777 ops/sec ±4.32% (10 runs sampled)
-  #startSpan:parent                   x 57,455 ops/sec ±3.87% (10 runs sampled)
-  #startSpan with attribute           x 85,139 ops/sec ±4.09% (10 runs sampled)
-  #startSpan with 30 attributes       x 38,240 ops/sec ±1.95% (10 runs sampled)
-  #startSpan with 100 attributes      x  3,670 ops/sec ±6.85% (10 runs sampled)
-  #startSpan with SimpleSpanProcessor x  4,504 ops/sec ±37.04% (10 runs sampled)
-  #startSpan with BatchSpanProcessor  x  1,847 ops/sec ±5.26% (10 runs sampled)
+  #startSpan                     x 74,539 ops/sec ±4.49% (20 runs sampled)
+  #startSpan:parent              x 48,953 ops/sec ±4.98% (20 runs sampled)
+  #startSpan with attribute      x 79,686 ops/sec ±2.54% (20 runs sampled)
+  #startSpan with 30 attributes  x 26,491 ops/sec ±13.68% (20 runs sampled)
+  #startSpan with 100 attributes x  2,464 ops/sec ±19.64% (20 runs sampled)
+
+Beginning BasicTracerRegistry with BatchSpanProcessor Benchmark...
+  5 tests completed.
+
+  #startSpan                     x 74,974 ops/sec ±3.57% (20 runs sampled)
+  #startSpan:parent              x 42,390 ops/sec ±20.68% (20 runs sampled)
+  #startSpan with attribute      x 76,497 ops/sec ±2.93% (20 runs sampled)
+  #startSpan with 30 attributes  x 33,042 ops/sec ±2.03% (20 runs sampled)
+  #startSpan with 100 attributes x  3,459 ops/sec ±4.56% (20 runs sampled)
 
 
 Beginning B3Format Benchmark...
   2 tests completed.
 
-  #Inject  x 5,569,330 ops/sec ±1.44% (10 runs sampled)
-  #Extract x 4,882,488 ops/sec ±3.72% (10 runs sampled)
+  #Inject  x 5,086,366 ops/sec ±3.18% (100 runs sampled)
+  #Extract x 4,859,557 ops/sec ±3.80% (100 runs sampled)
 
 Beginning HttpTraceContext Benchmark...
   2 tests completed.
 
-  #Inject  x 13,423,892 ops/sec ±4.62% (10 runs sampled)
-  #Extract x  1,673,804 ops/sec ±2.29% (10 runs sampled)
+  #Inject  x 13,660,710 ops/sec ±1.84% (100 runs sampled)
+  #Extract x  1,692,010 ops/sec ±0.83% (100 runs sampled)
 ```

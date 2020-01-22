@@ -8,6 +8,10 @@ const logger = new opentelemetry.NoopLogger();
 
 const setups = [
   {
+    name: 'NoopTracerRegistry',
+    registry: opentelemetry.getTracerRegistry()
+  },
+  {
     name: 'BasicTracerRegistry',
     registry: new BasicTracerRegistry({ logger })
   },
@@ -18,10 +22,6 @@ const setups = [
   {
     name: 'BasicTracerRegistry with BatchSpanProcessor',
     registry: getRegistry(new BatchSpanProcessor(new InMemorySpanExporter()))
-  },
-  {
-    name: 'NoopTracerRegistry',
-    registry: opentelemetry.getTracerRegistry()
   }
 ];
 
