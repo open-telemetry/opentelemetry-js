@@ -1,11 +1,12 @@
 {
-  "name": "@opentelemetry/types",
+  "name": "@opentelemetry/api",
   "version": "0.3.2",
-  "description": "TypeScript types for OpenTelemetry",
+  "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
+	"test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
     "build": "npm run compile",
     "check": "gts check",
     "precompile": "tsc --version",
@@ -42,8 +43,12 @@
     "access": "public"
   },
   "devDependencies": {
+    "@types/mocha": "^5.2.7",
     "gts": "^1.1.0",
-    "linkinator": "^1.5.0",
+	"linkinator": "^1.5.0",
+	"mocha": "^6.1.0",
+    "nyc": "^14.1.1",
+    "ts-mocha": "^6.0.0",
     "tslint-consistent-codestyle": "^1.15.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "typedoc": "^0.15.0",

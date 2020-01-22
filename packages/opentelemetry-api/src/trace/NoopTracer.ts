@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-import {
-  Tracer,
-  SpanOptions,
-  Span,
-  HttpTextFormat,
-  BinaryFormat,
-} from '@opentelemetry/types';
-import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
+import { BinaryFormat, HttpTextFormat, Span, SpanOptions, Tracer } from '..';
 import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
+import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
 import { NOOP_SPAN } from './NoopSpan';
 
 /**
@@ -60,4 +54,4 @@ export class NoopTracer implements Tracer {
   }
 }
 
-export const noopTracer = new NoopTracer();
+export const NOOP_TRACER = new NoopTracer();

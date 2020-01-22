@@ -16,7 +16,7 @@
 
 import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { hrTimeToNanoseconds, timeInputToHrTime } from '@opentelemetry/core';
 
 /**

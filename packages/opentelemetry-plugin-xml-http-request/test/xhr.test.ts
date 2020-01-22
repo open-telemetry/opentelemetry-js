@@ -26,7 +26,7 @@ import {
 } from '@opentelemetry/core';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import * as tracing from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import {
   PerformanceTimingNames as PTN,
   WebTracerRegistry,

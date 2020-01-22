@@ -18,7 +18,7 @@ import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { spanToThrift } from './transform';
 
 /**

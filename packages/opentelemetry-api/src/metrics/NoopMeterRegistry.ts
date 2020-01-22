@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, SpanContext } from '@opentelemetry/types';
+import { Meter } from './Meter';
+import { MeterRegistry } from './MeterRegistry';
+import { NOOP_METER } from './NoopMeter';
 
 /**
- * No-op implementations of {@link HttpTextFormat}.
+ * An implementation of the {@link MeterRegistry} which returns an impotent Meter
+ * for all calls to `getMeter`
  */
-class NoopHttpTextFormat implements HttpTextFormat {
-  // By default does nothing
-  inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
-  // By default does nothing
-  extract(format: string, carrier: unknown): SpanContext | null {
-    return null;
+export class NoopMeterRegistry implements MeterRegistry {
+  getMeter(_name?: string, _version?: string): Meter {
+    return NOOP_METER;
   }
 }
 
-export const NOOP_HTTP_TEXT_FORMAT = new NoopHttpTextFormat();
+export const NOOP_METER_REGISTRY = new NoopMeterRegistry();

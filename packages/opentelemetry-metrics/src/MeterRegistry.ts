@@ -15,7 +15,7 @@
  */
 
 import { ConsoleLogger } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 

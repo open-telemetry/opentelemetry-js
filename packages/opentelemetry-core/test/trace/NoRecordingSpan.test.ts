@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { NoRecordingSpan } from '../../src/trace/NoRecordingSpan';
-import { TraceFlags } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('NoRecordingSpan', () => {
   it('propagates span contexts', () => {

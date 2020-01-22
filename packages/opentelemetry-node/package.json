@@ -61,7 +61,7 @@
     "@opentelemetry/core": "^0.3.2",
     "@opentelemetry/scope-async-hooks": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/api": "^0.3.2",
     "require-in-the-middle": "^5.0.0",
     "semver": "^6.2.0"
   }

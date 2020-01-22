@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
 import * as pgPoolTypes from 'pg-pool';

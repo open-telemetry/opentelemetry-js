@@ -22,7 +22,7 @@ import {
   PluginInternalFiles,
   PluginInternalFilesVersion,
   TracerRegistry,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import * as semver from 'semver';
 import * as path from 'path';
 

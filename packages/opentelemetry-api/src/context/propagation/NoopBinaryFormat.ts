@@ -14,15 +14,23 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { noopTracer } from './NoopTracer';
+import { SpanContext } from '../../trace/span_context';
+import { BinaryFormat } from './BinaryFormat';
 
 /**
- * An implementation of the {@link TracerRegistry} which returns an impotent Tracer
- * for all calls to `getTracer`
+ * No-op implementations of {@link BinaryFormat}.
  */
-export class NoopTracerRegistry implements types.TracerRegistry {
-  getTracer(_name?: string, _version?: string): types.Tracer {
-    return noopTracer;
+class NoopBinaryFormat implements BinaryFormat {
+  private readonly _buff = new ArrayBuffer(0);
+  // By default does nothing
+  toBytes(spanContext: SpanContext): ArrayBuffer {
+    return this._buff;
+  }
+
+  // By default does nothing
+  fromBytes(buf: ArrayBuffer): SpanContext | null {
+    return null;
   }
 }
+
+export const NOOP_BINARY_FORMAT = new NoopBinaryFormat();

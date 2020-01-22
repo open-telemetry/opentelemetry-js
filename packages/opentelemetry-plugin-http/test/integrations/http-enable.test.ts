@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { SpanKind, Span } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import { plugin } from '../../src/http';

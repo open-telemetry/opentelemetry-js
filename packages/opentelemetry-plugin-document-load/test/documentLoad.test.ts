@@ -25,7 +25,7 @@ import {
   SimpleSpanProcessor,
   SpanExporter,
 } from '@opentelemetry/tracing';
-import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/types';
+import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ExportResult } from '../../opentelemetry-base/build/src';

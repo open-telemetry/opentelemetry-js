@@ -26,7 +26,7 @@ import { plugin } from '../../src/https';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 import { NodeTracerRegistry } from '@opentelemetry/node';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 
 describe('HttpsPlugin', () => {
   let server: https.Server;

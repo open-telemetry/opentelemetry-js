@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import {
-  ConsoleLogger,
-  NOOP_COUNTER_METRIC,
-  NOOP_GAUGE_METRIC,
-  NOOP_MEASURE_METRIC,
-} from '@opentelemetry/core';
+import * as types from '@opentelemetry/api';
+import { ConsoleLogger } from '@opentelemetry/core';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { Metric, CounterMetric, GaugeMetric } from './Metric';
 import {
@@ -64,7 +59,7 @@ export class Meter implements types.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return NOOP_MEASURE_METRIC;
+      return types.NOOP_MEASURE_METRIC;
     }
     // @todo: implement this method
     throw new Error('not implemented yet');
@@ -85,7 +80,7 @@ export class Meter implements types.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return NOOP_COUNTER_METRIC;
+      return types.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
@@ -117,7 +112,7 @@ export class Meter implements types.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return NOOP_GAUGE_METRIC;
+      return types.NOOP_GAUGE_METRIC;
     }
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default

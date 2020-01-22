@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/types';
+import { Logger } from '@opentelemetry/api';
 
 export interface StackdriverExporterOptions {
   /**

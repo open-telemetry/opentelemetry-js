@@ -59,10 +59,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.1",
-    "@opentelemetry/core": "^0.3.1",
-    "@opentelemetry/tracing": "^0.3.1",
-    "@opentelemetry/types": "^0.3.1",
+    "@opentelemetry/base": "^0.3.2",
+    "@opentelemetry/core": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.2",
+    "@opentelemetry/api": "^0.3.2",
     "google-auth-library": "^5.7.0",
     "googleapis": "^46.0.0"
   }

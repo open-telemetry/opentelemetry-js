@@ -15,7 +15,7 @@
  */
 
 import * as dns from 'dns';
-import { PluginConfig } from '@opentelemetry/types';
+import { PluginConfig } from '@opentelemetry/api';
 
 export type Dns = typeof dns;
 

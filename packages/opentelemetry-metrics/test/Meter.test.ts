@@ -22,14 +22,9 @@ import {
   GaugeMetric,
   MetricDescriptorType,
 } from '../src';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
-import {
-  NoopLogger,
-  NoopMetric,
-  hrTime,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
+import { NoopLogger, hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
 import { NoopExporter } from './mocks/Exporter';
 import { MeterRegistry } from '../src/MeterRegistry';
 
@@ -205,19 +200,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof NoopMetric);
+        assert.ok(counter instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof NoopMetric);
-        assert.ok(counter_ instanceof NoopMetric);
+        assert.ok(counter1 instanceof types.NoopMetric);
+        assert.ok(counter_ instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof NoopMetric);
+        assert.ok(counter instanceof types.NoopMetric);
       });
     });
   });
@@ -346,19 +341,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createGauge('');
-        assert.ok(gauge instanceof NoopMetric);
+        assert.ok(gauge instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const gauge1 = meter.createGauge('1name');
         const gauge_ = meter.createGauge('_name');
-        assert.ok(gauge1 instanceof NoopMetric);
-        assert.ok(gauge_ instanceof NoopMetric);
+        assert.ok(gauge1 instanceof types.NoopMetric);
+        assert.ok(gauge_ instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const gauge = meter.createGauge('name with invalid characters^&*(');
-        assert.ok(gauge instanceof NoopMetric);
+        assert.ok(gauge instanceof types.NoopMetric);
       });
     });
   });
@@ -367,19 +362,19 @@ describe('Meter', () => {
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createMeasure('');
-        assert.ok(gauge instanceof NoopMetric);
+        assert.ok(gauge instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const gauge1 = meter.createMeasure('1name');
         const gauge_ = meter.createMeasure('_name');
-        assert.ok(gauge1 instanceof NoopMetric);
-        assert.ok(gauge_ instanceof NoopMetric);
+        assert.ok(gauge1 instanceof types.NoopMetric);
+        assert.ok(gauge_ instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const gauge = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(gauge instanceof NoopMetric);
+        assert.ok(gauge instanceof types.NoopMetric);
       });
     });
   });

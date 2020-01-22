@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';

@@ -15,13 +15,7 @@
  */
 
 import * as childProcess from 'child_process';
-import {
-  SpanKind,
-  Attributes,
-  Event,
-  Span,
-  Status,
-} from '@opentelemetry/types';
+import { SpanKind, Attributes, Event, Span, Status } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {

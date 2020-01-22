@@ -14,22 +14,19 @@
  * limitations under the License.
  */
 
-import { SpanContext, BinaryFormat } from '@opentelemetry/types';
+import { SpanContext } from '../../trace/span_context';
+import { HttpTextFormat } from './HttpTextFormat';
 
 /**
- * No-op implementations of {@link BinaryFormat}.
+ * No-op implementations of {@link HttpTextFormat}.
  */
-class NoopBinaryFormat implements BinaryFormat {
-  private readonly _buff = new ArrayBuffer(0);
+class NoopHttpTextFormat implements HttpTextFormat {
   // By default does nothing
-  toBytes(spanContext: SpanContext): ArrayBuffer {
-    return this._buff;
-  }
-
+  inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
   // By default does nothing
-  fromBytes(buf: ArrayBuffer): SpanContext | null {
+  extract(format: string, carrier: unknown): SpanContext | null {
     return null;
   }
 }
 
-export const NOOP_BINARY_FORMAT = new NoopBinaryFormat();
+export const NOOP_HTTP_TEXT_FORMAT = new NoopHttpTextFormat();

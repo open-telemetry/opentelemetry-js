@@ -57,7 +57,7 @@
     "@opentelemetry/base": "^0.3.2",
     "@opentelemetry/core": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/api": "^0.3.2",
     "jaeger-client": "^3.15.0"
   }
 }

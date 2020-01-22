@@ -27,7 +27,7 @@ import {
   Span,
   CanonicalCode,
   Status,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import { plugin, PostgresPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';

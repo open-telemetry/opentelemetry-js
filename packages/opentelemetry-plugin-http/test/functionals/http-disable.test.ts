@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
+import { NoopTracerRegistry, NOOP_TRACER } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
+import { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
-
 import { plugin } from '../../src/http';
-import {
-  NoopLogger,
-  NoopTracerRegistry,
-  noopTracer,
-} from '@opentelemetry/core';
-import { AddressInfo } from 'net';
 import { httpRequest } from '../utils/httpRequest';
 
 describe('HttpPlugin', () => {
@@ -53,8 +49,8 @@ describe('HttpPlugin', () => {
     });
 
     beforeEach(() => {
-      noopTracer.startSpan = sinon.spy();
-      noopTracer.withSpan = sinon.spy();
+      NOOP_TRACER.startSpan = sinon.spy();
+      NOOP_TRACER.withSpan = sinon.spy();
     });
 
     afterEach(() => {
@@ -73,13 +69,13 @@ describe('HttpPlugin', () => {
 
         await httpRequest.get(options).then(result => {
           assert.strictEqual(
-            (noopTracer.startSpan as sinon.SinonSpy).called,
+            (NOOP_TRACER.startSpan as sinon.SinonSpy).called,
             false
           );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
           assert.strictEqual(
-            (noopTracer.withSpan as sinon.SinonSpy).called,
+            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
             false
           );
         });

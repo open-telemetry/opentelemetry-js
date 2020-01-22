@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { noopMeter } from './NoopMeter';
+import { NOOP_TRACER } from './NoopTracer';
+import { Tracer } from './tracer';
+import { TracerRegistry } from './tracer_registry';
 
 /**
- * An implementation of the {@link MeterRegistry} which returns an impotent Meter
- * for all calls to `getMeter`
+ * An implementation of the {@link TracerRegistry} which returns an impotent Tracer
+ * for all calls to `getTracer`
  */
-export class NoopMeterRegistry implements types.MeterRegistry {
-  getMeter(_name?: string, _version?: string): types.Meter {
-    return noopMeter;
+export class NoopTracerRegistry implements TracerRegistry {
+  getTracer(_name?: string, _version?: string): Tracer {
+    return NOOP_TRACER;
   }
 }
+
+export const NOOP_TRACER_REGISTRY = new NoopTracerRegistry();

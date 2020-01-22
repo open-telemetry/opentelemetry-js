@@ -22,7 +22,7 @@ import {
   SpanKind,
   SpanOptions,
   Status,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';

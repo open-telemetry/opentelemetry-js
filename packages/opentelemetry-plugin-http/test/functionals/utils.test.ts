@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';

@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';

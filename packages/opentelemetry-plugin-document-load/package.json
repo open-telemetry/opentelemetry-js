@@ -74,7 +74,7 @@
   "dependencies": {
     "@opentelemetry/core": "^0.3.2",
     "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/api": "^0.3.2",
     "@opentelemetry/web": "^0.3.2"
   }
 }

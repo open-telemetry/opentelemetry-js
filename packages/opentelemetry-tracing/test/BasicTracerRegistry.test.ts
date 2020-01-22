@@ -24,7 +24,7 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
-import { TraceFlags } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { BasicTracerRegistry, Span } from '../src';
 

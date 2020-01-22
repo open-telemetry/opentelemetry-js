@@ -20,7 +20,7 @@ import {
 } from '@opentelemetry/core';
 import * as core from '@opentelemetry/core';
 import * as tracing from '@opentelemetry/tracing';
-import { HrTime } from '@opentelemetry/types';
+import { HrTime } from '@opentelemetry/api';
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
