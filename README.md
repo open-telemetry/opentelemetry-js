@@ -197,3 +197,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
+[otel-types]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-types
+[otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core
