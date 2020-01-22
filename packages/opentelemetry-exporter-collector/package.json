@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -79,9 +79,9 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.2",
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2"
+    "@opentelemetry/base": "^0.3.3",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3"
   }
 }

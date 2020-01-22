@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "OpenTracing to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -39,7 +39,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/tracing": "^0.3.2",
+    "@opentelemetry/tracing": "^0.3.3",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "codecov": "^3.6.1",
@@ -54,8 +54,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3",
     "opentracing": "^0.14.4"
   }
 }

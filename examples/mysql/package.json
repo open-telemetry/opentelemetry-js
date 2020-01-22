@@ -1,7 +1,7 @@
 {
   "name": "mysql-example",
   "private": true,
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Example of mysql integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -28,13 +28,13 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/exporter-jaeger": "^0.3.2",
-    "@opentelemetry/exporter-zipkin": "^0.3.2",
-    "@opentelemetry/node": "^0.3.2",
-    "@opentelemetry/plugin-http": "^0.3.2",
-    "@opentelemetry/plugin-mysql": "^0.3.2",
-    "@opentelemetry/tracing": "^0.3.2",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/exporter-jaeger": "^0.3.3",
+    "@opentelemetry/exporter-zipkin": "^0.3.3",
+    "@opentelemetry/node": "^0.3.3",
+    "@opentelemetry/plugin-http": "^0.3.3",
+    "@opentelemetry/plugin-mysql": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
     "mysql": "*"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
