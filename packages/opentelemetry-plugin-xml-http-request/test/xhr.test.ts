@@ -18,6 +18,7 @@ import * as sinon from 'sinon';
 
 import {
   B3Format,
+  CommonAttributeNames,
   LogLevel,
   otperformance as performance,
   X_B3_SAMPLED,
@@ -216,36 +217,36 @@ describe('xhr', () => {
 
       assert.ok(
         attributes[keys[0]] !== '',
-        `attributes ${AttributeNames.COMPONENT} is not defined`
+        `attributes ${CommonAttributeNames.COMPONENT} is not defined`
       );
       assert.strictEqual(
         attributes[keys[1]],
         'GET',
-        `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${AttributeNames.HTTP_URL} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         200,
-        `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_STATUS_CODE} is wrong`
       );
       assert.strictEqual(
         attributes[keys[4]],
         'OK',
-        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.strictEqual(
         attributes[keys[5]],
         window.location.host,
-        `attributes ${AttributeNames.HTTP_HOST} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_HOST} is wrong`
       );
       assert.ok(
         attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',
@@ -483,36 +484,36 @@ describe('xhr', () => {
 
       assert.ok(
         attributes[keys[0]] !== '',
-        `attributes ${AttributeNames.COMPONENT} is not defined`
+        `attributes ${CommonAttributeNames.COMPONENT} is not defined`
       );
       assert.strictEqual(
         attributes[keys[1]],
         'GET',
-        `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_METHOD} is wrong`
       );
       assert.strictEqual(
         attributes[keys[2]],
         url,
-        `attributes ${AttributeNames.HTTP_URL} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_URL} is wrong`
       );
       assert.strictEqual(
         attributes[keys[3]],
         400,
-        `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_STATUS_CODE} is wrong`
       );
       assert.strictEqual(
         attributes[keys[4]],
         'Bad Request',
-        `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
       assert.strictEqual(
         attributes[keys[5]],
         'raw.githubusercontent.com',
-        `attributes ${AttributeNames.HTTP_HOST} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_HOST} is wrong`
       );
       assert.ok(
         attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-        `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
+        `attributes ${CommonAttributeNames.HTTP_SCHEME} is wrong`
       );
       assert.ok(
         attributes[keys[7]] !== '',

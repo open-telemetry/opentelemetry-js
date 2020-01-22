@@ -15,8 +15,8 @@
  */
 
 import { Attributes } from '@opentelemetry/types';
-import { AttributeNames } from './enums';
 import { ConnectionConfig, Query } from './types';
+import { CommonAttributeNames } from '@opentelemetry/core';
 
 /**
  * Get a span name from a mysql query
@@ -53,11 +53,11 @@ export function getConnectionAttributes(config: ConnectionConfig): Attributes {
   const { host, port, database, user } = getConfig(config);
 
   return {
-    [AttributeNames.PEER_ADDRESS]: getJDBCString(host, port, database),
-    [AttributeNames.DB_INSTANCE]: database,
-    [AttributeNames.PEER_HOSTNAME]: host,
-    [AttributeNames.PEER_PORT]: port,
-    [AttributeNames.DB_USER]: user,
+    [CommonAttributeNames.PEER_ADDRESS]: getJDBCString(host, port, database),
+    [CommonAttributeNames.DB_INSTANCE]: database,
+    [CommonAttributeNames.PEER_HOSTNAME]: host,
+    [CommonAttributeNames.PEER_PORT]: port,
+    [CommonAttributeNames.DB_USER]: user,
   };
 }
 

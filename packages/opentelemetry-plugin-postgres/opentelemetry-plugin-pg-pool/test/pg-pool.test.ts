@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { CommonAttributeNames, NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -50,25 +50,25 @@ const CONFIG = {
 };
 
 const DEFAULT_PGPOOL_ATTRIBUTES = {
-  [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
-  [AttributeNames.DB_INSTANCE]: CONFIG.database,
-  [AttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE,
-  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
-  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
-  [AttributeNames.PEER_PORT]: CONFIG.port,
-  [AttributeNames.DB_USER]: CONFIG.user,
+  [CommonAttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT,
+  [CommonAttributeNames.DB_INSTANCE]: CONFIG.database,
+  [CommonAttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE,
+  [CommonAttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [CommonAttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
+  [CommonAttributeNames.PEER_PORT]: CONFIG.port,
+  [CommonAttributeNames.DB_USER]: CONFIG.user,
   [AttributeNames.MAX_CLIENT]: CONFIG.maxClient,
   [AttributeNames.IDLE_TIMEOUT_MILLIS]: CONFIG.idleTimeoutMillis,
 };
 
 const DEFAULT_PG_ATTRIBUTES = {
-  [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-  [AttributeNames.DB_INSTANCE]: CONFIG.database,
-  [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
-  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
-  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
-  [AttributeNames.PEER_PORT]: CONFIG.port,
-  [AttributeNames.DB_USER]: CONFIG.user,
+  [CommonAttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+  [CommonAttributeNames.DB_INSTANCE]: CONFIG.database,
+  [CommonAttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
+  [CommonAttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [CommonAttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
+  [CommonAttributeNames.PEER_PORT]: CONFIG.port,
+  [CommonAttributeNames.DB_USER]: CONFIG.user,
 };
 
 const okStatus: Status = {
@@ -149,7 +149,7 @@ describe('pg-pool@2.x', () => {
       };
       const pgAttributes = {
         ...DEFAULT_PG_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+        [CommonAttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const span = registry.getTracer('test-pg-pool').startSpan('test span');
@@ -175,7 +175,7 @@ describe('pg-pool@2.x', () => {
       };
       const pgAttributes = {
         ...DEFAULT_PG_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+        [CommonAttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const parentSpan = registry
@@ -217,7 +217,7 @@ describe('pg-pool@2.x', () => {
       };
       const pgAttributes = {
         ...DEFAULT_PG_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+        [CommonAttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const span = registry.getTracer('test-pg-pool').startSpan('test span');
@@ -240,7 +240,7 @@ describe('pg-pool@2.x', () => {
       };
       const pgAttributes = {
         ...DEFAULT_PG_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+        [CommonAttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const parentSpan = registry

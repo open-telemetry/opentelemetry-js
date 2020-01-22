@@ -22,10 +22,9 @@ import {
 import { NodeTracerRegistry } from '@opentelemetry/node';
 import { plugin, RedisPlugin } from '../src';
 import * as redisTypes from 'redis';
-import { NoopLogger } from '@opentelemetry/core';
+import { CommonAttributeNames, NoopLogger } from '@opentelemetry/core';
 import * as testUtils from '@opentelemetry/test-utils';
 import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
-import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -37,10 +36,10 @@ const CONFIG = {
 const URL = `redis://${CONFIG.host}:${CONFIG.port}`;
 
 const DEFAULT_ATTRIBUTES = {
-  [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
-  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
-  [AttributeNames.PEER_PORT]: CONFIG.port,
-  [AttributeNames.PEER_ADDRESS]: URL,
+  [CommonAttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
+  [CommonAttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [CommonAttributeNames.PEER_PORT]: CONFIG.port,
+  [CommonAttributeNames.PEER_ADDRESS]: URL,
 };
 
 const okStatus: Status = {
@@ -160,7 +159,7 @@ describe('redis@2.x', () => {
         it(`should create a child span for ${operation.description}`, done => {
           const attributes = {
             ...DEFAULT_ATTRIBUTES,
-            [AttributeNames.DB_STATEMENT]: operation.command,
+            [CommonAttributeNames.DB_STATEMENT]: operation.command,
           };
           const span = tracer.startSpan('test span');
           tracer.withSpan(span, () => {

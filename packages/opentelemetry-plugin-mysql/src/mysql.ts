@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin, CommonAttributeNames } from '@opentelemetry/core';
 import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
 import * as mysqlTypes from 'mysql';
 import * as shimmer from 'shimmer';
@@ -29,9 +28,9 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
   static readonly DB_TYPE = 'sql';
 
   static readonly COMMON_ATTRIBUTES = {
-    [AttributeNames.COMPONENT]: MysqlPlugin.COMPONENT,
-    [AttributeNames.DB_TYPE]: MysqlPlugin.DB_TYPE,
-    [AttributeNames.PEER_SERVICE]: MysqlPlugin.COMPONENT,
+    [CommonAttributeNames.COMPONENT]: MysqlPlugin.COMPONENT,
+    [CommonAttributeNames.DB_TYPE]: MysqlPlugin.DB_TYPE,
+    [CommonAttributeNames.PEER_SERVICE]: MysqlPlugin.COMPONENT,
   };
 
   private _enabled = false;
@@ -218,10 +217,10 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         });
 
         if (typeof query === 'string') {
-          span.setAttribute(AttributeNames.DB_STATEMENT, query);
+          span.setAttribute(CommonAttributeNames.DB_STATEMENT, query);
         } else if (typeof query === 'object') {
           if (query.sql) {
-            span.setAttribute(AttributeNames.DB_STATEMENT, query.sql);
+            span.setAttribute(CommonAttributeNames.DB_STATEMENT, query.sql);
           }
 
           if (query.values) {

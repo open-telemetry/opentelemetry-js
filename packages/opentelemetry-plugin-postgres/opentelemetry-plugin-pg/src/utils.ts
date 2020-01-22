@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import { CommonAttributeNames } from '@opentelemetry/core';
 import { Span, CanonicalCode, Tracer, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import {
@@ -54,13 +54,13 @@ function pgStartSpan(
     kind: SpanKind.CLIENT,
     parent: tracer.getCurrentSpan(),
     attributes: {
-      [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
-      [AttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
-      [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
-      [AttributeNames.PEER_ADDRESS]: jdbcString, // required
-      [AttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
-      [AttributeNames.PEER_PORT]: client.connectionParameters.port,
-      [AttributeNames.DB_USER]: client.connectionParameters.user,
+      [CommonAttributeNames.COMPONENT]: PostgresPlugin.COMPONENT, // required
+      [CommonAttributeNames.DB_INSTANCE]: client.connectionParameters.database, // required
+      [CommonAttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE, // required
+      [CommonAttributeNames.PEER_ADDRESS]: jdbcString, // required
+      [CommonAttributeNames.PEER_HOSTNAME]: client.connectionParameters.host, // required
+      [CommonAttributeNames.PEER_PORT]: client.connectionParameters.port,
+      [CommonAttributeNames.DB_USER]: client.connectionParameters.user,
     },
   });
 }
@@ -80,7 +80,7 @@ export function handleConfigQuery(
 
   // Set attributes
   if (argsConfig.text) {
-    span.setAttribute(AttributeNames.DB_STATEMENT, argsConfig.text);
+    span.setAttribute(CommonAttributeNames.DB_STATEMENT, argsConfig.text);
   }
 
   if (argsConfig.values instanceof Array) {
@@ -109,7 +109,7 @@ export function handleParameterizedQuery(
   const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
-  span.setAttribute(AttributeNames.DB_STATEMENT, args[0]);
+  span.setAttribute(CommonAttributeNames.DB_STATEMENT, args[0]);
   if (args[1] instanceof Array) {
     span.setAttribute(AttributeNames.PG_VALUES, arrayStringifyHelper(args[1]));
   }
@@ -129,7 +129,7 @@ export function handleTextQuery(
   const span = pgStartSpan(tracer, this, name);
 
   // Set attributes
-  span.setAttribute(AttributeNames.DB_STATEMENT, args[0]);
+  span.setAttribute(CommonAttributeNames.DB_STATEMENT, args[0]);
 
   return span;
 }

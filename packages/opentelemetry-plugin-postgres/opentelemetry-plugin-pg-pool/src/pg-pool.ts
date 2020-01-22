@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin, CommonAttributeNames } from '@opentelemetry/core';
 import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
 import * as shimmer from 'shimmer';
@@ -69,13 +69,13 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
             kind: SpanKind.CLIENT,
             parent: plugin._tracer.getCurrentSpan() || undefined,
             attributes: {
-              [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT, // required
-              [AttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE, // required
-              [AttributeNames.DB_INSTANCE]: this.options.database, // required
-              [AttributeNames.PEER_HOSTNAME]: this.options.host, // required
-              [AttributeNames.PEER_ADDRESS]: jdbcString, // required
-              [AttributeNames.PEER_PORT]: this.options.port,
-              [AttributeNames.DB_USER]: this.options.user,
+              [CommonAttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT, // required
+              [CommonAttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE, // required
+              [CommonAttributeNames.DB_INSTANCE]: this.options.database, // required
+              [CommonAttributeNames.PEER_HOSTNAME]: this.options.host, // required
+              [CommonAttributeNames.PEER_ADDRESS]: jdbcString, // required
+              [CommonAttributeNames.PEER_PORT]: this.options.port,
+              [CommonAttributeNames.DB_USER]: this.options.user,
               [AttributeNames.IDLE_TIMEOUT_MILLIS]: this.options
                 .idleTimeoutMillis,
               [AttributeNames.MAX_CLIENT]: this.options.maxClient,

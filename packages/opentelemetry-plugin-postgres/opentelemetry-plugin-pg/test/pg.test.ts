@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { CommonAttributeNames, NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -46,13 +46,13 @@ const CONFIG = {
 };
 
 const DEFAULT_ATTRIBUTES = {
-  [AttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
-  [AttributeNames.DB_INSTANCE]: CONFIG.database,
-  [AttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
-  [AttributeNames.PEER_HOSTNAME]: CONFIG.host,
-  [AttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
-  [AttributeNames.PEER_PORT]: CONFIG.port,
-  [AttributeNames.DB_USER]: CONFIG.user,
+  [CommonAttributeNames.COMPONENT]: PostgresPlugin.COMPONENT,
+  [CommonAttributeNames.DB_INSTANCE]: CONFIG.database,
+  [CommonAttributeNames.DB_TYPE]: PostgresPlugin.DB_TYPE,
+  [CommonAttributeNames.PEER_HOSTNAME]: CONFIG.host,
+  [CommonAttributeNames.PEER_ADDRESS]: `jdbc:postgresql://${CONFIG.host}:${CONFIG.port}/${CONFIG.database}`,
+  [CommonAttributeNames.PEER_PORT]: CONFIG.port,
+  [CommonAttributeNames.DB_USER]: CONFIG.user,
 };
 
 const okStatus: Status = {
@@ -188,7 +188,7 @@ describe('pg@7.x', () => {
     it('should intercept client.query(text, callback)', done => {
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: 'SELECT NOW()',
+        [CommonAttributeNames.DB_STATEMENT]: 'SELECT NOW()',
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -208,7 +208,7 @@ describe('pg@7.x', () => {
       const values = ['0'];
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: '[0]',
       };
       const events: TimedEvent[] = [];
@@ -228,7 +228,7 @@ describe('pg@7.x', () => {
       const query = 'SELECT NOW()';
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -250,7 +250,7 @@ describe('pg@7.x', () => {
       const query = 'SELECT NOW()';
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');
@@ -270,7 +270,7 @@ describe('pg@7.x', () => {
       const values = ['0'];
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: '[0]',
       };
       const events: TimedEvent[] = [];
@@ -291,7 +291,7 @@ describe('pg@7.x', () => {
       const values = ['0'];
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: '[0]',
       };
       const events: TimedEvent[] = [];
@@ -317,7 +317,7 @@ describe('pg@7.x', () => {
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
         [AttributeNames.PG_PLAN]: name,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
         [AttributeNames.PG_VALUES]: '[0]',
       };
       const events: TimedEvent[] = [];
@@ -342,7 +342,7 @@ describe('pg@7.x', () => {
       const query = 'SELECT NOW()';
       const attributes = {
         ...DEFAULT_ATTRIBUTES,
-        [AttributeNames.DB_STATEMENT]: query,
+        [CommonAttributeNames.DB_STATEMENT]: query,
       };
       const events: TimedEvent[] = [];
       const span = tracer.startSpan('test span');

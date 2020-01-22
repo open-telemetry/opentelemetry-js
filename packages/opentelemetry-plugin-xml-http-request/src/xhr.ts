@@ -16,6 +16,7 @@
 
 import {
   BasePlugin,
+  CommonAttributeNames,
   hrTime,
   isUrlIgnored,
   isWrapped,
@@ -154,11 +155,14 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
 
-      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhrMem.status);
-      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
-      span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(CommonAttributeNames.HTTP_STATUS_CODE, xhrMem.status);
       span.setAttribute(
-        AttributeNames.HTTP_SCHEME,
+        CommonAttributeNames.HTTP_STATUS_TEXT,
+        xhrMem.statusText
+      );
+      span.setAttribute(CommonAttributeNames.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(
+        CommonAttributeNames.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
@@ -321,9 +325,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const currentSpan = this._tracer.startSpan(url, {
       parent: this._tracer.getCurrentSpan(),
       attributes: {
-        [AttributeNames.COMPONENT]: this.component,
-        [AttributeNames.HTTP_METHOD]: method,
-        [AttributeNames.HTTP_URL]: url,
+        [CommonAttributeNames.COMPONENT]: this.component,
+        [CommonAttributeNames.HTTP_METHOD]: method,
+        [CommonAttributeNames.HTTP_URL]: url,
       },
     });
 

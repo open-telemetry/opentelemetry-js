@@ -18,6 +18,7 @@ export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
 export * from './common/time';
 export * from './common/types';
+export * from './common/attributes';
 export * from './version';
 export * from './context/propagation/B3Format';
 export * from './context/propagation/BinaryTraceContext';

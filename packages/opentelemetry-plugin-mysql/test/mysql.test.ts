@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { CommonAttributeNames, NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -584,13 +584,16 @@ function assertSpan(
   values?: any,
   errorMessage?: string
 ) {
-  assert.equal(span.attributes[AttributeNames.COMPONENT], 'mysql');
-  assert.equal(span.attributes[AttributeNames.DB_TYPE], 'sql');
-  assert.equal(span.attributes[AttributeNames.DB_INSTANCE], database);
-  assert.equal(span.attributes[AttributeNames.PEER_PORT], port);
-  assert.equal(span.attributes[AttributeNames.PEER_HOSTNAME], host);
-  assert.equal(span.attributes[AttributeNames.DB_USER], user);
-  assert.strictEqual(span.attributes[AttributeNames.DB_STATEMENT], statement);
+  assert.equal(span.attributes[CommonAttributeNames.COMPONENT], 'mysql');
+  assert.equal(span.attributes[CommonAttributeNames.DB_TYPE], 'sql');
+  assert.equal(span.attributes[CommonAttributeNames.DB_INSTANCE], database);
+  assert.equal(span.attributes[CommonAttributeNames.PEER_PORT], port);
+  assert.equal(span.attributes[CommonAttributeNames.PEER_HOSTNAME], host);
+  assert.equal(span.attributes[CommonAttributeNames.DB_USER], user);
+  assert.strictEqual(
+    span.attributes[CommonAttributeNames.DB_STATEMENT],
+    statement
+  );
   if (values) {
     assert.deepStrictEqual(
       span.attributes[AttributeNames.MYSQL_VALUES],
