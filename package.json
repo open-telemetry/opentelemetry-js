@@ -7,6 +7,9 @@
   "scripts": {
     "bench": "node benchmark",
     "clean": "lerna run clean",
+    "clean:examples": "find examples -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
+    "clean:packages": "find packages -name 'node_modules' -path 'opentelemetry/node/test' -prune -type d -prune -exec rm -rf '{}' +",
+    "clean:all": "npm run clean && npm run clean:examples && npm run clean:packages",
     "fix": "lerna run fix",
     "postinstall": "yarn run bootstrap",
     "precompile": "tsc --version",
