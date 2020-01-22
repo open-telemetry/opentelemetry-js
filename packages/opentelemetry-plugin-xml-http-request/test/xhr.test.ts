@@ -34,7 +34,6 @@ import {
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
-import { Tracer } from '@opentelemetry/types';
 
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
@@ -101,7 +100,7 @@ describe('xhr', () => {
   let clearData: any;
 
   describe('when request is successful', () => {
-    let webTracerWithZone: Tracer;
+    let webTracerWithZone: types.Tracer;
     let webTracerRegistryWithZone: WebTracerRegistry;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
@@ -410,7 +409,7 @@ describe('xhr', () => {
 
   describe('when request is NOT successful', () => {
     let webTracerWithZoneRegistry: WebTracerRegistry;
-    let webTracerWithZone: Tracer;
+    let webTracerWithZone: types.Tracer;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
     let rootSpan: types.Span;
