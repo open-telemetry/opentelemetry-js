@@ -280,7 +280,19 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500, 505];
+      const httpErrorCodes = [
+        400,
+        401,
+        403,
+        404,
+        429,
+        501,
+        503,
+        504,
+        500,
+        505,
+        597,
+      ];
 
       for (let i = 0; i < httpErrorCodes.length; i++) {
         it(`should test span for GET requests with http error ${httpErrorCodes[i]}`, async () => {
