@@ -97,11 +97,11 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#bind" class="tsd-kind-icon">bind</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#clear" class="tsd-kind-icon">clear</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#getdefaulthandle" class="tsd-kind-icon">get<wbr>Default<wbr>Handle</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#gethandle" class="tsd-kind-icon">get<wbr>Handle</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#removehandle" class="tsd-kind-icon">remove<wbr>Handle</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#unbind" class="tsd-kind-icon">unbind</a></li>
 							</ul>
 						</section>
 					</div>
@@ -109,6 +109,39 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="bind" class="tsd-anchor"></a>
+					<h3>bind</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/Metric.ts#L81">metrics/Metric.ts:81</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Instrument associated with specified LabelSet.
+										It is recommended to keep a reference to the Instrument instead of always
+									calling this method for every operations.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
 					<a name="clear" class="tsd-anchor"></a>
 					<h3>clear</h3>
@@ -119,7 +152,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Metric.ts#L97">metrics/Metric.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/Metric.ts#L97">metrics/Metric.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -132,88 +165,24 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="getdefaulthandle" class="tsd-anchor"></a>
-					<h3>get<wbr>Default<wbr>Handle</h3>
+					<a name="getdefaultbound" class="tsd-anchor"></a>
+					<h3>get<wbr>Default<wbr>Bound</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Default<wbr>Handle<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Default<wbr>Bound<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Metric.ts#L86">metrics/Metric.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/Metric.ts#L86">metrics/Metric.ts:86</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns a Handle for a metric with all labels not set.</p>
+									<p>Returns a Instrument for a metric with all labels not set.</p>
 								</div>
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="gethandle" class="tsd-anchor"></a>
-					<h3>get<wbr>Handle</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Handle<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Metric.ts#L81">metrics/Metric.ts:81</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns a Handle associated with specified LabelSet.
-										It is recommended to keep a reference to the Handle instead of always
-									calling this method for every operations.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the canonicalized LabelSet used to associate with this metric handle.</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="removehandle" class="tsd-anchor"></a>
-					<h3>remove<wbr>Handle</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">remove<wbr>Handle<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Metric.ts#L92">metrics/Metric.ts:92</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Removes the Handle from the metric, if it is present.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the canonicalized LabelSet used to associate with this metric handle.</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -227,7 +196,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Metric.ts#L102">metrics/Metric.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/Metric.ts#L102">metrics/Metric.ts:102</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -251,6 +220,37 @@
 											</ul>
 										</li>
 									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+					<a name="unbind" class="tsd-anchor"></a>
+					<h3>unbind</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+						<li class="tsd-signature tsd-kind-icon">unbind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/Metric.ts#L92">metrics/Metric.ts:92</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Removes the Instrument from the metric, if it is present.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -291,7 +291,13 @@
 						<a href="binaryformat.html" class="tsd-kind-icon">Binary<wbr>Format</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="counterhandle.html" class="tsd-kind-icon">Counter<wbr>Handle</a>
+						<a href="boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundgauge.html" class="tsd-kind-icon">Bound<wbr>Gauge</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="distributedcontext.html" class="tsd-kind-icon">Distributed<wbr>Context</a>
@@ -301,9 +307,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="event.html" class="tsd-kind-icon">Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="gaugehandle.html" class="tsd-kind-icon">Gauge<wbr>Handle</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="httptextformat.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Format</a>
@@ -318,10 +321,10 @@
 						<a href="logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="measurehandle.html" class="tsd-kind-icon">Measure<wbr>Handle</a>
+						<a href="meter.html" class="tsd-kind-icon">Meter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="meter.html" class="tsd-kind-icon">Meter</a>
+						<a href="meterregistry.html" class="tsd-kind-icon">Meter<wbr>Registry</a>
 					</li>
 				</ul>
 				<ul class="current">
@@ -329,19 +332,19 @@
 						<a href="metric.html" class="tsd-kind-icon">Metric</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="metric.html#bind" class="tsd-kind-icon">bind</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="metric.html#clear" class="tsd-kind-icon">clear</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#getdefaulthandle" class="tsd-kind-icon">get<wbr>Default<wbr>Handle</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#gethandle" class="tsd-kind-icon">get<wbr>Handle</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#removehandle" class="tsd-kind-icon">remove<wbr>Handle</a>
+								<a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
 								<a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface">
+								<a href="metric.html#unbind" class="tsd-kind-icon">unbind</a>
 							</li>
 						</ul>
 					</li>
@@ -389,6 +392,9 @@
 					<li class=" tsd-kind-interface">
 						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
 					</li>
+					<li class=" tsd-kind-interface">
+						<a href="tracerregistry.html" class="tsd-kind-icon">Tracer<wbr>Registry</a>
+					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
 					</li>
@@ -400,6 +406,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#version" class="tsd-kind-icon">VERSION</a>
 					</li>
 				</ul>
 			</nav>

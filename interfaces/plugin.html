@@ -117,7 +117,7 @@
 					<div class="tsd-signature tsd-kind-icon">supported<wbr>Versions<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L29">trace/instrumentation/Plugin.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L29">trace/instrumentation/Plugin.ts:29</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -142,7 +142,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L47">trace/instrumentation/Plugin.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L47">trace/instrumentation/Plugin.ts:47</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -158,13 +158,13 @@
 					<a name="enable" class="tsd-anchor"></a>
 					<h3>enable</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span>moduleExports<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, tracer<span class="tsd-signature-symbol">: </span><a href="tracer.html" class="tsd-signature-type">Tracer</a>, logger<span class="tsd-signature-symbol">: </span><a href="logger.html" class="tsd-signature-type">Logger</a>, config<span class="tsd-signature-symbol">?: </span><a href="pluginconfig.html" class="tsd-signature-type">PluginConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+						<li class="tsd-signature tsd-kind-icon">enable<span class="tsd-signature-symbol">(</span>moduleExports<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, TracerRegistry<span class="tsd-signature-symbol">: </span><a href="tracerregistry.html" class="tsd-signature-type">TracerRegistry</a>, logger<span class="tsd-signature-symbol">: </span><a href="logger.html" class="tsd-signature-type">Logger</a>, config<span class="tsd-signature-symbol">?: </span><a href="pluginconfig.html" class="tsd-signature-type">PluginConfig</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L39">trace/instrumentation/Plugin.ts:39</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/trace/instrumentation/Plugin.ts#L39">trace/instrumentation/Plugin.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -182,9 +182,9 @@
 									</div>
 								</li>
 								<li>
-									<h5>tracer: <a href="tracer.html" class="tsd-signature-type">Tracer</a></h5>
+									<h5>TracerRegistry: <a href="tracerregistry.html" class="tsd-signature-type">TracerRegistry</a></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>a tracer instance.</p>
+										<p>a tracer registry.</p>
 									</div>
 								</li>
 								<li>
@@ -235,7 +235,13 @@
 						<a href="binaryformat.html" class="tsd-kind-icon">Binary<wbr>Format</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="counterhandle.html" class="tsd-kind-icon">Counter<wbr>Handle</a>
+						<a href="boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundgauge.html" class="tsd-kind-icon">Bound<wbr>Gauge</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="distributedcontext.html" class="tsd-kind-icon">Distributed<wbr>Context</a>
@@ -245,9 +251,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="event.html" class="tsd-kind-icon">Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="gaugehandle.html" class="tsd-kind-icon">Gauge<wbr>Handle</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="httptextformat.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Format</a>
@@ -262,10 +265,10 @@
 						<a href="logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="measurehandle.html" class="tsd-kind-icon">Measure<wbr>Handle</a>
+						<a href="meter.html" class="tsd-kind-icon">Meter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="meter.html" class="tsd-kind-icon">Meter</a>
+						<a href="meterregistry.html" class="tsd-kind-icon">Meter<wbr>Registry</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="metric.html" class="tsd-kind-icon">Metric</a>
@@ -327,6 +330,9 @@
 					<li class=" tsd-kind-interface">
 						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
 					</li>
+					<li class=" tsd-kind-interface">
+						<a href="tracerregistry.html" class="tsd-kind-icon">Tracer<wbr>Registry</a>
+					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
 					</li>
@@ -338,6 +344,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#version" class="tsd-kind-icon">VERSION</a>
 					</li>
 				</ul>
 			</nav>

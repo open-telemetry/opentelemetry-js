@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>MeasureHandle | OpenTelemetry API for JavaScript</title>
+	<title>MeterRegistry | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="measurehandle.html">MeasureHandle</a>
+					<a href="meterregistry.html">MeterRegistry</a>
 				</li>
 			</ul>
-			<h1>Interface MeasureHandle</h1>
+			<h1>Interface MeterRegistry</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Measure to report instantaneous measurement of a value.</p>
+						<p>MeterRegistry provides an interface for creating <a href="meter.html">Meter</a>s</p>
 					</div>
 				</div>
 			</section>
@@ -77,7 +77,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">MeasureHandle</span>
+						<span class="target">MeterRegistry</span>
 					</li>
 				</ul>
 			</section>
@@ -88,7 +88,7 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="measurehandle.html#record" class="tsd-kind-icon">record</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meterregistry.html#getmeter" class="tsd-kind-icon">get<wbr>Meter</a></li>
 							</ul>
 						</section>
 					</div>
@@ -97,72 +97,34 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="record" class="tsd-anchor"></a>
-					<h3>record</h3>
+					<a name="getmeter" class="tsd-anchor"></a>
+					<h3>get<wbr>Meter</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, distContext<span class="tsd-signature-symbol">: </span><a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, distContext<span class="tsd-signature-symbol">: </span><a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a>, spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Meter<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, version<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="meter.html" class="tsd-signature-type">Meter</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Handle.ts#L47">metrics/Handle.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/MeterRegistry.ts#L28">metrics/MeterRegistry.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Records the given value to this measure.</p>
+									<p>Returns a Meter, creating one if one with the given name and version is not already created</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the measurement to record.</p>
-									</div>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> version: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Handle.ts#L48">metrics/Handle.ts:48</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5>distContext: <a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/d8c8509/packages/opentelemetry-types/src/metrics/Handle.ts#L49">metrics/Handle.ts:49</a></li>
-								</ul>
-							</aside>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>value: <span class="tsd-signature-type">number</span></h5>
-								</li>
-								<li>
-									<h5>distContext: <a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a></h5>
-								</li>
-								<li>
-									<h5>spanContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="meter.html" class="tsd-signature-type">Meter</a></h4>
+							<p>Meter A Meter with the given name and version</p>
 						</li>
 					</ul>
 				</section>
@@ -200,7 +162,13 @@
 						<a href="binaryformat.html" class="tsd-kind-icon">Binary<wbr>Format</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="counterhandle.html" class="tsd-kind-icon">Counter<wbr>Handle</a>
+						<a href="boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundgauge.html" class="tsd-kind-icon">Bound<wbr>Gauge</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="distributedcontext.html" class="tsd-kind-icon">Distributed<wbr>Context</a>
@@ -210,9 +178,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="event.html" class="tsd-kind-icon">Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="gaugehandle.html" class="tsd-kind-icon">Gauge<wbr>Handle</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="httptextformat.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Format</a>
@@ -226,21 +191,21 @@
 					<li class=" tsd-kind-interface">
 						<a href="logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
+					<li class=" tsd-kind-interface">
+						<a href="meter.html" class="tsd-kind-icon">Meter</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="measurehandle.html" class="tsd-kind-icon">Measure<wbr>Handle</a>
+						<a href="meterregistry.html" class="tsd-kind-icon">Meter<wbr>Registry</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="measurehandle.html#record" class="tsd-kind-icon">record</a>
+								<a href="meterregistry.html#getmeter" class="tsd-kind-icon">get<wbr>Meter</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface">
-						<a href="meter.html" class="tsd-kind-icon">Meter</a>
-					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="metric.html" class="tsd-kind-icon">Metric</a>
 					</li>
@@ -286,6 +251,9 @@
 					<li class=" tsd-kind-interface">
 						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
 					</li>
+					<li class=" tsd-kind-interface">
+						<a href="tracerregistry.html" class="tsd-kind-icon">Tracer<wbr>Registry</a>
+					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
 					</li>
@@ -297,6 +265,9 @@
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="../globals.html#version" class="tsd-kind-icon">VERSION</a>
 					</li>
 				</ul>
 			</nav>
