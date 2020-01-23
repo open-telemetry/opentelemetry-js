@@ -25,6 +25,7 @@ export class TraceAPI {
   private static _instance?: TraceAPI;
   private _tracerRegistry: TracerRegistry = NOOP_TRACER_REGISTRY;
 
+  /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
 
   /** Get the singleton instance of the Trace API */

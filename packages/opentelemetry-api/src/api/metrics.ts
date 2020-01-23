@@ -25,6 +25,7 @@ export class MetricsAPI {
   private static _instance?: MetricsAPI;
   private _meterRegistry: MeterRegistry = NOOP_METER_REGISTRY;
 
+  /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
 
   /** Get the singleton instance of the Metrics API */
