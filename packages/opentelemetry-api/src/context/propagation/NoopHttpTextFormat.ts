@@ -20,7 +20,7 @@ import { HttpTextFormat } from './HttpTextFormat';
 /**
  * No-op implementations of {@link HttpTextFormat}.
  */
-class NoopHttpTextFormat implements HttpTextFormat {
+export class NoopHttpTextFormat implements HttpTextFormat {
   // By default does nothing
   inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
   // By default does nothing

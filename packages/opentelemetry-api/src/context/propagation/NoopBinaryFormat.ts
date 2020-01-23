@@ -20,7 +20,7 @@ import { BinaryFormat } from './BinaryFormat';
 /**
  * No-op implementations of {@link BinaryFormat}.
  */
-class NoopBinaryFormat implements BinaryFormat {
+export class NoopBinaryFormat implements BinaryFormat {
   private readonly _buff = new ArrayBuffer(0);
   // By default does nothing
   toBytes(spanContext: SpanContext): ArrayBuffer {
