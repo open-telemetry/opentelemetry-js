@@ -6,7 +6,7 @@
     "packages/*",
     "packages/opentelemetry-plugin-postgres/*"
   ],
-  "version": "0.3.2",
+  "version": "0.3.3",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {

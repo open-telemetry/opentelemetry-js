@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.3.3
+
+Released 2020-01-22
+
+#### :rocket: (Enhancement)
+* `opentelemetry-core`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-zipkin`, `opentelemetry-node`, `opentelemetry-plugin-dns`, `opentelemetry-plugin-document-load`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-plugin-ioredis`, `opentelemetry-plugin-mongodb`, `opentelemetry-plugin-mysql`, `opentelemetry-plugin-postgres`, `opentelemetry-plugin-redis`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-shim-opentracing`, `opentelemetry-tracing`, `opentelemetry-types`, `opentelemetry-web`
+  * [#582](https://github.com/open-telemetry/opentelemetry-js/pull/582) Named Tracers / Tracer Registry
+* `opentelemetry-node`, `opentelemetry-plugin-postgres`
+  * [#662](https://github.com/open-telemetry/opentelemetry-js/pull/662) feat: add pg-pool to default list of instrumented plugins
+  * [#708](https://github.com/open-telemetry/opentelemetry-js/pull/708) Simplify and speed up trace context parsing
+* `opentelemetry-metrics`
+  * [#700](https://github.com/open-telemetry/opentelemetry-js/pull/700) implement named meter 
+
+#### :sparkles: (Feature)
+* `opentelemetry-propagator-jaeger`
+  * [#701](https://github.com/open-telemetry/opentelemetry-js/pull/701) add jaeger http trace format 
+* `opentelemetry-exporter-stackdriver-trace`
+  * [#648](https://github.com/open-telemetry/opentelemetry-js/pull/648) Stackdriver Trace exporter
+
+#### :books: (Refine Doc)
+  * [#673](https://github.com/open-telemetry/opentelemetry-js/pull/673) chore(getting-started): Added a TypeScript version for Getting Started Guide
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-ioredis`
+  * [#714](https://github.com/open-telemetry/opentelemetry-js/pull/714) fix: return module exports from ioredis 
+
 ## 0.3.2
 
 Released 2020-01-03
