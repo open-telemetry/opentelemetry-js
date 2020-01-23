@@ -22,39 +22,32 @@ import {
   NoRecordingSpan,
   ConsoleLogger,
 } from '@opentelemetry/core';
-import {
-  BinaryFormat,
-  HttpTextFormat,
-  TraceFlags,
-  Logger,
-} from '@opentelemetry/types';
-import { BasicTracerConfig, TraceParams } from './types';
+import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
-import { SpanProcessor } from './SpanProcessor';
-import { NoopSpanProcessor } from './NoopSpanProcessor';
-import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { DEFAULT_CONFIG } from './config';
+import { BasicTracerRegistry } from './BasicTracerRegistry';
 
 /**
  * This class represents a basic tracer.
  */
-export class BasicTracer implements types.Tracer {
+export class Tracer implements types.Tracer {
   private readonly _defaultAttributes: types.Attributes;
   private readonly _binaryFormat: types.BinaryFormat;
   private readonly _httpTextFormat: types.HttpTextFormat;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
   private readonly _traceParams: TraceParams;
-  readonly logger: Logger;
-  private readonly _registeredSpanProcessor: SpanProcessor[] = [];
-  activeSpanProcessor = new NoopSpanProcessor();
+  readonly logger: types.Logger;
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: BasicTracerConfig = DEFAULT_CONFIG) {
+  constructor(
+    config: TracerConfig = DEFAULT_CONFIG,
+    private _tracerRegistry: BasicTracerRegistry
+  ) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;
@@ -85,8 +78,8 @@ export class BasicTracer implements types.Tracer {
       traceState = parentContext.traceState;
     }
     const traceFlags = samplingDecision
-      ? TraceFlags.SAMPLED
-      : TraceFlags.UNSAMPLED;
+      ? types.TraceFlags.SAMPLED
+      : types.TraceFlags.UNSAMPLED;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {
@@ -146,14 +139,14 @@ export class BasicTracer implements types.Tracer {
   /**
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
-  getBinaryFormat(): BinaryFormat {
+  getBinaryFormat(): types.BinaryFormat {
     return this._binaryFormat;
   }
 
   /**
    * Returns the HTTP text format interface which can inject/extract Spans.
    */
-  getHttpTextFormat(): HttpTextFormat {
+  getHttpTextFormat(): types.HttpTextFormat {
     return this._httpTextFormat;
   }
 
@@ -162,15 +155,8 @@ export class BasicTracer implements types.Tracer {
     return this._traceParams;
   }
 
-  /**
-   * Adds a new {@link SpanProcessor} to this tracer.
-   * @param spanProcessor the new SpanProcessor to be added.
-   */
-  addSpanProcessor(spanProcessor: SpanProcessor): void {
-    this._registeredSpanProcessor.push(spanProcessor);
-    this.activeSpanProcessor = new MultiSpanProcessor(
-      this._registeredSpanProcessor
-    );
+  getActiveSpanProcessor() {
+    return this._tracerRegistry.getActiveSpanProcessor();
   }
 
   private _getParentSpanContext(

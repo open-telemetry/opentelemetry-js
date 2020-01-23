@@ -4,7 +4,7 @@ const opentelemetry = require('@opentelemetry/core');
 const types = require('@opentelemetry/types');
 const config = require('./setup');
 config.setupTracerAndExporters('redis-client-service');
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-redis-client');
 const axios = require('axios').default;
 
 function makeRequest() {

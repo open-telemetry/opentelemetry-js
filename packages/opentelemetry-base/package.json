@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/base",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "OpenTelemetry base provides base code for the SDK packages",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -50,7 +50,7 @@
     "nyc": "^14.1.1",
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
-    "ts-node": "^8.0.0",
+    "ts-node": "^8.6.2",
     "tslint-consistent-codestyle": "^1.15.1",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"

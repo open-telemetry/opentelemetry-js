@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import { BasicTracerConfig } from './types';
 import {
+  DEFAULT_CONFIG,
   DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
   DEFAULT_MAX_EVENTS_PER_SPAN,
   DEFAULT_MAX_LINKS_PER_SPAN,
 } from './config';
-import { DEFAULT_CONFIG } from './config';
+import { TracerConfig } from './types';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
  * user provided configurations.
  */
-export function mergeConfig(userConfig: BasicTracerConfig) {
+export function mergeConfig(userConfig: TracerConfig) {
   const traceParams = userConfig.traceParams;
   const target = Object.assign({}, DEFAULT_CONFIG, userConfig);
 

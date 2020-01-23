@@ -22,7 +22,7 @@ import {
   timeInputToHrTime,
 } from '@opentelemetry/core';
 import { ReadableSpan } from './export/ReadableSpan';
-import { BasicTracer } from './BasicTracer';
+import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
 
@@ -52,7 +52,7 @@ export class Span implements types.Span, ReadableSpan {
 
   /** Constructs a new Span instance. */
   constructor(
-    parentTracer: BasicTracer,
+    parentTracer: Tracer,
     spanName: string,
     spanContext: types.SpanContext,
     kind: types.SpanKind,
@@ -68,7 +68,7 @@ export class Span implements types.Span, ReadableSpan {
     this.startTime = timeInputToHrTime(startTime);
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
-    this._spanProcessor = parentTracer.activeSpanProcessor;
+    this._spanProcessor = parentTracer.getActiveSpanProcessor();
     this._spanProcessor.onStart(this);
   }
 

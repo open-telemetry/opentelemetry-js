@@ -59,3 +59,5 @@ export class NoopTracer implements Tracer {
     return NOOP_HTTP_TEXT_FORMAT;
   }
 }
+
+export const noopTracer = new NoopTracer();

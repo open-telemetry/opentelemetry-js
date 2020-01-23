@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracer } from '@opentelemetry/node';
+import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -38,7 +38,7 @@ describe('mysql@2.x', () => {
   let connection: mysql.Connection;
   let pool: mysql.Pool;
   let poolCluster: mysql.PoolCluster;
-  const tracer = new NodeTracer({ plugins: {} });
+  const registry = new NodeTracerRegistry({ plugins: {} });
   const logger = new NoopLogger();
   const testMysql = process.env.RUN_MYSQL_TESTS; // For CI: assumes local mysql db is already available
   const testMysqlLocally = process.env.RUN_MYSQL_TESTS_LOCAL; // For local: spins up local mysql db via docker
@@ -52,7 +52,7 @@ describe('mysql@2.x', () => {
       this.test!.parent!.pending = true;
       this.skip();
     }
-    tracer.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     if (testMysqlLocally) {
       testUtils.startDocker('mysql');
       // wait 15 seconds for docker container to start
@@ -71,7 +71,7 @@ describe('mysql@2.x', () => {
   });
 
   beforeEach(function() {
-    plugin.enable(mysql, tracer, logger);
+    plugin.enable(mysql, registry, logger);
     connection = mysql.createConnection({
       port,
       user,
@@ -118,8 +118,8 @@ describe('mysql@2.x', () => {
 
   describe('#Connection', () => {
     it('should intercept connection.query(text: string)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         const query = connection.query(statement);
         let rows = 0;
@@ -140,8 +140,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept connection.query(text: string, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         connection.query(statement, (err, res) => {
           assert.ifError(err);
@@ -156,8 +156,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept connection.query(text: options, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+? as solution';
         connection.query({ sql: statement, values: [1] }, (err, res) => {
           assert.ifError(err);
@@ -172,8 +172,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept connection.query(text: options, values: [], callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+? as solution';
         // @ts-ignore this is documented https://github.com/mysqljs/mysql#performing-queries
         // but does not match the typings
@@ -190,8 +190,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept connection.query(text: string, values: [], callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         connection.query(statement, [1], (err, res) => {
           assert.ifError(err);
@@ -206,8 +206,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept connection.query(text: string, value: any, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         connection.query(statement, 1, (err, res) => {
           assert.ifError(err);
@@ -222,8 +222,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should attach error messages to spans', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         connection.query(statement, (err, res) => {
           assert.ok(err);
@@ -238,8 +238,8 @@ describe('mysql@2.x', () => {
 
   describe('#Pool', () => {
     it('should intercept pool.query(text: string)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         const query = pool.query(statement);
         let rows = 0;
@@ -260,8 +260,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.getConnection().query(text: string)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         pool.getConnection((err, conn) => {
           const query = conn.query(statement);
@@ -284,8 +284,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.query(text: string, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         pool.query(statement, (err, res) => {
           assert.ifError(err);
@@ -300,8 +300,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.getConnection().query(text: string, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+1 as solution';
         pool.getConnection((err, conn) => {
           conn.query(statement, (err, res) => {
@@ -318,8 +318,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.query(text: options, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+? as solution';
         pool.query({ sql: statement, values: [1] }, (err, res) => {
           assert.ifError(err);
@@ -334,8 +334,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.query(text: options, values: [], callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT 1+? as solution';
         // @ts-ignore this is documented https://github.com/mysqljs/mysql#performing-queries
         // but does not match the typings
@@ -352,8 +352,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.query(text: string, values: [], callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         pool.query(statement, [1], (err, res) => {
           assert.ifError(err);
@@ -368,8 +368,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should intercept pool.query(text: string, value: any, callback)', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         pool.query(statement, 1, (err, res) => {
           assert.ifError(err);
@@ -384,8 +384,8 @@ describe('mysql@2.x', () => {
     });
 
     it('should attach error messages to spans', done => {
-      const span = tracer.startSpan('test span');
-      tracer.withSpan(span, () => {
+      const span = registry.getTracer('default').startSpan('test span');
+      registry.getTracer('default').withSpan(span, () => {
         const statement = 'SELECT ? as solution';
         pool.query(statement, (err, res) => {
           assert.ok(err);
@@ -402,8 +402,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: string)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT 1+1 as solution';
           const query = poolClusterConnection.query(statement);
           let rows = 0;
@@ -427,8 +427,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: string, callback)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT 1+1 as solution';
           poolClusterConnection.query(statement, (err, res) => {
             assert.ifError(err);
@@ -446,8 +446,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: options, callback)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT 1+? as solution';
           poolClusterConnection.query(
             { sql: statement, values: [1] },
@@ -468,8 +468,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: options, values: [], callback)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT 1+? as solution';
           // @ts-ignore this is documented https://github.com/mysqljs/mysql#performing-queries
           // but does not match the typings
@@ -489,8 +489,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: string, values: [], callback)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT ? as solution';
           poolClusterConnection.query(statement, [1], (err, res) => {
             assert.ifError(err);
@@ -508,8 +508,8 @@ describe('mysql@2.x', () => {
     it('should intercept poolClusterConnection.query(text: string, value: any, callback)', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT ? as solution';
           poolClusterConnection.query(statement, 1, (err, res) => {
             assert.ifError(err);
@@ -527,8 +527,8 @@ describe('mysql@2.x', () => {
     it('should attach error messages to spans', done => {
       poolCluster.getConnection((err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT ? as solution';
           poolClusterConnection.query(statement, (err, res) => {
             assert.ok(err);
@@ -544,8 +544,8 @@ describe('mysql@2.x', () => {
     it('should get connection by name', done => {
       poolCluster.getConnection('name', (err, poolClusterConnection) => {
         assert.ifError(err);
-        const span = tracer.startSpan('test span');
-        tracer.withSpan(span, () => {
+        const span = registry.getTracer('default').startSpan('test span');
+        registry.getTracer('default').withSpan(span, () => {
           const statement = 'SELECT 1 as solution';
           poolClusterConnection.query(statement, (err, res) => {
             assert.ifError(err);

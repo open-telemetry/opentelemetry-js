@@ -14,7 +14,7 @@ const grpc = require('grpc');
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
 const PORT = 50051;
-const tracer = opentelemetry.getTracer();
+const tracer = opentelemetry.getTracer('example-grpc-client');
 
 /** A function which makes requests and handles response. */
 function main() {
