@@ -27,6 +27,7 @@ export class TraceAPI {
 
   private constructor() {}
 
+  /** Get the singleton instance of the Trace API */
   public static getInstance(): TraceAPI {
     if (!this._instance) {
       this._instance = new TraceAPI();

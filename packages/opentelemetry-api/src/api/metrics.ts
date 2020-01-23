@@ -27,6 +27,7 @@ export class MetricsAPI {
 
   private constructor() {}
 
+  /** Get the singleton instance of the Metrics API */
   public static getInstance(): MetricsAPI {
     if (!this._instance) {
       this._instance = new MetricsAPI();
