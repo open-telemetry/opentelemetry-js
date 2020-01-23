@@ -5,17 +5,21 @@ OpenTelemetry IORedis Instrumentation allows the user to automatically collect t
 ## Tracing backend setup
 
 ### Zipkin
+
 - Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
 
 - Set EXPORTER variable
+
   ```sh
   export EXPORTER=zipkin
   ```
 
 ### Jaeger
+
 - Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
 
 - Set EXPORTER variable
+
   ```sh
   export EXPORTER=jaeger
   ```
@@ -28,22 +32,23 @@ npm install
 
 ## Run the Application
 
- - Start redis via docker
+- Start redis via docker
 
-    ```sh
-    npm run docker:start
-    ```
+   ```sh
+   npm run docker:start
+   ```
 
- - Run the main program
-    ```sh
-    npm start
-    ```
+- Run the main program
 
- - Cleanup docker
+   ```sh
+   npm start
+   ```
 
-    ```sh
-    npm run docker:stop
-    ```
+- Cleanup docker
+
+   ```sh
+   npm run docker:stop
+   ```
 
 ## LICENSE
 

@@ -8,7 +8,7 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 const EXPORTER = process.env.EXPORTER || '';
 
-const tracer = new NodeTracer();
+const tracerRegistry = new NodeTracerRegistry();
 
 let exporter;
 if (EXPORTER.toLowerCase().startsWith('z')) {
@@ -24,6 +24,6 @@ if (EXPORTER.toLowerCase().startsWith('z')) {
 tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracer(tracer);
+opentelemetry.initGlobalTracerRegistry(tracerRegistry);
 
 module.exports = opentelemetry.getTracer();

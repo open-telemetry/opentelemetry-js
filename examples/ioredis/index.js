@@ -10,8 +10,10 @@ async function main() {
   try {
     await redis.set('test', 'data');
     await redis.get('test');
+    process.exit(0);
   } catch (error) {
     console.error(error);
+    process.exit(1);
   }
 }
 
