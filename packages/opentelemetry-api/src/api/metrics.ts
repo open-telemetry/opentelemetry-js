@@ -25,7 +25,7 @@ export class MetricsAPI {
   private static _instance?: MetricsAPI;
   private _meterRegistry: MeterRegistry = NOOP_METER_REGISTRY;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): MetricsAPI {
     if (!this._instance) {
@@ -36,23 +36,23 @@ export class MetricsAPI {
   }
 
   /**
-  * Set the current global meter. Returns the initialized global meter registry.
-  */
+   * Set the current global meter. Returns the initialized global meter registry.
+   */
   public initGlobalMeterRegistry(registry: MeterRegistry): MeterRegistry {
     this._meterRegistry = registry;
     return registry;
   }
 
   /**
-  * Returns the global meter registry.
-  */
+   * Returns the global meter registry.
+   */
   public getMeterRegistry(): MeterRegistry {
     return this._meterRegistry;
   }
 
   /**
-  * Returns a meter from the global meter registry.
-  */
+   * Returns a meter from the global meter registry.
+   */
   public getMeter(name: string, version?: string): Meter {
     return this.getMeterRegistry().getMeter(name, version);
   }

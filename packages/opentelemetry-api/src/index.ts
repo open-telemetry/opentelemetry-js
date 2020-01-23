@@ -46,12 +46,12 @@ export * from './metrics/NoopMeterRegistry';
 export * from './metrics/NoopMeter';
 
 import { TraceAPI } from './api/trace';
-export const tracing = TraceAPI.getInstance();
+export const trace = TraceAPI.getInstance();
 
 import { MetricsAPI } from './api/metrics';
 export const metrics = MetricsAPI.getInstance();
 
 export default {
-  tracing,
+  trace,
   metrics,
 };

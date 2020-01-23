@@ -25,7 +25,7 @@ export class TraceAPI {
   private static _instance?: TraceAPI;
   private _tracerRegistry: TracerRegistry = NOOP_TRACER_REGISTRY;
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): TraceAPI {
     if (!this._instance) {
@@ -36,23 +36,23 @@ export class TraceAPI {
   }
 
   /**
-  * Set the current global tracer. Returns the initialized global tracer registry
-  */
+   * Set the current global tracer. Returns the initialized global tracer registry
+   */
   public initGlobalTracerRegistry(registry: TracerRegistry): TracerRegistry {
     this._tracerRegistry = registry;
     return registry;
   }
 
   /**
-  * Returns the global tracer registry.
-  */
+   * Returns the global tracer registry.
+   */
   public getTracerRegistry(): TracerRegistry {
     return this._tracerRegistry;
   }
 
   /**
-  * Returns a tracer from the global tracer registry.
-  */
+   * Returns a tracer from the global tracer registry.
+   */
   public getTracer(name: string, version?: string): Tracer {
     return this.getTracerRegistry().getTracer(name, version);
   }
