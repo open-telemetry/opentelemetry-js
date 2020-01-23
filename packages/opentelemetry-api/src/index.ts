@@ -45,8 +45,8 @@ export * from './trace/NoopTracerRegistry';
 export * from './metrics/NoopMeterRegistry';
 export * from './metrics/NoopMeter';
 
-import { TracingAPI } from './api/tracing';
-export const tracing = TracingAPI.getInstance();
+import { TraceAPI } from './api/trace';
+export const tracing = TraceAPI.getInstance();
 
 import { MetricsAPI } from './api/metrics';
 export const metrics = MetricsAPI.getInstance();

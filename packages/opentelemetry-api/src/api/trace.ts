@@ -18,15 +18,18 @@ import { NOOP_TRACER_REGISTRY } from '../trace/NoopTracerRegistry';
 import { TracerRegistry } from '../trace/tracer_registry';
 import { Tracer } from '../trace/tracer';
 
-export class TracingAPI {
-  private static _instance?: TracingAPI;
+/**
+ * Singleton object which represents the entry point to the OpenTelemetry Tracing API
+ */
+export class TraceAPI {
+  private static _instance?: TraceAPI;
   private _tracerRegistry: TracerRegistry = NOOP_TRACER_REGISTRY;
 
   private constructor() { }
 
-  public static getInstance(): TracingAPI {
+  public static getInstance(): TraceAPI {
     if (!this._instance) {
-      this._instance = new TracingAPI();
+      this._instance = new TraceAPI();
     }
 
     return this._instance;

@@ -14,9 +14,13 @@
  * limitations under the License.
  */
 
+import { Meter } from '../metrics/Meter';
 import { MeterRegistry } from '../metrics/MeterRegistry';
 import { NOOP_METER_REGISTRY } from '../metrics/NoopMeterRegistry';
 
+/**
+ * Singleton object which represents the entry point to the OpenTelemetry Metrics API
+ */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;
   private _meterRegistry: MeterRegistry = NOOP_METER_REGISTRY;

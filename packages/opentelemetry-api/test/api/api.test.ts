@@ -27,7 +27,7 @@ describe('API', () => {
   ];
 
   it('should expose a tracer registry via getTracerRegistry', () => {
-    const tracer = api.getTracerRegistry();
+    const tracer = api.tracing.getTracerRegistry();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
   });
@@ -41,12 +41,12 @@ describe('API', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      api.initGlobalTracerRegistry(new NoopTracerRegistry());
+      api.tracing.initGlobalTracerRegistry(new NoopTracerRegistry());
     });
 
     it('should not crash', () => {
       functions.forEach(fn => {
-        const tracer = api.getTracerRegistry();
+        const tracer = api.tracing.getTracerRegistry();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -59,8 +59,8 @@ describe('API', () => {
     });
 
     it('should use the global tracer registry', () => {
-      api.initGlobalTracerRegistry(new TestTracerRegistry());
-      const tracer = api.getTracerRegistry().getTracer('name');
+      api.tracing.initGlobalTracerRegistry(new TestTracerRegistry());
+      const tracer = api.tracing.getTracerRegistry().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
