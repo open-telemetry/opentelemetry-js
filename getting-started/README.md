@@ -238,9 +238,9 @@ Create a file named `monitoring.js` and add the following code:
 ```javascript
 'use strict';
 
-const { Meter } = require("@opentelemetry/metrics");
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 ```
 
 Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so that it looks like this:
@@ -248,9 +248,9 @@ Now, you can require this file from your application code and use the `Meter` to
 ```javascript
 'use strict';
 
-const { Meter } = require("@opentelemetry/metrics");
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const requestCount = meter.createCounter("requests", {
   monotonic: true,
@@ -301,10 +301,10 @@ Next, modify your `monitoring.js` file to look like this:
 ```javascript
 "use strict";
 
-const { Meter } = require("@opentelemetry/metrics");
-const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
+const { MeterRegistry } = require('@opentelemetry/metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 meter.addExporter(
   new PrometheusExporter(

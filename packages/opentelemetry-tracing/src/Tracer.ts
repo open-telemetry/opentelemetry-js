@@ -22,12 +22,6 @@ import {
   NoRecordingSpan,
   ConsoleLogger,
 } from '@opentelemetry/core';
-import {
-  BinaryFormat,
-  HttpTextFormat,
-  TraceFlags,
-  Logger,
-} from '@opentelemetry/types';
 import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
@@ -45,7 +39,7 @@ export class Tracer implements types.Tracer {
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
   private readonly _traceParams: TraceParams;
-  readonly logger: Logger;
+  readonly logger: types.Logger;
 
   /**
    * Constructs a new Tracer instance.
@@ -84,8 +78,8 @@ export class Tracer implements types.Tracer {
       traceState = parentContext.traceState;
     }
     const traceFlags = samplingDecision
-      ? TraceFlags.SAMPLED
-      : TraceFlags.UNSAMPLED;
+      ? types.TraceFlags.SAMPLED
+      : types.TraceFlags.UNSAMPLED;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {
@@ -145,14 +139,14 @@ export class Tracer implements types.Tracer {
   /**
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
-  getBinaryFormat(): BinaryFormat {
+  getBinaryFormat(): types.BinaryFormat {
     return this._binaryFormat;
   }
 
   /**
    * Returns the HTTP text format interface which can inject/extract Spans.
    */
-  getHttpTextFormat(): HttpTextFormat {
+  getHttpTextFormat(): types.HttpTextFormat {
     return this._httpTextFormat;
   }
 

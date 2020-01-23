@@ -19,10 +19,10 @@ npm install --save @opentelemetry/metrics
 Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
 
 ```js
-const { Meter } = require('@opentelemetry/metrics');
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
   labelKeys: ["pid"],
@@ -40,10 +40,10 @@ boundCounter.add(10);
 Gauge metrics express a pre-calculated value. Generally, this kind of metric should be used when the metric cannot be expressed as a sum or because the measurement interval is arbitrary. Use this kind of metric when the measurement is not a quantity, and the sum and event count are not of interest. Gauges are defined as `Monotonic = false` by default, meaning that new values are permitted to make positive or negative changes to the gauge. There is no restriction on the sign of the input for gauges.
 
 ```js
-const { Meter } = require('@opentelemetry/metrics');
+const { MeterRegistry } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const gauge = meter.createGauge('metric_name', {
   labelKeys: ["pid"],

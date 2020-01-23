@@ -1,6 +1,6 @@
 {
   "name": "grpc-dynamic-codegen-example",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Example of gRPC integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -28,13 +28,13 @@
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.4.0",
-    "@opentelemetry/core": "^0.3.2",
-    "@opentelemetry/exporter-jaeger": "^0.3.2",
-    "@opentelemetry/exporter-zipkin": "^0.3.2",
-    "@opentelemetry/node": "^0.3.2",
-    "@opentelemetry/plugin-grpc": "^0.3.2",
-    "@opentelemetry/tracing": "^0.3.2",
-    "@opentelemetry/types": "^0.3.2",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/exporter-jaeger": "^0.3.3",
+    "@opentelemetry/exporter-zipkin": "^0.3.3",
+    "@opentelemetry/node": "^0.3.3",
+    "@opentelemetry/plugin-grpc": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3",
     "grpc": "^1.23.3",
     "node-pre-gyp": "0.12.0"
   },
