@@ -5,13 +5,13 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides everything needed to interact with the OpenTelemetry API, including all TypeScript interfaces and enums. It is intended for use both on the server and in the browser.
+This package provides everything needed to interact with the OpenTelemetry API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
 
 ## Basic Use
 
 ### API Entry Point
 
-API entry points are defined as global singleton objects `trace` and `metrics` which contain methods used to initialize DK implementations and acquire resources from the API.
+API entry points are defined as global singleton objects `trace` and `metrics` which contain methods used to initialize SDK implementations and acquire resources from the API.
 
 - [Trace API Documentation][trace-api-docs]
 - [Metrics API Documentation][metrics-api-docs]
@@ -19,14 +19,14 @@ API entry points are defined as global singleton objects `trace` and `metrics` w
 ```javascript
 const api = require("@opentelemetry/api")
 
-/* returns traceRegistry */
+/* Initialize TraceRegistry */
 api.trace.initGlobalTracerRegistry(traceRegistry);
 /* returns traceRegistry (no-op if a working registry has not been initialized) */
 api.trace.getTracerRegistry();
 /* returns a tracer from the registered global tracer registry (no-op if a working registry has not been initialized); */
 api.trace.getTracer(name, version);
 
-/* returns meterRegistry */
+/* Initialize MeterRegistry */
 api.metrics.initGlobalMeterRegistry(meterRegistry);
 /* returns meterRegistry (no-op if a working registry has not been initialized) */
 api.metrics.getMeterRegistry();
@@ -107,10 +107,10 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 [license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
 [license-image]: https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat
-[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-types
-[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-types
-[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-types
-[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-types&type=dev
+[dependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-api
+[dependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api
+[devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-api
+[devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/types
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Ftypes.svg
 
