@@ -19,8 +19,6 @@ For detailed documentation of the OpenTelemetry API, see [the documentation][doc
 
 To get started tracing your own application, see the [Getting Started Guide](getting-started/README.md). For more information about automatic instrumentation see [@opentelemetry/node][otel-node], which provides auto-instrumentation for Node.js applications. If the automatic instrumentation does not suit your needs, or you would like to create manual traces, see [@opentelemetry/tracing][otel-tracing]
 
-For more information, see [@opentelemetry/tracing][otel-tracing] for an SDK that supports creating traces through manual instrumentation or [@opentelemetry/node][otel-node] which provides auto-instrumentation for Node.js applications.
-
 ### Library Author
 
 If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an [Application Owner](#application-owner) uses a different SDK implementation.
