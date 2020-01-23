@@ -15,7 +15,16 @@
  */
 
 import * as assert from 'assert';
-import { Labels, NoopMeterRegistry, NOOP_BOUND_COUNTER, NOOP_BOUND_GAUGE, NOOP_BOUND_MEASURE, NOOP_COUNTER_METRIC, NOOP_GAUGE_METRIC, NOOP_MEASURE_METRIC } from '../src';
+import {
+  Labels,
+  NoopMeterRegistry,
+  NOOP_BOUND_COUNTER,
+  NOOP_BOUND_GAUGE,
+  NOOP_BOUND_MEASURE,
+  NOOP_COUNTER_METRIC,
+  NOOP_GAUGE_METRIC,
+  NOOP_MEASURE_METRIC
+} from '../../src';
 
 
 describe('NoopMeter', () => {

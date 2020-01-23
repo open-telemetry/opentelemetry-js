@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind } from '../src';
+import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
