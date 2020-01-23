@@ -14,15 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
+import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/types';
 import { TraceState } from '../../trace/TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
-const VALID_TRACE_PARENT_REGEX = /^[\da-f]{2}-[\da-f]{32}-[\da-f]{16}-[\da-f]{2}$/;
-const VALID_TRACEID_REGEX = /^[0-9a-f]{32}$/i;
-const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
-const INVALID_ID_REGEX = /^0+$/i;
+const VALID_TRACE_PARENT_REGEX = /^00-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})$/;
 const VERSION = '00';
 
 /**
@@ -37,33 +34,19 @@ const VERSION = '00';
  */
 export function parseTraceParent(traceParent: string): SpanContext | null {
   const match = traceParent.match(VALID_TRACE_PARENT_REGEX);
-  if (!match) return null;
-  const parts = traceParent.split('-');
-  const [version, traceId, spanId, option] = parts;
-  // tslint:disable-next-line:ban Needed to parse hexadecimal.
-  const traceFlags = parseInt(option, 16);
-
   if (
-    !isValidVersion(version) ||
-    !isValidTraceId(traceId) ||
-    !isValidSpanId(spanId)
+    !match ||
+    match[1] === '00000000000000000000000000000000' ||
+    match[2] === '0000000000000000'
   ) {
     return null;
   }
 
-  return { traceId, spanId, traceFlags };
-}
-
-function isValidVersion(version: string): boolean {
-  return version === VERSION;
-}
-
-function isValidTraceId(traceId: string): boolean {
-  return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
-}
-
-function isValidSpanId(spanId: string): boolean {
-  return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
+  return {
+    traceId: match[1],
+    spanId: match[2],
+    traceFlags: parseInt(match[3], 16),
+  };
 }
 
 /**

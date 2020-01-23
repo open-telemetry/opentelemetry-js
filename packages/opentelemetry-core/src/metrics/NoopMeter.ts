@@ -165,6 +165,8 @@ export class NoopBoundMeasure implements BoundMeasure {
   }
 }
 
+export const noopMeter = new NoopMeter();
+
 export const NOOP_BOUND_GAUGE = new NoopBoundGauge();
 export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_BOUND_GAUGE);
 

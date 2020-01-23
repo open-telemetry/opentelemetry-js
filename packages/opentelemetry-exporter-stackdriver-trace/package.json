@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-stackdriver-trace",
-  "version": "0.3.1",
+  "version": "0.3.3",
   "description": "OpenTelemetry StackDriver Trace Exporter allows the user to send collected traces to StackDriver Trace.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -59,10 +59,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.1",
-    "@opentelemetry/core": "^0.3.1",
-    "@opentelemetry/tracing": "^0.3.1",
-    "@opentelemetry/types": "^0.3.1",
+    "@opentelemetry/base": "^0.3.3",
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3",
     "google-auth-library": "^5.7.0",
     "googleapis": "^46.0.0"
   }
