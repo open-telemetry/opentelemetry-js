@@ -37,25 +37,31 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
       this._logger.debug(
         'Patching redis.RedisClient.prototype.internal_send_command'
       );
-      this._unpatchArr.push(mpWrapper.wrap(
-        this._moduleExports.RedisClient.prototype,
-        'internal_send_command',
-        this._getPatchInternalSendCommand()
-      ).unwrap);
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.RedisClient.prototype,
+          'internal_send_command',
+          this._getPatchInternalSendCommand()
+        ).unwrap
+      );
 
       this._logger.debug('patching redis.create_stream');
-      this._unpatchArr.push(mpWrapper.wrap(
-        this._moduleExports.RedisClient.prototype,
-        'create_stream',
-        this._getPatchCreateStream()
-      ).unwrap);
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.RedisClient.prototype,
+          'create_stream',
+          this._getPatchCreateStream()
+        ).unwrap
+      );
 
       this._logger.debug('patching redis.createClient');
-      this._unpatchArr.push(mpWrapper.wrap(
-        this._moduleExports,
-        'createClient',
-        this._getPatchCreateClient()
-      ).unwrap);
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports,
+          'createClient',
+          this._getPatchCreateClient()
+        ).unwrap
+      );
     }
     return this._moduleExports;
   }
