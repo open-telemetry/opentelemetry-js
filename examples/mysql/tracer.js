@@ -6,29 +6,29 @@ const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
-function setupTracerAndExporters(service) {
+module.exports = (serviceName) => {
   const registry = new NodeTracerRegistry({
     plugins: {
       mysql: {
         enabled: true,
-        path: "@opentelemetry/plugin-mysql"
+        path: '@opentelemetry/plugin-mysql',
       },
       http: {
         enabled: true,
-        path: "@opentelemetry/plugin-http"
-      }
-    }
+        path: '@opentelemetry/plugin-http',
+      },
+    },
   });
 
   registry.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
-    serviceName: service,
+    serviceName,
   })));
   registry.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
-    serviceName: service,
+    serviceName,
   })));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
   opentelemetry.initGlobalTracerRegistry(registry);
-}
 
-exports.setupTracerAndExporters = setupTracerAndExporters;
+  return opentelemetry.getTracer();
+};

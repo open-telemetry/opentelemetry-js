@@ -172,6 +172,12 @@ jobs:
           root: packages/opentelemetry-types/docs
           paths:
             - out
+      - run:
+          name: Install minimal modules to lint examples
+          command: npm i -D eslint eslint-plugin-import eslint-config-airbnb-base
+      - run:
+          name: Lint examples
+          command: npm run lint-examples
   docs-deploy:
     docker:
       - image: node:12
