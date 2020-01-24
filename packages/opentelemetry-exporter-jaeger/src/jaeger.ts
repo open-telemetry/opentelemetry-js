@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
-import * as jaegerTypes from './types';
 import { NoopLogger } from '@opentelemetry/core';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/types';
+import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
+import * as jaegerTypes from './types';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -40,6 +41,11 @@ export class JaegerExporter implements SpanExporter {
       typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
 
     this._sender = new jaegerTypes.UDPSender(config);
+    if (this._sender._client instanceof Socket) {
+      // unref socket to prevent it from keeping the process running
+      this._sender._client.unref();
+    }
+
     this._process = {
       serviceName: config.serviceName,
       tags: jaegerTypes.ThriftUtils.getThriftTags(tags),

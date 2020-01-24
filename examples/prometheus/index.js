@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 const { MeterRegistry } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
@@ -7,37 +7,37 @@ const meter = new MeterRegistry().getMeter('example-prometheus');
 
 const exporter = new PrometheusExporter(
   {
-    startServer: true
+    startServer: true,
   },
   () => {
-    console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-  }
+    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  },
 );
 
 meter.addExporter(exporter);
 
 // Monotonic counters and gauges can only be increased.
-const monotonicCounter = meter.createCounter("monotonic_counter", {
+const monotonicCounter = meter.createCounter('monotonic_counter', {
   monotonic: true,
-  labelKeys: ["pid"],
-  description: "Example of a monotonic counter"
+  labelKeys: ['pid'],
+  description: 'Example of a monotonic counter',
 });
-const monotonicGauge = meter.createGauge("monotonic_gauge", {
+const monotonicGauge = meter.createGauge('monotonic_gauge', {
   monotonic: true,
-  labelKeys: ["pid"],
-  description: "Example of a monotonic gauge"
+  labelKeys: ['pid'],
+  description: 'Example of a monotonic gauge',
 });
 
 // Non-monotonic counters and gauges can be increased or decreased.
-const nonMonotonicCounter = meter.createCounter("non_monotonic_counter", {
+const nonMonotonicCounter = meter.createCounter('non_monotonic_counter', {
   monotonic: false,
-  labelKeys: ["pid"],
-  description: "Example of a non-monotonic counter"
+  labelKeys: ['pid'],
+  description: 'Example of a non-monotonic counter',
 });
-const nonMonotonicGauge = meter.createGauge("non_monotonic_gauge", {
+const nonMonotonicGauge = meter.createGauge('non_monotonic_gauge', {
   monotonic: false,
-  labelKeys: ["pid"],
-  description: "Example of a non-monotonic gauge"
+  labelKeys: ['pid'],
+  description: 'Example of a non-monotonic gauge',
 });
 
 let currentMonotonicGaugeValue = 0;
