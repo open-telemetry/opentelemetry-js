@@ -18,7 +18,7 @@ npm install --save @opentelemetry/plugin-pg-pool
 
 ## Usage
 
-To load all of the [default supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use the below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no  computational overhead for listing plugsin for unused modules.
+To load all of the [default supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use the below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no  computational overhead for listing plugins for unused modules.
 
 ```js
 const { NodeTracer } = require('@opentelemetry/node');
