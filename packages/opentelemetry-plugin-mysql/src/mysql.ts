@@ -245,14 +245,22 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         }
 
         if (typeof arguments[1] === 'function') {
-          mpWrapper.wrap(arguments, 1 as any, thisPlugin._patchCallbackQuery(span));
+          mpWrapper.wrap(
+            arguments,
+            1 as any,
+            thisPlugin._patchCallbackQuery(span)
+          );
         } else if (typeof arguments[2] === 'function') {
           if (Array.isArray(_valuesOrCallback)) {
             span.setAttribute(AttributeNames.MYSQL_VALUES, _valuesOrCallback);
           } else if (arguments[2]) {
             span.setAttribute(AttributeNames.MYSQL_VALUES, [_valuesOrCallback]);
           }
-          mpWrapper.wrap(arguments, 2 as any, thisPlugin._patchCallbackQuery(span));
+          mpWrapper.wrap(
+            arguments,
+            2 as any,
+            thisPlugin._patchCallbackQuery(span)
+          );
         }
 
         return originalQuery.apply(connection, arguments);

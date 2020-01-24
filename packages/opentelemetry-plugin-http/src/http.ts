@@ -72,20 +72,24 @@ export class HttpPlugin extends BasePlugin<Http> {
       this.version
     );
 
-    this._unpatchArr.push(mpWrapper.wrap(
-      this._moduleExports,
-      'request',
-      this._getPatchOutgoingRequestFunction()
-    ).unwrap);
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports,
+        'request',
+        this._getPatchOutgoingRequestFunction()
+      ).unwrap
+    );
 
     // In Node >=8, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
-      this._unpatchArr.push(mpWrapper.wrap(
-        this._moduleExports,
-        'get',
-        this._getPatchOutgoingGetFunction(request)
-      ).unwrap);
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports,
+          'get',
+          this._getPatchOutgoingGetFunction(request)
+        ).unwrap
+      );
     }
 
     if (
@@ -93,11 +97,13 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._moduleExports.Server &&
       this._moduleExports.Server.prototype
     ) {
-      this._unpatchArr.push(mpWrapper.wrap(
-        this._moduleExports.Server.prototype,
-        'emit',
-        this._getPatchIncomingRequestFunction()
-      ).unwrap);
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.Server.prototype,
+          'emit',
+          this._getPatchIncomingRequestFunction()
+        ).unwrap
+      );
     } else {
       this._logger.error(
         'Could not apply patch to %s.emit. Interface is not as expected.',
