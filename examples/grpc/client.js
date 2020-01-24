@@ -1,20 +1,12 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-const config = require('./setup');
-
-/**
- * The trace instance needs to be initialized first, if you want to enable
- * automatic tracing for built-in plugins (gRPC in this case).
- */
-config.setupTracerAndExporters('grpc-client-service');
-
+const tracer = require('./tracer')('example-grpc-client');
+// eslint-disable-next-line import/order
 const grpc = require('grpc');
-
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
+
 const PORT = 50051;
-const tracer = opentelemetry.getTracer('example-grpc-client');
 
 /** A function which makes requests and handles response. */
 function main() {
@@ -26,17 +18,18 @@ function main() {
     console.log('Client traceId ', span.context().traceId);
     const client = new services.GreeterClient(
       `localhost:${PORT}`,
-      grpc.credentials.createInsecure()
+      grpc.credentials.createInsecure(),
     );
     const request = new messages.HelloRequest();
     let user;
     if (process.argv.length >= 3) {
+      // eslint-disable-next-line prefer-destructuring
       user = process.argv[2];
     } else {
       user = 'world';
     }
     request.setName(user);
-    client.sayHello(request, function(err, response) {
+    client.sayHello(request, (err, response) => {
       span.end();
       if (err) throw err;
       console.log('Greeting:', response.getMessage());
@@ -46,7 +39,7 @@ function main() {
   // The process must live for at least the interval past any traces that
   // must be exported, or some risk being lost if they are recorded after the
   // last export.
-  console.log('Sleeping 5 seconds before shutdown to ensure all records are flushed.')
+  console.log('Sleeping 5 seconds before shutdown to ensure all records are flushed.');
   setTimeout(() => { console.log('Completed.'); }, 5000);
 }
 
