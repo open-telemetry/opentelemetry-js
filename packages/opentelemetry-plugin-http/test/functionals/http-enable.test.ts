@@ -201,7 +201,7 @@ describe('HttpPlugin', () => {
       });
 
       it(`${protocol} module should be patched`, () => {
-        assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
+        assert.strictEqual(http.Server.prototype.emit.__mpWrapped, true);
       });
 
       it(`should not patch if it's not a ${protocol} module`, () => {

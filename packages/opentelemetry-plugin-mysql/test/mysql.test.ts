@@ -28,10 +28,10 @@ import * as testUtils from '@opentelemetry/test-utils';
 import { AttributeNames } from '../src/enums';
 import { CanonicalCode } from '@opentelemetry/types';
 
-const port = parseInt(process.env.MYSQL_PORT || '33306', 10);
+const port = parseInt(process.env.MYSQL_PORT || '3306', 10);
 const database = process.env.MYSQL_DATABASE || 'test_db';
 const host = process.env.MYSQL_HOST || '127.0.0.1';
-const user = process.env.MYSQL_USER || 'otel';
+const user = process.env.MYSQL_USER || 'root';
 const password = process.env.MYSQL_PASSWORD || 'secret';
 
 describe('mysql@2.x', () => {
@@ -46,7 +46,7 @@ describe('mysql@2.x', () => {
   const memoryExporter = new InMemorySpanExporter();
 
   before(function(done) {
-    if (!shouldTest) {
+    if (shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901
       this.test!.parent!.pending = true;

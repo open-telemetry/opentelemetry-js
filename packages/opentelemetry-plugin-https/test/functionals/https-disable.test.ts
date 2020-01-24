@@ -48,7 +48,7 @@ describe('HttpsPlugin', () => {
       plugin.enable((https as unknown) as Http, registry, registry.logger);
       tracer = plugin['_tracer'];
       // Ensure that https module is patched.
-      assert.strictEqual(https.Server.prototype.emit.__wrapped, true);
+      assert.strictEqual(https.Server.prototype.emit.__mpWrapped, true);
       server = https.createServer(
         {
           key: fs.readFileSync('test/fixtures/server-key.pem'),
@@ -90,7 +90,10 @@ describe('HttpsPlugin', () => {
             false
           );
 
-          assert.strictEqual(https.Server.prototype.emit.__wrapped, undefined);
+          assert.strictEqual(
+            https.Server.prototype.emit.__mpWrapped,
+            undefined
+          );
           assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         });
       });

@@ -17,7 +17,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { CanonicalCode, Span } from '@opentelemetry/types';
 import * as pgTypes from 'pg';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import {
   PgClientExtended,
   PgPluginQueryConfig,
@@ -44,19 +44,15 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
 
   protected patch(): typeof pgTypes {
     if (this._moduleExports.Client.prototype.query) {
-      shimmer.wrap(
-        this._moduleExports.Client.prototype,
-        'query',
-        this._getClientQueryPatch() as never
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.Client.prototype,
+          'query',
+          this._getClientQueryPatch() as never
+        ).unwrap
       );
     }
     return this._moduleExports;
-  }
-
-  protected unpatch(): void {
-    if (this._moduleExports.Client.prototype.query) {
-      shimmer.unwrap(this._moduleExports.Client.prototype, 'query');
-    }
   }
 
   private _getClientQueryPatch() {
@@ -98,10 +94,9 @@ export class PostgresPlugin extends BasePlugin<typeof pgTypes> {
           const parentSpan = plugin._tracer.getCurrentSpan();
           if (typeof args[args.length - 1] === 'function') {
             // Patch ParameterQuery callback
-            args[args.length - 1] = utils.patchCallback(
-              span,
-              args[args.length - 1] as PostgresCallback
-            );
+            args[args.length - 1] = utils.patchCallback(span, args[
+              args.length - 1
+            ] as PostgresCallback);
             // If a parent span exists, bind the callback
             if (parentSpan) {
               args[args.length - 1] = plugin._tracer.bind(

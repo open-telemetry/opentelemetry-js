@@ -40,6 +40,8 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
   protected _config!: PluginConfig;
 
+  protected _unpatchArr: Function[] = [];
+
   constructor(
     protected readonly _tracerName: string,
     protected readonly _tracerVersion?: string
@@ -63,7 +65,7 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   }
 
   disable(): void {
-    this.unpatch();
+    this._unpatch();
   }
 
   /**
@@ -146,6 +148,22 @@ export abstract class BasePlugin<T> implements Plugin<T> {
     });
   }
 
+  private _unpatch(): void {
+    this._logger.debug(
+      'removing patch to %s@%s',
+      this.moduleName,
+      this.version
+    );
+    this._unpatchArr.forEach(unpatch => {
+      if (typeof unpatch === 'function') {
+        unpatch();
+      }
+    });
+    this._unpatchArr = [];
+    this.unpatch();
+  }
+
+  protected unpatch(): void {}
+
   protected abstract patch(): T;
-  protected abstract unpatch(): void;
 }

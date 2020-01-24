@@ -46,7 +46,6 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.12",
     "@types/semver": "^6.2.0",
-    "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.5.0",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
@@ -63,7 +62,7 @@
   "dependencies": {
     "@opentelemetry/core": "^0.3.3",
     "@opentelemetry/types": "^0.3.3",
-    "semver": "^6.3.0",
-    "shimmer": "^1.2.1"
+    "mpwrapper": "^0.1.7",
+    "semver": "^6.3.0"
   }
 }

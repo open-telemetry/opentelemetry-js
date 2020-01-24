@@ -31,7 +31,7 @@ import {
 } from 'http';
 import { Socket } from 'net';
 import * as semver from 'semver';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
 import { Format } from './enums/Format';
@@ -72,20 +72,20 @@ export class HttpPlugin extends BasePlugin<Http> {
       this.version
     );
 
-    shimmer.wrap(
+    this._unpatchArr.push(mpWrapper.wrap(
       this._moduleExports,
       'request',
       this._getPatchOutgoingRequestFunction()
-    );
+    ).unwrap);
 
     // In Node >=8, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.wrap(
+      this._unpatchArr.push(mpWrapper.wrap(
         this._moduleExports,
         'get',
         this._getPatchOutgoingGetFunction(request)
-      );
+      ).unwrap);
     }
 
     if (
@@ -93,11 +93,11 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._moduleExports.Server &&
       this._moduleExports.Server.prototype
     ) {
-      shimmer.wrap(
+      this._unpatchArr.push(mpWrapper.wrap(
         this._moduleExports.Server.prototype,
         'emit',
         this._getPatchIncomingRequestFunction()
-      );
+      ).unwrap);
     } else {
       this._logger.error(
         'Could not apply patch to %s.emit. Interface is not as expected.',
@@ -106,21 +106,6 @@ export class HttpPlugin extends BasePlugin<Http> {
     }
 
     return this._moduleExports;
-  }
-
-  /** Unpatches all HTTP patched function. */
-  protected unpatch(): void {
-    shimmer.unwrap(this._moduleExports, 'request');
-    if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.unwrap(this._moduleExports, 'get');
-    }
-    if (
-      this._moduleExports &&
-      this._moduleExports.Server &&
-      this._moduleExports.Server.prototype
-    ) {
-      shimmer.unwrap(this._moduleExports.Server.prototype, 'emit');
-    }
   }
 
   /**

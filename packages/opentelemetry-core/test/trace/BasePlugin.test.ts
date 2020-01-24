@@ -78,7 +78,6 @@ class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   protected patch(): { [key: string]: Function } {
     return this._moduleExports;
   }
-  protected unpatch(): void {}
 }
 
 const basedir = path.dirname(require.resolve('./fixtures/test-package'));

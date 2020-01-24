@@ -18,7 +18,6 @@ import {
   BasePlugin,
   hrTime,
   isUrlIgnored,
-  isWrapped,
   otperformance,
   urlMatches,
 } from '@opentelemetry/core';
@@ -29,7 +28,7 @@ import {
   parseUrl,
   PerformanceTimingNames as PTN,
 } from '@opentelemetry/web';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import { Format } from './enums/Format';
@@ -499,18 +498,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   protected patch() {
     this._logger.debug('applying patch to', this.moduleName, this.version);
 
-    if (isWrapped(XMLHttpRequest.prototype.open)) {
-      shimmer.unwrap(XMLHttpRequest.prototype, 'open');
-      this._logger.debug('removing previous patch from method open');
-    }
-
-    if (isWrapped(XMLHttpRequest.prototype.send)) {
-      shimmer.unwrap(XMLHttpRequest.prototype, 'send');
-      this._logger.debug('removing previous patch from method send');
-    }
-
-    shimmer.wrap(XMLHttpRequest.prototype, 'open', this._patchOpen());
-    shimmer.wrap(XMLHttpRequest.prototype, 'send', this._patchSend());
+    this._unpatchArr.push(
+      mpWrapper.wrap(XMLHttpRequest.prototype, 'open', this._patchOpen()).unwrap
+    );
+    this._unpatchArr.push(
+      mpWrapper.wrap(XMLHttpRequest.prototype, 'send', this._patchSend()).unwrap
+    );
 
     return this._moduleExports;
   }
@@ -519,11 +512,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * implements unpatch function
    */
   protected unpatch() {
-    this._logger.debug('removing patch from', this.moduleName, this.version);
-
-    shimmer.unwrap(XMLHttpRequest.prototype, 'open');
-    shimmer.unwrap(XMLHttpRequest.prototype, 'send');
-
     this._tasksCount = 0;
     this._xhrMem = new WeakMap<XMLHttpRequest, XhrMem>();
     this._usedResources = new WeakSet<PerformanceResourceTiming>();

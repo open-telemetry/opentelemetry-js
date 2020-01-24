@@ -41,7 +41,7 @@ describe('HttpPlugin', () => {
 
       plugin.enable(http, registry, logger);
       // Ensure that http module is patched.
-      assert.strictEqual(http.Server.prototype.emit.__wrapped, true);
+      assert.strictEqual(http.Server.prototype.emit.__mpWrapped, true);
       server = http.createServer((request, response) => {
         response.end('Test Server Response');
       });
@@ -77,7 +77,7 @@ describe('HttpPlugin', () => {
             false
           );
 
-          assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
+          assert.strictEqual(http.Server.prototype.emit.__mpWrapped, undefined);
           assert.strictEqual(
             (noopTracer.withSpan as sinon.SinonSpy).called,
             false

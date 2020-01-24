@@ -19,7 +19,7 @@ import * as http from 'http';
 import * as https from 'https';
 import { URL } from 'url';
 import * as semver from 'semver';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import * as utils from './utils';
 
 /**
@@ -46,10 +46,12 @@ export class HttpsPlugin extends HttpPlugin {
       this._moduleExports.Server &&
       this._moduleExports.Server.prototype
     ) {
-      shimmer.wrap(
-        this._moduleExports.Server.prototype,
-        'emit',
-        this._getPatchIncomingRequestFunction()
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.Server.prototype,
+          'emit',
+          this._getPatchIncomingRequestFunction()
+        ).unwrap
       );
     } else {
       this._logger.error(
@@ -58,19 +60,23 @@ export class HttpsPlugin extends HttpPlugin {
       );
     }
 
-    shimmer.wrap(
-      this._moduleExports,
-      'request',
-      this._getPatchHttpsOutgoingRequestFunction()
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports,
+        'request',
+        this._getPatchHttpsOutgoingRequestFunction()
+      ).unwrap
     );
 
     // In Node 8-12, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.wrap(
-        this._moduleExports,
-        'get',
-        this._getPatchHttpsOutgoingGetFunction(https.request)
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports,
+          'get',
+          this._getPatchHttpsOutgoingGetFunction(https.request)
+        ).unwrap
       );
     }
 
@@ -116,21 +122,6 @@ export class HttpsPlugin extends HttpPlugin {
         );
       };
     };
-  }
-
-  /** Unpatches all HTTPS patched function. */
-  protected unpatch(): void {
-    if (
-      this._moduleExports &&
-      this._moduleExports.Server &&
-      this._moduleExports.Server.prototype
-    ) {
-      shimmer.unwrap(this._moduleExports.Server.prototype, 'emit');
-    }
-    shimmer.unwrap(this._moduleExports, 'request');
-    if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.unwrap(this._moduleExports, 'get');
-    }
   }
 }
 

@@ -17,7 +17,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import { AttributeNames } from './enums';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import * as pgPoolTypes from 'pg-pool';
 import {
   PostgresPoolPluginOptions,
@@ -41,17 +41,15 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
   }
 
   protected patch(): typeof pgPoolTypes {
-    shimmer.wrap(
-      this._moduleExports.prototype,
-      'connect',
-      this._getPoolConnectPatch() as never
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports.prototype,
+        'connect',
+        this._getPoolConnectPatch() as never
+      ).unwrap
     );
 
     return this._moduleExports;
-  }
-
-  protected unpatch(): void {
-    shimmer.unwrap(this._moduleExports.prototype, 'connect');
   }
 
   private _getPoolConnectPatch() {

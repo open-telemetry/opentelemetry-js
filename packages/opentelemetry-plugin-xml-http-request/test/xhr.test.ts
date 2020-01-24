@@ -108,11 +108,13 @@ describe('xhr', () => {
     let spyEntries: any;
     const url = `${window.location.origin}/xml-http-request.js`;
     let fakeNow = 0;
+    let plugin: XMLHttpRequestPlugin;
 
     clearData = () => {
       requests = [];
       sandbox.restore();
       spyEntries.restore();
+      plugin.disable();
     };
 
     prepareData = (
@@ -139,16 +141,14 @@ describe('xhr', () => {
 
       spyEntries = sandbox.stub(performance, 'getEntriesByType');
       spyEntries.withArgs('resource').returns(resources);
-
+      plugin = new XMLHttpRequestPlugin({
+        propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
+      });
       webTracerRegistryWithZone = new WebTracerRegistry({
         logLevel: LogLevel.ERROR,
         httpTextFormat: new B3Format(),
         scopeManager: new ZoneScopeManager(),
-        plugins: [
-          new XMLHttpRequestPlugin({
-            propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
-          }),
-        ],
+        plugins: [plugin],
       });
       webTracerWithZone = webTracerRegistryWithZone.getTracer('xhr-test');
       dummySpanExporter = new DummySpanExporter();

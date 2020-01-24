@@ -34,7 +34,7 @@ registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 describe('DnsPlugin', () => {
   before(() => {
     plugin.enable(dns, registry, tracer.logger);
-    assert.strictEqual(dns.lookup.__wrapped, true);
+    assert.strictEqual(dns.lookup.__mpWrapped, true);
   });
 
   beforeEach(() => {
@@ -58,7 +58,7 @@ describe('DnsPlugin', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
 
-        assert.strictEqual(dns.lookup.__wrapped, undefined);
+        assert.strictEqual(dns.lookup.__mpWrapped, undefined);
         assert.strictEqual((tracer.withSpan as sinon.SinonSpy).called, false);
         done();
       });

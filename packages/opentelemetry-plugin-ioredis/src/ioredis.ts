@@ -16,7 +16,7 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import * as ioredisTypes from 'ioredis';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import { traceConnection, traceSendCommand } from './utils';
 import { VERSION } from './version';
 
@@ -31,27 +31,24 @@ export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
 
   protected patch(): typeof ioredisTypes {
     this._logger.debug('Patching ioredis.prototype.sendCommand');
-    shimmer.wrap(
-      this._moduleExports.prototype,
-      'sendCommand',
-      this._patchSendCommand()
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports.prototype,
+        'sendCommand',
+        this._patchSendCommand()
+      ).unwrap
     );
 
     this._logger.debug('patching ioredis.prototype.connect');
-    shimmer.wrap(
-      this._moduleExports.prototype,
-      'connect',
-      this._patchConnection()
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports.prototype,
+        'connect',
+        this._patchConnection()
+      ).unwrap
     );
 
     return this._moduleExports;
-  }
-
-  protected unpatch(): void {
-    if (this._moduleExports) {
-      shimmer.unwrap(this._moduleExports.prototype, 'sendCommand');
-      shimmer.unwrap(this._moduleExports.prototype, 'connect');
-    }
   }
 
   /**

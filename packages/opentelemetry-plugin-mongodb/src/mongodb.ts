@@ -20,7 +20,7 @@
 import { BasePlugin } from '@opentelemetry/core';
 import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
 import * as mongodb from 'mongodb';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import {
   AttributeNames,
   Func,
@@ -53,13 +53,15 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
     if (this._moduleExports.Server) {
       for (const fn of this._SERVER_METHODS) {
         this._logger.debug(`patching mongodb.Server.prototype.${fn}`);
-        shimmer.wrap(
-          this._moduleExports.Server.prototype,
-          // Forced to ignore due to incomplete typings
-          // tslint:disable-next-line:ban-ts-ignore
-          // @ts-ignore
-          fn,
-          this._getPatchCommand(fn)
+        this._unpatchArr.push(
+          mpWrapper.wrap(
+            this._moduleExports.Server.prototype,
+            // Forced to ignore due to incomplete typings
+            // tslint:disable-next-line:ban-ts-ignore
+            // @ts-ignore
+            fn,
+            this._getPatchCommand(fn)
+          ).unwrap
         );
       }
     }
@@ -69,11 +71,17 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         'patching mongodb.Cursor.prototype functions:',
         this._CURSOR_METHODS
       );
-      shimmer.massWrap(
-        [this._moduleExports.Cursor.prototype],
-        this._CURSOR_METHODS as never[],
-        // tslint:disable-next-line:no-any
-        this._getPatchCursor() as any
+      this._unpatchArr.push(
+        ...mpWrapper
+          .massWrap(
+            [this._moduleExports.Cursor.prototype],
+            this._CURSOR_METHODS as never[],
+            // tslint:disable-next-line:no-any
+            this._getPatchCursor() as any
+          )
+          .map(wrapper => {
+            return wrapper.unwrap;
+          })
       );
     }
 
@@ -82,11 +90,11 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
 
   /** Unpatches all MongoDB patched functions. */
   unpatch(): void {
-    shimmer.massUnwrap(
+    mpWrapper.massUnwrap(
       [this._moduleExports.Server.prototype],
       this._SERVER_METHODS as never[]
     );
-    shimmer.massUnwrap(
+    mpWrapper.massUnwrap(
       [this._moduleExports.Cursor.prototype],
       this._CURSOR_METHODS as never[]
     );

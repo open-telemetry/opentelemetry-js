@@ -32,13 +32,3 @@ export interface TimeOriginLegacy {
     fetchStart: number;
   };
 }
-
-/**
- * This interface defines the params that are be added to the wrapped function
- * using the "shimmer.wrap"
- */
-export interface ShimWrapped {
-  __wrapped: boolean;
-  __unwrap: Function;
-  __original: Function;
-}

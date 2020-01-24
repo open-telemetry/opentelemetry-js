@@ -47,7 +47,6 @@
     "@types/mocha": "^5.2.7",
     "@types/mysql": "^2.15.4",
     "@types/node": "^12.6.9",
-    "@types/shimmer": "^1.0.1",
     "codecov": "^3.5.0",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
@@ -63,6 +62,6 @@
   "dependencies": {
     "@opentelemetry/core": "^0.3.3",
     "@opentelemetry/types": "^0.3.3",
-    "shimmer": "^1.2.1"
+    "mpwrapper": "^0.1.7"
   }
 }

@@ -26,7 +26,7 @@ import {
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
@@ -74,19 +74,23 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     );
 
     if (this._moduleExports.Server) {
-      shimmer.wrap(
-        this._moduleExports.Server.prototype,
-        'register',
-        // tslint:disable-next-line:no-any
-        this._patchServer() as any
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.Server.prototype,
+          'register',
+          // tslint:disable-next-line:no-any
+          this._patchServer() as any
+        ).unwrap
       );
     }
 
     // Wrap the externally exported client constructor
-    shimmer.wrap(
-      this._moduleExports,
-      'makeGenericClientConstructor',
-      this._patchClient()
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports,
+        'makeGenericClientConstructor',
+        this._patchClient()
+      ).unwrap
     );
 
     if (this._internalFilesExports['client']) {
@@ -95,31 +99,16 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       ] as GrpcInternalClientTypes;
 
       // Wrap the internally used client constructor
-      shimmer.wrap(
-        grpcClientModule,
-        'makeClientConstructor',
-        this._patchClient()
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          grpcClientModule,
+          'makeClientConstructor',
+          this._patchClient()
+        ).unwrap
       );
     }
 
     return this._moduleExports;
-  }
-  protected unpatch(): void {
-    this._logger.debug(
-      'removing patch to %s@%s',
-      this.moduleName,
-      this.version
-    );
-
-    if (this._moduleExports.Server) {
-      shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
-    }
-
-    shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
-
-    if (grpcClientModule) {
-      shimmer.unwrap(grpcClientModule, 'makeClientConstructor');
-    }
   }
 
   private _getSpanContext(metadata: grpcTypes.Metadata): SpanContext | null {
@@ -160,7 +149,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const originalResult = originalRegister.apply(this, arguments as any);
         const handlerSet = this.handlers[name];
 
-        shimmer.wrap(
+        mpWrapper.wrap(
           handlerSet,
           'func',
           (originalFunc: grpcTypes.handleCall<RequestType, ResponseType>) => {
@@ -328,7 +317,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       ) {
         // tslint:disable-next-line:no-any
         const client = original.apply(this, arguments as any);
-        shimmer.massWrap(
+        mpWrapper.massWrap(
           client.prototype as never,
           plugin._getMethodsToWrap(client, methods) as never[],
           // tslint:disable-next-line:no-any
@@ -368,12 +357,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             parent: plugin._tracer.getCurrentSpan(),
           })
           .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-        return plugin._makeGrpcClientRemoteCall(
-          original,
-          args,
-          this,
-          plugin
-        )(span);
+        return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
+          span
+        );
       };
     };
   }

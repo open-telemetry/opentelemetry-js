@@ -99,9 +99,8 @@ export const assertSpan = (
       'must have PEER_PORT'
     );
     assert.ok(
-      (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
-        span.attributes[AttributeNames.NET_PEER_NAME] as string
-      ) > -1,
+      (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(span
+        .attributes[AttributeNames.NET_PEER_NAME] as string) > -1,
       'must be consistent'
     );
   }

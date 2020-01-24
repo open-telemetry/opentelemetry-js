@@ -18,14 +18,13 @@ import { BasePlugin } from '@opentelemetry/core';
 import { Span, SpanKind, SpanOptions } from '@opentelemetry/types';
 import { LookupAddress } from 'dns';
 import * as semver from 'semver';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import { AddressFamily } from './enums/AddressFamily';
 import { AttributeNames } from './enums/AttributeNames';
 import {
   Dns,
   DnsPluginConfig,
   LookupCallbackSignature,
-  LookupFunction,
   LookupFunctionSignature,
   LookupPromiseSignature,
 } from './types';
@@ -54,21 +53,25 @@ export class DnsPlugin extends BasePlugin<Dns> {
       this.version
     );
 
-    shimmer.wrap<{ lookup: LookupFunction }, 'lookup'>(
-      this._moduleExports,
-      'lookup',
-      // tslint:disable-next-line:no-any
-      this._getLookup() as any
+    this._unpatchArr.push(
+      mpWrapper.wrap(
+        this._moduleExports,
+        'lookup',
+        // tslint:disable-next-line:no-any
+        this._getLookup() as any
+      ).unwrap
     );
 
     // new promise methods in node >= 10.6.0
     // https://nodejs.org/docs/latest/api/dns.html#dns_dnspromises_lookup_hostname_options
     if (semver.gte(this.version, '10.6.0')) {
-      shimmer.wrap(
-        this._moduleExports.promises,
-        'lookup',
-        // tslint:disable-next-line:no-any
-        this._getLookup() as any
+      this._unpatchArr.push(
+        mpWrapper.wrap(
+          this._moduleExports.promises,
+          'lookup',
+          // tslint:disable-next-line:no-any
+          this._getLookup() as any
+        ).unwrap
       );
     }
 
@@ -77,10 +80,10 @@ export class DnsPlugin extends BasePlugin<Dns> {
 
   /** Unpatches all DNS patched function. */
   protected unpatch(): void {
-    shimmer.unwrap(this._moduleExports, 'lookup');
-    if (semver.gte(this.version, '10.6.0')) {
-      shimmer.unwrap(this._moduleExports.promises, 'lookup');
-    }
+    // mpWrapper.unwrap(this._moduleExports, 'lookup');
+    // if (semver.gte(this.version, '10.6.0')) {
+    //   mpWrapper.unwrap(this._moduleExports.promises, 'lookup');
+    // }
   }
 
   /**

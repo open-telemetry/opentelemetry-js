@@ -16,7 +16,7 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import * as redisTypes from 'redis';
-import * as shimmer from 'shimmer';
+import * as mpWrapper from 'mpwrapper';
 import {
   getTracedCreateClient,
   getTracedCreateStreamTrace,
@@ -37,41 +37,27 @@ export class RedisPlugin extends BasePlugin<typeof redisTypes> {
       this._logger.debug(
         'Patching redis.RedisClient.prototype.internal_send_command'
       );
-      shimmer.wrap(
+      this._unpatchArr.push(mpWrapper.wrap(
         this._moduleExports.RedisClient.prototype,
         'internal_send_command',
         this._getPatchInternalSendCommand()
-      );
+      ).unwrap);
 
       this._logger.debug('patching redis.create_stream');
-      shimmer.wrap(
+      this._unpatchArr.push(mpWrapper.wrap(
         this._moduleExports.RedisClient.prototype,
         'create_stream',
         this._getPatchCreateStream()
-      );
+      ).unwrap);
 
       this._logger.debug('patching redis.createClient');
-      shimmer.wrap(
+      this._unpatchArr.push(mpWrapper.wrap(
         this._moduleExports,
         'createClient',
         this._getPatchCreateClient()
-      );
+      ).unwrap);
     }
     return this._moduleExports;
-  }
-
-  protected unpatch(): void {
-    if (this._moduleExports) {
-      shimmer.unwrap(
-        this._moduleExports.RedisClient.prototype,
-        'internal_send_command'
-      );
-      shimmer.unwrap(
-        this._moduleExports.RedisClient.prototype,
-        'create_stream'
-      );
-      shimmer.unwrap(this._moduleExports, 'createClient');
-    }
   }
 
   /**
