@@ -357,9 +357,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             parent: plugin._tracer.getCurrentSpan(),
           })
           .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-        return plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(
-          span
-        );
+        return plugin._makeGrpcClientRemoteCall(
+          original,
+          args,
+          this,
+          plugin
+        )(span);
       };
     };
   }
