@@ -33,6 +33,7 @@
     "@opentelemetry/exporter-zipkin": "^0.3.3",
     "@opentelemetry/node": "^0.3.3",
     "@opentelemetry/shim-opentracing": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
     "opentracing": "^0.14.4"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
