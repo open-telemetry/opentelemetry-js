@@ -1,7 +1,7 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracer } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
@@ -21,7 +21,7 @@ if (EXPORTER.toLowerCase().startsWith('z')) {
   });
 }
 
-tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
+tracerRegistry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
 opentelemetry.initGlobalTracerRegistry(tracerRegistry);
