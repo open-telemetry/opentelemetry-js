@@ -9,7 +9,6 @@ const redis = new Redis();
 async function main() {
   try {
     await redis.set('test', 'data');
-    await redis.get('test');
     process.exit(0);
   } catch (error) {
     console.error(error);
