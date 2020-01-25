@@ -22,8 +22,28 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import { HrTime } from '@opentelemetry/api';
+import { HrTime, Labels } from '@opentelemetry/api';
 import { Resource, ExportResult } from '@opentelemetry/base';
+import { Aggregator } from './Aggregator';
+
+export enum MetricKind {
+  COUNTER,
+  GAUGE,
+  MEASURE,
+}
+
+export interface DistributionData {
+  min: number;
+  max: number;
+  count: number;
+  sum: number;
+}
+
+export interface MetricRecord {
+  labels: Labels;
+  descriptor: MetricDescriptor;
+  aggregator: Aggregator;
+}
 
 export interface ReadableMetric {
   /**

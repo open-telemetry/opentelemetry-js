@@ -143,6 +143,16 @@ export class Meter implements types.Meter {
   }
 
   /**
+   * Collects all the metrics created with this `Meter` for export.
+   *
+   * Utilizes the batcher to create checkpoints of the current values in
+   * each aggregator belonging to the metrics that were created with this
+   * meter instance.
+   */
+  collect() {
+    Array.from(this._metrics.values()).forEach(metric => {});
+  }
+  /**
    * Gets a collection of Metrics to be exported.
    * @returns The list of metrics.
    */

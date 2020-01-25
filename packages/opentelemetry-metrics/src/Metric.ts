@@ -113,6 +113,12 @@ export abstract class Metric<T extends BaseBoundInstrument>
     };
   }
 
+  getRecord() {
+    return {
+      descriptor: this._metricDescriptor,
+    };
+  }
+
   private _getMetricDescriptor(): MetricDescriptor {
     return {
       name: this._name,
