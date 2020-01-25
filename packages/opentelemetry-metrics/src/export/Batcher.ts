@@ -30,11 +30,17 @@ import { MetricRecord, MetricKind } from './types';
  * will be sent to an exporter for exporting.
  */
 export abstract class Batcher {
+  /** Returns an aggregator based off metric kind. */
   abstract aggregatorFor(metricKind: MetricKind): Aggregator;
+
+  /** Stores record information to be ready for exporting. */
   abstract process(record: MetricRecord): void;
 }
 
-/** Accepts all records and passes them for exporting */
+/**
+ * Batcher which retains all dimensions/labels. It accepts all records and
+ * passes them for exporting.
+ */
 export class UngroupedBatcher extends Batcher {
   aggregatorFor(metricKind: MetricKind): Aggregator {
     switch (metricKind) {

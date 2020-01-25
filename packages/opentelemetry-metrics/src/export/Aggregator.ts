@@ -18,17 +18,18 @@ import { DistributionData } from './types';
 import { hrTime } from '@opentelemetry/core';
 import * as types from '@opentelemetry/types';
 
-export abstract class Aggregator {
-  abstract update(value: number): void;
+/**
+ * Base interface for aggregators. Aggregators are responsible for holding
+ * aggregated values and taking a snapshot of these values upon export.
+ */
+export interface Aggregator {
+  /** Updates the current with the new value. */
+  update(value: number): void;
 }
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
-export class CounterSumAggregator extends Aggregator {
+export class CounterSumAggregator implements Aggregator {
   current: number = 0;
-
-  constructor() {
-    super();
-  }
 
   update(value: number): void {
     this.current += value;
@@ -36,13 +37,9 @@ export class CounterSumAggregator extends Aggregator {
 }
 
 /** Basic aggregator which keeps the last recorded value and timestamp. */
-export class GaugeAggregator extends Aggregator {
+export class GaugeAggregator implements Aggregator {
   current: number = 0;
   timestamp: types.HrTime = hrTime();
-
-  constructor() {
-    super();
-  }
 
   update(value: number): void {
     this.current = value;
@@ -51,11 +48,10 @@ export class GaugeAggregator extends Aggregator {
 }
 
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
-export class MeasureExactAggregator extends Aggregator {
+export class MeasureExactAggregator implements Aggregator {
   distributionData: DistributionData;
 
   constructor() {
-    super();
     this.distributionData = {
       min: Infinity,
       max: -Infinity,

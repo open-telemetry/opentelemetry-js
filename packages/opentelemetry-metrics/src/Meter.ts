@@ -28,6 +28,7 @@ import { LabelSet } from './LabelSet';
 import { ReadableMetric, MetricExporter } from './export/types';
 import { notNull } from './Utils';
 import { ExportResult } from '@opentelemetry/base';
+import { Batcher, UngroupedBatcher } from './export/Batcher';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -36,7 +37,7 @@ export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _exporters: MetricExporter[] = [];
-
+  private readonly _batcher: Batcher;
   readonly labels = Meter.labels;
 
   /**
@@ -44,6 +45,7 @@ export class Meter implements types.Meter {
    */
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
+    this._batcher = new UngroupedBatcher();
   }
 
   /**
@@ -151,6 +153,8 @@ export class Meter implements types.Meter {
    */
   collect() {
     Array.from(this._metrics.values()).forEach(metric => {});
+
+    //this._batcher.process();
   }
   /**
    * Gets a collection of Metrics to be exported.
