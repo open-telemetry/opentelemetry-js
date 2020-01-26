@@ -26,7 +26,7 @@ import {
   PatchedRequest,
   Parameters,
   PathParams,
-  _MIDDLEWARES_STORE_PROPERTY,
+  _LAYERS_STORE_PROPERTY,
   ExpressPluginConfig,
   ExpressLayerType,
 } from './types';
@@ -174,7 +174,7 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
         next: express.NextFunction
       ) {
         storeLayerPath(req, layerPath);
-        const route = (req[_MIDDLEWARES_STORE_PROPERTY] as string[]).join('');
+        const route = (req[_LAYERS_STORE_PROPERTY] as string[]).join('');
         const attributes: Attributes = {
           [AttributeNames.COMPONENT]: plugin._COMPONENT,
           [AttributeNames.HTTP_ROUTE]: route.length > 0 ? route : undefined,
@@ -200,7 +200,7 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           arguments[callbackIdx] = function() {
             callbackHasBeenCalled = true;
             if (!(req.route && arguments[0] instanceof Error)) {
-              (req[_MIDDLEWARES_STORE_PROPERTY] as string[]).pop();
+              (req[_LAYERS_STORE_PROPERTY] as string[]).pop();
             }
             return patchEnd(span, plugin._tracer.bind(next))();
           };

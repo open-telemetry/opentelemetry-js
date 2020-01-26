@@ -19,7 +19,7 @@ import {
   ExpressLayer,
   AttributeNames,
   PatchedRequest,
-  _MIDDLEWARES_STORE_PROPERTY,
+  _LAYERS_STORE_PROPERTY,
   ExpressLayerType,
   IgnoreMatcher,
   ExpressPluginConfig,
@@ -31,14 +31,14 @@ import {
  * @param [value] the value to push into the array
  */
 export const storeLayerPath = (request: PatchedRequest, value?: string) => {
-  if (Array.isArray(request[_MIDDLEWARES_STORE_PROPERTY]) === false) {
-    Object.defineProperty(request, _MIDDLEWARES_STORE_PROPERTY, {
+  if (Array.isArray(request[_LAYERS_STORE_PROPERTY]) === false) {
+    Object.defineProperty(request, _LAYERS_STORE_PROPERTY, {
       enumerable: false,
       value: [],
     });
   }
   if (value === undefined) return;
-  (request[_MIDDLEWARES_STORE_PROPERTY] as string[]).push(value);
+  (request[_LAYERS_STORE_PROPERTY] as string[]).push(value);
 };
 
 /**
