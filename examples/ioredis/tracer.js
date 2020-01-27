@@ -6,20 +6,9 @@ const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
-const EXPORTER = process.env.EXPORTER || '';
-
 const tracerRegistry = new NodeTracerRegistry();
 
-let exporter;
-if (EXPORTER.toLowerCase().startsWith('z')) {
-  exporter = new ZipkinExporter({
-    serviceName: 'ioredis-example',
-  });
-} else {
-  exporter = new JaegerExporter({
-    serviceName: 'ioredis-example',
-  });
-}
+const exporter = new JaegerExporter({ serviceName: 'ioredis-example' });
 
 tracerRegistry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 

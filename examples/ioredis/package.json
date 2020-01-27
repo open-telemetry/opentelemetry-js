@@ -37,7 +37,5 @@
     "ioredis": "^4.14.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
-  "devDependencies": {
-    "cross-env": "^6.0.0"
-  }
+  "devDependencies": {}
 }

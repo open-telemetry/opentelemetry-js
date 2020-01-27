@@ -1,28 +1,12 @@
 # Overview
 
-OpenTelemetry IORedis Instrumentation allows the user to automatically collect trace data and export them to the backend of choice (we can use Zipkin or Jaeger for this example), to give observability to distributed systems.
+OpenTelemetry IORedis Instrumentation allows the user to automatically collect trace data and export them to the backend(s) of choice (Jaeger in this example).
 
 ## Tracing backend setup
-
-### Zipkin
-
-- Setup [Zipkin Tracing](https://zipkin.io/pages/quickstart.html)
-
-- Set EXPORTER variable
-
-  ```sh
-  export EXPORTER=zipkin
-  ```
 
 ### Jaeger
 
 - Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one)
-
-- Set EXPORTER variable
-
-  ```sh
-  export EXPORTER=jaeger
-  ```
 
 ## Installation
 
@@ -41,7 +25,7 @@ npm install
 - Run the main program
 
    ```sh
-   npm start
+   npm run start
    ```
 
 - Cleanup docker
