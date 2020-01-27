@@ -8,7 +8,7 @@ const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdrive
 // Initialize an exporter
 const exporter = new StackdriverTraceExporter({
   serviceName: 'basic-service',
-  logger: new opentelemetry.ConsoleLogger()
+  logger: new opentelemetry.ConsoleLogger(),
 });
 
 const tracer = new BasicTracer();
@@ -22,17 +22,17 @@ opentelemetry.initGlobalTracer(tracer);
 // Create a span. A span must be closed.
 const root = opentelemetry.getTracer().startSpan('main');
 const related = opentelemetry.getTracer().startSpan('related', {
-  links: [{ spanContext: root.context() }]
+  links: [{ spanContext: root.context() }],
 });
 
-for (let i = 0; i < 10; i++) {
+for (let i = 0; i < 10; i += 1) {
   doWork(root);
   doWork(related);
 }
 // Be sure to end the span.
 root.setStatus({
-  code: CanonicalCode.UNKNOWN
-})
+  code: CanonicalCode.UNKNOWN,
+});
 root.end();
 related.end();
 
@@ -43,17 +43,19 @@ function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
   const span = opentelemetry.getTracer().startSpan('doWork', {
-    parent: parent
+    parent,
   });
 
   // simulate some random work.
   const work = Math.floor(Math.random() * 40000000);
-  for (let i = 0; i <= work; i++) { }
+  for (let i = 0; i <= work; i += 1) {
+    // empty
+  }
 
   if (work % 2 === 1) {
     span.setStatus({
-      code: CanonicalCode.UNKNOWN
-    })
+      code: CanonicalCode.UNKNOWN,
+    });
   }
 
   // Set attributes to the span.

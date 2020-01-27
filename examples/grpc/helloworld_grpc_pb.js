@@ -1,3 +1,14 @@
+/* eslint-disable no-multi-assign */
+/* eslint-disable prefer-const */
+/* eslint-disable no-var */
+/* eslint-disable vars-on-top */
+/* eslint-disable no-unused-vars */
+/* eslint-disable func-names */
+/* eslint-disable camelcase */
+/* eslint-disable no-undef */
+/* eslint-disable no-new-func */
+/* eslint-disable strict */
+
 // GENERATED CODE -- DO NOT EDIT!
 
 // Original file comments:
@@ -15,9 +26,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 'use strict';
-var grpc = require('grpc');
-var helloworld_pb = require('./helloworld_pb.js');
+
+const grpc = require('grpc');
+const helloworld_pb = require('./helloworld_pb.js');
 
 function serialize_HelloReply(arg) {
   if (!(arg instanceof helloworld_pb.HelloReply)) {
@@ -39,12 +52,12 @@ function serialize_HelloRequest(arg) {
 
 function deserialize_HelloRequest(buffer_arg) {
   return helloworld_pb.HelloRequest.deserializeBinary(
-    new Uint8Array(buffer_arg)
+    new Uint8Array(buffer_arg),
   );
 }
 
 // The greeting service definition.
-var GreeterService = (exports.GreeterService = {
+const GreeterService = (exports.GreeterService = {
   // Sends a greeting
   sayHello: {
     path: '/helloworld.Greeter/SayHello',
@@ -55,8 +68,8 @@ var GreeterService = (exports.GreeterService = {
     requestSerialize: serialize_HelloRequest,
     requestDeserialize: deserialize_HelloRequest,
     responseSerialize: serialize_HelloReply,
-    responseDeserialize: deserialize_HelloReply
-  }
+    responseDeserialize: deserialize_HelloReply,
+  },
 });
 
 exports.GreeterClient = grpc.makeGenericClientConstructor(GreeterService);
