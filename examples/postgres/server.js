@@ -1,18 +1,13 @@
 'use strict';
 
-// set up ot
-const opentelemetry = require('@opentelemetry/core');
+// eslint-disable-next-line import/order
+const tracer = require('./tracer')('postgres-server-service');
 const { SpanKind, CanonicalCode } = require('@opentelemetry/types');
-const config = require('./setup');
-config.setupTracerAndExporters('postgres-server-service');
-const tracer = opentelemetry.getTracer();
+const express = require('express');
+const setupPg = require('./setupPsql');
 
-// set up pg
-const setupPg  = require('./setupPsql');
 const pool = setupPg.startPsql();
 
-// set up express
-const express = require('express');
 const app = express();
 
 app.get('/:cmd', (req, res) => {
@@ -28,7 +23,7 @@ app.get('/:cmd', (req, res) => {
       return;
     }
     queryText = {
-      text: `INSERT INTO test (id, text) VALUES($1, $2) ON CONFLICT(id) DO UPDATE SET text=$2`,
+      text: 'INSERT INTO test (id, text) VALUES($1, $2) ON CONFLICT(id) DO UPDATE SET text=$2',
       values: [req.query.id, req.query.text],
     };
   }
@@ -45,7 +40,7 @@ app.get('/:cmd', (req, res) => {
         res.send(ret.rows);
       });
     } catch (e) {
-      res.status(400).send({message: e.message});
+      res.status(400).send({ message: e.message });
       span.setStatus(CanonicalCode.UNKNOWN);
     }
     span.end();
@@ -54,7 +49,6 @@ app.get('/:cmd', (req, res) => {
 
 // start server
 const port = 3000;
-app.listen(port, function() {
+app.listen(port, () => {
   console.log(`Node HTTP listening on ${port}`);
 });
-

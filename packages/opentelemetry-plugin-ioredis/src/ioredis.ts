@@ -44,7 +44,7 @@ export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
       this._patchConnection()
     );
 
-    return this._moduleExports.prototype;
+    return this._moduleExports;
   }
 
   protected unpatch(): void {
