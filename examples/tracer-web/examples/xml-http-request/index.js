@@ -1,4 +1,3 @@
-'use strict';
 
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracer } from '@opentelemetry/web';
@@ -14,28 +13,41 @@ const webTracerWithZone = new WebTracer({
     new XMLHttpRequestPlugin({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
       propagateTraceHeaderCorsUrls: [
-        'https://httpbin.org/get'
-      ]
-    })
-  ]
+        'https://httpbin.org/get',
+      ],
+    }),
+  ],
 });
 
 webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
+const getData = (url) => new Promise((resolve, _reject) => {
+  // eslint-disable-next-line no-undef
+  const req = new XMLHttpRequest();
+  req.open('GET', url, true);
+  req.setRequestHeader('Content-Type', 'application/json');
+  req.setRequestHeader('Accept', 'application/json');
+  req.send();
+  req.onload = () => {
+    resolve();
+  };
+});
+
 // example of keeping track of scope between async operations
 const prepareClickEvent = () => {
   const url1 = 'https://httpbin.org/get';
 
+  let document;
   const element = document.getElementById('button1');
 
   const onClick = () => {
-    for (let i = 0, j = 5; i < j; i++) {
+    for (let i = 0, j = 5; i < j; i += 1) {
       const span1 = webTracerWithZone.startSpan(`files-series-info-${i}`, {
-        parent: webTracerWithZone.getCurrentSpan()
+        parent: webTracerWithZone.getCurrentSpan(),
       });
       webTracerWithZone.withSpan(span1, () => {
-        getData(url1).then((data) => {
+        getData(url1).then((_data) => {
           webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
           span1.end();
         });
@@ -45,17 +57,5 @@ const prepareClickEvent = () => {
   element.addEventListener('click', onClick);
 };
 
-const getData = (url) => {
-  return new Promise(async (resolve, reject) => {
-    const req = new XMLHttpRequest();
-    req.open('GET', url, true);
-    req.setRequestHeader('Content-Type', 'application/json');
-    req.setRequestHeader('Accept', 'application/json');
-    req.send();
-    req.onload = function () {
-      resolve();
-    };
-  });
-};
-
+let window;
 window.addEventListener('load', prepareClickEvent);
