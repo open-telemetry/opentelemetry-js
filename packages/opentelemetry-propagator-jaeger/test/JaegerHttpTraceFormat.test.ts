@@ -90,7 +90,7 @@ describe('JaegerHttpTraceFormat', () => {
 
     it('should extract context of a sampled span from UTF-8 encoded carrier', () => {
       carrier[UBER_TRACE_ID_HEADER] =
-          'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
+        'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
