@@ -23,7 +23,7 @@ import { VERSION } from './version';
 export class IORedisPlugin extends BasePlugin<typeof ioredisTypes> {
   static readonly COMPONENT = 'ioredis';
   static readonly DB_TYPE = 'redis';
-  readonly supportedVersions = ['^2.0.0'];
+  readonly supportedVersions = ['>1 <5'];
 
   constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-ioredis', VERSION);
