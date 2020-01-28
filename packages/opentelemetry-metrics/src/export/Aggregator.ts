@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { DistributionData } from './types';
+import { Distribution, Sum, LastValue } from './types';
 import { hrTime } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 
 /**
  * Base interface for aggregators. Aggregators are responsible for holding
@@ -25,34 +25,48 @@ import * as types from '@opentelemetry/types';
 export interface Aggregator {
   /** Updates the current with the new value. */
   update(value: number): void;
+
+  /** Returns snapshot of the current value. */
+  value(): Sum | LastValue | Distribution;
 }
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {
-  current: number = 0;
+  private _current: number = 0;
 
   update(value: number): void {
-    this.current += value;
+    this._current += value;
+  }
+
+  value(): Sum {
+    return this._current;
   }
 }
 
 /** Basic aggregator which keeps the last recorded value and timestamp. */
 export class GaugeAggregator implements Aggregator {
-  current: number = 0;
-  timestamp: types.HrTime = hrTime();
+  private _current: number = 0;
+  private _timestamp: types.HrTime = hrTime();
 
   update(value: number): void {
-    this.current = value;
-    this.timestamp = hrTime();
+    this._current = value;
+    this._timestamp = hrTime();
+  }
+
+  value(): LastValue {
+    return {
+      value: this._current,
+      timestamp: this._timestamp,
+    };
   }
 }
 
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
 export class MeasureExactAggregator implements Aggregator {
-  distributionData: DistributionData;
+  private _distribution: Distribution;
 
   constructor() {
-    this.distributionData = {
+    this._distribution = {
       min: Infinity,
       max: -Infinity,
       sum: 0,
@@ -61,9 +75,13 @@ export class MeasureExactAggregator implements Aggregator {
   }
 
   update(value: number): void {
-    this.distributionData.count++;
-    this.distributionData.sum += value;
-    this.distributionData.min = Math.min(this.distributionData.min, value);
-    this.distributionData.max = Math.max(this.distributionData.max, value);
+    this._distribution.count++;
+    this._distribution.sum += value;
+    this._distribution.min = Math.min(this._distribution.min, value);
+    this._distribution.max = Math.max(this._distribution.max, value);
+  }
+
+  value(): Distribution {
+    return this._distribution;
   }
 }

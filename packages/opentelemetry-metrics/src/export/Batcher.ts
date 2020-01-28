@@ -30,11 +30,17 @@ import { MetricRecord, MetricKind } from './types';
  * will be sent to an exporter for exporting.
  */
 export abstract class Batcher {
+  protected readonly _batchMap = new Map<string, MetricRecord>();
+
   /** Returns an aggregator based off metric kind. */
   abstract aggregatorFor(metricKind: MetricKind): Aggregator;
 
   /** Stores record information to be ready for exporting. */
   abstract process(record: MetricRecord): void;
+
+  checkPointSet(): MetricRecord[] {
+    return Array.from(this._batchMap.values());
+  }
 }
 
 /**
@@ -53,5 +59,10 @@ export class UngroupedBatcher extends Batcher {
     }
   }
 
-  process(record: MetricRecord): void {}
+  process(record: MetricRecord): void {
+    this._batchMap.set(
+      record.descriptor.name + record.labels.identifier,
+      record
+    );
+  }
 }
