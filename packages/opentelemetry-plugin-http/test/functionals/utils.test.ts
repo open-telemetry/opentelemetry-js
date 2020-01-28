@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
+import { NoopLogger } from '@opentelemetry/core';
+import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
+import { CanonicalCode, SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
+import * as http from 'http';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { AttributeNames } from '../../src';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
-import * as http from 'http';
-import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
-import { AttributeNames } from '../../src';
-import { NoopLogger } from '@opentelemetry/core';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
@@ -36,16 +36,23 @@ describe('Utility', () => {
     });
 
     it('should return OK for Success HTTP status code', () => {
-      for (let index = 200; index < 400; index++) {
+      for (let index = 100; index < 400; index++) {
         const status = utils.parseResponseStatus(index);
         assert.deepStrictEqual(status, { code: CanonicalCode.OK });
       }
     });
 
     it('should not return OK for Bad HTTP status code', () => {
-      for (let index = 400; index <= 504; index++) {
+      for (let index = 400; index <= 600; index++) {
         const status = utils.parseResponseStatus(index);
         assert.notStrictEqual(status.code, CanonicalCode.OK);
+      }
+    });
+    it('should handle special HTTP status codes', () => {
+      for (const key in utils.HTTP_STATUS_SPECIAL_CASES) {
+        const status = utils.parseResponseStatus(key as any);
+        const canonicalCode = utils.HTTP_STATUS_SPECIAL_CASES[key];
+        assert.deepStrictEqual(status.code, canonicalCode);
       }
     });
   });
