@@ -36,7 +36,7 @@ const registry = new NodeTracerRegistry({
 });
 ```
 
-To load all the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+To load all of the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
 const { NodeTracerRegistry } = require('@opentelemetry/node');
 
@@ -55,6 +55,7 @@ Http plugin has few options available to choose from. You can set the following:
 | [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
 | [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `string` | The primary server name of the matched virtual host. |
+
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>

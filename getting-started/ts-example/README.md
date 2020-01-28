@@ -72,8 +72,8 @@ All tracing initialization should happen before your application’s code runs. 
 Create a file named `tracing.ts` and add the following code:
 
 ```typescript
-import * as opentelemetry from "@opentelemetry/core";
-import { NodeTracer } from "@opentelemetry/node";
+import * as opentelemetry from '@opentelemetry/core';
+import { NodeTracer } from '@opentelemetry/node';
 
 const tracer: NodeTracer = new NodeTracer({
   logLevel: opentelemetry.LogLevel.ERROR
@@ -106,13 +106,13 @@ $ # npm install @opentelemetry/exporter-jaeger
 After these dependencies are installed, we will need to initialize and register them. Modify `tracing.ts` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
 
 ```typescript
-import * as opentelemetry from "@opentelemetry/core";
-import { NodeTracer } from "@opentelemetry/node";
+import * as opentelemetry from '@opentelemetry/core';
+import { NodeTracer } from '@opentelemetry/node';
 
-import { SimpleSpanProcessor } from "@opentelemetry/tracing";
-import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
+import { SimpleSpanProcessor } from '@opentelemetry/tracing';
+import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // For Jaeger, use the following line instead:
-// import { JaegerExporter } from "@opentelemetry/exporter-jaeger";
+// import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const tracer: NodeTracer = new NodeTracer({
   logLevel: opentelemetry.LogLevel.ERROR
@@ -236,18 +236,18 @@ In order to create and monitor metrics, we will need a `Meter`. In OpenTelemetry
 Create a file named `monitoring.ts` and add the following code:
 
 ```typescript
-import { Meter } from "@opentelemetry/metrics";
+import { MeterRegistry } from '@opentelemetry/metrics';
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 ```
 
 Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.ts` file a middleware function that express can use to count all requests by route. Modify the `monitoring.ts` file so that it looks like this:
 
 ```typescript
-import { Meter } from "@opentelemetry/metrics";
-import { Metric, BoundCounter } from "@opentelemetry/types";
+import { MeterRegistry } from '@opentelemetry/metrics';
+import { Metric, BoundCounter } from '@opentelemetry/types';
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
@@ -296,11 +296,11 @@ $ npm install @opentelemetry/exporter-prometheus
 Next, modify your `monitoring.ts` file to look like this:
 
 ```typescript
-import { Meter } from "@opentelemetry/metrics";
-import { Metric, BoundCounter } from "@opentelemetry/types";
-import { PrometheusExporter } from "@opentelemetry/exporter-prometheus";
+import { MeterRegistry } from '@opentelemetry/metrics';
+import { Metric, BoundCounter } from '@opentelemetry/types';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-const meter = new Meter();
+const meter = new MeterRegistry().getMeter('your-meter-name');
 
 meter.addExporter(
   new PrometheusExporter({ startServer: true }, () => {

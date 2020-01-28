@@ -21,7 +21,6 @@ import {
   initGlobalTracerRegistry,
 } from '../../src/trace/globaltracer-utils';
 import { NoopTracer, NoopSpan } from '../../src';
-import { TraceFlags } from '@opentelemetry/types';
 import { NoopTracerRegistry } from '../../src/trace/NoopTracerRegistry';
 
 describe('globaltracer-utils', () => {
@@ -43,7 +42,7 @@ describe('globaltracer-utils', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.UNSAMPLED,
+      traceFlags: types.TraceFlags.UNSAMPLED,
     };
     const dummySpan = new NoopSpan(spanContext);
 
