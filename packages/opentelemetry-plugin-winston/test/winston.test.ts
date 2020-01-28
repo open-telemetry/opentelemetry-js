@@ -36,6 +36,7 @@ describe('WinstonPlugin', () => {
   let plugin: WinstonPlugin;
   let sandbox: sinon.SinonSandbox;
   let enableReturned: typeof winston;
+
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     plugin = new WinstonPlugin('winston', '1.2.3');
@@ -131,7 +132,6 @@ describe('WinstonPlugin', () => {
 
   describe('unpatch()', () => {
     it('log should not contains trace information', () => {
-      plugin.disable();
       const winstonConsole = new winston.transports.Console();
       const spy = sinon.spy(winstonConsole, 'log');
 
@@ -141,6 +141,9 @@ describe('WinstonPlugin', () => {
         transports: [winstonConsole],
       };
       const logger = winston.createLogger(loggerOptions);
+
+      // disable after creating logger to make sure unpatch works correctly
+      plugin.disable();
 
       const span = tracer.startSpan('test');
       tracer.withSpan(span, () => {

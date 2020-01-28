@@ -26,6 +26,8 @@ import { VERSION } from './version';
  */
 export class WinstonPlugin extends BasePlugin<any> {
   readonly component: string;
+  readonly supportedVersions = ['>=1 <4'];
+  private _loggers: winston.Logger[] = [];
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, version);
@@ -46,17 +48,8 @@ export class WinstonPlugin extends BasePlugin<any> {
         ...args: any[]
       ): winston.Logger {
         const logger: winston.Logger = original.apply(this, args);
-        const originalWrite = logger.write;
-
-        logger.write = function writePatched(this, ...args: any) {
-          const span = plugin._tracer.getCurrentSpan();
-          if (span) {
-            const chunk: WinstonChunk = args[0];
-            args[0] = addTraceToChunk(chunk, span);
-          }
-          return originalWrite.apply(logger, args);
-        };
-
+        plugin._loggers.push(logger);
+        shimmer.wrap(logger, 'write', plugin._patchLoggerWriteV3());
         return logger;
       };
     };
@@ -72,6 +65,33 @@ export class WinstonPlugin extends BasePlugin<any> {
         const span = plugin._tracer.getCurrentSpan();
         if (span) {
           args = processArgs(args, span);
+        }
+        return original.apply(this, args);
+      };
+    };
+  }
+
+  /**
+   * Patching logger.write function for winston version 3
+   */
+  private _patchLoggerWriteV3() {
+    return (original: {
+      (
+        chunk: any,
+        encoding?: string | undefined,
+        cb?: ((error: Error | null | undefined) => void) | undefined
+      ): boolean;
+      (
+        chunk: any,
+        cb?: ((error: Error | null | undefined) => void) | undefined
+      ): boolean;
+    }) => {
+      const plugin = this;
+      return function createLoggerWritePatched(this: any, ...args: any) {
+        const span = plugin._tracer.getCurrentSpan();
+        if (span) {
+          const chunk: WinstonChunk = args[0];
+          args[0] = addTraceToChunk(chunk, span);
         }
         return original.apply(this, args);
       };
@@ -111,6 +131,10 @@ export class WinstonPlugin extends BasePlugin<any> {
 
     if (semver.satisfies(this._moduleExports.version, '>=3.0.0')) {
       shimmer.unwrap(this._moduleExports, 'createLogger');
+      this._loggers.forEach((logger: winston.Logger) => {
+        shimmer.unwrap(logger, 'write');
+      });
+      this._loggers = [];
     }
     if (semver.satisfies(this._moduleExports.version, '1 - 2')) {
       shimmer.unwrap(this._moduleExports.Logger.prototype, 'log');
