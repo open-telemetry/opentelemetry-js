@@ -1,0 +1,72 @@
+{
+  "name": "@opentelemetry/plugin-winston",
+  "version": "0.3.3",
+  "description": "OpenTelemetry Winston automatic instrumentation package.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "check": "gts check",
+    "clean": "rimraf build/*",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "precompile": "tsc --version",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "fix": "gts fix",
+    "prepare": "npm run compile",
+    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "opentelemetry",
+    "node",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@opentelemetry/node": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^12.6.8",
+    "@types/semver": "^6.2.0",
+    "@types/shimmer": "^1.0.1",
+    "@types/sinon": "^7.0.13",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
+    "mocha": "^6.1.0",
+    "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
+    "sinon": "^7.5.0",
+    "ts-loader": "^6.0.4",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.6.2",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.6.4",
+    "winston": "^3.2.1"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/types": "^0.3.3",
+    "semver": "^7.1.1",
+    "shimmer": "^1.2.1"
+  }
+}

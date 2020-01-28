@@ -1,0 +1,39 @@
+{
+  "name": "example-winston-ver2",
+  "private": true,
+  "version": "0.3.3",
+  "description": "Example of using @opentelemetry/plugin-winston in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "winston",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/exporter-collector": "^0.3.3",
+    "@opentelemetry/node": "^0.3.3",
+    "@opentelemetry/plugin-winston": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "winston": "^2.4.4"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}
