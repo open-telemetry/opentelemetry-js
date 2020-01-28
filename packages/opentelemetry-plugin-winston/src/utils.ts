@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import { TraceInformation, TRACE_PARAM_NAME, WinstonChunk } from './types';
+import { SpanContext } from '@opentelemetry/types';
+import { TRACE_PARAM_NAME, WinstonChunk } from './types';
 import * as types from '@opentelemetry/types';
 
 /**
  * Get trace information from span
  * @param span
  */
-function getTraceInformation(span: types.Span): TraceInformation {
-  const traceInformation: TraceInformation = {
-    trace_id: span.context().traceId,
-    span_id: span.context().spanId,
+function getTraceInformation(span: types.Span): SpanContext {
+  const traceInformation = {
+    traceId: span.context().traceId,
+    spanId: span.context().spanId,
   };
   return traceInformation;
 }
@@ -39,7 +40,9 @@ export function addTraceToChunk(
   span: types.Span
 ): WinstonChunk {
   const newChunk: WinstonChunk = Object.assign({}, chunk);
-  newChunk[TRACE_PARAM_NAME] = getTraceInformation(span);
+  if (!newChunk[TRACE_PARAM_NAME]) {
+    newChunk[TRACE_PARAM_NAME] = getTraceInformation(span);
+  }
   return newChunk;
 }
 

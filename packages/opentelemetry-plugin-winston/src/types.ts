@@ -17,19 +17,11 @@
 /**
  * Name of params under which the trace information will be saved
  */
-export const TRACE_PARAM_NAME = 'ot';
+export const TRACE_PARAM_NAME = 'traceContext';
 
 /**
  * Winston Log Chunk Interface
  */
 export interface WinstonChunk {
   [key: string]: any;
-}
-
-/**
- * Trace Information that should be added to log
- */
-export interface TraceInformation {
-  trace_id: string;
-  span_id: string;
 }

@@ -81,8 +81,8 @@ describe('WinstonPlugin', () => {
       const params = spy.args[0][0];
       assert.strictEqual(params.message, 'foo');
       assert.deepStrictEqual(params[TRACE_PARAM_NAME], {
-        span_id: span.context().spanId,
-        trace_id: span.context().traceId,
+        spanId: span.context().spanId,
+        traceId: span.context().traceId,
       });
       sinon.assert.callCount(spy, 1);
     });
@@ -122,8 +122,8 @@ describe('WinstonPlugin', () => {
         const ot = (params[1] || {})[TRACE_PARAM_NAME];
         assert.strictEqual(message, 'foo');
         assert.deepStrictEqual(ot, {
-          span_id: span.context().spanId,
-          trace_id: span.context().traceId,
+          spanId: span.context().spanId,
+          traceId: span.context().traceId,
         });
         sinon.assert.callCount(winstonConsole.log, 1);
       });

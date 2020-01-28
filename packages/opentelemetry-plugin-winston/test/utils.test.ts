@@ -32,8 +32,8 @@ describe('utils', () => {
       assert.deepStrictEqual(newChunk, {
         foo: 'bar',
         [TRACE_PARAM_NAME]: {
-          trace_id: '1',
-          span_id: '2',
+          traceId: '1',
+          spanId: '2',
         },
       });
     });
@@ -46,8 +46,8 @@ describe('utils', () => {
       assert.deepStrictEqual(processedArgs, [
         {
           [TRACE_PARAM_NAME]: {
-            span_id: '2',
-            trace_id: '1',
+            spanId: '2',
+            traceId: '1',
           },
         },
       ]);
@@ -60,8 +60,8 @@ describe('utils', () => {
       assert.deepStrictEqual(processedArgs, [
         {
           [TRACE_PARAM_NAME]: {
-            span_id: '2',
-            trace_id: '1',
+            spanId: '2',
+            traceId: '1',
           },
         },
         callback,
@@ -76,8 +76,8 @@ describe('utils', () => {
         {
           foo1: 'bar',
           [TRACE_PARAM_NAME]: {
-            span_id: '2',
-            trace_id: '1',
+            spanId: '2',
+            traceId: '1',
           },
         },
       ]);
@@ -95,8 +95,8 @@ describe('utils', () => {
           {
             foo1: 'bar',
             [TRACE_PARAM_NAME]: {
-              span_id: '2',
-              trace_id: '1',
+              spanId: '2',
+              traceId: '1',
             },
           },
           callback,
