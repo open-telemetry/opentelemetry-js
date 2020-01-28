@@ -19,7 +19,7 @@ import { NoopLogger } from '@opentelemetry/core';
 import {
   MetricExporter,
   MetricRecord,
-  Descriptor,
+  MetricDescriptor,
   LastValue,
   MetricKind,
   Sum,
@@ -206,7 +206,7 @@ export class PrometheusExporter implements MetricExporter {
     }
   }
 
-  private _getPrometheusMetricName(descriptor: Descriptor): string {
+  private _getPrometheusMetricName(descriptor: MetricDescriptor): string {
     return this._sanitizePrometheusMetricName(
       this._prefix ? `${this._prefix}_${descriptor.name}` : descriptor.name
     );

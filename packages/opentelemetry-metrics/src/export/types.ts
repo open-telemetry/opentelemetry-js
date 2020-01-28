@@ -51,12 +51,12 @@ export interface Distribution {
 }
 
 export interface MetricRecord {
-  readonly descriptor: Descriptor;
+  readonly descriptor: MetricDescriptor;
   readonly labels: LabelSet;
   readonly aggregator: Aggregator;
 }
 
-export interface Descriptor {
+export interface MetricDescriptor {
   readonly name: string;
   readonly description: string;
   readonly unit: string;

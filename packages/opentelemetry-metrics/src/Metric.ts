@@ -22,7 +22,7 @@ import {
   BoundMeasure,
 } from './BoundInstrument';
 import { MetricOptions } from './types';
-import { MetricKind, Descriptor, MetricRecord } from './export/types';
+import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
 
 /** This is a SDK implementation of {@link Metric} interface. */
@@ -32,7 +32,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
   protected readonly _disabled: boolean;
   protected readonly _valueType: types.ValueType;
   protected readonly _logger: types.Logger;
-  private readonly _descriptor: Descriptor;
+  private readonly _descriptor: MetricDescriptor;
   private readonly _instruments: Map<string, T> = new Map();
 
   constructor(
@@ -44,7 +44,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     this._disabled = _options.disabled;
     this._valueType = _options.valueType;
     this._logger = _options.logger;
-    this._descriptor = this._getDescriptor();
+    this._descriptor = this._getMetricDescriptor();
   }
 
   /**
@@ -100,7 +100,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     }));
   }
 
-  private _getDescriptor(): Descriptor {
+  private _getMetricDescriptor(): MetricDescriptor {
     return {
       name: this._name,
       description: this._options.description,
