@@ -2,7 +2,7 @@
 
 const opentelemetry = require('@opentelemetry/core');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CanonicalCode } = require('@opentelemetry/types');
+const { CanonicalCode } = require('@opentelemetry/api');
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
 // Initialize an exporter

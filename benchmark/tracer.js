@@ -1,15 +1,16 @@
 'use strict';
 
 const benchmark = require('./benchmark');
-const opentelemetry = require('../packages/opentelemetry-core');
+const opentelemetry = require('../packages/opentelemetry-api');
+const { NoopLogger } = require('../packages/opentelemetry-core');
 const { BasicTracerRegistry, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
 
-const logger = new opentelemetry.NoopLogger();
+const logger = new NoopLogger();
 
 const setups = [
   {
     name: 'NoopTracerRegistry',
-    registry: opentelemetry.getTracerRegistry()
+    registry: opentelemetry.trace.getTracerRegistry()
   },
   {
     name: 'BasicTracerRegistry',

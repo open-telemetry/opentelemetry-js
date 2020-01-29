@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/order
 const tracer = require('./tracer')('postgres-server-service');
-const { SpanKind, CanonicalCode } = require('@opentelemetry/types');
+const { SpanKind, CanonicalCode } = require('@opentelemetry/api');
 const express = require('express');
 const setupPg = require('./setupPsql');
 

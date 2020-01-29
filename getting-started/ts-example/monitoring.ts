@@ -1,5 +1,5 @@
 import { MeterProvider } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/types';
+import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 const meter = new MeterProvider().getMeter('example-ts');

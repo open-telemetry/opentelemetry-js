@@ -1,13 +1,12 @@
 "use strict";
 
-const opentelemetry = require("@opentelemetry/core");
+const opentelemetry = require("@opentelemetry/api");
 const { NodeTracerProvider } = require("@opentelemetry/node");
-
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 
 const tracerProvider = new NodeTracerProvider({ logLevel: opentelemetry.LogLevel.ERROR });
-opentelemetry.initGlobalTracerProvider(tracerProvider);
+opentelemetry.trace.initGlobalTracerProvider(tracerProvider);
 
 tracer.addSpanProcessor(
   new SimpleSpanProcessor(

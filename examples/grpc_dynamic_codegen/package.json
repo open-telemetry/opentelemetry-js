@@ -34,7 +34,7 @@
     "@opentelemetry/node": "^0.3.3",
     "@opentelemetry/plugin-grpc": "^0.3.3",
     "@opentelemetry/tracing": "^0.3.3",
-    "@opentelemetry/types": "^0.3.3",
+    "@opentelemetry/api": "^0.3.3",
     "grpc": "^1.23.3",
     "node-pre-gyp": "0.12.0"
   },
