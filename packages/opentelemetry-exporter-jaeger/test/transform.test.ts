@@ -242,8 +242,14 @@ describe('transform', () => {
 
       const thriftSpan = spanToThrift(readableSpan);
 
-      assert.strictEqual(thriftSpan.traceIdLow.toString('hex'), '92b449d5929fda1b');
-      assert.strictEqual(thriftSpan.traceIdHigh.toString('hex'), '0000000000000000');
+      assert.strictEqual(
+        thriftSpan.traceIdLow.toString('hex'),
+        '92b449d5929fda1b'
+      );
+      assert.strictEqual(
+        thriftSpan.traceIdHigh.toString('hex'),
+        '0000000000000000'
+      );
     });
   });
 });
