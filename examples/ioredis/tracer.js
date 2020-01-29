@@ -1,17 +1,17 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
-const tracerRegistry = new NodeTracerRegistry();
+const tracerProvider = new NodeTracerProvider();
 
 const exporter = new JaegerExporter({ serviceName: 'ioredis-example' });
 
-tracerRegistry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+tracerProvider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracerRegistry(tracerRegistry);
+opentelemetry.initGlobalTracerProvider(tracerProvider);
 
 module.exports = opentelemetry.getTracer();
