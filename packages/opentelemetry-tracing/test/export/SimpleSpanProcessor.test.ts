@@ -21,7 +21,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
 
 describe('SimpleSpanProcessor', () => {
   const registry = new BasicTracerRegistry();

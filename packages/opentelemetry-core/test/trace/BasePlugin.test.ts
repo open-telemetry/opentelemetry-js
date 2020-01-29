@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import { NoopTracerRegistry } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin, NoopLogger } from '../../src';
-import { NoopTracerRegistry } from '../../src/trace/NoopTracerRegistry';
 import * as types from './fixtures/test-package/foo/bar/internal';
 
 const registry = new NoopTracerRegistry();

@@ -22,7 +22,7 @@ import {
   Link,
   SpanContext,
   TimedEvent,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 
 export interface ReadableSpan {
   readonly name: string;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/types';
+import { Logger } from '@opentelemetry/api';
 import { LogLevel } from './types';
 
 export class ConsoleLogger implements Logger {

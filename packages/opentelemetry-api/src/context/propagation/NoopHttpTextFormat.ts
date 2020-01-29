@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { noopTracer } from './NoopTracer';
+import { SpanContext } from '../../trace/span_context';
+import { HttpTextFormat } from './HttpTextFormat';
 
 /**
- * An implementation of the {@link TracerRegistry} which returns an impotent Tracer
- * for all calls to `getTracer`
+ * No-op implementations of {@link HttpTextFormat}.
  */
-export class NoopTracerRegistry implements types.TracerRegistry {
-  getTracer(_name?: string, _version?: string): types.Tracer {
-    return noopTracer;
+export class NoopHttpTextFormat implements HttpTextFormat {
+  // By default does nothing
+  inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
+  // By default does nothing
+  extract(format: string, carrier: unknown): SpanContext | null {
+    return null;
   }
 }
+
+export const NOOP_HTTP_TEXT_FORMAT = new NoopHttpTextFormat();

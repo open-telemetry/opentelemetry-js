@@ -24,7 +24,7 @@ import {
   NoRecordingSpan,
 } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '../src/NodeTracerRegistry';
-import { TraceFlags } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/api';
 import { Span } from '@opentelemetry/tracing';
 import * as path from 'path';
 

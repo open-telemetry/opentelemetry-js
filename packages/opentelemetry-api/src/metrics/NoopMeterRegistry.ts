@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-import { SpanContext, BinaryFormat } from '@opentelemetry/types';
+import { Meter } from './Meter';
+import { MeterRegistry } from './MeterRegistry';
+import { NOOP_METER } from './NoopMeter';
 
 /**
- * No-op implementations of {@link BinaryFormat}.
+ * An implementation of the {@link MeterRegistry} which returns an impotent Meter
+ * for all calls to `getMeter`
  */
-class NoopBinaryFormat implements BinaryFormat {
-  private readonly _buff = new ArrayBuffer(0);
-  // By default does nothing
-  toBytes(spanContext: SpanContext): ArrayBuffer {
-    return this._buff;
-  }
-
-  // By default does nothing
-  fromBytes(buf: ArrayBuffer): SpanContext | null {
-    return null;
+export class NoopMeterRegistry implements MeterRegistry {
+  getMeter(_name?: string, _version?: string): Meter {
+    return NOOP_METER;
   }
 }
 
-export const NOOP_BINARY_FORMAT = new NoopBinaryFormat();
+export const NOOP_METER_REGISTRY = new NoopMeterRegistry();

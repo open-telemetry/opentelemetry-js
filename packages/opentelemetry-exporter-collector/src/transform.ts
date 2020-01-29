@@ -16,7 +16,7 @@
 
 import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/types';
+import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
 import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;

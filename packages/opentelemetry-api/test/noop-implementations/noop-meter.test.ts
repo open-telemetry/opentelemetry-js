@@ -16,15 +16,16 @@
 
 import * as assert from 'assert';
 import {
-  NOOP_BOUND_GAUGE,
-  NOOP_GAUGE_METRIC,
+  Labels,
+  NoopMeterRegistry,
   NOOP_BOUND_COUNTER,
-  NOOP_COUNTER_METRIC,
+  NOOP_BOUND_GAUGE,
   NOOP_BOUND_MEASURE,
-  NOOP_MEASURE_METRIC,
-} from '../../src/metrics/NoopMeter';
-import { Labels } from '@opentelemetry/types';
-import { NoopMeterRegistry } from '../../src/metrics/NoopMeterRegistry';
+  NOOP_COUNTER_METRIC,
+  NOOP_GAUGE_METRIC,
+  NOOP_MEASURE_METRIC
+} from '../../src';
+
 
 describe('NoopMeter', () => {
   it('should not crash', () => {

@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
 import {
   NoopLogger,

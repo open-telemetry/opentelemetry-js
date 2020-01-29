@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { CanonicalCode, Span } from '@opentelemetry/types';
+import { CanonicalCode, Span } from '@opentelemetry/api';
 import * as pgTypes from 'pg';
 import * as shimmer from 'shimmer';
 import {

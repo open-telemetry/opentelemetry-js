@@ -22,7 +22,7 @@ import {
   otperformance,
   urlMatches,
 } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import {
   addSpanNetworkEvent,
   getResource,

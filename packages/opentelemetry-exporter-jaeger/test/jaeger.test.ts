@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { JaegerExporter } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';

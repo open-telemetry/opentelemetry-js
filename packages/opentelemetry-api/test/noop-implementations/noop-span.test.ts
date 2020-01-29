@@ -15,9 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopSpan } from '../../src/trace/NoopSpan';
-import { CanonicalCode, TraceFlags } from '@opentelemetry/types';
-import { INVALID_TRACEID, INVALID_SPANID } from '../../src';
+import { CanonicalCode, INVALID_SPAN_ID, INVALID_TRACE_ID, NoopSpan, TraceFlags } from '../../src';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
@@ -53,8 +51,8 @@ describe('NoopSpan', () => {
 
     assert.ok(!span.isRecording());
     assert.deepStrictEqual(span.context(), {
-      traceId: INVALID_TRACEID,
-      spanId: INVALID_SPANID,
+      traceId: INVALID_TRACE_ID,
+      spanId: INVALID_SPAN_ID,
       traceFlags: TraceFlags.UNSAMPLED,
     });
     span.end();

@@ -14,21 +14,33 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
+import { TimeInput } from '../common/Time';
+import { Attributes } from './attributes';
+import { Span } from './span';
+import { SpanContext } from './span_context';
+import { Status } from './status';
+import { TraceFlags } from './trace_flags';
+
+export const INVALID_TRACE_ID = '0';
+export const INVALID_SPAN_ID = '0';
+const INVALID_SPAN_CONTEXT: SpanContext = {
+  traceId: INVALID_TRACE_ID,
+  spanId: INVALID_SPAN_ID,
+  traceFlags: TraceFlags.UNSAMPLED,
+};
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span
  * implementation is available. All operations are no-op including context
  * propagation.
  */
-export class NoopSpan implements types.Span {
+export class NoopSpan implements Span {
   constructor(
-    private readonly _spanContext: types.SpanContext = INVALID_SPAN_CONTEXT
+    private readonly _spanContext: SpanContext = INVALID_SPAN_CONTEXT
   ) {}
 
   // Returns a SpanContext.
-  context(): types.SpanContext {
+  context(): SpanContext {
     return this._spanContext;
   }
 
@@ -38,22 +50,22 @@ export class NoopSpan implements types.Span {
   }
 
   // By default does nothing
-  setAttributes(attributes: types.Attributes): this {
+  setAttributes(attributes: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addEvent(name: string, attributes?: types.Attributes): this {
+  addEvent(name: string, attributes?: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  addLink(spanContext: types.SpanContext, attributes?: types.Attributes): this {
+  addLink(spanContext: SpanContext, attributes?: Attributes): this {
     return this;
   }
 
   // By default does nothing
-  setStatus(status: types.Status): this {
+  setStatus(status: Status): this {
     return this;
   }
 
@@ -63,7 +75,7 @@ export class NoopSpan implements types.Span {
   }
 
   // By default does nothing
-  end(endTime?: types.TimeInput): void {}
+  end(endTime?: TimeInput): void {}
 
   // isRecording always returns false for noopSpan.
   isRecording(): boolean {

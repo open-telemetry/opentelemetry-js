@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import {
   hrTime,
   timeInputToHrTime,

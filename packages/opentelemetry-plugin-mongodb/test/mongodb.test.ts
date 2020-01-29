@@ -18,7 +18,7 @@ import { NodeTracerRegistry } from '@opentelemetry/node';
 import * as assert from 'assert';
 import * as mongodb from 'mongodb';
 import { plugin } from '../src';
-import { SpanKind, CanonicalCode } from '@opentelemetry/types';
+import { SpanKind, CanonicalCode } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { AttributeNames } from '../src/types';
 import {

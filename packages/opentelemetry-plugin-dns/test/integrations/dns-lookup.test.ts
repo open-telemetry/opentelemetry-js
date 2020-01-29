@@ -25,7 +25,7 @@ import { plugin } from '../../src/dns';
 import * as dns from 'dns';
 import * as utils from '../utils/utils';
 import { assertSpan } from '../utils/assertSpan';
-import { CanonicalCode } from '@opentelemetry/types';
+import { CanonicalCode } from '@opentelemetry/api';
 
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();

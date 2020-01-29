@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Status, CanonicalCode, Span, Attributes } from '@opentelemetry/types';
+import { Status, CanonicalCode, Span, Attributes } from '@opentelemetry/api';
 import {
   RequestOptions,
   IncomingMessage,

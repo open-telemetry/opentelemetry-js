@@ -17,7 +17,7 @@
 import { NoopLogger } from '@opentelemetry/core';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';

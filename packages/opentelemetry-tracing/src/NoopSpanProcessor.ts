@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/types';
+import { Span } from '@opentelemetry/api';
 import { SpanProcessor } from './SpanProcessor';
 
 /** No-op implementation of SpanProcessor */

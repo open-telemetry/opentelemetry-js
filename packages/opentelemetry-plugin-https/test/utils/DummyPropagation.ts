@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { SpanContext, HttpTextFormat } from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat } from '@opentelemetry/api';
 import * as http from 'http';
 
 export class DummyPropagation implements HttpTextFormat {

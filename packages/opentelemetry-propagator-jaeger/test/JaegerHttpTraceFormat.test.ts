@@ -19,7 +19,7 @@ import {
   JaegerHttpTraceFormat,
   UBER_TRACE_ID_HEADER,
 } from '../src/JaegerHttpTraceFormat';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 
 describe('JaegerHttpTraceFormat', () => {
   const jaegerHttpTraceFormat = new JaegerHttpTraceFormat();

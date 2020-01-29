@@ -26,7 +26,7 @@ import * as mysql from 'mysql';
 import { MysqlPlugin, plugin } from '../src';
 import * as testUtils from '@opentelemetry/test-utils';
 import { AttributeNames } from '../src/enums';
-import { CanonicalCode } from '@opentelemetry/types';
+import { CanonicalCode } from '@opentelemetry/api';
 
 const port = parseInt(process.env.MYSQL_PORT || '33306', 10);
 const database = process.env.MYSQL_DATABASE || 'test_db';

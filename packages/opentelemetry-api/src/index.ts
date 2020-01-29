@@ -39,3 +39,21 @@ export * from './trace/tracer';
 export * from './trace/tracer_registry';
 export * from './trace/trace_flags';
 export * from './trace/trace_state';
+export * from './trace/NoopSpan';
+export * from './trace/NoopTracer';
+export * from './trace/NoopTracerRegistry';
+export * from './metrics/NoopMeterRegistry';
+export * from './metrics/NoopMeter';
+
+import { TraceAPI } from './api/trace';
+/** Entrypoint for trace API */
+export const trace = TraceAPI.getInstance();
+
+import { MetricsAPI } from './api/metrics';
+/** Entrypoint for metrics API */
+export const metrics = MetricsAPI.getInstance();
+
+export default {
+  trace,
+  metrics,
+};

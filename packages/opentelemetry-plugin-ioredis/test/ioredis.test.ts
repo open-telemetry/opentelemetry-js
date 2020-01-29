@@ -24,7 +24,7 @@ import { plugin, IORedisPlugin } from '../src';
 import * as ioredisTypes from 'ioredis';
 import { NoopLogger } from '@opentelemetry/core';
 import * as testUtils from '@opentelemetry/test-utils';
-import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
+import { SpanKind, Status, CanonicalCode } from '@opentelemetry/api';
 import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();

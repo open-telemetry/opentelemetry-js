@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode, Status, Attributes } from '@opentelemetry/types';
+import { Span, CanonicalCode, Status, Attributes } from '@opentelemetry/api';
 import { AttributeNames } from './enums/AttributeNames';
 import { AddressFamily } from './enums/AddressFamily';
 import * as dns from 'dns';

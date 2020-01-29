@@ -19,7 +19,7 @@ import {
   Plugin,
   PluginConfig,
   TracerRegistry,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import * as hook from 'require-in-the-middle';
 import * as utils from './utils';
 

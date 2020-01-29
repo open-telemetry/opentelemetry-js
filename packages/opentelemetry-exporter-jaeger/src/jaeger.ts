@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/types';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
@@ -26,7 +26,7 @@ import * as jaegerTypes from './types';
  * Format and sends span information to Jaeger Exporter.
  */
 export class JaegerExporter implements SpanExporter {
-  private readonly _logger: types.Logger;
+  private readonly _logger: api.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _forceFlushOnShutdown: boolean = true;

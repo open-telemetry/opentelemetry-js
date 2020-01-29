@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/types';
+import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
 
 export const TRACE_PARENT_HEADER = 'traceparent';

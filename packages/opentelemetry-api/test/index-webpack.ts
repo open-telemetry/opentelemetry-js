@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
-import { noopMeter } from './NoopMeter';
+// This file is the webpack entry point for the browser Karma tests. It requires
+// all modules ending in "test" from the current folder and all its subfolders.
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-/**
- * An implementation of the {@link MeterRegistry} which returns an impotent Meter
- * for all calls to `getMeter`
- */
-export class NoopMeterRegistry implements types.MeterRegistry {
-  getMeter(_name?: string, _version?: string): types.Meter {
-    return noopMeter;
-  }
-}
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

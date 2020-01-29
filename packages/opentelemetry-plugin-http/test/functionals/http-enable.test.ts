@@ -20,7 +20,7 @@ import {
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as path from 'path';

@@ -14,19 +14,11 @@
  * limitations under the License.
  */
 
-import {
-  BoundCounter,
-  DistributedContext,
-  BoundGauge,
-  Meter,
-  Metric,
-  MetricOptions,
-  MetricUtils,
-  BoundMeasure,
-  SpanContext,
-  LabelSet,
-  Labels,
-} from '@opentelemetry/types';
+import { Meter } from './Meter';
+import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
+import { BoundMeasure, BoundCounter, BoundGauge } from './BoundInstrument';
+import { DistributedContext } from '../distributed_context/DistributedContext';
+import { SpanContext } from '../trace/span_context';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses constant
@@ -165,7 +157,7 @@ export class NoopBoundMeasure implements BoundMeasure {
   }
 }
 
-export const noopMeter = new NoopMeter();
+export const NOOP_METER = new NoopMeter();
 
 export const NOOP_BOUND_GAUGE = new NoopBoundGauge();
 export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_BOUND_GAUGE);

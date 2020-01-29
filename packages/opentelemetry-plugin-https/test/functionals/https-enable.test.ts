@@ -26,7 +26,7 @@ import {
   OT_REQUEST_HEADER,
   AttributeNames,
 } from '@opentelemetry/plugin-http';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as http from 'http';

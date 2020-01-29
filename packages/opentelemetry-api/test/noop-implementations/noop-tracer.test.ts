@@ -15,9 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer } from '../../src/trace/NoopTracer';
-import { NOOP_SPAN } from '../../src/trace/NoopSpan';
-import { SpanKind } from '@opentelemetry/types';
+import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {

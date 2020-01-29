@@ -20,7 +20,7 @@ import {
   CanonicalCode,
   TraceFlags,
   SpanContext,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import { BasicTracerRegistry, Span } from '../src';
 import {
   hrTime,

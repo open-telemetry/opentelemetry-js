@@ -20,7 +20,7 @@ import {
   Http,
   AttributeNames,
 } from '@opentelemetry/plugin-http';
-import { SpanKind, Span } from '@opentelemetry/types';
+import { SpanKind, Span } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as https from 'https';

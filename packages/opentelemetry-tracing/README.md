@@ -24,12 +24,12 @@ npm install --save @opentelemetry/tracing
 ## Usage
 
 ```js
-const opentelemetry = require('@opentelemetry/core');
+const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerRegistry } = require('@opentelemetry/tracing');
 
 // To start a trace, you first need to initialize the Tracer registry.
 // NOTE: the default OpenTelemetry tracer registry does not record any tracing information.
-opentelemetry.initGlobalTracer(new BasicTracerRegistry());
+opentelemetry.trace.initGlobalTracerRegistry(new BasicTracerRegistry());
 
 // To create a span in a trace, we used the global singleton tracer to start a new span.
 const span = opentelemetry.getTracer('default').startSpan('foo');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, PluginConfig } from '@opentelemetry/types';
+import { Span, PluginConfig } from '@opentelemetry/api';
 import * as url from 'url';
 import {
   ClientRequest,

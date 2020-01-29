@@ -21,7 +21,7 @@ import {
   HttpTextFormat,
   Logger,
   Sampler,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
 
 /**

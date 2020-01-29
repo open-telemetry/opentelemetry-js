@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { NoopLogger, NoopTracerRegistry } from '@opentelemetry/core';
+import { NoopTracerRegistry, SpanKind } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerRegistry } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { SpanKind } from '@opentelemetry/types';
 import * as assert from 'assert';
 import * as grpc from 'grpc';
 import * as semver from 'semver';

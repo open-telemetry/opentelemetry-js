@@ -15,7 +15,7 @@
  */
 
 import * as core from '@opentelemetry/core';
-import { Logger } from '@opentelemetry/types';
+import { Logger } from '@opentelemetry/api';
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
 import { VERSION } from '../../version';

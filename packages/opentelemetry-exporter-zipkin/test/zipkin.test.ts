@@ -19,7 +19,7 @@ import * as nock from 'nock';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 import { OT_REQUEST_HEADER } from '../src/utils';
