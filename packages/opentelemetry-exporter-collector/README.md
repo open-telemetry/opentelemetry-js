@@ -17,36 +17,36 @@ npm install --save @opentelemetry/exporter-collector
 ```js
 import * as opentelemetry from '@opentelemetry/api';
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerRegistry } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorExporter } from '@opentelemetry/exporter-collector'
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
 };
 
-const registry = new WebTracerRegistry();
+const provider = new WebTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
-registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
 ```
 
 ## Usage in Node
 ```js
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerRegistry, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
 };
 
-const registry = new BasicTracerRegistry();
+const provider = new BasicTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
-registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
 ```
 

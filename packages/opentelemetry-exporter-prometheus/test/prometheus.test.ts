@@ -18,7 +18,7 @@ import {
   CounterMetric,
   GaugeMetric,
   Meter,
-  MeterRegistry,
+  MeterProvider,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -171,7 +171,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterRegistry().getMeter('test-prometheus');
+      meter = new MeterProvider().getMeter('test-prometheus');
       exporter.startServer(done);
     });
 
@@ -387,7 +387,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new MeterRegistry().getMeter('test-prometheus');
+      meter = new MeterProvider().getMeter('test-prometheus');
       gauge = meter.createGauge('gauge') as GaugeMetric;
       gauge.bind(meter.labels({ key1: 'labelValue1' })).set(10);
     });

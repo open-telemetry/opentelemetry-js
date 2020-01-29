@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasicTracerRegistry } from '@opentelemetry/tracing';
+import { BasicTracerProvider } from '@opentelemetry/tracing';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { PluginLoader } from './instrumentation/PluginLoader';
 import { NodeTracerConfig, DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
@@ -22,7 +22,7 @@ import { NodeTracerConfig, DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
 /**
  * This class represents a node tracer with `async_hooks` module.
  */
-export class NodeTracerRegistry extends BasicTracerRegistry {
+export class NodeTracerProvider extends BasicTracerProvider {
   private readonly _pluginLoader: PluginLoader;
 
   /**

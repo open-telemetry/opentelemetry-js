@@ -17,14 +17,14 @@
 import * as assert from 'assert';
 import {
   Span,
-  BasicTracerRegistry,
+  BasicTracerProvider,
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
 import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
 
 describe('SimpleSpanProcessor', () => {
-  const registry = new BasicTracerRegistry();
+  const provider = new BasicTracerProvider();
   const exporter = new InMemorySpanExporter();
 
   describe('constructor', () => {
@@ -43,7 +43,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        provider.getTracer('default'),
         'span-name',
         spanContext,
         SpanKind.CLIENT
@@ -66,7 +66,7 @@ describe('SimpleSpanProcessor', () => {
         traceFlags: TraceFlags.UNSAMPLED,
       };
       const span = new Span(
-        registry.getTracer('default'),
+        provider.getTracer('default'),
         'span-name',
         spanContext,
         SpanKind.CLIENT

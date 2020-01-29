@@ -15,7 +15,7 @@
  */
 
 export * from './Tracer';
-export * from './BasicTracerRegistry';
+export * from './BasicTracerProvider';
 export * from './export/ConsoleSpanExporter';
 export * from './export/BatchSpanProcessor';
 export * from './export/InMemorySpanExporter';
