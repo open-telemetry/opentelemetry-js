@@ -19,18 +19,18 @@ API entry points are defined as global singleton objects `trace` and `metrics` w
 ```javascript
 const api = require("@opentelemetry/api")
 
-/* Initialize TraceRegistry */
-api.trace.initGlobalTracerRegistry(traceRegistry);
-/* returns traceRegistry (no-op if a working registry has not been initialized) */
-api.trace.getTracerRegistry();
-/* returns a tracer from the registered global tracer registry (no-op if a working registry has not been initialized); */
+/* Initialize TraceProvider */
+api.trace.initGlobalTracerProvider(traceProvider);
+/* returns traceProvider (no-op if a working provider has not been initialized) */
+api.trace.getTracerProvider();
+/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */
 api.trace.getTracer(name, version);
 
-/* Initialize MeterRegistry */
-api.metrics.initGlobalMeterRegistry(meterRegistry);
-/* returns meterRegistry (no-op if a working registry has not been initialized) */
-api.metrics.getMeterRegistry();
-/* returns a meter from the registered global meter registry (no-op if a working registry has not been initialized); */
+/* Initialize MeterProvider */
+api.metrics.initGlobalMeterProvider(meterProvider);
+/* returns meterProvider (no-op if a working provider has not been initialized) */
+api.metrics.getMeterProvider();
+/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */
 api.metrics.getMeter(name, version);
 ```
 
@@ -40,7 +40,7 @@ Application owners will also need a working OpenTelemetry SDK implementation. Op
 
 #### Simple NodeJS Example
 
-Before any other module in your application is loaded, you must initialize the global tracer and meter registries. If you fail to initialize a registry, no-op implementations will be provided to any library which acquires them from the API.
+Before any other module in your application is loaded, you must initialize the global tracer and meter registries. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
 
 ```javascript
 const api = require("@opentelemetry/api");
@@ -54,14 +54,14 @@ const exporter = new JaegerExporter({
   serviceName: 'basic-service'
 });
 
-// Create a registry which we will configure as the global tracer registry
-const registry = new sdk.NodeTracerRegistry();
+// Create a provider which we will configure as the global tracer provider
+const provider = new sdk.NodeTracerProvider();
 
 // Configure span processor to send spans to the exporter
-registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the NodeTracerRegistry bindings
-api.trace.initGlobalTracerRegistry(registry);
+// Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
+api.trace.initGlobalTracerProvider(provider);
 
 // your application code below this line
 ```

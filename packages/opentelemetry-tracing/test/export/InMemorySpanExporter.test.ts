@@ -18,14 +18,14 @@ import * as assert from 'assert';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
-  BasicTracerRegistry,
+  BasicTracerProvider,
 } from '../../src';
 import { ExportResult } from '@opentelemetry/base';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
-  const registry = new BasicTracerRegistry();
-  registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  const provider = new BasicTracerProvider();
+  provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
   afterEach(() => {
     // reset spans in memory.
@@ -33,11 +33,11 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should get finished spans', () => {
-    const root = registry.getTracer('default').startSpan('root');
-    const child = registry
+    const root = provider.getTracer('default').startSpan('root');
+    const child = provider
       .getTracer('default')
       .startSpan('child', { parent: root });
-    const grandChild = registry
+    const grandChild = provider
       .getTracer('default')
       .startSpan('grand-child', { parent: child });
 
@@ -60,8 +60,8 @@ describe('InMemorySpanExporter', () => {
   });
 
   it('should shutdown the exorter', () => {
-    const root = registry.getTracer('default').startSpan('root');
-    registry
+    const root = provider.getTracer('default').startSpan('root');
+    provider
       .getTracer('default')
       .startSpan('child', { parent: root })
       .end();
@@ -71,7 +71,7 @@ describe('InMemorySpanExporter', () => {
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
 
     // after shutdown no new spans are accepted
-    registry
+    provider
       .getTracer('default')
       .startSpan('child1', { parent: root })
       .end();

@@ -24,7 +24,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import * as url from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -60,11 +60,11 @@ describe('HttpPlugin Integration tests', () => {
 
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const registry = new NodeTracerRegistry({
+    const provider = new NodeTracerProvider({
       logger,
       httpTextFormat,
     });
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -83,7 +83,7 @@ describe('HttpPlugin Integration tests', () => {
       try {
         plugin.disable();
       } catch (e) {}
-      plugin.enable(http, registry, registry.logger, config);
+      plugin.enable(http, provider, provider.logger, config);
     });
 
     after(() => {

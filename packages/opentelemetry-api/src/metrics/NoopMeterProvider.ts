@@ -15,17 +15,17 @@
  */
 
 import { Meter } from './Meter';
-import { MeterRegistry } from './MeterRegistry';
+import { MeterProvider } from './MeterProvider';
 import { NOOP_METER } from './NoopMeter';
 
 /**
- * An implementation of the {@link MeterRegistry} which returns an impotent Meter
+ * An implementation of the {@link MeterProvider} which returns an impotent Meter
  * for all calls to `getMeter`
  */
-export class NoopMeterRegistry implements MeterRegistry {
+export class NoopMeterProvider implements MeterProvider {
   getMeter(_name?: string, _version?: string): Meter {
     return NOOP_METER;
   }
 }
 
-export const NOOP_METER_REGISTRY = new NoopMeterRegistry();
+export const NOOP_METER_PROVIDER = new NoopMeterProvider();

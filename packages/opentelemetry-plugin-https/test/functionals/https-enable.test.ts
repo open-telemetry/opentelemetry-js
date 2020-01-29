@@ -19,7 +19,7 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   Http,
   HttpPluginConfig,
@@ -50,12 +50,12 @@ const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
 const httpTextFormat = new DummyPropagation();
 const logger = new NoopLogger();
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   logger,
   httpTextFormat,
 });
-const tracer = registry.getTracer('test-https');
-registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+const tracer = provider.getTracer('test-https');
+provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 function doNock(
   hostname: string,
@@ -114,7 +114,7 @@ describe('HttpsPlugin', () => {
         pluginWithBadOptions = new HttpsPlugin(process.versions.node);
         pluginWithBadOptions.enable(
           (https as unknown) as Http,
-          registry,
+          provider,
           tracer.logger,
           config
         );
@@ -203,7 +203,7 @@ describe('HttpsPlugin', () => {
         };
         plugin.enable(
           (https as unknown) as Http,
-          registry,
+          provider,
           tracer.logger,
           config
         );
@@ -232,7 +232,7 @@ describe('HttpsPlugin', () => {
       it(`should not patch if it's not a ${protocol} module`, () => {
         const httpsNotPatched = new HttpsPlugin(process.versions.node).enable(
           {} as Http,
-          registry,
+          provider,
           tracer.logger,
           {}
         );

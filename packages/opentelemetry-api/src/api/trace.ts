@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { NOOP_TRACER_REGISTRY } from '../trace/NoopTracerRegistry';
-import { TracerRegistry } from '../trace/tracer_registry';
+import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
+import { TracerProvider } from '../trace/tracer_provider';
 import { Tracer } from '../trace/tracer';
 
 /**
@@ -23,7 +23,7 @@ import { Tracer } from '../trace/tracer';
  */
 export class TraceAPI {
   private static _instance?: TraceAPI;
-  private _tracerRegistry: TracerRegistry = NOOP_TRACER_REGISTRY;
+  private _tracerProvider: TracerProvider = NOOP_TRACER_PROVIDER;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -38,24 +38,24 @@ export class TraceAPI {
   }
 
   /**
-   * Set the current global tracer. Returns the initialized global tracer registry
+   * Set the current global tracer. Returns the initialized global tracer provider
    */
-  public initGlobalTracerRegistry(registry: TracerRegistry): TracerRegistry {
-    this._tracerRegistry = registry;
-    return registry;
+  public initGlobalTracerProvider(provider: TracerProvider): TracerProvider {
+    this._tracerProvider = provider;
+    return provider;
   }
 
   /**
-   * Returns the global tracer registry.
+   * Returns the global tracer provider.
    */
-  public getTracerRegistry(): TracerRegistry {
-    return this._tracerRegistry;
+  public getTracerProvider(): TracerProvider {
+    return this._tracerProvider;
   }
 
   /**
-   * Returns a tracer from the global tracer registry.
+   * Returns a tracer from the global tracer provider.
    */
   public getTracer(name: string, version?: string): Tracer {
-    return this.getTracerRegistry().getTracer(name, version);
+    return this.getTracerProvider().getTracer(name, version);
   }
 }

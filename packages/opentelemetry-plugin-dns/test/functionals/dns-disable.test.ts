@@ -20,20 +20,20 @@ import {
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import { plugin } from '../../src/dns';
 import * as sinon from 'sinon';
 import * as dns from 'dns';
 
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();
-const registry = new NodeTracerRegistry({ logger });
-const tracer = registry.getTracer('default');
-registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+const provider = new NodeTracerProvider({ logger });
+const tracer = provider.getTracer('default');
+provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 describe('DnsPlugin', () => {
   before(() => {
-    plugin.enable(dns, registry, tracer.logger);
+    plugin.enable(dns, provider, tracer.logger);
     assert.strictEqual(dns.lookup.__wrapped, true);
   });
 
