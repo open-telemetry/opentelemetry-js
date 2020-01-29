@@ -23,12 +23,30 @@ import {
   OutgoingHttpHeaders,
   ServerResponse,
 } from 'http';
-import { IgnoreMatcher, Err, ParsedRequestOptions } from './types';
+import {
+  IgnoreMatcher,
+  Err,
+  ParsedRequestOptions,
+  SpecialHttpStatusCodeMapping,
+} from './types';
 import { AttributeNames } from './enums/AttributeNames';
 import * as url from 'url';
 import { Socket } from 'net';
 
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+
+export const HTTP_STATUS_SPECIAL_CASES: SpecialHttpStatusCodeMapping = {
+  401: CanonicalCode.UNAUTHENTICATED,
+  403: CanonicalCode.PERMISSION_DENIED,
+  404: CanonicalCode.NOT_FOUND,
+  429: CanonicalCode.RESOURCE_EXHAUSTED,
+  501: CanonicalCode.UNIMPLEMENTED,
+  503: CanonicalCode.UNAVAILABLE,
+  504: CanonicalCode.DEADLINE_EXCEEDED,
+  598: CanonicalCode.INTERNAL,
+  599: CanonicalCode.INTERNAL,
+};
+
 /**
  * Get an absolute url
  */
@@ -58,37 +76,40 @@ export const getAbsoluteUrl = (
   return `${protocol}//${host}${path}`;
 };
 /**
- * Parse status code from HTTP response.
+ * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
 export const parseResponseStatus = (
   statusCode: number
 ): Omit<Status, 'message'> => {
-  if (statusCode < 200 || statusCode > 504) {
-    return { code: CanonicalCode.UNKNOWN };
-  } else if (statusCode >= 200 && statusCode < 400) {
-    return { code: CanonicalCode.OK };
-  } else {
-    switch (statusCode) {
-      case 400:
-        return { code: CanonicalCode.INVALID_ARGUMENT };
-      case 504:
-        return { code: CanonicalCode.DEADLINE_EXCEEDED };
-      case 404:
-        return { code: CanonicalCode.NOT_FOUND };
-      case 403:
-        return { code: CanonicalCode.PERMISSION_DENIED };
-      case 401:
-        return { code: CanonicalCode.UNAUTHENTICATED };
-      case 429:
-        return { code: CanonicalCode.RESOURCE_EXHAUSTED };
-      case 501:
-        return { code: CanonicalCode.UNIMPLEMENTED };
-      case 503:
-        return { code: CanonicalCode.UNAVAILABLE };
-      default:
-        return { code: CanonicalCode.UNKNOWN };
-    }
+  // search for special case
+  const code: number | undefined = HTTP_STATUS_SPECIAL_CASES[statusCode];
+
+  if (code !== undefined) {
+    return { code };
   }
+
+  // 0xx are unknown
+  if (statusCode < 100) {
+    return { code: CanonicalCode.UNKNOWN };
+  }
+
+  // 1xx, 2xx, 3xx are OK
+  if (statusCode < 400) {
+    return { code: CanonicalCode.OK };
+  }
+
+  // 4xx are client errors
+  if (statusCode < 500) {
+    return { code: CanonicalCode.INVALID_ARGUMENT };
+  }
+
+  // 5xx are internal errors
+  if (statusCode < 512) {
+    return { code: CanonicalCode.INTERNAL };
+  }
+
+  // All other codes are unknown
+  return { code: CanonicalCode.UNKNOWN };
 };
 
 /**
