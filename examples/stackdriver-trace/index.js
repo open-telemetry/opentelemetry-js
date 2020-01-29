@@ -1,7 +1,7 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerRegistry, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CanonicalCode } = require('@opentelemetry/types');
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
@@ -10,13 +10,13 @@ const exporter = new StackdriverTraceExporter({
   projectId: '<PROJECT_ID>',
 });
 
-const provider = new BasicTracerProvider();
+const registry = new BasicTracerRegistry();
 
 // Configure span processor to send spans to the provided exporter
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-opentelemetry.initGlobalTracerProvider(provider);
+// Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
+opentelemetry.initGlobalTracerRegistry(registry);
 const tracer = opentelemetry.getTracer('stackdriver-basic');
 
 // Create a span. A span must be closed.

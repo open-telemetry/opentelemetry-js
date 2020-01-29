@@ -1,13 +1,13 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerRegistry } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 module.exports = (serviceName) => {
-  const provider = new NodeTracerProvider({
+  const registry = new NodeTracerRegistry({
     plugins: {
       mysql: {
         enabled: true,
@@ -20,15 +20,15 @@ module.exports = (serviceName) => {
     },
   });
 
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
+  registry.addSpanProcessor(new SimpleSpanProcessor(new ZipkinExporter({
     serviceName,
   })));
-  provider.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
+  registry.addSpanProcessor(new SimpleSpanProcessor(new JaegerExporter({
     serviceName,
   })));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-  opentelemetry.initGlobalTracerProvider(provider);
+  // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
+  opentelemetry.initGlobalTracerRegistry(registry);
 
   return opentelemetry.getTracer();
 };

@@ -1,26 +1,26 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerProvider } from '@opentelemetry/web';
+import { WebTracerRegistry } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 
-const provider = new WebTracerProvider({
+const registry = new WebTracerRegistry({
   plugins: [
     new DocumentLoad(),
   ],
 });
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+registry.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
-const providerWithZone = new WebTracerProvider({
+const registryWithZone = new WebTracerRegistry({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new DocumentLoad(),
   ],
 });
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
-const tracerWithZone = providerWithZone.getTracer('example-tracer-web');
+const tracerWithZone = registryWithZone.getTracer('example-tracer-web');
 let window;
 console.log('Current span is window', tracerWithZone.getCurrentSpan() === window);
 
