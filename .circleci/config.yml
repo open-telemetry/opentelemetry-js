@@ -99,7 +99,7 @@ node_unit_tests: &node_unit_tests
           - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
     - run:
         name: Install Dependencies
-        command: yarn install
+        command: npm install
     - save_cache:
         <<: *cache_1
     - save_cache:
