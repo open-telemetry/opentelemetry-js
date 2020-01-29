@@ -1,0 +1,40 @@
+{
+  "name": "ioredis-example",
+  "private": true,
+  "version": "0.3.3",
+  "description": "Example of HTTP integration with OpenTelemetry",
+  "main": "index.js",
+  "scripts": {
+    "docker:start": "docker run -d -p 6379:6379 --name otjsredis redis:alpine",
+    "docker:stop": "docker stop otjsredis && docker rm otjsredis",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "redis",
+    "ioredis",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/exporter-jaeger": "^0.3.3",
+    "@opentelemetry/node": "^0.3.3",
+    "@opentelemetry/plugin-ioredis": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
+    "ioredis": "^4.14.1"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {}
+}
