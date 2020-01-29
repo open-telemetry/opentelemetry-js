@@ -69,7 +69,7 @@ const registry = new NodeTracerRegistry({
 });
 
 // Initialize the registry
-opentelemetry.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerRegistry(registry);
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
@@ -86,7 +86,7 @@ const { NodeTracerRegistry } = require('@opentelemetry/node');
 const registry = new NodeTracerRegistry();
 
 // Initialize the registry
-opentelemetry.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerRegistry(registry);
 
 // Your application code
 // ...

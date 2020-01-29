@@ -28,7 +28,7 @@ const registry = new WebTracerRegistry();
 const exporter = new CollectorExporter(collectorOptions);
 registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerRegistry(registry);
 
 ```
 
@@ -46,7 +46,7 @@ const registry = new BasicTracerRegistry();
 const exporter = new CollectorExporter(collectorOptions);
 registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.initGlobalTracerRegistry(registry);
+opentelemetry.trace.initGlobalTracerRegistry(registry);
 
 ```
 
