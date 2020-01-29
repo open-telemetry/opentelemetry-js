@@ -1,6 +1,6 @@
 {
   "lerna": "3.13.4",
-  "npmClient": "yarn",
+  "npmClient": "npm",
   "packages": [
     "benchmark/*",
     "packages/*",
