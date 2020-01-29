@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-http",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTelemetry http automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,9 +41,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.3.3",
-    "@opentelemetry/scope-base": "^0.3.3",
-    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/node": "^0.4.0",
+    "@opentelemetry/scope-base": "^0.4.0",
+    "@opentelemetry/tracing": "^0.4.0",
     "@types/got": "^9.6.7",
     "@types/mocha": "^5.2.7",
     "@types/nock": "^11.1.0",
@@ -72,8 +72,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/api": "^0.3.3",
+    "@opentelemetry/api": "^0.4.0",
+    "@opentelemetry/core": "^0.4.0",
     "semver": "^6.3.0",
     "shimmer": "^1.2.1"
   }
