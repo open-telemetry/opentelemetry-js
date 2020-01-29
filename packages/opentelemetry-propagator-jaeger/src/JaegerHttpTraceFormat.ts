@@ -86,7 +86,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
  * @return {SpanContext} - returns a span context represented by the serializedString.
  **/
 function deserializeSpanContext(serializedString: string): SpanContext | null {
-  let headers = serializedString.split(':');
+  const headers = decodeURIComponent(serializedString).split(':');
   if (headers.length !== 4) {
     return null;
   }
