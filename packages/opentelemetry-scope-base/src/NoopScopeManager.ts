@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as types from './types';
+import { ScopeManager } from "./types";
 
-export class NoopScopeManager implements types.ScopeManager {
+export class NoopScopeManager implements ScopeManager {
   active(): unknown {
     return undefined;
   }
@@ -26,6 +26,13 @@ export class NoopScopeManager implements types.ScopeManager {
     fn: T
   ): ReturnType<T> {
     return fn();
+  }
+
+  async withAsync<
+    T extends (...args: unknown[]) => Promise<T2>,
+    T2 extends unknown
+  >(scope: unknown, fn: T): Promise<T2> {
+    return await fn();
   }
 
   bind<T>(target: T, scope?: unknown): T {

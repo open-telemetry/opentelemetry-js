@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { Func, TargetWithEvents } from './types';
-import { isListenerObject } from './util';
+import { ScopeManager } from "@opentelemetry/scope-base";
+import { Func, TargetWithEvents } from "./types";
+import { isListenerObject } from "./util";
 
 /* Key name to be used to save a scope reference in Zone */
-const ZONE_SCOPE_KEY = 'OT_ZONE_SCOPE';
+const ZONE_SCOPE_KEY = "OT_ZONE_SCOPE";
 
 /**
  * ZoneScopeManager
@@ -60,11 +60,11 @@ export class ZoneScopeManager implements ScopeManager {
     const contextWrapper = function(this: any, ...args: unknown[]) {
       return manager.with(scope, () => target.apply(this || scope, args));
     };
-    Object.defineProperty(contextWrapper, 'length', {
+    Object.defineProperty(contextWrapper, "length", {
       enumerable: false,
       configurable: true,
       writable: false,
-      value: target.length,
+      value: target.length
     });
     return (contextWrapper as unknown) as T;
   }
@@ -80,7 +80,7 @@ export class ZoneScopeManager implements ScopeManager {
     }
     target.__ot_listeners = {};
 
-    if (typeof target.addEventListener === 'function') {
+    if (typeof target.addEventListener === "function") {
       target.addEventListener = this._patchAddEventListener(
         target,
         target.addEventListener,
@@ -88,7 +88,7 @@ export class ZoneScopeManager implements ScopeManager {
       );
     }
 
-    if (typeof target.removeEventListener === 'function') {
+    if (typeof target.removeEventListener === "function") {
       target.removeEventListener = this._patchRemoveEventListener(
         target,
         target.removeEventListener
@@ -116,8 +116,8 @@ export class ZoneScopeManager implements ScopeManager {
     return Zone.root.fork({
       name: zoneName,
       properties: {
-        [ZONE_SCOPE_KEY]: scope,
-      },
+        [ZONE_SCOPE_KEY]: scope
+      }
     });
   }
 
@@ -206,7 +206,7 @@ export class ZoneScopeManager implements ScopeManager {
     if (scope === undefined) {
       scope = this.active();
     }
-    if (typeof target === 'function') {
+    if (typeof target === "function") {
       return this._bindFunction(target, scope);
     } else if (isListenerObject(target)) {
       this._bindListener(target, scope);
@@ -245,7 +245,7 @@ export class ZoneScopeManager implements ScopeManager {
     fn: () => ReturnType<T>
   ): ReturnType<T> {
     // if no scope use active from active zone
-    if (typeof scope === 'undefined' || scope === null) {
+    if (typeof scope === "undefined" || scope === null) {
       scope = this.active();
     }
 
@@ -254,5 +254,21 @@ export class ZoneScopeManager implements ScopeManager {
     const newZone = this._createZone(zoneName, scope);
 
     return newZone.run(fn, scope);
+  }
+
+  async withAsync<
+    T extends (...args: unknown[]) => Promise<T2>,
+    T2 extends unknown
+  >(scope: unknown, fn: () => Promise<T2>): Promise<T2> {
+    // if no scope use active from active zone
+    if (typeof scope === "undefined" || scope === null) {
+      scope = this.active();
+    }
+
+    const zoneName = this._createZoneName();
+
+    const newZone = this._createZone(zoneName, scope);
+
+    return await newZone.run(fn, scope);
   }
 }

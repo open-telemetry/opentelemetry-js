@@ -31,6 +31,17 @@ export interface ScopeManager {
   ): ReturnType<T>;
 
   /**
+   * Asynchronously run the fn callback with object set as the
+   * current active scope
+   * @param scope Any object to set as the current active scope
+   * @param fn A callback to be immediately run within a specific scope
+   */
+  withAsync<T extends (...args: unknown[]) => Promise<T2>, T2 extends unknown>(
+    scope: unknown,
+    fn: T
+  ): Promise<T2>;
+
+  /**
    * Bind an object as the current scope (or a specific one)
    * @param target Any object to which a scope need to be set
    * @param [scope] Optionally specify the scope which you want to assign

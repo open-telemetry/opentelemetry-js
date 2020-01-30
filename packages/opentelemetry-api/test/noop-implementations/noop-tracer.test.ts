@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
+import * as assert from "assert";
+import { NoopTracer, NOOP_SPAN, SpanKind } from "../../src";
 
-describe('NoopTracer', () => {
-  it('should not crash', () => {
-    const spanContext = { traceId: '', spanId: '' };
+describe("NoopTracer", () => {
+  it("should not crash", () => {
+    const spanContext = { traceId: "", spanId: "" };
     const tracer = new NoopTracer();
 
-    assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);
+    assert.deepStrictEqual(tracer.startSpan("span-name"), NOOP_SPAN);
     assert.deepStrictEqual(
-      tracer.startSpan('span-name1', { kind: SpanKind.CLIENT }),
+      tracer.startSpan("span-name1", { kind: SpanKind.CLIENT }),
       NOOP_SPAN
     );
     assert.deepStrictEqual(
-      tracer.startSpan('span-name2', {
+      tracer.startSpan("span-name2", {
         kind: SpanKind.CLIENT,
-        isRecording: true,
+        isRecording: true
       }),
       NOOP_SPAN
     );
@@ -38,8 +38,8 @@ describe('NoopTracer', () => {
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
     const httpTextFormat = tracer.getHttpTextFormat();
     assert.ok(httpTextFormat);
-    httpTextFormat.inject(spanContext, 'HttpTextFormat', {});
-    assert.deepStrictEqual(httpTextFormat.extract('HttpTextFormat', {}), null);
+    httpTextFormat.inject(spanContext, "HttpTextFormat", {});
+    assert.deepStrictEqual(httpTextFormat.extract("HttpTextFormat", {}), null);
 
     const binaryFormat = tracer.getBinaryFormat();
     assert.ok(binaryFormat);
@@ -47,14 +47,30 @@ describe('NoopTracer', () => {
     assert.deepStrictEqual(binaryFormat.fromBytes(new ArrayBuffer(0)), null);
   });
 
-  it('should not crash when .withSpan()', done => {
+  it("should not crash when .withSpan()", done => {
     const tracer = new NoopTracer();
     tracer.withSpan(NOOP_SPAN, () => {
       return done();
     });
   });
 
-  it('should not crash when .bind()', done => {
+  it("should not crash when .withSpanAsync()", async done => {
+    const tracer = new NoopTracer();
+    await tracer.withSpanAsync(NOOP_SPAN, () => {
+      return done();
+    });
+  });
+
+  it("should return the expected value when .withSpanAsync()", async () => {
+    const tracer = new NoopTracer();
+    const result = await tracer.withSpanAsync(NOOP_SPAN, async () => {
+      return await Promise.resolve(5);
+    });
+
+    assert.equal(result, 5);
+  });
+
+  it("should not crash when .bind()", done => {
     const tracer = new NoopTracer();
     const fn = () => {
       return done();

@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as types from "@opentelemetry/api";
 import {
   randomTraceId,
   isValid,
   randomSpanId,
   NoRecordingSpan,
-  ConsoleLogger,
-} from '@opentelemetry/core';
-import { TracerConfig, TraceParams } from './types';
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { Span } from './Span';
-import { mergeConfig } from './utility';
-import { DEFAULT_CONFIG } from './config';
-import { BasicTracerRegistry } from './BasicTracerRegistry';
+  ConsoleLogger
+} from "@opentelemetry/core";
+import { TracerConfig, TraceParams } from "./types";
+import { ScopeManager } from "@opentelemetry/scope-base";
+import { Span } from "./Span";
+import { mergeConfig } from "./utility";
+import { DEFAULT_CONFIG } from "./config";
+import { BasicTracerRegistry } from "./BasicTracerRegistry";
 
 /**
  * This class represents a basic tracer.
@@ -83,7 +83,7 @@ export class Tracer implements types.Tracer {
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {
-      this.logger.debug('Sampling is off, starting no recording span');
+      this.logger.debug("Sampling is off, starting no recording span");
       return new NoRecordingSpan(spanContext);
     }
 
@@ -130,6 +130,17 @@ export class Tracer implements types.Tracer {
   }
 
   /**
+   * Enters the scope of code where the given Span is in the current context.
+   */
+  async withSpanAsync<T extends (...args: unknown[]) => ReturnType<T>>(
+    span: types.Span,
+    fn: T
+  ): Promise<ReturnType<T>> {
+    // Set given span to context.
+    return this._scopeManager.with(span, fn);
+  }
+
+  /**
    * Bind a span (or the current one) to the target's scope
    */
   bind<T>(target: T, span?: types.Span): T {
@@ -169,7 +180,7 @@ export class Tracer implements types.Tracer {
       return parent as types.SpanContext;
     }
 
-    if (typeof (parent as types.Span).context === 'function') {
+    if (typeof (parent as types.Span).context === "function") {
       return (parent as Span).context();
     }
     return undefined;

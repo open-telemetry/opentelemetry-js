@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
-import { BinaryFormat } from '../context/propagation/BinaryFormat';
-import { Span } from './span';
-import { SpanOptions } from './SpanOptions';
+import { HttpTextFormat } from "../context/propagation/HttpTextFormat";
+import { BinaryFormat } from "../context/propagation/BinaryFormat";
+import { Span } from "./span";
+import { SpanOptions } from "./SpanOptions";
 
 /**
  * Tracer provides an interface for creating {@link Span}s and propagating
@@ -56,6 +56,23 @@ export interface Tracer {
     span: Span,
     fn: T
   ): ReturnType<T>;
+
+  /**
+   * Asynchronously executes the function given by fn within the context
+   * provided by Span
+   *
+   * @param span The span that provides the context
+   * @param fn The function to be executed inside the provided context
+   * @example
+   * tracer.withSpan(span, function() { ... });
+   */
+  withSpanAsync<
+    T extends (...args: unknown[]) => Promise<T2>,
+    T2 extends unknown
+  >(
+    span: Span,
+    fn: T
+  ): Promise<T2>;
 
   /**
    * Bind a span as the target's scope or propagate the current one.

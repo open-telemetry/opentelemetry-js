@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { BinaryFormat, HttpTextFormat, Span, SpanOptions, Tracer } from '..';
-import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
-import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
-import { NOOP_SPAN } from './NoopSpan';
+import { BinaryFormat, HttpTextFormat, Span, SpanOptions, Tracer } from "..";
+import { NOOP_BINARY_FORMAT } from "../context/propagation/NoopBinaryFormat";
+import { NOOP_HTTP_TEXT_FORMAT } from "../context/propagation/NoopHttpTextFormat";
+import { NOOP_SPAN } from "./NoopSpan";
 
 /**
  * No-op implementations of {@link Tracer}.
@@ -37,6 +37,13 @@ export class NoopTracer implements Tracer {
     fn: T
   ): ReturnType<T> {
     return fn();
+  }
+
+  async withSpanAsync<
+    T extends (...args: unknown[]) => Promise<T2>,
+    T2 extends unknown
+  >(span: Span, fn: T): Promise<T2> {
+    return await fn();
   }
 
   bind<T>(target: T, span?: Span): T {
