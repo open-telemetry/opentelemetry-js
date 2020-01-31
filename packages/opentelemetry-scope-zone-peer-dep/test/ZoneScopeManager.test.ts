@@ -214,20 +214,26 @@ describe("ZoneScopeManager", () => {
       scope3;
 
       await scopeManager.withAsync(scope1, async () => {
+        console.log("within zone");
         assert.strictEqual(scopeManager.active(), "scope1");
         await scopeManager.withAsync(scope2, async () => {
+          console.log("within zone 2");
           assert.strictEqual(scopeManager.active(), "scope2");
           await scopeManager.withAsync(scope3, async () => {
+            console.log("within zone 3");
             assert.strictEqual(scopeManager.active(), "scope3");
           });
-          //   assert.strictEqual(scopeManager.active(), "scope2");
+          console.log("after zone 3");
+          assert.strictEqual(scopeManager.active(), "scope2");
         });
+        console.log("after zone 2");
         // assert.strictEqual(scopeManager.active(), "scope1");
-        setTimeout(() => {
-          // assert.strictEqual(scopeManager.active(), "scope1");
-        }, 500);
-        clock.tick(500);
+        // setTimeout(() => {
+        //   // assert.strictEqual(scopeManager.active(), "scope1");
+        // }, 500);
+        // clock.tick(500);
       });
+      console.log("after zone");
       assert.strictEqual(scopeManager.active(), window);
     });
 

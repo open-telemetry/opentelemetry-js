@@ -259,7 +259,7 @@ export class ZoneScopeManager implements ScopeManager {
   async withAsync<
     T extends (...args: unknown[]) => Promise<T2>,
     T2 extends unknown
-  >(scope: unknown, fn: () => Promise<T2>): Promise<T2> {
+  >(scope: unknown, fn: T): Promise<T2> {
     // if no scope use active from active zone
     if (typeof scope === "undefined" || scope === null) {
       scope = this.active();
@@ -269,6 +269,10 @@ export class ZoneScopeManager implements ScopeManager {
 
     const newZone = this._createZone(zoneName, scope);
 
-    return await newZone.run(fn, scope);
+    console.log("before running code", scope);
+    console.log("active: ", this.active());
+    const result = await newZone.run(fn, scope);
+    console.log("after running code", scope);
+    return result as T2;
   }
 }
