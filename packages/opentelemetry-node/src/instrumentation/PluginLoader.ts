@@ -134,13 +134,13 @@ export class PluginLoader {
           const plugin: Plugin = require(modulePath).plugin;
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
             this.logger.error(
-              `PluginLoader#load: Plugin ${name} only support module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`
+              `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`
             );
             return exports;
           }
           if (plugin.moduleName !== name) {
             this.logger.error(
-              `PluginLoader#load: Entry ${name} use a plugin that instrument ${plugin.moduleName}`
+              `PluginLoader#load: Entry ${name} use a plugin that instruments ${plugin.moduleName}`
             );
             return exports;
           }

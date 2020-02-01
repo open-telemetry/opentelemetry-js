@@ -251,7 +251,7 @@ describe('PluginLoader', () => {
       pluginLoader.unload();
     });
 
-    it('should not load a plugin that patch a different module that the one configured', () => {
+    it('should not load a plugin that patches a different module that the one configured', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load(differentNamePlugins);
