@@ -72,30 +72,3 @@ export function isSupportedVersion(
 export function searchPathForTest(searchPath: string) {
   module.paths.push(searchPath);
 }
-
-// Includes support for npm '@org/name' packages
-// Regex: .*?node_modules(?!.*node_modules)\/(@[^\/]*\/[^\/]*|[^\/]*).*
-// Tests: https://regex101.com/r/lW2bE3/6
-const moduleRegex = new RegExp(
-  [
-    '.*?node_modules(?!.*node_modules)\\',
-    '(@[^\\',
-    ']*\\',
-    '[^\\',
-    ']*|[^\\',
-    ']*).*',
-  ].join(path.sep)
-);
-
-/**
- * Retrieves a package name from the full import path.
- * For example:
- *   './node_modules/bar/index/foo.js' => 'bar'
- *
- * @param path The full import path.
- * Extracted from https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/util.ts#L214
- */
-export function packageNameFromPath(importPath: string) {
-  const matches = moduleRegex.exec(importPath);
-  return matches && matches.length > 1 ? matches[1] : null;
-}

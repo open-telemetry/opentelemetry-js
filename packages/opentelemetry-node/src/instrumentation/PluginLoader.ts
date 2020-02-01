@@ -87,7 +87,7 @@ export class PluginLoader {
       const requiredModulesToHook = modulesToHook.filter(
         name =>
           alreadyRequiredModules.find(
-            cached => utils.packageNameFromPath(cached) === name
+            cached => require.resolve(name) === cached
           ) !== undefined
       );
       if (requiredModulesToHook.length > 0) {
