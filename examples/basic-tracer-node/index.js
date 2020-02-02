@@ -46,7 +46,7 @@ function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
   const span = tracer.startSpan('doWork', {
-    parent,
+    parent : parent,
   });
 
   // simulate some random work.
@@ -59,4 +59,7 @@ function doWork(parent) {
 
   // Annotate our span to capture metadata about our operation
   span.addEvent('invoking doWork').end();
+  
+  // End the child span.
+  span.end();
 }
