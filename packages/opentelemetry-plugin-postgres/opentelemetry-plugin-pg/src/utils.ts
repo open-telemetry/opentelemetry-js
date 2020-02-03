@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode, Tracer, SpanKind } from '@opentelemetry/types';
+import { Span, CanonicalCode, Tracer, SpanKind } from '@opentelemetry/api';
 import { AttributeNames } from './enums';
 import {
   PgClientExtended,

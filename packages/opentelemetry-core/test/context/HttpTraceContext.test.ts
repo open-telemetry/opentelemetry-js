@@ -20,7 +20,7 @@ import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/context/propagation/HttpTraceContext';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('HttpTraceContext', () => {

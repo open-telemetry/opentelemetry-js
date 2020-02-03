@@ -24,9 +24,9 @@ OpenTelemetry MySQL Instrumentation allows the user to automatically collect tra
 
 To load a specific plugin (**MySQL** in this case), specify it in the Node Tracer's configuration
 ```js
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     mysql: {
       enabled: true,
@@ -39,9 +39,9 @@ const registry = new NodeTracerRegistry({
 
 To load all of the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```js
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-const registry = new NodeTracerRegistry();
+const provider = new NodeTracerProvider();
 ```
 
 See [examples/mysql](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/mysql) for a short example.

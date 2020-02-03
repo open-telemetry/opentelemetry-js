@@ -23,7 +23,7 @@
     "predocs-test": "yarn docs",
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
-    "docs-deploy": "gh-pages --dist packages/opentelemetry-types/docs/out",
+    "docs-deploy": "gh-pages --dist packages/opentelemetry-api/docs/out",
     "lint-examples": "eslint ./examples/**/*.js",
     "fix-examples": "eslint ./examples/**/*.js --fix"
   },

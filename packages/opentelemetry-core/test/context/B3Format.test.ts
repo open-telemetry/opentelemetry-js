@@ -21,7 +21,7 @@ import {
   X_B3_SPAN_ID,
   X_B3_SAMPLED,
 } from '../../src/context/propagation/B3Format';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('B3Format', () => {

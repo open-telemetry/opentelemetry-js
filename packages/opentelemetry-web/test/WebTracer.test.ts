@@ -21,7 +21,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
 import { StackScopeManager } from '../src/StackScopeManager';
-import { WebTracerRegistry } from '../src/WebTracerRegistry';
+import { WebTracerProvider } from '../src/WebTracerProvider';
 
 class DummyPlugin extends BasePlugin<unknown> {
   constructor() {
@@ -42,7 +42,7 @@ describe('WebTracer', () => {
     });
 
     it('should construct an instance with required only options', () => {
-      const tracer = new WebTracerRegistry(
+      const tracer = new WebTracerProvider(
         Object.assign({}, defaultOptions)
       ).getTracer('default');
       assert.ok(tracer instanceof Tracer);
@@ -54,7 +54,7 @@ describe('WebTracer', () => {
       options = { scopeManager };
 
       const spy = sinon.spy(scopeManager, 'enable');
-      new WebTracerRegistry(options);
+      new WebTracerProvider(options);
 
       assert.ok(spy.calledOnce === true);
     });
@@ -71,7 +71,7 @@ describe('WebTracer', () => {
       const plugins = [dummyPlugin1, dummyPlugin2];
 
       options = { plugins, scopeManager };
-      new WebTracerRegistry(options);
+      new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);
       assert.ok(spyEnable2.calledOnce === true);
@@ -79,13 +79,13 @@ describe('WebTracer', () => {
 
     it('should work without default scope manager', () => {
       assert.doesNotThrow(() => {
-        new WebTracerRegistry({});
+        new WebTracerProvider({});
       });
     });
 
     describe('when scopeManager is "ZoneScopeManager"', () => {
       it('should correctly return the scopes for 2 parallel actions', () => {
-        const webTracerWithZone = new WebTracerRegistry({
+        const webTracerWithZone = new WebTracerProvider({
           scopeManager: new ZoneScopeManager(),
         }).getTracer('default');
 

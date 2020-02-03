@@ -96,8 +96,8 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 | Package                 | Description |
 | ----------------------- | -----------------|
-| [@opentelemetry/types][otel-types] | This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry types for trace and metrics. It's intended for use both on the server and in the browser. |
+| [@opentelemetry/api][otel-api] | This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It's intended for use both on the server and in the browser. |
 
 ### Implementation / SDKs
 
@@ -195,5 +195,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[otel-types]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-types
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core

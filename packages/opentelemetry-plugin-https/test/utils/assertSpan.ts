@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';

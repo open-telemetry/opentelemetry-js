@@ -77,4 +77,4 @@ To generate the docs, use:
 $ yarn docs
 ```
 
-The document will be available under `packages/opentelemetry-types/docs/out` path.
+The document will be available under `packages/opentelemetry-api/docs/out` path.

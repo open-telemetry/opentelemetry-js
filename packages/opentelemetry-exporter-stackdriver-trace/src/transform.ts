@@ -19,7 +19,7 @@ import {
   VERSION as CORE_VERSION,
 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import * as ot from '@opentelemetry/types';
+import * as ot from '@opentelemetry/api';
 import {
   AttributeMap,
   Attributes,

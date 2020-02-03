@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  BasicTracerRegistry,
+  BasicTracerProvider,
   ConsoleSpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
@@ -39,17 +39,17 @@ describe('ConsoleSpanExporter', () => {
   describe('.export()', () => {
     it('should export information about span', () => {
       assert.doesNotThrow(() => {
-        const basicTracerRegistry = new BasicTracerRegistry();
+        const basicTracerProvider = new BasicTracerProvider();
         consoleExporter = new ConsoleSpanExporter();
 
         const spyConsole = sinon.spy(console, 'log');
         const spyExport = sinon.spy(consoleExporter, 'export');
 
-        basicTracerRegistry.addSpanProcessor(
+        basicTracerProvider.addSpanProcessor(
           new SimpleSpanProcessor(consoleExporter)
         );
 
-        const span = basicTracerRegistry.getTracer('default').startSpan('foo');
+        const span = basicTracerProvider.getTracer('default').startSpan('foo');
         span.addEvent('foobar');
         span.end();
 

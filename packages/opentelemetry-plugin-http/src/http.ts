@@ -21,7 +21,7 @@ import {
   SpanKind,
   SpanOptions,
   Status,
-} from '@opentelemetry/types';
+} from '@opentelemetry/api';
 import {
   ClientRequest,
   IncomingMessage,

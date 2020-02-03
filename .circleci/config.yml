@@ -45,7 +45,7 @@ cache_1: &cache_1
     - ./yarn.lock
     - packages/opentelemetry-base/node_modules
     - packages/opentelemetry-scope-base/node_modules
-    - packages/opentelemetry-types/node_modules
+    - packages/opentelemetry-api/node_modules
     - packages/opentelemetry-scope-async-hooks/node_modules
     - packages/opentelemetry-core/node_modules
     - packages/opentelemetry-exporter-prometheus/node_modules
@@ -169,7 +169,7 @@ jobs:
           name: Docs tests
           command: yarn docs-test
       - persist_to_workspace:
-          root: packages/opentelemetry-types/docs
+          root: packages/opentelemetry-api/docs
           paths:
             - out
       - run:
@@ -184,7 +184,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: packages/opentelemetry-types/docs
+          at: packages/opentelemetry-api/docs
       - run:
           name: Install and configure dependencies
           command: |
@@ -196,7 +196,7 @@ jobs:
             - "1d:a3:60:b5:b4:8d:e7:8a:96:ce:6a:0a:e9:58:4c:54"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages --dist packages/opentelemetry-types/docs/out
+          command: gh-pages --dist packages/opentelemetry-api/docs/out
   node8:
     docker:
       - image: node:8
