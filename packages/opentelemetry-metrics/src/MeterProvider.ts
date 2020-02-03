@@ -20,9 +20,9 @@ import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 
 /**
- * This class represents a meter registry which platform libraries can extend
+ * This class represents a meter provider which platform libraries can extend
  */
-export class MeterRegistry implements types.MeterRegistry {
+export class MeterProvider implements types.MeterProvider {
   private readonly _meters: Map<string, Meter> = new Map();
   readonly logger: types.Logger;
 

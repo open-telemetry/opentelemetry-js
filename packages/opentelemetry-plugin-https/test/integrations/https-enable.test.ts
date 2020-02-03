@@ -30,7 +30,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 import * as url from 'url';
 import * as utils from '../utils/utils';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -65,11 +65,11 @@ describe('HttpsPlugin Integration tests', () => {
 
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const registry = new NodeTracerRegistry({
+    const provider = new NodeTracerProvider({
       logger,
       httpTextFormat,
     });
-    registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
       memoryExporter.reset();
     });
@@ -90,8 +90,8 @@ describe('HttpsPlugin Integration tests', () => {
       } catch (e) {}
       plugin.enable(
         (https as unknown) as Http,
-        registry,
-        registry.logger,
+        provider,
+        provider.logger,
         config
       );
     });

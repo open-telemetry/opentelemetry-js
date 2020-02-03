@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { BasicTracerRegistry, TracerConfig } from '@opentelemetry/tracing';
+import { BasicTracerProvider, TracerConfig } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
 
 /**
@@ -31,7 +31,7 @@ export interface WebTracerConfig extends TracerConfig {
 /**
  * This class represents a web tracer with {@link StackScopeManager}
  */
-export class WebTracerRegistry extends BasicTracerRegistry {
+export class WebTracerProvider extends BasicTracerProvider {
   /**
    * Constructs a new Tracer instance.
    * @param config Web Tracer config

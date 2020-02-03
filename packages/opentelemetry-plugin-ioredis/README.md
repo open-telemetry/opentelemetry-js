@@ -22,9 +22,9 @@ npm install --save @opentelemetry/plugin-ioredis
 
 To load a specific plugin (**ioredis** in this case), specify it in the Node Tracer's configuration
 ```js
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     ioredis: {
       enabled: true,
@@ -37,9 +37,9 @@ const registry = new NodeTracerRegistry({
 
 To load all of the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 ```javascript
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-const registry = new NodeTracerRegistry();
+const provider = new NodeTracerProvider();
 ```
 
 ## Useful links

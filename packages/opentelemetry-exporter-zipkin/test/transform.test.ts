@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as types from '@opentelemetry/api';
-import { Span, BasicTracerRegistry } from '@opentelemetry/tracing';
+import { Span, BasicTracerProvider } from '@opentelemetry/tracing';
 import {
   NoopLogger,
   hrTimeToMicroseconds,
@@ -32,7 +32,7 @@ import {
 import * as zipkinTypes from '../src/types';
 
 const logger = new NoopLogger();
-const tracer = new BasicTracerRegistry({
+const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');
 const parentId = '5c1c63257de34c67';

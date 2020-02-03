@@ -27,7 +27,7 @@ import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
 import { DEFAULT_CONFIG } from './config';
-import { BasicTracerRegistry } from './BasicTracerRegistry';
+import { BasicTracerProvider } from './BasicTracerProvider';
 
 /**
  * This class represents a basic tracer.
@@ -46,7 +46,7 @@ export class Tracer implements types.Tracer {
    */
   constructor(
     config: TracerConfig = DEFAULT_CONFIG,
-    private _tracerRegistry: BasicTracerRegistry
+    private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
@@ -156,7 +156,7 @@ export class Tracer implements types.Tracer {
   }
 
   getActiveSpanProcessor() {
-    return this._tracerRegistry.getActiveSpanProcessor();
+    return this._tracerProvider.getActiveSpanProcessor();
   }
 
   private _getParentSpanContext(

@@ -23,9 +23,9 @@ import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { TracerConfig } from './types';
 
 /**
- * This class represents a basic tracer registry which platform libraries can extend
+ * This class represents a basic tracer provider which platform libraries can extend
  */
-export class BasicTracerRegistry implements types.TracerRegistry {
+export class BasicTracerProvider implements types.TracerProvider {
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 

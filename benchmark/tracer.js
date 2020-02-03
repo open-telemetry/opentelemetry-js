@@ -2,32 +2,32 @@
 
 const benchmark = require('./benchmark');
 const opentelemetry = require('../packages/opentelemetry-core');
-const { BasicTracerRegistry, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
+const { BasicTracerProvider, BatchSpanProcessor, InMemorySpanExporter, SimpleSpanProcessor } = require('../packages/opentelemetry-tracing');
 
 const logger = new opentelemetry.NoopLogger();
 
 const setups = [
   {
-    name: 'NoopTracerRegistry',
-    registry: opentelemetry.getTracerRegistry()
+    name: 'NoopTracerProvider',
+    provider: opentelemetry.getTracerProvider()
   },
   {
-    name: 'BasicTracerRegistry',
-    registry: new BasicTracerRegistry({ logger })
+    name: 'BasicTracerProvider',
+    provider: new BasicTracerProvider({ logger })
   },
   {
-    name: 'BasicTracerRegistry with SimpleSpanProcessor',
-    registry: getRegistry(new SimpleSpanProcessor(new InMemorySpanExporter()))
+    name: 'BasicTracerProvider with SimpleSpanProcessor',
+    provider: getProvider(new SimpleSpanProcessor(new InMemorySpanExporter()))
   },
   {
-    name: 'BasicTracerRegistry with BatchSpanProcessor',
-    registry: getRegistry(new BatchSpanProcessor(new InMemorySpanExporter()))
+    name: 'BasicTracerProvider with BatchSpanProcessor',
+    provider: getProvider(new BatchSpanProcessor(new InMemorySpanExporter()))
   }
 ];
 
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
-  const tracer = setup.registry.getTracer("benchmark");
+  const tracer = setup.provider.getTracer("benchmark");
   const suite = benchmark(20)
     .add('#startSpan', function () {
       const span = tracer.startSpan('op');
@@ -62,9 +62,9 @@ for (const setup of setups) {
   // run async
   suite.run({ async: false });
 }
-function getRegistry(processor) {
-  const registry = new BasicTracerRegistry({ logger });
-  registry.addSpanProcessor(processor);
-  return registry;
+function getProvider(processor) {
+  const provider = new BasicTracerProvider({ logger });
+  provider.addSpanProcessor(processor);
+  return provider;
 }
 

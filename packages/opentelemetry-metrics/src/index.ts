@@ -17,6 +17,6 @@
 export * from './BoundInstrument';
 export * from './Meter';
 export * from './Metric';
-export * from './MeterRegistry';
+export * from './MeterProvider';
 export * from './export/ConsoleMetricExporter';
 export * from './export/types';

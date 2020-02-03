@@ -26,7 +26,7 @@ import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
 import { NoopLogger, hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
 import { NoopExporter } from './mocks/Exporter';
-import { MeterRegistry } from '../src/MeterRegistry';
+import { MeterProvider } from '../src/MeterProvider';
 
 const performanceTimeOrigin = hrTime();
 
@@ -39,7 +39,7 @@ describe('Meter', () => {
   const hrTime: types.HrTime = [22, 400000000];
 
   beforeEach(() => {
-    meter = new MeterRegistry({
+    meter = new MeterProvider({
       logger: new NoopLogger(),
     }).getMeter('test-meter');
     labelSet = meter.labels(labels);
