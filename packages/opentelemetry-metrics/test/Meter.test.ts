@@ -413,10 +413,10 @@ describe('Meter', () => {
     });
 
     describe('.bind()', () => {
-      it('should create a measure handle', () => {
+      it('should create a measure instrument', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle = measure.bind(labelSet);
-        assert.doesNotThrow(() => handle.record(10));
+        const boundMeasure = measure.bind(labelSet);
+        assert.doesNotThrow(() => boundMeasure.record(10));
       });
 
       it('should return the timeseries', () => {
@@ -427,49 +427,49 @@ describe('Meter', () => {
         // @todo: implement once record is implemented
       });
 
-      it('should not set the handle data when disabled', () => {
+      it('should not set the instrument data when disabled', () => {
         const measure = meter.createMeasure('name', {
           disabled: true,
         }) as MeasureMetric;
-        const handle = measure.bind(labelSet);
-        handle.record(10);
-        assert.strictEqual(handle['_data'], 0);
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(10);
+        assert.strictEqual(boundMeasure['_data'], 0);
       });
 
       it('should accept negative (and positive) values when monotonic is set to false', () => {
         // @todo: implement once record is implemented
       });
 
-      it('should return same handle on same label values', () => {
+      it('should return same instrument on same label values', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle1 = measure.bind(labelSet);
-        handle1.record(10);
-        const handle2 = measure.bind(labelSet);
-        handle2.record(100);
+        const boundMeasure1 = measure.bind(labelSet);
+        boundMeasure1.record(10);
+        const boundMeasure2 = measure.bind(labelSet);
+        boundMeasure2.record(100);
         // @todo: re-add once record is implemented
-        // assert.strictEqual(handle1['_data'], 100);
-        assert.strictEqual(handle1, handle2);
+        // assert.strictEqual(boundMeasure1['_data'], 100);
+        assert.strictEqual(boundMeasure1, boundMeasure2);
       });
     });
 
     describe('.unbind()', () => {
-      it('should remove the measure handle', () => {
+      it('should remove the measure instrument', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
-        const handle = measure.bind(labelSet);
+        const boundMeasure = measure.bind(labelSet);
         assert.strictEqual(measure['_instruments'].size, 1);
         measure.unbind(labelSet);
         assert.strictEqual(measure['_instruments'].size, 0);
-        const handle1 = measure.bind(labelSet);
+        const boundMeasure2 = measure.bind(labelSet);
         assert.strictEqual(measure['_instruments'].size, 1);
-        assert.notStrictEqual(handle, handle1);
+        assert.notStrictEqual(boundMeasure, boundMeasure2);
       });
 
-      it('should not fail when removing non existing handle', () => {
+      it('should not fail when removing non existing instrument', () => {
         const measure = meter.createMeasure('name');
         measure.unbind(new LabelSet('nonexistant', {}));
       });
 
-      it('should clear all handles', () => {
+      it('should clear all instruments', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
         measure.bind(labelSet);
         assert.strictEqual(measure['_instruments'].size, 1);
