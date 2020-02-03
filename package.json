@@ -38,8 +38,8 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@commitlint/cli": "^8.2.0",
-    "@commitlint/config-conventional": "^8.2.0",
+    "@commitlint/cli": "^8.3.4",
+    "@commitlint/config-conventional": "^8.3.4",
     "beautify-benchmark": "^0.2.4",
     "benchmark": "^2.1.4",
     "eslint": "^6.8.0",
