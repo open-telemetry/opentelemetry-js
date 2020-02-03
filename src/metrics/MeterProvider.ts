@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-import { Tracer } from './tracer';
+import { Meter } from './Meter';
 
 /**
- * TracerRegistry provides an interface for creating {@link Tracer}s
+ * MeterProvider provides an interface for creating {@link Meter}s
  */
-export interface TracerRegistry {
+export interface MeterProvider {
   /**
-   * Returns a Tracer, creating one if one with the given name and version is not already created
+   * Returns a Meter, creating one if one with the given name and version is not already created
    *
-   * If there is no Span associated with the current context, null is returned.
-   *
-   * @returns Tracer A Tracer with the given name and version
+   * @returns Meter A Meter with the given name and version
    */
-  getTracer(name: string, version?: string): Tracer;
+  getMeter(name: string, version?: string): Meter;
 }

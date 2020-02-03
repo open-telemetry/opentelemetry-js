@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import api, { TraceFlags, NoopSpan, NoopTracerRegistry, NoopTracer, SpanOptions, Span } from '../../src';
+import api, { TraceFlags, NoopSpan, NoopTracerProvider, NoopTracer, SpanOptions, Span } from '../../src';
 
 describe('API', () => {
   const functions = [
@@ -26,13 +26,13 @@ describe('API', () => {
     'getHttpTextFormat',
   ];
 
-  it('should expose a tracer registry via getTracerRegistry', () => {
-    const tracer =  api.trace.getTracerRegistry();
+  it('should expose a tracer provider via getTracerProvider', () => {
+    const tracer =  api.trace.getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
   });
 
-  describe('GlobalTracerRegistry', () => {
+  describe('GlobalTracerProvider', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -41,12 +41,12 @@ describe('API', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      api.trace.initGlobalTracerRegistry(new NoopTracerRegistry());
+      api.trace.initGlobalTracerProvider(new NoopTracerProvider());
     });
 
     it('should not crash', () => {
       functions.forEach(fn => {
-        const tracer =  api.trace.getTracerRegistry();
+        const tracer =  api.trace.getTracerProvider();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -58,9 +58,9 @@ describe('API', () => {
       });
     });
 
-    it('should use the global tracer registry', () => {
-      api.trace.initGlobalTracerRegistry(new TestTracerRegistry());
-      const tracer =  api.trace.getTracerRegistry().getTracer('name');
+    it('should use the global tracer provider', () => {
+      api.trace.initGlobalTracerProvider(new TestTracerProvider());
+      const tracer =  api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
@@ -74,7 +74,7 @@ describe('API', () => {
       }
     }
 
-    class TestTracerRegistry extends NoopTracerRegistry {
+    class TestTracerProvider extends NoopTracerProvider {
       getTracer(_name: string, version?: string) {
         return new TestTracer();
       }
