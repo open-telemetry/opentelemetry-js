@@ -123,23 +123,18 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   }
 
   private _getSpanContext(metadata: grpcTypes.Metadata): SpanContext | null {
-    const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer;
-    // Entry doesn't exist
-    if (!metadataValue) {
-      return null;
-    }
-    return this._tracer.getBinaryFormat().fromBytes(metadataValue);
+    return this._tracer
+      .getHttpTextFormat()
+      .extract(/* unused */ '', metadata.getMap());
   }
 
   private _setSpanContext(
     metadata: grpcTypes.Metadata,
     spanContext: SpanContext
   ): void {
-    const serializedSpanContext = this._tracer
-      .getBinaryFormat()
-      .toBytes(spanContext);
-    const buffer = Buffer.from(serializedSpanContext);
-    metadata.set(GRPC_TRACE_KEY, buffer);
+    this._tracer
+      .getHttpTextFormat()
+      .inject(spanContext, /* unused */ '', metadata);
   }
 
   private _patchServer() {
