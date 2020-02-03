@@ -132,9 +132,13 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     metadata: grpcTypes.Metadata,
     spanContext: SpanContext
   ): void {
+    const carrier = {};
     this._tracer
       .getHttpTextFormat()
-      .inject(spanContext, /* unused */ '', metadata);
+      .inject(spanContext, /* unused */ '', carrier);
+    for (const [k, v] of Object.entries(carrier)) {
+      metadata.set(k, v as string);
+    }
   }
 
   private _patchServer() {
