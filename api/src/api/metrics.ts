@@ -15,15 +15,15 @@
  */
 
 import { Meter } from '../metrics/Meter';
-import { MeterRegistry } from '../metrics/MeterRegistry';
-import { NOOP_METER_REGISTRY } from '../metrics/NoopMeterRegistry';
+import { MeterProvider } from '../metrics/MeterProvider';
+import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
  */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;
-  private _meterRegistry: MeterRegistry = NOOP_METER_REGISTRY;
+  private _meterProvider: MeterProvider = NOOP_METER_PROVIDER;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -38,24 +38,24 @@ export class MetricsAPI {
   }
 
   /**
-   * Set the current global meter. Returns the initialized global meter registry.
+   * Set the current global meter. Returns the initialized global meter provider.
    */
-  public initGlobalMeterRegistry(registry: MeterRegistry): MeterRegistry {
-    this._meterRegistry = registry;
-    return registry;
+  public initGlobalMeterProvider(provider: MeterProvider): MeterProvider {
+    this._meterProvider = provider;
+    return provider;
   }
 
   /**
-   * Returns the global meter registry.
+   * Returns the global meter provider.
    */
-  public getMeterRegistry(): MeterRegistry {
-    return this._meterRegistry;
+  public getMeterProvider(): MeterProvider {
+    return this._meterProvider;
   }
 
   /**
-   * Returns a meter from the global meter registry.
+   * Returns a meter from the global meter provider.
    */
   public getMeter(name: string, version?: string): Meter {
-    return this.getMeterRegistry().getMeter(name, version);
+    return this.getMeterProvider().getMeter(name, version);
   }
 }
