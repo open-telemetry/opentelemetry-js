@@ -5,7 +5,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides default and no-op implementations of the OpenTelemetry types for trace and metrics. It's intended for use both on the server and in the browser.
+This package provides default and no-op implementations of the OpenTelemetry API for trace and metrics. It's intended for use both on the server and in the browser.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
