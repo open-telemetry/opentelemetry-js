@@ -1,12 +1,12 @@
 
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerRegistry } from '@opentelemetry/web';
+import { WebTracer } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 import { B3Format } from '@opentelemetry/core';
 
-const registryWithZone = new WebTracerRegistry({
+const webTracerWithZone = new WebTracer({
   httpTextFormat: new B3Format(),
   scopeManager: new ZoneScopeManager(),
   plugins: [
@@ -19,10 +19,8 @@ const registryWithZone = new WebTracerRegistry({
   ],
 });
 
-registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
-
-const webTracerWithZone = registryWithZone.getTracer('example-tracer-web');
+webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
 const getData = (url) => new Promise((resolve, _reject) => {
   // eslint-disable-next-line no-undef
