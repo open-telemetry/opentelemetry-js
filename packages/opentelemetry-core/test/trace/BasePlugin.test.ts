@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { NoopTracerRegistry } from '@opentelemetry/api';
+import { NoopTracerProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin, NoopLogger } from '../../src';
 import * as types from './fixtures/test-package/foo/bar/internal';
 
-const registry = new NoopTracerRegistry();
+const provider = new NoopTracerProvider();
 const logger = new NoopLogger();
 
 describe('BasePlugin', () => {
@@ -29,7 +29,7 @@ describe('BasePlugin', () => {
       const testPackage = require('./fixtures/test-package');
       const plugin = new TestPlugin();
       assert.doesNotThrow(() => {
-        plugin.enable(testPackage, registry, logger);
+        plugin.enable(testPackage, provider, logger);
       });
 
       // @TODO: https://github.com/open-telemetry/opentelemetry-js/issues/285

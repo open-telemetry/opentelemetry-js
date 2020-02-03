@@ -11,14 +11,14 @@ For manual instrumentation see the
 [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
 
 ## How does automated instrumentation work?
-This package exposes a `NodeTracerRegistry` that will automatically hook into the module loader of Node.js.
+This package exposes a `NodeTracerProvider` that will automatically hook into the module loader of Node.js.
 
-For this to work, please make sure that `NodeTracerRegistry` is initialized before any other module of your application, (like `http` or `express`) is loaded.
+For this to work, please make sure that `NodeTracerProvider` is initialized before any other module of your application, (like `http` or `express`) is loaded.
 
 OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
 
 
-Whenever a module is loaded `NodeTracerRegistry` will check if a matching instrumentation plugin has been installed.
+Whenever a module is loaded `NodeTracerProvider` will check if a matching instrumentation plugin has been installed.
 
 > **Please note:** This module does *not* bundle any plugins. They need to be installed separately.
 
@@ -34,7 +34,7 @@ This instrumentation code will automatically
 In short, this means that this module will use provided plugins to automatically instrument your application to produce spans and provide end-to-end tracing by just adding a few lines of code.
 
 ## Creating custom spans on top of auto-instrumentation
-Additionally to automated instrumentation, `NodeTracerRegistry` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing), allowing creating custom spans if needed.
+Additionally to automated instrumentation, `NodeTracerProvider` exposes the same API as [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing), allowing creating custom spans if needed.
 
 ## Installation
 
@@ -50,14 +50,14 @@ npm install --save @opentelemetry/plugin-https
 
 ## Usage
 
-The following code will configure the `NodeTracerRegistry` to instrument `http` using `@opentelemetry/plugin-http`.
+The following code will configure the `NodeTracerProvider` to instrument `http` using `@opentelemetry/plugin-http`.
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-// Create and configure NodeTracerRegistry
-const registry = new NodeTracerRegistry({
+// Create and configure NodeTracerProvider
+const provider = new NodeTracerProvider({
   plugins: {
     http: {
       enabled: true,
@@ -68,25 +68,25 @@ const registry = new NodeTracerRegistry({
   }
 });
 
-// Initialize the registry
-opentelemetry.trace.initGlobalTracerRegistry(registry);
+// Initialize the provider
+opentelemetry.initGlobalTracerProvider(provider);
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
 const http = require('http');
 ```
 
-To enable instrumentation for all [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins), create an instance of `NodeTracerRegistry` without providing any plugin configuration to the constructor.
+To enable instrumentation for all [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins), create an instance of `NodeTracerProvider` without providing any plugin configuration to the constructor.
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
-// Create and initialize NodeTracerRegistry
-const registry = new NodeTracerRegistry();
+// Create and initialize NodeTracerProvider
+const provider = new NodeTracerProvider();
 
-// Initialize the registry
-opentelemetry.trace.initGlobalTracerRegistry(registry);
+// Initialize the provider
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
 // Your application code
 // ...

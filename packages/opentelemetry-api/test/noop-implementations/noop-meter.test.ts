@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import {
   Labels,
-  NoopMeterRegistry,
+  NoopMeterProvider,
   NOOP_BOUND_COUNTER,
   NOOP_BOUND_GAUGE,
   NOOP_BOUND_MEASURE,
@@ -29,7 +29,7 @@ import {
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
-    const meter = new NoopMeterRegistry().getMeter('test-noop');
+    const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
     const labels = {} as Labels;
     const labelSet = meter.labels(labels);

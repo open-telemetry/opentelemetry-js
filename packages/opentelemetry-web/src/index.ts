@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './WebTracerRegistry';
+export * from './WebTracerProvider';
 export * from './StackScopeManager';
 export * from './enums/PerformanceTimingNames';
 export * from './types';
