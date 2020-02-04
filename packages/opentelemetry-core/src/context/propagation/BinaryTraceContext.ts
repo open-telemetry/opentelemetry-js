@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BinaryFormat, SpanContext, TraceFlags } from '@opentelemetry/types';
+import { BinaryFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
 
 const VERSION_ID = 0;
 const TRACE_ID_FIELD_ID = 0;

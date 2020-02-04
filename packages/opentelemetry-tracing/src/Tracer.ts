@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import {
   randomTraceId,
   isValid,
@@ -22,18 +22,12 @@ import {
   NoRecordingSpan,
   ConsoleLogger,
 } from '@opentelemetry/core';
-import {
-  BinaryFormat,
-  HttpTextFormat,
-  TraceFlags,
-  Logger,
-} from '@opentelemetry/types';
 import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { Span } from './Span';
 import { mergeConfig } from './utility';
 import { DEFAULT_CONFIG } from './config';
-import { BasicTracerRegistry } from './BasicTracerRegistry';
+import { BasicTracerProvider } from './BasicTracerProvider';
 
 /**
  * This class represents a basic tracer.
@@ -45,14 +39,14 @@ export class Tracer implements types.Tracer {
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
   private readonly _traceParams: TraceParams;
-  readonly logger: Logger;
+  readonly logger: types.Logger;
 
   /**
    * Constructs a new Tracer instance.
    */
   constructor(
     config: TracerConfig = DEFAULT_CONFIG,
-    private _tracerRegistry: BasicTracerRegistry
+    private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
     this._binaryFormat = localConfig.binaryFormat;
@@ -84,8 +78,8 @@ export class Tracer implements types.Tracer {
       traceState = parentContext.traceState;
     }
     const traceFlags = samplingDecision
-      ? TraceFlags.SAMPLED
-      : TraceFlags.UNSAMPLED;
+      ? types.TraceFlags.SAMPLED
+      : types.TraceFlags.UNSAMPLED;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {
@@ -145,14 +139,14 @@ export class Tracer implements types.Tracer {
   /**
    * Returns the binary format interface which can serialize/deserialize Spans.
    */
-  getBinaryFormat(): BinaryFormat {
+  getBinaryFormat(): types.BinaryFormat {
     return this._binaryFormat;
   }
 
   /**
    * Returns the HTTP text format interface which can inject/extract Spans.
    */
-  getHttpTextFormat(): HttpTextFormat {
+  getHttpTextFormat(): types.HttpTextFormat {
     return this._httpTextFormat;
   }
 
@@ -162,7 +156,7 @@ export class Tracer implements types.Tracer {
   }
 
   getActiveSpanProcessor() {
-    return this._tracerRegistry.getActiveSpanProcessor();
+    return this._tracerProvider.getActiveSpanProcessor();
   }
 
   private _getParentSpanContext(

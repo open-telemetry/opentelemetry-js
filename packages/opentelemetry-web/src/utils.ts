@@ -16,7 +16,7 @@
 
 import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { hrTimeToNanoseconds, timeInputToHrTime } from '@opentelemetry/core';
 
 /**
@@ -254,6 +254,10 @@ export function getElementXPath(target: any, optimised?: boolean) {
   return xpath;
 }
 
+/**
+ * get node index within the siblings
+ * @param target
+ */
 function getNodeIndex(target: HTMLElement): number {
   if (!target.parentNode) {
     return 0;
@@ -277,6 +281,11 @@ function getNodeIndex(target: HTMLElement): number {
   return 0;
 }
 
+/**
+ * get node value for xpath
+ * @param target
+ * @param optimised
+ */
 function getNodeValue(target: HTMLElement, optimised?: boolean): string {
   const nodeType = target.nodeType;
   const index = getNodeIndex(target);

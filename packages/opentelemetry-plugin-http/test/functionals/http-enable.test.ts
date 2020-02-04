@@ -19,8 +19,8 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/types';
+import { NodeTracerProvider } from '@opentelemetry/node';
+import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as path from 'path';
@@ -45,11 +45,11 @@ const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
 const httpTextFormat = new DummyPropagation();
 const logger = new NoopLogger();
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   logger,
   httpTextFormat,
 });
-registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 function doNock(
   hostname: string,
@@ -109,7 +109,7 @@ describe('HttpPlugin', () => {
           plugin.component,
           process.versions.node
         );
-        pluginWithBadOptions.enable(http, registry, registry.logger, config);
+        pluginWithBadOptions.enable(http, provider, provider.logger, config);
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -187,7 +187,7 @@ describe('HttpPlugin', () => {
           applyCustomAttributesOnSpan: customAttributeFunction,
           serverName,
         };
-        plugin.enable(http, registry, registry.logger, config);
+        plugin.enable(http, provider, provider.logger, config);
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
@@ -208,7 +208,7 @@ describe('HttpPlugin', () => {
         const httpNotPatched = new HttpPlugin(
           plugin.component,
           process.versions.node
-        ).enable({} as Http, registry, registry.logger, {});
+        ).enable({} as Http, provider, provider.logger, {});
         assert.strictEqual(Object.keys(httpNotPatched).length, 0);
       });
 
@@ -280,7 +280,19 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500, 505];
+      const httpErrorCodes = [
+        400,
+        401,
+        403,
+        404,
+        429,
+        501,
+        503,
+        504,
+        500,
+        505,
+        597,
+      ];
 
       for (let i = 0; i < httpErrorCodes.length; i++) {
         it(`should test span for GET requests with http error ${httpErrorCodes[i]}`, async () => {
@@ -323,8 +335,8 @@ describe('HttpPlugin', () => {
         const testPath = '/outgoing/rootSpan/childs/1';
         doNock(hostname, testPath, 200, 'Ok');
         const name = 'TestRootSpan';
-        const span = registry.getTracer('default').startSpan(name);
-        return registry.getTracer('default').withSpan(span, async () => {
+        const span = provider.getTracer('default').startSpan(name);
+        return provider.getTracer('default').withSpan(span, async () => {
           const result = await httpRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
@@ -366,8 +378,8 @@ describe('HttpPlugin', () => {
             httpErrorCodes[i].toString()
           );
           const name = 'TestRootSpan';
-          const span = registry.getTracer('default').startSpan(name);
-          return registry.getTracer('default').withSpan(span, async () => {
+          const span = provider.getTracer('default').startSpan(name);
+          return provider.getTracer('default').withSpan(span, async () => {
             const result = await httpRequest.get(
               `${protocol}://${hostname}${testPath}`
             );
@@ -405,8 +417,8 @@ describe('HttpPlugin', () => {
         const num = 5;
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
-        const span = registry.getTracer('default').startSpan(name);
-        await registry.getTracer('default').withSpan(span, async () => {
+        const span = provider.getTracer('default').startSpan(name);
+        await provider.getTracer('default').withSpan(span, async () => {
           for (let i = 0; i < num; i++) {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             const spans = memoryExporter.getFinishedSpans();

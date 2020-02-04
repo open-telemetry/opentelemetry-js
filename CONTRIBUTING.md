@@ -65,7 +65,7 @@ The `opentelemetry-js` project is written in TypeScript.
 
 
 ### Generating API documentation
-- `yarn docs` or `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-types/docs/out`
+- `yarn docs` or `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-api/docs/out`
 
 ### Generating CHANGELOG documentation
 - `yarn changelog` or `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).

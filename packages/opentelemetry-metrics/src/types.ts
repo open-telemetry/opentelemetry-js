@@ -15,7 +15,7 @@
  */
 
 import { LogLevel } from '@opentelemetry/core';
-import { Logger, ValueType } from '@opentelemetry/types';
+import { Logger, ValueType } from '@opentelemetry/api';
 
 /** Options needed for SDK metric creation. */
 export interface MetricOptions {

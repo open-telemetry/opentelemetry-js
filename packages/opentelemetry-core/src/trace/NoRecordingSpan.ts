@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopSpan } from './NoopSpan';
-import { SpanContext } from '@opentelemetry/types';
+import { SpanContext, NoopSpan } from '@opentelemetry/api';
 import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
 
 /**

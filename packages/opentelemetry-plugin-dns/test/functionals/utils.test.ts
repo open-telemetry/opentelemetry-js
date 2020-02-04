@@ -15,8 +15,8 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
-import { CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { AttributeNames } from '../../src/enums/AttributeNames';
@@ -162,7 +162,7 @@ describe('Utility', () => {
     it('should have error attributes', () => {
       const errorMessage = 'test error';
       const span = new Span(
-        new BasicTracerRegistry().getTracer('default'),
+        new BasicTracerProvider().getTracer('default'),
         'test',
         { spanId: '', traceId: '' },
         SpanKind.INTERNAL

@@ -22,7 +22,7 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import { HrTime } from '@opentelemetry/types';
+import { HrTime } from '@opentelemetry/api';
 import { Resource, ExportResult } from '@opentelemetry/base';
 
 export interface ReadableMetric {

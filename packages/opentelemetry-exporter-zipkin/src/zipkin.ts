@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
