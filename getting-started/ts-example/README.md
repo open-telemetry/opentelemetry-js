@@ -72,11 +72,12 @@ All tracing initialization should happen before your application’s code runs. 
 Create a file named `tracing.ts` and add the following code:
 
 ```typescript
-import * as opentelemetry from '@opentelemetry/core';
+import * as opentelemetry from '@opentelemetry/api';
+import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: opentelemetry.LogLevel.ERROR
+  logLevel: LogLevel.ERROR
 });
 
 opentelemetry.trace.initGlobalTracerProvider(provider);

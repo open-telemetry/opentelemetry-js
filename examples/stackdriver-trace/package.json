@@ -25,7 +25,7 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.3",
+    "@opentelemetry/api": "^0.3.3",
     "@opentelemetry/exporter-stackdriver-trace": "^0.3.3",
     "@opentelemetry/tracing": "^0.3.3",
     "@opentelemetry/api": "^0.3.3"

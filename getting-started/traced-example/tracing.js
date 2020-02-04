@@ -5,10 +5,10 @@ const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 
-const tracerProvider = new NodeTracerProvider({ logLevel: opentelemetry.LogLevel.ERROR });
-opentelemetry.trace.initGlobalTracerProvider(tracerProvider);
+const provider = new NodeTracerProvider({ logLevel: opentelemetry.LogLevel.ERROR });
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
-tracer.addSpanProcessor(
+provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
       serviceName: "getting-started"

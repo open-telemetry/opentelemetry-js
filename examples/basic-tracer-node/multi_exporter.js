@@ -1,6 +1,6 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
+const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, BatchSpanProcessor, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
@@ -21,7 +21,7 @@ provider.addSpanProcessor(new BatchSpanProcessor(zipkinExporter, {
   bufferSize: 10,
 }));
 
-const tracer = opentelemetry.getTracer('default');
+const tracer = opentelemetry.trace.getTracer('default');
 
 tracer.addSpanProcessor(new BatchSpanProcessor(jaegerExporter), {
   bufferSize: 10,
@@ -30,7 +30,7 @@ tracer.addSpanProcessor(new BatchSpanProcessor(jaegerExporter), {
 provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-opentelemetry.initGlobalTracerProvider(provider);
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
 // Create a span. A span must be closed.
 const parentSpan = tracer.startSpan('main');

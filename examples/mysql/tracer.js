@@ -1,6 +1,6 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
+const opentelemetry = require('@opentelemetry/api');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
@@ -28,7 +28,7 @@ module.exports = (serviceName) => {
   })));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-  opentelemetry.initGlobalTracerProvider(provider);
+  opentelemetry.trace.initGlobalTracerProvider(provider);
 
-  return opentelemetry.getTracer();
+  return opentelemetry.trace.getTracer('mysql-example');
 };
