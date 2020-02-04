@@ -16,16 +16,16 @@
 
 import { NOOP_TRACER } from './NoopTracer';
 import { Tracer } from './tracer';
-import { TracerRegistry } from './tracer_registry';
+import { TracerProvider } from './tracer_provider';
 
 /**
- * An implementation of the {@link TracerRegistry} which returns an impotent Tracer
+ * An implementation of the {@link TracerProvider} which returns an impotent Tracer
  * for all calls to `getTracer`
  */
-export class NoopTracerRegistry implements TracerRegistry {
+export class NoopTracerProvider implements TracerProvider {
   getTracer(_name?: string, _version?: string): Tracer {
     return NOOP_TRACER;
   }
 }
 
-export const NOOP_TRACER_REGISTRY = new NoopTracerRegistry();
+export const NOOP_TRACER_PROVIDER = new NoopTracerProvider();

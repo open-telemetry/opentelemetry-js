@@ -25,7 +25,7 @@ import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import * as types from '@opentelemetry/api';
 
 describe('HttpsPlugin', () => {
@@ -35,17 +35,17 @@ describe('HttpsPlugin', () => {
   describe('disable()', () => {
     const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-    const registry = new NodeTracerRegistry({
+    const provider = new NodeTracerProvider({
       logger,
       httpTextFormat,
     });
-    // const tracer = registry.getTracer('test-https')
+    // const tracer = provider.getTracer('test-https')
     let tracer: types.Tracer;
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();
 
-      plugin.enable((https as unknown) as Http, registry, registry.logger);
+      plugin.enable((https as unknown) as Http, provider, provider.logger);
       tracer = plugin['_tracer'];
       // Ensure that https module is patched.
       assert.strictEqual(https.Server.prototype.emit.__wrapped, true);

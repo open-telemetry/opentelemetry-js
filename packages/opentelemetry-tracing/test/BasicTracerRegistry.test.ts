@@ -26,48 +26,48 @@ import {
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
 import { TraceFlags } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { BasicTracerRegistry, Span } from '../src';
+import { BasicTracerProvider, Span } from '../src';
 
-describe('BasicTracerRegistry', () => {
+describe('BasicTracerProvider', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
-      const registry = new BasicTracerRegistry();
-      assert.ok(registry instanceof BasicTracerRegistry);
+      const provider = new BasicTracerProvider();
+      assert.ok(provider instanceof BasicTracerProvider);
     });
 
     it('should construct an instance with binary format', () => {
-      const registry = new BasicTracerRegistry({
+      const provider = new BasicTracerProvider({
         binaryFormat: new BinaryTraceContext(),
       });
-      assert.ok(registry instanceof BasicTracerRegistry);
+      assert.ok(provider instanceof BasicTracerProvider);
     });
 
     it('should construct an instance with http text format', () => {
-      const registry = new BasicTracerRegistry({
+      const provider = new BasicTracerProvider({
         httpTextFormat: new HttpTraceContext(),
         scopeManager: new NoopScopeManager(),
       });
-      assert.ok(registry instanceof BasicTracerRegistry);
+      assert.ok(provider instanceof BasicTracerProvider);
     });
 
     it('should construct an instance with logger', () => {
-      const registry = new BasicTracerRegistry({
+      const provider = new BasicTracerProvider({
         logger: new NoopLogger(),
         scopeManager: new NoopScopeManager(),
       });
-      assert.ok(registry instanceof BasicTracerRegistry);
+      assert.ok(provider instanceof BasicTracerProvider);
     });
 
     it('should construct an instance with sampler', () => {
-      const registry = new BasicTracerRegistry({
+      const provider = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
         sampler: ALWAYS_SAMPLER,
       });
-      assert.ok(registry instanceof BasicTracerRegistry);
+      assert.ok(provider instanceof BasicTracerProvider);
     });
 
     it('should construct an instance with default trace params', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getActiveTraceParams(), {
@@ -78,7 +78,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should construct an instance with customized numberOfAttributesPerSpan trace params', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
         traceParams: {
           numberOfAttributesPerSpan: 100,
@@ -92,7 +92,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should construct an instance with customized numberOfEventsPerSpan trace params', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
         traceParams: {
           numberOfEventsPerSpan: 300,
@@ -106,7 +106,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should construct an instance with customized numberOfLinksPerSpan trace params', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
         traceParams: {
           numberOfLinksPerSpan: 10,
@@ -120,26 +120,26 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should construct an instance with default attributes', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         defaultAttributes: {
           region: 'eu-west',
           asg: 'my-asg',
         },
       });
-      assert.ok(tracer instanceof BasicTracerRegistry);
+      assert.ok(tracer instanceof BasicTracerProvider);
     });
   });
 
   describe('.startSpan()', () => {
     it('should start a span with name only', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span);
       assert.ok(span instanceof Span);
     });
 
     it('should start a span with name and options', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
       assert.ok(span);
       assert.ok(span instanceof Span);
@@ -152,7 +152,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with defaultAttributes and spanoptions->attributes', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         defaultAttributes: { foo: 'bar' },
       }).getTracer('default');
       const span = tracer.startSpan('my-span', {
@@ -163,7 +163,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with defaultAttributes and undefined spanoptions->attributes', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         defaultAttributes: { foo: 'bar' },
       }).getTracer('default');
       const span = tracer.startSpan('my-span', {}) as Span;
@@ -172,7 +172,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with spanoptions->attributes', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
@@ -181,7 +181,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with name and parent spancontext', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const state = new TraceState('a=1,b=2');
       const span = tracer.startSpan('my-span', {
         parent: {
@@ -199,7 +199,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with name and parent span', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const childSpan = tracer.startSpan('child-span', {
         parent: span,
@@ -212,7 +212,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with name and with invalid parent span', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         parent: ('invalid-parent' as unknown) as undefined,
       }) as Span;
@@ -220,7 +220,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should start a span with name and with invalid spancontext', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         parent: { traceId: '0', spanId: '0' },
       });
@@ -233,7 +233,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should return a no recording span when never sampling', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       }).getTracer('default');
@@ -248,7 +248,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should create real span when not sampled but recording events true', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         sampler: NEVER_SAMPLER,
       }).getTracer('default');
       const span = tracer.startSpan('my-span', { isRecording: true });
@@ -258,7 +258,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should not create real span when not sampled and recording events false', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       }).getTracer('default');
@@ -269,7 +269,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should not create real span when not sampled and no recording events configured', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
       }).getTracer('default');
@@ -280,7 +280,7 @@ describe('BasicTracerRegistry', () => {
     });
 
     it('should create real span when sampled and recording events true', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         sampler: ALWAYS_SAMPLER,
         scopeManager: new NoopScopeManager(),
       }).getTracer('default');
@@ -294,7 +294,7 @@ describe('BasicTracerRegistry', () => {
       const defaultAttributes = {
         foo: 'bar',
       };
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: new NoopScopeManager(),
         defaultAttributes,
       }).getTracer('default');
@@ -307,13 +307,13 @@ describe('BasicTracerRegistry', () => {
 
   describe('.getCurrentSpan()', () => {
     it('should return null with NoopScopeManager', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const currentSpan = tracer.getCurrentSpan();
       assert.deepStrictEqual(currentSpan, undefined);
     });
 
     it('should return current span when it exists', () => {
-      const tracer = new BasicTracerRegistry({
+      const tracer = new BasicTracerProvider({
         scopeManager: {
           active: () => 'foo',
         } as ScopeManager,
@@ -324,7 +324,7 @@ describe('BasicTracerRegistry', () => {
 
   describe('.withSpan()', () => {
     it('should run scope with NoopScopeManager scope manager', done => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
@@ -335,7 +335,7 @@ describe('BasicTracerRegistry', () => {
 
   describe('.bind()', () => {
     it('should bind scope with NoopScopeManager scope manager', done => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
         assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
@@ -348,14 +348,14 @@ describe('BasicTracerRegistry', () => {
 
   describe('.getBinaryFormat()', () => {
     it('should get default binary formatter', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
     });
   });
 
   describe('.getHttpTextFormat()', () => {
     it('should get default HTTP text formatter', () => {
-      const tracer = new BasicTracerRegistry().getTracer('default');
+      const tracer = new BasicTracerProvider().getTracer('default');
       assert.ok(tracer.getHttpTextFormat() instanceof HttpTraceContext);
     });
   });

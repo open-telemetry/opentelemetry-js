@@ -150,7 +150,7 @@ export class Meter implements types.Meter {
   /**
    * Provide a pre-computed re-useable LabelSet by
    * converting the unordered labels into a canonicalized
-   * set of lables with an unique identifier, useful for pre-aggregation.
+   * set of labels with an unique identifier, useful for pre-aggregation.
    * @param labels user provided unordered Labels.
    */
   static labels(labels: types.Labels): types.LabelSet {

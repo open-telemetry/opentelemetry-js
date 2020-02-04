@@ -18,14 +18,14 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   Span,
-  BasicTracerRegistry,
+  BasicTracerProvider,
   InMemorySpanExporter,
   BatchSpanProcessor,
 } from '../../src';
 import { NEVER_SAMPLER, ALWAYS_SAMPLER, NoopLogger } from '@opentelemetry/core';
 
 function createSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracerRegistry({
+  const tracer = new BasicTracerProvider({
     sampler: ALWAYS_SAMPLER,
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
@@ -34,7 +34,7 @@ function createSampledSpan(spanName: string): Span {
 }
 
 function createUnSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracerRegistry({
+  const tracer = new BasicTracerProvider({
     sampler: NEVER_SAMPLER,
     logger: new NoopLogger(),
   }).getTracer('default');

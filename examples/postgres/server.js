@@ -19,7 +19,7 @@ app.get('/:cmd', (req, res) => {
   let queryText = `SELECT id, text FROM test WHERE id = ${req.query.id}`;
   if (cmd === 'insert') {
     if (!req.query.text) {
-      res.status(400).send('No text provded');
+      res.status(400).send('No text provided');
       return;
     }
     queryText = {

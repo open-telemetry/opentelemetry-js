@@ -24,7 +24,7 @@ There are known modules that break scope propagation ([some of them are listed t
 
 ### Prior arts
 
-Context propagation is a big subject when talking about tracing in NodeJS, if you want more informations about that here are some resources:
+Context propagation is a big subject when talking about tracing in NodeJS, if you want more information about that here are some resources:
 - https://www.npmjs.com/package/continuation-local-storage (which was the old way of doing context propagation)
 - Datadog's own implementation for their Javascript tracer: [here][dd-js-tracer-scope]
 - OpenTracing implementation: [here][opentracing-scope]

@@ -16,7 +16,7 @@
 
 import { NoopLogger } from '@opentelemetry/core';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { BasicTracerRegistry, Span } from '@opentelemetry/tracing';
+import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -255,7 +255,7 @@ describe('Utility', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracerRegistry({
+          new BasicTracerProvider({
             scopeManager: new NoopScopeManager(),
           }).getTracer('default'),
           'test',
