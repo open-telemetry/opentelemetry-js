@@ -2,7 +2,7 @@
 
 // eslint-disable-next-line import/order
 const tracer = require('./tracer')('example-grpc-capitalize-server');
-const { SpanKind } = require('@opentelemetry/types');
+const { SpanKind } = require('@opentelemetry/api');
 const path = require('path');
 const grpc = require('grpc');
 const protoLoader = require('@grpc/proto-loader');

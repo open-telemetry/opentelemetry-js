@@ -11,16 +11,16 @@ const provider = new WebTracerProvider({
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
-const registryWithZone = new WebTracerRegistry({
+const providerWithZone = new WebTracerProvider({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new DocumentLoad(),
   ],
 });
-registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-registryWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
-const tracerWithZone = registryWithZone.getTracer('example-tracer-web');
+const tracerWithZone = providerWithZone.getTracer('example-tracer-web');
 let window;
 console.log('Current span is window', tracerWithZone.getCurrentSpan() === window);
 
