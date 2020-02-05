@@ -1,7 +1,7 @@
 'use strict';
 
-const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const opentelemetry = require('@opentelemetry/api');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
@@ -9,7 +9,7 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 
 module.exports = (serviceName) => {
-  const registry = new NodeTracerRegistry({
+  const provider = new NodeTracerProvider({
     plugins: {
       grpc: {
         enabled: true,
@@ -32,10 +32,10 @@ module.exports = (serviceName) => {
 
   // It is recommended to use this `BatchSpanProcessor` for better performance
   // and optimization, especially in production.
-  registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
-  opentelemetry.initGlobalTracerRegistry(registry);
+  // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
+  opentelemetry.trace.initGlobalTracerProvider(provider);
 
-  return opentelemetry.getTracer();
+  return opentelemetry.trace.getTracer('grpc-dynamic-codegen-example');
 };
