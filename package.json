@@ -49,7 +49,7 @@
     "gts": "^1.1.0",
     "husky": "^3.0.9",
     "lerna": "^3.17.0",
-    "lerna-changelog": "^0.8.2",
+    "lerna-changelog": "^1.0.0",
     "tslint": "^5.0.0",
     "typescript": "^3.7.2"
   },
