@@ -17,7 +17,7 @@
 import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, GaugeMetric } from './Metric';
+import { Metric, CounterMetric, GaugeMetric, MeasureMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -61,8 +61,20 @@ export class Meter implements types.Meter {
       );
       return types.NOOP_MEASURE_METRIC;
     }
-    // @todo: implement this method
-    throw new Error('not implemented yet');
+    const opt: MetricOptions = {
+      // Measures are defined as absolute by default
+      absolute: true,
+      monotonic: false, // not applicable to measure, set to false
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+
+    const measure = new MeasureMetric(name, opt, () => {
+      this._exportOneMetric(name);
+    });
+    this._registerMetric(name, measure);
+    return measure;
   }
 
   /**
@@ -85,6 +97,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Counters are defined as monotonic by default
       monotonic: true,
+      absolute: false, // not applicable to counter, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -117,6 +130,7 @@ export class Meter implements types.Meter {
     const opt: MetricOptions = {
       // Gauges are defined as non-monotonic by default
       monotonic: false,
+      absolute: false, // not applicable for gauges, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,

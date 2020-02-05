@@ -14,7 +14,7 @@
     "fix": "gts fix",
     "precompile": "tsc --version",
     "prepare": "npm run compile",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'"
   },
   "keywords": [
@@ -54,7 +54,7 @@
     "sinon": "^8.0.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
   },
