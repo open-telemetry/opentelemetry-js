@@ -15,7 +15,7 @@
  */
 
 import * as ioredisTypes from 'ioredis';
-import { Tracer, SpanKind, Span, CanonicalCode } from '@opentelemetry/types';
+import { Tracer, SpanKind, Span, CanonicalCode } from '@opentelemetry/api';
 import { IORedisPluginClientTypes, IORedisCommand } from './types';
 import { IORedisPlugin } from './ioredis';
 import { AttributeNames } from './enums';

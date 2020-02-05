@@ -1,27 +1,27 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/core');
-const { BasicTracer, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerRegistry, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CanonicalCode } = require('@opentelemetry/types');
 const { StackdriverTraceExporter } = require('@opentelemetry/exporter-stackdriver-trace');
 
 // Initialize an exporter
 const exporter = new StackdriverTraceExporter({
-  serviceName: 'basic-service',
-  logger: new opentelemetry.ConsoleLogger(),
+  projectId: '<PROJECT_ID>',
 });
 
-const tracer = new BasicTracer();
+const registry = new BasicTracerRegistry();
 
 // Configure span processor to send spans to the provided exporter
-tracer.addSpanProcessor(new SimpleSpanProcessor(exporter));
+registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.initGlobalTracer(tracer);
+// Initialize the OpenTelemetry APIs to use the BasicTracerRegistry bindings
+opentelemetry.initGlobalTracerRegistry(registry);
+const tracer = opentelemetry.getTracer('stackdriver-basic');
 
 // Create a span. A span must be closed.
-const root = opentelemetry.getTracer().startSpan('main');
-const related = opentelemetry.getTracer().startSpan('related', {
+const root = tracer.startSpan('main');
+const related = tracer.startSpan('related', {
   links: [{ spanContext: root.context() }],
 });
 
@@ -42,9 +42,7 @@ exporter.shutdown();
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
   // span, so that'll be the parent span, and this will be a child span.
-  const span = opentelemetry.getTracer().startSpan('doWork', {
-    parent,
-  });
+  const span = tracer.startSpan('doWork', { parent });
 
   // simulate some random work.
   const work = Math.floor(Math.random() * 40000000);

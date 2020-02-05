@@ -19,7 +19,7 @@ import {
   JaegerHttpTraceFormat,
   UBER_TRACE_ID_HEADER,
 } from '../src/JaegerHttpTraceFormat';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 
 describe('JaegerHttpTraceFormat', () => {
   const jaegerHttpTraceFormat = new JaegerHttpTraceFormat();
@@ -83,6 +83,19 @@ describe('JaegerHttpTraceFormat', () => {
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '45fd2a9709dadcf1',
         traceId: '9c41e35aeb6d1272',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
+    it('should extract context of a sampled span from UTF-8 encoded carrier', () => {
+      carrier[UBER_TRACE_ID_HEADER] =
+        'ac1f3dc3c2c0b06e%3A5ac292c4a11a163e%3Ac086aaa825821068%3A1';
+      const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '5ac292c4a11a163e',
+        traceId: 'ac1f3dc3c2c0b06e',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });

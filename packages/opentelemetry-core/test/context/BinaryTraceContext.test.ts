@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { BinaryTraceContext } from '../../src/context/propagation/BinaryTraceContext';
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 
 describe('BinaryTraceContext', () => {
   const binaryTraceContext = new BinaryTraceContext();

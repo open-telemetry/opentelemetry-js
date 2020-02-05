@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -86,7 +86,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
  * @return {SpanContext} - returns a span context represented by the serializedString.
  **/
 function deserializeSpanContext(serializedString: string): SpanContext | null {
-  let headers = serializedString.split(':');
+  const headers = decodeURIComponent(serializedString).split(':');
   if (headers.length !== 4) {
     return null;
   }

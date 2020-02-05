@@ -17,7 +17,7 @@
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { Logger } from '@opentelemetry/types';
+import { Logger } from '@opentelemetry/api';
 import { GoogleAuth } from 'google-auth-library';
 import { google } from 'googleapis';
 import { StackdriverExporterOptions } from './external-types';

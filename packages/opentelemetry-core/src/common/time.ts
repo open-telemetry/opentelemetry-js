@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { otperformance as performance } from '../platform';
 import { TimeOriginLegacy } from './types';
 

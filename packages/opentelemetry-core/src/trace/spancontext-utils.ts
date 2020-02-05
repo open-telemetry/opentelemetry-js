@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanContext, TraceFlags } from '@opentelemetry/types';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 
 export const INVALID_SPANID = '0';
 export const INVALID_TRACEID = '0';

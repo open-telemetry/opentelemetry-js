@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Status, CanonicalCode } from '@opentelemetry/types';
+import { SpanKind, Status, CanonicalCode } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { AttributeNames } from '../../src/enums/AttributeNames';

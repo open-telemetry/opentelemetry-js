@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, Span, SpanKind } from '@opentelemetry/api';
 import * as mysqlTypes from 'mysql';
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums';

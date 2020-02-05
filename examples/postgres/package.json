@@ -39,11 +39,11 @@
     "@opentelemetry/plugin-pg-pool": "^0.3.3",
     "@opentelemetry/tracing": "^0.3.3",
     "@opentelemetry/types": "^0.3.3",
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "pg": "^7.12.1"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {
-    "cross-env": "^6.0.0",
-    "pg": "^7.12.1"
+    "cross-env": "^6.0.0"
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/types';
+import { SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';

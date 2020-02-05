@@ -15,7 +15,7 @@
  */
 
 import * as redisTypes from 'redis';
-import { Tracer, SpanKind, Span, CanonicalCode } from '@opentelemetry/types';
+import { Tracer, SpanKind, Span, CanonicalCode } from '@opentelemetry/api';
 import {
   RedisPluginStreamTypes,
   RedisPluginClientTypes,

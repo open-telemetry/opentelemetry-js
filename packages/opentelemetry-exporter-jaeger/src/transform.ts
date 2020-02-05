@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Link, CanonicalCode, SpanKind } from '@opentelemetry/types';
+import { Link, CanonicalCode, SpanKind } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,

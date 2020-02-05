@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Status } from '@opentelemetry/types';
+import { SpanKind, Status } from '@opentelemetry/api';
 
 // header to prevent instrumentation on request
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
