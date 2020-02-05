@@ -1,15 +1,15 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerRegistry } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 
-const registry = new WebTracerRegistry({
+const provider = new WebTracerProvider({
   plugins: [
     new DocumentLoad(),
   ],
 });
-registry.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 const registryWithZone = new WebTracerRegistry({
   scopeManager: new ZoneScopeManager(),
