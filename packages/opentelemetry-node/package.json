@@ -7,7 +7,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
@@ -53,7 +53,7 @@
     "shimmer": "^1.2.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
   },

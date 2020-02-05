@@ -17,7 +17,7 @@
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "prepare": "npm run compile",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",

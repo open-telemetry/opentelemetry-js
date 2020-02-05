@@ -8,7 +8,7 @@
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",

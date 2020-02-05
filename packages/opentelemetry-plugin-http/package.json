@@ -7,7 +7,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
