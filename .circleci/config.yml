@@ -205,7 +205,7 @@ jobs:
           command: gh-pages --dist packages/opentelemetry-api/docs/out
   node8:
     docker:
-      - image: node:8
+      - image: node:8.5.0
         environment: *node_test_env
       - *postgres_service
       - *mysql_service
