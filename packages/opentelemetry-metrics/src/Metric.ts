@@ -20,6 +20,7 @@ import {
   BoundCounter,
   BoundGauge,
   BaseBoundInstrument,
+  BoundMeasure,
 } from './BoundInstrument';
 import { MetricOptions } from './types';
 import {
@@ -197,5 +198,40 @@ export class GaugeMetric extends Metric<BoundGauge>
    */
   set(value: number, labelSet: types.LabelSet) {
     this.bind(labelSet).set(value);
+  }
+}
+
+export class MeasureMetric extends Metric<BoundMeasure>
+  implements Pick<types.MetricUtils, 'record'> {
+  protected readonly _absolute: boolean;
+
+  constructor(
+    name: string,
+    options: MetricOptions,
+    private readonly _onUpdate: Function
+  ) {
+    super(
+      name,
+      options,
+      options.valueType === types.ValueType.DOUBLE
+        ? MetricDescriptorType.MEASURE_DOUBLE
+        : MetricDescriptorType.MEASURE_INT64
+    );
+
+    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
+  }
+  protected _makeInstrument(labelSet: types.LabelSet): BoundMeasure {
+    return new BoundMeasure(
+      labelSet,
+      this._disabled,
+      this._absolute,
+      this._valueType,
+      this._logger,
+      this._onUpdate
+    );
+  }
+
+  record(value: number, labelSet: types.LabelSet) {
+    this.bind(labelSet).record(value);
   }
 }

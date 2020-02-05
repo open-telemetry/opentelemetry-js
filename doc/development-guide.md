@@ -2,19 +2,17 @@
 
 Before contributing to this open source project, read our [CONTRIBUTING](../CONTRIBUTING.md). We gratefully welcome improvements to documentation as well as to code.
 
-The code base is a monorepo. We use [Lerna](https://lerna.js.org/) for managing inter-module dependencies, which makes it easier to develop coordinated changes between the modules. Instead of running lerna directly, the commands are wrapped with `yarn`;
+The code base is a monorepo. We use [Lerna](https://lerna.js.org/) for managing inter-module dependencies, which makes it easier to develop coordinated changes between the modules. Instead of running lerna directly, the commands are wrapped with `npm`;
 
 ### Requirements
 
 Since this project supports multiple Node versions, using a version
 manager such as [nvm](https://github.com/creationix/nvm) is recommended.
 
-We use [yarn](https://yarnpkg.com/) for its workspace functionality, so make sure to install that as well.
-
-To get started once you have Node and yarn installed, run:
+To get started once you have Node installed, run:
 
 ```sh
-$ yarn
+$ npm install
 ```
 
 This will install all the necessary modules.
@@ -26,13 +24,13 @@ This will install all the necessary modules.
 To run the all unit tests, use:
 
 ```sh
-$ yarn test
+$ npm run test
 ```
 
 To run the unit tests continuously in watch mode while developing, use:
 
 ```sh
-$ yarn tdd
+$ npm run tdd
 ```
 
 ### Linting
@@ -43,12 +41,12 @@ Before raising a pull request, make sure there are no lint problems.
 
 To check the linter, use:
 ```sh
-$ yarn run check
+$ npm run check
 ```
 
 To fix the linter, use:
 ```sh
-$ yarn fix
+$ npm run fix
 ```
 
 ### Continuous Integration
@@ -74,7 +72,7 @@ We use [typedoc](https://www.npmjs.com/package/typedoc) to generate the api docu
 
 To generate the docs, use:
 ```sh
-$ yarn docs
+$ npm run docs
 ```
 
 The document will be available under `packages/opentelemetry-api/docs/out` path.
