@@ -73,14 +73,14 @@ Create a file named `tracing.js` and add the following code:
 ```javascript
 'use strict';
 
-const opentelemetry = require("@opentelemetry/core");
-const { NodeTracerRegistry } = require("@opentelemetry/node");
+const opentelemetry = require("@opentelemetry/api");
+const { NodeTracerProvider } = require("@opentelemetry/node");
 
-const tracerRegistry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
-opentelemetry.initGlobalTracerRegistry(tracerRegistry);
+opentelemetry.trace.initGlobalTracerProvider(provider);
 ```
 
 If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -109,19 +109,19 @@ After these dependencies are installed, we will need to initialize and register 
 ```javascript
 'use strict';
 
-const opentelemetry = require("@opentelemetry/core");
-const { NodeTracerRegistry } = require("@opentelemetry/node");
-
+const opentelemetry = require("@opentelemetry/api");
+const { LogLevel } = require("@opentelemetry/core");
+const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 
-const tracerRegistry = new NodeTracerRegistry({
-  logLevel: opentelemetry.LogLevel.ERROR
+const provider = new NodeTracerProvider({
+  logLevel: LogLevel.ERROR
 });
 
-opentelemetry.initGlobalTracerRegistry(tracerRegistry);
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
-tracerRegistry.addSpanProcessor(
+provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
       serviceName: "getting-started",
@@ -238,9 +238,9 @@ Create a file named `monitoring.js` and add the following code:
 ```javascript
 'use strict';
 
-const { MeterRegistry } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 
-const meter = new MeterRegistry().getMeter('your-meter-name');
+const meter = new MeterProvider().getMeter('your-meter-name');
 ```
 
 Now, you can require this file from your application code and use the `Meter` to create and manage metrics. The simplest of these metrics is a counter. Let's create and export from our `monitoring.js` file a middleware function that express can use to count all requests by route. Modify the `monitoring.js` file so that it looks like this:
@@ -248,9 +248,9 @@ Now, you can require this file from your application code and use the `Meter` to
 ```javascript
 'use strict';
 
-const { MeterRegistry } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 
-const meter = new MeterRegistry().getMeter('your-meter-name');
+const meter = new MeterProvider().getMeter('your-meter-name');
 
 const requestCount = meter.createCounter("requests", {
   monotonic: true,
@@ -301,10 +301,10 @@ Next, modify your `monitoring.js` file to look like this:
 ```javascript
 "use strict";
 
-const { MeterRegistry } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
-const meter = new MeterRegistry().getMeter('your-meter-name');
+const meter = new MeterProvider().getMeter('your-meter-name');
 
 meter.addExporter(
   new PrometheusExporter(
