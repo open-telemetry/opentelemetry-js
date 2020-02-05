@@ -2,12 +2,11 @@
   "lerna": "3.13.4",
   "npmClient": "npm",
   "packages": [
-    "examples/tracer-web",
     "benchmark/*",
     "packages/*",
     "packages/opentelemetry-plugin-postgres/*"
   ],
-  "version": "0.3.3",
+  "version": "0.4.0",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
