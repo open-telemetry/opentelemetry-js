@@ -21,6 +21,7 @@ import {
   CounterMetric,
   GaugeMetric,
   MetricDescriptorType,
+  MeasureMetric,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
@@ -359,6 +360,39 @@ describe('Meter', () => {
   });
 
   describe('#measure', () => {
+    it('should create a measure', () => {
+      const measure = meter.createMeasure('name') as MeasureMetric;
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should create a measure with options', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should be absolute by default', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      assert.strictEqual((measure as MeasureMetric)['_absolute'], true);
+    });
+
+    it('should be able to set absolute to false', () => {
+      const measure = meter.createMeasure('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        absolute: false,
+      });
+      assert.strictEqual((measure as MeasureMetric)['_absolute'], false);
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const gauge = meter.createMeasure('');
@@ -375,6 +409,72 @@ describe('Meter', () => {
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const gauge = meter.createMeasure('name with invalid characters^&*(');
         assert.ok(gauge instanceof types.NoopMetric);
+      });
+    });
+
+    describe('.bind()', () => {
+      it('should create a measure instrument', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const boundMeasure = measure.bind(labelSet);
+        assert.doesNotThrow(() => boundMeasure.record(10));
+      });
+
+      it('should return the timeseries', () => {
+        // @todo: implement once record is implemented
+      });
+
+      it('should not accept negative values by default', () => {
+        // @todo: implement once record is implemented
+      });
+
+      it('should not set the instrument data when disabled', () => {
+        const measure = meter.createMeasure('name', {
+          disabled: true,
+        }) as MeasureMetric;
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(10);
+        assert.strictEqual(boundMeasure['_data'], 0);
+      });
+
+      it('should accept negative (and positive) values when monotonic is set to false', () => {
+        // @todo: implement once record is implemented
+      });
+
+      it('should return same instrument on same label values', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const boundMeasure1 = measure.bind(labelSet);
+        boundMeasure1.record(10);
+        const boundMeasure2 = measure.bind(labelSet);
+        boundMeasure2.record(100);
+        // @todo: re-add once record is implemented
+        // assert.strictEqual(boundMeasure1['_data'], 100);
+        assert.strictEqual(boundMeasure1, boundMeasure2);
+      });
+    });
+
+    describe('.unbind()', () => {
+      it('should remove the measure instrument', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        const boundMeasure = measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
+        measure.unbind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 0);
+        const boundMeasure2 = measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
+        assert.notStrictEqual(boundMeasure, boundMeasure2);
+      });
+
+      it('should not fail when removing non existing instrument', () => {
+        const measure = meter.createMeasure('name');
+        measure.unbind(new LabelSet('nonexistant', {}));
+      });
+
+      it('should clear all instruments', () => {
+        const measure = meter.createMeasure('name') as MeasureMetric;
+        measure.bind(labelSet);
+        assert.strictEqual(measure['_instruments'].size, 1);
+        measure.clear();
+        assert.strictEqual(measure['_instruments'].size, 0);
       });
     });
   });
