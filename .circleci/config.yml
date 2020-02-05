@@ -18,6 +18,7 @@ node_test_env: &node_test_env
   MYSQL_PASSWORD: secret
   MYSQL_DATABASE: circle_database
   MYSQL_PORT: 3306
+  NPM_CONFIG_UNSAFE_PERM: true
 
 postgres_service: &postgres_service
   image: circleci/postgres:9.6-alpine
@@ -39,10 +40,10 @@ mysql_service: &mysql_service
     MYSQL_ROOT_PASSWORD: rootpw
 
 cache_1: &cache_1
-  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
   paths:
     - ./node_modules
-    - ./yarn.lock
+    - ./package-lock.json
     - packages/opentelemetry-base/node_modules
     - packages/opentelemetry-scope-base/node_modules
     - packages/opentelemetry-api/node_modules
@@ -59,7 +60,7 @@ cache_1: &cache_1
     - packages/opentelemetry-plugin-dns/node_modules
 
 cache_2: &cache_2
-  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
+  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
   paths:
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
@@ -76,6 +77,7 @@ cache_2: &cache_2
     - packages/opentelemetry-exporter-stackdriver-trace/node_modules
 
 node_unit_tests: &node_unit_tests
+  resource_class: large
   steps:
     - checkout
     - run:
@@ -93,28 +95,29 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-2
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
     - run:
-        name: Install Dependencies
-        command: yarn install
+        name: Install Root Dependencies
+        command: npm install --ignore-scripts
+    - run:
+        name: Boostrap dependencies
+        command: npx lerna bootstrap --no-ci
     - save_cache:
         <<: *cache_1
     - save_cache:
         <<: *cache_2
     - run:
-        name: Compile code
-        command: yarn compile
-    - run:
         name: Unit tests
-        command: yarn test
+        command: npm run test
     - run:
         name: report coverage
-        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then yarn codecov; fi
+        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run codecov; fi
 
 browsers_unit_tests: &browsers_unit_tests
+  resource_class: large
   steps:
     - checkout
     - run:
@@ -132,23 +135,26 @@ browsers_unit_tests: &browsers_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-1
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
     - run:
-        name: Install Dependencies
-        command: yarn install
+        name: Install Root Dependencies
+        command: npm install --ignore-scripts
+    - run:
+        name: Boostrap dependencies
+        command: npx lerna bootstrap --no-ci
     - save_cache:
         <<: *cache_1
     - save_cache:
         <<: *cache_2
     - run:
         name: Unit tests
-        command: yarn test:browser
+        command: npm run test:browser
     - run:
         name: report coverage
-        command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then yarn codecov:browser; fi
+        command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then npm run codecov:browser; fi
 
 jobs:
   lint_&_docs:
@@ -158,16 +164,16 @@ jobs:
       - checkout
       - run:
           name: Install minimal doc and lint modules globally
-          command: yarn global add lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
+          command: npm i -g tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
       - run:
           name: Symlink global modules into all lerna packages
-          command: lerna exec 'ln -s $(yarn global dir)/node_modules node_modules'
+          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
-          command: yarn run check
+          command: npm run check
       - run:
           name: Docs tests
-          command: yarn docs-test
+          command: npm run docs-test
       - persist_to_workspace:
           root: packages/opentelemetry-api/docs
           paths:
