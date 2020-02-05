@@ -57,20 +57,20 @@ Please also see [GitHub workflow](https://github.com/open-telemetry/community/bl
 
 The `opentelemetry-js` project is written in TypeScript.
 
-- `yarn install` or `npm install` to install dependencies.
-- `yarn compile` or `npm run compile` compiles the code, checking for type errors.
-- `yarn bootstrap` or `npm run bootstrap` Bootstrap the packages in the current Lerna repo. Installs all of their dependencies and links any cross-dependencies.
-- `yarn test` or `npm test` tests code the same way that our CI will test it.
-- `yarn fix` or `npm run fix` lint (and maybe fix) any changes.
+- `npm install` to install dependencies.
+- `npm run compile` compiles the code, checking for type errors.
+- `npm run bootstrap` Bootstrap the packages in the current Lerna repo. Installs all of their dependencies and links any cross-dependencies.
+- `npm test` tests code the same way that our CI will test it.
+- `npm run fix` lint (and maybe fix) any changes.
 
 
 ### Generating API documentation
-- `yarn docs` or `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-api/docs/out`
+- `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-api/docs/out`
 
 ### Generating CHANGELOG documentation
-- `yarn changelog` or `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
+- `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
 
 ### Benchmarks
 When two or more approaches must be compared, please write a benchmark in the benchmark/index.js module so that we can keep track of the most efficient algorithm.
 
-- `yarn bench` or `npm run bench` to run your benchmark.
+- `npm run bench` to run your benchmark.
