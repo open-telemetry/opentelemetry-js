@@ -1,7 +1,7 @@
 {
-  "name": "@opentelemetry/web",
+  "name": "@opentelemetry/plugin-user-interaction",
   "version": "0.3.3",
-  "description": "OpenTelemetry Web Tracer",
+  "description": "OpenTelemetry UserInteraction automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -43,12 +43,16 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@opentelemetry/scope-zone": "^0.3.3",
+    "@opentelemetry/plugin-xml-http-request": "^0.3.3",
+    "@opentelemetry/scope-zone-peer-dep": "^0.3.3",
+    "@opentelemetry/tracing": "^0.3.3",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@types/shimmer": "^1.0.1",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
+    "@types/zone.js": "^0.5.12",
     "babel-loader": "^8.0.6",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
@@ -69,15 +73,19 @@
     "ts-node": "^8.6.2",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.7.2",
+    "typescript": "3.6.4",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
     "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/scope-base": "^0.3.3",
-    "@opentelemetry/tracing": "^0.3.3",
-    "@opentelemetry/api": "^0.3.3"
-  }
+    "@opentelemetry/types": "^0.3.3",
+    "@opentelemetry/web": "^0.3.3",
+    "shimmer": "^1.2.1"
+  },
+  "peerDependencies": {
+    "zone.js": "^0.10.2"
+  },
+  "sideEffects": false
 }

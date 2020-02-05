@@ -24,7 +24,12 @@ import { HrTime } from '@opentelemetry/api';
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { addSpanNetworkEvent, getResource, PerformanceEntries } from '../src';
+import {
+  addSpanNetworkEvent,
+  getElementXPath,
+  getResource,
+  PerformanceEntries,
+} from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
 const SECOND_TO_NANOSECONDS = 1e9;
@@ -38,6 +43,45 @@ function createHrTime(startTime: HrTime, addToStart: number): HrTime {
   }
   return [seconds, nanos];
 }
+const fixture = `
+<div>
+  <div></div>
+  <div></div>
+  <div></div>
+  <div>
+    <div></div>
+    <div>
+    </div>
+    <div id="text">lorep ipsum</div>
+    <div></div>
+    <div class="btn2">
+      foo
+      <button></button>
+      <button></button>
+      <button id="btn22"></button>
+      <button></button>
+      bar
+    </div>
+    <div>
+      aaaaaaaaa
+      <![CDATA[ /*Some code with < & and what not */ ]]>
+      <button id="btn23"></button>
+      bbb
+    </div>
+    <div></div>
+    <div id="comment"></div>
+    <div></div>
+    <div id="cdata">
+      <![CDATA[ /*Some code with < & and what not */ ]]>
+      <![CDATA[ /*Some code with < & and what not */ ]]>
+      <![CDATA[ /*Some code with < & and what not */ ]]>
+      bar
+    </div>
+    <div></div>
+  </div>
+  <div></div>
+</div>
+`;
 
 function createResource(
   resource = {},
@@ -383,4 +427,95 @@ describe('utils', () => {
       });
     });
   });
+  describe('getElementXPath', () => {
+    let $fixture: any;
+    let child: any;
+    before(() => {
+      $fixture = $(fixture);
+      const body = document.querySelector('body');
+      if (body) {
+        body.appendChild($fixture[0]);
+        child = body.lastChild;
+      }
+    });
+    after(() => {
+      child.parentNode.removeChild(child);
+    });
+
+    it('should return correct path for element with id and optimise = true', () => {
+      const element = getElementXPath($fixture.find('#btn22')[0], true);
+      assert.strictEqual(element, '//*[@id="btn22"]');
+      assert.strictEqual(
+        $fixture.find('#btn22')[0],
+        getElementByXpath(element)
+      );
+    });
+
+    it(
+      'should return correct path for element with id and surrounded by the' +
+        ' same type',
+      () => {
+        const element = getElementXPath($fixture.find('#btn22')[0]);
+        assert.strictEqual(element, '//html/body/div/div[4]/div[5]/button[3]');
+        assert.strictEqual(
+          $fixture.find('#btn22')[0],
+          getElementByXpath(element)
+        );
+      }
+    );
+
+    it(
+      'should return correct path for element with id and and surrounded by' +
+        ' text nodes mixed with cnode',
+      () => {
+        const element = getElementXPath($fixture.find('#btn23')[0]);
+        assert.strictEqual(element, '//html/body/div/div[4]/div[6]/button');
+        assert.strictEqual(
+          $fixture.find('#btn23')[0],
+          getElementByXpath(element)
+        );
+      }
+    );
+
+    it(
+      'should return correct path for text node element surrounded by cdata' +
+        ' nodes',
+      () => {
+        const text = $fixture.find('#cdata')[0];
+        const textNode = document.createTextNode('foobar');
+        text.appendChild(textNode);
+        const element = getElementXPath(textNode);
+        assert.strictEqual(element, '//html/body/div/div[4]/div[10]/text()[5]');
+        assert.strictEqual(textNode, getElementByXpath(element));
+      }
+    );
+
+    it('should return correct path when element is text node', () => {
+      const text = $fixture.find('#text')[0];
+      const textNode = document.createTextNode('foobar');
+      text.appendChild(textNode);
+      const element = getElementXPath(textNode);
+      assert.strictEqual(element, '//html/body/div/div[4]/div[3]/text()[2]');
+      assert.strictEqual(textNode, getElementByXpath(element));
+    });
+
+    it('should return correct path when element is comment node', () => {
+      const comment = $fixture.find('#comment')[0];
+      const node = document.createComment('foobar');
+      comment.appendChild(node);
+      const element = getElementXPath(node);
+      assert.strictEqual(element, '//html/body/div/div[4]/div[8]/comment()');
+      assert.strictEqual(node, getElementByXpath(element));
+    });
+  });
 });
+
+function getElementByXpath(path: string) {
+  return document.evaluate(
+    path,
+    document,
+    null,
+    XPathResult.FIRST_ORDERED_NODE_TYPE,
+    null
+  ).singleNodeValue;
+}
