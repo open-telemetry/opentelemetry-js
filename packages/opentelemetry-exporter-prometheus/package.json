@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-prometheus",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTelemetry Exporter Prometheus provides a metrics endpoint for Prometheus",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -53,10 +53,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.3",
-    "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/metrics": "^0.3.3",
-    "@opentelemetry/api": "^0.3.3",
+    "@opentelemetry/api": "^0.4.0",
+    "@opentelemetry/base": "^0.4.0",
+    "@opentelemetry/core": "^0.4.0",
+    "@opentelemetry/metrics": "^0.4.0",
     "prom-client": "^11.5.3"
   }
 }
