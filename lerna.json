@@ -2,6 +2,7 @@
   "lerna": "3.13.4",
   "npmClient": "npm",
   "packages": [
+    "examples/tracer-web",
     "benchmark/*",
     "packages/*",
     "packages/opentelemetry-plugin-postgres/*"

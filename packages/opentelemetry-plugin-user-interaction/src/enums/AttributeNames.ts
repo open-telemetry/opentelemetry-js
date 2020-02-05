@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-const karmaWebpackConfig = require('../../karma.webpack');
-const karmaBaseConfig = require('../../karma.base');
-
-module.exports = (config) => {
-  config.set(Object.assign({}, karmaBaseConfig, {
-    frameworks: karmaBaseConfig.frameworks.concat(['jquery-1.8.3']),
-    webpack: karmaWebpackConfig
-  }))
-};
+export enum AttributeNames {
+  COMPONENT = 'component',
+  EVENT_TYPE = 'event_type',
+  TARGET_ELEMENT = 'target_element',
+  TARGET_XPATH = 'target_xpath',
+  HTTP_URL = 'http.url',
+  // NOT ON OFFICIAL SPEC
+  HTTP_USER_AGENT = 'http.user_agent',
+}
