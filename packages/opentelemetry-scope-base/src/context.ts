@@ -32,9 +32,8 @@ export class Context {
    *
    * @param context a context from which to inherit values
    */
-  protected constructor(context: Context | Store = {}) {
-    const storage = context instanceof Context ? context._context : context;
-    this._context = Object.assign(Object.create(null), storage);
+  protected constructor(parentContext: Store = {}) {
+    this._context = Object.assign(Object.create(null), parentContext);
   }
 
   /**
@@ -54,10 +53,9 @@ export class Context {
    * @param value value to set for the given key
    */
   setValue(key: string, value: unknown): Context {
-    return new Context({
-      ...this._context,
-      [key]: value,
-    });
+    const context = new Context(this._context);
+    context._context[key] = value;
+    return context
   }
 
   /**
@@ -67,7 +65,7 @@ export class Context {
    * @param key context key for which to clear a value
    */
   deleteValue(key: string): Context {
-    const context = new Context(this);
+    const context = new Context(this._context);
     delete context._context[key];
     return context;
   }
