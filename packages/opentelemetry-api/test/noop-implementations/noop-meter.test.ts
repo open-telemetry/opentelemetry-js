@@ -23,9 +23,8 @@ import {
   NOOP_BOUND_MEASURE,
   NOOP_COUNTER_METRIC,
   NOOP_GAUGE_METRIC,
-  NOOP_MEASURE_METRIC
+  NOOP_MEASURE_METRIC,
 } from '../../src';
-
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
@@ -50,13 +49,10 @@ describe('NoopMeter', () => {
 
     const measure = meter.createMeasure('some-name');
     measure.getDefaultBound().record(1);
-    measure.getDefaultBound().record(
-      1,
-      {
-        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-        spanId: '5e0c63257de34c92',
-      }
-    );
+    measure.getDefaultBound().record(1, {
+      traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+      spanId: '5e0c63257de34c92',
+    });
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);

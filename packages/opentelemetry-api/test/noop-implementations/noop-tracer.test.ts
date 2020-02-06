@@ -41,7 +41,10 @@ describe('NoopTracer', () => {
     assert.ok(httpTextFormat);
 
     httpTextFormat.inject(Context.ROOT_CONTEXT, {});
-    assert.deepStrictEqual(httpTextFormat.extract(Context.ROOT_CONTEXT, {}), Context.ROOT_CONTEXT);
+    assert.deepStrictEqual(
+      httpTextFormat.extract(Context.ROOT_CONTEXT, {}),
+      Context.ROOT_CONTEXT
+    );
 
     const binaryFormat = tracer.getBinaryFormat();
     assert.ok(binaryFormat);
