@@ -164,10 +164,10 @@ jobs:
       - checkout
       - run:
           name: Install minimal doc and lint modules globally
-          command: npm i -g tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib @types/mocha
+          command: npm i -g tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
       - run:
           name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib @types/mocha'
+          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
           command: npm run check
