@@ -15,7 +15,6 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { Carrier } from '@opentelemetry/api';
 import { Context, NoopLogger } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 
@@ -121,7 +120,7 @@ export class TracerShim extends opentracing.Tracer {
   _inject(
     spanContext: opentracing.SpanContext,
     format: string,
-    carrier: Carrier
+    carrier: unknown
   ): void {
     const opentelemSpanContext: types.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     if (!carrier || typeof carrier !== 'object') return;
@@ -149,7 +148,7 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  _extract(format: string, carrier: Carrier): opentracing.SpanContext | null {
+  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     switch (format) {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
