@@ -1,25 +1,28 @@
-const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+'use strict';
+
+const opentelemetry = require('@opentelemetry/api');
+const { LogLevel } = require('@opentelemetry/core');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/tracing');
 const { CollectorExporter } = require('@opentelemetry/exporter-collector');
 
-const registry = new NodeTracerRegistry({
-  logLevel: opentelemetry.LogLevel.DEBUG,
+const provider = new NodeTracerProvider({
+  logLevel: LogLevel.DEBUG,
   plugins: {
     winston: {
       enabled: true,
-      path: '@opentelemetry/plugin-winston'
-    }
-  }
+      path: '@opentelemetry/plugin-winston',
+    },
+  },
 });
 
-const exporter = new CollectorExporter({serviceName: 'basic-service'});
-registry.addSpanProcessor(new SimpleSpanProcessor(exporter));
+const exporter = new CollectorExporter({ serviceName: 'basic-service' });
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-registry.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-opentelemetry.initGlobalTracerRegistry(registry);
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+opentelemetry.trace.initGlobalTracerProvider(provider);
 
-const tracer = opentelemetry.getTracer('example-winston');
+const tracer = provider.getTracer('example-winston');
 
 const winston = require('winston');
 

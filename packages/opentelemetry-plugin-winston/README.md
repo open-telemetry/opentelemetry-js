@@ -18,10 +18,10 @@ npm install --save @opentelemetry/plugin-winston
 
 ```js
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/tracing');
 
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     winston: {
       enabled: true,
@@ -30,8 +30,8 @@ const registry = new NodeTracerRegistry({
   }
 });
 
-registry.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-opentelemetry.initGlobalTracerRegistry(registry);
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+opentelemetry.initGlobalTracerProvider(provider);
 
 const tracer = opentelemetry.getTracer('example-winston');
 
@@ -59,10 +59,10 @@ span.end();
 ```js
 
 const opentelemetry = require('@opentelemetry/core');
-const { NodeTracerRegistry } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 const { SimpleSpanProcessor, ConsoleSpanExporter } = require('@opentelemetry/tracing');
 
-const registry = new NodeTracerRegistry({
+const provider = new NodeTracerProvider({
   plugins: {
     winston: {
       enabled: true,
@@ -71,8 +71,8 @@ const registry = new NodeTracerRegistry({
   }
 });
 
-registry.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-opentelemetry.initGlobalTracerRegistry(registry);
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+opentelemetry.initGlobalTracerRegistry(provider);
 
 const tracer = opentelemetry.getTracer('example-winston');
 

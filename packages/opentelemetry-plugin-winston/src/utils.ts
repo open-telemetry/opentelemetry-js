@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-import { SpanContext } from '@opentelemetry/types';
+import { Span, SpanContext } from '@opentelemetry/api';
 import { TRACE_PARAM_NAME, WinstonChunk } from './types';
-import * as types from '@opentelemetry/types';
 
 /**
  * Get trace information from span
  * @param span
  */
-function getTraceInformation(span: types.Span): SpanContext {
+function getTraceInformation(span: Span): SpanContext {
   const traceInformation = {
     traceId: span.context().traceId,
     spanId: span.context().spanId,
@@ -35,10 +34,7 @@ function getTraceInformation(span: types.Span): SpanContext {
  * @param chunk
  * @param span
  */
-export function addTraceToChunk(
-  chunk: WinstonChunk,
-  span: types.Span
-): WinstonChunk {
+export function addTraceToChunk(chunk: WinstonChunk, span: Span): WinstonChunk {
   const newChunk: WinstonChunk = Object.assign({}, chunk);
   if (!newChunk[TRACE_PARAM_NAME]) {
     newChunk[TRACE_PARAM_NAME] = getTraceInformation(span);
@@ -51,7 +47,7 @@ export function addTraceToChunk(
  * @param args
  * @param span
  */
-export function processArgs(args: any[], span: types.Span): any[] {
+export function processArgs(args: any[], span: Span): any[] {
   for (let i = args.length - 1; i >= 0; i--) {
     if (typeof args[i] === 'object') {
       args[i] = addTraceToChunk(args[i], span);

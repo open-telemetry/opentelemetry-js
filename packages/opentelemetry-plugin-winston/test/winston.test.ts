@@ -20,7 +20,7 @@ import {
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import * as sinon from 'sinon';
 import * as winston from 'winston';
 import { WinstonPlugin } from '../src';
@@ -28,9 +28,9 @@ import { TRACE_PARAM_NAME } from '../src/types';
 
 const memoryExporter = new InMemorySpanExporter();
 const logger = new NoopLogger();
-const registry = new NodeTracerRegistry({ logger });
-const tracer = registry.getTracer('default');
-registry.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+const provider = new NodeTracerProvider({ logger });
+const tracer = provider.getTracer('default');
+provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
 
 describe('WinstonPlugin', () => {
   let plugin: WinstonPlugin;
@@ -40,7 +40,7 @@ describe('WinstonPlugin', () => {
   beforeEach(() => {
     sandbox = sinon.createSandbox();
     plugin = new WinstonPlugin('winston', '1.2.3');
-    enableReturned = plugin.enable(winston, registry, tracer.logger);
+    enableReturned = plugin.enable(winston, provider, tracer.logger);
   });
 
   afterEach(() => {
@@ -63,7 +63,7 @@ describe('WinstonPlugin', () => {
       assert.strictEqual(winston.createLogger.__wrapped, true);
     });
 
-    it('log should contains trace information', () => {
+    it('log should contain trace information', () => {
       const winstonConsole = new winston.transports.Console();
       const spy = sinon.spy(winstonConsole, 'log');
       const loggerOptions = {
@@ -103,14 +103,14 @@ describe('WinstonPlugin', () => {
           version: '2.0.0',
           Logger: DummyLogger,
         };
-        enableReturned = oldPlugin.enable(oldWinston, registry, tracer.logger);
+        enableReturned = oldPlugin.enable(oldWinston, provider, tracer.logger);
       });
 
       it('should patch log function', () => {
         assert.strictEqual(oldWinston.Logger.prototype.log.__wrapped, true);
       });
 
-      it('log should contains trace information', () => {
+      it('log should contain trace information', () => {
         const logger = new oldWinston.Logger();
         const span = tracer.startSpan('test');
         tracer.withSpan(span, () => {
@@ -131,7 +131,8 @@ describe('WinstonPlugin', () => {
   });
 
   describe('unpatch()', () => {
-    it('log should not contains trace information', () => {
+    it('log should not contain trace information', () => {
+      plugin.enable(winston, provider, tracer.logger);
       const winstonConsole = new winston.transports.Console();
       const spy = sinon.spy(winstonConsole, 'log');
 

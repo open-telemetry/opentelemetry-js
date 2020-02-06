@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 
-import * as types from '@opentelemetry/types';
+import { Span } from '@opentelemetry/api';
 import * as sinon from 'sinon';
 import { TRACE_PARAM_NAME, WinstonChunk } from '../src/types';
 import * as utils from '../src/utils';
@@ -27,7 +27,7 @@ describe('utils', () => {
       const chunk: WinstonChunk = {
         foo: 'bar',
       };
-      const span: types.Span = createTestSpan();
+      const span: Span = createTestSpan();
       const newChunk: WinstonChunk = utils.addTraceToChunk(chunk, span);
       assert.deepStrictEqual(newChunk, {
         foo: 'bar',
@@ -41,7 +41,7 @@ describe('utils', () => {
   describe('processArgs', () => {
     it('should add trace when there are no extra params', () => {
       const args: any[] = [];
-      const span: types.Span = createTestSpan();
+      const span: Span = createTestSpan();
       const processedArgs = utils.processArgs(args, span);
       assert.deepStrictEqual(processedArgs, [
         {
@@ -55,7 +55,7 @@ describe('utils', () => {
     it('should add trace when there are no extra params and callback exists', () => {
       const callback = function() {};
       const args: any[] = [callback];
-      const span: types.Span = createTestSpan();
+      const span: Span = createTestSpan();
       const processedArgs = utils.processArgs(args, span);
       assert.deepStrictEqual(processedArgs, [
         {
@@ -69,7 +69,7 @@ describe('utils', () => {
     });
     it('should add trace when there are already extra params', () => {
       const args: any[] = ['foo', { foo1: 'bar' }];
-      const span: types.Span = createTestSpan();
+      const span: Span = createTestSpan();
       const processedArgs = utils.processArgs(args, span);
       assert.deepStrictEqual(processedArgs, [
         'foo',
@@ -88,7 +88,7 @@ describe('utils', () => {
       () => {
         const callback = function() {};
         const args: any[] = ['foo', { foo1: 'bar' }, callback];
-        const span: types.Span = createTestSpan();
+        const span: Span = createTestSpan();
         const processedArgs = utils.processArgs(args, span);
         assert.deepStrictEqual(processedArgs, [
           'foo',
@@ -107,7 +107,7 @@ describe('utils', () => {
 });
 
 function createTestSpan() {
-  const span: types.Span = {
+  const span: Span = {
     context: function() {
       return {
         traceId: '1',
