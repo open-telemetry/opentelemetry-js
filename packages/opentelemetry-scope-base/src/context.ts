@@ -55,7 +55,7 @@ export class Context {
   setValue(key: string, value: unknown): Context {
     const context = new Context(this._context);
     context._context[key] = value;
-    return context
+    return context;
   }
 
   /**
