@@ -73,7 +73,7 @@ For that please make sure you have [docker](https://docs.docker.com/) installed
    ```
 
 #### Collector Exporter - Zipkin UI
-The [opentelemetry-collector][opentelemetry-collector-url] 
+The [opentelemetry-collector][opentelemetry-collector-url]
 docker container is using [Zipkin Exporter](#zipkin).
 You can define more exporters without changing the instrumented code.
 To use default [Zipkin Exporter](#zipkin) please follow the section [Zipkin UI](#zipkin-ui) only
