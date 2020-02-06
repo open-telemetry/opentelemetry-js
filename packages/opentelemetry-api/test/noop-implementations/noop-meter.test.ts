@@ -50,10 +50,8 @@ describe('NoopMeter', () => {
 
     const measure = meter.createMeasure('some-name');
     measure.getDefaultBound().record(1);
-    measure.getDefaultBound().record(1, { key: { value: 'value' } });
     measure.getDefaultBound().record(
       1,
-      { key: { value: 'value' } },
       {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
