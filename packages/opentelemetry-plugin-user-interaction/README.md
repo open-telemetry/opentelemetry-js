@@ -6,7 +6,7 @@
 [![Apache License][license-image]][license-image]
 
 This module provides auto instrumentation of user interaction for web.
-This module can work either with [zone-js] or without it. 
+This module can work either with [zone-js] or without it.
 With [zone-js] and ZoneScopeManager it will fully support the async operations.
 If you use Angular you already have the [zone-js]. It will be the same if you use [@opentelemetry/scope-zone].
 Without [zone-js] it will still work but with limited support.
@@ -99,6 +99,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-plugin-user-interaction
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-plugin-user-interaction&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-user-interaction
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%plugin-user-interaction.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-user-interaction.svg
 [zone-js]: https://www.npmjs.com/package/zone.js
 [@opentelemetry/scope-zone]: https://www.npmjs.com/package/@opentelemetry/scope-zone
