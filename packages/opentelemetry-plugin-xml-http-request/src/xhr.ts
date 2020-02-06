@@ -16,6 +16,7 @@
 
 import {
   BasePlugin,
+  Context,
   hrTime,
   isUrlIgnored,
   isWrapped,
@@ -32,7 +33,6 @@ import {
 import * as shimmer from 'shimmer';
 import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
-import { Format } from './enums/Format';
 import {
   OpenFunction,
   PropagateTraceHeaderCorsUrls,
@@ -90,7 +90,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const headers: { [key: string]: unknown } = {};
     this._tracer
       .getHttpTextFormat()
-      .inject(span.context(), Format.HTTP, headers);
+      // Using context direclty like this is temporary. In a future PR, context
+      // will be managed by the scope manager (which may be renamed to context manager?)
+      .inject(Context.setActiveSpan(Context.ROOT_CONTEXT, span), headers);
 
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));

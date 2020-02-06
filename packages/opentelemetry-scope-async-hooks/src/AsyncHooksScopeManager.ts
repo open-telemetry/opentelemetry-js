@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { ScopeManager, Context } from '@opentelemetry/scope-base';
 import * as asyncHooks from 'async_hooks';
 import { EventEmitter } from 'events';
 
@@ -39,7 +39,9 @@ const ADD_LISTENER_METHODS = [
 
 export class AsyncHooksScopeManager implements ScopeManager {
   private _asyncHook: asyncHooks.AsyncHook;
-  private _scopes: { [uid: number]: unknown } = Object.create(null);
+  private _scopes: {
+    [uid: number]: Context | undefined | null;
+  } = Object.create(null);
 
   constructor() {
     this._asyncHook = asyncHooks.createHook({
@@ -49,12 +51,12 @@ export class AsyncHooksScopeManager implements ScopeManager {
     });
   }
 
-  active(): unknown {
-    return this._scopes[asyncHooks.executionAsyncId()] || undefined;
+  active(): Context {
+    return this._scopes[asyncHooks.executionAsyncId()] || Context.ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: unknown,
+    scope: Context,
     fn: T
   ): ReturnType<T> {
     const uid = asyncHooks.executionAsyncId();
@@ -73,7 +75,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
     }
   }
 
-  bind<T>(target: T, scope?: unknown): T {
+  bind<T>(target: T, scope: Context): T {
     // if no specific scope to propagate is given, we use the current one
     if (scope === undefined) {
       scope = this.active();
@@ -97,7 +99,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
     return this;
   }
 
-  private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
+  private _bindFunction<T extends Function>(target: T, scope: Context): T {
     const manager = this;
     const contextWrapper = function(this: {}, ...args: unknown[]) {
       return manager.with(scope, () => target.apply(this, args));
@@ -125,7 +127,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
    */
   private _bindEventEmitter<T extends EventEmitter>(
     target: T,
-    scope?: unknown
+    scope: Context
   ): T {
     const ee = (target as unknown) as PatchedEventEmitter;
     if (ee.__ot_listeners !== undefined) return target;
@@ -205,7 +207,7 @@ export class AsyncHooksScopeManager implements ScopeManager {
   private _patchAddListener(
     ee: PatchedEventEmitter,
     original: Function,
-    scope?: unknown
+    scope: Context
   ) {
     const scopeManager = this;
     return function(this: {}, event: string, listener: Func<void>) {

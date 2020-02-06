@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import { StackScopeManager } from '../src';
+import { Context } from '@opentelemetry/core';
 
 describe('StackScopeManager', () => {
   let scopeManager: StackScopeManager;
@@ -33,7 +34,10 @@ describe('StackScopeManager', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
         assert(scopeManager.enable() === scopeManager, 'should return this');
-        assert(scopeManager.active() === window, 'should has root scope');
+        assert(
+          scopeManager.active() === Context.ROOT_CONTEXT,
+          'should has root scope'
+        );
       });
     });
   });
@@ -42,7 +46,10 @@ describe('StackScopeManager', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
         assert(scopeManager.disable() === scopeManager, 'should return this');
-        assert(scopeManager.active() === undefined, 'should has no scope');
+        assert(
+          scopeManager.active() === Context.ROOT_CONTEXT,
+          'should has no scope'
+        );
       });
     });
   });
@@ -53,7 +60,7 @@ describe('StackScopeManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = { a: 1 };
+      const test = Context.ROOT_CONTEXT.setValue('a', 1);
       scopeManager.with(test, () => {
         assert.strictEqual(scopeManager.active(), test, 'should have scope');
         return done();
@@ -78,28 +85,28 @@ describe('StackScopeManager', () => {
     });
 
     it('should finally restore an old scope', done => {
-      const scope1 = 'scope1';
-      const scope2 = 'scope2';
-      const scope3 = 'scope3';
+      const scope1 = Context.ROOT_CONTEXT.setValue('name', 'scope1');
+      const scope2 = Context.ROOT_CONTEXT.setValue('name', 'scope2');
+      const scope3 = Context.ROOT_CONTEXT.setValue('name', 'scope3');
       scopeManager.with(scope1, () => {
-        assert.strictEqual(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), scope1);
         scopeManager.with(scope2, () => {
-          assert.strictEqual(scopeManager.active(), 'scope2');
+          assert.strictEqual(scopeManager.active(), scope2);
           scopeManager.with(scope3, () => {
-            assert.strictEqual(scopeManager.active(), 'scope3');
+            assert.strictEqual(scopeManager.active(), scope3);
           });
-          assert.strictEqual(scopeManager.active(), 'scope2');
+          assert.strictEqual(scopeManager.active(), scope2);
         });
-        assert.strictEqual(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), scope1);
         return done();
       });
       assert.strictEqual(scopeManager.active(), window);
     });
 
     it('should finally restore an old scope when scope is an object', done => {
-      const scope1 = { a: 1 };
-      const scope2 = { a: 2 };
-      const scope3 = { a: 3 };
+      const scope1 = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope2 = Context.ROOT_CONTEXT.setValue('a', 2);
+      const scope3 = Context.ROOT_CONTEXT.setValue('a', 3);
       scopeManager.with(scope1, () => {
         assert.strictEqual(scopeManager.active(), scope1);
         scopeManager.with(scope2, () => {
@@ -126,31 +133,32 @@ describe('StackScopeManager', () => {
         }
 
         getTitle() {
-          return this.title;
+          return (scopeManager.active().getValue('obj') as Obj).title;
         }
       }
 
       const obj1 = new Obj('a1');
+      const ctx = Context.ROOT_CONTEXT.setValue('obj', obj1);
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
-      const wrapper: any = scopeManager.bind(obj2.getTitle, obj1);
+      const wrapper: any = scopeManager.bind(obj2.getTitle, ctx);
       assert.ok(wrapper(), 'a2');
     });
 
     it('should return the same target (when enabled)', () => {
-      const test = { a: 1 };
+      const test = Context.ROOT_CONTEXT.setValue('a', 1);
       assert.deepStrictEqual(scopeManager.bind(test), test);
     });
 
     it('should return the same target (when disabled)', () => {
       scopeManager.disable();
-      const test = { a: 1 };
+      const test = Context.ROOT_CONTEXT.setValue('a', 1);
       assert.deepStrictEqual(scopeManager.bind(test), test);
       scopeManager.enable();
     });
 
     it('should return current scope (when enabled)', done => {
-      const scope = { a: 1 };
+      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
       const fn: any = scopeManager.bind(() => {
         assert.strictEqual(scopeManager.active(), scope, 'should have scope');
         return done();
@@ -160,7 +168,7 @@ describe('StackScopeManager', () => {
 
     it('should return current scope (when disabled)', done => {
       scopeManager.disable();
-      const scope = { a: 1 };
+      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
       const fn: any = scopeManager.bind(() => {
         assert.strictEqual(scopeManager.active(), scope, 'should have scope');
         return done();

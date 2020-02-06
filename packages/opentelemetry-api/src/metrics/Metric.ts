@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
@@ -123,18 +122,7 @@ export interface MetricUtils {
    */
   record(value: number, labelSet: LabelSet): void;
 
-  record(
-    value: number,
-    labelSet: LabelSet,
-    distContext: DistributedContext
-  ): void;
-
-  record(
-    value: number,
-    labelSet: LabelSet,
-    distContext: DistributedContext,
-    spanContext: SpanContext
-  ): void;
+  record(value: number, labelSet: LabelSet, spanContext: SpanContext): void;
 }
 
 /**

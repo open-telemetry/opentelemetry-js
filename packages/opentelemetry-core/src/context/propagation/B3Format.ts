@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
+import { HttpTextFormat, TraceFlags } from '@opentelemetry/api';
+import { Context } from '../context';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
@@ -36,11 +37,10 @@ function isValidSpanId(spanId: string): boolean {
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3Format implements HttpTextFormat {
-  inject(
-    spanContext: SpanContext,
-    format: string,
-    carrier: { [key: string]: unknown }
-  ): void {
+  inject(context: Context, carrier: { [key: string]: unknown }) {
+    const spanContext = Context.getParentSpanContext(context);
+    if (!spanContext) return;
+
     if (
       isValidTraceId(spanContext.traceId) &&
       isValidSpanId(spanContext.spanId)
@@ -56,14 +56,11 @@ export class B3Format implements HttpTextFormat {
     }
   }
 
-  extract(
-    format: string,
-    carrier: { [key: string]: unknown }
-  ): SpanContext | null {
+  extract(context: Context, carrier: { [key: string]: unknown }): Context {
     const traceIdHeader = carrier[X_B3_TRACE_ID];
     const spanIdHeader = carrier[X_B3_SPAN_ID];
     const sampledHeader = carrier[X_B3_SAMPLED];
-    if (!traceIdHeader || !spanIdHeader) return null;
+    if (!traceIdHeader || !spanIdHeader) return context;
     const traceId = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]
       : traceIdHeader;
@@ -73,15 +70,15 @@ export class B3Format implements HttpTextFormat {
       : sampledHeader;
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
-      return {
+      return Context.setExtractedSpanContext(context, {
         traceId,
         spanId,
         isRemote: true,
         traceFlags: isNaN(Number(options))
           ? TraceFlags.UNSAMPLED
           : Number(options),
-      };
+      });
     }
-    return null;
+    return context;
   }
 }

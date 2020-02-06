@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
+import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
+import { Context } from '@opentelemetry/core';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -43,16 +44,10 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  /**
-   * @param {SpanContext} spanContext - context from which we take information to inject in carrier.
-   * @param {string} format - unused.
-   * @param { [key: string]: unknown } carrier - a carrier to which span information will be injected.
-   **/
-  inject(
-    spanContext: SpanContext,
-    format: string,
-    carrier: { [key: string]: unknown }
-  ) {
+  inject(context: Context, carrier: { [key: string]: unknown }) {
+    const spanContext = Context.getParentSpanContext(context);
+    if (!spanContext) return;
+
     const traceFlags = `0${(
       spanContext.traceFlags || TraceFlags.UNSAMPLED
     ).toString(16)}`;
@@ -62,22 +57,17 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
-  /**
-   * @param {string} format - unused.
-   * @param { [key: string]: unknown } carrier - a carrier from which span context will be constructed.
-   * @return {SpanContext} - returns a span context extracted from carrier.
-   **/
-  extract(
-    format: string,
-    carrier: { [key: string]: unknown }
-  ): SpanContext | null {
+  extract(context: Context, carrier: { [key: string]: unknown }): Context {
     const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
-    if (!uberTraceIdHeader) return null;
+    if (!uberTraceIdHeader) return context;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]
       : uberTraceIdHeader;
 
-    return deserializeSpanContext(uberTraceId);
+    const spanContext = deserializeSpanContext(uberTraceId);
+    if (!spanContext) return context;
+
+    return Context.setExtractedSpanContext(context, spanContext);
   }
 }
 

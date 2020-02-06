@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,30 +14,6 @@
  * limitations under the License.
  */
 
-import * as types from './types';
-import { Context } from './context';
-
-export class NoopScopeManager implements types.ScopeManager {
-  active(): Context {
-    return Context.ROOT_CONTEXT;
-  }
-
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: Context,
-    fn: T
-  ): ReturnType<T> {
-    return fn();
-  }
-
-  bind<T>(target: T, scope?: Context): T {
-    return target;
-  }
-
-  enable(): this {
-    return this;
-  }
-
-  disable(): this {
-    return this;
-  }
-}
+export type Carrier = {
+  [key: string]: unknown;
+};

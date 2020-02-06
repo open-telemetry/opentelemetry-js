@@ -18,6 +18,7 @@ import 'zone.js';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { ZoneScopeManager } from '../src';
+import { Context } from '@opentelemetry/scope-base';
 
 let clock: any;
 
@@ -37,18 +38,27 @@ describe('ZoneScopeManager', () => {
 
   describe('.enable()', () => {
     it('should work', () => {
+      const ctx = Context.ROOT_CONTEXT.setValue('a', 1);
       assert.doesNotThrow(() => {
         assert(scopeManager.enable() === scopeManager, 'should return this');
-        assert(scopeManager.active() === window, 'should has root scope');
+        scopeManager.with(ctx, () => {
+          assert(scopeManager.active() === ctx, 'should has root scope');
+        });
       });
     });
   });
 
   describe('.disable()', () => {
     it('should work', () => {
+      const ctx = Context.ROOT_CONTEXT.setValue('a', 1);
       assert.doesNotThrow(() => {
         assert(scopeManager.disable() === scopeManager, 'should return this');
-        assert(scopeManager.active() === undefined, 'should has no scope');
+        scopeManager.with(ctx, () => {
+          assert(
+            scopeManager.active() === Context.ROOT_CONTEXT,
+            'should has root scope'
+          );
+        });
       });
     });
   });
@@ -59,7 +69,7 @@ describe('ZoneScopeManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = { a: 1 };
+      const test = Context.ROOT_CONTEXT.setValue('a', 1);
       scopeManager.with(test, () => {
         assert.strictEqual(scopeManager.active(), test, 'should have scope');
         return done();
@@ -84,22 +94,22 @@ describe('ZoneScopeManager', () => {
     });
 
     it('should finally restore an old scope, including the async task', done => {
-      const scope1 = 'scope1';
-      const scope2 = 'scope2';
-      const scope3 = 'scope3';
+      const scope1 = Context.ROOT_CONTEXT.setValue('scope', 'scope1');
+      const scope2 = Context.ROOT_CONTEXT.setValue('scope', 'scope2');
+      const scope3 = Context.ROOT_CONTEXT.setValue('scope', 'scope3');
 
       scopeManager.with(scope1, () => {
-        assert.strictEqual(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), scope1);
         scopeManager.with(scope2, () => {
-          assert.strictEqual(scopeManager.active(), 'scope2');
+          assert.strictEqual(scopeManager.active(), scope2);
           scopeManager.with(scope3, () => {
-            assert.strictEqual(scopeManager.active(), 'scope3');
+            assert.strictEqual(scopeManager.active(), scope3);
           });
-          assert.strictEqual(scopeManager.active(), 'scope2');
+          assert.strictEqual(scopeManager.active(), scope2);
         });
-        assert.strictEqual(scopeManager.active(), 'scope1');
+        assert.strictEqual(scopeManager.active(), scope1);
         setTimeout(() => {
-          assert.strictEqual(scopeManager.active(), 'scope1');
+          assert.strictEqual(scopeManager.active(), scope1);
           done();
         }, 500);
         clock.tick(500);
@@ -108,9 +118,9 @@ describe('ZoneScopeManager', () => {
     });
 
     it('should finally restore an old scope when scope is an object, including the async task', done => {
-      const scope1 = { a: 1 };
-      const scope2 = { a: 2 };
-      const scope3 = { a: 3 };
+      const scope1 = Context.ROOT_CONTEXT.setValue('x', 1);
+      const scope2 = Context.ROOT_CONTEXT.setValue('x', 2);
+      const scope3 = Context.ROOT_CONTEXT.setValue('x', 3);
       scopeManager.with(scope1, () => {
         assert.strictEqual(scopeManager.active(), scope1);
         scopeManager.with(scope2, () => {
@@ -130,20 +140,29 @@ describe('ZoneScopeManager', () => {
       assert.strictEqual(scopeManager.active(), window);
     });
     it('should correctly return the scopes for 3 parallel actions', () => {
-      const rootSpan = { name: 'rootSpan' };
+      const rootSpan = Context.ROOT_CONTEXT.setValue('name', 'root');
       scopeManager.with(rootSpan, () => {
         assert.ok(
-          scopeManager.active() === rootSpan,
+          scopeManager.active().getValue('name') === 'root',
           'Current span is rootSpan'
         );
-        const concurrentSpan1 = { name: 'concurrentSpan1' };
-        const concurrentSpan2 = { name: 'concurrentSpan2' };
-        const concurrentSpan3 = { name: 'concurrentSpan3' };
+        const concurrentSpan1 = Context.ROOT_CONTEXT.setValue(
+          'span',
+          'concurrentSpan1'
+        );
+        const concurrentSpan2 = Context.ROOT_CONTEXT.setValue(
+          'span',
+          'concurrentSpan2'
+        );
+        const concurrentSpan3 = Context.ROOT_CONTEXT.setValue(
+          'span',
+          'concurrentSpan3'
+        );
 
         scopeManager.with(concurrentSpan1, () => {
           setTimeout(() => {
             assert.ok(
-              scopeManager.active() === concurrentSpan1,
+              scopeManager.active().getValue('span') === concurrentSpan1,
               'Current span is concurrentSpan1'
             );
           }, 10);
@@ -152,7 +171,7 @@ describe('ZoneScopeManager', () => {
         scopeManager.with(concurrentSpan2, () => {
           setTimeout(() => {
             assert.ok(
-              scopeManager.active() === concurrentSpan2,
+              scopeManager.active().getValue('span') === concurrentSpan2,
               'Current span is concurrentSpan2'
             );
           }, 20);
@@ -161,7 +180,7 @@ describe('ZoneScopeManager', () => {
         scopeManager.with(concurrentSpan3, () => {
           setTimeout(() => {
             assert.ok(
-              scopeManager.active() === concurrentSpan3,
+              scopeManager.active().getValue('span') === concurrentSpan3,
               'Current span is concurrentSpan3'
             );
           }, 30);
@@ -180,31 +199,38 @@ describe('ZoneScopeManager', () => {
         }
 
         getTitle() {
-          return this.title;
+          return (scopeManager.active().getValue('obj') as Obj).title;
         }
       }
 
       const obj1 = new Obj('a1');
+      const ctx = Context.ROOT_CONTEXT.setValue('obj', obj1);
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
-      const wrapper: any = scopeManager.bind(obj2.getTitle, obj1);
+      const wrapper: any = scopeManager.bind(obj2.getTitle, ctx);
       assert.ok(wrapper(), 'a2');
     });
 
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };
-      assert.deepStrictEqual(scopeManager.bind(test), test);
+      assert.deepStrictEqual(
+        scopeManager.bind(test, Context.ROOT_CONTEXT),
+        test
+      );
     });
 
     it('should return the same target (when disabled)', () => {
       scopeManager.disable();
       const test = { a: 1 };
-      assert.deepStrictEqual(scopeManager.bind(test), test);
+      assert.deepStrictEqual(
+        scopeManager.bind(test, Context.ROOT_CONTEXT),
+        test
+      );
       scopeManager.enable();
     });
 
     it('should return current scope (when enabled)', done => {
-      const scope = { a: 1 };
+      const scope = Context.ROOT_CONTEXT.setValue('ctx', { a: 1 });
       const fn: any = scopeManager.bind(() => {
         assert.strictEqual(scopeManager.active(), scope, 'should have scope');
         return done();
@@ -212,18 +238,22 @@ describe('ZoneScopeManager', () => {
       fn();
     });
 
-    it('should return current scope (when disabled)', done => {
+    it('should return root scope (when disabled)', done => {
       scopeManager.disable();
-      const scope = { a: 1 };
+      const scope = Context.ROOT_CONTEXT.setValue('ctx', { a: 1 });
       const fn: any = scopeManager.bind(() => {
-        assert.strictEqual(scopeManager.active(), scope, 'should have scope');
+        assert.strictEqual(
+          scopeManager.active(),
+          Context.ROOT_CONTEXT,
+          'should have scope'
+        );
         return done();
       }, scope);
       fn();
     });
 
     it('should bind the the certain scope to the target "addEventListener" function', done => {
-      const scope1 = { a: 1 };
+      const scope1 = Context.ROOT_CONTEXT.setValue('a', 1);
       const element = document.createElement('div');
 
       scopeManager.bind(element, scope1);
@@ -247,7 +277,7 @@ describe('ZoneScopeManager', () => {
     });
 
     it('should preserve zone when creating new click event inside zone', done => {
-      const scope1 = { a: 1 };
+      const scope1 = Context.ROOT_CONTEXT.setValue('a', 1);
       const element = document.createElement('div');
 
       scopeManager.bind(element, scope1);
