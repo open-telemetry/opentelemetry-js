@@ -16,7 +16,7 @@
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
-    "docs-test": "linkinator docs/out --silent --skip david-dm.org --skip https://open-telemetry.github.io/opentelemetry-js/classes/.+api.html --skip https://www.npmjs.com/package/@opentelemetry/api",
+    "docs-test": "linkinator docs/out --silent --skip david-dm.org",
     "docs": "typedoc --tsconfig tsconfig.json",
     "prepare": "npm run compile"
   },
