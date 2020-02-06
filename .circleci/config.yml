@@ -160,6 +160,8 @@ jobs:
   lint_&_docs:
     docker:
       - image: node:12
+        environment:
+          NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - checkout
       - run:
