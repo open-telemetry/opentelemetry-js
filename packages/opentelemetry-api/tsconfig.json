@@ -5,8 +5,7 @@
     "outDir": "build"
   },
   "include": [
-    "src/**/*.ts",
-    "test/**/*.ts"
+    "src/**/*.ts"
   ],
   "typedocOptions": {
     "name": "OpenTelemetry API for JavaScript",

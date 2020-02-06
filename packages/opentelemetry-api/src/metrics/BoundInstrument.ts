@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
 
 /** An Instrument for Counter Metric. */
@@ -39,9 +40,15 @@ export interface BoundMeasure {
   /**
    * Records the given value to this measure.
    * @param value the measurement to record.
+   * @param distContext the distContext associated with the measurements.
    * @param spanContext the {@link SpanContext} that identifies the {@link Span}
    *     for which the measurements are associated with.
    */
   record(value: number): void;
-  record(value: number, spanContext: SpanContext): void;
+  record(value: number, distContext: DistributedContext): void;
+  record(
+    value: number,
+    distContext: DistributedContext,
+    spanContext: SpanContext
+  ): void;
 }

@@ -144,7 +144,11 @@ export class BoundMeasure extends BaseBoundInstrument
     super(labelSet);
   }
 
-  record(value: number, spanContext?: types.SpanContext): void {
+  record(
+    value: number,
+    distContext?: types.DistributedContext,
+    spanContext?: types.SpanContext
+  ): void {
     if (this._disabled) return;
 
     if (this._absolute && value < 0) {

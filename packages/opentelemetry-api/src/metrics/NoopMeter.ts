@@ -17,6 +17,7 @@
 import { Meter } from './Meter';
 import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
 import { BoundMeasure, BoundCounter, BoundGauge } from './BoundInstrument';
+import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
@@ -118,11 +119,18 @@ export class NoopGaugeMetric extends NoopMetric<BoundGauge>
 
 export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   implements Pick<MetricUtils, 'record'> {
-  record(value: number, labelSet: LabelSet, spanContext?: SpanContext) {
-    if (typeof spanContext === 'undefined') {
+  record(
+    value: number,
+    labelSet: LabelSet,
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
+  ) {
+    if (typeof distContext === 'undefined') {
       this.bind(labelSet).record(value);
+    } else if (typeof spanContext === 'undefined') {
+      this.bind(labelSet).record(value, distContext);
     } else {
-      this.bind(labelSet).record(value, spanContext);
+      this.bind(labelSet).record(value, distContext, spanContext);
     }
   }
 }
@@ -140,7 +148,11 @@ export class NoopBoundGauge implements BoundGauge {
 }
 
 export class NoopBoundMeasure implements BoundMeasure {
-  record(value: number, spanContext?: SpanContext): void {
+  record(
+    value: number,
+    distContext?: DistributedContext,
+    spanContext?: SpanContext
+  ): void {
     return;
   }
 }

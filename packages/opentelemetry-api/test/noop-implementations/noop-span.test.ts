@@ -15,13 +15,7 @@
  */
 
 import * as assert from 'assert';
-import {
-  CanonicalCode,
-  INVALID_SPAN_ID,
-  INVALID_TRACE_ID,
-  NoopSpan,
-  TraceFlags,
-} from '../../src';
+import { CanonicalCode, INVALID_SPAN_ID, INVALID_TRACE_ID, NoopSpan, TraceFlags } from '../../src';
 
 describe('NoopSpan', () => {
   it('do not crash', () => {
