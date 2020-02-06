@@ -160,6 +160,8 @@ jobs:
   lint_&_docs:
     docker:
       - image: node:12
+        environment:
+          NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - checkout
       - run:
@@ -167,7 +169,7 @@ jobs:
           command: npm i -g lerna
       - run:
           name: Install API dependencies
-          command: lerna bootstrap --scope @opentelemetry/api --include-filtered-dependencies
+          command: lerna bootstrap --no-ci -- --only=dev
       - run:
           name: Check code style and linting
           command: npm run check
