@@ -164,13 +164,10 @@ jobs:
       - checkout
       - run:
           name: Install minimal doc and lint modules globally
-          command: npm i -g tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
+          command: npm i -g lerna
       - run:
           name: Install API dependencies
           command: lerna bootstrap --scope @opentelemetry/api --include-filtered-dependencies
-      - run:
-          name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
           command: npm run check
