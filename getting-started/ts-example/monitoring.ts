@@ -1,8 +1,8 @@
-import { MeterRegistry } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/types';
+import { MeterProvider } from '@opentelemetry/metrics';
+import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-const meter = new MeterRegistry().getMeter('example-ts');
+const meter = new MeterProvider().getMeter('example-ts');
 
 meter.addExporter(
   new PrometheusExporter({ startServer: true }, () => {

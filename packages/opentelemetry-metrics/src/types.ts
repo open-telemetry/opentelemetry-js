@@ -34,11 +34,14 @@ export interface MetricOptions {
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
 
-  /** Indicates the metric is a verbose metric that is disabled by default */
+  /** Indicates the metric is a verbose metric that is disabled by default. */
   disabled: boolean;
 
   /** Monotonic metrics may only increase. */
   monotonic: boolean;
+
+  /** (Measure only) Asserts that this metric will only accept non-negative values. */
+  absolute: boolean;
 
   /** User provided logger. */
   logger: Logger;

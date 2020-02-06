@@ -122,6 +122,14 @@ export enum MetricDescriptorType {
    * window. This is not recommended, since it cannot be aggregated.
    */
   SUMMARY,
+  /**
+   * Integer measure. The value can be positive or negative.
+   */
+  MEASURE_INT64,
+  /**
+   * Floating point measure. The value can be positive or negative.
+   */
+  MEASURE_DOUBLE,
 }
 
 /**
