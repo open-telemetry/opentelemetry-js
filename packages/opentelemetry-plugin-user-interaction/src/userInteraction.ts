@@ -16,7 +16,7 @@
 
 import * as shimmer from 'shimmer';
 import { BasePlugin, hrTime, isWrapped } from '@opentelemetry/core';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { getElementXPath } from '@opentelemetry/web';
 import {
   AsyncTask,
