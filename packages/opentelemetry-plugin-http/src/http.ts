@@ -297,7 +297,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         }),
       };
 
-      // Using context direclty like this is temporary. In a future PR, context
+      // Using context directly like this is temporary. In a future PR, context
       // will be managed by the scope manager (which may be renamed to context manager?)
       const spanContext = Context.getExtractedSpanContext(
         propagation.extract(Context.ROOT_CONTEXT, headers)
@@ -410,7 +410,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const span = plugin._startHttpSpan(operationName, spanOptions);
       plugin._tracer
         .getHttpTextFormat()
-        // Using context direclty like this is temporary. In a future PR, context
+        // Using context directly like this is temporary. In a future PR, context
         // will be managed by the scope manager (which may be renamed to context manager?)
         .inject(
           Context.setActiveSpan(Context.ROOT_CONTEXT, span),
