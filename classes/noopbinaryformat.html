@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>SpanContext | OpenTelemetry API for JavaScript</title>
+	<title>NoopBinaryFormat | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="spancontext.html">SpanContext</a>
+					<a href="noopbinaryformat.html">NoopBinaryFormat</a>
 				</li>
 			</ul>
-			<h1>Interface SpanContext</h1>
+			<h1>Class NoopBinaryFormat</h1>
 		</div>
 	</div>
 </header>
@@ -69,8 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>A SpanContext represents the portion of a <a href="span.html">Span</a> which must be
-						serialized and propagated along side of a <a href="distributedcontext.html">DistributedContext</a>.</p>
+						<p>No-op implementations of <a href="../interfaces/binaryformat.html">BinaryFormat</a>.</p>
 					</div>
 				</div>
 			</section>
@@ -78,124 +77,101 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">SpanContext</span>
+						<span class="target">NoopBinaryFormat</span>
 					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/binaryformat.html" class="tsd-signature-type">BinaryFormat</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-private tsd-is-private-protected">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="spancontext.html#isremote" class="tsd-kind-icon">is<wbr>Remote</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="spancontext.html#spanid" class="tsd-kind-icon">span<wbr>Id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="spancontext.html#traceflags" class="tsd-kind-icon">trace<wbr>Flags</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="spancontext.html#traceid" class="tsd-kind-icon">trace<wbr>Id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="spancontext.html#tracestate" class="tsd-kind-icon">trace<wbr>State</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><a href="noopbinaryformat.html#_buff" class="tsd-kind-icon">_buff</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section ">
+							<h3>Methods</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="noopbinaryformat.html#frombytes" class="tsd-kind-icon">from<wbr>Bytes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="noopbinaryformat.html#tobytes" class="tsd-kind-icon">to<wbr>Bytes</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="isremote" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> is<wbr>Remote</h3>
-					<div class="tsd-signature tsd-kind-icon">is<wbr>Remote<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">false</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">true</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private">
+					<a name="_buff" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _buff</h3>
+					<div class="tsd-signature tsd-kind-icon">_buff<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol"> =&nbsp;new ArrayBuffer(0)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/span_context.ts#L41">trace/span_context.ts:41</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/NoopBinaryFormat.ts#L24">context/propagation/NoopBinaryFormat.ts:24</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Only true if the SpanContext was propagated from a remote parent.</p>
-						</div>
-					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="spanid" class="tsd-anchor"></a>
-					<h3>span<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">span<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/span_context.ts#L37">trace/span_context.ts:37</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The ID of the Span. It is globally unique with practically sufficient
-								probability by being made as 8 randomly generated bytes, encoded as a 16
-							lowercase hex characters corresponding to 64 bits.</p>
-						</div>
-					</div>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="frombytes" class="tsd-anchor"></a>
+					<h3>from<wbr>Bytes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">from<wbr>Bytes<span class="tsd-signature-symbol">(</span>buf<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/binaryformat.html">BinaryFormat</a>.<a href="../interfaces/binaryformat.html#frombytes">fromBytes</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/NoopBinaryFormat.ts#L31">context/propagation/NoopBinaryFormat.ts:31</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>buf: <span class="tsd-signature-type">ArrayBuffer</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">null</span>
+							</h4>
+						</li>
+					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="traceflags" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> trace<wbr>Flags</h3>
-					<div class="tsd-signature tsd-kind-icon">trace<wbr>Flags<span class="tsd-signature-symbol">:</span> <a href="../enums/traceflags.html" class="tsd-signature-type">TraceFlags</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/span_context.ts#L52">trace/span_context.ts:52</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Trace flags to propagate.</p>
-						</div>
-						<p>It is represented as 1 byte (bitmap). Bit to represent whether trace is
-							sampled or not. When set, the least significant bit documents that the
-							caller may have recorded trace data. A caller who does not record trace
-						data out-of-band leaves this flag unset.</p>
-						<p>SAMPLED = 0x1 and UNSAMPLED = 0x0;</p>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="traceid" class="tsd-anchor"></a>
-					<h3>trace<wbr>Id</h3>
-					<div class="tsd-signature tsd-kind-icon">trace<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/span_context.ts#L31">trace/span_context.ts:31</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The ID of the trace that this span belongs to. It is worldwide unique
-								with practically sufficient probability by being made as 16 randomly
-								generated bytes, encoded as a 32 lowercase hex characters corresponding to
-							128 bits.</p>
-						</div>
-					</div>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="tracestate" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> trace<wbr>State</h3>
-					<div class="tsd-signature tsd-kind-icon">trace<wbr>State<span class="tsd-signature-symbol">:</span> <a href="tracestate.html" class="tsd-signature-type">TraceState</a></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/span_context.ts#L69">trace/span_context.ts:69</a></li>
-						</ul>
-					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>Tracing-system-specific info to propagate.</p>
-						</div>
-						<p>The tracestate field value is a <code>list</code> as defined below. The <code>list</code> is a
-							series of <code>list-members</code> separated by commas <code>,</code>, and a list-member is a
-							key/value pair separated by an equals sign <code>=</code>. Spaces and horizontal tabs
-							surrounding <code>list-members</code> are ignored. There can be a maximum of 32
-							<code>list-members</code> in a <code>list</code>.
-						More Info: <a href="https://www.w3.org/TR/trace-context/#tracestate-field">https://www.w3.org/TR/trace-context/#tracestate-field</a></p>
-						<p>Examples:
-							Single tracing system (generic format):
-							tracestate: rojo=00f067aa0ba902b7
-							Multiple tracing systems (with different formatting):
-						tracestate: rojo=00f067aa0ba902b7,congo=t61rcWkgMzE</p>
-					</div>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="tobytes" class="tsd-anchor"></a>
+					<h3>to<wbr>Bytes</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">to<wbr>Bytes<span class="tsd-signature-symbol">(</span>spanContext<span class="tsd-signature-symbol">: </span><a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/binaryformat.html">BinaryFormat</a>.<a href="../interfaces/binaryformat.html#tobytes">toBytes</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/NoopBinaryFormat.ts#L26">context/propagation/NoopBinaryFormat.ts:26</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>spanContext: <a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ArrayBuffer</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -211,23 +187,17 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="spancontext.html" class="tsd-kind-icon">Span<wbr>Context</a>
+					<li class="current tsd-kind-class">
+						<a href="noopbinaryformat.html" class="tsd-kind-icon">Noop<wbr>Binary<wbr>Format</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="spancontext.html#isremote" class="tsd-kind-icon">is<wbr>Remote</a>
+							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private">
+								<a href="noopbinaryformat.html#_buff" class="tsd-kind-icon">_buff</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="spancontext.html#spanid" class="tsd-kind-icon">span<wbr>Id</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="noopbinaryformat.html#frombytes" class="tsd-kind-icon">from<wbr>Bytes</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="spancontext.html#traceflags" class="tsd-kind-icon">trace<wbr>Flags</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="spancontext.html#traceid" class="tsd-kind-icon">trace<wbr>Id</a>
-							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="spancontext.html#tracestate" class="tsd-kind-icon">trace<wbr>State</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="noopbinaryformat.html#tobytes" class="tsd-kind-icon">to<wbr>Bytes</a>
 							</li>
 						</ul>
 					</li>

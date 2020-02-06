@@ -68,11 +68,90 @@
 					<h1>OpenTelemetry API for JavaScript</h1>
 				</a>
 				<p><a href="https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"><img src="https://badges.gitter.im/open-telemetry/opentelemetry-js.svg" alt="Gitter chat"></a>
-					<a href="https://www.npmjs.com/package/@opentelemetry/types"><img src="https://badge.fury.io/js/%40opentelemetry%2Ftypes.svg" alt="NPM Published Version"></a>
-					<a href="https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-types"><img src="https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-types" alt="dependencies"></a>
-					<a href="https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-types&amp;type=dev"><img src="https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-types" alt="devDependencies"></a>
+					<a href="https://www.npmjs.com/package/@opentelemetry/api"><img src="https://badge.fury.io/js/%40opentelemetry%2Ftypes.svg" alt="NPM Published Version"></a>
+					<a href="https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api"><img src="https://david-dm.org/open-telemetry/opentelemetry-js/status.svg?path=packages/opentelemetry-api" alt="dependencies"></a>
+					<a href="https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api&amp;type=dev"><img src="https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-api" alt="devDependencies"></a>
 				<a href="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat"><img src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=flat" alt="Apache License"></a></p>
-				<p>This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser.</p>
+				<p>This package provides everything needed to interact with the OpenTelemetry API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.</p>
+				<a href="#basic-use" id="basic-use" style="color: inherit; text-decoration: none;">
+					<h2>Basic Use</h2>
+				</a>
+				<a href="#api-entry-point" id="api-entry-point" style="color: inherit; text-decoration: none;">
+					<h3>API Entry Point</h3>
+				</a>
+				<p>API entry points are defined as global singleton objects <code>trace</code> and <code>metrics</code> which contain methods used to initialize SDK implementations and acquire resources from the API.</p>
+				<ul>
+					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/traceapi.html">Trace API Documentation</a></li>
+					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/metricsapi.html">Metrics API Documentation</a></li>
+				</ul>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>)
+
+<span class="hljs-comment">/* Initialize TraceProvider */</span>
+api.trace.initGlobalTracerProvider(traceProvider);
+<span class="hljs-comment">/* returns traceProvider (no-op if a working provider has not been initialized) */</span>
+api.trace.getTracerProvider();
+<span class="hljs-comment">/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */</span>
+api.trace.getTracer(name, version);
+
+<span class="hljs-comment">/* Initialize MeterProvider */</span>
+api.metrics.initGlobalMeterProvider(meterProvider);
+<span class="hljs-comment">/* returns meterProvider (no-op if a working provider has not been initialized) */</span>
+api.metrics.getMeterProvider();
+<span class="hljs-comment">/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */</span>
+api.metrics.getMeter(name, version);</code></pre>
+				<a href="#application-owners" id="application-owners" style="color: inherit; text-decoration: none;">
+					<h3>Application Owners</h3>
+				</a>
+				<p>Application owners will also need a working OpenTelemetry SDK implementation. OpenTelemetry provides working SDK implementations for <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web">web</a> and <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node">node</a> for both <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing">tracing</a> and <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics">metrics</a>.</p>
+				<a href="#simple-nodejs-example" id="simple-nodejs-example" style="color: inherit; text-decoration: none;">
+					<h4>Simple NodeJS Example</h4>
+				</a>
+				<p>Before any other module in your application is loaded, you must initialize the global tracer and meter registries. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>);
+<span class="hljs-keyword">const</span> sdk = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/node"</span>);
+
+<span class="hljs-keyword">const</span> { SimpleSpanProcessor } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'@opentelemetry/tracing'</span>);
+<span class="hljs-keyword">const</span> { JaegerExporter } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'@opentelemetry/exporter-jaeger'</span>);
+
+<span class="hljs-comment">// Initialize an exporter</span>
+<span class="hljs-keyword">const</span> exporter = <span class="hljs-keyword">new</span> JaegerExporter({
+  <span class="hljs-attr">serviceName</span>: <span class="hljs-string">'basic-service'</span>
+});
+
+<span class="hljs-comment">// Create a provider which we will configure as the global tracer provider</span>
+<span class="hljs-keyword">const</span> provider = <span class="hljs-keyword">new</span> sdk.NodeTracerProvider();
+
+<span class="hljs-comment">// Configure span processor to send spans to the exporter</span>
+provider.addSpanProcessor(<span class="hljs-keyword">new</span> SimpleSpanProcessor(exporter));
+
+<span class="hljs-comment">// Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings</span>
+api.trace.initGlobalTracerProvider(provider);
+
+<span class="hljs-comment">// your application code below this line</span></code></pre>
+				<a href="#library-authors" id="library-authors" style="color: inherit; text-decoration: none;">
+					<h3>Library Authors</h3>
+				</a>
+				<p>Library authors need only to depend on the <code>@opentelemetry/api</code> package and trust that the application owners which use their library will initialize an appropriate SDK.</p>
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>);
+
+<span class="hljs-keyword">const</span> tracer = api.trace.getTracer(<span class="hljs-string">"my-library-name"</span>, <span class="hljs-string">"0.2.3"</span>);
+
+<span class="hljs-keyword">async</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">doSomething</span>(<span class="hljs-params"></span>) </span>{
+  <span class="hljs-keyword">const</span> span = tracer.startSpan(<span class="hljs-string">"doSomething"</span>, { <span class="hljs-attr">parent</span>: tracer.getCurrentSpan() });
+  <span class="hljs-keyword">try</span> {
+    <span class="hljs-keyword">const</span> result = <span class="hljs-keyword">await</span> doSomethingElse();
+    span.end();
+    <span class="hljs-keyword">return</span> result;
+  } <span class="hljs-keyword">catch</span> (err) {
+    span.setStatus({
+      <span class="hljs-comment">// use an appropriate status code here</span>
+      <span class="hljs-attr">code</span>: api.CanonicalCode.INTERNAL,
+      <span class="hljs-attr">message</span>: err.message,
+    });
+    span.end();
+    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>;
+  }
+}</code></pre>
 				<a href="#useful-links" id="useful-links" style="color: inherit; text-decoration: none;">
 					<h2>Useful links</h2>
 				</a>
@@ -111,6 +190,54 @@
 					</li>
 					<li class=" tsd-kind-enum">
 						<a href="enums/valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/metricsapi.html" class="tsd-kind-icon">MetricsAPI</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopbinaryformat.html" class="tsd-kind-icon">Noop<wbr>Binary<wbr>Format</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopboundcounter.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Counter</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopboundgauge.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Gauge</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopboundmeasure.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Measure</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopgaugemetric.html" class="tsd-kind-icon">Noop<wbr>Gauge<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noophttptextformat.html" class="tsd-kind-icon">Noop<wbr>Http<wbr>Text<wbr>Format</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopmeasuremetric.html" class="tsd-kind-icon">Noop<wbr>Measure<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopmeterprovider.html" class="tsd-kind-icon">Noop<wbr>Meter<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-class tsd-has-type-parameter">
+						<a href="classes/noopmetric.html" class="tsd-kind-icon">Noop<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/nooptracer.html" class="tsd-kind-icon">Noop<wbr>Tracer</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/nooptracerprovider.html" class="tsd-kind-icon">Noop<wbr>Tracer<wbr>Provider</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/traceapi.html" class="tsd-kind-icon">TraceAPI</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a>
@@ -152,7 +279,7 @@
 						<a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/meterregistry.html" class="tsd-kind-icon">Meter<wbr>Registry</a>
+						<a href="interfaces/meterprovider.html" class="tsd-kind-icon">Meter<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-has-type-parameter">
 						<a href="interfaces/metric.html" class="tsd-kind-icon">Metric</a>
@@ -200,7 +327,7 @@
 						<a href="interfaces/tracer.html" class="tsd-kind-icon">Tracer</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/tracerregistry.html" class="tsd-kind-icon">Tracer<wbr>Registry</a>
+						<a href="interfaces/tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
@@ -215,7 +342,64 @@
 						<a href="globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
 					</li>
 					<li class=" tsd-kind-variable">
+						<a href="globals.html#invalid_span_id" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#invalid_trace_id" class="tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_binary_format" class="tsd-kind-icon">NOOP_<wbr>BINARY_<wbr>FORMAT</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_bound_counter" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_bound_gauge" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>GAUGE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_bound_measure" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_gauge_metric" class="tsd-kind-icon">NOOP_<wbr>GAUGE_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_http_text_format" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>FORMAT</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_label_set" class="tsd-kind-icon">NOOP_<wbr>LABEL_<wbr>SET</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_measure_metric" class="tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_meter_provider" class="tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
+					</li>
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#version" class="tsd-kind-icon">VERSION</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#metrics" class="tsd-kind-icon">metrics</a>
+					</li>
+					<li class=" tsd-kind-variable">
+						<a href="globals.html#trace" class="tsd-kind-icon">trace</a>
+					</li>
+					<li class=" tsd-kind-object-literal tsd-is-not-exported">
+						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
 					</li>
 				</ul>
 			</nav>

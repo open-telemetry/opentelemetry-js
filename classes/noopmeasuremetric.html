@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Metric | OpenTelemetry API for JavaScript</title>
+	<title>NoopMeasureMetric | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,112 +56,137 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="metric.html">Metric</a>
+					<a href="noopmeasuremetric.html">NoopMeasureMetric</a>
 				</li>
 			</ul>
-			<h1>Interface Metric&lt;T&gt;</h1>
+			<h1>Class NoopMeasureMetric</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Metric represents a base class for different types of metric
-						pre aggregations.</p>
-					</div>
-				</div>
-			</section>
-			<section class="tsd-panel tsd-type-parameters">
-				<h3>Type parameters</h3>
-				<ul class="tsd-type-parameters">
-					<li>
-						<h4>T</h4>
-					</li>
-				</ul>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Metric</span>
+						<a href="noopmetric.html" class="tsd-signature-type">NoopMetric</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a><span class="tsd-signature-symbol">&gt;</span>
+						<ul class="tsd-hierarchy">
+							<li>
+								<span class="target">NoopMeasureMetric</span>
+							</li>
+						</ul>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
-				<h3>Implemented by</h3>
+				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../classes/noopcountermetric.html" class="tsd-signature-type">NoopCounterMetric</a></li>
-					<li><a href="../classes/noopgaugemetric.html" class="tsd-signature-type">NoopGaugeMetric</a></li>
-					<li><a href="../classes/noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a></li>
-					<li><a href="../classes/noopmetric.html" class="tsd-signature-type">NoopMetric</a></li>
+					<li><a href="../interfaces/metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a><span class="tsd-signature-symbol">&gt;</span></li>
+					<li><span class="tsd-signature-type">object</span></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
+						<section class="tsd-index-section tsd-is-inherited">
+							<h3>Constructors</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#constructor" class="tsd-kind-icon">constructor</a></li>
+							</ul>
+						</section>
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#bind" class="tsd-kind-icon">bind</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#clear" class="tsd-kind-icon">clear</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#unbind" class="tsd-kind-icon">unbind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#bind" class="tsd-kind-icon">bind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#clear" class="tsd-kind-icon">clear</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="noopmeasuremetric.html#record" class="tsd-kind-icon">record</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><a href="noopmeasuremetric.html#unbind" class="tsd-kind-icon">unbind</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="bind" class="tsd-anchor"></a>
-					<h3>bind</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+			<section class="tsd-panel-group tsd-member-group tsd-is-inherited">
+				<h2>Constructors</h2>
+				<section class="tsd-panel tsd-member tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+					<a name="constructor" class="tsd-anchor"></a>
+					<h3>constructor</h3>
+					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">new <wbr>Noop<wbr>Measure<wbr>Metric<span class="tsd-signature-symbol">(</span>instrument<span class="tsd-signature-symbol">: </span><a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#constructor">constructor</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L86">metrics/Metric.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L63">metrics/NoopMeter.ts:63</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>instrument: <a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a></h4>
+						</li>
+					</ul>
+				</section>
+			</section>
+			<section class="tsd-panel-group tsd-member-group ">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+					<a name="bind" class="tsd-anchor"></a>
+					<h3>bind</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/metric.html">Metric</a>.<a href="../interfaces/metric.html#bind">bind</a></p>
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#bind">bind</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L74">metrics/NoopMeter.ts:74</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns a Instrument associated with specified LabelSet.
-										It is recommended to keep a reference to the Instrument instead of always
+									<p>Returns a Bound Instrument associated with specified LabelSet.
+										It is recommended to keep a reference to the Bound Instrument instead of always
 									calling this method for every operations.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
+									<h5>labels: <a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="clear" class="tsd-anchor"></a>
 					<h3>clear</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon">clear<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/metric.html">Metric</a>.<a href="../interfaces/metric.html#clear">clear</a></p>
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#clear">clear</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L102">metrics/Metric.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L97">metrics/NoopMeter.ts:97</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -173,46 +198,76 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="getdefaultbound" class="tsd-anchor"></a>
 					<h3>get<wbr>Default<wbr>Bound</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Default<wbr>Bound<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Default<wbr>Bound<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/metric.html">Metric</a>.<a href="../interfaces/metric.html#getdefaultbound">getDefaultBound</a></p>
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#getdefaultbound">getDefaultBound</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L81">metrics/NoopMeter.ts:81</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns a Bound Instrument for a metric with all labels not set.</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/boundmeasure.html" class="tsd-signature-type">BoundMeasure</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="record" class="tsd-anchor"></a>
+					<h3>record</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, labelSet<span class="tsd-signature-symbol">: </span><a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a>, distContext<span class="tsd-signature-symbol">?: </span><a href="../interfaces/distributedcontext.html" class="tsd-signature-type">DistributedContext</a>, spanContext<span class="tsd-signature-symbol">?: </span><a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L91">metrics/Metric.ts:91</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L122">metrics/NoopMeter.ts:122</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns a Instrument for a metric with all labels not set.</p>
-								</div>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>labelSet: <a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> distContext: <a href="../interfaces/distributedcontext.html" class="tsd-signature-type">DistributedContext</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> spanContext: <a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="setcallback" class="tsd-anchor"></a>
 					<h3>set<wbr>Callback</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 						<li class="tsd-signature tsd-kind-icon">set<wbr>Callback<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#setcallback">setCallback</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L107">metrics/Metric.ts:107</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L101">metrics/NoopMeter.ts:101</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>what should the callback signature be?</p>
-								</div>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
@@ -235,28 +290,30 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
 					<a name="unbind" class="tsd-anchor"></a>
 					<h3>unbind</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">unbind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+						<li class="tsd-signature tsd-kind-icon">unbind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/metric.html">Metric</a>.<a href="../interfaces/metric.html#unbind">unbind</a></p>
+								<p>Inherited from <a href="noopmetric.html">NoopMetric</a>.<a href="noopmetric.html#unbind">unbind</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L97">metrics/Metric.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L89">metrics/NoopMeter.ts:89</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Removes the Instrument from the metric, if it is present.</p>
+									<p>Removes the Binding from the metric, if it is present.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
+									<h5>labels: <a href="../interfaces/labelset.html" class="tsd-signature-type">LabelSet</a></h5>
 									<div class="tsd-comment tsd-typography">
 										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
 									</div>
@@ -280,23 +337,29 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-has-type-parameter">
-						<a href="metric.html" class="tsd-kind-icon">Metric</a>
+					<li class="current tsd-kind-class">
+						<a href="noopmeasuremetric.html" class="tsd-kind-icon">Noop<wbr>Measure<wbr>Metric</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#bind" class="tsd-kind-icon">bind</a>
+							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#clear" class="tsd-kind-icon">clear</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#bind" class="tsd-kind-icon">bind</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#clear" class="tsd-kind-icon">clear</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#unbind" class="tsd-kind-icon">unbind</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="noopmeasuremetric.html#record" class="tsd-kind-icon">record</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-inherited">
+								<a href="noopmeasuremetric.html#unbind" class="tsd-kind-icon">unbind</a>
 							</li>
 						</ul>
 					</li>

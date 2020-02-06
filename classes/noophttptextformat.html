@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>MeterRegistry | OpenTelemetry API for JavaScript</title>
+	<title>NoopHttpTextFormat | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="meterregistry.html">MeterRegistry</a>
+					<a href="noophttptextformat.html">NoopHttpTextFormat</a>
 				</li>
 			</ul>
-			<h1>Interface MeterRegistry</h1>
+			<h1>Class NoopHttpTextFormat</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>MeterRegistry provides an interface for creating <a href="meter.html">Meter</a>s</p>
+						<p>No-op implementations of <a href="../interfaces/httptextformat.html">HttpTextFormat</a>.</p>
 					</div>
 				</div>
 			</section>
@@ -77,8 +77,14 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">MeterRegistry</span>
+						<span class="target">NoopHttpTextFormat</span>
 					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implements</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../interfaces/httptextformat.html" class="tsd-signature-type">HttpTextFormat</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -88,7 +94,8 @@
 						<section class="tsd-index-section ">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meterregistry.html#getmeter" class="tsd-kind-icon">get<wbr>Meter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="noophttptextformat.html#extract" class="tsd-kind-icon">extract</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class"><a href="noophttptextformat.html#inject" class="tsd-kind-icon">inject</a></li>
 							</ul>
 						</section>
 					</div>
@@ -96,35 +103,63 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="getmeter" class="tsd-anchor"></a>
-					<h3>get<wbr>Meter</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Meter<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, version<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="meter.html" class="tsd-signature-type">Meter</a></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="extract" class="tsd-anchor"></a>
+					<h3>extract</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>format<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/httptextformat.html">HttpTextFormat</a>.<a href="../interfaces/httptextformat.html#extract">extract</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/cb677c0/packages/opentelemetry-types/src/metrics/MeterRegistry.ts#L28">metrics/MeterRegistry.ts:28</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/NoopHttpTextFormat.ts#L27">context/propagation/NoopHttpTextFormat.ts:27</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns a Meter, creating one if one with the given name and version is not already created</p>
-								</div>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<h5>format: <span class="tsd-signature-type">string</span></h5>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> version: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="meter.html" class="tsd-signature-type">Meter</a></h4>
-							<p>Meter A Meter with the given name and version</p>
+							<h4 class="tsd-returns-title">Returns <a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a>
+								<span class="tsd-signature-symbol"> | </span>
+								<span class="tsd-signature-type">null</span>
+							</h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class">
+					<a name="inject" class="tsd-anchor"></a>
+					<h3>inject</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
+						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>spanContext<span class="tsd-signature-symbol">: </span><a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a>, format<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<p>Implementation of <a href="../interfaces/httptextformat.html">HttpTextFormat</a>.<a href="../interfaces/httptextformat.html#inject">inject</a></p>
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/NoopHttpTextFormat.ts#L25">context/propagation/NoopHttpTextFormat.ts:25</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>spanContext: <a href="../interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
+								</li>
+								<li>
+									<h5>format: <span class="tsd-signature-type">string</span></h5>
+								</li>
+								<li>
+									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -140,135 +175,21 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
-					<li class=" tsd-kind-enum">
-						<a href="../enums/canonicalcode.html" class="tsd-kind-icon">Canonical<wbr>Code</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="../enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="../enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="../enums/traceflags.html" class="tsd-kind-icon">Trace<wbr>Flags</a>
-					</li>
-					<li class=" tsd-kind-enum">
-						<a href="../enums/valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="attributes.html" class="tsd-kind-icon">Attributes</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="binaryformat.html" class="tsd-kind-icon">Binary<wbr>Format</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="boundgauge.html" class="tsd-kind-icon">Bound<wbr>Gauge</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="distributedcontext.html" class="tsd-kind-icon">Distributed<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="event.html" class="tsd-kind-icon">Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="httptextformat.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Format</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="labelset.html" class="tsd-kind-icon">Label<wbr>Set</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="link.html" class="tsd-kind-icon">Link</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="logger.html" class="tsd-kind-icon">Logger</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="meter.html" class="tsd-kind-icon">Meter</a>
-					</li>
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="meterregistry.html" class="tsd-kind-icon">Meter<wbr>Registry</a>
+					<li class="current tsd-kind-class">
+						<a href="noophttptextformat.html" class="tsd-kind-icon">Noop<wbr>Http<wbr>Text<wbr>Format</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="meterregistry.html#getmeter" class="tsd-kind-icon">get<wbr>Meter</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="noophttptextformat.html#extract" class="tsd-kind-icon">extract</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class">
+								<a href="noophttptextformat.html#inject" class="tsd-kind-icon">inject</a>
 							</li>
 						</ul>
 					</li>
 				</ul>
 				<ul class="after-current">
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="metric.html" class="tsd-kind-icon">Metric</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="metricoptions.html" class="tsd-kind-icon">Metric<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="metricutils.html" class="tsd-kind-icon">Metric<wbr>Utils</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter">
-						<a href="plugin.html" class="tsd-kind-icon">Plugin</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="pluginconfig.html" class="tsd-kind-icon">Plugin<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="plugininternalfiles.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="plugininternalfilesversion.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files<wbr>Version</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="sampler.html" class="tsd-kind-icon">Sampler</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="span.html" class="tsd-kind-icon">Span</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="spancontext.html" class="tsd-kind-icon">Span<wbr>Context</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="spanoptions.html" class="tsd-kind-icon">Span<wbr>Options</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="status.html" class="tsd-kind-icon">Status</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="timedevent.html" class="tsd-kind-icon">Timed<wbr>Event</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="tracestate.html" class="tsd-kind-icon">Trace<wbr>State</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="tracerregistry.html" class="tsd-kind-icon">Tracer<wbr>Registry</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="../globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="../globals.html#labels" class="tsd-kind-icon">Labels</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="../globals.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
-					</li>
-					<li class=" tsd-kind-type-alias">
-						<a href="../globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
-					</li>
-					<li class=" tsd-kind-variable">
-						<a href="../globals.html#version" class="tsd-kind-icon">VERSION</a>
-					</li>
 				</ul>
 			</nav>
 		</div>
