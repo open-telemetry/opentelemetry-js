@@ -15,6 +15,7 @@
  */
 
 import { SpanContext } from '../../trace/span_context';
+import { Carrier } from './carrier';
 
 /**
  * Injects and extracts a value as text into carriers that travel in-band
@@ -35,18 +36,18 @@ export interface HttpTextFormat {
    *
    * @param spanContext the SpanContext to transmit over the wire.
    * @param format the format of the carrier.
-   * @param carrier the carrier of propagation fields, such as an http request.
+   * @param carrier the carrier of propagation fields, such as http request headers.
    */
-  inject(spanContext: SpanContext, format: string, carrier: unknown): void;
+  inject(spanContext: SpanContext, format: string, carrier: Carrier): void;
 
   /**
    * Returns a {@link SpanContext} instance extracted from `carrier` in the
    * given format from upstream.
    *
    * @param format the format of the carrier.
-   * @param carrier the carrier of propagation fields, such as an http request.
+   * @param carrier the carrier of propagation fields, such as http request headers.
    * @returns SpanContext The extracted SpanContext, or null if no such
    *     SpanContext could be found in carrier.
    */
-  extract(format: string, carrier: unknown): SpanContext | null;
+  extract(format: string, carrier: Carrier): SpanContext | null;
 }

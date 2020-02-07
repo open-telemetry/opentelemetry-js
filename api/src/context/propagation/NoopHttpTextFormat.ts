@@ -15,6 +15,7 @@
  */
 
 import { SpanContext } from '../../trace/span_context';
+import { Carrier } from './carrier';
 import { HttpTextFormat } from './HttpTextFormat';
 
 /**
@@ -22,9 +23,9 @@ import { HttpTextFormat } from './HttpTextFormat';
  */
 export class NoopHttpTextFormat implements HttpTextFormat {
   // By default does nothing
-  inject(spanContext: SpanContext, format: string, carrier: unknown): void {}
+  inject(spanContext: SpanContext, format: string, carrier: Carrier): void {}
   // By default does nothing
-  extract(format: string, carrier: unknown): SpanContext | null {
+  extract(format: string, carrier: Carrier): SpanContext | null {
     return null;
   }
 }
