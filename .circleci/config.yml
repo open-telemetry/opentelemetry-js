@@ -173,7 +173,7 @@ jobs:
           command: npm run check
       - run:
           name: Install doc dependencies
-          command: lerna bootstrap --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
+          command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
       - run:
           name: Docs tests
           command: npm run docs-test
