@@ -33,7 +33,7 @@ export class Context {
    *
    * @param context a context from which to inherit values
    */
-  private constructor(parentContext: Store = {}) {
+  private constructor(parentContext?: Store) {
     this._currentContext = Object.assign(Object.create(null), parentContext);
   }
 
