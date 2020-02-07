@@ -15,8 +15,12 @@
  */
 
 import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import { Context } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
-import { Context } from '../../src/context/context';
+import {
+  getExtractedSpanContext,
+  setExtractedSpanContext,
+} from '../../src/context/context';
 import {
   HttpTraceContext,
   TRACE_PARENT_HEADER,
@@ -41,7 +45,7 @@ describe('HttpTraceContext', () => {
       };
 
       httpTraceContext.inject(
-        Context.setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
         carrier
       );
       assert.deepStrictEqual(
@@ -60,7 +64,7 @@ describe('HttpTraceContext', () => {
       };
 
       httpTraceContext.inject(
-        Context.setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
         carrier
       );
       assert.deepStrictEqual(
@@ -75,7 +79,7 @@ describe('HttpTraceContext', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[TRACE_PARENT_HEADER] =
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
-      const extractedSpanContext = Context.getExtractedSpanContext(
+      const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
       );
 
@@ -89,7 +93,7 @@ describe('HttpTraceContext', () => {
 
     it('returns null if traceparent header is missing', () => {
       assert.deepStrictEqual(
-        Context.getExtractedSpanContext(
+        getExtractedSpanContext(
           httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
         ),
         undefined
@@ -99,7 +103,7 @@ describe('HttpTraceContext', () => {
     it('returns null if traceparent header is invalid', () => {
       carrier[TRACE_PARENT_HEADER] = 'invalid!';
       assert.deepStrictEqual(
-        Context.getExtractedSpanContext(
+        getExtractedSpanContext(
           httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
         ),
         undefined
@@ -110,7 +114,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] = [
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
       ];
-      const extractedSpanContext = Context.getExtractedSpanContext(
+      const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
       );
       assert.deepStrictEqual(extractedSpanContext, {
@@ -125,7 +129,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] =
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       carrier[TRACE_STATE_HEADER] = 'foo=bar,baz=qux';
-      const extractedSpanContext = Context.getExtractedSpanContext(
+      const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
       );
 
@@ -143,7 +147,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] =
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       carrier[TRACE_STATE_HEADER] = ['foo=bar,baz=qux', 'quux=quuz'];
-      const extractedSpanContext = Context.getExtractedSpanContext(
+      const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
       );
       assert.deepStrictEqual(extractedSpanContext, {
@@ -195,7 +199,7 @@ describe('HttpTraceContext', () => {
       Object.getOwnPropertyNames(testCases).forEach(testCase => {
         carrier[TRACE_PARENT_HEADER] = testCases[testCase];
 
-        const extractedSpanContext = Context.getExtractedSpanContext(
+        const extractedSpanContext = getExtractedSpanContext(
           httpTraceContext.extract(Context.ROOT_CONTEXT, carrier)
         );
         assert.deepStrictEqual(extractedSpanContext, undefined, testCase);

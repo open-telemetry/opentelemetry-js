@@ -23,8 +23,9 @@ type Store = { [identifer: string]: unknown };
  * but create a new one with updated values.
  */
 export class Context {
-  private _context: Store;
+  private _currentContext: Store;
 
+  /** The root context is used as the default parent context when there is no active context */
   public static readonly ROOT_CONTEXT = new Context();
 
   /**
@@ -32,8 +33,8 @@ export class Context {
    *
    * @param context a context from which to inherit values
    */
-  protected constructor(parentContext: Store = {}) {
-    this._context = Object.assign(Object.create(null), parentContext);
+  private constructor(parentContext: Store = {}) {
+    this._currentContext = Object.assign(Object.create(null), parentContext);
   }
 
   /**
@@ -42,7 +43,7 @@ export class Context {
    * @param key key which identifies a context value
    */
   getValue(key: string): unknown {
-    return this._context[key];
+    return this._currentContext[key];
   }
 
   /**
@@ -53,8 +54,8 @@ export class Context {
    * @param value value to set for the given key
    */
   setValue(key: string, value: unknown): Context {
-    const context = new Context(this._context);
-    context._context[key] = value;
+    const context = new Context(this._currentContext);
+    context._currentContext[key] = value;
     return context;
   }
 
@@ -65,8 +66,8 @@ export class Context {
    * @param key context key for which to clear a value
    */
   deleteValue(key: string): Context {
-    const context = new Context(this._context);
-    delete context._context[key];
+    const context = new Context(this._currentContext);
+    delete context._currentContext[key];
     return context;
   }
 }

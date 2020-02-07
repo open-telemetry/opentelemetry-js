@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import { StackScopeManager } from '../src';
-import { Context } from '@opentelemetry/core';
+import { Context } from '@opentelemetry/api';
 
 describe('StackScopeManager', () => {
   let scopeManager: StackScopeManager;

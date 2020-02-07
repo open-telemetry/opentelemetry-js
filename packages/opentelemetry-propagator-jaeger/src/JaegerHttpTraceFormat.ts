@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/core';
+import {
+  Context,
+  HttpTextFormat,
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
+import {
+  getParentSpanContext,
+  setExtractedSpanContext,
+} from '@opentelemetry/core';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -45,7 +53,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
   }
 
   inject(context: Context, carrier: { [key: string]: unknown }) {
-    const spanContext = Context.getParentSpanContext(context);
+    const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
     const traceFlags = `0${(
@@ -67,7 +75,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     const spanContext = deserializeSpanContext(uberTraceId);
     if (!spanContext) return context;
 
-    return Context.setExtractedSpanContext(context, spanContext);
+    return setExtractedSpanContext(context, spanContext);
   }
 }
 

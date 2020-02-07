@@ -16,12 +16,18 @@
 
 import {
   CanonicalCode,
+  Context,
   Span,
   SpanKind,
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
-import { BasePlugin, Context, isValid } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  getExtractedSpanContext,
+  isValid,
+  setActiveSpan,
+} from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -299,7 +305,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       // Using context directly like this is temporary. In a future PR, context
       // will be managed by the scope manager (which may be renamed to context manager?)
-      const spanContext = Context.getExtractedSpanContext(
+      const spanContext = getExtractedSpanContext(
         propagation.extract(Context.ROOT_CONTEXT, headers)
       );
       if (spanContext && isValid(spanContext)) {
@@ -412,10 +418,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         .getHttpTextFormat()
         // Using context directly like this is temporary. In a future PR, context
         // will be managed by the scope manager (which may be renamed to context manager?)
-        .inject(
-          Context.setActiveSpan(Context.ROOT_CONTEXT, span),
-          options.headers!
-        );
+        .inject(setActiveSpan(Context.ROOT_CONTEXT, span), options.headers!);
 
       const request: ClientRequest = plugin._safeExecute(
         span,

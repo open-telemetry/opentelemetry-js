@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
+import * as types from '@opentelemetry/api';
 import {
   BasePlugin,
-  Context,
   hrTime,
   isUrlIgnored,
   isWrapped,
   otperformance,
+  setActiveSpan,
   urlMatches,
 } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
 import {
   addSpanNetworkEvent,
   getResource,
@@ -90,9 +90,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const headers: { [key: string]: unknown } = {};
     this._tracer
       .getHttpTextFormat()
-      // Using context directly like this is temporary. In a future PR, context
+      // Using context direclty like this is temporary. In a future PR, context
       // will be managed by the scope manager (which may be renamed to context manager?)
-      .inject(Context.setActiveSpan(Context.ROOT_CONTEXT, span), headers);
+      .inject(setActiveSpan(types.Context.ROOT_CONTEXT, span), headers);
 
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));

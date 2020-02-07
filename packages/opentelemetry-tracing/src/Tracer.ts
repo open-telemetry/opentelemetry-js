@@ -16,19 +16,20 @@
 
 import * as types from '@opentelemetry/api';
 import {
-  randomTraceId,
-  isValid,
-  randomSpanId,
-  NoRecordingSpan,
   ConsoleLogger,
-  Context,
+  getActiveSpan,
+  isValid,
+  NoRecordingSpan,
+  randomSpanId,
+  randomTraceId,
+  setActiveSpan,
 } from '@opentelemetry/core';
-import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
-import { Span } from './Span';
-import { mergeConfig } from './utility';
-import { DEFAULT_CONFIG } from './config';
 import { BasicTracerProvider } from './BasicTracerProvider';
+import { DEFAULT_CONFIG } from './config';
+import { Span } from './Span';
+import { TraceParams, TracerConfig } from './types';
+import { mergeConfig } from './utility';
 
 /**
  * This class represents a basic tracer.
@@ -111,7 +112,7 @@ export class Tracer implements types.Tracer {
    */
   getCurrentSpan(): types.Span | undefined {
     // Get the current Span from the context or null if none found.
-    return Context.getActiveSpan(this._scopeManager.active());
+    return getActiveSpan(this._scopeManager.active());
   }
 
   /**
@@ -123,7 +124,7 @@ export class Tracer implements types.Tracer {
   ): ReturnType<T> {
     // Set given span to context.
     return this._scopeManager.with(
-      Context.setActiveSpan(this._scopeManager.active(), span),
+      setActiveSpan(this._scopeManager.active(), span),
       fn
     );
   }
@@ -135,7 +136,7 @@ export class Tracer implements types.Tracer {
     return this._scopeManager.bind(
       target,
       span
-        ? Context.setActiveSpan(this._scopeManager.active(), span)
+        ? setActiveSpan(this._scopeManager.active(), span)
         : this._scopeManager.active()
     );
   }

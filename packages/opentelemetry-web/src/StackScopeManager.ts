@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
 import { ScopeManager } from '@opentelemetry/scope-base';
-import { Context } from '@opentelemetry/core';
 
 /**
  * Stack Scope Manager for managing the state in web

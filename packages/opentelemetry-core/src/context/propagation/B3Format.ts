@@ -15,7 +15,8 @@
  */
 
 import { HttpTextFormat, TraceFlags } from '@opentelemetry/api';
-import { Context } from '../context';
+import { Context } from '@opentelemetry/scope-base';
+import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
@@ -38,7 +39,7 @@ function isValidSpanId(spanId: string): boolean {
  */
 export class B3Format implements HttpTextFormat {
   inject(context: Context, carrier: { [key: string]: unknown }) {
-    const spanContext = Context.getParentSpanContext(context);
+    const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
     if (
@@ -70,7 +71,7 @@ export class B3Format implements HttpTextFormat {
       : sampledHeader;
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
-      return Context.setExtractedSpanContext(context, {
+      return setExtractedSpanContext(context, {
         traceId,
         spanId,
         isRemote: true,

@@ -13,21 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { HttpTextFormat } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/core';
+import { Context, HttpTextFormat } from '@opentelemetry/api';
+import {
+  setExtractedSpanContext,
+  getParentSpanContext,
+} from '@opentelemetry/core';
 import * as http from 'http';
 
 export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
   extract(context: Context, carrier: http.OutgoingHttpHeaders) {
-    return Context.setExtractedSpanContext(Context.ROOT_CONTEXT, {
+    return setExtractedSpanContext(Context.ROOT_CONTEXT, {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
     });
   }
   inject(context: Context, headers: { [custom: string]: string }): void {
-    const spanContext = Context.getParentSpanContext(context);
+    const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
     headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
     headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;

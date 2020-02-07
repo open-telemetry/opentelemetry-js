@@ -15,7 +15,11 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { Context, NoopLogger } from '@opentelemetry/core';
+import {
+  getExtractedSpanContext,
+  NoopLogger,
+  setExtractedSpanContext,
+} from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 
 function translateReferences(
@@ -131,8 +135,8 @@ export class TracerShim extends opentracing.Tracer {
         this._tracer
           .getHttpTextFormat()
           .inject(
-            Context.setExtractedSpanContext(
-              Context.ROOT_CONTEXT,
+            setExtractedSpanContext(
+              types.Context.ROOT_CONTEXT,
               opentelemSpanContext
             ),
             carrier
@@ -153,10 +157,10 @@ export class TracerShim extends opentracing.Tracer {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP:
-        const context = Context.getExtractedSpanContext(
+        const context = getExtractedSpanContext(
           this._tracer
             .getHttpTextFormat()
-            .extract(Context.ROOT_CONTEXT, carrier)
+            .extract(types.Context.ROOT_CONTEXT, carrier)
         );
         if (!context) {
           return null;

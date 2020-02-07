@@ -15,67 +15,60 @@
  */
 
 import { Span, SpanContext } from '@opentelemetry/api';
-import { Context as ContextBase } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/scope-base';
 
 /**
- * Context class with static helper functions for accessing values
- * of cross-cutting concerns.
+ * Return the active span if one exists
+ *
+ * @param context context to get span from
  */
-export class Context extends ContextBase {
-  /**
-   * Return the active span if one exists
-   *
-   * @param context context to get span from
-   */
-  static getActiveSpan(context: Context): Span | undefined {
-    return (context.getValue('ACTIVE_SPAN') as Span) || undefined;
-  }
+export function getActiveSpan(context: Context): Span | undefined {
+  return (context.getValue('ACTIVE_SPAN') as Span) || undefined;
+}
 
-  /**
-   * Set the active span on a context
-   *
-   * @param context context to use as parent
-   * @param span span to set active
-   */
-  static setActiveSpan(context: Context, span: Span): Context {
-    return context.setValue('ACTIVE_SPAN', span);
-  }
+/**
+ * Set the active span on a context
+ *
+ * @param context context to use as parent
+ * @param span span to set active
+ */
+export function setActiveSpan(context: Context, span: Span): Context {
+  return context.setValue('ACTIVE_SPAN', span);
+}
 
-  /**
-   * Get the extracted span context from a context
-   *
-   * @param context context to get span context from
-   */
-  static getExtractedSpanContext(context: Context): SpanContext | undefined {
-    return (
-      (context.getValue('EXTRACTED_SPAN_CONTEXT') as SpanContext) || undefined
-    );
-  }
+/**
+ * Get the extracted span context from a context
+ *
+ * @param context context to get span context from
+ */
+export function getExtractedSpanContext(
+  context: Context
+): SpanContext | undefined {
+  return (
+    (context.getValue('EXTRACTED_SPAN_CONTEXT') as SpanContext) || undefined
+  );
+}
 
-  /**
-   * Set the extracted span context on a context
-   *
-   * @param context context to set span context on
-   * @param spanContext span context to set
-   */
-  static setExtractedSpanContext(
-    context: Context,
-    spanContext: SpanContext
-  ): Context {
-    return context.setValue('EXTRACTED_SPAN_CONTEXT', spanContext);
-  }
+/**
+ * Set the extracted span context on a context
+ *
+ * @param context context to set span context on
+ * @param spanContext span context to set
+ */
+export function setExtractedSpanContext(
+  context: Context,
+  spanContext: SpanContext
+): Context {
+  return context.setValue('EXTRACTED_SPAN_CONTEXT', spanContext);
+}
 
-  /**
-   * Get the span context of the parent span if it exists,
-   * or the extracted span context if there is no active
-   * span.
-   *
-   * @param context context to get values from
-   */
-  static getParentSpanContext(context: Context) {
-    return (
-      Context.getActiveSpan(context)?.context() ||
-      Context.getExtractedSpanContext(context)
-    );
-  }
+/**
+ * Get the span context of the parent span if it exists,
+ * or the extracted span context if there is no active
+ * span.
+ *
+ * @param context context to get values from
+ */
+export function getParentSpanContext(context: Context) {
+  return getActiveSpan(context)?.context() || getExtractedSpanContext(context);
 }
