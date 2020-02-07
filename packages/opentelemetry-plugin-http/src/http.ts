@@ -407,7 +407,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const span = plugin._startHttpSpan(operationName, spanOptions);
       plugin._tracer
         .getHttpTextFormat()
-        .inject(span.context(), Format.HTTP, options.headers);
+        .inject(span.context(), Format.HTTP, options.headers!);
 
       const request: ClientRequest = plugin._safeExecute(
         span,

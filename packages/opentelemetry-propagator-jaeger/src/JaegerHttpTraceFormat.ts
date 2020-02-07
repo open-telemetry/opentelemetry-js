@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanContext, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
+import {
+  SpanContext,
+  HttpTextFormat,
+  TraceFlags,
+  Carrier,
+} from '@opentelemetry/api';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -46,13 +51,9 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
   /**
    * @param {SpanContext} spanContext - context from which we take information to inject in carrier.
    * @param {string} format - unused.
-   * @param { [key: string]: unknown } carrier - a carrier to which span information will be injected.
+   * @param {Carrier} carrier - a carrier to which span information will be injected.
    **/
-  inject(
-    spanContext: SpanContext,
-    format: string,
-    carrier: { [key: string]: unknown }
-  ) {
+  inject(spanContext: SpanContext, format: string, carrier: Carrier) {
     const traceFlags = `0${(
       spanContext.traceFlags || TraceFlags.UNSAMPLED
     ).toString(16)}`;
@@ -64,13 +65,10 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
 
   /**
    * @param {string} format - unused.
-   * @param { [key: string]: unknown } carrier - a carrier from which span context will be constructed.
+   * @param {Carrier} carrier - a carrier from which span context will be constructed.
    * @return {SpanContext} - returns a span context extracted from carrier.
    **/
-  extract(
-    format: string,
-    carrier: { [key: string]: unknown }
-  ): SpanContext | null {
+  extract(format: string, carrier: Carrier): SpanContext | null {
     const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
     if (!uberTraceIdHeader) return null;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
