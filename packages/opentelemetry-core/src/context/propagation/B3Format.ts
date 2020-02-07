@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, TraceFlags } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/scope-base';
+import {
+  Carrier,
+  Context,
+  HttpTextFormat,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
@@ -38,7 +42,7 @@ function isValidSpanId(spanId: string): boolean {
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3Format implements HttpTextFormat {
-  inject(context: Context, carrier: { [key: string]: unknown }) {
+  inject(context: Context, carrier: Carrier) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -57,7 +61,7 @@ export class B3Format implements HttpTextFormat {
     }
   }
 
-  extract(context: Context, carrier: { [key: string]: unknown }): Context {
+  extract(context: Context, carrier: Carrier): Context {
     const traceIdHeader = carrier[X_B3_TRACE_ID];
     const spanIdHeader = carrier[X_B3_SPAN_ID];
     const sampledHeader = carrier[X_B3_SAMPLED];

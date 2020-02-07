@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/scope-base';
+import {
+  Carrier,
+  Context,
+  HttpTextFormat,
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
@@ -58,7 +63,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContext implements HttpTextFormat {
-  inject(context: Context, carrier: { [key: string]: unknown }) {
+  inject(context: Context, carrier: Carrier) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -72,7 +77,7 @@ export class HttpTraceContext implements HttpTextFormat {
     }
   }
 
-  extract(context: Context, carrier: { [key: string]: unknown }): Context {
+  extract(context: Context, carrier: Carrier): Context {
     const traceParentHeader = carrier[TRACE_PARENT_HEADER];
     if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)

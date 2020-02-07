@@ -15,6 +15,7 @@
  */
 
 import {
+  Carrier,
   Context,
   HttpTextFormat,
   SpanContext,
@@ -52,7 +53,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  inject(context: Context, carrier: { [key: string]: unknown }) {
+  inject(context: Context, carrier: Carrier) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -65,7 +66,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
-  extract(context: Context, carrier: { [key: string]: unknown }): Context {
+  extract(context: Context, carrier: Carrier): Context {
     const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
     if (!uberTraceIdHeader) return context;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
