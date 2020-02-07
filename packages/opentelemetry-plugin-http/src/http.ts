@@ -414,11 +414,13 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       const span = plugin._startHttpSpan(operationName, spanOptions);
+
+      if (!options.headers) options.headers = {};
       plugin._tracer
         .getHttpTextFormat()
         // Using context directly like this is temporary. In a future PR, context
         // will be managed by the scope manager (which may be renamed to context manager?)
-        .inject(setActiveSpan(Context.ROOT_CONTEXT, span), options.headers!);
+        .inject(setActiveSpan(Context.ROOT_CONTEXT, span), options.headers);
 
       const request: ClientRequest = plugin._safeExecute(
         span,

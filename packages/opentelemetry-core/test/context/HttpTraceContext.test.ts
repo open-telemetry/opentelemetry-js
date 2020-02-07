@@ -75,7 +75,7 @@ describe('HttpTraceContext', () => {
     });
   });
 
-  describe('.extract())', () => {
+  describe('.extract()', () => {
     it('should extract context of a sampled span from carrier', () => {
       carrier[TRACE_PARENT_HEADER] =
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
