@@ -120,7 +120,7 @@ export class TracerShim extends opentracing.Tracer {
   _inject(
     spanContext: opentracing.SpanContext,
     format: string,
-    carrier: unknown
+    carrier: types.Carrier
   ): void {
     const opentelemSpanContext: types.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     switch (format) {
@@ -141,7 +141,10 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
+  _extract(
+    format: string,
+    carrier: types.Carrier
+  ): opentracing.SpanContext | null {
     switch (format) {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
