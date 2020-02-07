@@ -73,7 +73,7 @@ describe('API', () => {
     });
 
     class TestTracer extends NoopTracer {
-      startSpan(name: string, options?: SpanOptions | undefined): Span {
+      startSpan(name: string, options?: SpanOptions): Span {
         return dummySpan;
       }
     }
