@@ -9,7 +9,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 > This project is currently in Alpha stage. Its APIs can change at any time and it is not intended to be used in production scenarios!
 
-The minimum supported version of NodeJS is `8.5.0` and the maximum supported version is `12`
+Modern browsers and Active LTS versions are supported, and it has been tested on the latest version of Node 8
 
 ## Documentation
 
