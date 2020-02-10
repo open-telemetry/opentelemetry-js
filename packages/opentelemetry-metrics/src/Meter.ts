@@ -66,8 +66,7 @@ export class Meter implements types.Meter {
       return types.NOOP_MEASURE_METRIC;
     }
     const opt: MetricOptions = {
-      // Measures are defined as absolute by default
-      absolute: true,
+      absolute: true, // Measures are defined as absolute by default
       monotonic: false, // not applicable to measure, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
@@ -97,8 +96,7 @@ export class Meter implements types.Meter {
       return types.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
-      // Counters are defined as monotonic by default
-      monotonic: true,
+      monotonic: true, // Counters are defined as monotonic by default
       absolute: false, // not applicable to counter, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
@@ -128,8 +126,7 @@ export class Meter implements types.Meter {
       return types.NOOP_GAUGE_METRIC;
     }
     const opt: MetricOptions = {
-      // Gauges are defined as non-monotonic by default
-      monotonic: false,
+      monotonic: false, // Gauges are defined as non-monotonic by default
       absolute: false, // not applicable for gauges, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,

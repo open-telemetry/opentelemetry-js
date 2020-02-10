@@ -133,15 +133,19 @@ export class BoundGauge extends BaseBoundInstrument
  */
 export class BoundMeasure extends BaseBoundInstrument
   implements types.BoundMeasure {
+  private readonly _absolute: boolean;
+
   constructor(
     labelSet: types.LabelSet,
     disabled: boolean,
+    monotonic: boolean,
     absolute: boolean,
     valueType: types.ValueType,
     logger: types.Logger,
     aggregator: Aggregator
   ) {
-    super(labelSet, logger, absolute, disabled, valueType, aggregator);
+    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
+    this._absolute = absolute;
   }
 
   record(

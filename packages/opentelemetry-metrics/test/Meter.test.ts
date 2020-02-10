@@ -25,19 +25,14 @@ import {
   Sum,
   MeterProvider,
   MeasureMetric,
-  Distribution
+  Distribution,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
-import {
-  NoopLogger,
-  hrTime,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
+import { NoopLogger, hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   GaugeAggregator,
-  MeasureExactAggregator,
 } from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
 
@@ -497,8 +492,12 @@ describe('Meter', () => {
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-
-        assert.strictEqual((record1.aggregator.value() as Distribution), 10);
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 0,
+          max: -Infinity,
+          min: Infinity,
+          sum: 0,
+        });
       });
 
       it('should accept negative (and positive) values when monotonic is set to false', () => {
@@ -511,8 +510,14 @@ describe('Meter', () => {
         boundMeasure1.record(10);
         const boundMeasure2 = measure.bind(labelSet);
         boundMeasure2.record(100);
-        // @todo: re-add once record is implemented
-        // assert.strictEqual(boundMeasure1['_data'], 100);
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 2,
+          max: 100,
+          min: 10,
+          sum: 110,
+        });
         assert.strictEqual(boundMeasure1, boundMeasure2);
       });
     });

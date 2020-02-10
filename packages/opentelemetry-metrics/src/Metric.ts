@@ -186,11 +186,7 @@ export class MeasureMetric extends Metric<BoundMeasure>
     options: MetricOptions,
     private readonly _batcher: Batcher
   ) {
-    super(
-      name,
-      options,
-      MetricKind.MEASURE
-    );
+    super(name, options, MetricKind.MEASURE);
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
@@ -198,6 +194,7 @@ export class MeasureMetric extends Metric<BoundMeasure>
     return new BoundMeasure(
       labelSet,
       this._disabled,
+      this._monotonic,
       this._absolute,
       this._valueType,
       this._logger,
