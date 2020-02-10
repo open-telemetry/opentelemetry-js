@@ -112,7 +112,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [devDependencies-image]: https://david-dm.org/open-telemetry/opentelemetry-js/dev-status.svg?path=packages/opentelemetry-api
 [devDependencies-url]: https://david-dm.org/open-telemetry/opentelemetry-js?path=packages%2Fopentelemetry-api&type=dev
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/api
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Ftypes.svg
+[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fapi.svg
 
 [trace-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/traceapi.html
 [metrics-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/metricsapi.html
