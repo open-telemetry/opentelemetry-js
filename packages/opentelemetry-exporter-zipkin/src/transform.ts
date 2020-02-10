@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';

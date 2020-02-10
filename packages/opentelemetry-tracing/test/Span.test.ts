@@ -20,8 +20,8 @@ import {
   CanonicalCode,
   TraceFlags,
   SpanContext,
-} from '@opentelemetry/types';
-import { BasicTracerRegistry, Span } from '../src';
+} from '@opentelemetry/api';
+import { BasicTracerProvider, Span } from '../src';
 import {
   hrTime,
   hrTimeToNanoseconds,
@@ -33,7 +33,7 @@ import {
 const performanceTimeOrigin = hrTime();
 
 describe('Span', () => {
-  const tracer = new BasicTracerRegistry({
+  const tracer = new BasicTracerProvider({
     logger: new NoopLogger(),
   }).getTracer('default');
   const name = 'span1';

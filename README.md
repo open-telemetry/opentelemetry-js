@@ -96,8 +96,8 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 | Package                 | Description |
 | ----------------------- | -----------------|
-| [@opentelemetry/types][otel-types] | This package provides TypeScript interfaces and enums for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry types for trace and metrics. It's intended for use both on the server and in the browser. |
+| [@opentelemetry/api][otel-api] | This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It's intended for use both on the server and in the browser. |
 
 ### Implementation / SDKs
 
@@ -141,6 +141,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 #### Web Plugins
 - [@opentelemetry/plugin-document-load][otel-plugin-document-load]
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/plugin-user-interaction][otel-plugin-user-interaction]
 
 To request automatic tracing support for a module not on this list, please [file an issue](https://github.com/open-telemetry/opentelemetry-js/issues). Alternatively, you can [write a plugin yourself](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md).
 
@@ -191,9 +192,10 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-plugin-pg-pool]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool
 [otel-plugin-pg]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg
 [otel-plugin-redis]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis
+[otel-plugin-user-interaction]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-user-interaction
 [otel-plugin-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
-[otel-types]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-types
+[otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core

@@ -23,7 +23,7 @@ import {
   MetricExporter,
   ReadableMetric,
 } from '@opentelemetry/metrics';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';

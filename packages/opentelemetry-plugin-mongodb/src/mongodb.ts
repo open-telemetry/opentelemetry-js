@@ -18,7 +18,7 @@
 /* tslint:disable:deprecation */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { CanonicalCode, Span, SpanKind } from '@opentelemetry/types';
+import { CanonicalCode, Span, SpanKind } from '@opentelemetry/api';
 import * as mongodb from 'mongodb';
 import * as shimmer from 'shimmer';
 import {

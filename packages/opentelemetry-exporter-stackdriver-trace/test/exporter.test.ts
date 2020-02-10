@@ -17,7 +17,7 @@
 import { ExportResult } from '@opentelemetry/base';
 import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as nock from 'nock';
 import * as sinon from 'sinon';

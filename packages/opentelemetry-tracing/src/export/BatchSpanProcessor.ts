@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from '@opentelemetry/types';
+import { TraceFlags } from '@opentelemetry/api';
 import { unrefTimer } from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';

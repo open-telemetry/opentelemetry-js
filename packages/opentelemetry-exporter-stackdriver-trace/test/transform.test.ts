@@ -16,7 +16,7 @@
 
 import { VERSION as CORE_VERSION } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import * as assert from 'assert';
 import { getReadableSpanTransformer } from '../src/transform';
 import { LinkType, Span } from '../src/types';

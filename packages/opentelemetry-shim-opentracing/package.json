@@ -1,13 +1,13 @@
 {
   "name": "@opentelemetry/shim-opentracing",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTracing to OpenTelemetry shim",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "check": "gts check",
@@ -39,7 +39,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/tracing": "^0.4.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "codecov": "^3.6.1",
@@ -49,13 +49,13 @@
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/types": "^0.3.3",
+    "@opentelemetry/api": "^0.4.0",
+    "@opentelemetry/core": "^0.4.0",
     "opentracing": "^0.14.4"
   }
 }

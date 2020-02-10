@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-stackdriver-trace",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTelemetry StackDriver Trace Exporter allows the user to send collected traces to StackDriver Trace.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -14,7 +14,7 @@
     "fix": "gts fix",
     "precompile": "tsc --version",
     "prepare": "npm run compile",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'"
   },
   "keywords": [
@@ -54,15 +54,15 @@
     "sinon": "^8.0.1",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.3.0",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/base": "^0.3.3",
-    "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/tracing": "^0.3.3",
-    "@opentelemetry/types": "^0.3.3",
+    "@opentelemetry/api": "^0.4.0",
+    "@opentelemetry/base": "^0.4.0",
+    "@opentelemetry/core": "^0.4.0",
+    "@opentelemetry/tracing": "^0.4.0",
     "google-auth-library": "^5.7.0",
     "googleapis": "^46.0.0"
   }

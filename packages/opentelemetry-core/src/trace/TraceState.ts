@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { validateKey, validateValue } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;

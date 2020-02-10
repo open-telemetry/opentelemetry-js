@@ -20,7 +20,7 @@ import {
   parseTraceParent,
   TRACE_PARENT_HEADER,
 } from '@opentelemetry/core';
-import { PluginConfig, Span, SpanOptions } from '@opentelemetry/types';
+import { PluginConfig, Span, SpanOptions } from '@opentelemetry/api';
 import {
   addSpanNetworkEvent,
   hasKey,

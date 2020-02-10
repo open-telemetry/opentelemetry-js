@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Sampler, SpanContext } from '@opentelemetry/types';
+import { Sampler, SpanContext } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {

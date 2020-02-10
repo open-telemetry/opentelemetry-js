@@ -1,12 +1,12 @@
 'use strict';
 
-const types = require('@opentelemetry/types');
+const api = require('@opentelemetry/api');
 
 function getMiddlewareTracer(tracer) {
   return (req, res, next) => {
     const span = tracer.startSpan(`express.middleware.tracer(${req.method} ${req.path})`, {
       parent: tracer.getCurrentSpan(),
-      kind: types.SpanKind.SERVER,
+      kind: api.SpanKind.SERVER,
     });
 
     // End this span before sending out the response
@@ -25,7 +25,7 @@ function getErrorTracer(tracer) {
     console.error('Caught error', err.message);
     const span = tracer.getCurrentSpan();
     if (span) {
-      span.setStatus({ code: types.CanonicalCode.INTERNAL, message: err.message });
+      span.setStatus({ code: api.CanonicalCode.INTERNAL, message: err.message });
     }
     res.status(500).send(err.message);
   };

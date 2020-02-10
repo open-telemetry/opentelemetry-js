@@ -22,7 +22,7 @@
  * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
  */
 
-import { HrTime } from '@opentelemetry/types';
+import { HrTime } from '@opentelemetry/api';
 import { Resource, ExportResult } from '@opentelemetry/base';
 
 export interface ReadableMetric {
@@ -122,6 +122,14 @@ export enum MetricDescriptorType {
    * window. This is not recommended, since it cannot be aggregated.
    */
   SUMMARY,
+  /**
+   * Integer measure. The value can be positive or negative.
+   */
+  MEASURE_INT64,
+  /**
+   * Floating point measure. The value can be positive or negative.
+   */
+  MEASURE_DOUBLE,
 }
 
 /**

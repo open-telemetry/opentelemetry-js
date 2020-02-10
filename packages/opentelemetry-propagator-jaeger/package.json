@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/propagator-jaeger",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTelemetry Jaeger propagator provides HTTP header propagation for systems that are using Jaeger HTTP header format.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -8,8 +8,8 @@
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
     "test:browser": "nyc karma start --single-run",
-    "tdd": "yarn tdd:node",
-    "tdd:node": "yarn test -- --watch-extensions ts --watch",
+    "tdd": "npm run tdd:node",
+    "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
@@ -70,6 +70,6 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/types": "^0.3.3"
+    "@opentelemetry/api": "^0.4.0"
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CanonicalCode, Status } from '@opentelemetry/types';
+import { CanonicalCode, Status } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 
 // Equivalent to lodash _.findIndex

@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/types';
+import * as types from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 

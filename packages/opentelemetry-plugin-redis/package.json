@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-redis",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "description": "OpenTelemetry redis automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -8,8 +8,8 @@
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'",
     "test:debug": "cross-env RUN_REDIS_TESTS_LOCAL=true ts-mocha --inspect-brk --no-timeouts -p tsconfig.json 'test/**/*.test.ts'",
-    "test:local": "cross-env RUN_REDIS_TESTS_LOCAL=true yarn test",
-    "tdd": "yarn test -- --watch-extensions ts --watch",
+    "test:local": "cross-env RUN_REDIS_TESTS_LOCAL=true npm run test",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "check": "gts check",
     "precompile": "tsc --version",
@@ -43,9 +43,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/node": "^0.3.3",
-    "@opentelemetry/test-utils": "^0.3.3",
-    "@opentelemetry/tracing": "^0.3.3",
+    "@opentelemetry/node": "^0.4.0",
+    "@opentelemetry/test-utils": "^0.4.0",
+    "@opentelemetry/tracing": "^0.4.0",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/redis": "^2.8.14",
@@ -59,13 +59,13 @@
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.15.1",
+    "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/core": "^0.3.3",
-    "@opentelemetry/types": "^0.3.3",
+    "@opentelemetry/api": "^0.4.0",
+    "@opentelemetry/core": "^0.4.0",
     "shimmer": "^1.2.1"
   }
 }

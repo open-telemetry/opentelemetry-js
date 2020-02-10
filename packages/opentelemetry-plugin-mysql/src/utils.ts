@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/types';
+import { Attributes } from '@opentelemetry/api';
 import { AttributeNames } from './enums';
 import { ConnectionConfig, Query } from './types';
 

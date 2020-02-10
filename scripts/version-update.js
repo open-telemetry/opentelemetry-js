@@ -15,6 +15,7 @@
  */
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const appRoot = process.cwd();
@@ -44,4 +45,4 @@ export const VERSION = '${pjson.version}';
 
 const fileUrl = path.join(appRoot, "src", "version.ts")
 
-fs.writeFileSync(fileUrl, content);
+fs.writeFileSync(fileUrl, content.replace(/\n/g, os.EOL));

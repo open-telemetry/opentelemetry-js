@@ -9,6 +9,7 @@ const common = {
   entry: {
     'document-load': 'examples/document-load/index.js',
     'xml-http-request': 'examples/xml-http-request/index.js',
+    'user-interaction': 'examples/user-interaction/index.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

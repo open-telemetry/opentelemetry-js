@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, CanonicalCode } from '@opentelemetry/types';
+import { Span, CanonicalCode } from '@opentelemetry/api';
 import { PgPoolOptionsParams, PgPoolCallback, PgPoolExtended } from './types';
 
 export function getJDBCString(params: PgPoolOptionsParams) {
