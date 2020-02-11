@@ -21,8 +21,8 @@ import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
- * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses constant
- * NoopMetrics for all of its methods.
+ * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
+ * constant NoopMetrics for all of its methods.
  */
 export class NoopMeter implements Meter {
   constructor() {}
@@ -67,9 +67,10 @@ export class NoopMetric<T> implements Metric<T> {
   }
   /**
    * Returns a Bound Instrument associated with specified LabelSet.
-   * It is recommended to keep a reference to the Bound Instrument instead of always
-   * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * It is recommended to keep a reference to the Bound Instrument instead of
+   * always calling this method for every operations.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   bind(labels: LabelSet): T {
     return this._instrument;
@@ -84,10 +85,10 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Binding from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   unbind(labels: LabelSet): void {
-    // @todo: implement this method
     return;
   }
 
