@@ -86,6 +86,13 @@ const notSupportedVersionPlugins: Plugins = {
   },
 };
 
+const alreadyRequiredPlugins: Plugins = {
+  'already-require-module': {
+    enabled: true,
+    path: '@opentelemetry/plugin-supported-module',
+  },
+};
+
 describe('PluginLoader', () => {
   const provider = new NoopTracerProvider();
   const logger = new NoopLogger();
@@ -217,6 +224,23 @@ describe('PluginLoader', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       pluginLoader.load({});
       assert.strictEqual(require('simple-module').value(), 0);
+      pluginLoader.unload();
+    });
+
+    it(`should warn when module was already loaded`, callback => {
+      const verifyWarnLogger = {
+        error: logger.error,
+        info: logger.info,
+        debug: logger.debug,
+        warn: (message: string, ...args: unknown[]) => {
+          assert(message.match(/were already required when/));
+          assert(message.match(/(already-require-module)/));
+          return callback();
+        },
+      };
+      require('already-require-module');
+      const pluginLoader = new PluginLoader(provider, verifyWarnLogger);
+      pluginLoader.load(alreadyRequiredPlugins);
       pluginLoader.unload();
     });
   });
