@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-import { Distribution, Sum, LastValue } from './types';
+import { Distribution, Sum, LastValue, Aggregator } from './types';
 import { hrTime } from '@opentelemetry/core';
 import * as types from '@opentelemetry/api';
-
-/**
- * Base interface for aggregators. Aggregators are responsible for holding
- * aggregated values and taking a snapshot of these values upon export.
- */
-export interface Aggregator {
-  /** Updates the current with the new value. */
-  update(value: number): void;
-
-  /** Returns snapshot of the current value. */
-  value(): Sum | LastValue | Distribution;
-}
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {

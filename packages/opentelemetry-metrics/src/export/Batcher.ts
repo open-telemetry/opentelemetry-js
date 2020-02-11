@@ -16,11 +16,10 @@
 
 import {
   CounterSumAggregator,
-  Aggregator,
   GaugeAggregator,
   MeasureExactAggregator,
 } from './Aggregator';
-import { MetricRecord, MetricKind } from './types';
+import { MetricRecord, MetricKind, Aggregator } from './types';
 
 /**
  * Base class for all batcher types.

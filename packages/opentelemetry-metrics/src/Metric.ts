@@ -132,6 +132,7 @@ export class CounterMetric extends Metric<BoundCounter>
       this._monotonic,
       this._valueType,
       this._logger,
+      // @todo: consider to set to CounterSumAggregator always.
       this._batcher.aggregatorFor(MetricKind.COUNTER)
     );
   }

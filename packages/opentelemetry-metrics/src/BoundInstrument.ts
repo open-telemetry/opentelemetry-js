@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { Aggregator } from './export/Aggregator';
+import { Aggregator } from './export/types';
 
 /**
  * This class represent the base to BoundInstrument, which is responsible for generating

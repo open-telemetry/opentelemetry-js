@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-/**
- * This is based on
- * opencensus-node/packages/opencensus-core/src/metrics/export/types.ts
- *
- * Proto definition:
- * opentelemetry-proto/opentelemetry/proto/metrics/v1/metrics.proto
- */
-
 import { HrTime, ValueType } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
-import { Aggregator } from './Aggregator';
 import { LabelSet } from '../LabelSet';
 
 /** The kind of metric. */
@@ -78,4 +69,16 @@ export interface MetricExporter {
 
   /** Stops the exporter. */
   shutdown(): void;
+}
+
+/**
+ * Base interface for aggregators. Aggregators are responsible for holding
+ * aggregated values and taking a snapshot of these values upon export.
+ */
+export interface Aggregator {
+  /** Updates the current with the new value. */
+  update(value: number): void;
+
+  /** Returns snapshot of the current value. */
+  value(): Sum | LastValue | Distribution;
 }
