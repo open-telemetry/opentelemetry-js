@@ -92,7 +92,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       .getHttpTextFormat()
       // Using context direclty like this is temporary. In a future PR, context
       // will be managed by the scope manager (which may be renamed to context manager?)
-      .inject(setActiveSpan(types.Context.ROOT_CONTEXT, span), headers);
+      .inject(setActiveSpan(types.Context.TODO, span), headers);
 
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));

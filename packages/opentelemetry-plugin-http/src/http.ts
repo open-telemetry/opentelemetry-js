@@ -306,7 +306,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       // Using context directly like this is temporary. In a future PR, context
       // will be managed by the scope manager (which may be renamed to context manager?)
       const spanContext = getExtractedSpanContext(
-        propagation.extract(Context.ROOT_CONTEXT, headers)
+        propagation.extract(Context.TODO, headers)
       );
       if (spanContext && isValid(spanContext)) {
         spanOptions.parent = spanContext;
@@ -420,7 +420,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         .getHttpTextFormat()
         // Using context directly like this is temporary. In a future PR, context
         // will be managed by the scope manager (which may be renamed to context manager?)
-        .inject(setActiveSpan(Context.ROOT_CONTEXT, span), options.headers);
+        .inject(setActiveSpan(Context.TODO, span), options.headers);
 
       const request: ClientRequest = plugin._safeExecute(
         span,

@@ -26,6 +26,15 @@ export class Context {
   /** The root context is used as the default parent context when there is no active context */
   public static readonly ROOT_CONTEXT = new Context();
 
+
+  /** 
+   * This is another identifier to the root context which allows developers to easily search the
+   * codebase for direct uses of context which need to be removed in later PRs.
+   * 
+   * It's existence is temporary and it should be removed when all references are fixed.
+   */
+  public static readonly TODO = Context.ROOT_CONTEXT;
+
   /** Get a key to uniquely identify a context value */
   public static getKey(description: string) {
     return Symbol(description);
