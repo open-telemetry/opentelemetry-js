@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-/** Map of identifiers to an unknown value used internally to store context */
-type Store = { [identifer: string]: unknown };
 
 /**
  * Class which stores and manages current context values. All methods which
@@ -23,18 +21,23 @@ type Store = { [identifer: string]: unknown };
  * but create a new one with updated values.
  */
 export class Context {
-  private _currentContext: Store;
+  private _currentContext: Map<symbol, unknown>;
 
   /** The root context is used as the default parent context when there is no active context */
   public static readonly ROOT_CONTEXT = new Context();
+
+  /** Get a key to uniquely identify a context value */
+  public static getKey(description: string) {
+    return Symbol(description);
+  }
 
   /**
    * Construct a new context which inherits values from an optional parent context.
    *
    * @param parentContext a context from which to inherit values
    */
-  private constructor(parentContext?: Store) {
-    this._currentContext = Object.assign(Object.create(null), parentContext);
+  private constructor(parentContext?: Map<symbol, unknown>) {
+    this._currentContext = parentContext ? new Map(parentContext) : new Map();
   }
 
   /**
@@ -42,8 +45,8 @@ export class Context {
    *
    * @param key key which identifies a context value
    */
-  getValue(key: string): unknown {
-    return this._currentContext[key];
+  getValue(key: symbol): unknown {
+    return this._currentContext.get(key);
   }
 
   /**
@@ -53,9 +56,9 @@ export class Context {
    * @param key context key for which to set the value
    * @param value value to set for the given key
    */
-  setValue(key: string, value: unknown): Context {
+  setValue(key: symbol, value: unknown): Context {
     const context = new Context(this._currentContext);
-    context._currentContext[key] = value;
+    context._currentContext.set(key, value);
     return context;
   }
 
@@ -65,9 +68,9 @@ export class Context {
    *
    * @param key context key for which to clear a value
    */
-  deleteValue(key: string): Context {
+  deleteValue(key: symbol): Context {
     const context = new Context(this._currentContext);
-    delete context._currentContext[key];
+    context._currentContext.delete(key);
     return context;
   }
 }

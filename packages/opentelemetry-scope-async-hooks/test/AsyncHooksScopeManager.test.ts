@@ -21,6 +21,7 @@ import { Context } from '@opentelemetry/scope-base';
 
 describe('AsyncHooksScopeManager', () => {
   let scopeManager: AsyncHooksScopeManager;
+  const key1 = Context.getKey('test key 1');
 
   beforeEach(() => {
     scopeManager = new AsyncHooksScopeManager();
@@ -55,7 +56,7 @@ describe('AsyncHooksScopeManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = Context.ROOT_CONTEXT.setValue('a', 1);
+      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
       scopeManager.with(test, () => {
         assert.strictEqual(scopeManager.active(), test, 'should have scope');
         return done();
@@ -80,8 +81,8 @@ describe('AsyncHooksScopeManager', () => {
     });
 
     it('should finally restore an old scope', done => {
-      const scope1 = Context.ROOT_CONTEXT.setValue('name', 'scope1');
-      const scope2 = Context.ROOT_CONTEXT.setValue('name', 'scope2');
+      const scope1 = Context.ROOT_CONTEXT.setValue(key1, 'scope1');
+      const scope2 = Context.ROOT_CONTEXT.setValue(key1, 'scope2');
       scopeManager.with(scope1, () => {
         assert.strictEqual(scopeManager.active(), scope1);
         scopeManager.with(scope2, () => {
@@ -113,7 +114,7 @@ describe('AsyncHooksScopeManager', () => {
     });
 
     it('should return current scope (when enabled)', done => {
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = scopeManager.bind(() => {
         assert.strictEqual(scopeManager.active(), scope, 'should have scope');
         return done();
@@ -127,7 +128,7 @@ describe('AsyncHooksScopeManager', () => {
      */
     it('should return current scope (when disabled)', done => {
       scopeManager.disable();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = scopeManager.bind(() => {
         assert.strictEqual(scopeManager.active(), scope, 'should have scope');
         return done();
@@ -137,7 +138,7 @@ describe('AsyncHooksScopeManager', () => {
 
     it('should fail to return current scope (when disabled + async op)', done => {
       scopeManager.disable();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = scopeManager.bind(() => {
         setTimeout(() => {
           assert.strictEqual(
@@ -153,7 +154,7 @@ describe('AsyncHooksScopeManager', () => {
 
     it('should return current scope (when re-enabled + async op)', done => {
       scopeManager.enable();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = scopeManager.bind(() => {
         setTimeout(() => {
           assert.strictEqual(scopeManager.active(), scope, 'should have scope');
@@ -179,7 +180,7 @@ describe('AsyncHooksScopeManager', () => {
 
     it('should return current scope and removeListener (when enabled)', done => {
       const ee = new EventEmitter();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         assert.deepStrictEqual(scopeManager.active(), scope);
@@ -194,7 +195,7 @@ describe('AsyncHooksScopeManager', () => {
 
     it('should return current scope and removeAllListener (when enabled)', done => {
       const ee = new EventEmitter();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         assert.deepStrictEqual(scopeManager.active(), scope);
@@ -214,7 +215,7 @@ describe('AsyncHooksScopeManager', () => {
     it('should return scope (when disabled)', done => {
       scopeManager.disable();
       const ee = new EventEmitter();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         assert.deepStrictEqual(scopeManager.active(), scope);
@@ -231,7 +232,7 @@ describe('AsyncHooksScopeManager', () => {
     it('should not return current scope (when disabled + async op)', done => {
       scopeManager.disable();
       const ee = new EventEmitter();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         setImmediate(() => {
@@ -249,7 +250,7 @@ describe('AsyncHooksScopeManager', () => {
     it('should return current scope (when enabled + async op)', done => {
       scopeManager.enable();
       const ee = new EventEmitter();
-      const scope = Context.ROOT_CONTEXT.setValue('a', 1);
+      const scope = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = scopeManager.bind(ee, scope);
       const handler = () => {
         setImmediate(() => {

@@ -44,7 +44,8 @@ describe('NoopScopeManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = Context.ROOT_CONTEXT.setValue('a', 1);
+      const key = Context.getKey('test key 1');
+      const test = Context.ROOT_CONTEXT.setValue(key, 1);
       scopeManager.with(test, () => {
         assert.strictEqual(
           scopeManager.active(),

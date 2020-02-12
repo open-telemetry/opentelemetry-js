@@ -17,8 +17,8 @@
 import { Span, SpanContext } from '@opentelemetry/api';
 import { Context } from '@opentelemetry/scope-base';
 
-const ACTIVE_SPAN_KEY = 'ACTIVE_SPAN';
-const EXTRACTED_SPAN_CONTEXT_KEY = 'EXTRACTED_SPAN_CONTEXT';
+const ACTIVE_SPAN_KEY = Context.getKey('OpenTelemetry Context Key ACTIVE_SPAN');
+const EXTRACTED_SPAN_CONTEXT_KEY = Context.getKey('OpenTelemetry Context Key EXTRACTED_SPAN_CONTEXT');
 
 /**
  * Return the active span if one exists
