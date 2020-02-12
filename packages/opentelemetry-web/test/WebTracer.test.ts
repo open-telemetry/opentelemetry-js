@@ -27,6 +27,8 @@ class DummyPlugin extends BasePlugin<unknown> {
   constructor() {
     super('dummy');
   }
+  moduleName = 'dummy';
+
   patch() {}
   unpatch() {}
 }
