@@ -42,7 +42,7 @@ describe('ZoneScopeManager', () => {
       assert.doesNotThrow(() => {
         assert(scopeManager.enable() === scopeManager, 'should return this');
         scopeManager.with(ctx, () => {
-          assert(scopeManager.active() === ctx, 'should has root scope');
+          assert(scopeManager.active() === ctx, 'should have root scope');
         });
       });
     });
@@ -56,7 +56,7 @@ describe('ZoneScopeManager', () => {
         scopeManager.with(ctx, () => {
           assert(
             scopeManager.active() === Context.ROOT_CONTEXT,
-            'should has root scope'
+            'should have root scope'
           );
         });
       });

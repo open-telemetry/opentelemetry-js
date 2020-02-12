@@ -17,13 +17,16 @@
 import { Span, SpanContext } from '@opentelemetry/api';
 import { Context } from '@opentelemetry/scope-base';
 
+const ACTIVE_SPAN_KEY = 'ACTIVE_SPAN';
+const EXTRACTED_SPAN_CONTEXT_KEY = 'EXTRACTED_SPAN_CONTEXT';
+
 /**
  * Return the active span if one exists
  *
  * @param context context to get span from
  */
 export function getActiveSpan(context: Context): Span | undefined {
-  return (context.getValue('ACTIVE_SPAN') as Span) || undefined;
+  return (context.getValue(ACTIVE_SPAN_KEY) as Span) || undefined;
 }
 
 /**
@@ -33,7 +36,7 @@ export function getActiveSpan(context: Context): Span | undefined {
  * @param span span to set active
  */
 export function setActiveSpan(context: Context, span: Span): Context {
-  return context.setValue('ACTIVE_SPAN', span);
+  return context.setValue(ACTIVE_SPAN_KEY, span);
 }
 
 /**
@@ -45,7 +48,7 @@ export function getExtractedSpanContext(
   context: Context
 ): SpanContext | undefined {
   return (
-    (context.getValue('EXTRACTED_SPAN_CONTEXT') as SpanContext) || undefined
+    (context.getValue(EXTRACTED_SPAN_CONTEXT_KEY) as SpanContext) || undefined
   );
 }
 
@@ -59,7 +62,7 @@ export function setExtractedSpanContext(
   context: Context,
   spanContext: SpanContext
 ): Context {
-  return context.setValue('EXTRACTED_SPAN_CONTEXT', spanContext);
+  return context.setValue(EXTRACTED_SPAN_CONTEXT_KEY, spanContext);
 }
 
 /**
@@ -69,6 +72,8 @@ export function setExtractedSpanContext(
  *
  * @param context context to get values from
  */
-export function getParentSpanContext(context: Context) {
+export function getParentSpanContext(
+  context: Context
+): SpanContext | undefined {
   return getActiveSpan(context)?.context() || getExtractedSpanContext(context);
 }

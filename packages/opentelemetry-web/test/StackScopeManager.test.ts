@@ -36,7 +36,7 @@ describe('StackScopeManager', () => {
         assert(scopeManager.enable() === scopeManager, 'should return this');
         assert(
           scopeManager.active() === Context.ROOT_CONTEXT,
-          'should has root scope'
+          'should have root scope'
         );
       });
     });
@@ -48,7 +48,7 @@ describe('StackScopeManager', () => {
         assert(scopeManager.disable() === scopeManager, 'should return this');
         assert(
           scopeManager.active() === Context.ROOT_CONTEXT,
-          'should has no scope'
+          'should have no scope'
         );
       });
     });
