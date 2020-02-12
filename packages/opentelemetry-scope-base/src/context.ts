@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 /**
  * Class which stores and manages current context values. All methods which
  * update context such as get and delete do not modify an existing context,
@@ -26,11 +25,10 @@ export class Context {
   /** The root context is used as the default parent context when there is no active context */
   public static readonly ROOT_CONTEXT = new Context();
 
-
-  /** 
+  /**
    * This is another identifier to the root context which allows developers to easily search the
    * codebase for direct uses of context which need to be removed in later PRs.
-   * 
+   *
    * It's existence is temporary and it should be removed when all references are fixed.
    */
   public static readonly TODO = Context.ROOT_CONTEXT;
