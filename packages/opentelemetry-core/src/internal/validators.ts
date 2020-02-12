@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-const VALID_KEY_REGEX = /^[a-z][_0-9a-z-*/]{0,255}$/;
+const VALID_KEY_CHAR_RANGE = '[_0-9a-z-*/]';
+const VALID_KEY_REGEX = new RegExp(`^[a-z]${VALID_KEY_CHAR_RANGE}{0,255}$`);
+const VALID_KEY_VENDOR_REGEX = new RegExp(
+  `^[a-z0-9]${VALID_KEY_CHAR_RANGE}{0,240}@[a-z]${VALID_KEY_CHAR_RANGE}{0,13}$`
+);
 const VALID_VALUE_BASE_REGEX = /^[ -~]{0,255}[!-~]$/;
 const INVALID_VALUE_COMMA_EQUAL_REGEX = /,|=/;
 
@@ -24,7 +28,7 @@ const INVALID_VALUE_COMMA_EQUAL_REGEX = /,|=/;
  * underscores _, dashes -, asterisks *, and forward slashes /.
  */
 export function validateKey(key: string): boolean {
-  return VALID_KEY_REGEX.test(key);
+  return VALID_KEY_REGEX.test(key) || VALID_KEY_VENDOR_REGEX.test(key);
 }
 
 /**
