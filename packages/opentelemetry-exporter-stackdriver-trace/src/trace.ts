@@ -37,7 +37,7 @@ export class StackdriverTraceExporter implements SpanExporter {
 
   private static readonly _cloudTrace = google.cloudtrace('v2');
 
-  constructor(options: StackdriverExporterOptions) {
+  constructor(options: StackdriverExporterOptions = {}) {
     this._logger = options.logger || new NoopLogger();
 
     this._auth = new GoogleAuth({
