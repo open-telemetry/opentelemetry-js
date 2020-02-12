@@ -24,8 +24,8 @@ let clock: any;
 
 describe('ZoneScopeManager', () => {
   let scopeManager: ZoneScopeManager;
-  const key1 = Context.getKey('test key 1');
-  const key2 = Context.getKey('test key 2');
+  const key1 = Context.createKey('test key 1');
+  const key2 = Context.createKey('test key 2');
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();

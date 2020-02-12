@@ -34,7 +34,7 @@ export class Context {
   public static readonly TODO = Context.ROOT_CONTEXT;
 
   /** Get a key to uniquely identify a context value */
-  public static getKey(description: string) {
+  public static createKey(description: string) {
     return Symbol(description);
   }
 

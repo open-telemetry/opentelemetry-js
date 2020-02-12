@@ -20,7 +20,7 @@ import { Context } from '@opentelemetry/api';
 
 describe('StackScopeManager', () => {
   let scopeManager: StackScopeManager;
-  const key1 = Context.getKey('test key 1');
+  const key1 = Context.createKey('test key 1');
 
   beforeEach(() => {
     scopeManager = new StackScopeManager();
