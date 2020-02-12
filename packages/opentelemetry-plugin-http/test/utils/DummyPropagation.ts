@@ -24,7 +24,7 @@ export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
   extract(context: Context, carrier: http.OutgoingHttpHeaders) {
-    return setExtractedSpanContext(Context.ROOT_CONTEXT, {
+    return setExtractedSpanContext(context, {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
     });
