@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import { kLayerPatched } from './express';
 import { Request } from 'express';
-import { PluginConfig, Attributes } from '@opentelemetry/types';
+import { PluginConfig, Attributes } from '@opentelemetry/api';
 
 /**
  * This const define where on the `request` object the plugin will mount the

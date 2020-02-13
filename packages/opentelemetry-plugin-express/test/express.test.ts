@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NodeTracerRegistry } from '@opentelemetry/node';
+import { NodeTracerProvider } from '@opentelemetry/node';
 import * as assert from 'assert';
 import * as express from 'express';
 import * as http from 'http';
@@ -52,14 +52,14 @@ const httpRequest = {
 
 describe('Express Plugin', () => {
   const logger = new NoopLogger();
-  const registry = new NodeTracerRegistry();
+  const provider = new NodeTracerProvider();
   const memoryExporter = new InMemorySpanExporter();
   const spanProcessor = new SimpleSpanProcessor(memoryExporter);
-  registry.addSpanProcessor(spanProcessor);
-  const tracer = registry.getTracer('default');
+  provider.addSpanProcessor(spanProcessor);
+  const tracer = provider.getTracer('default');
 
   before(() => {
-    plugin.enable(express, registry, logger);
+    plugin.enable(express, provider, logger);
   });
 
   afterEach(() => {
@@ -138,7 +138,7 @@ describe('Express Plugin', () => {
       const config: ExpressPluginConfig = {
         ignoreLayersType: [ExpressLayerType.MIDDLEWARE],
       };
-      plugin.enable(express, registry, logger, config);
+      plugin.enable(express, provider, logger, config);
       const rootSpan = tracer.startSpan('rootSpan');
       const app = express();
       app.use(express.json());

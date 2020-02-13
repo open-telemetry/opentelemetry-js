@@ -137,7 +137,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-redis][otel-plugin-redis]
 - [@opentelemetry/plugin-ioredis][otel-plugin-ioredis]
 - [@opentelemetry/plugin-dns][otel-plugin-dns] - By default, this plugin is not loaded [#612](https://github.com/open-telemetry/opentelemetry-js/issues/612)
-- [@opentelemetry/plugin-express][otel-plugin-express]
+- [@opentelemetry/plugin-express][otel-plugin-express] - By default, this plugin is not loaded
 
 #### Web Plugins
 - [@opentelemetry/plugin-document-load][otel-plugin-document-load]

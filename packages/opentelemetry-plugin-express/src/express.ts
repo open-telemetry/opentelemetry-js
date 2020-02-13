@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { Attributes } from '@opentelemetry/types';
+import { Attributes } from '@opentelemetry/api';
 import * as express from 'express';
 import * as core from 'express-serve-static-core';
 import * as shimmer from 'shimmer';
@@ -46,7 +46,7 @@ export const kLayerPatched: unique symbol = Symbol('express-layer-patched');
 
 /** Express instrumentation plugin for OpenTelemetry */
 export class ExpressPlugin extends BasePlugin<typeof express> {
-  readonly _COMPONENT = 'express';
+  static readonly component = 'express';
   readonly supportedVersions = ['^4.0.0'];
   protected _config!: ExpressPluginConfig;
 
@@ -176,7 +176,7 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
         storeLayerPath(req, layerPath);
         const route = (req[_LAYERS_STORE_PROPERTY] as string[]).join('');
         const attributes: Attributes = {
-          [AttributeNames.COMPONENT]: plugin._COMPONENT,
+          [AttributeNames.COMPONENT]: ExpressPlugin.component,
           [AttributeNames.HTTP_ROUTE]: route.length > 0 ? route : undefined,
         };
         const metadata = getLayerMetadata(layer, layerPath);
@@ -217,4 +217,4 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
   }
 }
 
-export const plugin = new ExpressPlugin('express');
+export const plugin = new ExpressPlugin(ExpressPlugin.component);
