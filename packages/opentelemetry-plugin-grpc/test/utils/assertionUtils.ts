@@ -30,8 +30,8 @@ export const assertSpan = (
   kind: SpanKind,
   validations: { name: string; status: grpc.status }
 ) => {
-  assert.strictEqual(span.spanContext.traceId.length, 32);
-  assert.strictEqual(span.spanContext.spanId.length, 16);
+  assert.strictEqual(span.spanContext.traceId.length, 16);
+  assert.strictEqual(span.spanContext.spanId.length, 8);
   assert.strictEqual(span.kind, kind);
 
   assert.strictEqual(
@@ -63,11 +63,11 @@ export const assertPropagation = (
 ) => {
   const targetSpanContext = incomingSpan.spanContext;
   const sourceSpanContext = outgoingSpan.spanContext;
-  assert.strictEqual(targetSpanContext.traceId, sourceSpanContext.traceId);
-  assert.strictEqual(incomingSpan.parentSpanId, sourceSpanContext.spanId);
+  assert.deepStrictEqual(targetSpanContext.traceId, sourceSpanContext.traceId);
+  assert.deepStrictEqual(incomingSpan.parentSpanId, sourceSpanContext.spanId);
   assert.strictEqual(
     targetSpanContext.traceFlags,
     sourceSpanContext.traceFlags
   );
-  assert.notStrictEqual(targetSpanContext.spanId, sourceSpanContext.spanId);
+  assert.notDeepStrictEqual(targetSpanContext.spanId, sourceSpanContext.spanId);
 };

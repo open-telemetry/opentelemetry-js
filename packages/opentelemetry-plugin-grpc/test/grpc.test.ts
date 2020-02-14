@@ -437,11 +437,11 @@ describe('GrpcPlugin', () => {
               assertSpan(serverSpan, SpanKind.SERVER, validations);
               assertSpan(clientSpan, SpanKind.CLIENT, validations);
               assertPropagation(serverSpan, clientSpan);
-              assert.strictEqual(
+              assert.deepStrictEqual(
                 rootSpan.context().traceId,
                 serverSpan.spanContext.traceId
               );
-              assert.strictEqual(
+              assert.deepStrictEqual(
                 rootSpan.context().spanId,
                 clientSpan.parentSpanId
               );
@@ -539,11 +539,11 @@ describe('GrpcPlugin', () => {
             assertSpan(serverSpan, SpanKind.SERVER, validations);
             assertSpan(clientSpan, SpanKind.CLIENT, validations);
             assertPropagation(serverSpan, clientSpan);
-            assert.strictEqual(
+            assert.deepStrictEqual(
               rootSpan.context().traceId,
               serverSpan.spanContext.traceId
             );
-            assert.strictEqual(
+            assert.deepStrictEqual(
               rootSpan.context().spanId,
               clientSpan.parentSpanId
             );

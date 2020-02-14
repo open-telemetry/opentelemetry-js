@@ -123,12 +123,14 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   }
 
   private _getSpanContext(metadata: grpcTypes.Metadata): SpanContext | null {
-    const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer;
+    const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer | undefined;
     // Entry doesn't exist
     if (!metadataValue) {
       return null;
     }
-    return this._tracer.getBinaryFormat().fromBytes(metadataValue);
+    // it's needed to covert to Uint8Array here as Buffer.slice and Uint8Array.slice differ
+    const buf = new Uint8Array(metadataValue.buffer, metadataValue.byteOffset, metadataValue.byteLength);
+    return this._tracer.getBinaryFormat().fromBytes(buf);
   }
 
   private _setSpanContext(
