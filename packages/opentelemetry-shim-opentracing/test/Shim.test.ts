@@ -87,7 +87,9 @@ describe('OpenTracing Shim', () => {
         childOf: span,
       }) as SpanShim;
       assert.strictEqual(
-        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString("hex"),
+        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString(
+          'hex'
+        ),
         context.toSpanId()
       );
       assert.strictEqual(
@@ -101,7 +103,9 @@ describe('OpenTracing Shim', () => {
         childOf: context,
       }) as SpanShim;
       assert.strictEqual(
-        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString("hex"),
+        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString(
+          'hex'
+        ),
         context.toSpanId()
       );
       assert.strictEqual(
@@ -131,8 +135,14 @@ describe('OpenTracing Shim', () => {
     it('returns the correct context', () => {
       const shim = new SpanContextShim(INVALID_SPAN_CONTEXT);
       assert.strictEqual(shim.getSpanContext(), INVALID_SPAN_CONTEXT);
-      assert.strictEqual(shim.toTraceId(), Buffer.from(INVALID_SPAN_CONTEXT.traceId).toString("hex"));
-      assert.strictEqual(shim.toSpanId(), Buffer.from(INVALID_SPAN_CONTEXT.spanId).toString("hex"));
+      assert.strictEqual(
+        shim.toTraceId(),
+        Buffer.from(INVALID_SPAN_CONTEXT.traceId).toString('hex')
+      );
+      assert.strictEqual(
+        shim.toSpanId(),
+        Buffer.from(INVALID_SPAN_CONTEXT.spanId).toString('hex')
+      );
     });
   });
 

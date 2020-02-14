@@ -27,7 +27,6 @@ export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 
-
 /**
  * Propagator for the B3 HTTP header format.
  * Based on: https://github.com/openzipkin/b3-propagation
@@ -55,10 +54,11 @@ export class B3Format implements HttpTextFormat {
     const sampledHeader = carrier[X_B3_SAMPLED];
     if (!traceIdHeader || !spanIdHeader) return null;
     const traceId = hexToId(
-      Array.isArray(traceIdHeader)
-        ? traceIdHeader[0]
-        : traceIdHeader);
-    const spanId = hexToId(Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader);
+      Array.isArray(traceIdHeader) ? traceIdHeader[0] : traceIdHeader
+    );
+    const spanId = hexToId(
+      Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader
+    );
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;

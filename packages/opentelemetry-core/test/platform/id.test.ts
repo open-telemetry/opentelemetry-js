@@ -15,7 +15,13 @@
  */
 
 import * as assert from 'assert';
-import { randomSpanId, randomTraceId, idToHex, hexToId, idsEquals } from '../../src/platform';
+import {
+  randomSpanId,
+  randomTraceId,
+  idToHex,
+  hexToId,
+  idsEquals,
+} from '../../src/platform';
 
 describe('randomTraceId', () => {
   it('returns different 16 bytes Uint8Array', () => {
@@ -35,21 +41,47 @@ describe('randomSpanId', () => {
 
 describe('idToHex', () => {
   it('converts it to hex string', () => {
-    assert.strictEqual(idToHex(new Uint8Array([0x01, 0xf8, 0xab, 0x56])), '01f8ab56');
+    assert.strictEqual(
+      idToHex(new Uint8Array([0x01, 0xf8, 0xab, 0x56])),
+      '01f8ab56'
+    );
   });
 });
 
 describe('hexToId', () => {
   it('coverts hex encoded string to id', () => {
-    assert.deepStrictEqual(hexToId('01f8ab56'), new Uint8Array([0x01, 0xf8, 0xab, 0x56]));
+    assert.deepStrictEqual(
+      hexToId('01f8ab56'),
+      new Uint8Array([0x01, 0xf8, 0xab, 0x56])
+    );
   });
 });
 
 describe('idsEquals', () => {
   it('returns if ids match', () => {
-    assert.ok(idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x13])));
-    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x13, 0x14])));
-    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13, 0x14]), new Uint8Array([0x11, 0x12, 0x13])));
-    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x14])));
+    assert.ok(
+      idsEquals(
+        new Uint8Array([0x11, 0x12, 0x13]),
+        new Uint8Array([0x11, 0x12, 0x13])
+      )
+    );
+    assert.ok(
+      !idsEquals(
+        new Uint8Array([0x11, 0x12, 0x13]),
+        new Uint8Array([0x11, 0x12, 0x13, 0x14])
+      )
+    );
+    assert.ok(
+      !idsEquals(
+        new Uint8Array([0x11, 0x12, 0x13, 0x14]),
+        new Uint8Array([0x11, 0x12, 0x13])
+      )
+    );
+    assert.ok(
+      !idsEquals(
+        new Uint8Array([0x11, 0x12, 0x13]),
+        new Uint8Array([0x11, 0x12, 0x14])
+      )
+    );
   });
 });

@@ -63,9 +63,9 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  */
 export class HttpTraceContext implements HttpTextFormat {
   inject(spanContext: SpanContext, format: string, carrier: Carrier) {
-    const traceParent = `${VERSION}-${idToHex(spanContext.traceId)}-${
-      idToHex(spanContext.spanId)
-    }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
+    const traceParent = `${VERSION}-${idToHex(spanContext.traceId)}-${idToHex(
+      spanContext.spanId
+    )}-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
 
     carrier[TRACE_PARENT_HEADER] = traceParent;
     if (spanContext.traceState) {

@@ -102,7 +102,10 @@ function spanLinksToThriftRefs(
 ): ThriftReference[] {
   return links
     .map((link): ThriftReference | null => {
-      if (parentSpanId != null && Buffer.compare(link.spanContext.spanId, parentSpanId) === 0) {
+      if (
+        parentSpanId != null &&
+        Buffer.compare(link.spanContext.spanId, parentSpanId) === 0
+      ) {
         const refType = ThriftReferenceType.CHILD_OF;
         const traceId = link.spanContext.traceId;
         const traceIdHigh = Buffer.from(traceId.slice(0, 8));

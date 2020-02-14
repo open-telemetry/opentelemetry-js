@@ -52,7 +52,9 @@ export function getReadableSpanTransformer(
       },
       endTime: hrTimeToTimeStamp(span.endTime),
       startTime: hrTimeToTimeStamp(span.startTime),
-      name: `projects/${projectId}/traces/${idToHex(span.spanContext.traceId)}/spans/${idToHex(span.spanContext.spanId)}`,
+      name: `projects/${projectId}/traces/${idToHex(
+        span.spanContext.traceId
+      )}/spans/${idToHex(span.spanContext.spanId)}`,
       spanId: idToHex(span.spanContext.spanId),
       sameProcessAsParentSpan: !span.spanContext.isRemote,
       status: span.status,

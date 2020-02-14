@@ -145,7 +145,11 @@ export function toCollectorLinkType(
   const spanParentId = span.parentSpanId;
   const spanTraceId = span.spanContext.traceId;
 
-  if (spanParentId != null && Buffer.compare(linkSpanId, spanParentId) === 0 && Buffer.compare(linkTraceId, spanTraceId) === 0) {
+  if (
+    spanParentId != null &&
+    Buffer.compare(linkSpanId, spanParentId) === 0 &&
+    Buffer.compare(linkTraceId, spanTraceId) === 0
+  ) {
     return collectorTypes.LinkType.PARENT_LINKED_SPAN;
   }
   return collectorTypes.LinkType.UNSPECIFIED;

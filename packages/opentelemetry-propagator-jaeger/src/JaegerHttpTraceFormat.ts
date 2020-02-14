@@ -59,9 +59,9 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
       spanContext.traceFlags || TraceFlags.UNSAMPLED
     ).toString(16)}`;
 
-    carrier[
-      this._jaegerTraceHeader
-    ] = `${idToHex(spanContext.traceId)}:${idToHex(spanContext.spanId)}:0:${traceFlags}`;
+    carrier[this._jaegerTraceHeader] = `${idToHex(
+      spanContext.traceId
+    )}:${idToHex(spanContext.spanId)}:0:${traceFlags}`;
   }
 
   /**
@@ -93,5 +93,10 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
 
   const traceFlags = flags.match(/^[0-9a-f]{2}$/i) ? parseInt(flags) & 1 : 1;
 
-  return { traceId: hexToId(traceId), spanId: hexToId(spanId), isRemote: true, traceFlags };
+  return {
+    traceId: hexToId(traceId),
+    spanId: hexToId(spanId),
+    isRemote: true,
+    traceFlags,
+  };
 }

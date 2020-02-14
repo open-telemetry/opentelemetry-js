@@ -19,13 +19,12 @@ import * as crypto from 'crypto';
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
-
 /**
  * Encodes an Uint8Array into a hex string.
  * @param buf the array buffer to encode
  */
 export function idToHex(buf: Uint8Array): string {
-  return Buffer.from(buf).toString("hex");
+  return Buffer.from(buf).toString('hex');
 }
 
 /**
@@ -33,7 +32,7 @@ export function idToHex(buf: Uint8Array): string {
  * @param s the string to convert
  */
 export function hexToId(s: string): Uint8Array {
-  const buf = Buffer.from(s, "hex");
+  const buf = Buffer.from(s, 'hex');
   return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
 }
 

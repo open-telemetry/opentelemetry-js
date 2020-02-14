@@ -46,5 +46,7 @@ export function spanIdIsValid(spanId: Uint8Array): boolean {
  * @return true if this {@link SpanContext} is valid.
  */
 export function isValid(spanContext: SpanContext): boolean {
-  return spanIdIsValid(spanContext.spanId) && traceIdIsValid(spanContext.traceId);
+  return (
+    spanIdIsValid(spanContext.spanId) && traceIdIsValid(spanContext.traceId)
+  );
 }

@@ -17,7 +17,6 @@ import { SpanContext, HttpTextFormat } from '@opentelemetry/api';
 import * as http from 'http';
 import { hexToId, idToHex } from '@opentelemetry/core';
 
-
 export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';

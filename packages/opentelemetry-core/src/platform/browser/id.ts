@@ -38,7 +38,7 @@ export function idToHex(buf: Uint8Array): string {
   for (let i = 0; i < buf.length; ++i) {
     hex.push(byteToHex[buf[i]]);
   }
-  return hex.join("");
+  return hex.join('');
 }
 
 /**
@@ -49,7 +49,7 @@ export function hexToId(s: string): Uint8Array {
   const cnt = s.length / 2;
   const buf = new Uint8Array(cnt);
   for (let i = 0; i < cnt; i++) {
-    buf[i] = parseInt(s.substring(2*i, 2*i + 2), 16);
+    buf[i] = parseInt(s.substring(2 * i, 2 * i + 2), 16);
   }
   return buf;
 }

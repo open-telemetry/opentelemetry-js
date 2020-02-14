@@ -43,7 +43,10 @@ export function toZipkinSpan(
 ): zipkinTypes.Span {
   const zipkinSpan: zipkinTypes.Span = {
     traceId: idToHex(span.spanContext.traceId),
-    parentId: span.parentSpanId != null ? idToHex(span.parentSpanId) : span.parentSpanId,
+    parentId:
+      span.parentSpanId != null
+        ? idToHex(span.parentSpanId)
+        : span.parentSpanId,
     name: span.name,
     id: idToHex(span.spanContext.spanId),
     kind: ZIPKIN_SPAN_KIND_MAPPING[span.kind],

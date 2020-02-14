@@ -62,7 +62,8 @@ export class BinaryTraceContext implements BinaryFormat {
     buf[SPAN_ID_FIELD_ID_OFFSET] = SPAN_ID_FIELD_ID;
     buf.set(spanId, SPAN_ID_OFFSET);
     buf[TRACE_OPTION_FIELD_ID_OFFSET] = TRACE_OPTION_FIELD_ID;
-    buf[TRACE_OPTIONS_OFFSET] = Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
+    buf[TRACE_OPTIONS_OFFSET] =
+      Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
     return buf;
   }
 
@@ -79,7 +80,10 @@ export class BinaryTraceContext implements BinaryFormat {
       return null;
     }
 
-    const result: SpanContext = { traceId: new Uint8Array(TRACE_ID_SIZE), spanId: new Uint8Array(SPAN_ID_SIZE) };
+    const result: SpanContext = {
+      traceId: new Uint8Array(TRACE_ID_SIZE),
+      spanId: new Uint8Array(SPAN_ID_SIZE),
+    };
     result.isRemote = true;
 
     // See serializeSpanContext for byte offsets.
