@@ -21,6 +21,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
+import { hexToId, idToHex } from '../../platform';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
@@ -48,8 +49,8 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
   }
 
   return {
-    traceId: match[1],
-    spanId: match[2],
+    traceId: hexToId(match[1]),
+    spanId: hexToId(match[2]),
     traceFlags: parseInt(match[3], 16),
   };
 }
@@ -62,8 +63,8 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  */
 export class HttpTraceContext implements HttpTextFormat {
   inject(spanContext: SpanContext, format: string, carrier: Carrier) {
-    const traceParent = `${VERSION}-${spanContext.traceId}-${
-      spanContext.spanId
+    const traceParent = `${VERSION}-${idToHex(spanContext.traceId)}-${
+      idToHex(spanContext.spanId)
     }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
 
     carrier[TRACE_PARENT_HEADER] = traceParent;

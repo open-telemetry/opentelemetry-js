@@ -20,21 +20,13 @@ import {
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
+import { spanIdIsValid, traceIdIsValid } from '../../trace/spancontext-utils';
+import { hexToId, idToHex } from '../../platform';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
-const VALID_TRACEID_REGEX = /^[0-9a-f]{32}$/i;
-const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
-const INVALID_ID_REGEX = /^0+$/i;
 
-function isValidTraceId(traceId: string): boolean {
-  return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
-}
-
-function isValidSpanId(spanId: string): boolean {
-  return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
-}
 
 /**
  * Propagator for the B3 HTTP header format.
@@ -43,11 +35,11 @@ function isValidSpanId(spanId: string): boolean {
 export class B3Format implements HttpTextFormat {
   inject(spanContext: SpanContext, format: string, carrier: Carrier): void {
     if (
-      isValidTraceId(spanContext.traceId) &&
-      isValidSpanId(spanContext.spanId)
+      traceIdIsValid(spanContext.traceId) &&
+      spanIdIsValid(spanContext.spanId)
     ) {
-      carrier[X_B3_TRACE_ID] = spanContext.traceId;
-      carrier[X_B3_SPAN_ID] = spanContext.spanId;
+      carrier[X_B3_TRACE_ID] = idToHex(spanContext.traceId);
+      carrier[X_B3_SPAN_ID] = idToHex(spanContext.spanId);
 
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
@@ -62,15 +54,16 @@ export class B3Format implements HttpTextFormat {
     const spanIdHeader = carrier[X_B3_SPAN_ID];
     const sampledHeader = carrier[X_B3_SAMPLED];
     if (!traceIdHeader || !spanIdHeader) return null;
-    const traceId = Array.isArray(traceIdHeader)
-      ? traceIdHeader[0]
-      : traceIdHeader;
-    const spanId = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
+    const traceId = hexToId(
+      Array.isArray(traceIdHeader)
+        ? traceIdHeader[0]
+        : traceIdHeader);
+    const spanId = hexToId(Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader);
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
 
-    if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
+    if (traceIdIsValid(traceId) && spanIdIsValid(spanId)) {
       return {
         traceId,
         spanId,

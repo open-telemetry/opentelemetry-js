@@ -40,10 +40,10 @@ const DEFAULT_FLAGS = 0x1;
  * @param span Span to be translated
  */
 export function spanToThrift(span: ReadableSpan): ThriftSpan {
-  const traceIdHigh = span.spanContext.traceId.slice(0, 16);
-  const traceIdLow = span.spanContext.traceId.slice(16);
+  const traceIdHigh = Buffer.from(span.spanContext.traceId.slice(0, 8));
+  const traceIdLow = Buffer.from(span.spanContext.traceId.slice(8));
   const parentSpan = span.parentSpanId
-    ? Utils.encodeInt64(span.parentSpanId)
+    ? Buffer.from(span.parentSpanId)
     : ThriftUtils.emptyBuffer;
 
   const tags = Object.keys(span.attributes).map(
@@ -81,9 +81,9 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   const spanLogs: ThriftLog[] = ThriftUtils.getThriftLogs(logs);
 
   return {
-    traceIdLow: Utils.encodeInt64(traceIdLow),
-    traceIdHigh: Utils.encodeInt64(traceIdHigh),
-    spanId: Utils.encodeInt64(span.spanContext.spanId),
+    traceIdLow,
+    traceIdHigh,
+    spanId: Buffer.from(span.spanContext.spanId),
     parentSpanId: parentSpan,
     operationName: span.name,
     references: spanLinksToThriftRefs(span.links, span.parentSpanId),
@@ -98,16 +98,16 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
 /** Translate OpenTelemetry {@link Link}s to Jaeger ThriftReference. */
 function spanLinksToThriftRefs(
   links: Link[],
-  parentSpanId?: string
+  parentSpanId?: Uint8Array
 ): ThriftReference[] {
   return links
     .map((link): ThriftReference | null => {
-      if (link.spanContext.spanId === parentSpanId) {
+      if (parentSpanId != null && Buffer.compare(link.spanContext.spanId, parentSpanId) === 0) {
         const refType = ThriftReferenceType.CHILD_OF;
         const traceId = link.spanContext.traceId;
-        const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
-        const traceIdLow = Utils.encodeInt64(traceId.slice(16));
-        const spanId = Utils.encodeInt64(link.spanContext.spanId);
+        const traceIdHigh = Buffer.from(traceId.slice(0, 8));
+        const traceIdLow = Buffer.from(traceId.slice(8));
+        const spanId = Buffer.from(link.spanContext.spanId);
         return { traceIdLow, traceIdHigh, spanId, refType };
       }
       return null;

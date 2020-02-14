@@ -34,7 +34,7 @@ export class Span implements types.Span, ReadableSpan {
   // purposes but are not intended to be written-to directly.
   readonly spanContext: types.SpanContext;
   readonly kind: types.SpanKind;
-  readonly parentSpanId?: string;
+  readonly parentSpanId?: Uint8Array;
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
@@ -56,7 +56,7 @@ export class Span implements types.Span, ReadableSpan {
     spanName: string,
     spanContext: types.SpanContext,
     kind: types.SpanKind,
-    parentSpanId?: string,
+    parentSpanId?: Uint8Array,
     links: types.Link[] = [],
     startTime: types.TimeInput = hrTime()
   ) {

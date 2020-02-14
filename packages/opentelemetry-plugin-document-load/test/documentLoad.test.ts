@@ -363,13 +363,13 @@ describe('DocumentLoad Plugin', () => {
           assert.strictEqual(rootSpan.name, 'documentFetch');
           assert.strictEqual(fetchSpan.name, 'documentLoad');
 
-          assert.strictEqual(
+          assert.deepStrictEqual(
             rootSpan.spanContext.traceId,
-            'ab42124a3c573678d4d8b21ba52df3bf'
+            new Uint8Array([0xab, 0x42, 0x12, 0x4a, 0x3c, 0x57, 0x36, 0x78, 0xd4, 0xd8, 0xb2, 0x1b, 0xa5, 0x2d, 0xf3, 0xbf])
           );
-          assert.strictEqual(
+          assert.deepStrictEqual(
             fetchSpan.spanContext.traceId,
-            'ab42124a3c573678d4d8b21ba52df3bf'
+            new Uint8Array([0xab, 0x42, 0x12, 0x4a, 0x3c, 0x57, 0x36, 0x78, 0xd4, 0xd8, 0xb2, 0x1b, 0xa5, 0x2d, 0xf3, 0xbf])
           );
 
           assert.strictEqual(spyOnEnd.callCount, 2);

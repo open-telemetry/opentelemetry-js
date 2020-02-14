@@ -23,6 +23,7 @@ import {
 } from '../../src/context/propagation/B3Format';
 import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import { TraceState } from '../../src/trace/TraceState';
+import { INVALID_SPANID, INVALID_TRACEID } from '../../src';
 
 describe('B3Format', () => {
   const b3Format = new B3Format();
@@ -35,8 +36,8 @@ describe('B3Format', () => {
   describe('.inject()', () => {
     it('should set b3 traceId and spanId headers', () => {
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b ]),
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         traceFlags: TraceFlags.SAMPLED,
       };
 
@@ -51,8 +52,8 @@ describe('B3Format', () => {
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b ]),
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         traceFlags: TraceFlags.UNSAMPLED,
         traceState: new TraceState('foo=bar,baz=qux'),
         isRemote: false,
@@ -69,8 +70,8 @@ describe('B3Format', () => {
 
     it('should not inject empty spancontext', () => {
       const emptySpanContext = {
-        traceId: '',
-        spanId: '',
+        traceId: INVALID_TRACEID,
+        spanId: INVALID_SPANID,
       };
       b3Format.inject(emptySpanContext, 'B3Format', carrier);
       assert.deepStrictEqual(carrier[X_B3_TRACE_ID], undefined);
@@ -79,8 +80,8 @@ describe('B3Format', () => {
 
     it('should handle absence of sampling decision', () => {
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b ]),
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
       };
 
       b3Format.inject(spanContext, 'B3Format', carrier);
@@ -100,8 +101,8 @@ describe('B3Format', () => {
       const extractedSpanContext = b3Format.extract('B3Format', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: new Uint8Array([0xb7, 0xad, 0x6b, 0x71, 0x69, 0x20, 0x33, 0x31]),
+        traceId: new Uint8Array([0x0a, 0xf7, 0x65, 0x19, 0x16, 0xcd, 0x43, 0xdd, 0x84, 0x48, 0xeb, 0x21, 0x1c, 0x80, 0x31, 0x9c]),
         isRemote: true,
         traceFlags: TraceFlags.UNSAMPLED,
       });
@@ -114,8 +115,8 @@ describe('B3Format', () => {
       const extractedSpanContext = b3Format.extract('B3Format', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: new Uint8Array([0xb7, 0xad, 0x6b, 0x71, 0x69, 0x20, 0x33, 0x31]),
+        traceId: new Uint8Array([0x0a, 0xf7, 0x65, 0x19, 0x16, 0xcd, 0x43, 0xdd, 0x84, 0x48, 0xeb, 0x21, 0x1c, 0x80, 0x31, 0x9c]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -128,8 +129,8 @@ describe('B3Format', () => {
       const extractedSpanContext = b3Format.extract('B3Format', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: new Uint8Array([0xb7, 0xad, 0x6b, 0x71, 0x69, 0x20, 0x33, 0x31]),
+        traceId: new Uint8Array([0x0a, 0xf7, 0x65, 0x19, 0x16, 0xcd, 0x43, 0xdd, 0x84, 0x48, 0xeb, 0x21, 0x1c, 0x80, 0x31, 0x9c]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -142,8 +143,8 @@ describe('B3Format', () => {
       const extractedSpanContext = b3Format.extract('B3Format', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: new Uint8Array([0xb7, 0xad, 0x6b, 0x71, 0x69, 0x20, 0x33, 0x31]),
+        traceId: new Uint8Array([0x0a, 0xf7, 0x65, 0x19, 0x16, 0xcd, 0x43, 0xdd, 0x84, 0x48, 0xeb, 0x21, 0x1c, 0x80, 0x31, 0x9c]),
         isRemote: true,
         traceFlags: TraceFlags.UNSAMPLED,
       });
@@ -176,8 +177,8 @@ describe('B3Format', () => {
       carrier[X_B3_SAMPLED] = '01';
       const extractedSpanContext = b3Format.extract('B3Format', carrier);
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
+        spanId: new Uint8Array([0xb7, 0xad, 0x6b, 0x71, 0x69, 0x20, 0x33, 0x31]),
+        traceId: new Uint8Array([0x0a, 0xf7, 0x65, 0x19, 0x16, 0xcd, 0x43, 0xdd, 0x84, 0x48, 0xeb, 0x21, 0x1c, 0x80, 0x31, 0x9c]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });

@@ -25,11 +25,11 @@ export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
   spanContext: {
-    traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-    spanId: '5e107261f64fa53e',
+    traceId: new Uint8Array([0x1f, 0x10, 0x08, 0xdc, 0x8e, 0x27, 0x0e, 0x85, 0xc4, 0x0a, 0x0d, 0x7c, 0x39, 0x39, 0xb2, 0x78]),
+    spanId: new Uint8Array([0x5e, 0x10, 0x72, 0x61, 0xf6, 0x4f, 0xa5, 0x3e]),
     traceFlags: 1,
   },
-  parentSpanId: '78a8915098864388',
+  parentSpanId: new Uint8Array([0x78, 0xa8, 0x91, 0x50, 0x98, 0x86, 0x43, 0x88]),
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
   status: { code: 0 },
@@ -37,8 +37,8 @@ export const mockedReadableSpan: ReadableSpan = {
   links: [
     {
       spanContext: {
-        traceId: '1f1008dc8e270e85c40a0d7c3939b278',
-        spanId: '78a8915098864388',
+        traceId: new Uint8Array([0x1f, 0x10, 0x08, 0xdc, 0x8e, 0x27, 0x0e, 0x85, 0xc4, 0x0a, 0x0d, 0x7c, 0x39, 0x39, 0xb2, 0x78]),
+        spanId: new Uint8Array([0x78, 0xa8, 0x91, 0x50, 0x98, 0x86, 0x43, 0x88]),
         traceFlags: 1,
       },
       attributes: { component: 'document-load' },

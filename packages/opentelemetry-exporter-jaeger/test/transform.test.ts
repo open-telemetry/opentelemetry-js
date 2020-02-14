@@ -23,8 +23,8 @@ import { hrTimeToMicroseconds } from '@opentelemetry/core';
 
 describe('transform', () => {
   const spanContext = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
+    traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+    spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
   };
 
   describe('spanToThrift', () => {
@@ -46,8 +46,8 @@ describe('transform', () => {
         links: [
           {
             spanContext: {
-              traceId: 'a4cda95b652f4a1592b449d5929fda1b',
-              spanId: '3e0c63257de34c92',
+              traceId: new Uint8Array([0xa4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+              spanId: new Uint8Array([0x3e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
             },
             attributes: {
               testBool: true,
@@ -191,12 +191,12 @@ describe('transform', () => {
           code: types.CanonicalCode.OK,
         },
         attributes: {},
-        parentSpanId: '3e0c63257de34c92',
+        parentSpanId: new Uint8Array([0x3e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         links: [
           {
             spanContext: {
-              traceId: 'a4cda95b652f4a1592b449d5929fda1b',
-              spanId: '3e0c63257de34c92',
+              traceId: new Uint8Array([0xa4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+              spanId: new Uint8Array([0x3e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
             },
           },
         ],

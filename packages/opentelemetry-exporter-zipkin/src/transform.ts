@@ -16,7 +16,7 @@
 
 import * as types from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { hrTimeToMicroseconds } from '@opentelemetry/core';
+import { hrTimeToMicroseconds, idToHex } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 
 const ZIPKIN_SPAN_KIND_MAPPING = {
@@ -42,10 +42,10 @@ export function toZipkinSpan(
   statusDescriptionTagName: string
 ): zipkinTypes.Span {
   const zipkinSpan: zipkinTypes.Span = {
-    traceId: span.spanContext.traceId,
-    parentId: span.parentSpanId,
+    traceId: idToHex(span.spanContext.traceId),
+    parentId: span.parentSpanId != null ? idToHex(span.parentSpanId) : span.parentSpanId,
     name: span.name,
-    id: span.spanContext.spanId,
+    id: idToHex(span.spanContext.spanId),
     kind: ZIPKIN_SPAN_KIND_MAPPING[span.kind],
     timestamp: hrTimeToMicroseconds(span.startTime),
     duration: hrTimeToMicroseconds(span.duration),

@@ -20,6 +20,7 @@ import {
   TraceFlags,
   Carrier,
 } from '@opentelemetry/api';
+import { idToHex, hexToId } from '@opentelemetry/core';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -60,7 +61,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
 
     carrier[
       this._jaegerTraceHeader
-    ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
+    ] = `${idToHex(spanContext.traceId)}:${idToHex(spanContext.spanId)}:0:${traceFlags}`;
   }
 
   /**
@@ -92,5 +93,5 @@ function deserializeSpanContext(serializedString: string): SpanContext | null {
 
   const traceFlags = flags.match(/^[0-9a-f]{2}$/i) ? parseInt(flags) & 1 : 1;
 
-  return { traceId, spanId, isRemote: true, traceFlags };
+  return { traceId: hexToId(traceId), spanId: hexToId(spanId), isRemote: true, traceFlags };
 }

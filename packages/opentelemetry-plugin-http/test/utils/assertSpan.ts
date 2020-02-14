@@ -39,8 +39,8 @@ export const assertSpan = (
     component: string;
   }
 ) => {
-  assert.strictEqual(span.spanContext.traceId.length, 32);
-  assert.strictEqual(span.spanContext.spanId.length, 16);
+  assert.strictEqual(span.spanContext.traceId.length, 16);
+  assert.strictEqual(span.spanContext.spanId.length, 8);
   assert.strictEqual(span.kind, kind);
   assert.strictEqual(
     span.name,
@@ -122,7 +122,7 @@ export const assertSpan = (
         'must have HOST_IP'
       );
     }
-    assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
+    assert.strictEqual(span.parentSpanId!.byteLength, 8);
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
     assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);

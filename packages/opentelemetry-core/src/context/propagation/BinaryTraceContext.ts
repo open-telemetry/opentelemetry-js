@@ -55,26 +55,18 @@ export class BinaryTraceContext implements BinaryFormat {
      *  | `---------------------------------- traceID field ID (0)
      *  `------------------------------------ version (0)
      */
-    const traceId = spanContext.traceId;
-    const spanId = spanContext.spanId;
+    const traceId = new Uint8Array(spanContext.traceId);
+    const spanId = new Uint8Array(spanContext.spanId);
     const buf = new Uint8Array(FORMAT_LENGTH);
-    let j = TRACE_ID_OFFSET;
-    for (let i = TRACE_ID_OFFSET; i < SPAN_ID_FIELD_ID_OFFSET; i++) {
-      // tslint:disable-next-line:ban Needed to parse hexadecimal.
-      buf[j++] = parseInt(traceId.substr((i - TRACE_ID_OFFSET) * 2, 2), 16);
-    }
-    buf[j++] = SPAN_ID_FIELD_ID;
-    for (let i = SPAN_ID_OFFSET; i < TRACE_OPTION_FIELD_ID_OFFSET; i++) {
-      // tslint:disable-next-line:ban Needed to parse hexadecimal.
-      buf[j++] = parseInt(spanId.substr((i - SPAN_ID_OFFSET) * 2, 2), 16);
-    }
-    buf[j++] = TRACE_OPTION_FIELD_ID;
-    buf[j++] = Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
+    buf.set(traceId, TRACE_ID_OFFSET);
+    buf[SPAN_ID_FIELD_ID_OFFSET] = SPAN_ID_FIELD_ID;
+    buf.set(spanId, SPAN_ID_OFFSET);
+    buf[TRACE_OPTION_FIELD_ID_OFFSET] = TRACE_OPTION_FIELD_ID;
+    buf[TRACE_OPTIONS_OFFSET] = Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
     return buf;
   }
 
   fromBytes(buf: Uint8Array): SpanContext | null {
-    const result: SpanContext = { traceId: '', spanId: '' };
     // Length must be 29.
     if (buf.length !== FORMAT_LENGTH) return null;
     // Check version and field numbers.
@@ -87,27 +79,13 @@ export class BinaryTraceContext implements BinaryFormat {
       return null;
     }
 
+    const result: SpanContext = { traceId: new Uint8Array(TRACE_ID_SIZE), spanId: new Uint8Array(SPAN_ID_SIZE) };
     result.isRemote = true;
 
     // See serializeSpanContext for byte offsets.
-    result.traceId = toHex(buf.slice(TRACE_ID_OFFSET, SPAN_ID_FIELD_ID_OFFSET));
-    result.spanId = toHex(
-      buf.slice(SPAN_ID_OFFSET, TRACE_OPTION_FIELD_ID_OFFSET)
-    );
+    result.traceId = buf.slice(TRACE_ID_OFFSET, SPAN_ID_FIELD_ID_OFFSET);
+    result.spanId = buf.slice(SPAN_ID_OFFSET, TRACE_OPTION_FIELD_ID_OFFSET);
     result.traceFlags = buf[TRACE_OPTIONS_OFFSET];
     return result;
   }
-}
-
-function toHex(buff: Uint8Array) {
-  let out = '';
-  for (let i = 0; i < buff.length; ++i) {
-    const n = buff[i];
-    if (n < 16) {
-      out += '0' + n.toString(16);
-    } else {
-      out += n.toString(16);
-    }
-  }
-  return out;
 }

@@ -17,19 +17,47 @@
 import * as crypto from 'crypto';
 
 const SPAN_ID_BYTES = 8;
+const TRACE_ID_BYTES = 16;
+
 
 /**
- * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
- * characters corresponding to 128 bits.
+ * Encodes an Uint8Array into a hex string.
+ * @param buf the array buffer to encode
  */
-export function randomTraceId(): string {
-  return randomSpanId() + randomSpanId();
+export function idToHex(buf: Uint8Array): string {
+  return Buffer.from(buf).toString("hex");
 }
 
 /**
- * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
- * characters corresponding to 64 bits.
+ * Converts hex encoded string into an Uint8Array
+ * @param s the string to convert
  */
-export function randomSpanId(): string {
-  return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
+export function hexToId(s: string): Uint8Array {
+  const buf = Buffer.from(s, "hex");
+  return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+}
+
+/**
+ * Compare if two id are equal.
+ * @param id1 first id to compare
+ * @param id2 second id to compare
+ */
+export function idsEquals(id1: Uint8Array, id2: Uint8Array): boolean {
+  return Buffer.compare(id1, id2) === 0;
+}
+
+/**
+ * Returns a random 16-byte trace ID.
+ */
+export function randomTraceId(): Uint8Array {
+  const traceId = crypto.randomBytes(TRACE_ID_BYTES);
+  return new Uint8Array(traceId.buffer, traceId.byteOffset, traceId.byteLength);
+}
+
+/**
+ * Returns a random 8-byte span ID.
+ */
+export function randomSpanId(): Uint8Array {
+  const spanId = crypto.randomBytes(SPAN_ID_BYTES);
+  return new Uint8Array(spanId.buffer, spanId.byteOffset, spanId.byteLength);
 }

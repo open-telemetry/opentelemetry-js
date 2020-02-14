@@ -21,24 +21,66 @@ declare type WindowWithMsCrypto = Window & {
 const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
 
 const SPAN_ID_BYTES = 8;
-const spanBytesArray = new Uint8Array(SPAN_ID_BYTES);
+const TRACE_ID_BYTES = 16;
 
-/** Returns a random 16-byte trace ID formatted as a 32-char hex string. */
-export function randomTraceId(): string {
-  return randomSpanId() + randomSpanId();
+const byteToHex: string[] = [];
+for (let n = 0; n <= 0xff; ++n) {
+  const hexOctet = n.toString(16).padStart(2, '0');
+  byteToHex.push(hexOctet);
 }
 
-/** Returns a random 8-byte span ID formatted as a 16-char hex string. */
-export function randomSpanId(): string {
-  let spanId = '';
-  cryptoLib.getRandomValues(spanBytesArray);
-  for (let i = 0; i < SPAN_ID_BYTES; i++) {
-    const hexStr = spanBytesArray[i].toString(16);
-
-    // Zero pad bytes whose hex values are single digit.
-    if (hexStr.length === 1) spanId += '0';
-
-    spanId += hexStr;
+/**
+ * Encodes an Uint8Array into a hex string.
+ * @param buf the array buffer to encode
+ */
+export function idToHex(buf: Uint8Array): string {
+  const hex = new Array(buf.length);
+  for (let i = 0; i < buf.length; ++i) {
+    hex.push(byteToHex[buf[i]]);
   }
+  return hex.join("");
+}
+
+/**
+ * Converts hex encoded string into an Uint8Array
+ * @param s the string to convert
+ */
+export function hexToId(s: string): Uint8Array {
+  const cnt = s.length / 2;
+  const buf = new Uint8Array(cnt);
+  for (let i = 0; i < cnt; i++) {
+    buf[i] = parseInt(s.substring(2*i, 2*i + 2), 16);
+  }
+  return buf;
+}
+
+/*
+ * Compare if two id are equal.
+ * @param id1 first id to compare
+ * @param id2 second id to compare
+ */
+export function idsEquals(id1: Uint8Array, id2: Uint8Array): boolean {
+  if (id1.byteLength !== id2.byteLength) {
+    return false;
+  }
+  for (let i = 0; i < id1.byteLength; i++) {
+    if (id1[i] !== id2[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+/** Returns a random 16-byte trace ID. */
+export function randomTraceId(): Uint8Array {
+  const traceId = new Uint8Array(TRACE_ID_BYTES);
+  cryptoLib.getRandomValues(traceId);
+  return traceId;
+}
+
+/** Returns a random 8-byte span ID. */
+export function randomSpanId(): Uint8Array {
+  let spanId = new Uint8Array(SPAN_ID_BYTES);
+  cryptoLib.getRandomValues(spanId);
   return spanId;
 }

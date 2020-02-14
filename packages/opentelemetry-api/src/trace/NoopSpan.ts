@@ -21,8 +21,8 @@ import { SpanContext } from './span_context';
 import { Status } from './status';
 import { TraceFlags } from './trace_flags';
 
-export const INVALID_TRACE_ID = '0';
-export const INVALID_SPAN_ID = '0';
+export const INVALID_TRACE_ID = new Uint8Array(16);
+export const INVALID_SPAN_ID = new Uint8Array(8);
 const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACE_ID,
   spanId: INVALID_SPAN_ID,

@@ -23,6 +23,7 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
+  idToHex,
 } from '@opentelemetry/core';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import * as tracing from '@opentelemetry/tracing';
@@ -327,12 +328,12 @@ describe('xhr', () => {
         const span: types.Span = exportSpy.args[0][0][0];
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_TRACE_ID],
-          span.context().traceId,
+          idToHex(span.context().traceId),
           `trace header '${X_B3_TRACE_ID}' not set`
         );
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_SPAN_ID],
-          span.context().spanId,
+          idToHex(span.context().spanId),
           `trace header '${X_B3_SPAN_ID}' not set`
         );
         assert.strictEqual(
@@ -359,12 +360,12 @@ describe('xhr', () => {
           const span: types.Span = exportSpy.args[0][0][0];
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_TRACE_ID],
-            span.context().traceId,
+            idToHex(span.context().traceId),
             `trace header '${X_B3_TRACE_ID}' not set`
           );
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_SPAN_ID],
-            span.context().spanId,
+            idToHex(span.context().spanId),
             `trace header '${X_B3_SPAN_ID}' not set`
           );
           assert.strictEqual(

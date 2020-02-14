@@ -15,9 +15,10 @@
  */
 
 import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import { idsEquals } from '../platform';
 
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
+export const INVALID_SPANID = new Uint8Array(8);
+export const INVALID_TRACEID = new Uint8Array(16);
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
@@ -25,12 +26,25 @@ export const INVALID_SPAN_CONTEXT: SpanContext = {
 };
 
 /**
+ * Returns true if traceId is valid.
+ * @return true if traceId is valid.
+ */
+export function traceIdIsValid(traceId: Uint8Array): boolean {
+  return traceId.byteLength === 16 && !idsEquals(traceId, INVALID_TRACEID);
+}
+
+/**
+ * Returns true if spanId is valid.
+ * @return true if spanId is valid.
+ */
+export function spanIdIsValid(spanId: Uint8Array): boolean {
+  return spanId.byteLength === 8 && !idsEquals(spanId, INVALID_SPANID);
+}
+
+/**
  * Returns true if this {@link SpanContext} is valid.
  * @return true if this {@link SpanContext} is valid.
  */
 export function isValid(spanContext: SpanContext): boolean {
-  return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
-  );
+  return spanIdIsValid(spanContext.spanId) && traceIdIsValid(spanContext.traceId);
 }

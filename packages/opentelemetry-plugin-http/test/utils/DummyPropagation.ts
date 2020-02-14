@@ -15,14 +15,16 @@
  */
 import { SpanContext, HttpTextFormat } from '@opentelemetry/api';
 import * as http from 'http';
+import { hexToId, idToHex } from '@opentelemetry/core';
+
 
 export class DummyPropagation implements HttpTextFormat {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
   extract(format: string, carrier: http.OutgoingHttpHeaders): SpanContext {
     return {
-      traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
-      spanId: DummyPropagation.SPAN_CONTEXT_KEY,
+      traceId: hexToId(carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string),
+      spanId: hexToId(carrier[DummyPropagation.SPAN_CONTEXT_KEY] as string),
     };
   }
   inject(
@@ -30,7 +32,7 @@ export class DummyPropagation implements HttpTextFormat {
     format: string,
     headers: { [custom: string]: string }
   ): void {
-    headers[DummyPropagation.TRACE_CONTEXT_KEY] = spanContext.traceId;
-    headers[DummyPropagation.SPAN_CONTEXT_KEY] = spanContext.spanId;
+    headers[DummyPropagation.TRACE_CONTEXT_KEY] = idToHex(spanContext.traceId);
+    headers[DummyPropagation.SPAN_CONTEXT_KEY] = idToHex(spanContext.spanId);
   }
 }

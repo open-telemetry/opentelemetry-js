@@ -33,8 +33,8 @@ function getReadableSpan() {
     name: 'my-span',
     kind: types.SpanKind.INTERNAL,
     spanContext: {
-      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
+      traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+      spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
     },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
@@ -127,7 +127,7 @@ describe('ZipkinExporter', () => {
         })
         .reply(202);
 
-      const parentSpanId = '5c1c63257de34c67';
+      const parentSpanId = new Uint8Array([0x5c, 0x1c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x67]);
       const startTime = 1566156729709;
       const duration = 2000;
 
@@ -136,8 +136,8 @@ describe('ZipkinExporter', () => {
         kind: types.SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
+          traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+          spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -162,8 +162,8 @@ describe('ZipkinExporter', () => {
         name: 'my-span',
         kind: types.SpanKind.SERVER,
         spanContext: {
-          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-          spanId: '6e0c63257de34c92',
+          traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1c]),
+          spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x93]),
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -194,24 +194,24 @@ describe('ZipkinExporter', () => {
               },
             ],
             duration: duration * MICROS_PER_SECS,
-            id: span1.spanContext.spanId,
+            id: '6e0c63257de34c92',
             localEndpoint: {
               serviceName: 'my-service',
             },
             name: span1.name,
-            parentId: parentSpanId,
+            parentId: '5c1c63257de34c67',
             tags: {
               key1: 'value1',
               key2: 'value2',
               'ot.status_code': 'OK',
             },
             timestamp: startTime * MICROS_PER_SECS,
-            traceId: span1.spanContext.traceId,
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           },
           // Span 2
           {
             duration: duration * MICROS_PER_SECS,
-            id: span2.spanContext.spanId,
+            id: '6e0c63257de34c93',
             kind: 'SERVER',
             localEndpoint: {
               serviceName: 'my-service',
@@ -221,7 +221,7 @@ describe('ZipkinExporter', () => {
               'ot.status_code': 'OK',
             },
             timestamp: hrTimeToMicroseconds([startTime, 0]),
-            traceId: span2.spanContext.traceId,
+            traceId: 'd4cda95b652f4a1592b449d5929fda1c',
           },
         ]);
       });

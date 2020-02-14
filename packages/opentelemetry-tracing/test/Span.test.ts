@@ -38,8 +38,8 @@ describe('Span', () => {
   }).getTracer('default');
   const name = 'span1';
   const spanContext: SpanContext = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
+    traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+    spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
     traceFlags: TraceFlags.SAMPLED,
   };
 
@@ -135,7 +135,7 @@ describe('Span', () => {
     assert.strictEqual(context.traceId, spanContext.traceId);
     assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
     assert.strictEqual(context.traceState, undefined);
-    assert.ok(context.spanId.match(/[a-f0-9]{16}/));
+    assert.strictEqual(context.spanId.byteLength, 8);
     assert.ok(span.isRecording());
     span.end();
   });
@@ -165,12 +165,12 @@ describe('Span', () => {
 
   it('should set a link', () => {
     const spanContext: SpanContext = {
-      traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-      spanId: '5e0c63257de34c92',
+      traceId: new Uint8Array([0xa3, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+      spanId: new Uint8Array([0x5e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
       traceFlags: TraceFlags.SAMPLED,
     };
     const attributes = { attr1: 'value', attr2: 123, attr3: true };
-    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, '12345', [
+    const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, new Uint8Array([0x12, 0x34, 0x50]), [
       { spanContext },
       { spanContext, attributes },
     ]);
@@ -202,7 +202,7 @@ describe('Span', () => {
   });
 
   it('should return ReadableSpan', () => {
-    const parentId = '5c1c63257de34c67';
+    const parentId = new Uint8Array([0x5c, 0x1c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x67]);
     const span = new Span(
       tracer,
       'my-span',

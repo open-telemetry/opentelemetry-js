@@ -164,7 +164,7 @@ describe('Utility', () => {
       const span = new Span(
         new BasicTracerProvider().getTracer('default'),
         'test',
-        { spanId: '', traceId: '' },
+        { spanId: new Uint8Array(8), traceId: new Uint8Array(16) },
         SpanKind.INTERNAL
       );
       utils.setError(new Error(errorMessage), span, process.versions.node);

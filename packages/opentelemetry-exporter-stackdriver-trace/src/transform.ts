@@ -17,6 +17,7 @@
 import {
   hrTimeToTimeStamp,
   VERSION as CORE_VERSION,
+  idToHex,
 } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as ot from '@opentelemetry/api';
@@ -51,8 +52,8 @@ export function getReadableSpanTransformer(
       },
       endTime: hrTimeToTimeStamp(span.endTime),
       startTime: hrTimeToTimeStamp(span.startTime),
-      name: `projects/${projectId}/traces/${span.spanContext.traceId}/spans/${span.spanContext.spanId}`,
-      spanId: span.spanContext.spanId,
+      name: `projects/${projectId}/traces/${idToHex(span.spanContext.traceId)}/spans/${idToHex(span.spanContext.spanId)}`,
+      spanId: idToHex(span.spanContext.spanId),
       sameProcessAsParentSpan: !span.spanContext.isRemote,
       status: span.status,
       timeEvents: {
@@ -67,7 +68,7 @@ export function getReadableSpanTransformer(
     };
 
     if (span.parentSpanId) {
-      out.parentSpanId = span.parentSpanId;
+      out.parentSpanId = idToHex(span.parentSpanId);
     }
 
     return out;
@@ -77,8 +78,8 @@ export function getReadableSpanTransformer(
 function transformLink(link: ot.Link): Link {
   return {
     attributes: transformAttributes(link.attributes),
-    spanId: link.spanContext.spanId,
-    traceId: link.spanContext.traceId,
+    spanId: idToHex(link.spanContext.spanId),
+    traceId: idToHex(link.spanContext.traceId),
     type: LinkType.UNSPECIFIED,
   };
 }

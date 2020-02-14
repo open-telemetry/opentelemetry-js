@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
+import { hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
 import * as collectorTypes from './types';
@@ -145,7 +145,7 @@ export function toCollectorLinkType(
   const spanParentId = span.parentSpanId;
   const spanTraceId = span.spanContext.traceId;
 
-  if (linkSpanId === spanParentId && linkTraceId === spanTraceId) {
+  if (spanParentId != null && Buffer.compare(linkSpanId, spanParentId) === 0 && Buffer.compare(linkTraceId, spanTraceId) === 0) {
     return collectorTypes.LinkType.PARENT_LINKED_SPAN;
   }
   return collectorTypes.LinkType.UNSPECIFIED;
@@ -158,8 +158,8 @@ export function toCollectorLinkType(
 export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
   const collectorLinks: collectorTypes.Link[] = span.links.map((link: Link) => {
     const collectorLink: collectorTypes.Link = {
-      traceId: hexToBase64(link.spanContext.traceId),
-      spanId: hexToBase64(link.spanContext.spanId),
+      traceId: Buffer.from(link.spanContext.traceId).toString('base64'),
+      spanId: Buffer.from(link.spanContext.spanId).toString('base64'),
       type: toCollectorLinkType(span, link),
     };
 
@@ -181,10 +181,10 @@ export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
  */
 export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
   return {
-    traceId: hexToBase64(span.spanContext.traceId),
-    spanId: hexToBase64(span.spanContext.spanId),
+    traceId: Buffer.from(span.spanContext.traceId).toString('base64'),
+    spanId: Buffer.from(span.spanContext.spanId).toString('base64'),
     parentSpanId: span.parentSpanId
-      ? hexToBase64(span.parentSpanId)
+      ? Buffer.from(span.parentSpanId).toString('base64')
       : undefined,
     tracestate: toCollectorTraceState(span.spanContext.traceState),
     name: toCollectorTruncatableString(span.name),

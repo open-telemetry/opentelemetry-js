@@ -31,10 +31,10 @@ export const assertSpan = (
   }
 ) => {
   if (span.spanContext.traceId) {
-    assert.strictEqual(span.spanContext.traceId.length, 32);
+    assert.strictEqual(span.spanContext.traceId.length, 16);
   }
   if (span.spanContext.spanId) {
-    assert.strictEqual(span.spanContext.spanId.length, 16);
+    assert.strictEqual(span.spanContext.spanId.length, 8);
   }
 
   assert.strictEqual(span.kind, SpanKind.CLIENT);

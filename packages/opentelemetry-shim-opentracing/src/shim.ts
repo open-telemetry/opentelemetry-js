@@ -78,14 +78,14 @@ export class SpanContextShim extends opentracing.SpanContext {
    * Returns the trace ID as a string.
    */
   toTraceId(): string {
-    return this._spanContext.traceId;
+    return Buffer.from(this._spanContext.traceId).toString("hex");
   }
 
   /**
    * Returns the span ID as a string.
    */
   toSpanId(): string {
-    return this._spanContext.spanId;
+    return Buffer.from(this._spanContext.spanId).toString("hex");
   }
 }
 

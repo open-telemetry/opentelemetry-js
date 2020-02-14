@@ -15,11 +15,11 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
+import { NoopTracer, NOOP_SPAN, SpanKind, INVALID_TRACE_ID, INVALID_SPAN_ID } from '../../src';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
-    const spanContext = { traceId: '', spanId: '' };
+    const spanContext = { traceId: INVALID_TRACE_ID, spanId: INVALID_SPAN_ID };
     const tracer = new NoopTracer();
 
     assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);

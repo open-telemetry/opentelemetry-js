@@ -34,8 +34,8 @@ describe('JaegerHttpTraceFormat', () => {
   describe('.inject()', () => {
     it('should set uber trace id header', () => {
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         traceFlags: TraceFlags.SAMPLED,
       };
 
@@ -48,8 +48,8 @@ describe('JaegerHttpTraceFormat', () => {
 
     it('should use custom header if provided', () => {
       const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
         traceFlags: TraceFlags.SAMPLED,
       };
 
@@ -68,8 +68,8 @@ describe('JaegerHttpTraceFormat', () => {
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: '6e0c63257de34c92',
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -81,8 +81,8 @@ describe('JaegerHttpTraceFormat', () => {
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: '45fd2a9709dadcf1',
-        traceId: '9c41e35aeb6d1272',
+        spanId: new Uint8Array([0x45, 0xfd, 0x2a, 0x97, 0x09, 0xda, 0xdc, 0xf1]),
+        traceId: new Uint8Array([0x9c, 0x41, 0xe3, 0x5a, 0xeb, 0x6d, 0x12, 0x72]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -94,8 +94,8 @@ describe('JaegerHttpTraceFormat', () => {
       const extractedSpanContext = jaegerHttpTraceFormat.extract('', carrier);
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: '5ac292c4a11a163e',
-        traceId: 'ac1f3dc3c2c0b06e',
+        spanId: new Uint8Array([0x5a, 0xc2, 0x92, 0xc4, 0xa1, 0x1a, 0x16, 0x3e]),
+        traceId: new Uint8Array([0xac, 0x1f, 0x3d, 0xc3, 0xc2, 0xc0, 0xb0, 0x6e]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
@@ -110,8 +110,8 @@ describe('JaegerHttpTraceFormat', () => {
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: '6e0c63257de34c92',
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: new Uint8Array([0x6e, 0x0c, 0x63, 0x25, 0x7d, 0xe3, 0x4c, 0x92]),
+        traceId: new Uint8Array([0xd4, 0xcd, 0xa9, 0x5b, 0x65, 0x2f, 0x4a, 0x15, 0x92, 0xb4, 0x49, 0xd5, 0x92, 0x9f, 0xda, 0x1b]),
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });

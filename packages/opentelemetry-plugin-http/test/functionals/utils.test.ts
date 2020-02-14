@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, INVALID_SPANID, INVALID_TRACEID } from '@opentelemetry/core';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { CanonicalCode, SpanKind } from '@opentelemetry/api';
@@ -259,7 +259,7 @@ describe('Utility', () => {
             scopeManager: new NoopScopeManager(),
           }).getTracer('default'),
           'test',
-          { spanId: '', traceId: '' },
+          { spanId: INVALID_SPANID, traceId: INVALID_TRACEID },
           SpanKind.INTERNAL
         );
         /* tslint:disable-next-line:no-any */

@@ -15,18 +15,41 @@
  */
 
 import * as assert from 'assert';
-import { randomSpanId, randomTraceId } from '../../src/platform';
+import { randomSpanId, randomTraceId, idToHex, hexToId, idsEquals } from '../../src/platform';
 
 describe('randomTraceId', () => {
-  it('returns different 32-char hex strings', () => {
+  it('returns different 16 bytes Uint8Array', () => {
     const traceId = randomTraceId();
-    assert.ok(traceId.match(/[a-f0-9]{32}/));
+    assert.ok(traceId instanceof Uint8Array);
+    assert.strictEqual(traceId.byteLength, 16);
   });
 });
 
 describe('randomSpanId', () => {
-  it('returns different 16-char hex string', () => {
+  it('returns different 8 bytes Uint8Array', () => {
     const spanId = randomSpanId();
-    assert.ok(spanId.match(/[a-f0-9]{16}/));
+    assert.ok(spanId instanceof Uint8Array);
+    assert.strictEqual(spanId.byteLength, 8);
+  });
+});
+
+describe('idToHex', () => {
+  it('converts it to hex string', () => {
+    assert.strictEqual(idToHex(new Uint8Array([0x01, 0xf8, 0xab, 0x56])), '01f8ab56');
+  });
+});
+
+describe('hexToId', () => {
+  it('coverts hex encoded string to id', () => {
+    assert.deepStrictEqual(hexToId('01f8ab56'), new Uint8Array([0x01, 0xf8, 0xab, 0x56]));
+  });
+});
+
+describe('idsEquals', () => {
+  it('returns if ids match', () => {
+    assert.ok(idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x13])));
+    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x13, 0x14])));
+    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13, 0x14]), new Uint8Array([0x11, 0x12, 0x13])));
+    assert.ok(!idsEquals(new Uint8Array([0x11, 0x12, 0x13]), new Uint8Array([0x11, 0x12, 0x14])));
   });
 });
