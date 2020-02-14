@@ -21,10 +21,18 @@ const TRACE_ID_BYTES = 16;
 
 /**
  * Encodes an Uint8Array into a hex string.
- * @param buf the array buffer to encode
+ * @param buf the buffer to encode
  */
 export function idToHex(buf: Uint8Array): string {
   return Buffer.from(buf).toString('hex');
+}
+
+/**
+ * Encodes an Uint8Array into a base64 encoded string.
+ * @param buf the buffer to encode
+ */
+export function idToBase64(buf: Uint8Array): string {
+  return Buffer.from(buf).toString('base64');
 }
 
 /**

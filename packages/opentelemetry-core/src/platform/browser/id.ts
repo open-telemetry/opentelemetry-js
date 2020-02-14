@@ -42,6 +42,18 @@ export function idToHex(buf: Uint8Array): string {
 }
 
 /**
+ * Encodes an Uint8Array into a base64 encoded string.
+ * @param buf the buffer to encode
+ */
+export function idToBase64(buf: Uint8Array): string {
+  let s = '';
+  for (let i = 0; i < buf.byteLength; i++) {
+    s += String.fromCharCode(buf[i]);
+  }
+  return btoa(s);
+}
+
+/**
  * Converts hex encoded string into an Uint8Array
  * @param s the string to convert
  */

@@ -21,6 +21,7 @@ import {
   idToHex,
   hexToId,
   idsEquals,
+  idToBase64,
 } from '../../src/platform';
 
 describe('randomTraceId', () => {
@@ -45,6 +46,41 @@ describe('idToHex', () => {
       idToHex(new Uint8Array([0x01, 0xf8, 0xab, 0x56])),
       '01f8ab56'
     );
+  });
+});
+
+describe('idToBase64', () => {
+  it('converts it to a base64 string', () => {
+    const id1 = new Uint8Array([
+      0x7d,
+      0xeb,
+      0x73,
+      0x9e,
+      0x02,
+      0xe4,
+      0x4e,
+      0xf2,
+    ]);
+    const id2 = new Uint8Array([
+      0x46,
+      0xce,
+      0xf8,
+      0x37,
+      0xb9,
+      0x19,
+      0xa1,
+      0x6f,
+      0xf2,
+      0x6e,
+      0x60,
+      0x8c,
+      0x8c,
+      0xf4,
+      0x2c,
+      0x80,
+    ]);
+    assert.strictEqual(idToBase64(id1), 'fetzngLkTvI=');
+    assert.strictEqual(idToBase64(id2), 'Rs74N7kZoW/ybmCMjPQsgA==');
   });
 });
 
