@@ -23,14 +23,17 @@ const setups = [
   }
 ];
 
+const traceId = Uint8Array.from(Buffer.from('d4cda95b652f4a1592b449d5929fda1b', 'hex'));
+const spanId = Uint8Array.from(Buffer.from('6e0c63257de34c92', 'hex'));
+
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
   const propagator = setup.propagator;
   const suite = benchmark(100)
     .add('#Inject', function () {
       propagator.inject({
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92'
+        traceId,
+        spanId
       }, setup.name, setup.injectCarrier);
     })
     .add('#Extract', function () {
