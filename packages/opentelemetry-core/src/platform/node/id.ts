@@ -24,7 +24,9 @@ const TRACE_ID_BYTES = 16;
  * @param buf the buffer to encode
  */
 export function idToHex(buf: Uint8Array): string {
-  return Buffer.from(buf).toString('hex');
+  return Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength).toString(
+    'hex'
+  );
 }
 
 /**
@@ -32,7 +34,9 @@ export function idToHex(buf: Uint8Array): string {
  * @param buf the buffer to encode
  */
 export function idToBase64(buf: Uint8Array): string {
-  return Buffer.from(buf).toString('base64');
+  return Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength).toString(
+    'base64'
+  );
 }
 
 /**

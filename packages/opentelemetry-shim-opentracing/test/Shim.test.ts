@@ -18,7 +18,11 @@ import * as assert from 'assert';
 import * as opentracing from 'opentracing';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
-import { INVALID_SPAN_CONTEXT, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  INVALID_SPAN_CONTEXT,
+  timeInputToHrTime,
+  idToHex,
+} from '@opentelemetry/core';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
@@ -87,9 +91,7 @@ describe('OpenTracing Shim', () => {
         childOf: span,
       }) as SpanShim;
       assert.strictEqual(
-        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString(
-          'hex'
-        ),
+        idToHex((childSpan.getSpan() as Span).parentSpanId!),
         context.toSpanId()
       );
       assert.strictEqual(
@@ -103,9 +105,7 @@ describe('OpenTracing Shim', () => {
         childOf: context,
       }) as SpanShim;
       assert.strictEqual(
-        Buffer.from((childSpan.getSpan() as Span).parentSpanId!).toString(
-          'hex'
-        ),
+        idToHex((childSpan.getSpan() as Span).parentSpanId!),
         context.toSpanId()
       );
       assert.strictEqual(
@@ -137,12 +137,9 @@ describe('OpenTracing Shim', () => {
       assert.strictEqual(shim.getSpanContext(), INVALID_SPAN_CONTEXT);
       assert.strictEqual(
         shim.toTraceId(),
-        Buffer.from(INVALID_SPAN_CONTEXT.traceId).toString('hex')
+        idToHex(INVALID_SPAN_CONTEXT.traceId)
       );
-      assert.strictEqual(
-        shim.toSpanId(),
-        Buffer.from(INVALID_SPAN_CONTEXT.spanId).toString('hex')
-      );
+      assert.strictEqual(shim.toSpanId(), idToHex(INVALID_SPAN_CONTEXT.spanId));
     });
   });
 

@@ -15,7 +15,7 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, idToHex } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 
 function translateReferences(
@@ -78,14 +78,14 @@ export class SpanContextShim extends opentracing.SpanContext {
    * Returns the trace ID as a string.
    */
   toTraceId(): string {
-    return Buffer.from(this._spanContext.traceId).toString('hex');
+    return idToHex(this._spanContext.traceId);
   }
 
   /**
    * Returns the span ID as a string.
    */
   toSpanId(): string {
-    return Buffer.from(this._spanContext.spanId).toString('hex');
+    return idToHex(this._spanContext.spanId);
   }
 }
 
