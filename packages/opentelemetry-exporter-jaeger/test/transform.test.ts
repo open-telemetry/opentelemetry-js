@@ -219,5 +219,37 @@ describe('transform', () => {
       assert.strictEqual(ref1.spanId.toString('hex'), '3e0c63257de34c92');
       assert.strictEqual(ref1.refType, ThriftReferenceType.CHILD_OF);
     });
+
+    it('should left pad trace ids', () => {
+      const readableSpan: ReadableSpan = {
+        name: 'my-span1',
+        kind: types.SpanKind.CLIENT,
+        spanContext: {
+          traceId: '92b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+        },
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
+        status: {
+          code: types.CanonicalCode.DATA_LOSS,
+          message: 'data loss',
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [32, 800000000],
+      };
+
+      const thriftSpan = spanToThrift(readableSpan);
+
+      assert.strictEqual(
+        thriftSpan.traceIdLow.toString('hex'),
+        '92b449d5929fda1b'
+      );
+      assert.strictEqual(
+        thriftSpan.traceIdHigh.toString('hex'),
+        '0000000000000000'
+      );
+    });
   });
 });
