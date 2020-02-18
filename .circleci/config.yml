@@ -40,7 +40,7 @@ mysql_service: &mysql_service
     MYSQL_ROOT_PASSWORD: rootpw
 
 cache_1: &cache_1
-  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
   paths:
     - ./node_modules
     - ./package-lock.json
@@ -60,7 +60,7 @@ cache_1: &cache_1
     - packages/opentelemetry-plugin-dns/node_modules
 
 cache_2: &cache_2
-  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
   paths:
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
@@ -95,10 +95,10 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
     - run:
         name: Install Root Dependencies
         command: npm install --ignore-scripts
@@ -135,10 +135,10 @@ browsers_unit_tests: &browsers_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-FDF2088C
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
     - run:
         name: Install Root Dependencies
         command: npm install --ignore-scripts
@@ -160,6 +160,8 @@ jobs:
   lint_&_docs:
     docker:
       - image: node:12
+        environment:
+          NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - checkout
       - run:
@@ -171,6 +173,9 @@ jobs:
       - run:
           name: Check code style and linting
           command: npm run check
+      - run:
+          name: Install API dependencies
+          command: lerna bootstrap --scope @opentelemetry/api --include-filtered-dependencies
       - run:
           name: Docs tests
           command: npm run docs-test

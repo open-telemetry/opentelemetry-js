@@ -14,40 +14,35 @@
  * limitations under the License.
  */
 
-import { SpanContext } from '../../trace/span_context';
+import { Context } from '@opentelemetry/scope-base';
 import { Carrier } from './carrier';
 
 /**
- * Injects and extracts a value as text into carriers that travel in-band
- * across process boundaries. Encoding is expected to conform to the HTTP
+ * Injects {@link Context} into and extracts it from carriers that travel
+ * in-band across process boundaries. Encoding is expected to conform to the HTTP
  * Header Field semantics. Values are often encoded as RPC/HTTP request headers.
  *
  * The carrier of propagated data on both the client (injector) and server
- * (extractor) side is usually an http request. Propagation is usually
- * implemented via library- specific request interceptors, where the
- * client-side injects values and the server-side extracts them.
+ * (extractor) side is usually an object such as http headers.
  */
 export interface HttpTextFormat {
   /**
-   * Injects the given {@link SpanContext} instance to transmit over the wire.
+   * Injects values from a given {@link Context} into a carrier.
    *
    * OpenTelemetry defines a common set of format values (BinaryFormat and
    * HTTPTextFormat), and each has an expected `carrier` type.
    *
-   * @param spanContext the SpanContext to transmit over the wire.
-   * @param format the format of the carrier.
+   * @param context the Context from which to extract values to transmit over the wire.
    * @param carrier the carrier of propagation fields, such as http request headers.
    */
-  inject(spanContext: SpanContext, format: string, carrier: Carrier): void;
+  inject(context: Context, carrier: Carrier): void;
 
   /**
-   * Returns a {@link SpanContext} instance extracted from `carrier` in the
-   * given format from upstream.
+   * Given a {@link Context} and a carrier, extract context values from a carrier and
+   * return a new context, created from the old context, with the extracted values.
    *
-   * @param format the format of the carrier.
+   * @param context the Context from which to extract values to transmit over the wire.
    * @param carrier the carrier of propagation fields, such as http request headers.
-   * @returns SpanContext The extracted SpanContext, or null if no such
-   *     SpanContext could be found in carrier.
    */
-  extract(format: string, carrier: Carrier): SpanContext | null;
+  extract(context: Context, carrier: Carrier): Context;
 }

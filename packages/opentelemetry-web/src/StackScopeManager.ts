@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Context } from '@opentelemetry/api';
 import { ScopeManager } from '@opentelemetry/scope-base';
 
 /**
@@ -29,14 +30,17 @@ export class StackScopeManager implements ScopeManager {
   /**
    * Keeps the reference to current scope
    */
-  public _currentScope: unknown;
+  public _currentScope = Context.ROOT_CONTEXT;
 
   /**
    *
    * @param target Function to be executed within the scope
    * @param scope
    */
-  private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
+  private _bindFunction<T extends Function>(
+    target: T,
+    scope = Context.ROOT_CONTEXT
+  ): T {
     const manager = this;
     const contextWrapper = function(...args: unknown[]) {
       return manager.with(scope, () => target.apply(scope, args));
@@ -53,7 +57,7 @@ export class StackScopeManager implements ScopeManager {
   /**
    * Returns the active scope
    */
-  active(): unknown {
+  active(): Context {
     return this._currentScope;
   }
 
@@ -62,7 +66,7 @@ export class StackScopeManager implements ScopeManager {
    * @param target
    * @param scope
    */
-  bind<T>(target: T, scope?: unknown): T {
+  bind<T>(target: T, scope = Context.ROOT_CONTEXT): T {
     // if no specific scope to propagate is given, we use the current one
     if (scope === undefined) {
       scope = this.active();
@@ -77,7 +81,7 @@ export class StackScopeManager implements ScopeManager {
    * Disable the scope manager (clears the current scope)
    */
   disable(): this {
-    this._currentScope = undefined;
+    this._currentScope = Context.ROOT_CONTEXT;
     this._enabled = false;
     return this;
   }
@@ -90,7 +94,7 @@ export class StackScopeManager implements ScopeManager {
       return this;
     }
     this._enabled = true;
-    this._currentScope = window;
+    this._currentScope = Context.ROOT_CONTEXT;
     return this;
   }
 
@@ -101,15 +105,11 @@ export class StackScopeManager implements ScopeManager {
    * @param fn Callback function
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: unknown,
+    scope: Context | null,
     fn: () => ReturnType<T>
   ): ReturnType<T> {
-    if (typeof scope === 'undefined' || scope === null) {
-      scope = window;
-    }
-
     const previousScope = this._currentScope;
-    this._currentScope = scope;
+    this._currentScope = scope || Context.ROOT_CONTEXT;
 
     try {
       return fn.apply(scope);

@@ -15,11 +15,16 @@
  */
 
 import {
-  SpanContext,
-  HttpTextFormat,
-  TraceFlags,
   Carrier,
+  Context,
+  HttpTextFormat,
+  SpanContext,
+  TraceFlags,
 } from '@opentelemetry/api';
+import {
+  getParentSpanContext,
+  setExtractedSpanContext,
+} from '@opentelemetry/core';
 
 export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
 
@@ -48,12 +53,10 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  /**
-   * @param {SpanContext} spanContext - context from which we take information to inject in carrier.
-   * @param {string} format - unused.
-   * @param {Carrier} carrier - a carrier to which span information will be injected.
-   **/
-  inject(spanContext: SpanContext, format: string, carrier: Carrier) {
+  inject(context: Context, carrier: Carrier) {
+    const spanContext = getParentSpanContext(context);
+    if (!spanContext) return;
+
     const traceFlags = `0${(
       spanContext.traceFlags || TraceFlags.UNSAMPLED
     ).toString(16)}`;
@@ -63,19 +66,17 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
   }
 
-  /**
-   * @param {string} format - unused.
-   * @param {Carrier} carrier - a carrier from which span context will be constructed.
-   * @return {SpanContext} - returns a span context extracted from carrier.
-   **/
-  extract(format: string, carrier: Carrier): SpanContext | null {
+  extract(context: Context, carrier: Carrier): Context {
     const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
-    if (!uberTraceIdHeader) return null;
+    if (!uberTraceIdHeader) return context;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]
       : uberTraceIdHeader;
 
-    return deserializeSpanContext(uberTraceId);
+    const spanContext = deserializeSpanContext(uberTraceId);
+    if (!spanContext) return context;
+
+    return setExtractedSpanContext(context, spanContext);
   }
 }
 
