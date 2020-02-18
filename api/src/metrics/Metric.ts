@@ -81,7 +81,8 @@ export interface Metric<T> {
    * Returns a Instrument associated with specified LabelSet.
    * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   bind(labels: LabelSet): T;
 
@@ -92,7 +93,8 @@ export interface Metric<T> {
 
   /**
    * Removes the Instrument from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   unbind(labels: LabelSet): void;
 
