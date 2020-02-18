@@ -15,7 +15,7 @@
     "precompile": "tsc --version",
     "prepare": "npm run compile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts'"
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'"
   },
   "keywords": [
     "opentelemetry",
