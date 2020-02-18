@@ -21,10 +21,14 @@ import { Tracer } from './tracer';
  */
 export interface TracerProvider {
   /**
-   * Returns a Tracer, creating one if one with the given name and version is not already created
+   * Returns a Tracer, creating one if one with the given name and version is
+   * not already created.
    *
-   * If there is no Span associated with the current context, null is returned.
+   * If there is no Span associated with the current context, `null` is
+   * returned.
    *
+   * @param name The name of the tracer or instrumentation library.
+   * @param version The version of the tracer or instrumentation library.
    * @returns Tracer A Tracer with the given name and version
    */
   getTracer(name: string, version?: string): Tracer;
