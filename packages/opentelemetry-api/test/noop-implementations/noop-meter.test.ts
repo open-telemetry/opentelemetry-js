@@ -19,11 +19,9 @@ import {
   Labels,
   NoopMeterProvider,
   NOOP_BOUND_COUNTER,
-  NOOP_BOUND_GAUGE,
   NOOP_BOUND_MEASURE,
   NOOP_COUNTER_METRIC,
-  NOOP_GAUGE_METRIC,
-  NOOP_MEASURE_METRIC,
+  NOOP_MEASURE_METRIC
 } from '../../src';
 
 describe('NoopMeter', () => {
@@ -64,14 +62,6 @@ describe('NoopMeter', () => {
     assert.strictEqual(measure.getDefaultBound(), NOOP_BOUND_MEASURE);
     assert.strictEqual(measure.bind(labelSet), NOOP_BOUND_MEASURE);
 
-    const gauge = meter.createGauge('some-name');
-    gauge.getDefaultBound().set(1);
-
-    // ensure the correct noop const is returned
-    assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
-    assert.strictEqual(gauge.getDefaultBound(), NOOP_BOUND_GAUGE);
-    assert.strictEqual(gauge.bind(labelSet), NOOP_BOUND_GAUGE);
-
     const options = {
       component: 'tests',
       description: 'the testing package',
@@ -81,7 +71,5 @@ describe('NoopMeter', () => {
     assert.strictEqual(measureWithOptions, NOOP_MEASURE_METRIC);
     const counterWithOptions = meter.createCounter('some-name', options);
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
-    const gaugeWithOptions = meter.createGauge('some-name', options);
-    assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
   });
 });

@@ -15,13 +15,13 @@
  */
 
 import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
-import { BoundCounter, BoundGauge, BoundMeasure } from './BoundInstrument';
+import { BoundCounter, BoundMeasure } from './BoundInstrument';
 
 /**
  * An interface to allow the recording metrics.
  *
- * {@link Metric}s are used for recording pre-defined aggregation (`Gauge` and
- * `Counter`), or raw values (`Measure`) in which the aggregation and labels
+ * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
+ * or raw values (`Measure`) in which the aggregation and labels
  * for the exported metric are deferred.
  */
 export interface Meter {
@@ -40,16 +40,6 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Metric<BoundCounter>;
-
-  /**
-   * Creates a new `gauge` metric. Generally, this kind of metric should be used
-   * when the metric cannot be expressed as a sum or because the measurement
-   * interval is arbitrary. Use this kind of metric when the measurement is not
-   * a quantity, and the sum and event count are not of interest.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createGauge(name: string, options?: MetricOptions): Metric<BoundGauge>;
 
   /**
    * Provide a pre-computed re-useable LabelSet by
