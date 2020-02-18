@@ -1,6 +1,6 @@
 # Plugin Developer Guide
 
-The `NodeTracer` or `Node-SDK` is driven by a set of plugins that describe how to patch a module to generate trace spans when that module is used. We provide out-of-the-box instrumentation for many popular frameworks and libraries by using a plugin system (see [builtin plugins][builtin-plugins]), and provide a means for developers to create their own.
+The `NodeTracerProvider` or `Node-SDK` is driven by a set of plugins that describe how to patch a module to generate trace spans when that module is used. We provide out-of-the-box instrumentation for many popular frameworks and libraries by using a plugin system (see [builtin plugins][builtin-plugins]), and provide a means for developers to create their own.
 
 We strongly recommended to create a dedicated package for newly added plugin, example: `@opentelemetry/plugin-xxx`.
 

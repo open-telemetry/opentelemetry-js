@@ -19,7 +19,7 @@
     "prepare": "npm run compile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/browser/**/*.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
     "watch": "tsc -w"
