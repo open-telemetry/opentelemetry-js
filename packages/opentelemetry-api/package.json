@@ -17,7 +17,7 @@
     "compile": "npm run version:update && tsc -p .",
     "fix": "gts fix",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
-    "docs": "typedoc --tsconfig tsconfig.json",
+    "docs": "typedoc --tsconfig tsconfig.json --exclude test/**/*.ts",
     "prepare": "npm run compile"
   },
   "keywords": [

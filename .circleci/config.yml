@@ -174,8 +174,8 @@ jobs:
           name: Check code style and linting
           command: npm run check
       - run:
-          name: Install API dependencies
-          command: lerna bootstrap --scope @opentelemetry/api --include-filtered-dependencies
+          name: Install doc dependencies
+          command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
       - run:
           name: Docs tests
           command: npm run docs-test
@@ -185,7 +185,7 @@ jobs:
             - out
       - run:
           name: Install minimal modules to lint examples
-          command: npm i -D eslint eslint-plugin-import eslint-config-airbnb-base
+          command: npm i --no-save eslint eslint-plugin-import eslint-config-airbnb-base
       - run:
           name: Lint examples
           command: npm run lint-examples
