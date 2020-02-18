@@ -93,6 +93,13 @@ const alreadyRequiredPlugins: Plugins = {
   },
 };
 
+const differentNamePlugins: Plugins = {
+  'random-module': {
+    enabled: true,
+    path: '@opentelemetry/plugin-http-module',
+  },
+};
+
 describe('PluginLoader', () => {
   const provider = new NoopTracerProvider();
   const logger = new NoopLogger();
@@ -241,6 +248,16 @@ describe('PluginLoader', () => {
       require('already-require-module');
       const pluginLoader = new PluginLoader(provider, verifyWarnLogger);
       pluginLoader.load(alreadyRequiredPlugins);
+      pluginLoader.unload();
+    });
+
+    it('should not load a plugin that patches a different module that the one configured', () => {
+      const pluginLoader = new PluginLoader(provider, logger);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      pluginLoader.load(differentNamePlugins);
+      // @ts-ignore only to trigger the loading of the plugin
+      const randomModule = require('random-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.unload();
     });
   });

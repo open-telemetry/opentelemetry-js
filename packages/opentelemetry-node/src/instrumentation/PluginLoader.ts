@@ -132,8 +132,16 @@ export class PluginLoader {
         // Expecting a plugin from module;
         try {
           const plugin: Plugin = require(modulePath).plugin;
-
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
+            this.logger.error(
+              `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`
+            );
+            return exports;
+          }
+          if (plugin.moduleName !== name) {
+            this.logger.error(
+              `PluginLoader#load: Entry ${name} use a plugin that instruments ${plugin.moduleName}`
+            );
             return exports;
           }
 
