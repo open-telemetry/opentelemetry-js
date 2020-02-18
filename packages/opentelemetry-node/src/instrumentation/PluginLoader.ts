@@ -83,6 +83,25 @@ export class PluginLoader {
         return this;
       }
 
+      const alreadyRequiredModules = Object.keys(require.cache);
+      const requiredModulesToHook = modulesToHook.filter(
+        name =>
+          alreadyRequiredModules.find(cached => {
+            try {
+              return require.resolve(name) === cached;
+            } catch (err) {
+              return false;
+            }
+          }) !== undefined
+      );
+      if (requiredModulesToHook.length > 0) {
+        this.logger.warn(
+          `Some modules (${requiredModulesToHook.join(
+            ', '
+          )}) were already required when their respective plugin was loaded, some plugins might not work. Make sure the SDK is setup before you require in other modules.`
+        );
+      }
+
       // Enable the require hook.
       hook(modulesToHook, (exports, name, baseDir) => {
         if (this._hookState !== HookState.ENABLED) return exports;
@@ -113,8 +132,16 @@ export class PluginLoader {
         // Expecting a plugin from module;
         try {
           const plugin: Plugin = require(modulePath).plugin;
-
           if (!utils.isSupportedVersion(version, plugin.supportedVersions)) {
+            this.logger.error(
+              `PluginLoader#load: Plugin ${name} only supports module ${plugin.moduleName} with the versions: ${plugin.supportedVersions}`
+            );
+            return exports;
+          }
+          if (plugin.moduleName !== name) {
+            this.logger.error(
+              `PluginLoader#load: Entry ${name} use a plugin that instruments ${plugin.moduleName}`
+            );
             return exports;
           }
 
