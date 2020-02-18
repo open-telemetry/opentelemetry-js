@@ -25,9 +25,9 @@ import {
   MeterConfig,
 } from './types';
 import { LabelSet } from './LabelSet';
-import { ReadableMetric, MetricExporter } from './export/types';
-import { notNull } from './Utils';
-import { ExportResult } from '@opentelemetry/base';
+import { Batcher, UngroupedBatcher } from './export/Batcher';
+import { PushController } from './export/Controller';
+import { NoopExporter } from '../test/mocks/Exporter';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -35,8 +35,7 @@ import { ExportResult } from '@opentelemetry/base';
 export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
-  private readonly _exporters: MetricExporter[] = [];
-
+  private readonly _batcher: Batcher;
   readonly labels = Meter.labels;
 
   /**
@@ -44,6 +43,11 @@ export class Meter implements types.Meter {
    */
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
+    this._batcher = new UngroupedBatcher();
+    // start the push controller
+    const exporter = config.exporter || new NoopExporter();
+    const interval = config.interval;
+    new PushController(this, exporter, interval);
   }
 
   /**
@@ -62,17 +66,14 @@ export class Meter implements types.Meter {
       return types.NOOP_MEASURE_METRIC;
     }
     const opt: MetricOptions = {
-      // Measures are defined as absolute by default
-      absolute: true,
+      absolute: true, // Measures are defined as absolute by default
       monotonic: false, // not applicable to measure, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
 
-    const measure = new MeasureMetric(name, opt, () => {
-      this._exportOneMetric(name);
-    });
+    const measure = new MeasureMetric(name, opt, this._batcher);
     this._registerMetric(name, measure);
     return measure;
   }
@@ -95,16 +96,13 @@ export class Meter implements types.Meter {
       return types.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
-      // Counters are defined as monotonic by default
-      monotonic: true,
+      monotonic: true, // Counters are defined as monotonic by default
       absolute: false, // not applicable to counter, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, () => {
-      this._exportOneMetric(name);
-    });
+    const counter = new CounterMetric(name, opt, this._batcher);
     this._registerMetric(name, counter);
     return counter;
   }
@@ -128,37 +126,34 @@ export class Meter implements types.Meter {
       return types.NOOP_GAUGE_METRIC;
     }
     const opt: MetricOptions = {
-      // Gauges are defined as non-monotonic by default
-      monotonic: false,
+      monotonic: false, // Gauges are defined as non-monotonic by default
       absolute: false, // not applicable for gauges, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const gauge = new GaugeMetric(name, opt, () => {
-      this._exportOneMetric(name);
-    });
+    const gauge = new GaugeMetric(name, opt, this._batcher);
     this._registerMetric(name, gauge);
     return gauge;
   }
 
   /**
-   * Gets a collection of Metrics to be exported.
-   * @returns The list of metrics.
+   * Collects all the metrics created with this `Meter` for export.
+   *
+   * Utilizes the batcher to create checkpoints of the current values in
+   * each aggregator belonging to the metrics that were created with this
+   * meter instance.
    */
-  getMetrics(): ReadableMetric[] {
-    return Array.from(this._metrics.values())
-      .map(metric => metric.get())
-      .filter(notNull);
+  collect() {
+    Array.from(this._metrics.values()).forEach(metric => {
+      metric.getMetricRecord().forEach(record => {
+        this._batcher.process(record);
+      });
+    });
   }
 
-  /**
-   * Add an exporter to the list of registered exporters
-   *
-   * @param exporter {@Link MetricExporter} to add to the list of registered exporters
-   */
-  addExporter(exporter: MetricExporter) {
-    this._exporters.push(exporter);
+  getBatcher(): Batcher {
+    return this._batcher;
   }
 
   /**
@@ -180,25 +175,6 @@ export class Meter implements types.Meter {
       sortedLabels[key] = labels[key];
     });
     return new LabelSet(identifier, sortedLabels);
-  }
-
-  /**
-   * Send a single metric by name to all registered exporters
-   */
-  private _exportOneMetric(name: string) {
-    const metric = this._metrics.get(name);
-    if (!metric) return;
-
-    const readableMetric = metric.get();
-    if (!readableMetric) return;
-
-    for (const exporter of this._exporters) {
-      exporter.export([readableMetric], result => {
-        if (result !== ExportResult.SUCCESS) {
-          this._logger.error(`Failed to export ${name}`);
-        }
-      });
-    }
   }
 
   /**

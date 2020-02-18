@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { MetricExporter, ReadableMetric } from '../../src/export/types';
+import { MetricExporter, MetricRecord } from '../../src/export/types';
 import { ExportResult } from '@opentelemetry/base';
 import { EventEmitter } from 'events';
 
 export class NoopExporter extends EventEmitter implements MetricExporter {
   export(
-    metrics: ReadableMetric[],
+    metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
   ): void {
     this.emit('export', metrics, resultCallback);
