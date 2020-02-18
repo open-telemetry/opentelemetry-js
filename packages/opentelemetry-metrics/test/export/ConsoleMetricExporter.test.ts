@@ -40,14 +40,14 @@ describe('ConsoleMetricExporter', () => {
       const meter = new MeterProvider().getMeter(
         'test-console-metric-exporter'
       );
-      const gauge = meter.createGauge('gauge', {
+      const counter = meter.createCounter('counter', {
         description: 'a test description',
         labelKeys: ['key1', 'key2'],
       });
-      const boundGauge = gauge.bind(
+      const boundCounter = counter.bind(
         meter.labels({ key1: 'labelValue1', key2: 'labelValue2' })
       );
-      boundGauge.set(10);
+      boundCounter.add(10);
 
       meter.collect();
       consoleExporter.export(meter.getBatcher().checkPointSet(), () => {});
@@ -57,9 +57,9 @@ describe('ConsoleMetricExporter', () => {
         {
           description: 'a test description',
           labelKeys: ['key1', 'key2'],
-          metricKind: MetricKind.GAUGE,
-          monotonic: false,
-          name: 'gauge',
+          metricKind: MetricKind.COUNTER,
+          monotonic: true,
+          name: 'counter',
           unit: '1',
           valueType: ValueType.DOUBLE,
         },
@@ -70,7 +70,7 @@ describe('ConsoleMetricExporter', () => {
           key2: 'labelValue2',
         },
       ]);
-      assert.ok(value[0].includes('value: 10, timestamp:'));
+      assert.deepStrictEqual(value[0], 'value: 10');
     });
   });
 });

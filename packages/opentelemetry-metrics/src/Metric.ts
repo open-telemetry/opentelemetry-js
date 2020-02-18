@@ -17,7 +17,6 @@
 import * as types from '@opentelemetry/api';
 import {
   BoundCounter,
-  BoundGauge,
   BaseBoundInstrument,
   BoundMeasure,
 } from './BoundInstrument';
@@ -145,37 +144,6 @@ export class CounterMetric extends Metric<BoundCounter>
    */
   add(value: number, labelSet: types.LabelSet) {
     this.bind(labelSet).add(value);
-  }
-}
-
-/** This is a SDK implementation of Gauge Metric. */
-export class GaugeMetric extends Metric<BoundGauge>
-  implements Pick<types.MetricUtils, 'set'> {
-  constructor(
-    name: string,
-    options: MetricOptions,
-    private readonly _batcher: Batcher
-  ) {
-    super(name, options, MetricKind.GAUGE);
-  }
-  protected _makeInstrument(labelSet: types.LabelSet): BoundGauge {
-    return new BoundGauge(
-      labelSet,
-      this._disabled,
-      this._monotonic,
-      this._valueType,
-      this._logger,
-      this._batcher.aggregatorFor(MetricKind.GAUGE)
-    );
-  }
-
-  /**
-   * Sets the given value. Values can be negative.
-   * @param value the new value.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric's instrument.
-   */
-  set(value: number, labelSet: types.LabelSet) {
-    this.bind(labelSet).set(value);
   }
 }
 

@@ -17,7 +17,7 @@
 import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, GaugeMetric, MeasureMetric } from './Metric';
+import { Metric, CounterMetric, MeasureMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,

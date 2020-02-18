@@ -95,40 +95,6 @@ export class BoundCounter extends BaseBoundInstrument
 }
 
 /**
- * BoundGauge allows the SDK to observe/record a single metric event. The
- * value of single instrument in the `Gauge` associated with specified LabelSet.
- */
-export class BoundGauge extends BaseBoundInstrument
-  implements types.BoundGauge {
-  private _current: number = 0;
-
-  constructor(
-    labelSet: types.LabelSet,
-    disabled: boolean,
-    monotonic: boolean,
-    valueType: types.ValueType,
-    logger: types.Logger,
-    aggregator: Aggregator
-  ) {
-    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
-  }
-
-  set(value: number): void {
-    if (this._monotonic && value < this._current) {
-      this._logger.error(
-        `Monotonic gauge cannot descend for ${Object.values(
-          this._labelSet.labels
-        )}`
-      );
-      return;
-    }
-
-    this._current = value;
-    this.update(value);
-  }
-}
-
-/**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
 export class BoundMeasure extends BaseBoundInstrument

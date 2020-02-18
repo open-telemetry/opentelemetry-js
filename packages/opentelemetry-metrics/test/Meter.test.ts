@@ -19,8 +19,6 @@ import {
   Meter,
   Metric,
   CounterMetric,
-  GaugeMetric,
-  LastValue,
   MetricKind,
   Sum,
   MeterProvider,
@@ -29,14 +27,9 @@ import {
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
-import { NoopLogger, hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
-import {
-  CounterSumAggregator,
-  GaugeAggregator,
-} from '../src/export/Aggregator';
+import { NoopLogger } from '@opentelemetry/core';
+import { CounterSumAggregator } from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
-
-const performanceTimeOrigin = hrTime();
 
 describe('Meter', () => {
   let meter: Meter;
