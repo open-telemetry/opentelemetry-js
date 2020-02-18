@@ -77,7 +77,8 @@ export abstract class Metric<T extends BaseBoundInstrument>
 
   /**
    * Removes the Instrument from the metric, if it is present.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labelSet the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   unbind(labelSet: types.LabelSet): void {
     this._instruments.delete(labelSet.identifier);
