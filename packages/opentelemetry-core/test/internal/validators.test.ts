@@ -27,10 +27,12 @@ describe('validators', () => {
       'baz*bar',
       'baz/',
       'tracestate',
+      'fw529a3039@dt',
+      '6cab5bb-29a@dt',
     ];
     validKeysTestCases.forEach(testCase =>
       it(`returns true when key contains valid chars ${testCase}`, () => {
-        assert.ok(validateKey(testCase));
+        assert.ok(validateKey(testCase), `${testCase} should be valid`);
       })
     );
 
@@ -42,10 +44,11 @@ describe('validators', () => {
       'TrAcEsTaTE',
       'TRACESTATE',
       '',
+      '6num',
     ];
     invalidKeysTestCases.forEach(testCase =>
       it(`returns true when key contains invalid chars ${testCase}`, () => {
-        assert.ok(!validateKey(testCase));
+        assert.ok(!validateKey(testCase), `${testCase} should be invalid`);
       })
     );
   });
