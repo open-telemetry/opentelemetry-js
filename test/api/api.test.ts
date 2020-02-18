@@ -15,7 +15,14 @@
  */
 
 import * as assert from 'assert';
-import api, { TraceFlags, NoopSpan, NoopTracerProvider, NoopTracer, SpanOptions, Span } from '../../src';
+import api, {
+  TraceFlags,
+  NoopSpan,
+  NoopTracerProvider,
+  NoopTracer,
+  SpanOptions,
+  Span,
+} from '../../src';
 
 describe('API', () => {
   const functions = [
@@ -27,7 +34,7 @@ describe('API', () => {
   ];
 
   it('should expose a tracer provider via getTracerProvider', () => {
-    const tracer =  api.trace.getTracerProvider();
+    const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
   });
@@ -46,7 +53,7 @@ describe('API', () => {
 
     it('should not crash', () => {
       functions.forEach(fn => {
-        const tracer =  api.trace.getTracerProvider();
+        const tracer = api.trace.getTracerProvider();
         try {
           ((tracer as unknown) as { [fn: string]: Function })[fn](); // Try to run the function
           assert.ok(true, fn);
@@ -60,16 +67,13 @@ describe('API', () => {
 
     it('should use the global tracer provider', () => {
       api.trace.initGlobalTracerProvider(new TestTracerProvider());
-      const tracer =  api.trace.getTracerProvider().getTracer('name');
+      const tracer = api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);
     });
 
     class TestTracer extends NoopTracer {
-      startSpan(
-        name: string,
-        options?: SpanOptions | undefined
-      ): Span {
+      startSpan(name: string, options?: SpanOptions): Span {
         return dummySpan;
       }
     }
