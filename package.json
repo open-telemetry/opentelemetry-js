@@ -45,6 +45,9 @@
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@opentelemetry/scope-base": "^0.4.0"
+  },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.8",

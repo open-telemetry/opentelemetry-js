@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanContext } from '../../trace/span_context';
+import { Context } from '@opentelemetry/scope-base';
 import { Carrier } from './carrier';
 import { HttpTextFormat } from './HttpTextFormat';
 
@@ -22,11 +22,11 @@ import { HttpTextFormat } from './HttpTextFormat';
  * No-op implementations of {@link HttpTextFormat}.
  */
 export class NoopHttpTextFormat implements HttpTextFormat {
-  // By default does nothing
-  inject(spanContext: SpanContext, format: string, carrier: Carrier): void {}
-  // By default does nothing
-  extract(format: string, carrier: Carrier): SpanContext | null {
-    return null;
+  /** Noop inject function does nothing */
+  inject(context: Context, carrier: Carrier): void {}
+  /** Noop extract function does nothing and returns the input context */
+  extract(context: Context, carrier: Carrier): Context {
+    return context;
   }
 }
 
