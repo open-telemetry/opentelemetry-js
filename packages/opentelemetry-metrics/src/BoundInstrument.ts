@@ -15,33 +15,51 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { TimeSeries } from './export/types';
+import { Aggregator } from './export/types';
 
 /**
  * This class represent the base to BoundInstrument, which is responsible for generating
  * the TimeSeries.
  */
 export class BaseBoundInstrument {
-  protected _data = 0;
   protected _labelSet: types.LabelSet;
+  protected _logger: types.Logger;
+  protected _monotonic: boolean;
 
-  constructor(labelSet: types.LabelSet) {
+  constructor(
+    labelSet: types.LabelSet,
+    logger: types.Logger,
+    monotonic: boolean,
+    private readonly _disabled: boolean,
+    private readonly _valueType: types.ValueType,
+    private readonly _aggregator: Aggregator
+  ) {
     this._labelSet = labelSet;
+    this._logger = logger;
+    this._monotonic = monotonic;
   }
 
-  /**
-   * Returns the TimeSeries with one or more Point.
-   *
-   * @param timestamp The time at which the instrument is recorded.
-   * @returns The TimeSeries.
-   */
-  getTimeSeries(timestamp: types.HrTime): TimeSeries {
-    return {
-      labelValues: Object.values(this._labelSet.labels).map(value => ({
-        value,
-      })),
-      points: [{ value: this._data, timestamp }],
-    };
+  update(value: number): void {
+    if (this._disabled) return;
+
+    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
+      this._logger.warn(
+        `INT value type cannot accept a floating-point value for ${Object.values(
+          this._labelSet.labels
+        )}, ignoring the fractional digits.`
+      );
+      value = Math.trunc(value);
+    }
+
+    this._aggregator.update(value);
+  }
+
+  getLabelSet(): types.LabelSet {
+    return this._labelSet;
+  }
+
+  getAggregator(): Aggregator {
+    return this._aggregator;
   }
 }
 
@@ -53,18 +71,16 @@ export class BoundCounter extends BaseBoundInstrument
   implements types.BoundCounter {
   constructor(
     labelSet: types.LabelSet,
-    private readonly _disabled: boolean,
-    private readonly _monotonic: boolean,
-    private readonly _valueType: types.ValueType,
-    private readonly _logger: types.Logger,
-    private readonly _onUpdate: Function
+    disabled: boolean,
+    monotonic: boolean,
+    valueType: types.ValueType,
+    logger: types.Logger,
+    aggregator: Aggregator
   ) {
-    super(labelSet);
+    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
-    if (this._disabled) return;
-
     if (this._monotonic && value < 0) {
       this._logger.error(
         `Monotonic counter cannot descend for ${Object.values(
@@ -73,16 +89,8 @@ export class BoundCounter extends BaseBoundInstrument
       );
       return;
     }
-    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
-      this._logger.warn(
-        `INT counter cannot accept a floating-point value for ${Object.values(
-          this._labelSet.labels
-        )}, ignoring the fractional digits.`
-      );
-      value = Math.trunc(value);
-    }
-    this._data = this._data + value;
-    this._onUpdate();
+
+    this.update(value);
   }
 }
 
@@ -92,21 +100,21 @@ export class BoundCounter extends BaseBoundInstrument
  */
 export class BoundGauge extends BaseBoundInstrument
   implements types.BoundGauge {
+  private _current: number = 0;
+
   constructor(
     labelSet: types.LabelSet,
-    private readonly _disabled: boolean,
-    private readonly _monotonic: boolean,
-    private readonly _valueType: types.ValueType,
-    private readonly _logger: types.Logger,
-    private readonly _onUpdate: Function
+    disabled: boolean,
+    monotonic: boolean,
+    valueType: types.ValueType,
+    logger: types.Logger,
+    aggregator: Aggregator
   ) {
-    super(labelSet);
+    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
   }
 
   set(value: number): void {
-    if (this._disabled) return;
-
-    if (this._monotonic && value < this._data) {
+    if (this._monotonic && value < this._current) {
       this._logger.error(
         `Monotonic gauge cannot descend for ${Object.values(
           this._labelSet.labels
@@ -115,16 +123,8 @@ export class BoundGauge extends BaseBoundInstrument
       return;
     }
 
-    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
-      this._logger.warn(
-        `INT gauge cannot accept a floating-point value for ${Object.values(
-          this._labelSet.labels
-        )}, ignoring the fractional digits.`
-      );
-      value = Math.trunc(value);
-    }
-    this._data = value;
-    this._onUpdate();
+    this._current = value;
+    this.update(value);
   }
 }
 
@@ -133,15 +133,19 @@ export class BoundGauge extends BaseBoundInstrument
  */
 export class BoundMeasure extends BaseBoundInstrument
   implements types.BoundMeasure {
+  private readonly _absolute: boolean;
+
   constructor(
     labelSet: types.LabelSet,
-    private readonly _disabled: boolean,
-    private readonly _absolute: boolean,
-    private readonly _valueType: types.ValueType,
-    private readonly _logger: types.Logger,
-    private readonly _onUpdate: Function
+    disabled: boolean,
+    monotonic: boolean,
+    absolute: boolean,
+    valueType: types.ValueType,
+    logger: types.Logger,
+    aggregator: Aggregator
   ) {
-    super(labelSet);
+    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
+    this._absolute = absolute;
   }
 
   record(
@@ -149,8 +153,6 @@ export class BoundMeasure extends BaseBoundInstrument
     distContext?: types.DistributedContext,
     spanContext?: types.SpanContext
   ): void {
-    if (this._disabled) return;
-
     if (this._absolute && value < 0) {
       this._logger.error(
         `Absolute measure cannot contain negative values for ${Object.values(
@@ -160,17 +162,6 @@ export class BoundMeasure extends BaseBoundInstrument
       return;
     }
 
-    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
-      this._logger.warn(
-        `INT measure cannot accept a floating-point value for ${Object.values(
-          this._labelSet.labels
-        )}; truncating the value.`
-      );
-      value = Math.trunc(value);
-    }
-
-    //@todo: implement this._data logic
-
-    this._onUpdate();
+    this.update(value);
   }
 }
