@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import { Context } from './context';
+
 export interface ScopeManager {
   /**
    * Get the current active scope
    */
-  active(): unknown;
+  active(): Context;
 
   /**
    * Run the fn callback with object set as the current active scope
@@ -26,7 +28,7 @@ export interface ScopeManager {
    * @param fn A callback to be immediately run within a specific scope
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: unknown,
+    scope: Context,
     fn: T
   ): ReturnType<T>;
 
@@ -35,7 +37,7 @@ export interface ScopeManager {
    * @param target Any object to which a scope need to be set
    * @param [scope] Optionally specify the scope which you want to assign
    */
-  bind<T>(target: T, scope?: unknown): T;
+  bind<T>(target: T, scope?: Context): T;
 
   /**
    * Enable scope management

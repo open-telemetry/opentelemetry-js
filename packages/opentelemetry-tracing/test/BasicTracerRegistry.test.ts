@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Context, TraceFlags } from '@opentelemetry/api';
 import {
   ALWAYS_SAMPLER,
   BinaryTraceContext,
@@ -21,10 +22,10 @@ import {
   NEVER_SAMPLER,
   NoopLogger,
   NoRecordingSpan,
+  setActiveSpan,
   TraceState,
 } from '@opentelemetry/core';
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
-import { TraceFlags } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
@@ -315,7 +316,8 @@ describe('BasicTracerProvider', () => {
     it('should return current span when it exists', () => {
       const tracer = new BasicTracerProvider({
         scopeManager: {
-          active: () => 'foo',
+          active: () =>
+            setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
         } as ScopeManager,
       }).getTracer('default');
       assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');

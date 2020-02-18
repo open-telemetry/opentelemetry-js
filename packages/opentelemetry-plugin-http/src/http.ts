@@ -14,14 +14,20 @@
  * limitations under the License.
  */
 
-import { BasePlugin, isValid } from '@opentelemetry/core';
 import {
   CanonicalCode,
+  Context,
   Span,
   SpanKind,
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
+import {
+  BasePlugin,
+  getExtractedSpanContext,
+  isValid,
+  setActiveSpan,
+} from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -34,7 +40,6 @@ import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Format } from './enums/Format';
 import {
   Err,
   Func,
@@ -298,7 +303,11 @@ export class HttpPlugin extends BasePlugin<Http> {
         }),
       };
 
-      const spanContext = propagation.extract(Format.HTTP, headers);
+      // Using context directly like this is temporary. In a future PR, context
+      // will be managed by the scope manager (which may be renamed to context manager?)
+      const spanContext = getExtractedSpanContext(
+        propagation.extract(Context.TODO, headers)
+      );
       if (spanContext && isValid(spanContext)) {
         spanOptions.parent = spanContext;
       }
@@ -405,9 +414,13 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       const span = plugin._startHttpSpan(operationName, spanOptions);
+
+      if (!options.headers) options.headers = {};
       plugin._tracer
         .getHttpTextFormat()
-        .inject(span.context(), Format.HTTP, options.headers!);
+        // Using context directly like this is temporary. In a future PR, context
+        // will be managed by the scope manager (which may be renamed to context manager?)
+        .inject(setActiveSpan(Context.TODO, span), options.headers);
 
       const request: ClientRequest = plugin._safeExecute(
         span,

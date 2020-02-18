@@ -187,12 +187,13 @@ describe('PrometheusExporter', () => {
 
       const boundCounter = counter.bind(meter.labels({ key1: 'labelValue1' }));
       boundCounter.add(10);
-      exporter.export(meter.getMetrics(), () => {
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         // This is to test the special case where counters are destroyed
         // and recreated in the exporter in order to get around prom-client's
         // aggregation and use ours.
         boundCounter.add(10);
-        exporter.export(meter.getMetrics(), () => {
+        exporter.export(meter.getBatcher().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -227,7 +228,8 @@ describe('PrometheusExporter', () => {
 
       const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
       boundGauge.set(10);
-      exporter.export([gauge.get()!], () => {
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -259,9 +261,10 @@ describe('PrometheusExporter', () => {
         labelKeys: ['counterKey1'],
       }) as CounterMetric;
 
-      gauge.bind(meter.labels({ key1: 'labelValue1' })).set(10);
-      counter.bind(meter.labels({ key1: 'labelValue1' })).add(10);
-      exporter.export([gauge.get()!, counter.get()!], () => {
+      gauge.bind(meter.labels({ gaugeKey1: 'labelValue1' })).set(10);
+      counter.bind(meter.labels({ counterKey1: 'labelValue1' })).add(10);
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -308,7 +311,8 @@ describe('PrometheusExporter', () => {
 
       const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
       boundGauge.set(10);
-      exporter.export([gauge.get()!], () => {
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -333,7 +337,8 @@ describe('PrometheusExporter', () => {
       const gauge = meter.createGauge('gauge.bad-name') as GaugeMetric;
       const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
       boundGauge.set(10);
-      exporter.export([gauge.get()!], () => {
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -362,7 +367,8 @@ describe('PrometheusExporter', () => {
       });
 
       counter.bind(meter.labels({ key1: 'labelValue1' })).add(20);
-      exporter.export(meter.getMetrics(), () => {
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -407,7 +413,8 @@ describe('PrometheusExporter', () => {
       });
 
       exporter.startServer(() => {
-        exporter!.export(meter.getMetrics(), () => {
+        meter.collect();
+        exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
               res.on('data', chunk => {
@@ -435,7 +442,8 @@ describe('PrometheusExporter', () => {
       });
 
       exporter.startServer(() => {
-        exporter!.export(meter.getMetrics(), () => {
+        meter.collect();
+        exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
             .get('http://localhost:8080/metrics', res => {
               res.on('data', chunk => {
@@ -463,7 +471,8 @@ describe('PrometheusExporter', () => {
       });
 
       exporter.startServer(() => {
-        exporter!.export(meter.getMetrics(), () => {
+        meter.collect();
+        exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
             .get('http://localhost:9464/test', res => {
               res.on('data', chunk => {

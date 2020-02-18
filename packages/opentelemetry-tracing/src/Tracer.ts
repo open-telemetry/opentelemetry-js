@@ -16,18 +16,20 @@
 
 import * as types from '@opentelemetry/api';
 import {
-  randomTraceId,
-  isValid,
-  randomSpanId,
-  NoRecordingSpan,
   ConsoleLogger,
+  getActiveSpan,
+  isValid,
+  NoRecordingSpan,
+  randomSpanId,
+  randomTraceId,
+  setActiveSpan,
 } from '@opentelemetry/core';
-import { TracerConfig, TraceParams } from './types';
 import { ScopeManager } from '@opentelemetry/scope-base';
-import { Span } from './Span';
-import { mergeConfig } from './utility';
-import { DEFAULT_CONFIG } from './config';
 import { BasicTracerProvider } from './BasicTracerProvider';
+import { DEFAULT_CONFIG } from './config';
+import { Span } from './Span';
+import { TraceParams, TracerConfig } from './types';
+import { mergeConfig } from './utility';
 
 /**
  * This class represents a basic tracer.
@@ -106,16 +108,11 @@ export class Tracer implements types.Tracer {
   /**
    * Returns the current Span from the current context.
    *
-   * If there is no Span associated with the current context, null is returned.
+   * If there is no Span associated with the current context, undefined is returned.
    */
   getCurrentSpan(): types.Span | undefined {
     // Get the current Span from the context or null if none found.
-    const current = this._scopeManager.active();
-    if (current === null || current === undefined) {
-      return;
-    } else {
-      return current as types.Span;
-    }
+    return getActiveSpan(this._scopeManager.active());
   }
 
   /**
@@ -126,14 +123,22 @@ export class Tracer implements types.Tracer {
     fn: T
   ): ReturnType<T> {
     // Set given span to context.
-    return this._scopeManager.with(span, fn);
+    return this._scopeManager.with(
+      setActiveSpan(this._scopeManager.active(), span),
+      fn
+    );
   }
 
   /**
    * Bind a span (or the current one) to the target's scope
    */
   bind<T>(target: T, span?: types.Span): T {
-    return this._scopeManager.bind(target, span);
+    return this._scopeManager.bind(
+      target,
+      span
+        ? setActiveSpan(this._scopeManager.active(), span)
+        : this._scopeManager.active()
+    );
   }
 
   /**

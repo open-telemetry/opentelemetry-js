@@ -46,6 +46,8 @@ export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
+export { Context } from '@opentelemetry/scope-base';
+
 import { TraceAPI } from './api/trace';
 /** Entrypoint for trace API */
 export const trace = TraceAPI.getInstance();
