@@ -46,6 +46,8 @@ export * from './trace/NoopTracerProvider';
 export * from './metrics/NoopMeterProvider';
 export * from './metrics/NoopMeter';
 
+export { Context } from '@opentelemetry/scope-base';
+
 import { TraceAPI } from './api/trace';
 /** Entrypoint for trace API */
 export const trace = TraceAPI.getInstance();

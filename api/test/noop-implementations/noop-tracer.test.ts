@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
+import { Context } from '@opentelemetry/scope-base';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
@@ -38,8 +39,12 @@ describe('NoopTracer', () => {
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
     const httpTextFormat = tracer.getHttpTextFormat();
     assert.ok(httpTextFormat);
-    httpTextFormat.inject(spanContext, 'HttpTextFormat', {});
-    assert.deepStrictEqual(httpTextFormat.extract('HttpTextFormat', {}), null);
+
+    httpTextFormat.inject(Context.ROOT_CONTEXT, {});
+    assert.deepStrictEqual(
+      httpTextFormat.extract(Context.ROOT_CONTEXT, {}),
+      Context.ROOT_CONTEXT
+    );
 
     const binaryFormat = tracer.getBinaryFormat();
     assert.ok(binaryFormat);
