@@ -26,15 +26,6 @@ export interface BoundCounter {
   add(value: number): void;
 }
 
-/** An Instrument for Gauge Metric. */
-export interface BoundGauge {
-  /**
-   * Sets the given value. Values can be negative.
-   * @param value the new value.
-   */
-  set(value: number): void;
-}
-
 /** Measure to report instantaneous measurement of a value. */
 export interface BoundMeasure {
   /**
