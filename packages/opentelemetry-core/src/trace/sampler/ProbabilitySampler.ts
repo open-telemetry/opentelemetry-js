@@ -15,6 +15,7 @@
  */
 
 import { Sampler, SpanContext } from '@opentelemetry/api';
+import { isSampled } from '../../utils/trace-flags';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {
@@ -23,6 +24,7 @@ export class ProbabilitySampler implements Sampler {
   }
 
   shouldSample(parentContext?: SpanContext) {
+    if (parentContext && isSampled(parentContext.traceFlags)) return true;
     if (this._probability >= 1.0) return true;
     else if (this._probability <= 0) return false;
     return Math.random() < this._probability;
