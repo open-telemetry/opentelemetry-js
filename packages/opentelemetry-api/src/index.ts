@@ -48,6 +48,10 @@ export * from './trace/tracer';
 
 export { Context } from '@opentelemetry/scope-base';
 
+import { ContextAPI } from './api/context';
+/** Entrypoint for context API */
+export const context = ContextAPI.getInstance();
+
 import { TraceAPI } from './api/trace';
 /** Entrypoint for trace API */
 export const trace = TraceAPI.getInstance();
