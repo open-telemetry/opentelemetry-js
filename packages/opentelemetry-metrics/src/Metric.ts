@@ -62,15 +62,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
   }
 
   /**
-   * Returns a Instrument for a metric with all labels not set.
-   */
-  getDefaultBound(): T {
-    // @todo: implement this method
-    this._logger.error('not implemented yet');
-    throw new Error('not implemented yet');
-  }
-
-  /**
    * Removes the Instrument from the metric, if it is present.
    * @param labelSet the canonicalized LabelSet used to associate with this
    *     metric instrument.
@@ -84,12 +75,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
    */
   clear(): void {
     this._instruments.clear();
-  }
-
-  setCallback(fn: () => void): void {
-    // @todo: implement this method
-    this._logger.error('not implemented yet');
-    return;
   }
 
   getMetricRecord(): MetricRecord[] {
