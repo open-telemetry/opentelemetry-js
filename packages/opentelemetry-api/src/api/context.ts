@@ -69,7 +69,7 @@ export class ContextAPI {
 
   /**
    * Bind a context to a target function or event emitter
-   * 
+   *
    * @param target function or event emitter to bind
    * @param context context to bind to the event emitter or function. Defaults to the currently active context
    */
