@@ -25,12 +25,12 @@ import {
  */
 export class ContextAPI {
   private static _instance?: ContextAPI;
-  private _manager: ScopeManager = new NoopScopeManager();
+  private _scopeManager: ScopeManager = new NoopScopeManager();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
 
-  /** Get the singleton instance of the Context API */
+  /** Get the singleton instance of the Scope API */
   public static getInstance(): ContextAPI {
     if (!this._instance) {
       this._instance = new ContextAPI();
@@ -42,37 +42,38 @@ export class ContextAPI {
   /**
    * Set the current context manager. Returns the initialized context manager
    */
-  public initGlobalContextManager(contextManager: ScopeManager): ScopeManager {
-    this._manager = contextManager;
-    return contextManager;
+  public initGlobalContextManager(scopeManager: ScopeManager): ScopeManager {
+    this._scopeManager = scopeManager;
+    return scopeManager;
   }
 
   /**
    * Get the currently active context
    */
   public active(): Context {
-    return this._manager.active();
+    return this._scopeManager.active();
   }
 
   /**
    * Execute a function with an active context
    *
    * @param fn function to execute in a context
-   * @param scope context to be active during function execution. Defaults to the currently active context
+   * @param context context to be active during function execution. Defaults to the currently active context
    */
   public with<T extends (...args: unknown[]) => ReturnType<T>>(
     fn: T,
-    scope: Context = this.active()
+    context: Context = this.active()
   ): ReturnType<T> {
-    return this._manager.with(scope, fn);
+    return this._scopeManager.with(context, fn);
   }
 
   /**
-   *
+   * Bind a context to a target function or event emitter
+   * 
    * @param target function or event emitter to bind
-   * @param scope context to bind to the event emitter or function. Defaults to the currently active context
+   * @param context context to bind to the event emitter or function. Defaults to the currently active context
    */
-  public bind<T>(target: T, scope: Context = this.active()): T {
-    return this._manager.bind(target, scope);
+  public bind<T>(target: T, context: Context = this.active()): T {
+    return this._scopeManager.bind(target, context);
   }
 }
