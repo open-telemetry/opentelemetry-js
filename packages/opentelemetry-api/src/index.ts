@@ -63,4 +63,5 @@ export const metrics = MetricsAPI.getInstance();
 export default {
   trace,
   metrics,
+  context,
 };
