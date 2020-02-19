@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  CounterMetric,
-  GaugeMetric,
-  Meter,
-  MeterProvider,
-} from '@opentelemetry/metrics';
+import { CounterMetric, Meter, MeterProvider } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
@@ -220,48 +215,12 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a gauge aggregation', done => {
-      const gauge = meter.createGauge('gauge', {
-        description: 'a test description',
-        labelKeys: ['key1'],
-      }) as GaugeMetric;
-
-      const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
-      boundGauge.set(10);
-      meter.collect();
-      exporter.export(meter.getBatcher().checkPointSet(), () => {
-        http
-          .get('http://localhost:9464/metrics', res => {
-            res.on('data', chunk => {
-              const body = chunk.toString();
-              const lines = body.split('\n');
-
-              assert.deepStrictEqual(lines, [
-                '# HELP gauge a test description',
-                '# TYPE gauge gauge',
-                'gauge{key1="labelValue1"} 10',
-                '',
-              ]);
-
-              done();
-            });
-          })
-          .on('error', errorHandler(done));
-      });
-    });
-
     it('should export multiple aggregations', done => {
-      const gauge = meter.createGauge('gauge', {
-        description: 'a test description',
-        labelKeys: ['gaugeKey1'],
-      }) as GaugeMetric;
-
       const counter = meter.createCounter('counter', {
         description: 'a test description',
         labelKeys: ['counterKey1'],
       }) as CounterMetric;
 
-      gauge.bind(meter.labels({ gaugeKey1: 'labelValue1' })).set(10);
       counter.bind(meter.labels({ counterKey1: 'labelValue1' })).add(10);
       meter.collect();
       exporter.export(meter.getBatcher().checkPointSet(), () => {
@@ -272,10 +231,6 @@ describe('PrometheusExporter', () => {
               const lines = body.split('\n');
 
               assert.deepStrictEqual(lines, [
-                '# HELP gauge a test description',
-                '# TYPE gauge gauge',
-                'gauge{gaugeKey1="labelValue1"} 10',
-                '',
                 '# HELP counter a test description',
                 '# TYPE counter counter',
                 'counter{counterKey1="labelValue1"} 10',
@@ -307,10 +262,10 @@ describe('PrometheusExporter', () => {
     });
 
     it('should add a description if missing', done => {
-      const gauge = meter.createGauge('gauge') as GaugeMetric;
+      const counter = meter.createCounter('counter');
 
-      const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
-      boundGauge.set(10);
+      const boundCounter = counter.bind(meter.labels({ key1: 'labelValue1' }));
+      boundCounter.add(10);
       meter.collect();
       exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
@@ -320,9 +275,9 @@ describe('PrometheusExporter', () => {
               const lines = body.split('\n');
 
               assert.deepStrictEqual(lines, [
-                '# HELP gauge description missing',
-                '# TYPE gauge gauge',
-                'gauge 10',
+                '# HELP counter description missing',
+                '# TYPE counter counter',
+                'counter 10',
                 '',
               ]);
 
@@ -334,9 +289,9 @@ describe('PrometheusExporter', () => {
     });
 
     it('should sanitize names', done => {
-      const gauge = meter.createGauge('gauge.bad-name') as GaugeMetric;
-      const boundGauge = gauge.bind(meter.labels({ key1: 'labelValue1' }));
-      boundGauge.set(10);
+      const counter = meter.createCounter('counter.bad-name');
+      const boundCounter = counter.bind(meter.labels({ key1: 'labelValue1' }));
+      boundCounter.add(10);
       meter.collect();
       exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
@@ -346,9 +301,9 @@ describe('PrometheusExporter', () => {
               const lines = body.split('\n');
 
               assert.deepStrictEqual(lines, [
-                '# HELP gauge_bad_name description missing',
-                '# TYPE gauge_bad_name gauge',
-                'gauge_bad_name 10',
+                '# HELP counter_bad_name description missing',
+                '# TYPE counter_bad_name counter',
+                'counter_bad_name 10',
                 '',
               ]);
 
@@ -389,13 +344,13 @@ describe('PrometheusExporter', () => {
 
   describe('configuration', () => {
     let meter: Meter;
-    let gauge: GaugeMetric;
+    let counter: CounterMetric;
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
-      gauge = meter.createGauge('gauge') as GaugeMetric;
-      gauge.bind(meter.labels({ key1: 'labelValue1' })).set(10);
+      counter = meter.createCounter('counter') as CounterMetric;
+      counter.bind(meter.labels({ key1: 'labelValue1' })).add(10);
     });
 
     afterEach(done => {
@@ -422,9 +377,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP test_prefix_gauge description missing',
-                  '# TYPE test_prefix_gauge gauge',
-                  'test_prefix_gauge 10',
+                  '# HELP test_prefix_counter description missing',
+                  '# TYPE test_prefix_counter counter',
+                  'test_prefix_counter 10',
                   '',
                 ]);
 
@@ -451,9 +406,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP gauge description missing',
-                  '# TYPE gauge gauge',
-                  'gauge 10',
+                  '# HELP counter description missing',
+                  '# TYPE counter counter',
+                  'counter 10',
                   '',
                 ]);
 
@@ -480,9 +435,9 @@ describe('PrometheusExporter', () => {
                 const lines = body.split('\n');
 
                 assert.deepStrictEqual(lines, [
-                  '# HELP gauge description missing',
-                  '# TYPE gauge gauge',
-                  'gauge 10',
+                  '# HELP counter description missing',
+                  '# TYPE counter counter',
+                  'counter 10',
                   '',
                 ]);
 

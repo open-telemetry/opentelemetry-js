@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HrTime, ValueType } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
 import { LabelSet } from '../LabelSet';
 
@@ -27,12 +27,6 @@ export enum MetricKind {
 
 /** Sum returns an aggregated sum. */
 export type Sum = number;
-
-/** LastValue returns the latest value that was aggregated. */
-export type LastValue = {
-  value: number;
-  timestamp: HrTime;
-};
 
 export interface Distribution {
   min: number;
@@ -80,5 +74,5 @@ export interface Aggregator {
   update(value: number): void;
 
   /** Returns snapshot of the current value. */
-  value(): Sum | LastValue | Distribution;
+  value(): Sum | Distribution;
 }

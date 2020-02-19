@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { Distribution, Sum, LastValue, Aggregator } from './types';
-import { hrTime } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import { Distribution, Sum, Aggregator } from './types';
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {
@@ -28,24 +26,6 @@ export class CounterSumAggregator implements Aggregator {
 
   value(): Sum {
     return this._current;
-  }
-}
-
-/** Basic aggregator which keeps the last recorded value and timestamp. */
-export class GaugeAggregator implements Aggregator {
-  private _current: number = 0;
-  private _timestamp: types.HrTime = hrTime();
-
-  update(value: number): void {
-    this._current = value;
-    this._timestamp = hrTime();
-  }
-
-  value(): LastValue {
-    return {
-      value: this._current,
-      timestamp: this._timestamp,
-    };
   }
 }
 

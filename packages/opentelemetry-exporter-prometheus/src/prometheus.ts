@@ -20,7 +20,6 @@ import {
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
-  LastValue,
   MetricKind,
   Sum,
 } from '@opentelemetry/metrics';
@@ -139,11 +138,6 @@ export class PrometheusExporter implements MetricExporter {
         metric.set(
           this._getLabelValues(labelKeys, record.labels),
           value as Sum
-        );
-      } else {
-        metric.set(
-          this._getLabelValues(labelKeys, record.labels),
-          (value as LastValue).value
         );
       }
     }

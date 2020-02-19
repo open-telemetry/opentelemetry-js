@@ -17,7 +17,7 @@
 import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, GaugeMetric, MeasureMetric } from './Metric';
+import { Metric, CounterMetric, MeasureMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -105,36 +105,6 @@ export class Meter implements types.Meter {
     const counter = new CounterMetric(name, opt, this._batcher);
     this._registerMetric(name, counter);
     return counter;
-  }
-
-  /**
-   * Creates a new gauge metric. Generally, this kind of metric should be used
-   * when the metric cannot be expressed as a sum or because the measurement
-   * interval is arbitrary. Use this kind of metric when the measurement is not
-   * a quantity, and the sum and event count are not of interest.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createGauge(
-    name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundGauge> {
-    if (!this._isValidName(name)) {
-      this._logger.warn(
-        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
-      );
-      return types.NOOP_GAUGE_METRIC;
-    }
-    const opt: MetricOptions = {
-      monotonic: false, // Gauges are defined as non-monotonic by default
-      absolute: false, // not applicable for gauges, set to false
-      logger: this._logger,
-      ...DEFAULT_METRIC_OPTIONS,
-      ...options,
-    };
-    const gauge = new GaugeMetric(name, opt, this._batcher);
-    this._registerMetric(name, gauge);
-    return gauge;
   }
 
   /**

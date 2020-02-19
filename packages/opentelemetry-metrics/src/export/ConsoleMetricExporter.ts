@@ -19,7 +19,6 @@ import {
   MetricRecord,
   MetricKind,
   Sum,
-  LastValue,
   Distribution,
 } from './types';
 import { ExportResult } from '@opentelemetry/base';
@@ -40,12 +39,6 @@ export class ConsoleMetricExporter implements MetricExporter {
         case MetricKind.COUNTER:
           const sum = metric.aggregator.value() as Sum;
           console.log('value: ' + sum);
-          break;
-        case MetricKind.GAUGE:
-          const lastValue = metric.aggregator.value() as LastValue;
-          console.log(
-            'value: ' + lastValue.value + ', timestamp: ' + lastValue.timestamp
-          );
           break;
         default:
           const distribution = metric.aggregator.value() as Distribution;

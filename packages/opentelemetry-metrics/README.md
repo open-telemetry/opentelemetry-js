@@ -36,27 +36,6 @@ const boundCounter = counter.bind(labels);
 boundCounter.add(10);
 ```
 
-### Gauge
-Gauge metrics express a pre-calculated value. Generally, this kind of metric should be used when the metric cannot be expressed as a sum or because the measurement interval is arbitrary. Use this kind of metric when the measurement is not a quantity, and the sum and event count are not of interest. Gauges are defined as `Monotonic = false` by default, meaning that new values are permitted to make positive or negative changes to the gauge. There is no restriction on the sign of the input for gauges.
-
-```js
-const { MeterProvider } = require('@opentelemetry/metrics');
-
-// Initialize the Meter to capture measurements in various ways.
-const meter = new MeterProvider().getMeter('your-meter-name');
-
-const gauge = meter.createGauge('metric_name', {
-  labelKeys: ["pid"],
-  description: "Example of a gauge"
-});
-
-const labels = meter.labels({ pid: process.pid });
-
-// Create a BoundInstrument associated with specified label values.
-const boundGauge = gauge.bind(labels);
-boundGauge.set(10); // Set to 10
-```
-
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
 ### Measure
