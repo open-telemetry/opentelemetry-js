@@ -14,58 +14,65 @@
  * limitations under the License.
  */
 
-import { ScopeManager, NoopScopeManager, Context } from "@opentelemetry/scope-base"
+import {
+  ScopeManager,
+  NoopScopeManager,
+  Context,
+} from '@opentelemetry/scope-base';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
  */
 export class ContextAPI {
-    private static _instance?: ContextAPI;
-    private _manager: ScopeManager = new NoopScopeManager();
+  private static _instance?: ContextAPI;
+  private _manager: ScopeManager = new NoopScopeManager();
 
-    /** Empty private constructor prevents end users from constructing a new instance of the API */
-    private constructor() { }
+  /** Empty private constructor prevents end users from constructing a new instance of the API */
+  private constructor() {}
 
-    /** Get the singleton instance of the Context API */
-    public static getInstance(): ContextAPI {
-        if (!this._instance) {
-            this._instance = new ContextAPI();
-        }
-
-        return this._instance;
+  /** Get the singleton instance of the Context API */
+  public static getInstance(): ContextAPI {
+    if (!this._instance) {
+      this._instance = new ContextAPI();
     }
 
-    /**
-     * Set the current context manager. Returns the initialized context manager
-     */
-    public initGlobalContextManager(contextManager: ScopeManager): ScopeManager {
-        this._manager = contextManager;
-        return contextManager;
-    }
+    return this._instance;
+  }
 
-    /**
-     * Get the currently active context
-     */
-    public active(): Context {
-        return this._manager.active()
-    }
+  /**
+   * Set the current context manager. Returns the initialized context manager
+   */
+  public initGlobalContextManager(contextManager: ScopeManager): ScopeManager {
+    this._manager = contextManager;
+    return contextManager;
+  }
 
-    /**
-     * Execute a function with an active context
-     * 
-     * @param fn function to execute in a context
-     * @param scope context to be active during function execution. Defaults to the currently active context
-     */
-    public with<T extends (...args: unknown[]) => ReturnType<T>>(fn: T, scope: Context = this.active()): ReturnType<T> {
-        return this._manager.with(scope, fn)
-    }
+  /**
+   * Get the currently active context
+   */
+  public active(): Context {
+    return this._manager.active();
+  }
 
-    /**
-     * 
-     * @param target function or event emitter to bind
-     * @param scope context to bind to the event emitter or function. Defaults to the currently active context
-     */
-    public bind<T>(target: T, scope: Context = this.active()): T {
-        return this._manager.bind(target, scope)
-    }
+  /**
+   * Execute a function with an active context
+   *
+   * @param fn function to execute in a context
+   * @param scope context to be active during function execution. Defaults to the currently active context
+   */
+  public with<T extends (...args: unknown[]) => ReturnType<T>>(
+    fn: T,
+    scope: Context = this.active()
+  ): ReturnType<T> {
+    return this._manager.with(scope, fn);
+  }
+
+  /**
+   *
+   * @param target function or event emitter to bind
+   * @param scope context to bind to the event emitter or function. Defaults to the currently active context
+   */
+  public bind<T>(target: T, scope: Context = this.active()): T {
+    return this._manager.bind(target, scope);
+  }
 }
