@@ -97,16 +97,6 @@ describe('BatchSpanProcessor', () => {
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should not export the unsampled spans', () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-      for (let i = 0; i < defaultBufferConfig.bufferSize * 2; i++) {
-        const span = createUnSampledSpan(`${name}_${i}`);
-        processor.onEnd(span);
-        assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      }
-      processor.shutdown();
-    });
-
     it('should force flush when timeout exceeded', done => {
       const clock = sinon.useFakeTimers();
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
