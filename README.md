@@ -137,6 +137,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 - [@opentelemetry/plugin-redis][otel-plugin-redis]
 - [@opentelemetry/plugin-ioredis][otel-plugin-ioredis]
 - [@opentelemetry/plugin-dns][otel-plugin-dns] - By default, this plugin is not loaded [#612](https://github.com/open-telemetry/opentelemetry-js/issues/612)
+- [@opentelemetry/plugin-express][otel-plugin-express] - By default, this plugin is not loaded
 
 #### Web Plugins
 - [@opentelemetry/plugin-document-load][otel-plugin-document-load]
@@ -194,6 +195,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-plugin-redis]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-redis
 [otel-plugin-user-interaction]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-user-interaction
 [otel-plugin-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request
+[otel-plugin-express]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-express
 [otel-shim-opentracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-shim-opentracing
 [otel-tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
