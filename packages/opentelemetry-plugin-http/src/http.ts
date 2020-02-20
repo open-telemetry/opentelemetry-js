@@ -336,6 +336,7 @@ export class HttpPlugin extends BasePlugin<Http> {
           );
 
           const attributes = utils.getIncomingRequestAttributesOnResponse(
+            request,
             response
           );
 
