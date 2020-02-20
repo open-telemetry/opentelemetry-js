@@ -24,7 +24,8 @@ export class ProbabilitySampler implements Sampler {
   }
 
   shouldSample(parentContext?: SpanContext) {
-    if (parentContext && parentContext.traceFlags !== undefined) return isSampled(parentContext.traceFlags);
+    if (parentContext && parentContext.traceFlags !== undefined)
+      return isSampled(parentContext.traceFlags);
     if (this._probability >= 1.0) return true;
     else if (this._probability <= 0) return false;
     return Math.random() < this._probability;
