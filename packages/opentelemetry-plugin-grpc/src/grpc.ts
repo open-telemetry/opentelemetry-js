@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  getExtractedSpanContext,
+  setExtractedSpanContext,
+} from '@opentelemetry/core';
 import {
   CanonicalCode,
   Span,
@@ -22,6 +26,7 @@ import {
   SpanKind,
   SpanOptions,
   Status,
+  Context,
 } from '@opentelemetry/api';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
@@ -122,10 +127,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
   }
 
-  private _getSpanContext(metadata: grpcTypes.Metadata): SpanContext | null {
-    return this._tracer
-      .getHttpTextFormat()
-      .extract(/* unused */ '', metadata.getMap());
+  private _getSpanContext(
+    metadata: grpcTypes.Metadata
+  ): SpanContext | undefined {
+    return getExtractedSpanContext(
+      this._tracer.getHttpTextFormat().extract(Context.TODO, metadata.getMap())
+    );
   }
 
   private _setSpanContext(
@@ -135,7 +142,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     const carrier = {};
     this._tracer
       .getHttpTextFormat()
-      .inject(spanContext, /* unused */ '', carrier);
+      .inject(
+        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
+        carrier
+      );
     for (const [k, v] of Object.entries(carrier)) {
       metadata.set(k, v as string);
     }
