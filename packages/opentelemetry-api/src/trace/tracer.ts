@@ -66,19 +66,6 @@ export interface Tracer {
   bind<T>(target: T, span?: Span): T;
 
   /**
-   * Returns the {@link BinaryFormat} interface which can serialize/deserialize
-   * Spans.
-   *
-   * If no tracer implementation is provided, this defaults to the W3C Trace
-   * Context binary format {@link BinaryFormat}. For more details see
-   * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
-   * binary protocol</a>.
-   *
-   * @returns the {@link BinaryFormat} for this implementation.
-   */
-  getBinaryFormat(): BinaryFormat;
-
-  /**
    * Returns the {@link HttpTextFormat} interface which can inject/extract
    * Spans.
    *

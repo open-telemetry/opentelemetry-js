@@ -16,7 +16,6 @@
 
 import {
   ALWAYS_SAMPLER,
-  BinaryTraceContext,
   HttpTraceContext,
   LogLevel,
 } from '@opentelemetry/core';
@@ -37,7 +36,6 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  */
 export const DEFAULT_CONFIG = {
   defaultAttributes: {},
-  binaryFormat: new BinaryTraceContext(),
   httpTextFormat: new HttpTraceContext(),
   logLevel: LogLevel.DEBUG,
   sampler: ALWAYS_SAMPLER,

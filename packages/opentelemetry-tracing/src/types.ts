@@ -29,11 +29,6 @@ import { LogLevel } from '@opentelemetry/core';
  */
 export interface TracerConfig {
   /**
-   * Binary formatter which can serialize/deserialize Spans.
-   */
-  binaryFormat?: BinaryFormat;
-
-  /**
    * Attributed that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.
    */

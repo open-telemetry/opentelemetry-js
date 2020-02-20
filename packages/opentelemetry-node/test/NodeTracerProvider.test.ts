@@ -57,13 +57,6 @@ describe('NodeTracerProvider', () => {
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should construct an instance with binary format', () => {
-      provider = new NodeTracerProvider({
-        binaryFormat: new BinaryTraceContext(),
-      });
-      assert.ok(provider instanceof NodeTracerProvider);
-    });
-
     it('should construct an instance with http text format', () => {
       provider = new NodeTracerProvider({
         httpTextFormat: new HttpTraceContext(),
@@ -259,16 +252,6 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = provider.getTracer('default').bind(fn, span);
       return patchedFn();
-    });
-  });
-
-  describe('.getBinaryFormat()', () => {
-    it('should get default binary formatter', () => {
-      provider = new NodeTracerProvider({});
-      assert.ok(
-        provider.getTracer('default').getBinaryFormat() instanceof
-          BinaryTraceContext
-      );
     });
   });
 
