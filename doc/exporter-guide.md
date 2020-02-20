@@ -43,7 +43,7 @@ The `MetricExporter` defines the interface that protocol-specific exporters must
 
 The current `MetricExporter` interface (`0.2.0`) defines 2 methods:
 
-- `export`: Exports a batch of telemetry data. In this method you’ll process and translate `ReadableMetric` Data into the data that your metric backend accepts.
+- `export`: Exports a batch of telemetry data. In this method you’ll process and translate `MetricRecord` Data into the data that your metric backend accepts.
 
 - `shutdown`: Shuts down the exporter. This is an opportunity for exporter to do any cleanup required. `Shutdown` should be called only once for each Exporter instance. After the call to `Shutdown` subsequent calls to Export are not allowed and should return `FailedNotRetryable` error.
 
