@@ -74,14 +74,14 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Saves the current values of all exported {@link ReadableMetric}s so that they can be pulled
-   * by the Prometheus backend.
+   * Saves the current values of all exported {@link MetricRecord}s so that
+   * they can be pulled by the Prometheus backend.
    *
-   * @todo reach into metrics to pull metric values on endpoint
-   * In its current state, the exporter saves the current values of all metrics when export
-   * is called and returns them when the export endpoint is called. In the future, this should
-   * be a no-op and the exporter should reach into the metrics when the export endpoint is
-   * called. As there is currently no interface to do this, this is our only option.
+   * In its current state, the exporter saves the current values of all metrics
+   * when export is called and returns them when the export endpoint is called.
+   * In the future, this should be a no-op and the exporter should reach into
+   * the metrics when the export endpoint is called. As there is currently no
+   * interface to do this, this is our only option.
    *
    * @param records Metrics to be sent to the prometheus backend
    * @param cb result callback to be called on finish
@@ -127,7 +127,7 @@ export class PrometheusExporter implements MetricExporter {
 
     if (metric instanceof Counter) {
       // Prometheus counter saves internal state and increments by given value.
-      // ReadableMetric value is the current state, not the delta to be incremented by.
+      // MetricRecord value is the current state, not the delta to be incremented by.
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
       metric.inc(this._getLabelValues(labelKeys, record.labels), value as Sum);
@@ -162,7 +162,7 @@ export class PrometheusExporter implements MetricExporter {
 
     /**
      * Prometheus library does aggregation, which means its inc method must be called with
-     * the value to be incremented by. It does not have a set method. As our ReadableMetric
+     * the value to be incremented by. It does not have a set method. As our MetricRecord
      * contains the current value, not the value to be incremented by, we destroy and
      * recreate counters when they are updated.
      *
