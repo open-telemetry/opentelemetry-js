@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Sampler, SpanContext } from '@opentelemetry/api';
-import { isSampled } from '../../utils/trace-flags';
+import { Sampler, SpanContext, TraceFlags } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {
@@ -24,8 +23,12 @@ export class ProbabilitySampler implements Sampler {
   }
 
   shouldSample(parentContext?: SpanContext) {
-    if (parentContext && parentContext.traceFlags !== undefined)
-      return isSampled(parentContext.traceFlags);
+    // Respect the parent sampling decision if there is one
+    if (parentContext && parentContext.traceFlags !== undefined) {
+      return (
+        (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
+      );
+    }
     if (this._probability >= 1.0) return true;
     else if (this._probability <= 0) return false;
     return Math.random() < this._probability;
