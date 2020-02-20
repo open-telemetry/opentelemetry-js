@@ -24,7 +24,7 @@ export class ProbabilitySampler implements Sampler {
 
   shouldSample(parentContext?: SpanContext) {
     // Respect the parent sampling decision if there is one
-    if (parentContext && parentContext.traceFlags !== undefined) {
+    if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
       return (
         (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
       );
