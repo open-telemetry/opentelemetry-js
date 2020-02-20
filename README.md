@@ -29,7 +29,7 @@ OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
-| Component                   | Version      | Target Date      |
+| Component                   | Version      | Release Date     |
 | --------------------------- | ------------ | ---------------- |
 | Tracing API                 | Alpha v0.1.0 | October 14 2019  |
 | Tracing SDK (Node and Web)  | Alpha v0.1.0 | October 14 2019  |
