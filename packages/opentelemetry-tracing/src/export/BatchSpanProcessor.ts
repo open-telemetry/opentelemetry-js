@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { isSampled, unrefTimer } from '@opentelemetry/core';
+import { unrefTimer } from '@opentelemetry/core';
 import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
@@ -55,7 +55,6 @@ export class BatchSpanProcessor implements SpanProcessor {
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
-    if (!isSampled(span.context().traceFlags)) return;
     this._addToBuffer(span.toReadableSpan());
   }
 
