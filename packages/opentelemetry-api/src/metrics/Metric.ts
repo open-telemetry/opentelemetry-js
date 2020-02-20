@@ -87,11 +87,6 @@ export interface Metric<T> {
   bind(labels: LabelSet): T;
 
   /**
-   * Returns a Instrument for a metric with all labels not set.
-   */
-  getDefaultBound(): T;
-
-  /**
    * Removes the Instrument from the metric, if it is present.
    * @param labels the canonicalized LabelSet used to associate with this
    *     metric instrument.
@@ -102,11 +97,6 @@ export interface Metric<T> {
    * Clears all timeseries from the Metric.
    */
   clear(): void;
-
-  /**
-   * what should the callback signature be?
-   */
-  setCallback(fn: () => void): void;
 }
 
 export interface MetricUtils {
