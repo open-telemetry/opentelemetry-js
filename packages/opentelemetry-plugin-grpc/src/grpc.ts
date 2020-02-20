@@ -142,10 +142,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     const carrier = {};
     this._tracer
       .getHttpTextFormat()
-      .inject(
-        setExtractedSpanContext(Context.TODO, spanContext),
-        carrier
-      );
+      .inject(setExtractedSpanContext(Context.TODO, spanContext), carrier);
     for (const [k, v] of Object.entries(carrier)) {
       metadata.set(k, v as string);
     }
