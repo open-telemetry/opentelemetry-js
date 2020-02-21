@@ -12,10 +12,10 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
     "lint": "gts check",
+    "lint:fix": "gts fix",
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "lint:fix": "gts fix",
     "prepare": "npm run compile"
   },
   "keywords": [

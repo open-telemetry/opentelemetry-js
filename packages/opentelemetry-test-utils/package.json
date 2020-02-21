@@ -5,8 +5,8 @@
   "main": "build/testUtils.js",
   "scripts": {
     "lint": "gts check",
-    "compile": "tsc -p .",
     "lint:fix": "gts fix",
+    "compile": "tsc -p .",
     "precompile": "tsc --version",
     "prepare": "npm run compile"
   },
