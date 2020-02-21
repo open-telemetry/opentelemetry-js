@@ -6,11 +6,11 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "clean": "rimraf build/*",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
     "prepare": "npm run compile",
     "watch": "tsc -w"
   },

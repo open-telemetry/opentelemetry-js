@@ -4,9 +4,9 @@
   "description": "Test utilities.",
   "main": "build/testUtils.js",
   "scripts": {
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "compile": "tsc -p .",
-    "fix": "gts fix",
     "precompile": "tsc --version",
     "prepare": "npm run compile"
   },
