@@ -236,6 +236,15 @@ jobs:
       - *redis_service
       - *mongo_service
     <<: *node_unit_tests
+  node13:
+    docker:
+      - image: node:13
+        environment: *node_test_env
+      - *postgres_service
+      - *mysql_service
+      - *redis_service
+      - *mongo_service
+    <<: *node_unit_tests
   node12-browsers:
     docker:
       - image: circleci/node:12-browsers
@@ -260,4 +269,5 @@ workflows:
       - node8
       - node10
       - node12
+      - node13
       - node12-browsers
