@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import {
   ALWAYS_SAMPLER,
-  BinaryTraceContext,
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,

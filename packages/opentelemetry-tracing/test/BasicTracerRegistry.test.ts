@@ -17,7 +17,6 @@
 import { Context, TraceFlags } from '@opentelemetry/api';
 import {
   ALWAYS_SAMPLER,
-  BinaryTraceContext,
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,

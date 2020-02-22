@@ -15,7 +15,6 @@
  */
 
 import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
-import { BinaryFormat } from '../context/propagation/BinaryFormat';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 

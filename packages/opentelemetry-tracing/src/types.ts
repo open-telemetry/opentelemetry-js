@@ -17,7 +17,6 @@
 import { ScopeManager } from '@opentelemetry/scope-base';
 import {
   Attributes,
-  BinaryFormat,
   HttpTextFormat,
   Logger,
   Sampler,
