@@ -41,12 +41,12 @@ Before raising a pull request, make sure there are no lint problems.
 
 To check the linter, use:
 ```sh
-$ npm run check
+$ npm run lint
 ```
 
 To fix the linter, use:
 ```sh
-$ npm run fix
+$ npm run lint:fix
 ```
 
 ### Continuous Integration

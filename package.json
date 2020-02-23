@@ -7,7 +7,6 @@
   "scripts": {
     "bench": "node benchmark",
     "clean": "lerna run clean",
-    "fix": "lerna run fix",
     "postinstall": "npm run bootstrap",
     "precompile": "tsc --version",
     "version:update": "lerna run version:update",
@@ -19,13 +18,14 @@
     "codecov": "lerna run codecov",
     "codecov:browser": "lerna run codecov:browser",
     "changelog": "lerna-changelog",
-    "check": "lerna run check",
     "predocs-test": "npm run docs",
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
     "docs-deploy": "gh-pages --dist packages/opentelemetry-api/docs/out",
-    "lint-examples": "eslint ./examples/**/*.js",
-    "fix-examples": "eslint ./examples/**/*.js --fix"
+    "lint": "lerna run lint",
+    "lint:fix": "lerna run lint:fix",
+    "lint:examples": "eslint ./examples/**/*.js",
+    "lint:examples:fix": "eslint ./examples/**/*.js --fix"
   },
   "repository": "open-telemetry/opentelemetry-js",
   "keywords": [
