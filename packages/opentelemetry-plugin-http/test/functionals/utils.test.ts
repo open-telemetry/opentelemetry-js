@@ -317,4 +317,27 @@ describe('Utility', () => {
       });
     }
   });
+
+  describe('getIncomingRequestAttributesOnResponse()', () => {
+    it('should correctly parse the middleware stack if present', () => {
+      const request = {
+        __ot_middlewares: ['/test', '/toto', '/'],
+      };
+      // @ts-ignore ignore error about invalid request types since we only want to
+      // check the parsing of the `__ot_middlewares` property
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      });
+      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], '/test/toto');
+    });
+    it('should succesfully process without middleware stack', () => {
+      const request = {};
+      // @ts-ignore ignore error about invalid request types since we only want to
+      // check the parsing of the `__ot_middlewares` property
+      const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
+        socket: {},
+      });
+      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], undefined);
+    });
+  });
 });

@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from '@opentelemetry/api';
 import { unrefTimer } from '@opentelemetry/core';
-import { SpanProcessor } from '../SpanProcessor';
-import { SpanExporter } from './SpanExporter';
 import { Span } from '../Span';
-import { ReadableSpan } from './ReadableSpan';
+import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
+import { ReadableSpan } from './ReadableSpan';
+import { SpanExporter } from './SpanExporter';
 
 const DEFAULT_BUFFER_SIZE = 100;
 const DEFAULT_BUFFER_TIMEOUT_MS = 20_000;
@@ -56,7 +55,6 @@ export class BatchSpanProcessor implements SpanProcessor {
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
-    if (span.context().traceFlags !== TraceFlags.SAMPLED) return;
     this._addToBuffer(span.toReadableSpan());
   }
 

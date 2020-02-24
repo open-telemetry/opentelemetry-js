@@ -11,17 +11,17 @@ For manual instrumentation see the
 [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
 
 ## How does automatic tracing work?
-This package exposes a class `WebTracer` that will be able to automatically trace things in Browser only.
+This package exposes a class `WebTracerProvider` that will be able to automatically trace things in Browser only.
 
 See the example how to use it.
 
 OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
 
 Web Tracer currently supports one plugin for document load.
-Unlike Node Tracer, the plugins needs to be initialised and passed in configuration. 
-The reason is to give user full control over which plugin will be bundled into web page.   
+Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialised and passed in configuration.
+The reason is to give user full control over which plugin will be bundled into web page.
 
-You can choose to use the ZoneScopeManager if you want to trace asynchronous operations.
+You can choose to use the `ZoneScopeManager` if you want to trace asynchronous operations.
 
 ## Installation
 
@@ -33,27 +33,27 @@ npm install --save @opentelemetry/web
 
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 
 // Minimum required setup - supports only synchronous operations
-const webTracer = new WebTracer({
+const provider = new WebTracerProvider({
   plugins: [
     new DocumentLoad()
   ]
 });
 
-webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // Changing default scopeManager to use ZoneScopeManager - supports asynchronous operations
-const webTracerWithZone = new WebTracer({
+const providerWithZone = new WebTracerProvider({
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new DocumentLoad()
   ]
 });
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 ```
 

@@ -17,6 +17,7 @@
 export * from './common/Logger';
 export * from './common/Time';
 export * from './context/propagation/BinaryFormat';
+export * from './context/propagation/carrier';
 export * from './context/propagation/HttpTextFormat';
 export * from './distributed_context/DistributedContext';
 export * from './distributed_context/EntryValue';
@@ -24,26 +25,32 @@ export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
+export * from './metrics/NoopMeter';
+export * from './metrics/NoopMeterProvider';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
 export * from './trace/link';
-export * from './trace/Sampler';
-export * from './trace/span';
-export * from './trace/SpanOptions';
-export * from './trace/span_context';
-export * from './trace/span_kind';
-export * from './trace/status';
-export * from './trace/TimedEvent';
-export * from './trace/tracer';
-export * from './trace/tracer_provider';
-export * from './trace/trace_flags';
-export * from './trace/trace_state';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
-export * from './metrics/NoopMeterProvider';
-export * from './metrics/NoopMeter';
+export * from './trace/Sampler';
+export * from './trace/span_context';
+export * from './trace/span_kind';
+export * from './trace/span';
+export * from './trace/SpanOptions';
+export * from './trace/status';
+export * from './trace/TimedEvent';
+export * from './trace/trace_flags';
+export * from './trace/trace_state';
+export * from './trace/tracer_provider';
+export * from './trace/tracer';
+
+export { Context } from '@opentelemetry/scope-base';
+
+import { ContextAPI } from './api/context';
+/** Entrypoint for context API */
+export const context = ContextAPI.getInstance();
 
 import { TraceAPI } from './api/trace';
 /** Entrypoint for trace API */
@@ -56,4 +63,5 @@ export const metrics = MetricsAPI.getInstance();
 export default {
   trace,
   metrics,
+  context,
 };

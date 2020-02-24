@@ -15,20 +15,21 @@
  */
 
 import * as types from './types';
+import { Context } from './context';
 
 export class NoopScopeManager implements types.ScopeManager {
-  active(): unknown {
-    return undefined;
+  active(): Context {
+    return Context.ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: unknown,
+    scope: Context,
     fn: T
   ): ReturnType<T> {
     return fn();
   }
 
-  bind<T>(target: T, scope?: unknown): T {
+  bind<T>(target: T, scope?: Context): T {
     return target;
   }
 

@@ -14,8 +14,15 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, SpanContext, TraceFlags } from '@opentelemetry/api';
+import {
+  Carrier,
+  Context,
+  HttpTextFormat,
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
+import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
@@ -56,11 +63,10 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContext implements HttpTextFormat {
-  inject(
-    spanContext: SpanContext,
-    format: string,
-    carrier: { [key: string]: unknown }
-  ) {
+  inject(context: Context, carrier: Carrier) {
+    const spanContext = getParentSpanContext(context);
+    if (!spanContext) return;
+
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
     }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
@@ -71,17 +77,14 @@ export class HttpTraceContext implements HttpTextFormat {
     }
   }
 
-  extract(
-    format: string,
-    carrier: { [key: string]: unknown }
-  ): SpanContext | null {
+  extract(context: Context, carrier: Carrier): Context {
     const traceParentHeader = carrier[TRACE_PARENT_HEADER];
-    if (!traceParentHeader) return null;
+    if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
       : traceParentHeader;
     const spanContext = parseTraceParent(traceParent);
-    if (!spanContext) return null;
+    if (!spanContext) return context;
 
     spanContext.isRemote = true;
 
@@ -94,6 +97,6 @@ export class HttpTraceContext implements HttpTextFormat {
         : traceStateHeader;
       spanContext.traceState = new TraceState(state as string);
     }
-    return spanContext;
+    return setExtractedSpanContext(context, spanContext);
   }
 }

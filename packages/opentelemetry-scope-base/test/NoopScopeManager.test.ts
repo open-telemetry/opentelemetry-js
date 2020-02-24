@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopScopeManager } from '../src';
+import { NoopScopeManager, Context } from '../src';
 
 describe('NoopScopeManager', () => {
   let scopeManager: NoopScopeManager;
@@ -39,16 +39,17 @@ describe('NoopScopeManager', () => {
   });
 
   describe('.with()', () => {
-    it('should run the callback (null as target)', done => {
-      scopeManager.with(null, done);
+    it('should run the callback (Context.ROOT_CONTEXT as target)', done => {
+      scopeManager.with(Context.ROOT_CONTEXT, done);
     });
 
     it('should run the callback (object as target)', done => {
-      const test = { a: 1 };
+      const key = Context.createKey('test key 1');
+      const test = Context.ROOT_CONTEXT.setValue(key, 1);
       scopeManager.with(test, () => {
         assert.strictEqual(
           scopeManager.active(),
-          undefined,
+          Context.ROOT_CONTEXT,
           'should not have scope'
         );
         return done();
@@ -57,7 +58,7 @@ describe('NoopScopeManager', () => {
 
     it('should run the callback (when disabled)', done => {
       scopeManager.disable();
-      scopeManager.with(null, () => {
+      scopeManager.with(Context.ROOT_CONTEXT, () => {
         scopeManager.enable();
         return done();
       });
@@ -65,19 +66,19 @@ describe('NoopScopeManager', () => {
   });
 
   describe('.active()', () => {
-    it('should always return null (when enabled)', () => {
+    it('should always return Context.ROOT_CONTEXT (when enabled)', () => {
       assert.strictEqual(
         scopeManager.active(),
-        undefined,
+        Context.ROOT_CONTEXT,
         'should not have scope'
       );
     });
 
-    it('should always return null (when disabled)', () => {
+    it('should always return Context.ROOT_CONTEXT (when disabled)', () => {
       scopeManager.disable();
       assert.strictEqual(
         scopeManager.active(),
-        undefined,
+        Context.ROOT_CONTEXT,
         'should not have scope'
       );
       scopeManager.enable();

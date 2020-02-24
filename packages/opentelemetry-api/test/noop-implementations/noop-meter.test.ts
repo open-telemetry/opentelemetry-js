@@ -19,13 +19,10 @@ import {
   Labels,
   NoopMeterProvider,
   NOOP_BOUND_COUNTER,
-  NOOP_BOUND_GAUGE,
   NOOP_BOUND_MEASURE,
   NOOP_COUNTER_METRIC,
-  NOOP_GAUGE_METRIC,
-  NOOP_MEASURE_METRIC
+  NOOP_MEASURE_METRIC,
 } from '../../src';
-
 
 describe('NoopMeter', () => {
   it('should not crash', () => {
@@ -35,43 +32,20 @@ describe('NoopMeter', () => {
     const labelSet = meter.labels(labels);
 
     // ensure NoopMetric does not crash.
-    counter.setCallback(() => {
-      assert.fail('callback occurred');
-    });
     counter.bind(labelSet).add(1);
-    counter.getDefaultBound().add(1);
     counter.unbind(labelSet);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
     assert.strictEqual(counter.bind(labelSet), NOOP_BOUND_COUNTER);
-    assert.strictEqual(counter.getDefaultBound(), NOOP_BOUND_COUNTER);
     counter.clear();
 
     const measure = meter.createMeasure('some-name');
-    measure.getDefaultBound().record(1);
-    measure.getDefaultBound().record(1, { key: { value: 'value' } });
-    measure.getDefaultBound().record(
-      1,
-      { key: { value: 'value' } },
-      {
-        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
-        spanId: '5e0c63257de34c92',
-      }
-    );
+    measure.bind(labelSet).record(1);
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
-    assert.strictEqual(measure.getDefaultBound(), NOOP_BOUND_MEASURE);
     assert.strictEqual(measure.bind(labelSet), NOOP_BOUND_MEASURE);
-
-    const gauge = meter.createGauge('some-name');
-    gauge.getDefaultBound().set(1);
-
-    // ensure the correct noop const is returned
-    assert.strictEqual(gauge, NOOP_GAUGE_METRIC);
-    assert.strictEqual(gauge.getDefaultBound(), NOOP_BOUND_GAUGE);
-    assert.strictEqual(gauge.bind(labelSet), NOOP_BOUND_GAUGE);
 
     const options = {
       component: 'tests',
@@ -82,7 +56,5 @@ describe('NoopMeter', () => {
     assert.strictEqual(measureWithOptions, NOOP_MEASURE_METRIC);
     const counterWithOptions = meter.createCounter('some-name', options);
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);
-    const gaugeWithOptions = meter.createGauge('some-name', options);
-    assert.strictEqual(gaugeWithOptions, NOOP_GAUGE_METRIC);
   });
 });
