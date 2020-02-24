@@ -40,7 +40,7 @@ const DEFAULT_FLAGS = 0x1;
  * @param span Span to be translated
  */
 export function spanToThrift(span: ReadableSpan): ThriftSpan {
-  const traceId = span.spanContext.traceId.padStart(32, '0');
+  const traceId = span.spanContext.traceId;
   const traceIdHigh = Buffer.from(traceId.slice(0, 8).buffer);
   const traceIdLow = Buffer.from(traceId.slice(8).buffer);
   const parentSpan = span.parentSpanId

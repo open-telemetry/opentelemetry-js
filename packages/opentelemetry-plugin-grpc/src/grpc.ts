@@ -133,7 +133,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     return getExtractedSpanContext(
       this._tracer.getHttpTextFormat().extract(Context.TODO, metadata.getMap())
     );
-    return this._tracer.getBinaryFormat().fromBytes(metadataValue);
   }
 
   private _setSpanContext(

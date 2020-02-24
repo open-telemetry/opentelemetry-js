@@ -22,6 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 import { hexToId, idToHex } from '../../platform';
+import { traceIdIsValid, spanIdIsValid } from '../../trace/spancontext-utils';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
