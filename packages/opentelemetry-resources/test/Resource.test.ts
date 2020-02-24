@@ -75,4 +75,15 @@ describe('Resource', () => {
     assert.strictEqual(Object.keys(actualResource.labels).length, 3);
     assert.deepStrictEqual(actualResource, resource1);
   });
+
+  it('should accept string, number, and boolean values', () => {
+    const resource = new Resource({
+      'custom.string': 'strvalue',
+      'custom.number': 42,
+      'custom.boolean': true,
+    });
+    assert.equal(resource.labels['custom.string'], 'strvalue');
+    assert.equal(resource.labels['custom.number'], 42);
+    assert.equal(resource.labels['custom.boolean'], true);
+  });
 });
