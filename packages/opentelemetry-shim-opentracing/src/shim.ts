@@ -15,7 +15,12 @@
  */
 
 import * as types from '@opentelemetry/api';
-import { NoopLogger, idToHex } from '@opentelemetry/core';
+import {
+  getExtractedSpanContext,
+  NoopLogger,
+  setExtractedSpanContext,
+  idToHex,
+} from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
 
 function translateReferences(
@@ -123,13 +128,20 @@ export class TracerShim extends opentracing.Tracer {
     carrier: types.Carrier
   ): void {
     const opentelemSpanContext: types.SpanContext = (spanContext as SpanContextShim).getSpanContext();
+    if (!carrier || typeof carrier !== 'object') return;
     switch (format) {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP:
         this._tracer
           .getHttpTextFormat()
-          .inject(opentelemSpanContext, format, carrier);
+          .inject(
+            setExtractedSpanContext(
+              types.Context.ROOT_CONTEXT,
+              opentelemSpanContext
+            ),
+            carrier
+          );
         return;
       case opentracing.FORMAT_BINARY:
         this._logger.warn(
@@ -149,9 +161,11 @@ export class TracerShim extends opentracing.Tracer {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP:
-        const context = this._tracer
-          .getHttpTextFormat()
-          .extract(format, carrier);
+        const context = getExtractedSpanContext(
+          this._tracer
+            .getHttpTextFormat()
+            .extract(types.Context.ROOT_CONTEXT, carrier)
+        );
         if (!context) {
           return null;
         }

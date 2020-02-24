@@ -16,13 +16,13 @@
 
 import { Meter } from './Meter';
 import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
-import { BoundMeasure, BoundCounter, BoundGauge } from './BoundInstrument';
+import { BoundMeasure, BoundCounter } from './BoundInstrument';
 import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
- * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses constant
- * NoopMetrics for all of its methods.
+ * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
+ * constant NoopMetrics for all of its methods.
  */
 export class NoopMeter implements Meter {
   constructor() {}
@@ -45,15 +45,6 @@ export class NoopMeter implements Meter {
     return NOOP_COUNTER_METRIC;
   }
 
-  /**
-   * Returns a constant gauge metric.
-   * @param name the name of the metric.
-   * @param [options] the metric options.
-   */
-  createGauge(name: string, options?: MetricOptions): Metric<BoundGauge> {
-    return NOOP_GAUGE_METRIC;
-  }
-
   labels(labels: Labels): LabelSet {
     return NOOP_LABEL_SET;
   }
@@ -67,9 +58,10 @@ export class NoopMetric<T> implements Metric<T> {
   }
   /**
    * Returns a Bound Instrument associated with specified LabelSet.
-   * It is recommended to keep a reference to the Bound Instrument instead of always
-   * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * It is recommended to keep a reference to the Bound Instrument instead of
+   * always calling this method for every operations.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   bind(labels: LabelSet): T {
     return this._instrument;
@@ -84,10 +76,10 @@ export class NoopMetric<T> implements Metric<T> {
 
   /**
    * Removes the Binding from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labels the canonicalized LabelSet used to associate with this
+   *     metric instrument.
    */
   unbind(labels: LabelSet): void {
-    // @todo: implement this method
     return;
   }
 
@@ -107,13 +99,6 @@ export class NoopCounterMetric extends NoopMetric<BoundCounter>
   implements Pick<MetricUtils, 'add'> {
   add(value: number, labelSet: LabelSet) {
     this.bind(labelSet).add(value);
-  }
-}
-
-export class NoopGaugeMetric extends NoopMetric<BoundGauge>
-  implements Pick<MetricUtils, 'set'> {
-  set(value: number, labelSet: LabelSet) {
-    this.bind(labelSet).set(value);
   }
 }
 
@@ -141,12 +126,6 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
-export class NoopBoundGauge implements BoundGauge {
-  set(value: number): void {
-    return;
-  }
-}
-
 export class NoopBoundMeasure implements BoundMeasure {
   record(
     value: number,
@@ -158,10 +137,6 @@ export class NoopBoundMeasure implements BoundMeasure {
 }
 
 export const NOOP_METER = new NoopMeter();
-
-export const NOOP_BOUND_GAUGE = new NoopBoundGauge();
-export const NOOP_GAUGE_METRIC = new NoopGaugeMetric(NOOP_BOUND_GAUGE);
-
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 

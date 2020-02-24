@@ -6,17 +6,17 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.ts' --exclude 'test/index-webpack.ts'",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
     "test:browser": "nyc karma start --single-run",
     "tdd": "npm run tdd:node",
     "tdd:node": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
     "prepare": "npm run compile",
     "version:update": "node ../../scripts/version-update.js",
     "watch": "tsc -w"
@@ -71,6 +71,6 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.4.0",
-    "@opentelemetry/core": "0.4.0"
+    "@opentelemetry/core": "^0.4.0"
   }
 }

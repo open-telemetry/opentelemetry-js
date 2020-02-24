@@ -16,8 +16,8 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ConsoleMetricExporter } from '../../src';
-import { MeterProvider } from '../../src/MeterProvider';
+import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
+import { ValueType } from '@opentelemetry/api';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -40,25 +40,37 @@ describe('ConsoleMetricExporter', () => {
       const meter = new MeterProvider().getMeter(
         'test-console-metric-exporter'
       );
-      meter.addExporter(consoleExporter);
-      const gauge = meter.createGauge('gauge', {
+      const counter = meter.createCounter('counter', {
         description: 'a test description',
         labelKeys: ['key1', 'key2'],
       });
-      const boundGauge = gauge.bind(
+      const boundCounter = counter.bind(
         meter.labels({ key1: 'labelValue1', key2: 'labelValue2' })
       );
-      boundGauge.set(10);
-      const [descriptor, timeseries] = spyConsole.args;
+      boundCounter.add(10);
+
+      meter.collect();
+      consoleExporter.export(meter.getBatcher().checkPointSet(), () => {});
+      assert.strictEqual(spyConsole.args.length, 3);
+      const [descriptor, labels, value] = spyConsole.args;
       assert.deepStrictEqual(descriptor, [
-        { description: 'a test description', name: 'gauge' },
-      ]);
-      assert.deepStrictEqual(timeseries, [
         {
-          labels: { key1: 'labelValue1', key2: 'labelValue2' },
-          value: 10,
+          description: 'a test description',
+          labelKeys: ['key1', 'key2'],
+          metricKind: MetricKind.COUNTER,
+          monotonic: true,
+          name: 'counter',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
         },
       ]);
+      assert.deepStrictEqual(labels, [
+        {
+          key1: 'labelValue1',
+          key2: 'labelValue2',
+        },
+      ]);
+      assert.deepStrictEqual(value[0], 'value: 10');
     });
   });
 });

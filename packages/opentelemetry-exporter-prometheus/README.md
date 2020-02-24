@@ -43,11 +43,6 @@ boundCounter.add(10);
 
 // .. some other work
 
-// Create and record Gauge
-const gauge = meter.createGauge('metric_name1');
-gauge.set(10, meter.labels({ [key1]: 'value1' }));
-```
-
 ## Viewing your metrics
 
 With the above you should now be able to navigate to the Prometheus UI at: http://localhost:9464/metrics

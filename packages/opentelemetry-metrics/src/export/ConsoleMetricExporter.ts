@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { MetricExporter, ReadableMetric } from './types';
+import {
+  MetricExporter,
+  MetricRecord,
+  MetricKind,
+  Sum,
+  Distribution,
+} from './types';
 import { ExportResult } from '@opentelemetry/base';
 
 /**
@@ -23,30 +29,30 @@ import { ExportResult } from '@opentelemetry/base';
  */
 export class ConsoleMetricExporter implements MetricExporter {
   export(
-    metrics: ReadableMetric[],
+    metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
   ): void {
     for (const metric of metrics) {
-      const descriptor = metric.descriptor;
-      const timeseries = metric.timeseries;
-      console.log({
-        name: descriptor.name,
-        description: descriptor.description,
-      });
-
-      for (const ts of timeseries) {
-        const labels = descriptor.labelKeys
-          .map((k, i) => [k, ts.labelValues[i]])
-          .reduce(
-            (p, c) => ({
-              ...p,
-              [c[0] as string]: typeof c[1] === 'string' ? c[1] : c[1].value,
-            }),
-            {}
+      console.log(metric.descriptor);
+      console.log(metric.labels.labels);
+      switch (metric.descriptor.metricKind) {
+        case MetricKind.COUNTER:
+          const sum = metric.aggregator.value() as Sum;
+          console.log('value: ' + sum);
+          break;
+        default:
+          const distribution = metric.aggregator.value() as Distribution;
+          console.log(
+            'min: ' +
+              distribution.min +
+              ', max: ' +
+              distribution.max +
+              ', count: ' +
+              distribution.count +
+              ', sum: ' +
+              distribution.sum
           );
-        for (const point of ts.points) {
-          console.log({ labels, value: point.value });
-        }
+          break;
       }
     }
     return resultCallback(ExportResult.SUCCESS);

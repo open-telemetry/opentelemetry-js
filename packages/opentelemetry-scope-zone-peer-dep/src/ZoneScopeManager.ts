@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { ScopeManager, Context } from '@opentelemetry/scope-base';
 import { Func, TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
@@ -45,20 +45,20 @@ export class ZoneScopeManager implements ScopeManager {
    * Returns the active scope from certain zone name
    * @param activeZone
    */
-  private _activeScopeFromZone(
-    activeZone: Zone | undefined
-  ): unknown | undefined {
-    return activeZone && activeZone.get(ZONE_SCOPE_KEY);
+  private _activeScopeFromZone(activeZone: Zone | undefined): Context {
+    return (
+      (activeZone && activeZone.get(ZONE_SCOPE_KEY)) || Context.ROOT_CONTEXT
+    );
   }
 
   /**
    * @param target Function to be executed within the scope
    * @param scope A scope (span) to be executed within target function
    */
-  private _bindFunction<T extends Function>(target: T, scope?: unknown): T {
+  private _bindFunction<T extends Function>(target: T, scope: Context): T {
     const manager = this;
     const contextWrapper = function(this: any, ...args: unknown[]) {
-      return manager.with(scope, () => target.apply(this || scope, args));
+      return manager.with(scope, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
       enumerable: false,
@@ -73,7 +73,7 @@ export class ZoneScopeManager implements ScopeManager {
    * @param obj target object on which the listeners will be patched
    * @param scope A scope (span) to be bind to target
    */
-  private _bindListener<T>(obj: T, scope?: unknown): T {
+  private _bindListener<T>(obj: T, scope: Context): T {
     const target = (obj as unknown) as TargetWithEvents;
     if (target.__ot_listeners !== undefined) {
       return obj;
@@ -137,7 +137,7 @@ export class ZoneScopeManager implements ScopeManager {
   private _patchAddEventListener(
     target: TargetWithEvents,
     original: Function,
-    scope?: unknown
+    scope: Context
   ) {
     const scopeManager = this;
 
@@ -183,17 +183,18 @@ export class ZoneScopeManager implements ScopeManager {
   /**
    * Returns the active scope
    */
-  active(): unknown | undefined {
+  active(): Context {
+    if (!this._enabled) {
+      return Context.ROOT_CONTEXT;
+    }
     const activeZone = this._getActiveZone();
 
     const active = this._activeScopeFromZone(activeZone);
     if (active) {
       return active;
     }
-    if (this._enabled) {
-      return window;
-    }
-    return undefined;
+
+    return Context.ROOT_CONTEXT;
   }
 
   /**
@@ -201,7 +202,7 @@ export class ZoneScopeManager implements ScopeManager {
    * @param target
    * @param scope A scope (span) to be bind to target
    */
-  bind<T>(target: T | TargetWithEvents, scope?: unknown): T {
+  bind<T>(target: T | TargetWithEvents, scope: Context): T {
     // if no specific scope to propagate is given, we use the current one
     if (scope === undefined) {
       scope = this.active();
@@ -226,9 +227,6 @@ export class ZoneScopeManager implements ScopeManager {
    * Enables the scope manager and creates a default(root) scope
    */
   enable(): this {
-    if (this._enabled) {
-      return this;
-    }
     this._enabled = true;
     return this;
   }
@@ -241,14 +239,9 @@ export class ZoneScopeManager implements ScopeManager {
    * @param fn Callback function
    */
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    scope: unknown,
+    scope: Context | null,
     fn: () => ReturnType<T>
   ): ReturnType<T> {
-    // if no scope use active from active zone
-    if (typeof scope === 'undefined' || scope === null) {
-      scope = this.active();
-    }
-
     const zoneName = this._createZoneName();
 
     const newZone = this._createZone(zoneName, scope);

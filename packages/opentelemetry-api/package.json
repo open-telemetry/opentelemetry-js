@@ -6,18 +6,18 @@
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json test/**/*.ts",
+    "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
     "test:browser": "nyc karma start --single-run",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "build": "npm run compile",
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
-    "docs": "typedoc --tsconfig tsconfig.json",
+    "docs": "typedoc --tsconfig tsconfig.json --exclude test/**/*.ts",
     "prepare": "npm run compile"
   },
   "keywords": [
@@ -44,6 +44,9 @@
   ],
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "@opentelemetry/scope-base": "^0.4.0"
   },
   "devDependencies": {
     "@types/mocha": "^5.2.7",
