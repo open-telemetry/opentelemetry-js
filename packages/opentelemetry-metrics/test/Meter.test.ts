@@ -272,20 +272,20 @@ describe('Meter', () => {
 
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
-        const gauge = meter.createMeasure('');
-        assert.ok(gauge instanceof types.NoopMetric);
+        const measure = meter.createMeasure('');
+        assert.ok(measure instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
-        const gauge1 = meter.createMeasure('1name');
-        const gauge_ = meter.createMeasure('_name');
-        assert.ok(gauge1 instanceof types.NoopMetric);
-        assert.ok(gauge_ instanceof types.NoopMetric);
+        const measure1 = meter.createMeasure('1name');
+        const measure_ = meter.createMeasure('_name');
+        assert.ok(measure1 instanceof types.NoopMetric);
+        assert.ok(measure_ instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
-        const gauge = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(gauge instanceof types.NoopMetric);
+        const measure = meter.createMeasure('name with invalid characters^&*(');
+        assert.ok(measure instanceof types.NoopMetric);
       });
     });
 
@@ -296,12 +296,19 @@ describe('Meter', () => {
         assert.doesNotThrow(() => boundMeasure.record(10));
       });
 
-      it('should return the timeseries', () => {
-        // @todo: implement once record is implemented
-      });
-
       it('should not accept negative values by default', () => {
-        // @todo: implement once record is implemented
+        const measure = meter.createMeasure('name');
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(-10);
+
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 0,
+          max: -Infinity,
+          min: Infinity,
+          sum: 0,
+        });
       });
 
       it('should not set the instrument data when disabled', () => {
@@ -321,8 +328,22 @@ describe('Meter', () => {
         });
       });
 
-      it('should accept negative (and positive) values when monotonic is set to false', () => {
-        // @todo: implement once record is implemented
+      it('should accept negative (and positive) values when absolute is set to false', () => {
+        const measure = meter.createMeasure('name', {
+          absolute: false,
+        });
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(-10);
+        boundMeasure.record(50);
+
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 2,
+          max: 50,
+          min: -10,
+          sum: 40,
+        });
       });
 
       it('should return same instrument on same label values', () => {
