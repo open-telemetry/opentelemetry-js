@@ -9,13 +9,13 @@
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "prepare": "npm run compile",
     "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix"
+    "compile": "npm run version:update && tsc -p ."
   },
   "keywords": [
     "opentelemetry",

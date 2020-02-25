@@ -10,12 +10,12 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
     "prepare": "npm run compile",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",

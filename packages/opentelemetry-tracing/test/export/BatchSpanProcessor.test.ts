@@ -14,31 +14,21 @@
  * limitations under the License.
  */
 
+import { ALWAYS_SAMPLER } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  Span,
   BasicTracerProvider,
-  InMemorySpanExporter,
   BatchSpanProcessor,
+  InMemorySpanExporter,
+  Span,
 } from '../../src';
-import { NEVER_SAMPLER, ALWAYS_SAMPLER, NoopLogger } from '@opentelemetry/core';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
     sampler: ALWAYS_SAMPLER,
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
-  span.end();
-  return span as Span;
-}
-
-function createUnSampledSpan(spanName: string): Span {
-  const tracer = new BasicTracerProvider({
-    sampler: NEVER_SAMPLER,
-    logger: new NoopLogger(),
-  }).getTracer('default');
-  const span = tracer.startSpan(spanName, { isRecording: false });
   span.end();
   return span as Span;
 }
@@ -95,16 +85,6 @@ describe('BatchSpanProcessor', () => {
 
       processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
-    });
-
-    it('should not export the unsampled spans', () => {
-      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-      for (let i = 0; i < defaultBufferConfig.bufferSize * 2; i++) {
-        const span = createUnSampledSpan(`${name}_${i}`);
-        processor.onEnd(span);
-        assert.strictEqual(exporter.getFinishedSpans().length, 0);
-      }
-      processor.shutdown();
     });
 
     it('should force flush when timeout exceeded', done => {
