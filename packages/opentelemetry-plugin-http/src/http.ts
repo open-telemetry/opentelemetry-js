@@ -375,12 +375,10 @@ export class HttpPlugin extends BasePlugin<Http> {
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as RequestOptions)
           : undefined;
-      const {
-        origin,
-        pathname,
-        method,
-        optionsParsed,
-      } = utils.getRequestInfo(options, extraOptions);
+      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
+        options,
+        extraOptions
+      );
 
       if (
         utils.isOpenTelemetryRequest(optionsParsed) ||
