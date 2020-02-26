@@ -15,3 +15,4 @@
  */
 
 export { Resource } from './Resource';
+export * from './constants';
