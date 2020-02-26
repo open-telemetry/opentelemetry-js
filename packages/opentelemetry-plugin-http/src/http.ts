@@ -375,15 +375,15 @@ export class HttpPlugin extends BasePlugin<Http> {
         (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as RequestOptions)
           : undefined;
-      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
-        options,
-        extraOptions
-      );
-
-      const requestOptions = optionsParsed;
+      const {
+        origin,
+        pathname,
+        method,
+        optionsParsed,
+      } = utils.getRequestInfo(options, extraOptions);
 
       if (
-        utils.isOpenTelemetryRequest(requestOptions) ||
+        utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,
@@ -391,7 +391,7 @@ export class HttpPlugin extends BasePlugin<Http> {
             plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
-        return original.apply(this, [requestOptions, ...args]);
+        return original.apply(this, [optionsParsed, ...args]);
       }
 
       const operationName = `${method} ${pathname}`;
@@ -402,18 +402,18 @@ export class HttpPlugin extends BasePlugin<Http> {
       const span = plugin._startHttpSpan(operationName, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
-        if (!requestOptions.headers) requestOptions.headers = {};
-        propagation.inject(requestOptions.headers);
+        if (!optionsParsed.headers) optionsParsed.headers = {};
+        propagation.inject(optionsParsed.headers);
 
         const request: ClientRequest = plugin._safeExecute(
           span,
-          () => original.apply(this, [requestOptions, ...args]),
+          () => original.apply(this, [optionsParsed, ...args]),
           true
         );
 
         plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
         plugin._tracer.bind(request);
-        return plugin._traceClientRequest(request, requestOptions, span);
+        return plugin._traceClientRequest(request, optionsParsed, span);
       });
     };
   }

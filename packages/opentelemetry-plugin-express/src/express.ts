@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { Attributes } from '@opentelemetry/api';
 import { BasePlugin } from '@opentelemetry/core';
+import { Attributes } from '@opentelemetry/api';
 import * as express from 'express';
 import * as core from 'express-serve-static-core';
 import * as shimmer from 'shimmer';
 import {
-  AttributeNames,
   ExpressLayer,
-  ExpressLayerType,
-  ExpressPluginConfig,
   ExpressRouter,
-  Parameters,
+  AttributeNames,
   PatchedRequest,
+  Parameters,
   PathParams,
   _LAYERS_STORE_PROPERTY,
+  ExpressPluginConfig,
+  ExpressLayerType,
 } from './types';
 import {
   getLayerMetadata,
-  isLayerIgnored,
-  patchEnd,
   storeLayerPath,
+  patchEnd,
+  isLayerIgnored,
 } from './utils';
 import { VERSION } from './version';
 

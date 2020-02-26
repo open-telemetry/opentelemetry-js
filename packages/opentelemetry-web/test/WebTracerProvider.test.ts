@@ -15,7 +15,7 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { BasePlugin, setActiveSpan } from '@opentelemetry/core';
+import { BasePlugin } from '@opentelemetry/core';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { Tracer } from '@opentelemetry/tracing';
