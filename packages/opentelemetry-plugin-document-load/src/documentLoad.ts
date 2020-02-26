@@ -105,54 +105,46 @@ export class DocumentLoad extends BasePlugin<unknown> {
     );
 
     const entries = this._getEntries();
-    context.with(
-      propagation.extract({
-        traceparent: (metaElement && metaElement.content) || '',
-      }),
-      () => {
-        const rootSpan = this._startSpan(
-          AttributeNames.DOCUMENT_LOAD,
+    const traceparent = (metaElement && metaElement.content) || '';
+    context.with(propagation.extract({ traceparent }), () => {
+      const rootSpan = this._startSpan(
+        AttributeNames.DOCUMENT_LOAD,
+        PTN.FETCH_START,
+        entries
+      );
+      if (!rootSpan) {
+        return;
+      }
+      this._tracer.withSpan(rootSpan, () => {
+        const fetchSpan = this._startSpan(
+          AttributeNames.DOCUMENT_FETCH,
           PTN.FETCH_START,
           entries
         );
-        if (!rootSpan) {
-          return;
+        if (fetchSpan) {
+          this._tracer.withSpan(fetchSpan, () => {
+            this._addSpanNetworkEvents(fetchSpan, entries);
+            this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
+          });
         }
-        this._tracer.withSpan(rootSpan, () => {
-          const fetchSpan = this._startSpan(
-            AttributeNames.DOCUMENT_FETCH,
-            PTN.FETCH_START,
-            entries
-          );
-          if (fetchSpan) {
-            this._tracer.withSpan(fetchSpan, () => {
-              this._addSpanNetworkEvents(fetchSpan, entries);
-              this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
-            });
-          }
-        });
+      });
 
-        this._addResourcesSpans(rootSpan);
+      this._addResourcesSpans(rootSpan);
 
-        addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
-        addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
-        addSpanNetworkEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
-        addSpanNetworkEvent(
-          rootSpan,
-          PTN.DOM_CONTENT_LOADED_EVENT_START,
-          entries
-        );
-        addSpanNetworkEvent(
-          rootSpan,
-          PTN.DOM_CONTENT_LOADED_EVENT_END,
-          entries
-        );
-        addSpanNetworkEvent(rootSpan, PTN.DOM_COMPLETE, entries);
-        addSpanNetworkEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
+      addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
+      addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
+      addSpanNetworkEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
+      addSpanNetworkEvent(
+        rootSpan,
+        PTN.DOM_CONTENT_LOADED_EVENT_START,
+        entries
+      );
+      addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
+      addSpanNetworkEvent(rootSpan, PTN.DOM_COMPLETE, entries);
+      addSpanNetworkEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
 
-        this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
-      }
-    );
+      this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
+    });
   }
 
   /**

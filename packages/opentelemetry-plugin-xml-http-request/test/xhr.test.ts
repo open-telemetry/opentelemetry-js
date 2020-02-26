@@ -15,6 +15,7 @@
  */
 import * as types from '@opentelemetry/api';
 import {
+  B3Format,
   LogLevel,
   otperformance as performance,
   setActiveSpan,
@@ -30,7 +31,6 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
@@ -98,7 +98,7 @@ describe('xhr', () => {
   let requests: any[] = [];
   let prepareData: any;
   let clearData: any;
-  let scopeManager: ScopeManager;
+  let scopeManager: ZoneScopeManager;
 
   beforeEach(() => {
     scopeManager = new ZoneScopeManager().enable();
@@ -107,6 +107,10 @@ describe('xhr', () => {
 
   afterEach(() => {
     scopeManager.disable();
+  });
+
+  before(() => {
+    types.propagation.initGlobalPropagator(new B3Format());
   });
 
   describe('when request is successful', () => {
@@ -166,8 +170,7 @@ describe('xhr', () => {
       );
 
       rootSpan = webTracerWithZone.startSpan('root');
-
-      scopeManager.with(setActiveSpan(types.context.active(), rootSpan), () => {
+      webTracerWithZone.withSpan(rootSpan, () => {
         getData(fileUrl, () => {
           fakeNow = 100;
         }).then(() => {
@@ -192,14 +195,6 @@ describe('xhr', () => {
 
     afterEach(() => {
       clearData();
-    });
-
-    it('current span should be root span', () => {
-      assert.strictEqual(
-        webTracerWithZone.getCurrentSpan(),
-        rootSpan,
-        'root span is wrong'
-      );
     });
 
     it('should create a span with correct root span', () => {

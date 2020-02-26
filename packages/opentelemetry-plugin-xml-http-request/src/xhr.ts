@@ -22,6 +22,7 @@ import {
   isWrapped,
   otperformance,
   urlMatches,
+  getParentSpanContext,
 } from '@opentelemetry/core';
 import {
   addSpanNetworkEvent,
@@ -88,6 +89,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
     const headers: { [key: string]: unknown } = {};
     api.propagation.inject(headers);
+    console.log(getParentSpanContext(api.context.active()));
 
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
@@ -467,23 +469,25 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          plugin._tasksCount++;
-          xhrMem.sendStartTime = hrTime();
-          currentSpan.addEvent(EventNames.METHOD_SEND);
+          plugin._tracer.withSpan(currentSpan, () => {
+            plugin._tasksCount++;
+            xhrMem.sendStartTime = hrTime();
+            currentSpan.addEvent(EventNames.METHOD_SEND);
 
-          this.addEventListener('abort', onAbort);
-          this.addEventListener('error', onError);
-          this.addEventListener('load', onLoad);
-          this.addEventListener('timeout', onTimeout);
+            this.addEventListener('abort', onAbort);
+            this.addEventListener('error', onError);
+            this.addEventListener('load', onLoad);
+            this.addEventListener('timeout', onTimeout);
 
-          xhrMem.callbackToRemoveEvents = () => {
-            unregister(this);
-            if (xhrMem.createdResources) {
-              xhrMem.createdResources.observer.disconnect();
-            }
-          };
-          plugin._addHeaders(this, spanUrl);
-          plugin._addResourceObserver(this, spanUrl);
+            xhrMem.callbackToRemoveEvents = () => {
+              unregister(this);
+              if (xhrMem.createdResources) {
+                xhrMem.createdResources.observer.disconnect();
+              }
+            };
+            plugin._addHeaders(this, spanUrl);
+            plugin._addResourceObserver(this, spanUrl);
+          });
         }
         return original.apply(this, args);
       };
