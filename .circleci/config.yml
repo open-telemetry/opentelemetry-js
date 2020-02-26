@@ -173,7 +173,7 @@ jobs:
           command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
-          command: npm run check
+          command: npm run lint
       - run:
           name: Install doc dependencies
           command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
@@ -189,7 +189,7 @@ jobs:
           command: npm i --no-save eslint eslint-plugin-import eslint-config-airbnb-base
       - run:
           name: Lint examples
-          command: npm run lint-examples
+          command: npm run lint:examples
   docs-deploy:
     docker:
       - image: node:12
@@ -236,6 +236,15 @@ jobs:
       - *redis_service
       - *mongo_service
     <<: *node_unit_tests
+  node13:
+    docker:
+      - image: node:13
+        environment: *node_test_env
+      - *postgres_service
+      - *mysql_service
+      - *redis_service
+      - *mongo_service
+    <<: *node_unit_tests
   node12-browsers:
     docker:
       - image: circleci/node:12-browsers
@@ -260,4 +269,5 @@ workflows:
       - node8
       - node10
       - node12
+      - node13
       - node12-browsers

@@ -3,8 +3,6 @@
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
-const meter = new MeterProvider().getMeter('example-prometheus');
-
 const exporter = new PrometheusExporter(
   {
     startServer: true,
@@ -14,7 +12,10 @@ const exporter = new PrometheusExporter(
   },
 );
 
-meter.addExporter(exporter);
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('example-prometheus');
 
 // Monotonic counters can only be increased.
 const monotonicCounter = meter.createCounter('monotonic_counter', {
