@@ -55,7 +55,7 @@ export class PropagationAPI {
    * @param carrier carrier to inject context into
    * @param context Context carrying tracing data to inject. Defaults to the currently active context.
    */
-  inject(carrier: Carrier, context = contextApi.active()): void {
+  public inject(carrier: Carrier, context = contextApi.active()): void {
     return this._propagator.inject(context, carrier);
   }
 
@@ -65,7 +65,7 @@ export class PropagationAPI {
    * @param carrier Carrier to extract context from
    * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
    */
-  extract(carrier: Carrier, context = contextApi.active()): Context {
+  public extract(carrier: Carrier, context = contextApi.active()): Context {
     return this._propagator.extract(context, carrier);
   }
 }
