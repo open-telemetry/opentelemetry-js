@@ -21,16 +21,16 @@
 
 /** Attributes defining a running environment (e.g. Cloud, Data Center). */
 export const CLOUD_RESOURCE = {
-  /** */
+  /** Name of the cloud provider. Example values are aws, azure, gcp. */
   PROVIDER: 'cloud.provider',
 
-  /** */
+  /** The cloud account id used to identify different entities. */
   ACCOUNT_ID: 'cloud.account.id',
 
-  /** */
+  /** A specific geographical location where different entities can run. */
   REGION: 'cloud.region',
 
-  /** */
+  /** Zones are a sub set of the region connected through low-latency links. */
   ZONE: 'cloud.zone',
 };
 
