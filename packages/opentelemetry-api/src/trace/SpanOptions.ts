@@ -14,11 +14,9 @@
  * limitations under the License.
  */
 
-import { Span } from './span';
 import { Attributes } from './attributes';
-import { SpanKind } from './span_kind';
-import { SpanContext } from './span_context';
 import { Link } from './link';
+import { SpanKind } from './span_kind';
 
 /**
  * Options needed for span creation
@@ -41,12 +39,6 @@ export interface SpanOptions {
 
   /** A spans links */
   links?: Link[];
-
-  /**
-   * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
-   * span will be the child of.
-   */
-  parent?: Span | SpanContext | null;
 
   /** A manually specified start time for the created `Span` object. */
   startTime?: number;

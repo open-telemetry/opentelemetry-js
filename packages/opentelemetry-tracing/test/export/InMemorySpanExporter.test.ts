@@ -21,6 +21,8 @@ import {
   BasicTracerProvider,
 } from '../../src';
 import { ExportResult } from '@opentelemetry/base';
+import { context } from '@opentelemetry/api';
+import { setActiveSpan } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
   const memoryExporter = new InMemorySpanExporter();
@@ -36,10 +38,10 @@ describe('InMemorySpanExporter', () => {
     const root = provider.getTracer('default').startSpan('root');
     const child = provider
       .getTracer('default')
-      .startSpan('child', { parent: root });
+      .startSpan('child', {}, setActiveSpan(context.active(), root));
     const grandChild = provider
       .getTracer('default')
-      .startSpan('grand-child', { parent: child });
+      .startSpan('grand-child', {}, setActiveSpan(context.active(), child));
 
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
     grandChild.end();
@@ -59,11 +61,12 @@ describe('InMemorySpanExporter', () => {
     assert.strictEqual(span2.parentSpanId, span3.spanContext.spanId);
   });
 
-  it('should shutdown the exorter', () => {
+  it('should shutdown the exporter', () => {
     const root = provider.getTracer('default').startSpan('root');
+
     provider
       .getTracer('default')
-      .startSpan('child', { parent: root })
+      .startSpan('child', {}, setActiveSpan(context.active(), root))
       .end();
     root.end();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
@@ -73,7 +76,7 @@ describe('InMemorySpanExporter', () => {
     // after shutdown no new spans are accepted
     provider
       .getTracer('default')
-      .startSpan('child1', { parent: root })
+      .startSpan('child1', {}, setActiveSpan(context.active(), root))
       .end();
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
   });

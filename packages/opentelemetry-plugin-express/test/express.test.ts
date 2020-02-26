@@ -20,7 +20,8 @@ import * as express from 'express';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { plugin } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, setActiveSpan } from '@opentelemetry/core';
+import { context } from '@opentelemetry/api';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -30,6 +31,7 @@ import {
   ExpressPluginConfig,
   ExpressLayerType,
 } from '../src/types';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 
 const httpRequest = {
   get: (options: http.ClientRequestArgs | string) => {
@@ -57,13 +59,20 @@ describe('Express Plugin', () => {
   const spanProcessor = new SimpleSpanProcessor(memoryExporter);
   provider.addSpanProcessor(spanProcessor);
   const tracer = provider.getTracer('default');
+  let scopeManager: AsyncHooksScopeManager;
 
   before(() => {
     plugin.enable(express, provider, logger);
   });
 
+  beforeEach(() => {
+    scopeManager = new AsyncHooksScopeManager();
+    context.initGlobalContextManager(scopeManager.enable());
+  });
+
   afterEach(() => {
     memoryExporter.reset();
+    scopeManager.disable();
   });
 
   describe('Instrumenting normal get operations', () => {
@@ -86,48 +95,51 @@ describe('Express Plugin', () => {
       server.listen(0, () => {
         const port = (server.address() as AddressInfo).port;
         assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-        tracer.withSpan(rootSpan, async () => {
-          await httpRequest.get(`http://localhost:${port}/toto/tata`);
-          rootSpan.end();
-          assert(
-            memoryExporter
+        scopeManager.with(
+          setActiveSpan(context.active(), rootSpan),
+          async () => {
+            await httpRequest.get(`http://localhost:${port}/toto/tata`);
+            rootSpan.end();
+            assert(
+              memoryExporter
+                .getFinishedSpans()
+                .find(span => span.name.includes('customMiddleware')) !==
+                undefined
+            );
+            assert(
+              memoryExporter
+                .getFinishedSpans()
+                .find(span => span.name.includes('query')) !== undefined
+            );
+            assert(
+              memoryExporter
+                .getFinishedSpans()
+                .find(span => span.name.includes('jsonParser')) !== undefined
+            );
+            const requestHandlerSpan = memoryExporter
               .getFinishedSpans()
-              .find(span => span.name.includes('customMiddleware')) !==
-              undefined
-          );
-          assert(
-            memoryExporter
+              .find(span => span.name.includes('request handler'));
+            assert(requestHandlerSpan !== undefined);
+            assert(
+              requestHandlerSpan?.attributes[AttributeNames.COMPONENT] ===
+                'express'
+            );
+            assert(
+              requestHandlerSpan?.attributes[AttributeNames.HTTP_ROUTE] ===
+                '/toto/:id'
+            );
+            assert(
+              requestHandlerSpan?.attributes[AttributeNames.EXPRESS_TYPE] ===
+                'request_handler'
+            );
+            let exportedRootSpan = memoryExporter
               .getFinishedSpans()
-              .find(span => span.name.includes('query')) !== undefined
-          );
-          assert(
-            memoryExporter
-              .getFinishedSpans()
-              .find(span => span.name.includes('jsonParser')) !== undefined
-          );
-          const requestHandlerSpan = memoryExporter
-            .getFinishedSpans()
-            .find(span => span.name.includes('request handler'));
-          assert(requestHandlerSpan !== undefined);
-          assert(
-            requestHandlerSpan?.attributes[AttributeNames.COMPONENT] ===
-              'express'
-          );
-          assert(
-            requestHandlerSpan?.attributes[AttributeNames.HTTP_ROUTE] ===
-              '/toto/:id'
-          );
-          assert(
-            requestHandlerSpan?.attributes[AttributeNames.EXPRESS_TYPE] ===
-              'request_handler'
-          );
-          let exportedRootSpan = memoryExporter
-            .getFinishedSpans()
-            .find(span => span.name === 'rootSpan');
-          assert(exportedRootSpan !== undefined);
-          server.close();
-          return done();
-        });
+              .find(span => span.name === 'rootSpan');
+            assert(exportedRootSpan !== undefined);
+            server.close();
+            return done();
+          }
+        );
       });
     });
   });
@@ -152,26 +164,29 @@ describe('Express Plugin', () => {
       server.listen(0, () => {
         const port = (server.address() as AddressInfo).port;
         assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-        tracer.withSpan(rootSpan, async () => {
-          await httpRequest.get(`http://localhost:${port}/toto/tata`);
-          rootSpan.end();
-          assert.deepEqual(
-            memoryExporter
+        scopeManager.with(
+          setActiveSpan(context.active(), rootSpan),
+          async () => {
+            await httpRequest.get(`http://localhost:${port}/toto/tata`);
+            rootSpan.end();
+            assert.deepEqual(
+              memoryExporter
+                .getFinishedSpans()
+                .filter(
+                  span =>
+                    span.attributes[AttributeNames.EXPRESS_TYPE] ===
+                    ExpressLayerType.MIDDLEWARE
+                ).length,
+              0
+            );
+            let exportedRootSpan = memoryExporter
               .getFinishedSpans()
-              .filter(
-                span =>
-                  span.attributes[AttributeNames.EXPRESS_TYPE] ===
-                  ExpressLayerType.MIDDLEWARE
-              ).length,
-            0
-          );
-          let exportedRootSpan = memoryExporter
-            .getFinishedSpans()
-            .find(span => span.name === 'rootSpan');
-          assert(exportedRootSpan !== undefined);
-          server.close();
-          return done();
-        });
+              .find(span => span.name === 'rootSpan');
+            assert(exportedRootSpan !== undefined);
+            server.close();
+            return done();
+          }
+        );
       });
     });
   });
@@ -192,14 +207,17 @@ describe('Express Plugin', () => {
       server.listen(0, () => {
         const port = (server.address() as AddressInfo).port;
         assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-        tracer.withSpan(rootSpan, async () => {
-          await httpRequest.get(`http://localhost:${port}/toto/tata`);
-          rootSpan.end();
-          assert.deepEqual(memoryExporter.getFinishedSpans().length, 1);
-          assert(memoryExporter.getFinishedSpans()[0] !== undefined);
-          server.close();
-          return done();
-        });
+        scopeManager.with(
+          setActiveSpan(context.active(), rootSpan),
+          async () => {
+            await httpRequest.get(`http://localhost:${port}/toto/tata`);
+            rootSpan.end();
+            assert.deepEqual(memoryExporter.getFinishedSpans().length, 1);
+            assert(memoryExporter.getFinishedSpans()[0] !== undefined);
+            server.close();
+            return done();
+          }
+        );
       });
     });
   });

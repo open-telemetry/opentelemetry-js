@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as assert from 'assert';
-import * as sinon from 'sinon';
-
+import * as types from '@opentelemetry/api';
 import {
-  B3Format,
   LogLevel,
   otperformance as performance,
+  setActiveSpan,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
 } from '@opentelemetry/core';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import * as tracing from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/api';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
 } from '@opentelemetry/web';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
 import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
@@ -98,6 +98,16 @@ describe('xhr', () => {
   let requests: any[] = [];
   let prepareData: any;
   let clearData: any;
+  let scopeManager: ScopeManager;
+
+  beforeEach(() => {
+    scopeManager = new ZoneScopeManager().enable();
+    types.context.initGlobalContextManager(scopeManager);
+  });
+
+  afterEach(() => {
+    scopeManager.disable();
+  });
 
   describe('when request is successful', () => {
     let webTracerWithZone: types.Tracer;
@@ -142,8 +152,6 @@ describe('xhr', () => {
 
       webTracerProviderWithZone = new WebTracerProvider({
         logLevel: LogLevel.ERROR,
-        httpTextFormat: new B3Format(),
-        scopeManager: new ZoneScopeManager(),
         plugins: [
           new XMLHttpRequestPlugin({
             propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
@@ -159,7 +167,7 @@ describe('xhr', () => {
 
       rootSpan = webTracerWithZone.startSpan('root');
 
-      webTracerWithZone.withSpan(rootSpan, () => {
+      scopeManager.with(setActiveSpan(types.context.active(), rootSpan), () => {
         getData(fileUrl, () => {
           fakeNow = 100;
         }).then(() => {
@@ -442,7 +450,6 @@ describe('xhr', () => {
 
       webTracerWithZoneProvider = new WebTracerProvider({
         logLevel: LogLevel.ERROR,
-        scopeManager: new ZoneScopeManager(),
         plugins: [new XMLHttpRequestPlugin()],
       });
       dummySpanExporter = new DummySpanExporter();
@@ -454,7 +461,7 @@ describe('xhr', () => {
 
       rootSpan = webTracerWithZone.startSpan('root');
 
-      webTracerWithZone.withSpan(rootSpan, () => {
+      scopeManager.with(setActiveSpan(types.context.active(), rootSpan), () => {
         getData(url, () => {
           fakeNow = 100;
         }).then(() => {

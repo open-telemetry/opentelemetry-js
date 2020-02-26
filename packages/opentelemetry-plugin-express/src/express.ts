@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
 import { Attributes } from '@opentelemetry/api';
+import { BasePlugin } from '@opentelemetry/core';
 import * as express from 'express';
 import * as core from 'express-serve-static-core';
 import * as shimmer from 'shimmer';
 import {
-  ExpressLayer,
-  ExpressRouter,
   AttributeNames,
-  PatchedRequest,
+  ExpressLayer,
+  ExpressLayerType,
+  ExpressPluginConfig,
+  ExpressRouter,
   Parameters,
+  PatchedRequest,
   PathParams,
   _LAYERS_STORE_PROPERTY,
-  ExpressPluginConfig,
-  ExpressLayerType,
 } from './types';
 import {
   getLayerMetadata,
-  storeLayerPath,
-  patchEnd,
   isLayerIgnored,
+  patchEnd,
+  storeLayerPath,
 } from './utils';
 import { VERSION } from './version';
 
@@ -188,7 +188,6 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           return original.apply(this, arguments);
         }
         const span = plugin._tracer.startSpan(metadata.name, {
-          parent: plugin._tracer.getCurrentSpan(),
           attributes: Object.assign(attributes, metadata.attributes),
         });
         // verify we have a callback

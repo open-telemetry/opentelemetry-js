@@ -25,7 +25,6 @@ import * as sinon from 'sinon';
 import { isWrapped, LogLevel } from '@opentelemetry/core';
 import * as tracing from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '../src';
 import { WindowWithZone } from '../src/types';
@@ -68,7 +67,6 @@ describe('UserInteractionPlugin', () => {
       userInteractionPlugin = new UserInteractionPlugin();
       webTracerProvider = new WebTracerProvider({
         logLevel: LogLevel.ERROR,
-        scopeManager: new ZoneScopeManager(),
         plugins: [userInteractionPlugin, new XMLHttpRequestPlugin()],
       });
       dummySpanExporter = new DummySpanExporter();

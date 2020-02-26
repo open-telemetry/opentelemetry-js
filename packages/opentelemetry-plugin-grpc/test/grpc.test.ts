@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider, SpanKind } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  context,
+  NoopTracerProvider,
+  SpanKind,
+  propagation,
+} from '@opentelemetry/api';
+import { NoopLogger, HttpTraceContext } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { ScopeManager } from '@opentelemetry/scope-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -293,6 +300,21 @@ function createClient(grpc: GrpcModule, proto: any) {
 }
 
 describe('GrpcPlugin', () => {
+  let scopeManger: ScopeManager;
+
+  before(() => {
+    propagation.initGlobalPropagator(new HttpTraceContext());
+  });
+
+  beforeEach(() => {
+    scopeManger = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManger);
+  });
+
+  afterEach(() => {
+    scopeManger.disable();
+  });
+
   it('should return a plugin', () => {
     assert.ok(plugin instanceof GrpcPlugin);
   });
