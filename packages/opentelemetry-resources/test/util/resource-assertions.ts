@@ -248,7 +248,7 @@ const assertHasOneLabel = (
   resource: Resource
 ): void => {
   const hasOne = Object.values(constants).reduce(
-    (found, key) => found || resource.labels[key],
+    (found, key) => found || resource.labels.hasOwnProperty(key),
     false
   );
   assert.ok(

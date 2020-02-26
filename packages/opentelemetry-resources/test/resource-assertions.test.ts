@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import { Resource } from '../src/Resource';
 import {
   CLOUD_RESOURCE,
