@@ -83,8 +83,7 @@ export class Tracer implements types.Tracer {
       ? types.TraceFlags.SAMPLED
       : types.TraceFlags.UNSAMPLED;
     const spanContext = { traceId, spanId, traceFlags, traceState };
-    const recordEvents = options.isRecording || false;
-    if (!recordEvents && !samplingDecision) {
+    if (!samplingDecision) {
       this.logger.debug('Sampling is off, starting no recording span');
       return new NoRecordingSpan(spanContext);
     }
