@@ -18,7 +18,6 @@ import {
   B3Format,
   LogLevel,
   otperformance as performance,
-  setActiveSpan,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
@@ -456,7 +455,7 @@ describe('xhr', () => {
 
       rootSpan = webTracerWithZone.startSpan('root');
 
-      scopeManager.with(setActiveSpan(types.context.active(), rootSpan), () => {
+      webTracerWithZone.withSpan(rootSpan, () => {
         getData(url, () => {
           fakeNow = 100;
         }).then(() => {
