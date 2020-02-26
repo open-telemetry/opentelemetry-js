@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
+import {
+  Attributes,
+  CanonicalCode,
+  context,
+  Span,
+  SpanKind,
+  Status,
+  TimedEvent,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import {
-  SpanKind,
-  Attributes,
-  TimedEvent,
-  Span,
-  CanonicalCode,
-  Status,
-} from '@opentelemetry/api';
-import { plugin, PostgresPlugin } from '../src';
-import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
-import * as testUtils from '@opentelemetry/test-utils';
+import { plugin, PostgresPlugin } from '../src';
+import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -81,6 +83,7 @@ const runCallbackTest = (
 
 describe('pg@7.x', () => {
   let client: pg.Client;
+  let scopeManager: AsyncHooksScopeManager;
   const provider = new NodeTracerProvider();
   const tracer = provider.getTracer('external');
   const logger = new NoopLogger();
@@ -117,11 +120,14 @@ describe('pg@7.x', () => {
 
   beforeEach(function() {
     plugin.enable(pg, provider, logger);
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {
     memoryExporter.reset();
     plugin.disable();
+    scopeManager.disable();
   });
 
   it('should return a plugin', () => {

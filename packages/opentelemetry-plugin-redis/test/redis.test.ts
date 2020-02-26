@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import { CanonicalCode, context, SpanKind, Status } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
+import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { NodeTracerProvider } from '@opentelemetry/node';
-import { plugin, RedisPlugin } from '../src';
+import * as assert from 'assert';
 import * as redisTypes from 'redis';
-import { NoopLogger } from '@opentelemetry/core';
-import * as testUtils from '@opentelemetry/test-utils';
-import { SpanKind, Status, CanonicalCode } from '@opentelemetry/api';
+import { plugin, RedisPlugin } from '../src';
 import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();
@@ -53,6 +54,16 @@ describe('redis@2.x', () => {
   let redis: typeof redisTypes;
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
+
+  let scopeManager: AsyncHooksScopeManager;
+  beforeEach(() => {
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
+  });
+
+  afterEach(() => {
+    scopeManager.disable();
+  });
 
   before(function() {
     // needs to be "function" to have MochaContext "this" scope
