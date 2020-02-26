@@ -30,7 +30,7 @@ function translateReferences(
     const context = reference.referencedContext();
     if (context instanceof SpanContextShim) {
       links.push({
-        spanContext: (context as SpanContextShim).getSpanContext(),
+        linkContext: (context as SpanContextShim).getSpanContext(),
         attributes: { 'span.kind': reference.type },
       });
     }

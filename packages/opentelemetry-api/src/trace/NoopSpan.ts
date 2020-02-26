@@ -60,11 +60,6 @@ export class NoopSpan implements Span {
   }
 
   // By default does nothing
-  addLink(spanContext: SpanContext, attributes?: Attributes): this {
-    return this;
-  }
-
-  // By default does nothing
   setStatus(status: Status): this {
     return this;
   }

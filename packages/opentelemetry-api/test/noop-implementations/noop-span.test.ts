@@ -39,18 +39,6 @@ describe('NoopSpan', () => {
     span.addEvent('sent');
     span.addEvent('sent', { id: '42', key: 'value' });
 
-    span.addLink({
-      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-      spanId: '6e0c63257de34c92',
-    });
-    span.addLink(
-      {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-      },
-      { id: '42', key: 'value' }
-    );
-
     span.setStatus({ code: CanonicalCode.CANCELLED });
 
     span.updateName('my-span');

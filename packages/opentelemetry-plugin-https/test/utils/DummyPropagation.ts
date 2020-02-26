@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Context, HttpTextFormat } from '@opentelemetry/api';
+import { Context, HttpTextFormat, TraceFlags } from '@opentelemetry/api';
 import {
   setExtractedSpanContext,
   getParentSpanContext,
@@ -27,6 +27,7 @@ export class DummyPropagation implements HttpTextFormat {
     return setExtractedSpanContext(context, {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
+      traceFlags: TraceFlags.SAMPLED,
     });
   }
   inject(context: Context, headers: { [custom: string]: string }): void {

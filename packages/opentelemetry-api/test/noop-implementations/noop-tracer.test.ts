@@ -20,7 +20,7 @@ import { Context } from '@opentelemetry/scope-base';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
-    const spanContext = { traceId: '', spanId: '' };
+    const spanContext = { traceId: '', spanId: '', traceFlags: 0 };
     const tracer = new NoopTracer();
 
     assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);

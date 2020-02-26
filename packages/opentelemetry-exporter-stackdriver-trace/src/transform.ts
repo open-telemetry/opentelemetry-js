@@ -77,8 +77,8 @@ export function getReadableSpanTransformer(
 function transformLink(link: ot.Link): Link {
   return {
     attributes: transformAttributes(link.attributes),
-    spanId: link.spanContext.spanId,
-    traceId: link.spanContext.traceId,
+    spanId: link.linkContext.spanId,
+    traceId: link.linkContext.traceId,
     type: LinkType.UNSPECIFIED,
   };
 }

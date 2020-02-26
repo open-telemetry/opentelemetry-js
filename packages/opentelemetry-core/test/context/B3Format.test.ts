@@ -82,6 +82,7 @@ describe('B3Format', () => {
       const emptySpanContext = {
         traceId: '',
         spanId: '',
+        traceFlags: 0,
       };
       b3Format.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, emptySpanContext),
@@ -89,24 +90,6 @@ describe('B3Format', () => {
       );
       assert.deepStrictEqual(carrier[X_B3_TRACE_ID], undefined);
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], undefined);
-    });
-
-    it('should handle absence of sampling decision', () => {
-      const spanContext: SpanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-      };
-
-      b3Format.inject(
-        setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
-        carrier
-      );
-      assert.deepStrictEqual(
-        carrier[X_B3_TRACE_ID],
-        'd4cda95b652f4a1592b449d5929fda1b'
-      );
-      assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], undefined);
     });
   });
 

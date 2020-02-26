@@ -49,7 +49,7 @@ export interface SpanContext {
    *
    * SAMPLED = 0x1 and UNSAMPLED = 0x0;
    */
-  traceFlags?: TraceFlags;
+  traceFlags: TraceFlags;
   /**
    * Tracing-system-specific info to propagate.
    *

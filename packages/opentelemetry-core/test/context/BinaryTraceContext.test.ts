@@ -68,7 +68,11 @@ describe('BinaryTraceContext', () => {
       description: 'span context with 64-bit span ID',
     },
     {
-      structured: { traceId: commonTraceId, spanId: commonSpanId },
+      structured: {
+        traceId: commonTraceId,
+        spanId: commonSpanId,
+        traceFlags: 0,
+      },
       binary: new Uint8Array([
         0,
         0,

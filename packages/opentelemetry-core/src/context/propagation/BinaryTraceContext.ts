@@ -74,7 +74,7 @@ export class BinaryTraceContext implements BinaryFormat {
   }
 
   fromBytes(buf: Uint8Array): SpanContext | null {
-    const result: SpanContext = { traceId: '', spanId: '' };
+    const result: SpanContext = { traceId: '', spanId: '', traceFlags: 0 };
     // Length must be 29.
     if (buf.length !== FORMAT_LENGTH) return null;
     // Check version and field numbers.

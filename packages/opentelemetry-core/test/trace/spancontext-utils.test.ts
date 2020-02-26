@@ -22,6 +22,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
+      traceFlags: 0,
     };
     assert.ok(context.isValid(spanContext));
   });
@@ -30,6 +31,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: context.INVALID_TRACEID,
       spanId: '6e0c63257de34c92',
+      traceFlags: 0,
     };
     assert.ok(!context.isValid(spanContext));
   });
@@ -38,6 +40,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: context.INVALID_SPANID,
+      traceFlags: 0,
     };
     assert.ok(!context.isValid(spanContext));
   });
@@ -46,6 +49,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: context.INVALID_TRACEID,
       spanId: context.INVALID_SPANID,
+      traceFlags: 0,
     };
     assert.ok(!context.isValid(spanContext));
   });

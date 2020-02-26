@@ -36,10 +36,9 @@ export const mockedReadableSpan: ReadableSpan = {
   attributes: { component: 'document-load' },
   links: [
     {
-      spanContext: {
+      linkContext: {
         traceId: '1f1008dc8e270e85c40a0d7c3939b278',
         spanId: '78a8915098864388',
-        traceFlags: 1,
       },
       attributes: { component: 'document-load' },
     },
