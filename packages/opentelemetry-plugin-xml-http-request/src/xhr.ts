@@ -22,7 +22,6 @@ import {
   isWrapped,
   otperformance,
   urlMatches,
-  setActiveSpan,
 } from '@opentelemetry/core';
 import {
   addSpanNetworkEvent,
@@ -133,7 +132,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    api.context.with(setActiveSpan(api.context.active(), span), () => {
+    this._tracer.withSpan(span, () => {
       const childSpan = this._tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });

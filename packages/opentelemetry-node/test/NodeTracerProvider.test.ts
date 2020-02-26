@@ -174,7 +174,7 @@ describe('NodeTracerProvider', () => {
     it('should run scope with AsyncHooksScopeManager scope manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      context.with(setActiveSpan(context.active(), span), () => {
+      provider.getTracer('default').withSpan(span, () => {
         assert.deepStrictEqual(
           provider.getTracer('default').getCurrentSpan(),
           span
@@ -190,7 +190,7 @@ describe('NodeTracerProvider', () => {
     it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
-      context.with(setActiveSpan(context.active(), span), () => {
+      provider.getTracer('default').withSpan(span, () => {
         assert.deepStrictEqual(
           provider.getTracer('default').getCurrentSpan(),
           span
@@ -198,7 +198,7 @@ describe('NodeTracerProvider', () => {
 
         const span1 = provider.getTracer('default').startSpan('my-span1');
 
-        context.with(setActiveSpan(context.active(), span1), () => {
+        provider.getTracer('default').withSpan(span1, () => {
           assert.deepStrictEqual(
             provider.getTracer('default').getCurrentSpan(),
             span1
@@ -221,7 +221,7 @@ describe('NodeTracerProvider', () => {
     it('should find correct scope with promises', async () => {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
-      await context.with(setActiveSpan(context.active(), span), async () => {
+      await provider.getTracer('default').withSpan(span, async () => {
         for (let i = 0; i < 3; i++) {
           await sleep(5).then(() => {
             assert.deepStrictEqual(

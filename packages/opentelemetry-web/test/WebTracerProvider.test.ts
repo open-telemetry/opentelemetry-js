@@ -84,7 +84,7 @@ describe('WebTracerProvider', () => {
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 
-        context.with(setActiveSpan(context.active(), rootSpan), () => {
+        webTracerWithZone.withSpan(rootSpan, () => {
           assert.ok(
             webTracerWithZone.getCurrentSpan() === rootSpan,
             'Current span is rootSpan'
@@ -96,7 +96,7 @@ describe('WebTracerProvider', () => {
             'concurrentSpan2'
           );
 
-          context.with(setActiveSpan(context.active(), concurrentSpan1), () => {
+          webTracerWithZone.withSpan(concurrentSpan1, () => {
             setTimeout(() => {
               assert.ok(
                 webTracerWithZone.getCurrentSpan() === concurrentSpan1,
@@ -105,7 +105,7 @@ describe('WebTracerProvider', () => {
             }, 10);
           });
 
-          context.with(setActiveSpan(context.active(), concurrentSpan2), () => {
+          webTracerWithZone.withSpan(concurrentSpan2, () => {
             setTimeout(() => {
               assert.ok(
                 webTracerWithZone.getCurrentSpan() === concurrentSpan2,

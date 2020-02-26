@@ -24,7 +24,6 @@ import {
 import {
   BasePlugin,
   otperformance,
-  setActiveSpan,
   TRACE_PARENT_HEADER,
 } from '@opentelemetry/core';
 import {
@@ -119,14 +118,14 @@ export class DocumentLoad extends BasePlugin<unknown> {
         if (!rootSpan) {
           return;
         }
-        context.with(setActiveSpan(context.active(), rootSpan), () => {
+        this._tracer.withSpan(rootSpan, () => {
           const fetchSpan = this._startSpan(
             AttributeNames.DOCUMENT_FETCH,
             PTN.FETCH_START,
             entries
           );
           if (fetchSpan) {
-            context.with(setActiveSpan(context.active(), fetchSpan), () => {
+            this._tracer.withSpan(fetchSpan, () => {
               this._addSpanNetworkEvents(fetchSpan, entries);
               this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
             });
