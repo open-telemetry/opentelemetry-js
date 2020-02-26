@@ -365,15 +365,18 @@ describe('pg@7.x', () => {
 
     it('should handle the same callback being given to multiple client.query()s', done => {
       let events = 0;
+      const parent = tracer.startSpan('parent');
 
-      const queryHandler = (err: Error, res: pg.QueryResult) => {
+      const queryHandler = (err?: Error, res?: pg.QueryResult) => {
         const span = tracer.getCurrentSpan();
-        assert.ok(span);
-        assert.strictEqual((span as any)['_ended'], false);
+        assert.deepStrictEqual(span!.context(), parent.context());
         if (err) {
           throw err;
         }
         events += 1;
+        if (events === 7) {
+          done();
+        }
       };
 
       const config = {
@@ -381,16 +384,17 @@ describe('pg@7.x', () => {
         callback: queryHandler,
       };
 
-      client.query(config.text, config.callback); // 1
-      client.query(config); // 2
-      client.query(config.text, queryHandler); // 3
-      client.query(config.text, queryHandler); // 4
-      client.query(config.text); // Not using queryHandler
-      client.query(config); // 5
-      client.query(config); // 6
-      client.query(config.text, (err, res) => {
-        assert.strictEqual(events, 6);
-        done();
+      tracer.withSpan(parent, () => {
+        client.query(config.text, config.callback); // 1
+        client.query(config); // 2
+        client.query(config.text, queryHandler); // 3
+        client.query(config.text, queryHandler); // 4
+        client
+          .query(config.text)
+          .then(result => queryHandler(undefined, result))
+          .catch(err => queryHandler(err)); // 5
+        client.query(config); // 6
+        client.query(config); // 7
       });
     });
 
