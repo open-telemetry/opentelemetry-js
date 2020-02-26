@@ -254,7 +254,7 @@ describe('Utility', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracerProvider({}).getTracer('default'),
+          new BasicTracerProvider().getTracer('default'),
           'test',
           { spanId: '', traceId: '' },
           SpanKind.INTERNAL

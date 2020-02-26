@@ -22,7 +22,6 @@ import {
   isWrapped,
   otperformance,
   urlMatches,
-  getParentSpanContext,
 } from '@opentelemetry/core';
 import {
   addSpanNetworkEvent,

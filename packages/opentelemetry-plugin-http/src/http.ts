@@ -246,7 +246,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       this._closeHttpSpan(span);
     });
 
-    this._logger.debug('makeRequestTrace return request');
+    this._logger.debug('_traceClientRequest return request');
     return request;
   }
 
