@@ -89,8 +89,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
     const headers: { [key: string]: unknown } = {};
     api.propagation.inject(headers);
-    console.log(getParentSpanContext(api.context.active()));
-
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
