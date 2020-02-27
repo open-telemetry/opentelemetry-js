@@ -20,7 +20,6 @@ import { Context } from '@opentelemetry/scope-base';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
-    const spanContext = { traceId: '', spanId: '' };
     const tracer = new NoopTracer();
 
     assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);
@@ -45,11 +44,6 @@ describe('NoopTracer', () => {
       httpTextFormat.extract(Context.ROOT_CONTEXT, {}),
       Context.ROOT_CONTEXT
     );
-
-    const binaryFormat = tracer.getBinaryFormat();
-    assert.ok(binaryFormat);
-    assert.ok(binaryFormat.toBytes(spanContext), typeof ArrayBuffer);
-    assert.deepStrictEqual(binaryFormat.fromBytes(new ArrayBuffer(0)), null);
   });
 
   it('should not crash when .withSpan()', done => {
