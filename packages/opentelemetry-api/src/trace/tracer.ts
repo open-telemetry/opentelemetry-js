@@ -15,8 +15,6 @@
  */
 
 import { Context } from '@opentelemetry/scope-base';
-import { BinaryFormat } from '../context/propagation/BinaryFormat';
-import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
