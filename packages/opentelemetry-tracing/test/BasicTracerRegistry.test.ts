@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context, SpanContext, TraceFlags } from '@opentelemetry/api';
+import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
 import {
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
@@ -24,10 +24,15 @@ import {
   setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
+import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
+  beforeEach(() => {
+    context.initGlobalContextManager(new NoopScopeManager());
+  });
+
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new BasicTracerProvider();
@@ -293,6 +298,42 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
+    });
+  });
+
+  describe('.getCurrentSpan()', () => {
+    it('should return current span when it exists', () => {
+      context.initGlobalContextManager({
+        active: () =>
+          setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
+      } as ScopeManager);
+
+      const tracer = new BasicTracerProvider().getTracer('default');
+      assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
+    });
+  });
+
+  describe('.withSpan()', () => {
+    it('should run scope with NoopScopeManager scope manager', done => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      tracer.withSpan(span, () => {
+        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
+        return done();
+      });
+    });
+  });
+
+  describe('.bind()', () => {
+    it('should bind scope with NoopScopeManager scope manager', done => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const fn = () => {
+        assert.deepStrictEqual(tracer.getCurrentSpan(), undefined);
+        return done();
+      };
+      const patchedFn = tracer.bind(fn, span);
+      return patchedFn();
     });
   });
 });

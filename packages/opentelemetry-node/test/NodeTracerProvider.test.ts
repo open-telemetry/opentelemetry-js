@@ -26,8 +26,8 @@ import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as path from 'path';
-import { NodeTracerProvider } from '../src/NodeTracerProvider';
 import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
+import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
   new Promise(resolve => {

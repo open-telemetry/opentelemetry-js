@@ -36,7 +36,6 @@ import { mergeConfig } from './utility';
  */
 export class Tracer implements api.Tracer {
   private readonly _defaultAttributes: api.Attributes;
-  private readonly _binaryFormat: api.BinaryFormat;
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
   readonly logger: api.Logger;
@@ -49,7 +48,6 @@ export class Tracer implements api.Tracer {
     private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
-    this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
@@ -137,12 +135,6 @@ export class Tracer implements api.Tracer {
     );
   }
 
-  /**
-   * Returns the binary format interface which can serialize/deserialize Spans.
-   */
-  getBinaryFormat(): api.BinaryFormat {
-    return this._binaryFormat;
-  }
   /** Returns the active {@link TraceParams}. */
   getActiveTraceParams(): TraceParams {
     return this._traceParams;

@@ -16,6 +16,7 @@
 
 import { Context } from '@opentelemetry/scope-base';
 import { BinaryFormat } from '../context/propagation/BinaryFormat';
+import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
@@ -65,17 +66,4 @@ export interface Tracer {
    * @param [context] Optionally specify the context which you want to bind
    */
   bind<T>(target: T, context?: Span): T;
-
-  /**
-   * Returns the {@link BinaryFormat} interface which can serialize/deserialize
-   * Spans.
-   *
-   * If no tracer implementation is provided, this defaults to the W3C Trace
-   * Context binary format {@link BinaryFormat}. For more details see
-   * <a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
-   * binary protocol</a>.
-   *
-   * @returns the {@link BinaryFormat} for this implementation.
-   */
-  getBinaryFormat(): BinaryFormat;
 }
