@@ -16,7 +16,6 @@
 
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/BinaryFormat';
 export * from './context/propagation/carrier';
 export * from './context/propagation/HttpTextFormat';
 export * from './distributed_context/DistributedContext';
