@@ -22,7 +22,7 @@ export class Resource {
   constructor(
     /**
      * A dictionary of labels with string keys and values that provide information
-     * about the entity as numbers, strings, or booleans
+     * about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on labels.
      */
     readonly labels: { [key: string]: number | string | boolean }

@@ -40,7 +40,7 @@ export const CONTAINER_RESOURCE = {
   /** The container name. */
   NAME: 'container.name',
 
-  /** The ame of the image the container was built on. */
+  /** The name of the image the container was built on. */
   IMAGE_NAME: 'container.image.name',
 
   /** The container image tag. */
@@ -89,7 +89,7 @@ export const K8S_RESOURCE = {
   DEPLOYMENT_NAME: 'k8s.deployment.name',
 };
 
-/**Attributes describing the telemetry library. */
+/** Attributes describing the telemetry library. */
 export const LIBRARY_RESOURCE = {
   /** The name of the telemetry library. */
   NAME: 'library.name',
