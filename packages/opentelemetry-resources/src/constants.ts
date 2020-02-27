@@ -34,8 +34,10 @@ export const CLOUD_RESOURCE = {
   ZONE: 'cloud.zone',
 };
 
-/** Attributes defining a compute unit (e.g. Container, Process, Lambda
- * Function). */
+/**
+ * Attributes defining a compute unit (e.g. Container, Process, Lambda
+ * Function).
+ * */
 export const CONTAINER_RESOURCE = {
   /** The container name. */
   NAME: 'container.name',
@@ -49,16 +51,22 @@ export const CONTAINER_RESOURCE = {
 
 /** Attributes defining a computing instance (e.g. host). */
 export const HOST_RESOURCE = {
-  /** Hostname of the host. It contains what the hostname command returns on the
-   * host machine.*/
+  /**
+   * Hostname of the host. It contains what the hostname command returns on the
+   * host machine.
+   */
   HOSTNAME: 'host.hostname',
 
-  /** Unique host id. For Cloud this must be the instance_id assigned by the
-   * cloud provider */
+  /**
+   * Unique host id. For Cloud this must be the instance_id assigned by the
+   * cloud provider
+   */
   ID: 'host.id',
 
-  /** Name of the host. It may contain what hostname returns on Unix systems,
-   * the fully qualified, or a name specified by the user.*/
+  /**
+   * Name of the host. It may contain what hostname returns on Unix systems,
+   * the fully qualified, or a name specified by the user.
+   */
   NAME: 'host.name',
 
   /** Type of host. For Cloud this must be the machine type.*/
