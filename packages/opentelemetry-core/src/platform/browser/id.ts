@@ -21,24 +21,29 @@ declare type WindowWithMsCrypto = Window & {
 const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
 
 const SPAN_ID_BYTES = 8;
-const spanBytesArray = new Uint8Array(SPAN_ID_BYTES);
+const TRACE_ID_BYTES = 16;
 
 /** Returns a random 16-byte trace ID formatted as a 32-char hex string. */
 export function randomTraceId(): string {
-  return randomSpanId() + randomSpanId();
+  return randomId(TRACE_ID_BYTES);
 }
 
 /** Returns a random 8-byte span ID formatted as a 16-char hex string. */
 export function randomSpanId(): string {
-  let spanId = '';
-  cryptoLib.getRandomValues(spanBytesArray);
-  for (let i = 0; i < SPAN_ID_BYTES; i++) {
-    const hexStr = spanBytesArray[i].toString(16);
+  return randomId(SPAN_ID_BYTES);
+}
+
+const randomBytesArray = new Uint8Array(TRACE_ID_BYTES);
+function randomId(byteLength: number): string {
+  let id = '';
+  cryptoLib.getRandomValues(randomBytesArray);
+  for (let i = 0; i < byteLength; i++) {
+    const hexStr = randomBytesArray[i].toString(16);
 
     // Zero pad bytes whose hex values are single digit.
-    if (hexStr.length === 1) spanId += '0';
+    if (hexStr.length === 1) id += '0';
 
-    spanId += hexStr;
+    id += hexStr;
   }
-  return spanId;
+  return id;
 }
