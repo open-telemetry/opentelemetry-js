@@ -103,9 +103,11 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         options: {} | Function,
         callback: Function
       ): mongodb.Server {
+        const currentSpan = plugin._tracer.getCurrentSpan();
         const resultHandler =
           typeof options === 'function' ? options : callback;
         if (
+          !currentSpan ||
           typeof resultHandler !== 'function' ||
           typeof commands !== 'object'
         ) {
@@ -206,8 +208,9 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
         },
         ...args: unknown[]
       ): mongodb.Cursor {
+        const currentSpan = plugin._tracer.getCurrentSpan();
         const resultHandler = args[0];
-        if (typeof resultHandler !== 'function') {
+        if (!currentSpan || typeof resultHandler !== 'function') {
           return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(`mongodb.query`, {
