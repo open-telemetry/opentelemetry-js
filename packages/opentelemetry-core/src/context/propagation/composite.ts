@@ -18,28 +18,25 @@ import { Carrier, Context, HttpTextFormat } from '@opentelemetry/api';
 
 /** Combines multiple propagators into a single propagator. */
 export class CompositePropagator implements HttpTextFormat {
-    private _propagators: HttpTextFormat[];
-    constructor(...propagators: HttpTextFormat[]) {
-        this._propagators = propagators;
-    }
+  private _propagators: HttpTextFormat[];
+  constructor(...propagators: HttpTextFormat[]) {
+    this._propagators = propagators;
+  }
 
-    inject(context: Context, carrier: Carrier) {
-        for (const propagator of this._propagators) {
-            try {
-                propagator.inject(context, carrier);
-            } catch { }
-        }
+  inject(context: Context, carrier: Carrier) {
+    for (const propagator of this._propagators) {
+      try {
+        propagator.inject(context, carrier);
+      } catch {}
     }
+  }
 
-    extract(context: Context, carrier: Carrier): Context {
-        return this._propagators.reduce(
-            (ctx, propagator) => {
-                try {
-                    return propagator.extract(ctx, carrier)
-                } catch { }
-                return ctx;
-            },
-            context
-        );
-    }
+  extract(context: Context, carrier: Carrier): Context {
+    return this._propagators.reduce((ctx, propagator) => {
+      try {
+        return propagator.extract(ctx, carrier);
+      } catch {}
+      return ctx;
+    }, context);
+  }
 }
