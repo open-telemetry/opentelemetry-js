@@ -17,12 +17,12 @@
 import * as api from '@opentelemetry/api';
 import {
   ConsoleLogger,
+  getActiveSpan,
   getParentSpanContext,
   isValid,
   NoRecordingSpan,
   randomSpanId,
   randomTraceId,
-  getActiveSpan,
   setActiveSpan,
 } from '@opentelemetry/core';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -63,7 +63,9 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    const parentContext = getParentSpanContext(context);
+    const parentContext = options.parent
+      ? getContext(options.parent)
+      : getParentSpanContext(context);
     // make sampling decision
     const samplingDecision = this._sampler.shouldSample(parentContext);
     const spanId = randomSpanId();
@@ -143,4 +145,12 @@ export class Tracer implements api.Tracer {
   getActiveSpanProcessor() {
     return this._tracerProvider.getActiveSpanProcessor();
   }
+}
+
+function getContext(span: api.Span | api.SpanContext) {
+  return isSpan(span) ? span.context() : span;
+}
+
+function isSpan(span: api.Span | api.SpanContext): span is api.Span {
+  return typeof (span as api.Span).context === 'function';
 }

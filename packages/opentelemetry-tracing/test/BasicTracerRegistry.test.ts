@@ -198,6 +198,42 @@ describe('BasicTracerProvider', () => {
       childSpan.end();
     });
 
+    it('should override context parent with option parent', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const overrideParent = tracer.startSpan('my-parent-override-span');
+      const childSpan = tracer.startSpan(
+        'child-span',
+        {
+          parent: overrideParent,
+        },
+        setActiveSpan(Context.ROOT_CONTEXT, span)
+      );
+      const context = childSpan.context();
+      assert.strictEqual(context.traceId, overrideParent.context().traceId);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+      span.end();
+      childSpan.end();
+    });
+
+    it('should override context parent with option parent context', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const overrideParent = tracer.startSpan('my-parent-override-span');
+      const childSpan = tracer.startSpan(
+        'child-span',
+        {
+          parent: overrideParent.context(),
+        },
+        setActiveSpan(Context.ROOT_CONTEXT, span)
+      );
+      const context = childSpan.context();
+      assert.strictEqual(context.traceId, overrideParent.context().traceId);
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+      span.end();
+      childSpan.end();
+    });
+
     it('should start a span with name and with invalid parent span', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan(
