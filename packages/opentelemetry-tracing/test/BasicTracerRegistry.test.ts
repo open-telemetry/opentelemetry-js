@@ -17,7 +17,6 @@
 import { Context, TraceFlags } from '@opentelemetry/api';
 import {
   ALWAYS_SAMPLER,
-  BinaryTraceContext,
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
@@ -33,13 +32,6 @@ describe('BasicTracerProvider', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new BasicTracerProvider();
-      assert.ok(provider instanceof BasicTracerProvider);
-    });
-
-    it('should construct an instance with binary format', () => {
-      const provider = new BasicTracerProvider({
-        binaryFormat: new BinaryTraceContext(),
-      });
       assert.ok(provider instanceof BasicTracerProvider);
     });
 
@@ -345,13 +337,6 @@ describe('BasicTracerProvider', () => {
       };
       const patchedFn = tracer.bind(fn, span);
       return patchedFn();
-    });
-  });
-
-  describe('.getBinaryFormat()', () => {
-    it('should get default binary formatter', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
-      assert.ok(tracer.getBinaryFormat() instanceof BinaryTraceContext);
     });
   });
 

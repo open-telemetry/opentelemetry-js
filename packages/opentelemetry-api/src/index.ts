@@ -16,7 +16,6 @@
 
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/BinaryFormat';
 export * from './context/propagation/carrier';
 export * from './context/propagation/HttpTextFormat';
 export * from './distributed_context/DistributedContext';
@@ -60,8 +59,13 @@ import { MetricsAPI } from './api/metrics';
 /** Entrypoint for metrics API */
 export const metrics = MetricsAPI.getInstance();
 
+import { PropagationAPI } from './api/propagation';
+/** Entrypoint for propagation API */
+export const propagation = PropagationAPI.getInstance();
+
 export default {
   trace,
   metrics,
   context,
+  propagation,
 };

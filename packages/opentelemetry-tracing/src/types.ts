@@ -17,7 +17,6 @@
 import { ScopeManager } from '@opentelemetry/scope-base';
 import {
   Attributes,
-  BinaryFormat,
   HttpTextFormat,
   Logger,
   Sampler,
@@ -28,11 +27,6 @@ import { LogLevel } from '@opentelemetry/core';
  * TracerConfig provides an interface for configuring a Basic Tracer.
  */
 export interface TracerConfig {
-  /**
-   * Binary formatter which can serialize/deserialize Spans.
-   */
-  binaryFormat?: BinaryFormat;
-
   /**
    * Attributed that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.

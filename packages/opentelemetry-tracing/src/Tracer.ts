@@ -36,7 +36,6 @@ import { mergeConfig } from './utility';
  */
 export class Tracer implements types.Tracer {
   private readonly _defaultAttributes: types.Attributes;
-  private readonly _binaryFormat: types.BinaryFormat;
   private readonly _httpTextFormat: types.HttpTextFormat;
   private readonly _sampler: types.Sampler;
   private readonly _scopeManager: ScopeManager;
@@ -51,7 +50,6 @@ export class Tracer implements types.Tracer {
     private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
-    this._binaryFormat = localConfig.binaryFormat;
     this._defaultAttributes = localConfig.defaultAttributes;
     this._httpTextFormat = localConfig.httpTextFormat;
     this._sampler = localConfig.sampler;
@@ -139,13 +137,6 @@ export class Tracer implements types.Tracer {
         ? setActiveSpan(this._scopeManager.active(), span)
         : this._scopeManager.active()
     );
-  }
-
-  /**
-   * Returns the binary format interface which can serialize/deserialize Spans.
-   */
-  getBinaryFormat(): types.BinaryFormat {
-    return this._binaryFormat;
   }
 
   /**
