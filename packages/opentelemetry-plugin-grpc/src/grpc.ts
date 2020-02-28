@@ -125,7 +125,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _setSpanContext(metadata: grpcTypes.Metadata): void {
     const carrier = {};
-    propagation.inject(metadata, undefined, (c, k, v) => c.set());
+    propagation.inject(carrier);
     for (const [k, v] of Object.entries(carrier)) {
       metadata.set(k, v as string);
     }
