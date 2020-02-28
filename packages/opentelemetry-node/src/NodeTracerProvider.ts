@@ -28,7 +28,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
    * Constructs a new Tracer instance.
    */
   constructor(config: NodeTracerConfig = {}) {
-    super(Object.assign({}, config));
+    super(config);
 
     this._pluginLoader = new PluginLoader(this, this.logger);
     this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);

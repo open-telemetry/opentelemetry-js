@@ -39,7 +39,7 @@ export class WebTracerProvider extends BasicTracerProvider {
     if (typeof config.plugins === 'undefined') {
       config.plugins = [];
     }
-    super(Object.assign({}, config));
+    super(config);
 
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger);
