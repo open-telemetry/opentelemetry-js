@@ -21,6 +21,7 @@ export * from './common/types';
 export * from './version';
 export * from './context/context';
 export * from './context/propagation/B3Format';
+export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './platform';
 export * from './trace/instrumentation/BasePlugin';
