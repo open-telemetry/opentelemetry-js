@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { CounterSumAggregator, MeasureExactAggregator } from './Aggregator';
+import {
+  CounterSumAggregator,
+  MeasureExactAggregator,
+  ObserverAggregator,
+} from './Aggregator';
 import { MetricRecord, MetricKind, Aggregator } from './types';
 
 /**
@@ -47,6 +51,8 @@ export class UngroupedBatcher extends Batcher {
     switch (metricKind) {
       case MetricKind.COUNTER:
         return new CounterSumAggregator();
+      case MetricKind.OBSERVER:
+        return new ObserverAggregator();
       default:
         return new MeasureExactAggregator();
     }

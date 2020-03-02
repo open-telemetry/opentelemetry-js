@@ -29,6 +29,19 @@ export class CounterSumAggregator implements Aggregator {
   }
 }
 
+/** Basic aggregator for Observer. */
+export class ObserverAggregator implements Aggregator {
+  private _current: number = 0;
+
+  update(value: number): void {
+    this._current = value;
+  }
+
+  value(): Sum {
+    return this._current;
+  }
+}
+
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
 export class MeasureExactAggregator implements Aggregator {
   private _distribution: Distribution;

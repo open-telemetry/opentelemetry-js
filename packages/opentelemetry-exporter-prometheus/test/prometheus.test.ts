@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { CounterMetric, Meter, MeterProvider } from '@opentelemetry/metrics';
+import { ObserverResult } from '@opentelemetry/api';
+import {
+  CounterMetric,
+  Meter,
+  MeterProvider,
+  ObserverMetric,
+} from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
@@ -206,6 +212,61 @@ describe('PrometheusExporter', () => {
                   'counter{key1="labelValue1"} 20',
                   '',
                 ]);
+
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+
+    it('should export an observer aggregation', done => {
+      function getCpuUsage() {
+        return Math.random();
+      }
+
+      const observer = meter.createObserver('metric_observer', {
+        description: 'a test description',
+        labelKeys: ['pid'],
+      }) as ObserverMetric;
+
+      observer.setCallback((observerResult: ObserverResult) => {
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: String(123), core: '1' })
+        );
+      });
+
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
+        // This is to test the special case where counters are destroyed
+        // and recreated in the exporter in order to get around prom-client's
+        // aggregation and use ours.
+        exporter.export(meter.getBatcher().checkPointSet(), () => {
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.strictEqual(
+                  lines[0],
+                  '# HELP metric_observer a test description'
+                );
+
+                assert.strictEqual(
+                  lines[0],
+                  '# HELP metric_observer a test description'
+                );
+                assert.strictEqual(lines[1], '# TYPE metric_observer gauge');
+
+                const line3 = lines[2].split(' ');
+                assert.strictEqual(line3[0], 'metric_observer{pid="123"}');
+                assert.ok(
+                  parseFloat(line3[1]) >= 0 && parseFloat(line3[1]) <= 1
+                );
+                assert.ok(parseInt(line3[2], 10) <= new Date().getTime());
 
                 done();
               });

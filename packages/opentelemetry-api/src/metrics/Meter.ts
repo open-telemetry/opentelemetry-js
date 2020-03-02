@@ -15,7 +15,7 @@
  */
 
 import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
-import { BoundCounter, BoundMeasure } from './BoundInstrument';
+import { BoundCounter, BoundMeasure, BoundObserver } from './BoundInstrument';
 
 /**
  * An interface to allow the recording metrics.
@@ -40,6 +40,13 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Metric<BoundCounter>;
+
+  /**
+   * Creates a new `observer` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createObserver(name: string, options?: MetricOptions): Metric<BoundObserver>;
 
   /**
    * Provide a pre-computed re-useable LabelSet by

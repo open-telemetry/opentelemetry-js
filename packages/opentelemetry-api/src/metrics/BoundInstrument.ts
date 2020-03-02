@@ -16,6 +16,7 @@
 
 import { DistributedContext } from '../distributed_context/DistributedContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
@@ -42,4 +43,13 @@ export interface BoundMeasure {
     distContext: DistributedContext,
     spanContext: SpanContext
   ): void;
+}
+
+/** An Instrument for Observer Metric. */
+export interface BoundObserver {
+  /**
+   * Sets callback for observer
+   * @param callback
+   */
+  setCallback(callback: (observerResult: ObserverResult) => {}): void;
 }

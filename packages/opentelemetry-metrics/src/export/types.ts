@@ -21,8 +21,8 @@ import { LabelSet } from '../LabelSet';
 /** The kind of metric. */
 export enum MetricKind {
   COUNTER,
-  GAUGE,
   MEASURE,
+  OBSERVER,
 }
 
 /** Sum returns an aggregated sum. */

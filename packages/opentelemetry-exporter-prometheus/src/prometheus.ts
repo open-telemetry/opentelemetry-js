@@ -29,7 +29,10 @@ import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 import { LabelSet } from '@opentelemetry/metrics/build/src/LabelSet';
-import { CounterSumAggregator } from '@opentelemetry/metrics/build/src/export/Aggregator';
+import {
+  CounterSumAggregator,
+  ObserverAggregator,
+} from '@opentelemetry/metrics/build/src/export/Aggregator';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -139,6 +142,12 @@ export class PrometheusExporter implements MetricExporter {
           this._getLabelValues(labelKeys, record.labels),
           value as Sum
         );
+      } else if (record.aggregator instanceof ObserverAggregator) {
+        metric.set(
+          this._getLabelValues(labelKeys, record.labels),
+          value as Sum,
+          new Date()
+        );
       }
     }
 
@@ -192,7 +201,7 @@ export class PrometheusExporter implements MetricExporter {
         return record.descriptor.monotonic
           ? new Counter(metricObject)
           : new Gauge(metricObject);
-      case MetricKind.GAUGE:
+      case MetricKind.OBSERVER:
         return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented
