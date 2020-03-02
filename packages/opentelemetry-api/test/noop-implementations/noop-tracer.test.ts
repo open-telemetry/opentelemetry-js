@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind, TraceFlags } from '../../src';
+import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
 import { Context } from '@opentelemetry/scope-base';
 
 describe('NoopTracer', () => {
