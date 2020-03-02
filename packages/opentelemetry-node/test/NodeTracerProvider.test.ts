@@ -17,7 +17,6 @@
 import * as assert from 'assert';
 import {
   ALWAYS_SAMPLER,
-  BinaryTraceContext,
   HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
@@ -54,13 +53,6 @@ describe('NodeTracerProvider', () => {
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
       provider = new NodeTracerProvider();
-      assert.ok(provider instanceof NodeTracerProvider);
-    });
-
-    it('should construct an instance with binary format', () => {
-      provider = new NodeTracerProvider({
-        binaryFormat: new BinaryTraceContext(),
-      });
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
@@ -259,16 +251,6 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = provider.getTracer('default').bind(fn, span);
       return patchedFn();
-    });
-  });
-
-  describe('.getBinaryFormat()', () => {
-    it('should get default binary formatter', () => {
-      provider = new NodeTracerProvider({});
-      assert.ok(
-        provider.getTracer('default').getBinaryFormat() instanceof
-          BinaryTraceContext
-      );
     });
   });
 

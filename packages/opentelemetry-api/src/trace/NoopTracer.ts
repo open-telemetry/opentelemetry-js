@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { BinaryFormat, HttpTextFormat, Span, SpanOptions, Tracer } from '..';
-import { NOOP_BINARY_FORMAT } from '../context/propagation/NoopBinaryFormat';
+import { HttpTextFormat, Span, SpanOptions, Tracer } from '..';
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
 import { NOOP_SPAN } from './NoopSpan';
 
@@ -41,11 +40,6 @@ export class NoopTracer implements Tracer {
 
   bind<T>(target: T, span?: Span): T {
     return target;
-  }
-
-  // By default does nothing
-  getBinaryFormat(): BinaryFormat {
-    return NOOP_BINARY_FORMAT;
   }
 
   // By default does nothing

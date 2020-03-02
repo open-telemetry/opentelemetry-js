@@ -29,7 +29,6 @@ describe('API', () => {
     'getCurrentSpan',
     'startSpan',
     'withSpan',
-    'getBinaryFormat',
     'getHttpTextFormat',
   ];
 
