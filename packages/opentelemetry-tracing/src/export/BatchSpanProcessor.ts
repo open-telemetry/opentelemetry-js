@@ -66,7 +66,6 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return;
     }
-    if (span.context().traceFlags !== TraceFlags.SAMPLED) return;
     this._addToBuffer(span.toReadableSpan());
   }
 

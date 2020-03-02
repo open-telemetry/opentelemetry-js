@@ -1,3 +1,4 @@
+
 /*!
  * Copyright 2019, OpenTelemetry Authors
  *
@@ -39,7 +40,6 @@ export class SimpleSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return;
     }
-    if (span.context().traceFlags !== TraceFlags.SAMPLED) return;
     this._exporter.export([span.toReadableSpan()], () => {});
   }
 
