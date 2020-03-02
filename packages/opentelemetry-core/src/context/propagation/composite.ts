@@ -46,7 +46,7 @@ export class CompositePropagator implements HttpTextFormat {
       try {
         propagator.inject(context, carrier);
       } catch (err) {
-        this._logger.error(
+        this._logger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
         );
       }
@@ -67,7 +67,7 @@ export class CompositePropagator implements HttpTextFormat {
       try {
         return propagator.extract(ctx, carrier);
       } catch (err) {
-        this._logger.error(
+        this._logger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
         );
       }
