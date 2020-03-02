@@ -16,18 +16,14 @@
 
 import {
   CanonicalCode,
-  Context,
+  context,
+  propagation,
   Span,
   SpanKind,
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
-import {
-  BasePlugin,
-  getExtractedSpanContext,
-  isValid,
-  setActiveSpan,
-} from '@opentelemetry/core';
+import { BasePlugin } from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -175,87 +171,83 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 
   /**
-   * Injects span's context to header for distributed tracing and finishes the
-   * span when the response is finished.
+   * Attach event listeners to a client request to end span and add span attributes.
+   *
    * @param request The original request object.
    * @param options The arguments to the original function.
    * @param span representing the current operation
    */
-  private _getMakeRequestTraceFunction(
+  private _traceClientRequest(
     request: ClientRequest,
     options: ParsedRequestOptions,
     span: Span
-  ): Func<ClientRequest> {
-    return (): ClientRequest => {
-      this._logger.debug('makeRequestTrace by injecting context into header');
+  ): ClientRequest {
+    const hostname =
+      options.hostname ||
+      options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+      'localhost';
+    const attributes = utils.getOutgoingRequestAttributes(options, {
+      component: this.component,
+      hostname,
+    });
+    span.setAttributes(attributes);
 
-      const hostname =
-        options.hostname ||
-        options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
-        'localhost';
-      const attributes = utils.getOutgoingRequestAttributes(options, {
-        component: this.component,
-        hostname,
-      });
-      span.setAttributes(attributes);
+    request.on(
+      'response',
+      (response: IncomingMessage & { aborted?: boolean }) => {
+        const attributes = utils.getOutgoingRequestAttributesOnResponse(
+          response,
+          { hostname }
+        );
+        span.setAttributes(attributes);
 
-      request.on(
-        'response',
-        (response: IncomingMessage & { aborted?: boolean }) => {
-          const attributes = utils.getOutgoingRequestAttributesOnResponse(
-            response,
-            { hostname }
-          );
-          span.setAttributes(attributes);
+        this._tracer.bind(response);
+        this._logger.debug('outgoingRequest on response()');
+        response.on('end', () => {
+          this._logger.debug('outgoingRequest on end()');
+          let status: Status;
 
-          this._tracer.bind(response);
-          this._logger.debug('outgoingRequest on response()');
-          response.on('end', () => {
-            this._logger.debug('outgoingRequest on end()');
-            let status: Status;
+          if (response.aborted && !response.complete) {
+            status = { code: CanonicalCode.ABORTED };
+          } else {
+            status = utils.parseResponseStatus(response.statusCode!);
+          }
 
-            if (response.aborted && !response.complete) {
-              status = { code: CanonicalCode.ABORTED };
-            } else {
-              status = utils.parseResponseStatus(response.statusCode!);
-            }
+          span.setStatus(status);
 
-            span.setStatus(status);
+          if (this._config.applyCustomAttributesOnSpan) {
+            this._safeExecute(
+              span,
+              () =>
+                this._config.applyCustomAttributesOnSpan!(
+                  span,
+                  request,
+                  response
+                ),
+              false
+            );
+          }
 
-            if (this._config.applyCustomAttributesOnSpan) {
-              this._safeExecute(
-                span,
-                () =>
-                  this._config.applyCustomAttributesOnSpan!(
-                    span,
-                    request,
-                    response
-                  ),
-                false
-              );
-            }
-
-            this._closeHttpSpan(span);
-          });
-          response.on('error', (error: Err) => {
-            utils.setSpanWithError(span, error, response);
-            this._closeHttpSpan(span);
-          });
-        }
-      );
-      request.on('close', () => {
-        if (!request.aborted) {
           this._closeHttpSpan(span);
-        }
-      });
-      request.on('error', (error: Err) => {
-        utils.setSpanWithError(span, error, request);
+        });
+        response.on('error', (error: Err) => {
+          utils.setSpanWithError(span, error, response);
+          this._closeHttpSpan(span);
+        });
+      }
+    );
+    request.on('close', () => {
+      if (!request.aborted) {
         this._closeHttpSpan(span);
-      });
+      }
+    });
+    request.on('error', (error: Err) => {
+      utils.setSpanWithError(span, error, request);
+      this._closeHttpSpan(span);
+    });
 
-      this._logger.debug('makeRequestTrace return request');
-      return request;
-    };
+    this._logger.debug('_traceClientRequest return request');
+    return request;
   }
 
   private _incomingRequestFunction(
@@ -292,7 +284,6 @@ export class HttpPlugin extends BasePlugin<Http> {
         return original.apply(this, [event, ...args]);
       }
 
-      const propagation = plugin._tracer.getHttpTextFormat();
       const headers = request.headers;
 
       const spanOptions: SpanOptions = {
@@ -303,69 +294,65 @@ export class HttpPlugin extends BasePlugin<Http> {
         }),
       };
 
-      // Using context directly like this is temporary. In a future PR, context
-      // will be managed by the scope manager (which may be renamed to context manager?)
-      const spanContext = getExtractedSpanContext(
-        propagation.extract(Context.TODO, headers)
-      );
-      if (spanContext && isValid(spanContext)) {
-        spanOptions.parent = spanContext;
-      }
+      return context.with(propagation.extract(headers), () => {
+        const span = plugin._startHttpSpan(
+          `${method} ${pathname}`,
+          spanOptions
+        );
 
-      const span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
+        return plugin._tracer.withSpan(span, () => {
+          context.bind(request);
+          context.bind(response);
 
-      return plugin._tracer.withSpan(span, () => {
-        plugin._tracer.bind(request);
-        plugin._tracer.bind(response);
+          // Wraps end (inspired by:
+          // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
+          const originalEnd = response.end;
+          response.end = function(
+            this: ServerResponse,
+            ...args: ResponseEndArgs
+          ) {
+            response.end = originalEnd;
+            // Cannot pass args of type ResponseEndArgs,
+            // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
+            const returned = plugin._safeExecute(
+              span,
+              // tslint:disable-next-line:no-any
+              () => response.end.apply(this, arguments as any),
+              true
+            );
 
-        // Wraps end (inspired by:
-        // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
-        const originalEnd = response.end;
-        response.end = function(
-          this: ServerResponse,
-          ...args: ResponseEndArgs
-        ) {
-          response.end = originalEnd;
-          // Cannot pass args of type ResponseEndArgs,
-          // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
-          const returned = plugin._safeExecute(
+            const attributes = utils.getIncomingRequestAttributesOnResponse(
+              request,
+              response
+            );
+
+            span
+              .setAttributes(attributes)
+              .setStatus(utils.parseResponseStatus(response.statusCode));
+
+            if (plugin._config.applyCustomAttributesOnSpan) {
+              plugin._safeExecute(
+                span,
+                () =>
+                  plugin._config.applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
+                false
+              );
+            }
+
+            plugin._closeHttpSpan(span);
+            return returned;
+          };
+
+          return plugin._safeExecute(
             span,
-            // tslint:disable-next-line:no-any
-            () => response.end.apply(this, arguments as any),
+            () => original.apply(this, [event, ...args]),
             true
           );
-
-          const attributes = utils.getIncomingRequestAttributesOnResponse(
-            request,
-            response
-          );
-
-          span
-            .setAttributes(attributes)
-            .setStatus(utils.parseResponseStatus(response.statusCode));
-
-          if (plugin._config.applyCustomAttributesOnSpan) {
-            plugin._safeExecute(
-              span,
-              () =>
-                plugin._config.applyCustomAttributesOnSpan!(
-                  span,
-                  request,
-                  response
-                ),
-              false
-            );
-          }
-
-          plugin._closeHttpSpan(span);
-          return returned;
-        };
-
-        return plugin._safeExecute(
-          span,
-          () => original.apply(this, [event, ...args]),
-          true
-        );
+        });
       });
     };
   }
@@ -393,10 +380,8 @@ export class HttpPlugin extends BasePlugin<Http> {
         extraOptions
       );
 
-      options = optionsParsed;
-
       if (
-        utils.isOpenTelemetryRequest(options) ||
+        utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,
@@ -404,48 +389,30 @@ export class HttpPlugin extends BasePlugin<Http> {
             plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
-        return original.apply(this, [options, ...args]);
+        return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const currentSpan = plugin._tracer.getCurrentSpan();
       const operationName = `${method} ${pathname}`;
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
-        parent: currentSpan ? currentSpan : undefined,
       };
 
       const span = plugin._startHttpSpan(operationName, spanOptions);
 
-      if (!options.headers) options.headers = {};
-      plugin._tracer
-        .getHttpTextFormat()
-        // Using context directly like this is temporary. In a future PR, context
-        // will be managed by the scope manager (which may be renamed to context manager?)
-        .inject(setActiveSpan(Context.TODO, span), options.headers);
+      return plugin._tracer.withSpan(span, () => {
+        if (!optionsParsed.headers) optionsParsed.headers = {};
+        propagation.inject(optionsParsed.headers);
 
-      const request: ClientRequest = plugin._safeExecute(
-        span,
-        () => original.apply(this, [options, ...args]),
-        true
-      );
-
-      plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-      plugin._tracer.bind(request);
-
-      // Checks if this outgoing request is part of an operation by checking
-      // if there is a current span, if so, we create a child span. In
-      // case there is no active span, this means that the outgoing request is
-      // the first operation, therefore we create a span and call withSpan method.
-      if (!currentSpan) {
-        plugin._logger.debug('outgoingRequest starting a span without context');
-        return plugin._tracer.withSpan(
+        const request: ClientRequest = plugin._safeExecute(
           span,
-          plugin._getMakeRequestTraceFunction(request, options, span)
+          () => original.apply(this, [optionsParsed, ...args]),
+          true
         );
-      } else {
-        plugin._logger.debug('outgoingRequest starting a child span');
-        return plugin._getMakeRequestTraceFunction(request, options, span)();
-      }
+
+        plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+        plugin._tracer.bind(request);
+        return plugin._traceClientRequest(request, optionsParsed, span);
+      });
     };
   }
 

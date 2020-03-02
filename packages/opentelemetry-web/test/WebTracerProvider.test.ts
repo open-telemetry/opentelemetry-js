@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
+import { context } from '@opentelemetry/api';
 import { BasePlugin } from '@opentelemetry/core';
+import { ScopeManager } from '@opentelemetry/scope-base';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
-import { Tracer, TracerConfig } from '@opentelemetry/tracing';
+import { Tracer } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
-import { StackScopeManager } from '../src/StackScopeManager';
 import { WebTracerProvider } from '../src/WebTracerProvider';
 
 class DummyPlugin extends BasePlugin<unknown> {
@@ -36,11 +37,16 @@ class DummyPlugin extends BasePlugin<unknown> {
 describe('WebTracerProvider', () => {
   describe('constructor', () => {
     let defaultOptions: WebTracerConfig;
+    let scopeManager: ScopeManager;
 
     beforeEach(() => {
-      defaultOptions = {
-        scopeManager: new StackScopeManager(),
-      };
+      defaultOptions = {};
+      scopeManager = new ZoneScopeManager().enable();
+      context.initGlobalContextManager(scopeManager);
+    });
+
+    afterEach(() => {
+      scopeManager.disable();
     });
 
     it('should construct an instance with required only options', () => {
@@ -50,17 +56,6 @@ describe('WebTracerProvider', () => {
       assert.ok(tracer instanceof Tracer);
     });
 
-    it('should enable the scope manager', () => {
-      let options: TracerConfig;
-      const scopeManager = new StackScopeManager();
-      options = { scopeManager };
-
-      const spy = sinon.spy(scopeManager, 'enable');
-      new WebTracerProvider(options);
-
-      assert.ok(spy.calledOnce === true);
-    });
-
     it('should enable all plugins', () => {
       let options: WebTracerConfig;
       const dummyPlugin1 = new DummyPlugin();
@@ -68,11 +63,9 @@ describe('WebTracerProvider', () => {
       const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
       const spyEnable2 = sinon.spy(dummyPlugin2, 'enable');
 
-      const scopeManager = new StackScopeManager();
-
       const plugins = [dummyPlugin1, dummyPlugin2];
 
-      options = { plugins, scopeManager };
+      options = { plugins };
       new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);
@@ -87,9 +80,7 @@ describe('WebTracerProvider', () => {
 
     describe('when scopeManager is "ZoneScopeManager"', () => {
       it('should correctly return the scopes for 2 parallel actions', () => {
-        const webTracerWithZone = new WebTracerProvider({
-          scopeManager: new ZoneScopeManager(),
-        }).getTracer('default');
+        const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
 

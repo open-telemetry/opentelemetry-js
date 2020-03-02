@@ -18,19 +18,32 @@
  * Can't use Sinon Fake Time here as then cannot stub the performance getEntriesByType with desired metrics
  */
 
-import { ConsoleLogger, TRACE_PARENT_HEADER } from '@opentelemetry/core';
+import {
+  context,
+  Logger,
+  PluginConfig,
+  propagation,
+  TimedEvent,
+} from '@opentelemetry/api';
+import {
+  ConsoleLogger,
+  HttpTraceContext,
+  TRACE_PARENT_HEADER,
+} from '@opentelemetry/core';
 import {
   BasicTracerProvider,
   ReadableSpan,
   SimpleSpanProcessor,
   SpanExporter,
 } from '@opentelemetry/tracing';
-import { Logger, PluginConfig, TimedEvent } from '@opentelemetry/api';
+import {
+  PerformanceTimingNames as PTN,
+  StackScopeManager,
+} from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ExportResult } from '../../opentelemetry-base/build/src';
 import { DocumentLoad } from '../src';
-import { PerformanceTimingNames as PTN } from '@opentelemetry/web';
 
 export class DummyExporter implements SpanExporter {
   export(
@@ -196,8 +209,11 @@ describe('DocumentLoad Plugin', () => {
   let config: PluginConfig;
   let spanProcessor: SimpleSpanProcessor;
   let dummyExporter: DummyExporter;
+  let scopeManager: StackScopeManager;
 
   beforeEach(() => {
+    scopeManager = new StackScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
     Object.defineProperty(window.document, 'readyState', {
       writable: true,
       value: 'complete',
@@ -213,10 +229,15 @@ describe('DocumentLoad Plugin', () => {
   });
 
   afterEach(() => {
+    scopeManager.disable();
     Object.defineProperty(window.document, 'readyState', {
       writable: true,
       value: 'complete',
     });
+  });
+
+  before(() => {
+    propagation.initGlobalPropagator(new HttpTraceContext());
   });
 
   describe('constructor', () => {

@@ -44,12 +44,10 @@ export const customAttributeFunction = (span: Span): void => {
 
 describe('Packages', () => {
   describe('get', () => {
-    const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
 
     const provider = new NodeTracerProvider({
       logger,
-      httpTextFormat,
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
