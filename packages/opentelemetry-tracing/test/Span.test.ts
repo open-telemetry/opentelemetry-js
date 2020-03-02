@@ -275,11 +275,11 @@ describe('Span', () => {
     assert.strictEqual(readableSpan.links.length, 2);
     assert.deepStrictEqual(readableSpan.links, [
       {
-        linkContext,
+        context: linkContext,
       },
       {
         attributes: { attr1: 'value', attr2: 123, attr3: true },
-        linkContext,
+        context: linkContext,
       },
     ]);
 
