@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
 import { SpanKind } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as http from 'http';
-import * as nock from 'nock';
-import { plugin } from '../../src/http';
-import { assertSpan } from '../utils/assertSpan';
-import { DummyPropagation } from '../utils/DummyPropagation';
-import * as url from 'url';
-import axios, { AxiosResponse } from 'axios';
-import * as superagent from 'superagent';
-import * as got from 'got';
-import * as request from 'request-promise-native';
-import * as path from 'path';
+import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-
+import * as assert from 'assert';
+import axios, { AxiosResponse } from 'axios';
+import * as got from 'got';
+import * as http from 'http';
+import * as nock from 'nock';
+import * as path from 'path';
+import * as request from 'request-promise-native';
+import * as superagent from 'superagent';
+import * as url from 'url';
+import { plugin } from '../../src/http';
 import { HttpPluginConfig } from '../../src/types';
+import { assertSpan } from '../utils/assertSpan';
+import { DummyPropagation } from '../utils/DummyPropagation';
 import { customAttributeFunction } from './http-enable.test';
 
 const memoryExporter = new InMemorySpanExporter();
@@ -42,12 +41,9 @@ const protocol = 'http';
 
 describe('Packages', () => {
   describe('get', () => {
-    const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
-
     const provider = new NodeTracerProvider({
       logger,
-      httpTextFormat,
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {

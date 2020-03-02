@@ -15,23 +15,31 @@
  */
 
 import {
+  CanonicalCode,
+  Span as ISpan,
+  SpanKind,
+  propagation,
+  context,
+} from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
+import { NodeTracerProvider } from '@opentelemetry/node';
+import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { NoopLogger } from '@opentelemetry/core';
-import { NodeTracerProvider } from '@opentelemetry/node';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
-import * as path from 'path';
 import * as nock from 'nock';
+import * as path from 'path';
+import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin, plugin } from '../../src/http';
+import { Http, HttpPluginConfig } from '../../src/types';
+import { OT_REQUEST_HEADER } from '../../src/utils';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { OT_REQUEST_HEADER } from '../../src/utils';
-import { HttpPluginConfig, Http } from '../../src/types';
-import { AttributeNames } from '../../src/enums/AttributeNames';
+import { ScopeManager } from '@opentelemetry/scope-base';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -43,13 +51,12 @@ const hostname = 'localhost';
 const pathname = '/test';
 const serverName = 'my.server.name';
 const memoryExporter = new InMemorySpanExporter();
-const httpTextFormat = new DummyPropagation();
 const logger = new NoopLogger();
 const provider = new NodeTracerProvider({
   logger,
-  httpTextFormat,
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+propagation.initGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -70,6 +77,17 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpPlugin', () => {
+  let scopeManger: ScopeManager;
+
+  beforeEach(() => {
+    scopeManger = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManger);
+  });
+
+  afterEach(() => {
+    scopeManger.disable();
+  });
+
   it('should return a plugin', () => {
     assert.ok(plugin instanceof HttpPlugin);
   });

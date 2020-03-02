@@ -120,7 +120,6 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
             ? operationName
             : commandType;
         const span = plugin._tracer.startSpan(`mongodb.${type}`, {
-          parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
         plugin._populateAttributes(
@@ -215,7 +214,6 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
           return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(`mongodb.query`, {
-          parent: currentSpan,
           kind: SpanKind.CLIENT,
         });
         plugin._populateAttributes(span, this.ns, this.cmd, this.topology);

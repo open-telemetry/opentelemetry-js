@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   ConsoleLogger,
   getActiveSpan,
+  getParentSpanContext,
   isValid,
   NoRecordingSpan,
   randomSpanId,
   randomTraceId,
   setActiveSpan,
 } from '@opentelemetry/core';
-import { ScopeManager } from '@opentelemetry/scope-base';
 import { BasicTracerProvider } from './BasicTracerProvider';
 import { DEFAULT_CONFIG } from './config';
 import { Span } from './Span';
@@ -34,13 +34,11 @@ import { mergeConfig } from './utility';
 /**
  * This class represents a basic tracer.
  */
-export class Tracer implements types.Tracer {
-  private readonly _defaultAttributes: types.Attributes;
-  private readonly _httpTextFormat: types.HttpTextFormat;
-  private readonly _sampler: types.Sampler;
-  private readonly _scopeManager: ScopeManager;
+export class Tracer implements api.Tracer {
+  private readonly _defaultAttributes: api.Attributes;
+  private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
-  readonly logger: types.Logger;
+  readonly logger: api.Logger;
 
   /**
    * Constructs a new Tracer instance.
@@ -51,9 +49,7 @@ export class Tracer implements types.Tracer {
   ) {
     const localConfig = mergeConfig(config);
     this._defaultAttributes = localConfig.defaultAttributes;
-    this._httpTextFormat = localConfig.httpTextFormat;
     this._sampler = localConfig.sampler;
-    this._scopeManager = localConfig.scopeManager;
     this._traceParams = localConfig.traceParams;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
@@ -62,8 +58,14 @@ export class Tracer implements types.Tracer {
    * Starts a new Span or returns the default NoopSpan based on the sampling
    * decision.
    */
-  startSpan(name: string, options: types.SpanOptions = {}): types.Span {
-    const parentContext = this._getParentSpanContext(options.parent);
+  startSpan(
+    name: string,
+    options: api.SpanOptions = {},
+    context = api.context.active()
+  ): api.Span {
+    const parentContext = options.parent
+      ? getContext(options.parent)
+      : getParentSpanContext(context);
     // make sampling decision
     const samplingDecision = this._sampler.shouldSample(parentContext);
     const spanId = randomSpanId();
@@ -78,8 +80,8 @@ export class Tracer implements types.Tracer {
       traceState = parentContext.traceState;
     }
     const traceFlags = samplingDecision
-      ? types.TraceFlags.SAMPLED
-      : types.TraceFlags.UNSAMPLED;
+      ? api.TraceFlags.SAMPLED
+      : api.TraceFlags.UNSAMPLED;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {
@@ -91,7 +93,7 @@ export class Tracer implements types.Tracer {
       this,
       name,
       spanContext,
-      options.kind || types.SpanKind.INTERNAL,
+      options.kind || api.SpanKind.INTERNAL,
       parentContext ? parentContext.spanId : undefined,
       options.links || [],
       options.startTime
@@ -108,42 +110,31 @@ export class Tracer implements types.Tracer {
    *
    * If there is no Span associated with the current context, undefined is returned.
    */
-  getCurrentSpan(): types.Span | undefined {
+  getCurrentSpan(): api.Span | undefined {
+    const ctx = api.context.active();
     // Get the current Span from the context or null if none found.
-    return getActiveSpan(this._scopeManager.active());
+    return getActiveSpan(ctx);
   }
 
   /**
    * Enters the scope of code where the given Span is in the current context.
    */
   withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
-    span: types.Span,
+    span: api.Span,
     fn: T
   ): ReturnType<T> {
     // Set given span to context.
-    return this._scopeManager.with(
-      setActiveSpan(this._scopeManager.active(), span),
-      fn
-    );
+    return api.context.with(setActiveSpan(api.context.active(), span), fn);
   }
 
   /**
    * Bind a span (or the current one) to the target's scope
    */
-  bind<T>(target: T, span?: types.Span): T {
-    return this._scopeManager.bind(
+  bind<T>(target: T, span?: api.Span): T {
+    return api.context.bind(
       target,
-      span
-        ? setActiveSpan(this._scopeManager.active(), span)
-        : this._scopeManager.active()
+      span ? setActiveSpan(api.context.active(), span) : api.context.active()
     );
-  }
-
-  /**
-   * Returns the HTTP text format interface which can inject/extract Spans.
-   */
-  getHttpTextFormat(): types.HttpTextFormat {
-    return this._httpTextFormat;
   }
 
   /** Returns the active {@link TraceParams}. */
@@ -154,20 +145,12 @@ export class Tracer implements types.Tracer {
   getActiveSpanProcessor() {
     return this._tracerProvider.getActiveSpanProcessor();
   }
+}
 
-  private _getParentSpanContext(
-    parent?: types.Span | types.SpanContext | null
-  ): types.SpanContext | undefined {
-    if (!parent) return undefined;
+function getContext(span: api.Span | api.SpanContext) {
+  return isSpan(span) ? span.context() : span;
+}
 
-    // parent is a SpanContext
-    if ((parent as types.SpanContext).traceId) {
-      return parent as types.SpanContext;
-    }
-
-    if (typeof (parent as types.Span).context === 'function') {
-      return (parent as Span).context();
-    }
-    return undefined;
-  }
+function isSpan(span: api.Span | api.SpanContext): span is api.Span {
+  return typeof (span as api.Span).context === 'function';
 }
