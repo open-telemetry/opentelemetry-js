@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from '@opentelemetry/api';
+import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
-import { Span } from '../Span';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}

@@ -34,10 +34,8 @@ const endSpan = (span: Span, err: NodeJS.ErrnoException | null | undefined) => {
 
 export const traceConnection = (tracer: Tracer, original: Function) => {
   return function(this: ioredisTypes.Redis & IORedisPluginClientTypes) {
-    const parentSpan = tracer.getCurrentSpan();
     const span = tracer.startSpan('connect', {
       kind: SpanKind.CLIENT,
-      parent: parentSpan,
       attributes: {
         [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
         [AttributeNames.DB_TYPE]: IORedisPlugin.DB_TYPE,
@@ -67,12 +65,9 @@ export const traceSendCommand = (tracer: Tracer, original: Function) => {
     this: ioredisTypes.Redis & IORedisPluginClientTypes,
     cmd?: IORedisCommand
   ) {
-    const parentSpan = tracer.getCurrentSpan();
-
     if (arguments.length >= 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(cmd.name, {
         kind: SpanKind.CLIENT,
-        parent: parentSpan,
         attributes: {
           [AttributeNames.COMPONENT]: IORedisPlugin.COMPONENT,
           [AttributeNames.DB_TYPE]: IORedisPlugin.DB_TYPE,

@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
 import {
   CanonicalCode,
+  context,
+  propagation,
   Span,
-  SpanContext,
   SpanKind,
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
+import { BasePlugin } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';
@@ -122,24 +123,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
   }
 
-  private _getSpanContext(metadata: grpcTypes.Metadata): SpanContext | null {
-    const metadataValue = metadata.getMap()[GRPC_TRACE_KEY] as Buffer;
-    // Entry doesn't exist
-    if (!metadataValue) {
-      return null;
+  private _setSpanContext(metadata: grpcTypes.Metadata): void {
+    const carrier = {};
+    propagation.inject(carrier);
+    for (const [k, v] of Object.entries(carrier)) {
+      metadata.set(k, v as string);
     }
-    return this._tracer.getBinaryFormat().fromBytes(metadataValue);
-  }
-
-  private _setSpanContext(
-    metadata: grpcTypes.Metadata,
-    spanContext: SpanContext
-  ): void {
-    const serializedSpanContext = this._tracer
-      .getBinaryFormat()
-      .toBytes(spanContext);
-    const buffer = Buffer.from(serializedSpanContext);
-    metadata.set(GRPC_TRACE_KEY, buffer);
   }
 
   private _patchServer() {
@@ -174,7 +163,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               const spanName = `grpc.${name.replace('/', '')}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
-                parent: plugin._getSpanContext(call.metadata),
               };
 
               plugin._logger.debug(
@@ -182,37 +170,39 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                 JSON.stringify(spanOptions)
               );
 
-              const span = plugin._tracer
-                .startSpan(spanName, spanOptions)
-                .setAttributes({
-                  [AttributeNames.GRPC_KIND]: spanOptions.kind,
-                  [AttributeNames.COMPONENT]: GrpcPlugin.component,
-                });
+              context.with(propagation.extract(call.metadata.getMap()), () => {
+                const span = plugin._tracer
+                  .startSpan(spanName, spanOptions)
+                  .setAttributes({
+                    [AttributeNames.GRPC_KIND]: spanOptions.kind,
+                    [AttributeNames.COMPONENT]: GrpcPlugin.component,
+                  });
 
-              plugin._tracer.withSpan(span, () => {
-                switch (type) {
-                  case 'unary':
-                  case 'client_stream':
-                    return plugin._clientStreamAndUnaryHandler(
-                      plugin,
-                      span,
-                      call,
-                      callback,
-                      originalFunc,
-                      self
-                    );
-                  case 'server_stream':
-                  case 'bidi':
-                    return plugin._serverStreamAndBidiHandler(
-                      plugin,
-                      span,
-                      call,
-                      originalFunc,
-                      self
-                    );
-                  default:
-                    break;
-                }
+                plugin._tracer.withSpan(span, () => {
+                  switch (type) {
+                    case 'unary':
+                    case 'client_stream':
+                      return plugin._clientStreamAndUnaryHandler(
+                        plugin,
+                        span,
+                        call,
+                        callback,
+                        originalFunc,
+                        self
+                      );
+                    case 'server_stream':
+                    case 'bidi':
+                      return plugin._serverStreamAndBidiHandler(
+                        plugin,
+                        span,
+                        call,
+                        originalFunc,
+                        self
+                      );
+                    default:
+                      break;
+                  }
+                });
               });
             };
           }
@@ -365,15 +355,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const span = plugin._tracer
           .startSpan(name, {
             kind: SpanKind.CLIENT,
-            parent: plugin._tracer.getCurrentSpan(),
           })
           .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
-        return plugin._makeGrpcClientRemoteCall(
-          original,
-          args,
-          this,
-          plugin
-        )(span);
+        return plugin._tracer.withSpan(span, () =>
+          plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(span)
+        );
       };
     };
   }
@@ -451,7 +437,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
       });
 
-      this._setSpanContext(metadata, span.context());
+      this._setSpanContext(metadata);
       const call = original.apply(self, args);
 
       // if server stream or bidi

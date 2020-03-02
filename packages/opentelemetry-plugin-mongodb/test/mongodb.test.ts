@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
+import { CanonicalCode, context, SpanKind } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import {
+  InMemorySpanExporter,
+  ReadableSpan,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as mongodb from 'mongodb';
 import { plugin } from '../src';
-import { SpanKind, CanonicalCode } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
 import { AttributeNames } from '../src/types';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-  ReadableSpan,
-} from '@opentelemetry/tracing';
 
 interface MongoDBAccess {
   client: mongodb.MongoClient;
@@ -102,6 +103,7 @@ describe('MongoDBPlugin', () => {
   const DB_NAME = process.env.MONGODB_DB || 'opentelemetry-tests';
   const COLLECTION_NAME = 'test';
 
+  let scopeManager: AsyncHooksScopeManager;
   let client: mongodb.MongoClient;
   let collection: mongodb.Collection;
   const logger = new NoopLogger();
@@ -140,10 +142,13 @@ describe('MongoDBPlugin', () => {
     collection.insertMany(insertData, (err, result) => {
       done();
     });
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
   });
 
   afterEach(done => {
     collection.deleteOne({}, done);
+    scopeManager.disable();
   });
 
   after(() => {

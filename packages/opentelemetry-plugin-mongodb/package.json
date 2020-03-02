@@ -10,11 +10,11 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
-    "check": "gts check",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "fix": "gts fix",
     "prepare": "npm run compile"
   },
   "keywords": [
@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@opentelemetry/node": "^0.4.0",
+    "@opentelemetry/scope-async-hooks": "^0.4.0",
     "@opentelemetry/tracing": "^0.4.0",
     "@types/mocha": "^5.2.7",
     "@types/mongodb": "^3.2.3",
