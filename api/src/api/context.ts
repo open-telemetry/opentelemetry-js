@@ -57,12 +57,12 @@ export class ContextAPI {
   /**
    * Execute a function with an active context
    *
+   * @param context context to be active during function execution
    * @param fn function to execute in a context
-   * @param context context to be active during function execution. Defaults to the currently active context
    */
   public with<T extends (...args: unknown[]) => ReturnType<T>>(
-    fn: T,
-    context: Context = this.active()
+    context: Context,
+    fn: T
   ): ReturnType<T> {
     return this._scopeManager.with(context, fn);
   }
