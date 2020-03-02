@@ -180,8 +180,8 @@ describe('Span', () => {
     };
     const attributes = { attr1: 'value', attr2: 123, attr3: true };
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, '12345', [
-      { linkContext },
-      { linkContext, attributes },
+      { context: linkContext },
+      { context: linkContext, attributes },
     ]);
     span.end();
   });
@@ -264,9 +264,9 @@ describe('Span', () => {
       SpanKind.CLIENT,
       undefined,
       [
-        { linkContext },
+        { context: linkContext },
         {
-          linkContext,
+          context: linkContext,
           attributes: { attr1: 'value', attr2: 123, attr3: true },
         },
       ]

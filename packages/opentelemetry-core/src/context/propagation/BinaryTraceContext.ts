@@ -69,12 +69,16 @@ export class BinaryTraceContext implements BinaryFormat {
       buf[j++] = parseInt(spanId.substr((i - SPAN_ID_OFFSET) * 2, 2), 16);
     }
     buf[j++] = TRACE_OPTION_FIELD_ID;
-    buf[j++] = Number(spanContext.traceFlags) || TraceFlags.UNSAMPLED;
+    buf[j++] = Number(spanContext.traceFlags) || TraceFlags.NONE;
     return buf;
   }
 
   fromBytes(buf: Uint8Array): SpanContext | null {
-    const result: SpanContext = { traceId: '', spanId: '', traceFlags: 0 };
+    const result: SpanContext = {
+      traceId: '',
+      spanId: '',
+      traceFlags: TraceFlags.NONE,
+    };
     // Length must be 29.
     if (buf.length !== FORMAT_LENGTH) return null;
     // Check version and field numbers.

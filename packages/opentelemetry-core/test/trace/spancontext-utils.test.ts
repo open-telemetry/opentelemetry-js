@@ -16,13 +16,14 @@
 
 import * as assert from 'assert';
 import * as context from '../../src/trace/spancontext-utils';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('spancontext-utils', () => {
   it('should return true for valid spancontext', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: 0,
+      traceFlags: TraceFlags.NONE,
     };
     assert.ok(context.isValid(spanContext));
   });
@@ -31,7 +32,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: context.INVALID_TRACEID,
       spanId: '6e0c63257de34c92',
-      traceFlags: 0,
+      traceFlags: TraceFlags.NONE,
     };
     assert.ok(!context.isValid(spanContext));
   });
@@ -40,7 +41,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: context.INVALID_SPANID,
-      traceFlags: 0,
+      traceFlags: TraceFlags.NONE,
     };
     assert.ok(!context.isValid(spanContext));
   });
@@ -49,7 +50,7 @@ describe('spancontext-utils', () => {
     const spanContext = {
       traceId: context.INVALID_TRACEID,
       spanId: context.INVALID_SPANID,
-      traceFlags: 0,
+      traceFlags: TraceFlags.NONE,
     };
     assert.ok(!context.isValid(spanContext));
   });

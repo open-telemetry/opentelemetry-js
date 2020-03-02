@@ -21,7 +21,7 @@ export const INVALID_TRACEID = '0';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
-  traceFlags: TraceFlags.UNSAMPLED,
+  traceFlags: TraceFlags.NONE,
 };
 
 /**

@@ -244,7 +244,7 @@ describe('BasicTracerProvider', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
       assert.deepStrictEqual(context.traceState, undefined);
       span.end();
     });
@@ -255,7 +255,7 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       const span = tracer.startSpan('my-span', { isRecording: true });
       assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), true);
     });
 
@@ -266,7 +266,7 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       const span = tracer.startSpan('my-span', { isRecording: false });
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), false);
     });
 
@@ -277,7 +277,7 @@ describe('BasicTracerProvider', () => {
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), false);
     });
 

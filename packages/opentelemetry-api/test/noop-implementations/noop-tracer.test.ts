@@ -15,12 +15,16 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
+import { NoopTracer, NOOP_SPAN, SpanKind, TraceFlags } from '../../src';
 import { Context } from '@opentelemetry/scope-base';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
-    const spanContext = { traceId: '', spanId: '', traceFlags: 0 };
+    const spanContext = {
+      traceId: '',
+      spanId: '',
+      traceFlags: TraceFlags.NONE,
+    };
     const tracer = new NoopTracer();
 
     assert.deepStrictEqual(tracer.startSpan('span-name'), NOOP_SPAN);

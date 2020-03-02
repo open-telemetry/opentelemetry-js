@@ -140,8 +140,8 @@ export function toCollectorLinkType(
   span: ReadableSpan,
   link: Link
 ): collectorTypes.LinkType {
-  const linkSpanId = link.linkContext.spanId;
-  const linkTraceId = link.linkContext.traceId;
+  const linkSpanId = link.context.spanId;
+  const linkTraceId = link.context.traceId;
   const spanParentId = span.parentSpanId;
   const spanTraceId = span.spanContext.traceId;
 
@@ -158,8 +158,8 @@ export function toCollectorLinkType(
 export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
   const collectorLinks: collectorTypes.Link[] = span.links.map((link: Link) => {
     const collectorLink: collectorTypes.Link = {
-      traceId: hexToBase64(link.linkContext.traceId),
-      spanId: hexToBase64(link.linkContext.spanId),
+      traceId: hexToBase64(link.context.traceId),
+      spanId: hexToBase64(link.context.spanId),
       type: toCollectorLinkType(span, link),
     };
 

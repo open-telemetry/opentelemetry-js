@@ -23,8 +23,8 @@ import { LinkContext } from './link_context';
  * single batch handler processes multiple requests from different traces.
  */
 export interface Link {
-  /** The {@link SpanContext} of a linked span. */
-  linkContext: LinkContext;
+  /** The {@link LinkContext} of a linked span. */
+  context: LinkContext;
   /** A set of {@link Attributes} on the link. */
   attributes?: Attributes;
 }

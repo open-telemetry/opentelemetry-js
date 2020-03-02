@@ -71,7 +71,7 @@ describe('BinaryTraceContext', () => {
       structured: {
         traceId: commonTraceId,
         spanId: commonSpanId,
-        traceFlags: 0,
+        traceFlags: TraceFlags.NONE,
       },
       binary: new Uint8Array([
         0,
@@ -138,7 +138,7 @@ describe('BinaryTraceContext', () => {
           binaryTraceContext.fromBytes(testCase.binary),
           testCase.structured &&
             Object.assign(
-              { isRemote: true, traceFlags: TraceFlags.UNSAMPLED },
+              { isRemote: true, traceFlags: TraceFlags.NONE },
               testCase.structured
             )
         );

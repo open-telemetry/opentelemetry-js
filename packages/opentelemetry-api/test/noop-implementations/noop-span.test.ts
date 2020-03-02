@@ -47,7 +47,7 @@ describe('NoopSpan', () => {
     assert.deepStrictEqual(span.context(), {
       traceId: INVALID_TRACE_ID,
       spanId: INVALID_SPAN_ID,
-      traceFlags: TraceFlags.UNSAMPLED,
+      traceFlags: TraceFlags.NONE,
     });
     span.end();
   });

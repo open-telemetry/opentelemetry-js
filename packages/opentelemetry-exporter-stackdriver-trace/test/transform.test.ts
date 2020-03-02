@@ -21,6 +21,7 @@ import * as assert from 'assert';
 import { getReadableSpanTransformer } from '../src/transform';
 import { LinkType, Span } from '../src/types';
 import { VERSION } from '../src/version';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
   let readableSpan: ReadableSpan;
@@ -31,7 +32,7 @@ describe('transform', () => {
     spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: 0,
+      traceFlags: TraceFlags.NONE,
       isRemote: true,
     };
 
@@ -132,7 +133,7 @@ describe('transform', () => {
 
   it('should transform links', () => {
     readableSpan.links.push({
-      linkContext: {
+      context: {
         traceId: 'a4cda95b652f4a1592b449d5929fda1b',
         spanId: '3e0c63257de34c92',
       },
@@ -157,7 +158,7 @@ describe('transform', () => {
 
   it('should transform links with attributes', () => {
     readableSpan.links.push({
-      linkContext: {
+      context: {
         traceId: 'a4cda95b652f4a1592b449d5929fda1b',
         spanId: '3e0c63257de34c92',
       },

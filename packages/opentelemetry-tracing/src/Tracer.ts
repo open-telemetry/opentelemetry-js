@@ -81,7 +81,7 @@ export class Tracer implements types.Tracer {
     }
     const traceFlags = samplingDecision
       ? types.TraceFlags.SAMPLED
-      : types.TraceFlags.UNSAMPLED;
+      : types.TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
     const recordEvents = options.isRecording || false;
     if (!recordEvents && !samplingDecision) {

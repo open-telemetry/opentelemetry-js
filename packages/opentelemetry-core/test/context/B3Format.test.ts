@@ -61,7 +61,7 @@ describe('B3Format', () => {
       const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
-        traceFlags: TraceFlags.UNSAMPLED,
+        traceFlags: TraceFlags.NONE,
         traceState: new TraceState('foo=bar,baz=qux'),
         isRemote: false,
       };
@@ -75,14 +75,14 @@ describe('B3Format', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.UNSAMPLED);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.NONE);
     });
 
     it('should not inject empty spancontext', () => {
       const emptySpanContext = {
         traceId: '',
         spanId: '',
-        traceFlags: 0,
+        traceFlags: TraceFlags.NONE,
       };
       b3Format.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, emptySpanContext),
@@ -105,7 +105,7 @@ describe('B3Format', () => {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
         isRemote: true,
-        traceFlags: TraceFlags.UNSAMPLED,
+        traceFlags: TraceFlags.NONE,
       });
     });
 
@@ -153,7 +153,7 @@ describe('B3Format', () => {
         spanId: 'b7ad6b7169203331',
         traceId: '0af7651916cd43dd8448eb211c80319c',
         isRemote: true,
-        traceFlags: TraceFlags.UNSAMPLED,
+        traceFlags: TraceFlags.NONE,
       });
     });
 
