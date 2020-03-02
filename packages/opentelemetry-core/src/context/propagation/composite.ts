@@ -16,6 +16,7 @@
 
 import { Carrier, Context, HttpTextFormat, Logger } from '@opentelemetry/api';
 import { NoopLogger } from '../../common/NoopLogger';
+import { CompositePropagatorConfig } from './types';
 
 /** Combines multiple propagators into a single propagator. */
 export class CompositePropagator implements HttpTextFormat {
@@ -37,7 +38,7 @@ export class CompositePropagator implements HttpTextFormat {
    * Propagators are run in the order they are configured, so if multiple
    * propagators write the same carrier key, the propagator later in the list
    * will "win".
-   * 
+   *
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
@@ -58,7 +59,7 @@ export class CompositePropagator implements HttpTextFormat {
    * Propagators are run in the order they are configured, so if multiple
    * propagators write the same context key, the propagator later in the list
    * will "win".
-   * 
+   *
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
@@ -74,17 +75,4 @@ export class CompositePropagator implements HttpTextFormat {
       return ctx;
     }, context);
   }
-}
-
-/** Configuration object for composite propagator */
-export interface CompositePropagatorConfig {
-  /**
-   * List of propagators to run. Propagators run in the
-   * list order. If a propagator later in the list writes the same context
-   * key as a propagator earlier in the list, the later on will "win".
-   */
-  propagators?: HttpTextFormat[];
-
-  /** Instance of logger */
-  logger?: Logger;
 }

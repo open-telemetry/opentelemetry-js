@@ -23,6 +23,7 @@ export * from './context/context';
 export * from './context/propagation/B3Format';
 export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
+export * from './context/propagation/types';
 export * from './platform';
 export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoRecordingSpan';
