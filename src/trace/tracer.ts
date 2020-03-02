@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
+import { Context } from '@opentelemetry/scope-base';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
@@ -39,9 +39,10 @@ export interface Tracer {
    * Starts a new {@link Span}.
    * @param name The name of the span
    * @param [options] SpanOptions used for span creation
+   * @param [context] Context to use to extract parent
    * @returns Span The newly created span
    */
-  startSpan(name: string, options?: SpanOptions): Span;
+  startSpan(name: string, options?: SpanOptions, context?: Context): Span;
 
   /**
    * Executes the function given by fn within the context provided by Span
@@ -60,19 +61,7 @@ export interface Tracer {
    * Bind a span as the target's scope or propagate the current one.
    *
    * @param target Any object to which a scope need to be set
-   * @param [span] Optionally specify the span which you want to assign
+   * @param [context] Optionally specify the context which you want to bind
    */
-  bind<T>(target: T, span?: Span): T;
-
-  /**
-   * Returns the {@link HttpTextFormat} interface which can inject/extract
-   * Spans.
-   *
-   * If no tracer implementation is provided, this defaults to the W3C Trace
-   * Context HTTP text format {@link HttpTextFormat}. For more details see
-   * <a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.
-   *
-   * @returns the {@link HttpTextFormat} for this implementation.
-   */
-  getHttpTextFormat(): HttpTextFormat;
+  bind<T>(target: T, context?: Span): T;
 }

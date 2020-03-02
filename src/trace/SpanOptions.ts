@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Span } from './span';
 import { Attributes } from './attributes';
-import { SpanKind } from './span_kind';
-import { SpanContext } from './span_context';
 import { Link } from './link';
+import { SpanKind } from './span_kind';
+import { Span } from './span';
+import { SpanContext } from './span_context';
 
 /**
  * Options needed for span creation
@@ -43,8 +43,13 @@ export interface SpanOptions {
   links?: Link[];
 
   /**
+   * This option is NOT RECOMMENDED for normal use and should ONLY be used
+   * if your application manages context manually without the global context
+   * manager, or you are trying to override the parent extracted from context.
+   *
    * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
-   * span will be the child of.
+   * span will be the child of. This overrides the parent span extracted from
+   * the currently active context.
    */
   parent?: Span | SpanContext | null;
 
