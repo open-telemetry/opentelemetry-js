@@ -68,10 +68,9 @@ describe('Composite Propagator', () => {
     });
 
     it('should inject context using all configured propagators', () => {
-      const composite = new CompositePropagator(
-        new B3Format(),
-        new HttpTraceContext()
-      );
+      const composite = new CompositePropagator({
+        propagators: [new B3Format(), new HttpTraceContext()],
+      });
       composite.inject(ctxWithSpanContext, carrier);
 
       assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
@@ -85,10 +84,9 @@ describe('Composite Propagator', () => {
     });
 
     it('should not throw', () => {
-      const composite = new CompositePropagator(
-        new ThrowingPropagator(),
-        new HttpTraceContext()
-      );
+      const composite = new CompositePropagator({
+        propagators: [new ThrowingPropagator(), new HttpTraceContext()],
+      });
       composite.inject(ctxWithSpanContext, carrier);
 
       assert.strictEqual(
@@ -112,10 +110,9 @@ describe('Composite Propagator', () => {
     });
 
     it('should extract context using all configured propagators', () => {
-      const composite = new CompositePropagator(
-        new B3Format(),
-        new HttpTraceContext()
-      );
+      const composite = new CompositePropagator({
+        propagators: [new B3Format(), new HttpTraceContext()],
+      });
       const spanContext = getExtractedSpanContext(
         composite.extract(Context.ROOT_CONTEXT, carrier)
       );
@@ -132,10 +129,9 @@ describe('Composite Propagator', () => {
     });
 
     it('should not throw', () => {
-      const composite = new CompositePropagator(
-        new ThrowingPropagator(),
-        new HttpTraceContext()
-      );
+      const composite = new CompositePropagator({
+        propagators: [new ThrowingPropagator(), new HttpTraceContext()],
+      });
       const spanContext = getExtractedSpanContext(
         composite.extract(Context.ROOT_CONTEXT, carrier)
       );

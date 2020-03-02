@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,29 +14,77 @@
  * limitations under the License.
  */
 
-import { Carrier, Context, HttpTextFormat } from '@opentelemetry/api';
+import { Carrier, Context, HttpTextFormat, Logger } from '@opentelemetry/api';
+import { NoopLogger } from '../../common/NoopLogger';
 
 /** Combines multiple propagators into a single propagator. */
 export class CompositePropagator implements HttpTextFormat {
-  private _propagators: HttpTextFormat[];
-  constructor(...propagators: HttpTextFormat[]) {
-    this._propagators = propagators;
+  private readonly _propagators: HttpTextFormat[];
+  private readonly _logger: Logger;
+
+  /**
+   * Construct a composite propagator from a list of propagators.
+   *
+   * @param config Configuration object for composite propagator
+   */
+  constructor(config: CompositePropagatorConfig = {}) {
+    this._propagators = config.propagators ?? [];
+    this._logger = config.logger ?? new NoopLogger();
   }
 
+  /**
+   * Run each of the configured propagators with the given context and carrier.
+   * Propagators are run in the order they are configured, so if multiple
+   * propagators write the same carrier key, the propagator later in the list
+   * will "win".
+   * 
+   * @param context Context to inject
+   * @param carrier Carrier into which context will be injected
+   */
   inject(context: Context, carrier: Carrier) {
     for (const propagator of this._propagators) {
       try {
         propagator.inject(context, carrier);
-      } catch {}
+      } catch (err) {
+        this._logger.error(
+          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+        );
+      }
     }
   }
 
+  /**
+   * Run each of the configured propagators with the given context and carrier.
+   * Propagators are run in the order they are configured, so if multiple
+   * propagators write the same context key, the propagator later in the list
+   * will "win".
+   * 
+   * @param context Context to add values to
+   * @param carrier Carrier from which to extract context
+   */
   extract(context: Context, carrier: Carrier): Context {
     return this._propagators.reduce((ctx, propagator) => {
       try {
         return propagator.extract(ctx, carrier);
-      } catch {}
+      } catch (err) {
+        this._logger.error(
+          `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
+        );
+      }
       return ctx;
     }, context);
   }
+}
+
+/** Configuration object for composite propagator */
+export interface CompositePropagatorConfig {
+  /**
+   * List of propagators to run. Propagators run in the
+   * list order. If a propagator later in the list writes the same context
+   * key as a propagator earlier in the list, the later on will "win".
+   */
+  propagators?: HttpTextFormat[];
+
+  /** Instance of logger */
+  logger?: Logger;
 }
