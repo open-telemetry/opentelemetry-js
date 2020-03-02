@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-export type Carrier = {
-  [key: string]: unknown;
-};
+export type SetterFunction<Carrier = any> = (
+  carrier: Carrier,
+  key: string,
+  value: unknown
+) => void;
+
+export function defaultSetter(carrier: any, key: string, value: unknown) {
+  carrier[key] = value;
+}

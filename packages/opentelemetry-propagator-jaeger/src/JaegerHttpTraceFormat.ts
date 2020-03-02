@@ -15,11 +15,12 @@
  */
 
 import {
-  Carrier,
   Context,
   HttpTextFormat,
   SpanContext,
   TraceFlags,
+  SetterFunction,
+  GetterFunction,
 } from '@opentelemetry/api';
 import {
   getParentSpanContext,
@@ -53,7 +54,7 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     this._jaegerTraceHeader = customTraceHeader || UBER_TRACE_ID_HEADER;
   }
 
-  inject(context: Context, carrier: Carrier) {
+  inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -61,13 +62,15 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
       spanContext.traceFlags || TraceFlags.UNSAMPLED
     ).toString(16)}`;
 
-    carrier[
-      this._jaegerTraceHeader
-    ] = `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`;
+    setter(
+      carrier,
+      this._jaegerTraceHeader,
+      `${spanContext.traceId}:${spanContext.spanId}:0:${traceFlags}`
+    );
   }
 
-  extract(context: Context, carrier: Carrier): Context {
-    const uberTraceIdHeader = carrier[this._jaegerTraceHeader];
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+    const uberTraceIdHeader = getter(carrier, this._jaegerTraceHeader);
     if (!uberTraceIdHeader) return context;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]

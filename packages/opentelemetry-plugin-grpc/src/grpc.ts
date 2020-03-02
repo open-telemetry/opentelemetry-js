@@ -124,11 +124,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   }
 
   private _setSpanContext(metadata: grpcTypes.Metadata): void {
-    const carrier = {};
-    propagation.inject(carrier);
-    for (const [k, v] of Object.entries(carrier)) {
-      metadata.set(k, v as string);
-    }
+    propagation.inject(metadata, (metadata, k, v) =>
+      metadata.set(k, v as grpcTypes.MetadataValue)
+    );
   }
 
   private _patchServer() {
@@ -170,40 +168,45 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                 JSON.stringify(spanOptions)
               );
 
-              context.with(propagation.extract(call.metadata.getMap()), () => {
-                const span = plugin._tracer
-                  .startSpan(spanName, spanOptions)
-                  .setAttributes({
-                    [AttributeNames.GRPC_KIND]: spanOptions.kind,
-                    [AttributeNames.COMPONENT]: GrpcPlugin.component,
-                  });
+              context.with(
+                propagation.extract(call.metadata, (carrier, key) =>
+                  carrier.get(key)
+                ),
+                () => {
+                  const span = plugin._tracer
+                    .startSpan(spanName, spanOptions)
+                    .setAttributes({
+                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
+                      [AttributeNames.COMPONENT]: GrpcPlugin.component,
+                    });
 
-                plugin._tracer.withSpan(span, () => {
-                  switch (type) {
-                    case 'unary':
-                    case 'client_stream':
-                      return plugin._clientStreamAndUnaryHandler(
-                        plugin,
-                        span,
-                        call,
-                        callback,
-                        originalFunc,
-                        self
-                      );
-                    case 'server_stream':
-                    case 'bidi':
-                      return plugin._serverStreamAndBidiHandler(
-                        plugin,
-                        span,
-                        call,
-                        originalFunc,
-                        self
-                      );
-                    default:
-                      break;
-                  }
-                });
-              });
+                  plugin._tracer.withSpan(span, () => {
+                    switch (type) {
+                      case 'unary':
+                      case 'client_stream':
+                        return plugin._clientStreamAndUnaryHandler(
+                          plugin,
+                          span,
+                          call,
+                          callback,
+                          originalFunc,
+                          self
+                        );
+                      case 'server_stream':
+                      case 'bidi':
+                        return plugin._serverStreamAndBidiHandler(
+                          plugin,
+                          span,
+                          call,
+                          originalFunc,
+                          self
+                        );
+                      default:
+                        break;
+                    }
+                  });
+                }
+              );
             };
           }
         );

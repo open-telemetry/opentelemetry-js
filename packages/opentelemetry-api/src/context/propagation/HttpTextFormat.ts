@@ -15,7 +15,8 @@
  */
 
 import { Context } from '@opentelemetry/scope-base';
-import { Carrier } from './carrier';
+import { SetterFunction } from './setter';
+import { GetterFunction } from './getter';
 
 /**
  * Injects {@link Context} into and extracts it from carriers that travel
@@ -38,7 +39,7 @@ export interface HttpTextFormat {
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
    */
-  inject(context: Context, carrier: Carrier): void;
+  inject(context: Context, carrier: unknown, setter: SetterFunction): void;
 
   /**
    * Given a {@link Context} and a carrier, extract context values from a
@@ -50,5 +51,5 @@ export interface HttpTextFormat {
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
    */
-  extract(context: Context, carrier: Carrier): Context;
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context;
 }
