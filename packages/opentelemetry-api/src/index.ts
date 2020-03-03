@@ -18,6 +18,7 @@ export * from './common/Logger';
 export * from './common/Time';
 export * from './context/propagation/carrier';
 export * from './context/propagation/HttpTextFormat';
+export * from './context/propagation/NoopHttpTextFormat';
 export * from './distributed_context/DistributedContext';
 export * from './distributed_context/EntryValue';
 export * from './metrics/BoundInstrument';
