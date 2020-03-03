@@ -67,7 +67,6 @@ export class PostgresPoolPlugin extends BasePlugin<typeof pgPoolTypes> {
           `${PostgresPoolPlugin.COMPONENT}.connect`,
           {
             kind: SpanKind.CLIENT,
-            parent: plugin._tracer.getCurrentSpan() || undefined,
             attributes: {
               [AttributeNames.COMPONENT]: PostgresPoolPlugin.COMPONENT, // required
               [AttributeNames.DB_TYPE]: PostgresPoolPlugin.DB_TYPE, // required

@@ -18,15 +18,15 @@
 // code outside zone.js. This needs to be done before all
 const originalSetTimeout = window.setTimeout;
 
-import 'zone.js';
-
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import { context } from '@opentelemetry/api';
 import { isWrapped, LogLevel } from '@opentelemetry/core';
+import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 import * as tracing from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
-import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import 'zone.js';
 import { UserInteractionPlugin } from '../src';
 import { WindowWithZone } from '../src/types';
 import {
@@ -42,6 +42,7 @@ const FILE_URL =
 
 describe('UserInteractionPlugin', () => {
   describe('when zone.js is available', () => {
+    let scopeManager: ZoneScopeManager;
     let userInteractionPlugin: UserInteractionPlugin;
     let sandbox: sinon.SinonSandbox;
     let webTracerProvider: WebTracerProvider;
@@ -49,6 +50,8 @@ describe('UserInteractionPlugin', () => {
     let exportSpy: sinon.SinonSpy;
     let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
+      scopeManager = new ZoneScopeManager().enable();
+      context.initGlobalContextManager(scopeManager);
       sandbox = sinon.createSandbox();
       history.pushState({ test: 'testing' }, '', `${location.pathname}`);
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
@@ -68,7 +71,6 @@ describe('UserInteractionPlugin', () => {
       userInteractionPlugin = new UserInteractionPlugin();
       webTracerProvider = new WebTracerProvider({
         logLevel: LogLevel.ERROR,
-        scopeManager: new ZoneScopeManager(),
         plugins: [userInteractionPlugin, new XMLHttpRequestPlugin()],
       });
       dummySpanExporter = new DummySpanExporter();
@@ -85,6 +87,7 @@ describe('UserInteractionPlugin', () => {
       requests = [];
       sandbox.restore();
       exportSpy.restore();
+      scopeManager.disable();
     });
 
     it('should handle task without async operation', () => {

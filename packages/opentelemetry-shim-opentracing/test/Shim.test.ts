@@ -18,7 +18,12 @@ import * as assert from 'assert';
 import * as opentracing from 'opentracing';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
-import { INVALID_SPAN_CONTEXT, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  INVALID_SPAN_CONTEXT,
+  timeInputToHrTime,
+  HttpTraceContext,
+} from '@opentelemetry/core';
+import { propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
@@ -27,6 +32,7 @@ describe('OpenTracing Shim', () => {
     provider.getTracer('default')
   );
   opentracing.initGlobalTracer(shimTracer);
+  propagation.initGlobalPropagator(new HttpTraceContext());
 
   describe('TracerShim', () => {
     let span: opentracing.Span;

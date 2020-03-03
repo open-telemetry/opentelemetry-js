@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   BasePlugin,
   hrTime,
   isUrlIgnored,
   isWrapped,
   otperformance,
-  setActiveSpan,
   urlMatches,
 } from '@opentelemetry/core';
 import {
@@ -50,7 +49,7 @@ const OBSERVER_WAIT_TIME_MS = 300;
 /**
  * XMLHttpRequest config
  */
-export interface XMLHttpRequestPluginConfig extends types.PluginConfig {
+export interface XMLHttpRequestPluginConfig extends api.PluginConfig {
   // the number of timing resources is limited, after the limit
   // (chrome 250, safari 150) the information is not collected anymore
   // the only way to prevent that is to regularly clean the resources
@@ -83,17 +82,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param span
    * @private
    */
-  private _addHeaders(xhr: XMLHttpRequest, span: types.Span, spanUrl: string) {
+  private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
     if (!this._shouldPropagateTraceHeaders(spanUrl)) {
       return;
     }
     const headers: { [key: string]: unknown } = {};
-    this._tracer
-      .getHttpTextFormat()
-      // Using context direclty like this is temporary. In a future PR, context
-      // will be managed by the scope manager (which may be renamed to context manager?)
-      .inject(setActiveSpan(types.Context.TODO, span), headers);
-
+    api.propagation.inject(headers);
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
@@ -134,15 +128,16 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addChildSpan(
-    span: types.Span,
+    span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    const childSpan = this._tracer.startSpan('CORS Preflight', {
-      startTime: corsPreFlightRequest[PTN.FETCH_START],
-      parent: span,
-    }) as types.Span;
-    this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-    childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
+    this._tracer.withSpan(span, () => {
+      const childSpan = this._tracer.startSpan('CORS Preflight', {
+        startTime: corsPreFlightRequest[PTN.FETCH_START],
+      });
+      this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
+    });
   }
 
   /**
@@ -152,7 +147,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @param spanUrl
    * @private
    */
-  _addFinalSpanAttributes(span: types.Span, xhrMem: XhrMem, spanUrl?: string) {
+  _addFinalSpanAttributes(span: api.Span, xhrMem: XhrMem, spanUrl?: string) {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
 
@@ -177,7 +172,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addSpanNetworkEvents(
-    span: types.Span,
+    span: api.Span,
     resource: PerformanceResourceTiming
   ) {
     addSpanNetworkEvent(span, PTN.FETCH_START, resource);
@@ -244,10 +239,10 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    */
   private _findResourceAndAddNetworkEvents(
     xhrMem: XhrMem,
-    span: types.Span,
+    span: api.Span,
     spanUrl?: string,
-    startTime?: types.HrTime,
-    endTime?: types.HrTime
+    startTime?: api.HrTime,
+    endTime?: api.HrTime
   ): void {
     if (!spanUrl || !startTime || !endTime || !xhrMem.createdResources) {
       return;
@@ -314,14 +309,13 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     xhr: XMLHttpRequest,
     url: string,
     method: string
-  ): types.Span | undefined {
+  ): api.Span | undefined {
     if (isUrlIgnored(url, this._config.ignoreUrls)) {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }
 
     const currentSpan = this._tracer.startSpan(url, {
-      parent: this._tracer.getCurrentSpan(),
       attributes: {
         [AttributeNames.COMPONENT]: this.component,
         [AttributeNames.HTTP_METHOD]: method,
@@ -387,7 +381,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     function endSpanTimeout(
       eventName: string,
       xhrMem: XhrMem,
-      endTime: types.HrTime
+      endTime: api.HrTime
     ) {
       const callbackToRemoveEvents = xhrMem.callbackToRemoveEvents;
 
@@ -472,23 +466,25 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         const spanUrl = xhrMem.spanUrl;
 
         if (currentSpan && spanUrl) {
-          plugin._tasksCount++;
-          xhrMem.sendStartTime = hrTime();
-          currentSpan.addEvent(EventNames.METHOD_SEND);
+          plugin._tracer.withSpan(currentSpan, () => {
+            plugin._tasksCount++;
+            xhrMem.sendStartTime = hrTime();
+            currentSpan.addEvent(EventNames.METHOD_SEND);
 
-          this.addEventListener('abort', onAbort);
-          this.addEventListener('error', onError);
-          this.addEventListener('load', onLoad);
-          this.addEventListener('timeout', onTimeout);
+            this.addEventListener('abort', onAbort);
+            this.addEventListener('error', onError);
+            this.addEventListener('load', onLoad);
+            this.addEventListener('timeout', onTimeout);
 
-          xhrMem.callbackToRemoveEvents = () => {
-            unregister(this);
-            if (xhrMem.createdResources) {
-              xhrMem.createdResources.observer.disconnect();
-            }
-          };
-          plugin._addHeaders(this, currentSpan, spanUrl);
-          plugin._addResourceObserver(this, spanUrl);
+            xhrMem.callbackToRemoveEvents = () => {
+              unregister(this);
+              if (xhrMem.createdResources) {
+                xhrMem.createdResources.observer.disconnect();
+              }
+            };
+            plugin._addHeaders(this, spanUrl);
+            plugin._addResourceObserver(this, spanUrl);
+          });
         }
         return original.apply(this, args);
       };

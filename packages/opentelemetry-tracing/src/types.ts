@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import { ScopeManager } from '@opentelemetry/scope-base';
-import {
-  Attributes,
-  HttpTextFormat,
-  Logger,
-  Sampler,
-} from '@opentelemetry/api';
+import { Attributes, Logger, Sampler } from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
 
 /**
@@ -34,11 +28,6 @@ export interface TracerConfig {
   defaultAttributes?: Attributes;
 
   /**
-   * HTTP text formatter which can inject/extract Spans.
-   */
-  httpTextFormat?: HttpTextFormat;
-
-  /**
    * User provided logger.
    */
   logger?: Logger;
@@ -50,11 +39,6 @@ export interface TracerConfig {
    * Sampler determines if a span should be recorded or should be a NoopSpan.
    */
   sampler?: Sampler;
-
-  /**
-   * Scope manager keeps context across in-process operations.
-   */
-  scopeManager?: ScopeManager;
 
   /** Trace Parameters */
   traceParams?: TraceParams;
