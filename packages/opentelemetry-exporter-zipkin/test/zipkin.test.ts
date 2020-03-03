@@ -72,14 +72,6 @@ describe('ZipkinExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
     });
-    it('should construct an exporter with forceFlush', () => {
-      const exporter = new ZipkinExporter({
-        serviceName: 'my-service',
-        forceFlush: false,
-      });
-      assert.ok(typeof exporter.export === 'function');
-      assert.ok(typeof exporter.shutdown === 'function');
-    });
     it('should construct an exporter with statusCodeTagName', () => {
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
@@ -338,13 +330,5 @@ describe('ZipkinExporter', () => {
 
     // @todo: implement
     it('should send by default');
-    it('should not send with forceFlush=false', () => {
-      const exporter = new ZipkinExporter({
-        serviceName: 'my-service',
-        forceFlush: false,
-      });
-
-      exporter.shutdown();
-    });
   });
 });
