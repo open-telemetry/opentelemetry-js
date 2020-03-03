@@ -36,11 +36,10 @@ export function randomSpanId(): string {
   return toHex(randomBytesArray.slice(0, SPAN_ID_BYTES));
 }
 
-
 /**
  * Get the hex string representation of a byte array
- * 
- * @param byteArray 
+ *
+ * @param byteArray
  */
 function toHex(byteArray: Uint8Array) {
   const chars: number[] = new Array(byteArray.length * 2);
