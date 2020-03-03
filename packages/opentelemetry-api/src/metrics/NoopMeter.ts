@@ -48,8 +48,8 @@ export class NoopMeter implements Meter {
 
   /**
    * Returns constant noop observer.
-   * @param name
-   * @param options
+   * @param name the name of the metric.
+   * @param [options] the metric options.
    */
   createObserver(name: string, options?: MetricOptions): Metric<BoundObserver> {
     return NOOP_OBSERVER_METRIC;

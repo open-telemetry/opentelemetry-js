@@ -14,7 +14,8 @@
   "keywords": [
     "opentelemetry",
     "http",
-    "tracing"
+    "tracing",
+    "metrics"
   ],
   "engines": {
     "node": ">=8"

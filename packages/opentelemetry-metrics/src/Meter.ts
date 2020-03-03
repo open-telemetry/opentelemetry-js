@@ -123,8 +123,8 @@ export class Meter implements types.Meter {
       return types.NOOP_OBSERVER_METRIC;
     }
     const opt: MetricOptions = {
-      monotonic: false, // Counters are defined as monotonic by default
-      absolute: false, // not applicable to counter, set to false
+      monotonic: false, // Observers are defined as non-monotonic by default
+      absolute: false, // not applicable to observer, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,

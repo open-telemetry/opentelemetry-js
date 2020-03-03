@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Distribution, Sum, Aggregator } from './types';
+import { Aggregator, Distribution, LastValue, Sum } from './types';
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {
@@ -37,7 +37,7 @@ export class ObserverAggregator implements Aggregator {
     this._current = value;
   }
 
-  value(): Sum {
+  value(): LastValue {
     return this._current;
   }
 }

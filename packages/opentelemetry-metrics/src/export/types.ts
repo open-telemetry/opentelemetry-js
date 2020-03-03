@@ -27,6 +27,8 @@ export enum MetricKind {
 
 /** Sum returns an aggregated sum. */
 export type Sum = number;
+/** LastValue returns last value. */
+export type LastValue = number;
 
 export interface Distribution {
   min: number;

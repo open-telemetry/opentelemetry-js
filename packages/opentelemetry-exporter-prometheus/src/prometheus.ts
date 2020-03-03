@@ -17,22 +17,19 @@
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import {
+  CounterSumAggregator,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
   MetricKind,
   Sum,
+  ObserverAggregator,
 } from '@opentelemetry/metrics';
 import * as types from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
-import { LabelSet } from '@opentelemetry/metrics/build/src/LabelSet';
-import {
-  CounterSumAggregator,
-  ObserverAggregator,
-} from '@opentelemetry/metrics/build/src/export/Aggregator';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -154,7 +151,7 @@ export class PrometheusExporter implements MetricExporter {
     // TODO: only counter and gauge are implemented in metrics so far
   }
 
-  private _getLabelValues(keys: string[], values: LabelSet) {
+  private _getLabelValues(keys: string[], values: types.LabelSet) {
     const labelValues: labelValues = {};
     const labels = values.labels;
     for (let i = 0; i < keys.length; i++) {
