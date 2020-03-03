@@ -34,12 +34,13 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _finishedSpans: ReadableSpan[] = [];
   private _lastSpanFlush = Date.now();
   private _timer: NodeJS.Timeout;
+  private _isShutdown = false;
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
     this._bufferSize =
       config && config.bufferSize ? config.bufferSize : DEFAULT_BUFFER_SIZE;
     this._bufferTimeout =
-      config && config.bufferTimeout
+      config && typeof config.bufferTimeout === 'number'
         ? config.bufferTimeout
         : DEFAULT_BUFFER_TIMEOUT_MS;
 
@@ -51,15 +52,30 @@ export class BatchSpanProcessor implements SpanProcessor {
     unrefTimer(this._timer);
   }
 
+  forceFlush(): void {
+    if (this._isShutdown) {
+      return;
+    }
+    this._flush();
+  }
+
   // does nothing.
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
+    if (this._isShutdown) {
+      return;
+    }
     this._addToBuffer(span.toReadableSpan());
   }
 
   shutdown(): void {
+    if (this._isShutdown) {
+      return;
+    }
     clearInterval(this._timer);
+    this.forceFlush();
+    this._isShutdown = true;
     this._exporter.shutdown();
   }
 

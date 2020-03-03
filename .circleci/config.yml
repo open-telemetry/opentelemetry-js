@@ -64,7 +64,7 @@ cache_2: &cache_2
   paths:
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
-    - packages/opentelemetry-plugin-http2/node_modules
+    - packages/opentelemetry-plugin-ioredis/node_modules
     - packages/opentelemetry-plugin-mongodb/node_modules
     - packages/opentelemetry-plugin-redis/node_modules
     - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
@@ -76,6 +76,7 @@ cache_2: &cache_2
     - packages/opentelemetry-plugin-xml-http-request/node_modules
     - packages/opentelemetry-exporter-stackdriver-trace/node_modules
     - packages/opentelemetry-plugin-express/node_modules
+    - packages/opentelemetry-resources/node_modules
 
 node_unit_tests: &node_unit_tests
   resource_class: large
