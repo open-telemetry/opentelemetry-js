@@ -21,7 +21,7 @@ describe('randomTraceId', () => {
   it('returns 32 character hex strings', () => {
     const traceId = randomTraceId();
     assert.ok(traceId.match(/[a-f0-9]{32}/));
-    assert.ok(!traceId.match(/^0+$/))
+    assert.ok(!traceId.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
@@ -36,8 +36,8 @@ describe('randomSpanId', () => {
   it('returns 16 character hex strings', () => {
     const spanId = randomSpanId();
     assert.ok(spanId.match(/[a-f0-9]{16}/));
-    assert.ok(!spanId.match(/^0+$/))
-  })
+    assert.ok(!spanId.match(/^0+$/));
+  });
 
   it('returns different ids on each call', () => {
     const spanId1 = randomSpanId();
