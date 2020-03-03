@@ -22,7 +22,7 @@ import {
   setActiveSpan,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
-import { defaultSetter } from '@opentelemetry/api';
+import { CorrelationContext, defaultSetter } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -72,10 +72,15 @@ function getContextWithParent(options: opentracing.SpanOptions) {
  */
 export class SpanContextShim extends opentracing.SpanContext {
   private readonly _spanContext: api.SpanContext;
+  private _correlationContext: api.CorrelationContext;
 
-  constructor(spanContext: api.SpanContext) {
+  constructor(
+    spanContext: api.SpanContext,
+    correlationContext: CorrelationContext
+  ) {
     super();
     this._spanContext = spanContext;
+    this._correlationContext = correlationContext;
   }
 
   /**
@@ -83,6 +88,13 @@ export class SpanContextShim extends opentracing.SpanContext {
    */
   getSpanContext(): api.SpanContext {
     return this._spanContext;
+  }
+
+  /**
+   * Returns the underlying {@link api.CorrelationContext}
+   */
+  getCorrelationContext(): api.CorrelationContext {
+    return this._correlationContext;
   }
 
   /**
@@ -97,6 +109,18 @@ export class SpanContextShim extends opentracing.SpanContext {
    */
   toSpanId(): string {
     return this._spanContext.spanId;
+  }
+
+  getBaggageItem(key: string): string | undefined {
+    const entry: api.EntryValue = this._correlationContext[key];
+    return entry === undefined ? undefined : entry.value;
+  }
+
+  setBaggageItem(key: string, value: string) {
+    this._correlationContext = Object.assign(
+      { [key]: { value } },
+      this._correlationContext
+    );
   }
 }
 
@@ -125,11 +149,19 @@ export class TracerShim extends opentracing.Tracer {
       getContextWithParent(options)
     );
 
+    let correlationContext: CorrelationContext = {};
+    if (options.childOf) {
+      if (options.childOf instanceof SpanShim) {
+        const shimContext = options.childOf.context() as SpanContextShim;
+        correlationContext = shimContext.getCorrelationContext();
+      }
+    }
+
     if (options.tags) {
       span.setAttributes(options.tags);
     }
 
-    return new SpanShim(this, span);
+    return new SpanShim(this, span, correlationContext);
   }
 
   _inject(
@@ -156,7 +188,7 @@ export class TracerShim extends opentracing.Tracer {
         this._logger.warn(
           'OpentracingShim.inject() does not support FORMAT_BINARY'
         );
-        // @todo: Implement binary format
+        // @todo: Implement binary formats
         return;
       }
       default:
@@ -200,10 +232,14 @@ export class SpanShim extends opentracing.Span {
   private readonly _contextShim: SpanContextShim;
   private readonly _tracerShim: TracerShim;
 
-  constructor(tracerShim: TracerShim, span: api.Span) {
+  constructor(
+    tracerShim: TracerShim,
+    span: api.Span,
+    correlationalCtx: CorrelationContext
+  ) {
     super();
     this._span = span;
-    this._contextShim = new SpanContextShim(span.context());
+    this._contextShim = new SpanContextShim(span.context(), correlationalCtx);
     this._tracerShim = tracerShim;
   }
 
@@ -295,12 +331,11 @@ export class SpanShim extends opentracing.Span {
   }
 
   getBaggageItem(key: string): string | undefined {
-    // TODO: should this go into the context?
-    return undefined;
+    return this._contextShim.getBaggageItem(key);
   }
 
   setBaggageItem(key: string, value: string): this {
-    // TODO: should this go into the context?
+    this._contextShim.setBaggageItem(key, value);
     return this;
   }
 
