@@ -57,7 +57,7 @@ export class PropagationAPI {
    * @param setter Function used to set values on the carrier
    * @param context Context carrying tracing data to inject. Defaults to the currently active context.
    */
-  public inject<Carrier = any>(
+  public inject<Carrier>(
     carrier: Carrier,
     setter: SetterFunction<Carrier> = defaultSetter,
     context = contextApi.active()
@@ -72,7 +72,7 @@ export class PropagationAPI {
    * @param getter Function used to extract keys from a carrier
    * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
    */
-  public extract<Carrier = any>(
+  public extract<Carrier>(
     carrier: Carrier,
     getter: GetterFunction<Carrier> = defaultGetter,
     context = contextApi.active()
