@@ -68,6 +68,32 @@ describe('BatchSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
+    it('should do nothing after processor is shutdown', () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
+
+      const span = createSampledSpan(`${name}_0`);
+
+      processor.onEnd(span);
+      assert.strictEqual(processor['_finishedSpans'].length, 1);
+
+      processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, 1);
+
+      processor.onEnd(span);
+      assert.strictEqual(processor['_finishedSpans'].length, 1);
+
+      assert.strictEqual(spy.args.length, 1);
+      processor.shutdown();
+      assert.strictEqual(spy.args.length, 2);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+
+      processor.onEnd(span);
+      assert.strictEqual(spy.args.length, 2);
+      assert.strictEqual(processor['_finishedSpans'].length, 0);
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    });
+
     it('should export the sampled spans with buffer size reached', () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
@@ -104,6 +130,17 @@ describe('BatchSpanProcessor', () => {
       clock.tick(defaultBufferConfig.bufferTimeout + 1000);
 
       clock.restore();
+    });
+
+    it('should force flush on demand', () => {
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
+        processor.onEnd(span);
+      }
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, 5);
     });
   });
 });

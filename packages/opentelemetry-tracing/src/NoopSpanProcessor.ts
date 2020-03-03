@@ -22,4 +22,5 @@ export class NoopSpanProcessor implements SpanProcessor {
   onStart(span: Span): void {}
   onEnd(span: Span): void {}
   shutdown(): void {}
+  forceFlush(): void {}
 }
