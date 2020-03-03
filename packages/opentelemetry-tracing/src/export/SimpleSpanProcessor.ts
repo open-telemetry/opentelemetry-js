@@ -26,15 +26,28 @@ import { SpanExporter } from './SpanExporter';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   constructor(private readonly _exporter: SpanExporter) {}
+  private _isShutdown = false;
+
+  forceFlush(): void {
+    // do nothing as all spans are being exported without waiting
+  }
 
   // does nothing.
   onStart(span: Span): void {}
 
   onEnd(span: Span): void {
+    if (this._isShutdown) {
+      return;
+    }
     this._exporter.export([span.toReadableSpan()], () => {});
   }
 
   shutdown(): void {
+    if (this._isShutdown) {
+      return;
+    }
+    this._isShutdown = true;
+
     this._exporter.shutdown();
   }
 }
