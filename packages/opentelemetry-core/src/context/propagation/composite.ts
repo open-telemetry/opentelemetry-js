@@ -26,7 +26,7 @@ export class CompositePropagator implements HttpTextFormat {
   /**
    * Construct a composite propagator from a list of propagators.
    *
-   * @param config Configuration object for composite propagator
+   * @param [config] Configuration object for composite propagator
    */
   constructor(config: CompositePropagatorConfig = {}) {
     this._propagators = config.propagators ?? [];
