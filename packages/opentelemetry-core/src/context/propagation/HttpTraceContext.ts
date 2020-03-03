@@ -16,12 +16,12 @@
 
 import {
   Context,
+  GetterFunction,
   HttpTextFormat,
+  SetterFunction,
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
-import { GetterFunction } from '@opentelemetry/api';
-import { SetterFunction } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 

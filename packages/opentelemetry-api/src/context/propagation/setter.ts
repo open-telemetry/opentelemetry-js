@@ -20,6 +20,12 @@ export type SetterFunction<Carrier = any> = (
   value: unknown
 ) => void;
 
+/**
+ * Default setter which sets value via direct property access
+ *
+ * @param carrier
+ * @param key
+ */
 export function defaultSetter(carrier: any, key: string, value: unknown) {
   carrier[key] = value;
 }
