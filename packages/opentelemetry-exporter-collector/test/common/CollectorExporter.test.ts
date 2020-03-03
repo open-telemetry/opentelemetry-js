@@ -152,17 +152,6 @@ describe('CollectorExporter - common', () => {
       onShutdownSpy.restore();
     });
 
-    it('should export spans once only', done => {
-      collectorExporter.shutdown();
-      collectorExporter.shutdown();
-      collectorExporter.shutdown();
-
-      setTimeout(() => {
-        assert.strictEqual(onShutdownSpy.callCount, 1);
-        done();
-      });
-    });
-
     it('should call onShutdown', done => {
       collectorExporter.shutdown();
       setTimeout(() => {
