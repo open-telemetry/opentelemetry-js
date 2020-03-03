@@ -61,6 +61,7 @@ export class WebTracerProvider extends BasicTracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
       config.contextManager = new ZoneScopeManager();
+      config.contextManager.enable();
     }
 
     super.register(config);

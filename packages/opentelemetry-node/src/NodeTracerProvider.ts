@@ -49,6 +49,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
       config.contextManager = new AsyncHooksScopeManager();
+      config.contextManager.enable();
     }
 
     super.register(config);
