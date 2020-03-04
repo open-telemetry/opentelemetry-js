@@ -117,7 +117,7 @@ export class BoundMeasure extends BaseBoundInstrument
 
   record(
     value: number,
-    distContext?: types.DistributedContext,
+    correlationContext?: types.CorrelationContext,
     spanContext?: types.SpanContext
   ): void {
     if (this._absolute && value < 0) {
