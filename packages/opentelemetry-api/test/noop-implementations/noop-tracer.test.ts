@@ -32,7 +32,6 @@ describe('NoopTracer', () => {
     assert.deepStrictEqual(
       tracer.startSpan('span-name2', {
         kind: SpanKind.CLIENT,
-        isRecording: true,
       }),
       NOOP_SPAN
     );

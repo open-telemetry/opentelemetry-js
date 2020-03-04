@@ -27,6 +27,7 @@ class TestProcessor implements SpanProcessor {
   shutdown(): void {
     this.spans = [];
   }
+  forceFlush(): void {}
 }
 
 describe('MultiSpanProcessor', () => {

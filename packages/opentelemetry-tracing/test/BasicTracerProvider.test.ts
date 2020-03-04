@@ -281,43 +281,11 @@ describe('BasicTracerProvider', () => {
       span.end();
     });
 
-    it('should create real span when not sampled but recording events true', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: true });
-      assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should not create real span when not sampled and recording events false', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-        logger: new NoopLogger(),
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: false });
-      assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), false);
-    });
-
-    it('should not create real span when not sampled and no recording events configured', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-        logger: new NoopLogger(),
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), false);
-    });
-
-    it('should create real span when sampled and recording events true', () => {
+    it('should create real span when sampled', () => {
       const tracer = new BasicTracerProvider({
         sampler: ALWAYS_SAMPLER,
       }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: true });
+      const span = tracer.startSpan('my-span');
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
