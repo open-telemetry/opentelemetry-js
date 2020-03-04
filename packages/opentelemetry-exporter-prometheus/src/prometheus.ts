@@ -18,12 +18,13 @@ import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
+  LastValue,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
   MetricKind,
-  Sum,
   ObserverAggregator,
+  Sum,
 } from '@opentelemetry/metrics';
 import * as types from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
@@ -142,7 +143,7 @@ export class PrometheusExporter implements MetricExporter {
       } else if (record.aggregator instanceof ObserverAggregator) {
         metric.set(
           this._getLabelValues(labelKeys, record.labels),
-          value as Sum,
+          value as LastValue,
           new Date()
         );
       }

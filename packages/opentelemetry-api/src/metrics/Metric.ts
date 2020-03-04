@@ -109,7 +109,7 @@ export interface MetricUtils {
   /**
    * Sets a callback where user can observe value for certain labels
    * @param callback a function that will be called once to set observers
-   * for values
+   *     for values
    */
   setCallback(callback: (observerResult: ObserverResult) => void): void;
 

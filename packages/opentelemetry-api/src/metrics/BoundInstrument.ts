@@ -45,10 +45,12 @@ export interface BoundMeasure {
   ): void;
 }
 
-/** An Instrument for Observer Metric. */
+/** Base interface for the Observer metrics. */
 export interface BoundObserver {
   /**
-   * Sets callback for observer
+   * Sets callback for the observer. The callback is called once and then it
+   * sets observers for values. The observers are called periodically to
+   * retrieve the value.
    * @param callback
    */
   setCallback(callback: (observerResult: ObserverResult) => {}): void;

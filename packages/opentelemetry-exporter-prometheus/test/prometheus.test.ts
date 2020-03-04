@@ -240,9 +240,6 @@ describe('PrometheusExporter', () => {
 
       meter.collect();
       exporter.export(meter.getBatcher().checkPointSet(), () => {
-        // This is to test the special case where counters are destroyed
-        // and recreated in the exporter in order to get around prom-client's
-        // aggregation and use ours.
         exporter.export(meter.getBatcher().checkPointSet(), () => {
           http
             .get('http://localhost:9464/metrics', res => {
@@ -255,10 +252,6 @@ describe('PrometheusExporter', () => {
                   '# HELP metric_observer a test description'
                 );
 
-                assert.strictEqual(
-                  lines[0],
-                  '# HELP metric_observer a test description'
-                );
                 assert.strictEqual(lines[1], '# TYPE metric_observer gauge');
 
                 const line3 = lines[2].split(' ');

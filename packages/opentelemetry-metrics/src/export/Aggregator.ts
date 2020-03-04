@@ -29,7 +29,7 @@ export class CounterSumAggregator implements Aggregator {
   }
 }
 
-/** Basic aggregator for Observer. */
+/** Basic aggregator for Observer which keeps the last recorded value. */
 export class ObserverAggregator implements Aggregator {
   private _current: number = 0;
 
