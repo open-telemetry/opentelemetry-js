@@ -36,7 +36,7 @@ const provider = new NodeTracerProvider({
 
 If you use Zipkin, you must use `ignoreHostnames` in order to not trace those calls. If the server is local. You can set :
 
-```
+```js
 const provider = new NodeTracerProvider({
   plugins: {
     dns: {
