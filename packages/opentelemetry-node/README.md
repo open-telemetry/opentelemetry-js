@@ -39,12 +39,11 @@ Additionally to automated instrumentation, `NodeTracerProvider` exposes the same
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/core
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/node
 
 # Install instrumentation plugins
 npm install --save @opentelemetry/plugin-http
-npm install --save @opentelemetry/plugin-grpc
 npm install --save @opentelemetry/plugin-https
 ```
 
@@ -53,7 +52,7 @@ npm install --save @opentelemetry/plugin-https
 The following code will configure the `NodeTracerProvider` to instrument `http` using `@opentelemetry/plugin-http`.
 
 ```js
-const opentelemetry = require('@opentelemetry/core');
+const opentelemetry = require('@opentelemetry/api');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and configure NodeTracerProvider
@@ -79,7 +78,7 @@ const http = require('http');
 To enable instrumentation for all [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins), create an instance of `NodeTracerProvider` without providing any plugin configuration to the constructor.
 
 ```js
-const opentelemetry = require('@opentelemetry/core');
+const opentelemetry = require('@opentelemetry/api');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and initialize NodeTracerProvider

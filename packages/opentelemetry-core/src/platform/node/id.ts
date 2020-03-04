@@ -17,13 +17,14 @@
 import * as crypto from 'crypto';
 
 const SPAN_ID_BYTES = 8;
+const TRACE_ID_BYTES = 16;
 
 /**
  * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
  * characters corresponding to 128 bits.
  */
 export function randomTraceId(): string {
-  return randomSpanId() + randomSpanId();
+  return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
 }
 
 /**

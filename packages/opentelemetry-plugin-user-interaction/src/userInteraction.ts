@@ -96,7 +96,6 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
           [AttributeNames.HTTP_URL]: window.location.href,
           [AttributeNames.HTTP_USER_AGENT]: navigator.userAgent,
         },
-        parent: this._tracer.getCurrentSpan(),
       });
 
       this._spansData.set(span, {

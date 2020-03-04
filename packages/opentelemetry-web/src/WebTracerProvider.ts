@@ -16,7 +16,6 @@
 
 import { BasePlugin } from '@opentelemetry/core';
 import { BasicTracerProvider, TracerConfig } from '@opentelemetry/tracing';
-import { StackScopeManager } from './StackScopeManager';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -37,15 +36,10 @@ export class WebTracerProvider extends BasicTracerProvider {
    * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
-    if (typeof config.scopeManager === 'undefined') {
-      config.scopeManager = new StackScopeManager();
-    }
     if (typeof config.plugins === 'undefined') {
       config.plugins = [];
     }
-    super(Object.assign({}, { scopeManager: config.scopeManager }, config));
-
-    config.scopeManager.enable();
+    super(config);
 
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger);

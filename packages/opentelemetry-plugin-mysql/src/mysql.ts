@@ -209,7 +209,6 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         const spanName = getSpanName(query);
 
         const span = thisPlugin._tracer.startSpan(spanName, {
-          parent: thisPlugin._tracer.getCurrentSpan() || undefined,
           kind: SpanKind.CLIENT,
           attributes: {
             ...MysqlPlugin.COMMON_ATTRIBUTES,

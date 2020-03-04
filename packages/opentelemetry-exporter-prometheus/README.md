@@ -44,6 +44,7 @@ const boundCounter = counter.bind(meter.labels({ [key]: 'value' }));
 boundCounter.add(10);
 
 // .. some other work
+```
 
 ## Viewing your metrics
 

@@ -23,7 +23,6 @@ import { AddressInfo } from 'net';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
-import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpsRequest } from '../utils/httpsRequest';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import * as types from '@opentelemetry/api';
@@ -33,11 +32,9 @@ describe('HttpsPlugin', () => {
   let serverPort = 0;
 
   describe('disable()', () => {
-    const httpTextFormat = new DummyPropagation();
     const logger = new NoopLogger();
     const provider = new NodeTracerProvider({
       logger,
-      httpTextFormat,
     });
     // const tracer = provider.getTracer('test-https')
     let tracer: types.Tracer;

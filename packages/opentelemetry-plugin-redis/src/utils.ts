@@ -77,7 +77,6 @@ export const getTracedInternalSendCommand = (
     if (arguments.length === 1 && typeof cmd === 'object') {
       const span = tracer.startSpan(`${RedisPlugin.COMPONENT}-${cmd.command}`, {
         kind: SpanKind.CLIENT,
-        parent: tracer.getCurrentSpan(),
         attributes: {
           [AttributeNames.COMPONENT]: RedisPlugin.COMPONENT,
           [AttributeNames.DB_STATEMENT]: cmd.command,
