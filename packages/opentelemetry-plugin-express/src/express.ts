@@ -188,7 +188,6 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
           return original.apply(this, arguments);
         }
         const span = plugin._tracer.startSpan(metadata.name, {
-          parent: plugin._tracer.getCurrentSpan(),
           attributes: Object.assign(attributes, metadata.attributes),
         });
         // verify we have a callback

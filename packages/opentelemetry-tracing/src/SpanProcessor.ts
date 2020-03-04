@@ -22,6 +22,11 @@ import { Span } from '@opentelemetry/api';
  */
 export interface SpanProcessor {
   /**
+   * Forces to export all finished spans
+   */
+  forceFlush(): void;
+
+  /**
    * Called when a {@link Span} is started, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just started.

@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
-import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
+import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import { CanonicalCode, SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as sinon from 'sinon';
@@ -255,9 +255,7 @@ describe('Utility', () => {
       const errorMessage = 'test error';
       for (const obj of [undefined, { statusCode: 400 }]) {
         const span = new Span(
-          new BasicTracerProvider({
-            scopeManager: new NoopScopeManager(),
-          }).getTracer('default'),
+          new BasicTracerProvider().getTracer('default'),
           'test',
           { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
           SpanKind.INTERNAL

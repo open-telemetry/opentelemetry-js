@@ -14,25 +14,27 @@
  * limitations under the License.
  */
 
+import {
+  Attributes,
+  CanonicalCode,
+  context,
+  Span,
+  SpanKind,
+  Status,
+  TimedEvent,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import {
-  SpanKind,
-  Attributes,
-  TimedEvent,
-  Span,
-  CanonicalCode,
-  Status,
-} from '@opentelemetry/api';
-import { plugin, PostgresPlugin } from '../src';
-import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
-import * as testUtils from '@opentelemetry/test-utils';
+import { plugin, PostgresPlugin } from '../src';
+import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -81,6 +83,7 @@ const runCallbackTest = (
 
 describe('pg@7.x', () => {
   let client: pg.Client;
+  let scopeManager: AsyncHooksScopeManager;
   const provider = new NodeTracerProvider();
   const tracer = provider.getTracer('external');
   const logger = new NoopLogger();
@@ -117,11 +120,14 @@ describe('pg@7.x', () => {
 
   beforeEach(function() {
     plugin.enable(pg, provider, logger);
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {
     memoryExporter.reset();
     plugin.disable();
+    scopeManager.disable();
   });
 
   it('should return a plugin', () => {
@@ -359,15 +365,18 @@ describe('pg@7.x', () => {
 
     it('should handle the same callback being given to multiple client.query()s', done => {
       let events = 0;
+      const parent = tracer.startSpan('parent');
 
-      const queryHandler = (err: Error, res: pg.QueryResult) => {
+      const queryHandler = (err?: Error, res?: pg.QueryResult) => {
         const span = tracer.getCurrentSpan();
-        assert.ok(span);
-        assert.strictEqual((span as any)['_ended'], false);
+        assert.deepStrictEqual(span!.context(), parent.context());
         if (err) {
           throw err;
         }
         events += 1;
+        if (events === 7) {
+          done();
+        }
       };
 
       const config = {
@@ -375,16 +384,17 @@ describe('pg@7.x', () => {
         callback: queryHandler,
       };
 
-      client.query(config.text, config.callback); // 1
-      client.query(config); // 2
-      client.query(config.text, queryHandler); // 3
-      client.query(config.text, queryHandler); // 4
-      client.query(config.text); // Not using queryHandler
-      client.query(config); // 5
-      client.query(config); // 6
-      client.query(config.text, (err, res) => {
-        assert.strictEqual(events, 6);
-        done();
+      tracer.withSpan(parent, () => {
+        client.query(config.text, config.callback); // 1
+        client.query(config); // 2
+        client.query(config.text, queryHandler); // 3
+        client.query(config.text, queryHandler); // 4
+        client
+          .query(config.text)
+          .then(result => queryHandler(undefined, result))
+          .catch(err => queryHandler(err)); // 5
+        client.query(config); // 6
+        client.query(config); // 7
       });
     });
 

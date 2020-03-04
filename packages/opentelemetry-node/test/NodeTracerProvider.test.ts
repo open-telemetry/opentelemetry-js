@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
+import { context, TraceFlags } from '@opentelemetry/api';
 import {
   ALWAYS_SAMPLER,
-  HttpTraceContext,
   NEVER_SAMPLER,
   NoopLogger,
   NoRecordingSpan,
+  setActiveSpan,
 } from '@opentelemetry/core';
-import { NodeTracerProvider } from '../src/NodeTracerProvider';
-import { TraceFlags } from '@opentelemetry/api';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { Span } from '@opentelemetry/tracing';
+import * as assert from 'assert';
 import * as path from 'path';
+import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
+import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
   new Promise(resolve => {
@@ -40,26 +42,26 @@ const INSTALLED_PLUGINS_PATH = path.join(
 
 describe('NodeTracerProvider', () => {
   let provider: NodeTracerProvider;
+  let scopeManager: ScopeManager;
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
+  });
+
+  beforeEach(() => {
+    scopeManager = new AsyncHooksScopeManager();
+    context.initGlobalContextManager(scopeManager.enable());
   });
 
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
     provider.stop();
+    scopeManager.disable();
   });
 
   describe('constructor', () => {
     it('should construct an instance with required only options', () => {
       provider = new NodeTracerProvider();
-      assert.ok(provider instanceof NodeTracerProvider);
-    });
-
-    it('should construct an instance with http text format', () => {
-      provider = new NodeTracerProvider({
-        httpTextFormat: new HttpTraceContext(),
-      });
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
@@ -194,9 +196,8 @@ describe('NodeTracerProvider', () => {
           span
         );
 
-        const span1 = provider
-          .getTracer('default')
-          .startSpan('my-span1', { parent: span });
+        const span1 = provider.getTracer('default').startSpan('my-span1');
+
         provider.getTracer('default').withSpan(span1, () => {
           assert.deepStrictEqual(
             provider.getTracer('default').getCurrentSpan(),
@@ -217,10 +218,10 @@ describe('NodeTracerProvider', () => {
       );
     });
 
-    it('should find correct scope with promises', done => {
-      provider = new NodeTracerProvider({});
+    it('should find correct scope with promises', async () => {
+      provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
-      provider.getTracer('default').withSpan(span, async () => {
+      await provider.getTracer('default').withSpan(span, async () => {
         for (let i = 0; i < 3; i++) {
           await sleep(5).then(() => {
             assert.deepStrictEqual(
@@ -229,7 +230,6 @@ describe('NodeTracerProvider', () => {
             );
           });
         }
-        return done();
       });
       assert.deepStrictEqual(
         provider.getTracer('default').getCurrentSpan(),
@@ -249,18 +249,8 @@ describe('NodeTracerProvider', () => {
         );
         return done();
       };
-      const patchedFn = provider.getTracer('default').bind(fn, span);
+      const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
       return patchedFn();
-    });
-  });
-
-  describe('.getHttpTextFormat()', () => {
-    it('should get default HTTP text formatter', () => {
-      provider = new NodeTracerProvider({});
-      assert.ok(
-        provider.getTracer('default').getHttpTextFormat() instanceof
-          HttpTraceContext
-      );
     });
   });
 });

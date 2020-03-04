@@ -14,27 +14,29 @@
  * limitations under the License.
  */
 
+import {
+  Attributes,
+  CanonicalCode,
+  context,
+  Span,
+  SpanKind,
+  Status,
+  TimedEvent,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import {
-  SpanKind,
-  Attributes,
-  TimedEvent,
-  Span,
-  CanonicalCode,
-  Status,
-} from '@opentelemetry/api';
-import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
-import { plugin, PostgresPoolPlugin } from '../src';
-import { AttributeNames } from '../src/enums';
 import * as assert from 'assert';
 import * as pg from 'pg';
 import * as pgPool from 'pg-pool';
-import * as testUtils from '@opentelemetry/test-utils';
+import { plugin, PostgresPoolPlugin } from '../src';
+import { AttributeNames } from '../src/enums';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -92,6 +94,7 @@ const runCallbackTest = (
 
 describe('pg-pool@2.x', () => {
   let pool: pgPool<pg.Client>;
+  let scopeManager: AsyncHooksScopeManager;
   const provider = new NodeTracerProvider();
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
@@ -125,12 +128,15 @@ describe('pg-pool@2.x', () => {
   beforeEach(function() {
     plugin.enable(pgPool, provider, logger);
     pgPlugin.enable(pg, provider, logger);
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {
     memoryExporter.reset();
     plugin.disable();
     pgPlugin.disable();
+    scopeManager.disable();
   });
 
   it('should return a plugin', () => {

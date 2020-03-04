@@ -18,14 +18,15 @@
 // code outside zone.js. This needs to be done before all
 const originalSetTimeout = window.setTimeout;
 
-import * as assert from 'assert';
-import * as sinon from 'sinon';
+import { context } from '@opentelemetry/api';
 import { isWrapped, LogLevel } from '@opentelemetry/core';
+import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 import * as tracing from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { UserInteractionPlugin } from '../src';
-
 import {
   assertClickSpan,
   DummySpanExporter,
@@ -38,6 +39,7 @@ const FILE_URL =
 
 describe('UserInteractionPlugin', () => {
   describe('when zone.js is NOT available', () => {
+    let scopeManager: ZoneScopeManager;
     let userInteractionPlugin: UserInteractionPlugin;
     let sandbox: sinon.SinonSandbox;
     let webTracerProvider: WebTracerProvider;
@@ -45,6 +47,8 @@ describe('UserInteractionPlugin', () => {
     let exportSpy: sinon.SinonSpy;
     let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
+      scopeManager = new ZoneScopeManager().enable();
+      context.initGlobalContextManager(scopeManager);
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
       fakeXhr.onCreate = function(xhr: sinon.SinonFakeXMLHttpRequest) {
@@ -85,6 +89,7 @@ describe('UserInteractionPlugin', () => {
       requests = [];
       sandbox.restore();
       exportSpy.restore();
+      scopeManager.disable();
     });
 
     it('should handle task without async operation', () => {

@@ -23,8 +23,6 @@ export interface ExporterConfig {
   logger?: types.Logger;
   serviceName: string;
   url?: string;
-  // Initiates a request with spans in memory to the backend.
-  forceFlush?: boolean;
   // Optional mapping overrides for OpenTelemetry status code and description.
   statusCodeTagName?: string;
   statusDescriptionTagName?: string;
