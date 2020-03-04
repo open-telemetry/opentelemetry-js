@@ -21,19 +21,19 @@ npm install --save @opentelemetry/plugin-user-interaction
 
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 // or if you already have zone.js
 // import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
 
-const webTracerWithZone = new WebTracer({
+const provider = new WebTracerProvider({
   scopeManager: new ZoneScopeManager(), // optional
   plugins: [
     new UserInteractionPlugin()
   ]
 });
-webTracerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // and some test
 const btn1 = document.createElement('button');

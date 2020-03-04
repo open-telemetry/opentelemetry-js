@@ -17,16 +17,16 @@ npm install --save @opentelemetry/plugin-document-load
 
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracer } from '@opentelemetry/web';
+import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 
-const webTracer = new WebTracer({
+const provider = new WebTracerProvider({
   plugins: [
     new DocumentLoad()
   ]
 });
 
-webTracer.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 ```
 
 ## Optional: Send a trace parent from your server
