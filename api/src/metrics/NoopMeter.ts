@@ -17,7 +17,7 @@
 import { Meter } from './Meter';
 import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
 import { BoundMeasure, BoundCounter } from './BoundInstrument';
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
@@ -107,15 +107,15 @@ export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   record(
     value: number,
     labelSet: LabelSet,
-    distContext?: DistributedContext,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ) {
-    if (typeof distContext === 'undefined') {
+    if (typeof correlationContext === 'undefined') {
       this.bind(labelSet).record(value);
     } else if (typeof spanContext === 'undefined') {
-      this.bind(labelSet).record(value, distContext);
+      this.bind(labelSet).record(value, correlationContext);
     } else {
-      this.bind(labelSet).record(value, distContext, spanContext);
+      this.bind(labelSet).record(value, correlationContext, spanContext);
     }
   }
 }
@@ -129,7 +129,7 @@ export class NoopBoundCounter implements BoundCounter {
 export class NoopBoundMeasure implements BoundMeasure {
   record(
     value: number,
-    distContext?: DistributedContext,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ): void {
     return;

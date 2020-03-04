@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 
 /**
@@ -118,13 +118,13 @@ export interface MetricUtils {
   record(
     value: number,
     labelSet: LabelSet,
-    distContext: DistributedContext
+    correlationContext: CorrelationContext
   ): void;
 
   record(
     value: number,
     labelSet: LabelSet,
-    distContext: DistributedContext,
+    correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
 }

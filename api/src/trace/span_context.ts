@@ -19,7 +19,7 @@ import { TraceState } from './trace_state';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
- * serialized and propagated along side of a {@link DistributedContext}.
+ * serialized and propagated along side of a {@link CorrelationContext}.
  */
 export interface SpanContext {
   /**
