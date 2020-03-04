@@ -14,13 +14,34 @@
  * limitations under the License.
  */
 
-import { defaultGetter, defaultSetter, HttpTextFormat, SpanContext } from '@opentelemetry/api';
+import {
+  defaultGetter,
+  defaultSetter,
+  HttpTextFormat,
+  SpanContext,
+} from '@opentelemetry/api';
 import { Context } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
-import { CompositePropagator, HttpTraceContext, randomSpanId, randomTraceId } from '../../src';
-import { getExtractedSpanContext, setExtractedSpanContext } from '../../src/context/context';
-import { B3Format, X_B3_SAMPLED, X_B3_SPAN_ID, X_B3_TRACE_ID } from '../../src/context/propagation/B3Format';
-import { TRACE_PARENT_HEADER, TRACE_STATE_HEADER } from '../../src/context/propagation/HttpTraceContext';
+import {
+  CompositePropagator,
+  HttpTraceContext,
+  randomSpanId,
+  randomTraceId,
+} from '../../src';
+import {
+  getExtractedSpanContext,
+  setExtractedSpanContext,
+} from '../../src/context/context';
+import {
+  B3Format,
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from '../../src/context/propagation/B3Format';
+import {
+  TRACE_PARENT_HEADER,
+  TRACE_STATE_HEADER,
+} from '../../src/context/propagation/HttpTraceContext';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('Composite Propagator', () => {

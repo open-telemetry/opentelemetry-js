@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Context, GetterFunction, HttpTextFormat, Logger, SetterFunction } from '@opentelemetry/api';
+import {
+  Context,
+  GetterFunction,
+  HttpTextFormat,
+  Logger,
+  SetterFunction,
+} from '@opentelemetry/api';
 import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
 
