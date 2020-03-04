@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
+import { CanonicalCode, context } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
-  SimpleSpanProcessor,
   ReadableSpan,
+  SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as mysql from 'mysql';
 import { MysqlPlugin, plugin } from '../src';
-import * as testUtils from '@opentelemetry/test-utils';
 import { AttributeNames } from '../src/enums';
-import { CanonicalCode } from '@opentelemetry/api';
 
 const port = parseInt(process.env.MYSQL_PORT || '33306', 10);
 const database = process.env.MYSQL_DATABASE || 'test_db';
@@ -35,6 +36,7 @@ const user = process.env.MYSQL_USER || 'otel';
 const password = process.env.MYSQL_PASSWORD || 'secret';
 
 describe('mysql@2.x', () => {
+  let scopeManager: AsyncHooksScopeManager;
   let connection: mysql.Connection;
   let pool: mysql.Pool;
   let poolCluster: mysql.PoolCluster;
@@ -71,6 +73,8 @@ describe('mysql@2.x', () => {
   });
 
   beforeEach(function() {
+    scopeManager = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManager);
     plugin.enable(mysql, provider, logger);
     connection = mysql.createConnection({
       port,
@@ -97,6 +101,7 @@ describe('mysql@2.x', () => {
   });
 
   afterEach(done => {
+    scopeManager.disable();
     memoryExporter.reset();
     plugin.disable();
     connection.end(() => {

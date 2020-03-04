@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ export class Resource {
   constructor(
     /**
      * A dictionary of labels with string keys and values that provide information
-     * about the entity.
+     * about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on labels.
      */
-    readonly labels: { [key: string]: string }
+    readonly labels: { [key: string]: number | string | boolean }
   ) {}
 
   /**

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { Resource } from '../../src/resources/Resource';
+import { Resource } from '../src/Resource';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -74,5 +74,16 @@ describe('Resource', () => {
     const actualResource = resource1.merge(null);
     assert.strictEqual(Object.keys(actualResource.labels).length, 3);
     assert.deepStrictEqual(actualResource, resource1);
+  });
+
+  it('should accept string, number, and boolean values', () => {
+    const resource = new Resource({
+      'custom.string': 'strvalue',
+      'custom.number': 42,
+      'custom.boolean': true,
+    });
+    assert.equal(resource.labels['custom.string'], 'strvalue');
+    assert.equal(resource.labels['custom.number'], 42);
+    assert.equal(resource.labels['custom.boolean'], true);
   });
 });

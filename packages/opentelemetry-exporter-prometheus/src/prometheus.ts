@@ -28,8 +28,7 @@ import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
-import { LabelSet } from '@opentelemetry/metrics/build/src/LabelSet';
-import { CounterSumAggregator } from '@opentelemetry/metrics/build/src/export/Aggregator';
+import { CounterSumAggregator, LabelSet } from '@opentelemetry/metrics';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {

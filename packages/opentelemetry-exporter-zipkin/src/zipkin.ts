@@ -33,7 +33,6 @@ import { OT_REQUEST_HEADER } from './utils';
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
-  private readonly _forceFlush: boolean;
   private readonly _logger: types.Logger;
   private readonly _serviceName: string;
   private readonly _statusCodeTagName: string;
@@ -45,7 +44,6 @@ export class ZipkinExporter implements SpanExporter {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
     const urlOpts = url.parse(urlStr);
 
-    this._forceFlush = config.forceFlush || true;
     this._logger = config.logger || new NoopLogger();
     this._reqOpts = Object.assign(
       {
@@ -88,11 +86,6 @@ export class ZipkinExporter implements SpanExporter {
       return;
     }
     this._isShutdown = true;
-    // Make an optimistic flush.
-    if (this._forceFlush) {
-      // @todo get spans from span processor (batch)
-      this._sendSpans([]);
-    }
   }
 
   /**

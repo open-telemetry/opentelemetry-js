@@ -15,12 +15,17 @@
  */
 
 import {
+  context,
+  PluginConfig,
+  propagation,
+  Span,
+  SpanOptions,
+} from '@opentelemetry/api';
+import {
   BasePlugin,
   otperformance,
-  parseTraceParent,
   TRACE_PARENT_HEADER,
 } from '@opentelemetry/core';
-import { PluginConfig, Span, SpanOptions } from '@opentelemetry/api';
 import {
   addSpanNetworkEvent,
   hasKey,
@@ -71,9 +76,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     ) as PerformanceResourceTiming[];
     if (resources) {
       resources.forEach(resource => {
-        this._initResourceSpan(resource, {
-          parent: rootSpan,
-        });
+        this._initResourceSpan(resource);
       });
     }
   }
@@ -102,40 +105,46 @@ export class DocumentLoad extends BasePlugin<unknown> {
     );
 
     const entries = this._getEntries();
-
-    const rootSpan = this._startSpan(
-      AttributeNames.DOCUMENT_LOAD,
-      PTN.FETCH_START,
-      entries,
-      { parent: parseTraceParent((metaElement && metaElement.content) || '') }
-    );
-    if (!rootSpan) {
-      return;
-    }
-    const fetchSpan = this._startSpan(
-      AttributeNames.DOCUMENT_FETCH,
-      PTN.FETCH_START,
-      entries,
-      {
-        parent: rootSpan,
+    const traceparent = (metaElement && metaElement.content) || '';
+    context.with(propagation.extract({ traceparent }), () => {
+      const rootSpan = this._startSpan(
+        AttributeNames.DOCUMENT_LOAD,
+        PTN.FETCH_START,
+        entries
+      );
+      if (!rootSpan) {
+        return;
       }
-    );
-    if (fetchSpan) {
-      this._addSpanNetworkEvents(fetchSpan, entries);
-      this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
-    }
+      this._tracer.withSpan(rootSpan, () => {
+        const fetchSpan = this._startSpan(
+          AttributeNames.DOCUMENT_FETCH,
+          PTN.FETCH_START,
+          entries
+        );
+        if (fetchSpan) {
+          this._tracer.withSpan(fetchSpan, () => {
+            this._addSpanNetworkEvents(fetchSpan, entries);
+            this._endSpan(fetchSpan, PTN.RESPONSE_END, entries);
+          });
+        }
+      });
 
-    this._addResourcesSpans(rootSpan);
+      this._addResourcesSpans(rootSpan);
 
-    addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
-    addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
-    addSpanNetworkEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
-    addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_START, entries);
-    addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
-    addSpanNetworkEvent(rootSpan, PTN.DOM_COMPLETE, entries);
-    addSpanNetworkEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
+      addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_START, entries);
+      addSpanNetworkEvent(rootSpan, PTN.UNLOAD_EVENT_END, entries);
+      addSpanNetworkEvent(rootSpan, PTN.DOM_INTERACTIVE, entries);
+      addSpanNetworkEvent(
+        rootSpan,
+        PTN.DOM_CONTENT_LOADED_EVENT_START,
+        entries
+      );
+      addSpanNetworkEvent(rootSpan, PTN.DOM_CONTENT_LOADED_EVENT_END, entries);
+      addSpanNetworkEvent(rootSpan, PTN.DOM_COMPLETE, entries);
+      addSpanNetworkEvent(rootSpan, PTN.LOAD_EVENT_START, entries);
 
-    this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
+      this._endSpan(rootSpan, PTN.LOAD_EVENT_END, entries);
+    });
   }
 
   /**
