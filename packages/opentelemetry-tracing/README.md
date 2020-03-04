@@ -17,7 +17,7 @@ For automated instrumentation for Node.js, please see
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/core
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/tracing
 ```
 
