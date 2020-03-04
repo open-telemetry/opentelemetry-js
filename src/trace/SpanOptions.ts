@@ -33,12 +33,6 @@ export interface SpanOptions {
   /** A spans attributes */
   attributes?: Attributes;
 
-  /**
-   * Indicates that if this Span is active and recording information like
-   * events with the `AddEvent` operation and attributes using `setAttributes`.
-   */
-  isRecording?: boolean;
-
   /** A spans links */
   links?: Link[];
 
