@@ -101,7 +101,7 @@ describe('xhr', () => {
 
   beforeEach(() => {
     scopeManager = new ZoneScopeManager().enable();
-    types.context.initGlobalContextManager(scopeManager);
+    types.context.setGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {
@@ -109,7 +109,7 @@ describe('xhr', () => {
   });
 
   before(() => {
-    types.propagation.initGlobalPropagator(new B3Format());
+    types.propagation.setGlobalPropagator(new B3Format());
   });
 
   describe('when request is successful', () => {

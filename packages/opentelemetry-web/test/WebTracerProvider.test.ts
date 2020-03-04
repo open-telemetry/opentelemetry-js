@@ -42,7 +42,7 @@ describe('WebTracerProvider', () => {
     beforeEach(() => {
       defaultOptions = {};
       scopeManager = new ZoneScopeManager().enable();
-      context.initGlobalContextManager(scopeManager);
+      context.setGlobalContextManager(scopeManager);
     });
 
     afterEach(() => {

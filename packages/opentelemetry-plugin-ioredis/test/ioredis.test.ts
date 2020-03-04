@@ -58,7 +58,7 @@ describe('ioredis', () => {
   let scopeManager: AsyncHooksScopeManager;
   beforeEach(() => {
     scopeManager = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {

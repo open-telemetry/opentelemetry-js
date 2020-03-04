@@ -121,7 +121,7 @@ describe('pg@7.x', () => {
   beforeEach(function() {
     plugin.enable(pg, provider, logger);
     scopeManager = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {
