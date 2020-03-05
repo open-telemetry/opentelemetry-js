@@ -22,10 +22,9 @@ import {
   trace,
 } from '@opentelemetry/api';
 import { HttpTraceContext } from '@opentelemetry/core';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { NoopScopeManager } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
-import { WebTracerProvider } from '../src';
+import { WebTracerProvider, StackScopeManager } from '../src';
 
 describe('API registration', () => {
   beforeEach(() => {
@@ -38,7 +37,7 @@ describe('API registration', () => {
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register();
 
-    assert.ok(context['_scopeManager'] instanceof ZoneScopeManager);
+    assert.ok(context['_scopeManager'] instanceof StackScopeManager);
     assert.ok(propagation['_propagator'] instanceof HttpTraceContext);
     assert.ok(trace['_tracerProvider'] === tracerProvider);
   });
@@ -80,7 +79,7 @@ describe('API registration', () => {
 
     assert.ok(propagation['_propagator'] instanceof NoopHttpTextFormat);
 
-    assert.ok(context['_scopeManager'] instanceof ZoneScopeManager);
+    assert.ok(context['_scopeManager'] instanceof StackScopeManager);
     assert.ok(trace['_tracerProvider'] === tracerProvider);
   });
 });
