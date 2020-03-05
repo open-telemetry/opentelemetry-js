@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /**
  * Options needed for metric creation
@@ -106,6 +107,13 @@ export interface MetricUtils {
   add(value: number, labelSet: LabelSet): void;
 
   /**
+   * Sets a callback where user can observe value for certain labels
+   * @param callback a function that will be called once to set observers
+   *     for values
+   */
+  setCallback(callback: (observerResult: ObserverResult) => void): void;
+
+  /**
    * Sets the given value. Values can be negative.
    */
   set(value: number, labelSet: LabelSet): void;
@@ -118,13 +126,13 @@ export interface MetricUtils {
   record(
     value: number,
     labelSet: LabelSet,
-    distContext: DistributedContext
+    correlationContext: CorrelationContext
   ): void;
 
   record(
     value: number,
     labelSet: LabelSet,
-    distContext: DistributedContext,
+    correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
 }

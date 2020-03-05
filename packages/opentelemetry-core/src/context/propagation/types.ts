@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-export * from './LabelSet';
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterProvider';
-export * from './export/Aggregator';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
-export * from './export/Aggregator';
+import { HttpTextFormat, Logger } from '@opentelemetry/api';
+
+/** Configuration object for composite propagator */
+export interface CompositePropagatorConfig {
+  /**
+   * List of propagators to run. Propagators run in the
+   * list order. If a propagator later in the list writes the same context
+   * key as a propagator earlier in the list, the later on will "win".
+   */
+  propagators?: HttpTextFormat[];
+
+  /** Instance of logger */
+  logger?: Logger;
+}
