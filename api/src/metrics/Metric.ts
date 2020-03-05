@@ -16,6 +16,7 @@
 
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /**
  * Options needed for metric creation
@@ -104,6 +105,13 @@ export interface MetricUtils {
    * Adds the given value to the current value. Values cannot be negative.
    */
   add(value: number, labelSet: LabelSet): void;
+
+  /**
+   * Sets a callback where user can observe value for certain labels
+   * @param callback a function that will be called once to set observers
+   *     for values
+   */
+  setCallback(callback: (observerResult: ObserverResult) => void): void;
 
   /**
    * Sets the given value. Values can be negative.
