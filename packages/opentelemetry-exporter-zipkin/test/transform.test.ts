@@ -30,6 +30,7 @@ import {
   statusDescriptionTagName,
 } from '../src/transform';
 import * as zipkinTypes from '../src/types';
+import { Resource } from '@opentelemetry/resources';
 
 const logger = new NoopLogger();
 const tracer = new BasicTracerProvider({
@@ -41,6 +42,13 @@ const spanContext: types.SpanContext = {
   spanId: '6e0c63257de34c92',
   traceFlags: types.TraceFlags.SAMPLED,
 };
+
+const DUMMY_RESOUCE = new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
+});
+const EMPTY_RESOUCE = Resource.empty();
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
@@ -184,13 +192,17 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        DUMMY_RESOUCE
       );
 
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
         [statusCodeTagName]: 'OK',
+        cost: 112.12,
+        service: 'ui',
+        version: 1,
       });
     });
     it('should map OpenTelemetry Status.code to a Zipkin tag', () => {
@@ -213,7 +225,8 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        EMPTY_RESOUCE
       );
 
       assert.deepStrictEqual(tags, {
@@ -243,7 +256,8 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        Resource.empty()
       );
 
       assert.deepStrictEqual(tags, {

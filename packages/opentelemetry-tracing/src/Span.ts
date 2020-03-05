@@ -25,7 +25,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
-import { Resource } from "@opentelemetry/resources";
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * This class represents a span.

@@ -100,7 +100,17 @@ describe('transform', () => {
         Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
       assert.strictEqual(thriftSpan.tags.length, 9);
-      const [tag1, tag2, tag3, tag4, tag5, tag6, tag7, tag8, tag9] = thriftSpan.tags;
+      const [
+        tag1,
+        tag2,
+        tag3,
+        tag4,
+        tag5,
+        tag6,
+        tag7,
+        tag8,
+        tag9,
+      ] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);

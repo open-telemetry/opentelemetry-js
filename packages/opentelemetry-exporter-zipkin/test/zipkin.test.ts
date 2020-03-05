@@ -49,7 +49,11 @@ function getReadableSpan() {
     attributes: {},
     links: [],
     events: [],
-    resource: Resource.empty(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
   };
   return readableSpan;
 }
