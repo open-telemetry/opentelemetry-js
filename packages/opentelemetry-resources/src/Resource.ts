@@ -66,4 +66,10 @@ export class Resource {
     const mergedLabels = Object.assign({}, other.labels, this.labels);
     return new Resource(mergedLabels);
   }
+
+  static empty(): Resource {
+    return EMPTY_RESOURCE;
+  }
 }
+
+const EMPTY_RESOURCE = new Resource({});
