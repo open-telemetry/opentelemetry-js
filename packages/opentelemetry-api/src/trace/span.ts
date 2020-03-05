@@ -100,11 +100,4 @@ export interface Span {
    * with the AddEvent operation and attributes using setAttributes.
    */
   isRecording(): boolean;
-
-  /**
-   * Returns if the span has been ended.
-   *
-   * @returns true if the Span has been ended.
-   */
-  isEnded(): boolean;
 }
