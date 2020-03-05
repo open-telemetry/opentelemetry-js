@@ -16,9 +16,10 @@
 
 import { Meter } from './Meter';
 import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
-import { BoundMeasure, BoundCounter } from './BoundInstrument';
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { BoundMeasure, BoundCounter, BoundObserver } from './BoundInstrument';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -43,6 +44,15 @@ export class NoopMeter implements Meter {
    */
   createCounter(name: string, options?: MetricOptions): Metric<BoundCounter> {
     return NOOP_COUNTER_METRIC;
+  }
+
+  /**
+   * Returns constant noop observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createObserver(name: string, options?: MetricOptions): Metric<BoundObserver> {
+    return NOOP_OBSERVER_METRIC;
   }
 
   labels(labels: Labels): LabelSet {
@@ -107,17 +117,22 @@ export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   record(
     value: number,
     labelSet: LabelSet,
-    distContext?: DistributedContext,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ) {
-    if (typeof distContext === 'undefined') {
+    if (typeof correlationContext === 'undefined') {
       this.bind(labelSet).record(value);
     } else if (typeof spanContext === 'undefined') {
-      this.bind(labelSet).record(value, distContext);
+      this.bind(labelSet).record(value, correlationContext);
     } else {
-      this.bind(labelSet).record(value, distContext, spanContext);
+      this.bind(labelSet).record(value, correlationContext, spanContext);
     }
   }
+}
+
+export class NoopObserverMetric extends NoopMetric<BoundObserver>
+  implements Pick<MetricUtils, 'setCallback'> {
+  setCallback(callback: (observerResult: ObserverResult) => void): void {}
 }
 
 export class NoopBoundCounter implements BoundCounter {
@@ -129,11 +144,15 @@ export class NoopBoundCounter implements BoundCounter {
 export class NoopBoundMeasure implements BoundMeasure {
   record(
     value: number,
-    distContext?: DistributedContext,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ): void {
     return;
   }
+}
+
+export class NoopBoundObserver implements BoundObserver {
+  setCallback(callback: (observerResult: ObserverResult) => {}): void {}
 }
 
 export const NOOP_METER = new NoopMeter();
@@ -142,5 +161,8 @@ export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
 export const NOOP_BOUND_MEASURE = new NoopBoundMeasure();
 export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
+
+export const NOOP_BOUND_OBSERVER = new NoopBoundObserver();
+export const NOOP_OBSERVER_METRIC = new NoopObserverMetric(NOOP_BOUND_OBSERVER);
 
 export const NOOP_LABEL_SET = {} as LabelSet;

@@ -15,9 +15,10 @@
  */
 
 import {
-  Carrier,
   Context,
+  GetterFunction,
   HttpTextFormat,
+  SetterFunction,
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -63,7 +64,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContext implements HttpTextFormat {
-  inject(context: Context, carrier: Carrier) {
+  inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -71,14 +72,14 @@ export class HttpTraceContext implements HttpTextFormat {
       spanContext.spanId
     }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
 
-    carrier[TRACE_PARENT_HEADER] = traceParent;
+    setter(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
-      carrier[TRACE_STATE_HEADER] = spanContext.traceState.serialize();
+      setter(carrier, TRACE_STATE_HEADER, spanContext.traceState.serialize());
     }
   }
 
-  extract(context: Context, carrier: Carrier): Context {
-    const traceParentHeader = carrier[TRACE_PARENT_HEADER];
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+    const traceParentHeader = getter(carrier, TRACE_PARENT_HEADER);
     if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
@@ -88,7 +89,7 @@ export class HttpTraceContext implements HttpTextFormat {
 
     spanContext.isRemote = true;
 
-    const traceStateHeader = carrier[TRACE_STATE_HEADER];
+    const traceStateHeader = getter(carrier, TRACE_STATE_HEADER);
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a
       // single header.

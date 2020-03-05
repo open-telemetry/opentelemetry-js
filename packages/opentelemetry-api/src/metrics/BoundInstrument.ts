@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
@@ -31,15 +32,27 @@ export interface BoundMeasure {
   /**
    * Records the given value to this measure.
    * @param value the measurement to record.
-   * @param distContext the distContext associated with the measurements.
+   * @param correlationContext the correlationContext associated with the
+   *     measurements.
    * @param spanContext the {@link SpanContext} that identifies the {@link Span}
    *     for which the measurements are associated with.
    */
   record(value: number): void;
-  record(value: number, distContext: DistributedContext): void;
+  record(value: number, correlationContext: CorrelationContext): void;
   record(
     value: number,
-    distContext: DistributedContext,
+    correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
+}
+
+/** Base interface for the Observer metrics. */
+export interface BoundObserver {
+  /**
+   * Sets callback for the observer. The callback is called once and then it
+   * sets observers for values. The observers are called periodically to
+   * retrieve the value.
+   * @param callback
+   */
+  setCallback(callback: (observerResult: ObserverResult) => {}): void;
 }

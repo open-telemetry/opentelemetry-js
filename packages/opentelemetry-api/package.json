@@ -18,7 +18,8 @@
     "compile": "npm run version:update && tsc -p .",
     "docs-test": "linkinator docs/out --silent --skip david-dm.org",
     "docs": "typedoc --tsconfig tsconfig.json --exclude test/**/*.ts",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",

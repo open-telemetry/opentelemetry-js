@@ -15,7 +15,6 @@
  */
 
 import { Context } from '@opentelemetry/scope-base';
-import { Carrier } from './carrier';
 import { HttpTextFormat } from './HttpTextFormat';
 
 /**
@@ -23,9 +22,9 @@ import { HttpTextFormat } from './HttpTextFormat';
  */
 export class NoopHttpTextFormat implements HttpTextFormat {
   /** Noop inject function does nothing */
-  inject(context: Context, carrier: Carrier): void {}
+  inject(context: Context, carrier: unknown, setter: Function): void {}
   /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: Carrier): Context {
+  extract(context: Context, carrier: unknown, getter: Function): Context {
     return context;
   }
 }
