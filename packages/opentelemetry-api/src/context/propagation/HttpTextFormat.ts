@@ -38,6 +38,8 @@ export interface HttpTextFormat {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
+   * @param setter a function which accepts a carrier, key, and value, which
+   *     sets the key on the carrier to the value.
    */
   inject(context: Context, carrier: unknown, setter: SetterFunction): void;
 
@@ -50,6 +52,8 @@ export interface HttpTextFormat {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
+   * @param getter a function which accepts a carrier and a key, and returns
+   *     the value from the carrier identified by the key.
    */
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context;
 }
