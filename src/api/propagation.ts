@@ -15,9 +15,10 @@
  */
 
 import { Context } from '@opentelemetry/scope-base';
-import { Carrier } from '../context/propagation/carrier';
+import { defaultGetter, GetterFunction } from '../context/propagation/getter';
 import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
 import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
+import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
 
 const contextApi = ContextAPI.getInstance();
@@ -53,19 +54,29 @@ export class PropagationAPI {
    * Inject context into a carrier to be propagated inter-process
    *
    * @param carrier carrier to inject context into
+   * @param setter Function used to set values on the carrier
    * @param context Context carrying tracing data to inject. Defaults to the currently active context.
    */
-  public inject(carrier: Carrier, context = contextApi.active()): void {
-    return this._propagator.inject(context, carrier);
+  public inject<Carrier>(
+    carrier: Carrier,
+    setter: SetterFunction<Carrier> = defaultSetter,
+    context = contextApi.active()
+  ): void {
+    return this._propagator.inject(context, carrier, setter);
   }
 
   /**
    * Extract context from a carrier
    *
    * @param carrier Carrier to extract context from
+   * @param getter Function used to extract keys from a carrier
    * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
    */
-  public extract(carrier: Carrier, context = contextApi.active()): Context {
-    return this._propagator.extract(context, carrier);
+  public extract<Carrier>(
+    carrier: Carrier,
+    getter: GetterFunction<Carrier> = defaultGetter,
+    context = contextApi.active()
+  ): Context {
+    return this._propagator.extract(context, carrier, getter);
   }
 }
