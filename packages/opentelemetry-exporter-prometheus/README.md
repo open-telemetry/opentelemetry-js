@@ -29,8 +29,10 @@ const options = {port: 9464, startServer: true};
 const exporter = new PrometheusExporter(options);
 
 // Register the exporter
-const meter = new MeterProvider().getMeter('exporter-prometheus');
-meter.addExporter(exporter);
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('example-prometheus');
 
 // Now, start recording data
 const counter = meter.createCounter('metric_name');
@@ -42,6 +44,7 @@ const boundCounter = counter.bind(meter.labels({ [key]: 'value' }));
 boundCounter.add(10);
 
 // .. some other work
+```
 
 ## Viewing your metrics
 

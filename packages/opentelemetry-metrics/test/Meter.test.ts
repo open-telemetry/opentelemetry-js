@@ -24,11 +24,16 @@ import {
   MeterProvider,
   MeasureMetric,
   Distribution,
+  ObserverMetric,
+  MetricRecord,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
 import { NoopLogger } from '@opentelemetry/core';
-import { CounterSumAggregator } from '../src/export/Aggregator';
+import {
+  CounterSumAggregator,
+  ObserverAggregator,
+} from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
 
 describe('Meter', () => {
@@ -272,20 +277,20 @@ describe('Meter', () => {
 
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
-        const gauge = meter.createMeasure('');
-        assert.ok(gauge instanceof types.NoopMetric);
+        const measure = meter.createMeasure('');
+        assert.ok(measure instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
-        const gauge1 = meter.createMeasure('1name');
-        const gauge_ = meter.createMeasure('_name');
-        assert.ok(gauge1 instanceof types.NoopMetric);
-        assert.ok(gauge_ instanceof types.NoopMetric);
+        const measure1 = meter.createMeasure('1name');
+        const measure_ = meter.createMeasure('_name');
+        assert.ok(measure1 instanceof types.NoopMetric);
+        assert.ok(measure_ instanceof types.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
-        const gauge = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(gauge instanceof types.NoopMetric);
+        const measure = meter.createMeasure('name with invalid characters^&*(');
+        assert.ok(measure instanceof types.NoopMetric);
       });
     });
 
@@ -296,12 +301,19 @@ describe('Meter', () => {
         assert.doesNotThrow(() => boundMeasure.record(10));
       });
 
-      it('should return the timeseries', () => {
-        // @todo: implement once record is implemented
-      });
-
       it('should not accept negative values by default', () => {
-        // @todo: implement once record is implemented
+        const measure = meter.createMeasure('name');
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(-10);
+
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 0,
+          max: -Infinity,
+          min: Infinity,
+          sum: 0,
+        });
       });
 
       it('should not set the instrument data when disabled', () => {
@@ -321,8 +333,22 @@ describe('Meter', () => {
         });
       });
 
-      it('should accept negative (and positive) values when monotonic is set to false', () => {
-        // @todo: implement once record is implemented
+      it('should accept negative (and positive) values when absolute is set to false', () => {
+        const measure = meter.createMeasure('name', {
+          absolute: false,
+        });
+        const boundMeasure = measure.bind(labelSet);
+        boundMeasure.record(-10);
+        boundMeasure.record(50);
+
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
+          count: 2,
+          max: 50,
+          min: -10,
+          sum: 40,
+        });
       });
 
       it('should return same instrument on same label values', () => {
@@ -367,6 +393,69 @@ describe('Meter', () => {
         measure.clear();
         assert.strictEqual(measure['_instruments'].size, 0);
       });
+    });
+  });
+
+  describe('#observer', () => {
+    it('should create an observer', () => {
+      const measure = meter.createObserver('name') as ObserverMetric;
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should create observer with options', () => {
+      const measure = meter.createObserver('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      }) as ObserverMetric;
+      assert.ok(measure instanceof Metric);
+    });
+    it('should set callback and observe value ', () => {
+      const measure = meter.createObserver('name', {
+        description: 'desc',
+        labelKeys: ['pid', 'core'],
+      }) as ObserverMetric;
+
+      function getCpuUsage() {
+        return Math.random();
+      }
+
+      measure.setCallback((observerResult: types.ObserverResult) => {
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '1' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '2' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '3' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '4' })
+        );
+      });
+
+      const metricRecords: MetricRecord[] = measure.getMetricRecord();
+      assert.strictEqual(metricRecords.length, 4);
+
+      const metric1 = metricRecords[0];
+      const metric2 = metricRecords[1];
+      const metric3 = metricRecords[2];
+      const metric4 = metricRecords[3];
+
+      assert.ok(metric1.labels.identifier.indexOf('|#core:1,pid:123') === 0);
+      assert.ok(metric2.labels.identifier.indexOf('|#core:2,pid:123') === 0);
+      assert.ok(metric3.labels.identifier.indexOf('|#core:3,pid:123') === 0);
+      assert.ok(metric4.labels.identifier.indexOf('|#core:4,pid:123') === 0);
+
+      ensureMetric(metric1);
+      ensureMetric(metric2);
+      ensureMetric(metric3);
+      ensureMetric(metric4);
     });
   });
 
@@ -429,3 +518,16 @@ describe('Meter', () => {
     });
   });
 });
+
+function ensureMetric(metric: MetricRecord) {
+  assert.ok(metric.aggregator instanceof ObserverAggregator);
+  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
+  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
+  const descriptor = metric.descriptor;
+  assert.strictEqual(descriptor.name, 'name');
+  assert.strictEqual(descriptor.description, 'desc');
+  assert.strictEqual(descriptor.unit, '1');
+  assert.strictEqual(descriptor.metricKind, MetricKind.OBSERVER);
+  assert.strictEqual(descriptor.valueType, ValueType.DOUBLE);
+  assert.strictEqual(descriptor.monotonic, false);
+}

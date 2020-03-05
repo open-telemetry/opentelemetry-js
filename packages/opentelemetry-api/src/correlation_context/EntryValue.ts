@@ -16,7 +16,7 @@
 
 /**
  * {@link EntryValue} contains properties associated with a {@link
- * DistributedContext}.
+ * CorrelationContext}.
  */
 export interface EntryValue {
   /** `String` value of the `EntryValue`. */

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
+import { context } from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as express from 'express';
 import * as http from 'http';
 import { AddressInfo } from 'net';
 import { plugin } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
-import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
 import {
   AttributeNames,
-  ExpressPluginConfig,
   ExpressLayerType,
+  ExpressPluginConfig,
 } from '../src/types';
 
 const httpRequest = {
@@ -57,13 +59,20 @@ describe('Express Plugin', () => {
   const spanProcessor = new SimpleSpanProcessor(memoryExporter);
   provider.addSpanProcessor(spanProcessor);
   const tracer = provider.getTracer('default');
+  let scopeManager: AsyncHooksScopeManager;
 
   before(() => {
     plugin.enable(express, provider, logger);
   });
 
+  beforeEach(() => {
+    scopeManager = new AsyncHooksScopeManager();
+    context.initGlobalContextManager(scopeManager.enable());
+  });
+
   afterEach(() => {
     memoryExporter.reset();
+    scopeManager.disable();
   });
 
   describe('Instrumenting normal get operations', () => {

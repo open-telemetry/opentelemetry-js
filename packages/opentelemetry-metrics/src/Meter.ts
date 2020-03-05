@@ -17,7 +17,7 @@
 import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, MeasureMetric } from './Metric';
+import { Metric, CounterMetric, MeasureMetric, ObserverMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -105,6 +105,33 @@ export class Meter implements types.Meter {
     const counter = new CounterMetric(name, opt, this._batcher);
     this._registerMetric(name, counter);
     return counter;
+  }
+
+  /**
+   * Creates a new observer metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createObserver(
+    name: string,
+    options?: types.MetricOptions
+  ): types.Metric<types.BoundObserver> {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return types.NOOP_OBSERVER_METRIC;
+    }
+    const opt: MetricOptions = {
+      monotonic: false, // Observers are defined as non-monotonic by default
+      absolute: false, // not applicable to observer, set to false
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const observer = new ObserverMetric(name, opt, this._batcher);
+    this._registerMetric(name, observer);
+    return observer;
   }
 
   /**

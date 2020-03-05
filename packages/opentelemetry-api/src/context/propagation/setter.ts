@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-import { SpanContext } from '../../trace/span_context';
-import { BinaryFormat } from './BinaryFormat';
+export type SetterFunction<Carrier = any> = (
+  carrier: Carrier,
+  key: string,
+  value: unknown
+) => void;
 
 /**
- * No-op implementations of {@link BinaryFormat}.
+ * Default setter which sets value via direct property access
+ *
+ * @param carrier
+ * @param key
  */
-export class NoopBinaryFormat implements BinaryFormat {
-  private readonly _buff = new ArrayBuffer(0);
-  // By default does nothing
-  toBytes(spanContext: SpanContext): ArrayBuffer {
-    return this._buff;
-  }
-
-  // By default does nothing
-  fromBytes(buf: ArrayBuffer): SpanContext | null {
-    return null;
-  }
+export function defaultSetter(carrier: any, key: string, value: unknown) {
+  carrier[key] = value;
 }
-
-export const NOOP_BINARY_FORMAT = new NoopBinaryFormat();

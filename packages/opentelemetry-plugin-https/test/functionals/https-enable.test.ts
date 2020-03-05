@@ -15,24 +15,32 @@
  */
 
 import {
-  InMemorySpanExporter,
-  SimpleSpanProcessor,
-} from '@opentelemetry/tracing';
+  CanonicalCode,
+  context,
+  propagation,
+  Span as ISpan,
+  SpanKind,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
+  AttributeNames,
   Http,
   HttpPluginConfig,
   OT_REQUEST_HEADER,
-  AttributeNames,
 } from '@opentelemetry/plugin-http';
-import { CanonicalCode, Span as ISpan, SpanKind } from '@opentelemetry/api';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { ScopeManager } from '@opentelemetry/scope-base';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as fs from 'fs';
 import * as http from 'http';
 import * as https from 'https';
-import * as path from 'path';
 import * as nock from 'nock';
+import * as path from 'path';
 import { HttpsPlugin, plugin } from '../../src/https';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
@@ -48,14 +56,13 @@ const hostname = 'localhost';
 const serverName = 'my.server.name';
 const pathname = '/test';
 const memoryExporter = new InMemorySpanExporter();
-const httpTextFormat = new DummyPropagation();
 const logger = new NoopLogger();
 const provider = new NodeTracerProvider({
   logger,
-  httpTextFormat,
 });
 const tracer = provider.getTracer('test-https');
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+propagation.initGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -76,6 +83,17 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpsPlugin', () => {
+  let scopeManger: ScopeManager;
+
+  beforeEach(() => {
+    scopeManger = new AsyncHooksScopeManager().enable();
+    context.initGlobalContextManager(scopeManger);
+  });
+
+  afterEach(() => {
+    scopeManger.disable();
+  });
+
   it('should return a plugin', () => {
     assert.ok(plugin instanceof HttpsPlugin);
   });

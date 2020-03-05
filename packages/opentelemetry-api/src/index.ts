@@ -16,17 +16,18 @@
 
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/BinaryFormat';
-export * from './context/propagation/carrier';
+export * from './context/propagation/getter';
 export * from './context/propagation/HttpTextFormat';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
+export * from './context/propagation/setter';
+export * from './correlation_context/CorrelationContext';
+export * from './correlation_context/EntryValue';
 export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
 export * from './metrics/NoopMeter';
 export * from './metrics/NoopMeterProvider';
+export * from './metrics/ObserverResult';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
@@ -60,8 +61,13 @@ import { MetricsAPI } from './api/metrics';
 /** Entrypoint for metrics API */
 export const metrics = MetricsAPI.getInstance();
 
+import { PropagationAPI } from './api/propagation';
+/** Entrypoint for propagation API */
+export const propagation = PropagationAPI.getInstance();
+
 export default {
   trace,
   metrics,
   context,
+  propagation,
 };

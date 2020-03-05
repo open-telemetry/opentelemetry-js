@@ -29,41 +29,26 @@ OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
-The [v0.2 alpha
-release](https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.2.0)
-includes:
-
-- Tracing API
-- Tracing SDK (Node and Web)
-- Metrics API
-- Jaeger Trace Exporter
-- Zipkin Trace Exporter
-- OpenTracing Bridge
-- HTTP, GRPC, DNS Instrumentations
-- Document Load for web
-- Metrics SDK (`Counter` and `Gauge` support) - Export work is underway.
-
-The [v0.3 alpha
-release](https://github.com/open-telemetry/opentelemetry-js/releases/tag/v0.3.0)
-includes:
-
-- Prometheus Metric Exporter
-- OpenTelemetry Collector Exporter
-- mongodb, redis, mysql Instrumentations
+| Component                   | Version      | Release Date     |
+| --------------------------- | ------------ | ---------------- |
+| Tracing API                 | Alpha v0.1.0 | October 14 2019  |
+| Tracing SDK (Node and Web)  | Alpha v0.1.0 | October 14 2019  |
+| Jaeger Trace Exporter       | Alpha v0.1.0 | October 14 2019  |
+| Trace Context Propagation   | Alpha v0.1.0 | October 14 2019  |
+| Zipkin Trace Exporter       | Alpha v0.1.0 | October 14 2019  |
+| OpenTracing Bridge          | Alpha v0.1.0 | October 14 2019  |
+| Metrics API                 | Alpha v0.2.0 | November 04 2019 |
+| Metrics SDK                 | Alpha v0.2.0 | November 04 2019 |
+| Prometheus Metric Exporter  | Alpha v0.3.0 | December 13 2019 |
+| Collector Exporter          | Alpha v0.3.0 | December 13 2019 |
+| Resources                   | Beta         | March 25 2020    |
+| Support for Tags/Baggage    | Beta         | March 25 2020    |
+| OpenCensus Bridge           | Beta         | March 25 2020    |
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
 for details on upcoming releases. The dates and features described here are
 estimates, and subject to change.
-
-Future release targets include:
-
-| Component                   | Version    | Target Date        |
-| --------------------------- | ---------- | ------------------ |
-| Support for Tags/Baggage    | Alpha v0.4 | January 31 2020    |
-| Metrics Aggregation         | Alpha v0.4 | January 31 2020    |
-| Metrics SDK (Complete)      | Alpha v0.4 | January 31 2020    |
-| OpenCensus Bridge           | Alpha v0.4 | January 31 2020    |
 
 ## Contributing
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
