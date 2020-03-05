@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-export * from './LabelSet';
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterProvider';
-export * from './export/Aggregator';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
-export * from './export/Aggregator';
+import { ObserverResult as TypeObserverResult } from '@opentelemetry/api';
+import { LabelSet } from './LabelSet';
+
+/**
+ * Implementation of {@link TypeObserverResult}
+ */
+export class ObserverResult implements TypeObserverResult {
+  observers = new Map<LabelSet, Function>();
+  observe(callback: any, labelSet: LabelSet): void {
+    this.observers.set(labelSet, callback);
+  }
+}

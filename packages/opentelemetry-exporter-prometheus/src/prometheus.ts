@@ -17,10 +17,13 @@
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import {
+  CounterSumAggregator,
+  LastValue,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
   MetricKind,
+  ObserverAggregator,
   Sum,
 } from '@opentelemetry/metrics';
 import * as types from '@opentelemetry/api';
@@ -28,7 +31,6 @@ import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
-import { CounterSumAggregator, LabelSet } from '@opentelemetry/metrics';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -138,13 +140,19 @@ export class PrometheusExporter implements MetricExporter {
           this._getLabelValues(labelKeys, record.labels),
           value as Sum
         );
+      } else if (record.aggregator instanceof ObserverAggregator) {
+        metric.set(
+          this._getLabelValues(labelKeys, record.labels),
+          value as LastValue,
+          new Date()
+        );
       }
     }
 
     // TODO: only counter and gauge are implemented in metrics so far
   }
 
-  private _getLabelValues(keys: string[], values: LabelSet) {
+  private _getLabelValues(keys: string[], values: types.LabelSet) {
     const labelValues: labelValues = {};
     const labels = values.labels;
     for (let i = 0; i < keys.length; i++) {
@@ -191,7 +199,7 @@ export class PrometheusExporter implements MetricExporter {
         return record.descriptor.monotonic
           ? new Counter(metricObject)
           : new Gauge(metricObject);
-      case MetricKind.GAUGE:
+      case MetricKind.OBSERVER:
         return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented
