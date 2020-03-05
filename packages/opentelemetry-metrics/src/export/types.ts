@@ -21,12 +21,15 @@ import { LabelSet } from '../LabelSet';
 /** The kind of metric. */
 export enum MetricKind {
   COUNTER,
-  GAUGE,
   MEASURE,
+  OBSERVER,
 }
 
 /** Sum returns an aggregated sum. */
 export type Sum = number;
+
+/** LastValue returns last value. */
+export type LastValue = number;
 
 export interface Distribution {
   min: number;

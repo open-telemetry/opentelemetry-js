@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-export * from './LabelSet';
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './Metric';
-export * from './MeterProvider';
-export * from './export/Aggregator';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
-export * from './export/Aggregator';
+import { LabelSet } from './Metric';
+
+/**
+ * Interface that is being used in function setCallback for Observer Metric
+ */
+export interface ObserverResult {
+  observers: Map<LabelSet, Function>;
+  observe(callback: Function, labelSet: LabelSet): void;
+}
