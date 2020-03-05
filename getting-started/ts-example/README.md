@@ -80,7 +80,7 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR
 });
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 ```
 
 If you run your application now with `ts-node -r ./tracing.ts app.ts`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -119,7 +119,7 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(

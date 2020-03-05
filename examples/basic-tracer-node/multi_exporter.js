@@ -30,7 +30,7 @@ tracer.addSpanProcessor(new BatchSpanProcessor(jaegerExporter), {
 provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 // Create a span. A span must be closed.
 const parentSpan = tracer.startSpan('main');
