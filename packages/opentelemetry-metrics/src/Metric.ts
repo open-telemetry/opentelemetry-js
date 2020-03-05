@@ -19,7 +19,9 @@ import {
   BoundCounter,
   BaseBoundInstrument,
   BoundMeasure,
+  BoundObserver,
 } from './BoundInstrument';
+import { ObserverResult } from './ObserverResult';
 import { MetricOptions } from './types';
 import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
@@ -159,5 +161,46 @@ export class MeasureMetric extends Metric<BoundMeasure>
 
   record(value: number, labelSet: types.LabelSet) {
     this.bind(labelSet).record(value);
+  }
+}
+
+/** This is a SDK implementation of Observer Metric. */
+export class ObserverMetric extends Metric<BoundObserver>
+  implements Pick<types.MetricUtils, 'setCallback'> {
+  private _observerResult: types.ObserverResult = new ObserverResult();
+
+  constructor(
+    name: string,
+    options: MetricOptions,
+    private readonly _batcher: Batcher
+  ) {
+    super(name, options, MetricKind.OBSERVER);
+  }
+
+  protected _makeInstrument(labelSet: types.LabelSet): BoundObserver {
+    return new BoundObserver(
+      labelSet,
+      this._disabled,
+      this._monotonic,
+      this._valueType,
+      this._logger,
+      this._batcher.aggregatorFor(MetricKind.OBSERVER)
+    );
+  }
+
+  getMetricRecord(): MetricRecord[] {
+    this._observerResult.observers.forEach((callback, labelSet) => {
+      const instrument = this.bind(labelSet);
+      instrument.update(callback());
+    });
+    return super.getMetricRecord();
+  }
+
+  /**
+   * Sets a callback where user can observe value for certain labels
+   * @param callback
+   */
+  setCallback(callback: (observerResult: types.ObserverResult) => void): void {
+    callback(this._observerResult);
   }
 }

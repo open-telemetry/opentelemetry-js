@@ -24,11 +24,16 @@ import {
   MeterProvider,
   MeasureMetric,
   Distribution,
+  ObserverMetric,
+  MetricRecord,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
 import { NoopLogger } from '@opentelemetry/core';
-import { CounterSumAggregator } from '../src/export/Aggregator';
+import {
+  CounterSumAggregator,
+  ObserverAggregator,
+} from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
 
 describe('Meter', () => {
@@ -391,6 +396,69 @@ describe('Meter', () => {
     });
   });
 
+  describe('#observer', () => {
+    it('should create an observer', () => {
+      const measure = meter.createObserver('name') as ObserverMetric;
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should create observer with options', () => {
+      const measure = meter.createObserver('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      }) as ObserverMetric;
+      assert.ok(measure instanceof Metric);
+    });
+    it('should set callback and observe value ', () => {
+      const measure = meter.createObserver('name', {
+        description: 'desc',
+        labelKeys: ['pid', 'core'],
+      }) as ObserverMetric;
+
+      function getCpuUsage() {
+        return Math.random();
+      }
+
+      measure.setCallback((observerResult: types.ObserverResult) => {
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '1' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '2' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '3' })
+        );
+        observerResult.observe(
+          getCpuUsage,
+          meter.labels({ pid: '123', core: '4' })
+        );
+      });
+
+      const metricRecords: MetricRecord[] = measure.getMetricRecord();
+      assert.strictEqual(metricRecords.length, 4);
+
+      const metric1 = metricRecords[0];
+      const metric2 = metricRecords[1];
+      const metric3 = metricRecords[2];
+      const metric4 = metricRecords[3];
+
+      assert.ok(metric1.labels.identifier.indexOf('|#core:1,pid:123') === 0);
+      assert.ok(metric2.labels.identifier.indexOf('|#core:2,pid:123') === 0);
+      assert.ok(metric3.labels.identifier.indexOf('|#core:3,pid:123') === 0);
+      assert.ok(metric4.labels.identifier.indexOf('|#core:4,pid:123') === 0);
+
+      ensureMetric(metric1);
+      ensureMetric(metric2);
+      ensureMetric(metric3);
+      ensureMetric(metric4);
+    });
+  });
+
   describe('#getMetrics', () => {
     it('should create a DOUBLE counter', () => {
       const key = 'key';
@@ -450,3 +518,16 @@ describe('Meter', () => {
     });
   });
 });
+
+function ensureMetric(metric: MetricRecord) {
+  assert.ok(metric.aggregator instanceof ObserverAggregator);
+  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
+  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
+  const descriptor = metric.descriptor;
+  assert.strictEqual(descriptor.name, 'name');
+  assert.strictEqual(descriptor.description, 'desc');
+  assert.strictEqual(descriptor.unit, '1');
+  assert.strictEqual(descriptor.metricKind, MetricKind.OBSERVER);
+  assert.strictEqual(descriptor.valueType, ValueType.DOUBLE);
+  assert.strictEqual(descriptor.monotonic, false);
+}
