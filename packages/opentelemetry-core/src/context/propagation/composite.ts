@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { Carrier, Context, HttpTextFormat, Logger } from '@opentelemetry/api';
+import {
+  Context,
+  GetterFunction,
+  HttpTextFormat,
+  Logger,
+  SetterFunction,
+} from '@opentelemetry/api';
 import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
 
@@ -42,10 +48,10 @@ export class CompositePropagator implements HttpTextFormat {
    * @param context Context to inject
    * @param carrier Carrier into which context will be injected
    */
-  inject(context: Context, carrier: Carrier) {
+  inject(context: Context, carrier: unknown, setter: SetterFunction) {
     for (const propagator of this._propagators) {
       try {
-        propagator.inject(context, carrier);
+        propagator.inject(context, carrier, setter);
       } catch (err) {
         this._logger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`
@@ -63,10 +69,10 @@ export class CompositePropagator implements HttpTextFormat {
    * @param context Context to add values to
    * @param carrier Carrier from which to extract context
    */
-  extract(context: Context, carrier: Carrier): Context {
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
     return this._propagators.reduce((ctx, propagator) => {
       try {
-        return propagator.extract(ctx, carrier);
+        return propagator.extract(ctx, carrier, getter);
       } catch (err) {
         this._logger.warn(
           `Failed to inject with ${propagator.constructor.name}. Err: ${err.message}`

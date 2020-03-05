@@ -16,9 +16,10 @@
 
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/carrier';
+export * from './context/propagation/getter';
 export * from './context/propagation/HttpTextFormat';
 export * from './context/propagation/NoopHttpTextFormat';
+export * from './context/propagation/setter';
 export * from './correlation_context/CorrelationContext';
 export * from './correlation_context/EntryValue';
 export * from './metrics/BoundInstrument';
