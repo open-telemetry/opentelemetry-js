@@ -15,12 +15,12 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
   TracerConfig,
 } from '@opentelemetry/tracing';
+import { StackScopeManager } from './StackScopeManager';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -60,7 +60,7 @@ export class WebTracerProvider extends BasicTracerProvider {
    */
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
-      config.contextManager = new ZoneScopeManager();
+      config.contextManager = new StackScopeManager();
       config.contextManager.enable();
     }
 
