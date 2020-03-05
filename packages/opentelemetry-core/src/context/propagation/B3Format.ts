@@ -15,9 +15,10 @@
  */
 
 import {
-  Carrier,
   Context,
+  GetterFunction,
   HttpTextFormat,
+  SetterFunction,
   TraceFlags,
 } from '@opentelemetry/api';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
@@ -42,7 +43,7 @@ function isValidSpanId(spanId: string): boolean {
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3Format implements HttpTextFormat {
-  inject(context: Context, carrier: Carrier) {
+  inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -50,21 +51,21 @@ export class B3Format implements HttpTextFormat {
       isValidTraceId(spanContext.traceId) &&
       isValidSpanId(spanContext.spanId)
     ) {
-      carrier[X_B3_TRACE_ID] = spanContext.traceId;
-      carrier[X_B3_SPAN_ID] = spanContext.spanId;
+      setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
+      setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
 
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
       if (spanContext.traceFlags !== undefined) {
-        carrier[X_B3_SAMPLED] = Number(spanContext.traceFlags);
+        setter(carrier, X_B3_SAMPLED, Number(spanContext.traceFlags));
       }
     }
   }
 
-  extract(context: Context, carrier: Carrier): Context {
-    const traceIdHeader = carrier[X_B3_TRACE_ID];
-    const spanIdHeader = carrier[X_B3_SPAN_ID];
-    const sampledHeader = carrier[X_B3_SAMPLED];
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+    const traceIdHeader = getter(carrier, X_B3_TRACE_ID);
+    const spanIdHeader = getter(carrier, X_B3_SPAN_ID);
+    const sampledHeader = getter(carrier, X_B3_SAMPLED);
     if (!traceIdHeader || !spanIdHeader) return context;
     const traceId = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]

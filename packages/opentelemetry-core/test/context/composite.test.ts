@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
+import {
+  defaultGetter,
+  defaultSetter,
+  HttpTextFormat,
+  SpanContext,
+} from '@opentelemetry/api';
 import { Context } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
 import {
@@ -23,21 +29,20 @@ import {
   randomTraceId,
 } from '../../src';
 import {
-  setExtractedSpanContext,
   getExtractedSpanContext,
+  setExtractedSpanContext,
 } from '../../src/context/context';
 import {
   B3Format,
+  X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-  X_B3_SAMPLED,
 } from '../../src/context/propagation/B3Format';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
 } from '../../src/context/propagation/HttpTraceContext';
 import { TraceState } from '../../src/trace/TraceState';
-import { HttpTextFormat, SpanContext } from '@opentelemetry/api';
 
 describe('Composite Propagator', () => {
   let traceId: string;
@@ -71,7 +76,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new B3Format(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier);
+      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
 
       assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
       assert.strictEqual(carrier[X_B3_SPAN_ID], spanId);
@@ -87,7 +92,7 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      composite.inject(ctxWithSpanContext, carrier);
+      composite.inject(ctxWithSpanContext, carrier, defaultSetter);
 
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
@@ -114,7 +119,7 @@ describe('Composite Propagator', () => {
         propagators: [new B3Format(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
-        composite.extract(Context.ROOT_CONTEXT, carrier)
+        composite.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       if (!spanContext) {
@@ -133,7 +138,7 @@ describe('Composite Propagator', () => {
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
-        composite.extract(Context.ROOT_CONTEXT, carrier)
+        composite.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       if (!spanContext) {

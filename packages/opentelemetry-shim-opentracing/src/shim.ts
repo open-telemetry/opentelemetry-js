@@ -22,6 +22,7 @@ import {
   setActiveSpan,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
+import { defaultSetter } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -134,7 +135,7 @@ export class TracerShim extends opentracing.Tracer {
   _inject(
     spanContext: opentracing.SpanContext,
     format: string,
-    carrier: api.Carrier
+    carrier: unknown
   ): void {
     const opentelemSpanContext: api.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     if (!carrier || typeof carrier !== 'object') return;
@@ -144,6 +145,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP:
         api.propagation.inject(
           carrier,
+          defaultSetter,
           setExtractedSpanContext(
             api.Context.ROOT_CONTEXT,
             opentelemSpanContext
@@ -160,10 +162,7 @@ export class TracerShim extends opentracing.Tracer {
     }
   }
 
-  _extract(
-    format: string,
-    carrier: api.Carrier
-  ): opentracing.SpanContext | null {
+  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     switch (format) {
       // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:

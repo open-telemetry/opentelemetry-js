@@ -14,6 +14,18 @@
  * limitations under the License.
  */
 
-export type Carrier = {
-  [key: string]: unknown;
-};
+export type GetterFunction<Carrier = any> = (
+  carrier: Carrier,
+  key: string
+) => unknown;
+
+/**
+ * Default getter which just does a simple property access. Returns
+ * undefined if the key is not set.
+ *
+ * @param carrier
+ * @param key
+ */
+export function defaultGetter(carrier: any, key: string): unknown {
+  return carrier[key];
+}
