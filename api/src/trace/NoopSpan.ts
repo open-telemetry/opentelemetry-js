@@ -26,7 +26,7 @@ export const INVALID_SPAN_ID = '0';
 const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACE_ID,
   spanId: INVALID_SPAN_ID,
-  traceFlags: TraceFlags.UNSAMPLED,
+  traceFlags: TraceFlags.NONE,
 };
 
 /**
@@ -56,11 +56,6 @@ export class NoopSpan implements Span {
 
   // By default does nothing
   addEvent(name: string, attributes?: Attributes): this {
-    return this;
-  }
-
-  // By default does nothing
-  addLink(spanContext: SpanContext, attributes?: Attributes): this {
     return this;
   }
 

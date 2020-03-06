@@ -42,7 +42,7 @@ describe('API', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.UNSAMPLED,
+      traceFlags: TraceFlags.NONE,
     };
     const dummySpan = new NoopSpan(spanContext);
 

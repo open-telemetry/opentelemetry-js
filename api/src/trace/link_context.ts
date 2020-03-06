@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-import { Attributes } from './attributes';
-import { LinkContext } from './link_context';
+import { SpanContext } from './span_context';
 
 /**
- * A pointer from the current {@link Span} to another span in the same trace or
- * in a different trace. Used (for example) in batching operations, where a
- * single batch handler processes multiple requests from different traces.
+ * A pointer to another span.
  */
-export interface Link {
-  /** The {@link LinkContext} of a linked span. */
-  context: LinkContext;
-  /** A set of {@link Attributes} on the link. */
-  attributes?: Attributes;
-}
+export type LinkContext = Pick<SpanContext, 'traceId' | 'spanId'>;
