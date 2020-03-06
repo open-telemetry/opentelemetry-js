@@ -19,6 +19,7 @@ import { Logger } from '@opentelemetry/api';
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
 import { VERSION } from '../../version';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -43,12 +44,14 @@ export function onShutdown(shutdownF: EventListener) {
  * @param onSuccess
  * @param onError
  * @param collectorExporter
+ * @param resource
  */
 export function sendSpans(
   spans: collectorTypes.Span[],
   onSuccess: () => void,
   onError: (status?: number) => void,
-  collectorExporter: CollectorExporter
+  collectorExporter: CollectorExporter,
+  resource: Resource
 ) {
   const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
     node: {
@@ -66,7 +69,7 @@ export function sendSpans(
       },
       attributes: collectorExporter.attributes,
     },
-    // resource: '', not implemented
+    resource: resource.labels,
     spans,
   };
 

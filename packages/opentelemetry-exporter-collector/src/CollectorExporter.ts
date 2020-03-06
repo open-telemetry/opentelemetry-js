@@ -21,6 +21,7 @@ import { Attributes, Logger } from '@opentelemetry/api';
 import * as collectorTypes from './types';
 import { toCollectorSpan } from './transform';
 import { onInit, onShutdown, sendSpans } from './platform/index';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * Collector Exporter Config
@@ -100,10 +101,12 @@ export class CollectorExporter implements SpanExporter {
           toCollectorSpan(span)
         );
         this.logger.debug('spans to be sent', spansToBeSent);
+        const resource =
+          spansToBeSent.length > 0 ? spans[0].resource : Resource.empty();
 
         // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
         // it will use the appropriate transport layer automatically depends on platform
-        sendSpans(spansToBeSent, resolve, reject, this);
+        sendSpans(spansToBeSent, resolve, reject, this, resource);
       } catch (e) {
         reject(e);
       }
