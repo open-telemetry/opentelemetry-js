@@ -87,7 +87,7 @@ export type IgnoreMatcher = string | RegExp | ((name: string) => boolean);
  * Options available for the Express Plugin (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-express#express-plugin-options))
  */
 export interface ExpressPluginConfig extends PluginConfig {
-  /** Ingore specific based on their name */
+  /** Ignore specific based on their name */
   ignoreLayers?: IgnoreMatcher[];
   /** Ignore specific layers based on their type */
   ignoreLayersType?: ExpressLayerType[];
