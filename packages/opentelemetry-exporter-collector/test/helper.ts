@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { TraceFlags } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -27,7 +28,7 @@ export const mockedReadableSpan: ReadableSpan = {
   spanContext: {
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     spanId: '5e107261f64fa53e',
-    traceFlags: 1,
+    traceFlags: TraceFlags.SAMPLED,
   },
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
@@ -36,10 +37,9 @@ export const mockedReadableSpan: ReadableSpan = {
   attributes: { component: 'document-load' },
   links: [
     {
-      spanContext: {
+      context: {
         traceId: '1f1008dc8e270e85c40a0d7c3939b278',
         spanId: '78a8915098864388',
-        traceFlags: 1,
       },
       attributes: { component: 'document-load' },
     },

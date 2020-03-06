@@ -63,7 +63,7 @@ describe('SimpleSpanProcessor', () => {
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
         spanId: '5e0c63257de34c92',
-        traceFlags: TraceFlags.UNSAMPLED,
+        traceFlags: TraceFlags.NONE,
       };
       const span = new Span(
         provider.getTracer('default'),

@@ -20,6 +20,7 @@ import {
   CanonicalCode,
   TraceFlags,
   SpanContext,
+  LinkContext,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '../src';
 import {
@@ -41,6 +42,10 @@ describe('Span', () => {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
     traceFlags: TraceFlags.SAMPLED,
+  };
+  const linkContext: LinkContext = {
+    traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+    spanId: '7e0c63257de34c92',
   };
 
   it('should create a Span instance', () => {
@@ -169,10 +174,14 @@ describe('Span', () => {
       spanId: '5e0c63257de34c92',
       traceFlags: TraceFlags.SAMPLED,
     };
+    const linkContext: LinkContext = {
+      traceId: 'b3cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+    };
     const attributes = { attr1: 'value', attr2: 123, attr3: true };
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT, '12345', [
-      { spanContext },
-      { spanContext, attributes },
+      { context: linkContext },
+      { context: linkContext, attributes },
     ]);
     span.end();
   });
@@ -255,9 +264,9 @@ describe('Span', () => {
       SpanKind.CLIENT,
       undefined,
       [
-        { spanContext },
+        { context: linkContext },
         {
-          spanContext,
+          context: linkContext,
           attributes: { attr1: 'value', attr2: 123, attr3: true },
         },
       ]
@@ -266,11 +275,11 @@ describe('Span', () => {
     assert.strictEqual(readableSpan.links.length, 2);
     assert.deepStrictEqual(readableSpan.links, [
       {
-        spanContext,
+        context: linkContext,
       },
       {
         attributes: { attr1: 'value', attr2: 123, attr3: true },
-        spanContext,
+        context: linkContext,
       },
     ]);
 

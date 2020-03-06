@@ -139,7 +139,7 @@ describe('NodeTracerProvider', () => {
       });
       const span = provider.getTracer('default').startSpan('my-span');
       assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
       assert.strictEqual(span.isRecording(), false);
     });
 

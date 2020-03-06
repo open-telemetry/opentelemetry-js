@@ -22,6 +22,7 @@ import * as assert from 'assert';
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import { StackdriverTraceExporter } from '../src';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('Stackdriver Trace Exporter', () => {
   beforeEach(() => {
@@ -115,6 +116,7 @@ describe('Stackdriver Trace Exporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
@@ -147,6 +149,7 @@ describe('Stackdriver Trace Exporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
@@ -178,6 +181,7 @@ describe('Stackdriver Trace Exporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
@@ -207,6 +211,7 @@ describe('Stackdriver Trace Exporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },

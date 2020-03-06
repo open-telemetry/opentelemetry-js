@@ -103,12 +103,12 @@ function spanLinksToThriftRefs(
 ): ThriftReference[] {
   return links
     .map((link): ThriftReference | null => {
-      if (link.spanContext.spanId === parentSpanId) {
+      if (link.context.spanId === parentSpanId) {
         const refType = ThriftReferenceType.CHILD_OF;
-        const traceId = link.spanContext.traceId;
+        const traceId = link.context.traceId;
         const traceIdHigh = Utils.encodeInt64(traceId.slice(0, 16));
         const traceIdLow = Utils.encodeInt64(traceId.slice(16));
-        const spanId = Utils.encodeInt64(link.spanContext.spanId);
+        const spanId = Utils.encodeInt64(link.context.spanId);
         return { traceIdLow, traceIdHigh, spanId, refType };
       }
       return null;
