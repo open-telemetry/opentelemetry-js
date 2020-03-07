@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
 import { SDK_INFO } from '../src/constants';
-import { assertTelemetrySDKResource } from './util/resource-assertions';
+import { assertTelemetrySDKResource } from '../src/resource-assertions';
 
 describe('Resource', () => {
   const resource1 = new Resource({

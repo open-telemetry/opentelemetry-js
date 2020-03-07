@@ -16,3 +16,4 @@
 
 export { Resource } from './Resource';
 export * from './constants';
+export * from './resource-assertions';

@@ -24,7 +24,7 @@ import {
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { Span } from '@opentelemetry/tracing';
-import { assertTelemetrySDKResource } from '@opentelemetry/resources/test/util/resource-assertions';
+import { assertTelemetrySDKResource } from '@opentelemetry/resources';
 import { SDK_INFO } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
