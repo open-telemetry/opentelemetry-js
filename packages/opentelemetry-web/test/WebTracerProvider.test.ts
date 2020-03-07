@@ -15,10 +15,11 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin, NoopLogger } from '@opentelemetry/core';
 import { ScopeManager } from '@opentelemetry/scope-base';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
-import { Tracer } from '@opentelemetry/tracing';
+import { Tracer, Span } from '@opentelemetry/tracing';
+import { SDK_INFO, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
@@ -114,6 +115,20 @@ describe('WebTracerProvider', () => {
             }, 20);
           });
         });
+      });
+    });
+
+    describe('.startSpan()', () => {
+      it('should assign a telemetry sdk resource to span', () => {
+        const provider = new WebTracerProvider({
+          logger: new NoopLogger(),
+        });
+        const span = provider.getTracer('default').startSpan('my-span') as Span;
+        assert.ok(span);
+        assert.equal(
+          span.resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+          SDK_INFO.PLATFORM_WEB
+        );
       });
     });
   });

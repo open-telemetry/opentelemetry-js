@@ -21,6 +21,7 @@ import {
   TracerConfig,
 } from '@opentelemetry/tracing';
 import { StackScopeManager } from './StackScopeManager';
+import { Resource, SDK_INFO } from '@opentelemetry/resources';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -36,15 +37,20 @@ export interface WebTracerConfig extends TracerConfig {
  * This class represents a web tracer with {@link StackScopeManager}
  */
 export class WebTracerProvider extends BasicTracerProvider {
+  readonly resource: Resource = Resource.createTelemetrySDKResource(
+    SDK_INFO.PLATFORM_WEB
+  );
+
   /**
    * Constructs a new Tracer instance.
    * @param config Web Tracer config
    */
   constructor(config: WebTracerConfig = {}) {
+    super(config);
+
     if (typeof config.plugins === 'undefined') {
       config.plugins = [];
     }
-    super(config);
 
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger);
