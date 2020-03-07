@@ -16,8 +16,8 @@
 
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
-import { assertLibraryResource } from './util/resource-assertions';
-import { VERSION } from '../src/version';
+import { SDK_INFO } from '../src/constants';
+import { assertTelemetrySDKResource } from './util/resource-assertions';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -100,13 +100,13 @@ describe('Resource', () => {
     });
   });
 
-  describe('.createLibraryResource()', () => {
-    it('should return a library resource', () => {
-      const resource = Resource.createLibraryResource('nodejs');
-      assertLibraryResource(resource, {
+  describe('.createTelemetrySDKResource()', () => {
+    it('should return a telemetry SDK resource', () => {
+      const resource = Resource.createTelemetrySDKResource('nodejs');
+      assertTelemetrySDKResource(resource, {
         language: 'nodejs',
         name: 'opentelemetry',
-        version: VERSION,
+        version: SDK_INFO.VERSION,
       });
     });
   });

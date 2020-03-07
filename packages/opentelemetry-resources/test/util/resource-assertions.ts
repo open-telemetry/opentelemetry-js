@@ -21,7 +21,7 @@ import {
   CONTAINER_RESOURCE,
   HOST_RESOURCE,
   K8S_RESOURCE,
-  LIBRARY_RESOURCE,
+  TELEMETRY_SDK_RESOURCE,
   SERVICE_RESOURCE,
 } from '../../src/constants';
 /**
@@ -180,12 +180,12 @@ export const assertK8sResource = (
 };
 
 /**
- * Test utility method to validate a library resource
+ * Test utility method to validate a telemetry library resource
  *
  * @param resource the Resource to validate
  * @param validations validations for the resource labels
  */
-export const assertLibraryResource = (
+export const assertTelemetrySDKResource = (
   resource: Resource,
   validations: {
     name?: string;
@@ -193,20 +193,20 @@ export const assertLibraryResource = (
     version?: string;
   }
 ) => {
-  assertHasOneLabel(LIBRARY_RESOURCE, resource);
+  assertHasOneLabel(TELEMETRY_SDK_RESOURCE, resource);
   if (validations.name)
     assert.strictEqual(
-      resource.labels[LIBRARY_RESOURCE.NAME],
+      resource.labels[TELEMETRY_SDK_RESOURCE.NAME],
       validations.name
     );
   if (validations.language)
     assert.strictEqual(
-      resource.labels[LIBRARY_RESOURCE.LANGUAGE],
+      resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
       validations.language
     );
   if (validations.version)
     assert.strictEqual(
-      resource.labels[LIBRARY_RESOURCE.VERSION],
+      resource.labels[TELEMETRY_SDK_RESOURCE.VERSION],
       validations.version
     );
 };

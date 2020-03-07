@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { LIBRARY_RESOURCE } from './constants';
-import { VERSION } from './version';
+import { TELEMETRY_SDK_RESOURCE, SDK_INFO } from './constants';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -31,11 +30,11 @@ export class Resource {
     return Resource.EMPTY;
   }
 
-  static createLibraryResource(language: string): Resource {
+  static createTelemetrySDKResource(language: string): Resource {
     return new Resource({
-      [LIBRARY_RESOURCE.LANGUAGE]: language,
-      [LIBRARY_RESOURCE.NAME]: 'opentelemetry',
-      [LIBRARY_RESOURCE.VERSION]: VERSION,
+      [TELEMETRY_SDK_RESOURCE.LANGUAGE]: language,
+      [TELEMETRY_SDK_RESOURCE.NAME]: SDK_INFO.NAME,
+      [TELEMETRY_SDK_RESOURCE.VERSION]: SDK_INFO.VERSION,
     });
   }
 

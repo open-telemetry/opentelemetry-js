@@ -20,7 +20,7 @@ import {
   CONTAINER_RESOURCE,
   HOST_RESOURCE,
   K8S_RESOURCE,
-  LIBRARY_RESOURCE,
+  TELEMETRY_SDK_RESOURCE,
   SERVICE_RESOURCE,
 } from '../src/constants';
 import {
@@ -28,7 +28,7 @@ import {
   assertContainerResource,
   assertHostResource,
   assertK8sResource,
-  assertLibraryResource,
+  assertTelemetrySDKResource,
   assertServiceResource,
 } from './util/resource-assertions';
 
@@ -131,19 +131,21 @@ describe('assertK8sResource', () => {
   });
 });
 
-describe('assertLibraryResource', () => {
+describe('assertTelemetrySDKResource', () => {
   it('requires one library label', () => {
-    const resource = new Resource({ [LIBRARY_RESOURCE.NAME]: 'opentelemetry' });
-    assertLibraryResource(resource, {});
+    const resource = new Resource({
+      [TELEMETRY_SDK_RESOURCE.NAME]: 'opentelemetry',
+    });
+    assertTelemetrySDKResource(resource, {});
   });
 
   it('validates optional labels', () => {
     const resource = new Resource({
-      [LIBRARY_RESOURCE.NAME]: 'opentelemetry',
-      [LIBRARY_RESOURCE.LANGUAGE]: 'nodejs',
-      [LIBRARY_RESOURCE.VERSION]: '0.1.0',
+      [TELEMETRY_SDK_RESOURCE.NAME]: 'opentelemetry',
+      [TELEMETRY_SDK_RESOURCE.LANGUAGE]: 'nodejs',
+      [TELEMETRY_SDK_RESOURCE.VERSION]: '0.1.0',
     });
-    assertLibraryResource(resource, {
+    assertTelemetrySDKResource(resource, {
       name: 'opentelemetry',
       language: 'nodejs',
       version: '0.1.0',

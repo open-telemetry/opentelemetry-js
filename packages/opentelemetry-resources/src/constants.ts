@@ -1,3 +1,21 @@
+/*!
+ * Copyright 2020, OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+import { VERSION } from './version';
+
 /**
  * Copyright 2020, OpenTelemetry Authors
  *
@@ -98,15 +116,15 @@ export const K8S_RESOURCE = {
 };
 
 /** Attributes describing the telemetry library. */
-export const LIBRARY_RESOURCE = {
+export const TELEMETRY_SDK_RESOURCE = {
   /** The name of the telemetry library. */
-  NAME: 'library.name',
+  NAME: 'telemetry.sdk.name',
 
   /** The language of telemetry library and of the code instrumented with it. */
-  LANGUAGE: 'library.language',
+  LANGUAGE: 'telemetry.sdk.language',
 
-  /** The version string of the library. */
-  VERSION: 'library.version',
+  /** The version string of the telemetry library */
+  VERSION: 'telemetry.sdk.version',
 };
 
 /** Attributes describing a service instance. */
@@ -122,4 +140,12 @@ export const SERVICE_RESOURCE = {
 
   /** The version string of the service API or implementation. */
   VERSION: 'service.version',
+};
+
+/** Constants describing the SDK in use  */
+export const SDK_INFO = {
+  NAME: 'opentelemetry',
+  VERSION: VERSION,
+  PLATFORM_NODE: 'nodejs',
+  PLATFORM_WEB: 'webjs',
 };
