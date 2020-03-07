@@ -86,4 +86,15 @@ describe('Resource', () => {
     assert.equal(resource.labels['custom.number'], 42);
     assert.equal(resource.labels['custom.boolean'], true);
   });
+
+  describe('.empty()', () => {
+    it('should return an empty resource', () => {
+      const resource = Resource.empty();
+      assert.equal(Object.entries(resource.labels), 0);
+    });
+
+    it('should return the same empty resource', () => {
+      assert.strictEqual(Resource.empty(), Resource.empty());
+    });
+  });
 });

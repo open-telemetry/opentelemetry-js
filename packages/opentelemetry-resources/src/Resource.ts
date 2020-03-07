@@ -19,6 +19,15 @@
  * collected.
  */
 export class Resource {
+  static readonly EMPTY = new Resource({});
+
+  /**
+   * Returns an empty resource
+   */
+  static empty(): Resource {
+    return Resource.EMPTY;
+  }
+
   constructor(
     /**
      * A dictionary of labels with string keys and values that provide information
