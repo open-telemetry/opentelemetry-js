@@ -16,6 +16,7 @@
 
 import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { Metric, CounterMetric, MeasureMetric, ObserverMetric } from './Metric';
 import {
@@ -37,13 +38,15 @@ export class Meter implements types.Meter {
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
   readonly labels = Meter.labels;
+  readonly resource: Resource;
 
   /**
    * Constructs a new Meter instance.
    */
-  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+  constructor(config: MeterConfig = DEFAULT_CONFIG, resource: Resource) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = new UngroupedBatcher();
+    this.resource = resource;
     // start the push controller
     const exporter = config.exporter || new NoopExporter();
     const interval = config.interval;
@@ -73,7 +76,7 @@ export class Meter implements types.Meter {
       ...options,
     };
 
-    const measure = new MeasureMetric(name, opt, this._batcher);
+    const measure = new MeasureMetric(name, opt, this._batcher, this.resource);
     this._registerMetric(name, measure);
     return measure;
   }
@@ -102,7 +105,7 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, this._batcher);
+    const counter = new CounterMetric(name, opt, this._batcher, this.resource);
     this._registerMetric(name, counter);
     return counter;
   }
@@ -129,7 +132,12 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const observer = new ObserverMetric(name, opt, this._batcher);
+    const observer = new ObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this.resource
+    );
     this._registerMetric(name, observer);
     return observer;
   }
