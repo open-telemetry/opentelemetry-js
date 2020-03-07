@@ -24,6 +24,8 @@ import {
 } from '@opentelemetry/core';
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { Span } from '@opentelemetry/tracing';
+import { assertTelemetrySDKResource } from '@opentelemetry/resources/test/util/resource-assertions';
+import { SDK_INFO } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
 import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
@@ -157,6 +159,19 @@ describe('NodeTracerProvider', () => {
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
+    });
+
+    it('should assign a telemetry sdk resource to span', () => {
+      provider = new NodeTracerProvider({
+        logger: new NoopLogger(),
+      });
+      const span = provider.getTracer('default').startSpan('my-span') as Span;
+      assert.ok(span);
+      assertTelemetrySDKResource(span.resource, {
+        language: SDK_INFO.PLATFORM_NODE,
+        name: SDK_INFO.NAME,
+        version: SDK_INFO.VERSION,
+      });
     });
   });
 

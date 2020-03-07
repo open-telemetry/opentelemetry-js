@@ -19,6 +19,7 @@ import {
   BasicTracerProvider,
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
+import { Resource, SDK_INFO } from '@opentelemetry/resources';
 import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from './config';
 import { PluginLoader } from './instrumentation/PluginLoader';
 
@@ -30,6 +31,9 @@ import { PluginLoader } from './instrumentation/PluginLoader';
  * @param config Configuration object for SDK registration
  */
 export class NodeTracerProvider extends BasicTracerProvider {
+  readonly resource: Resource = Resource.createTelemetrySDKResource(
+    SDK_INFO.PLATFORM_NODE
+  );
   private readonly _pluginLoader: PluginLoader;
 
   /**
