@@ -309,7 +309,7 @@ describe('BasicTracerProvider', () => {
 
     it('should assign a resource', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
-      const span = tracer.startSpan('my-span');
+      const span = tracer.startSpan('my-span') as Span;
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
     });
