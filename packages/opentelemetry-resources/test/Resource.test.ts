@@ -16,6 +16,8 @@
 
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
+import { assertLibraryResource } from './util/resource-assertions';
+import { VERSION } from '../src/version';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -95,6 +97,17 @@ describe('Resource', () => {
 
     it('should return the same empty resource', () => {
       assert.strictEqual(Resource.empty(), Resource.empty());
+    });
+  });
+
+  describe('.createLibraryResource()', () => {
+    it('should return a library resource', () => {
+      const resource = Resource.createLibraryResource('nodejs');
+      assertLibraryResource(resource, {
+        language: 'nodejs',
+        name: 'opentelemetry',
+        version: VERSION,
+      });
     });
   });
 });

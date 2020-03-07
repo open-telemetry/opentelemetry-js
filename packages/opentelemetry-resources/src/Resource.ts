@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+import { LIBRARY_RESOURCE } from './constants';
+import { VERSION } from './version';
+
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
  * collected.
@@ -26,6 +29,14 @@ export class Resource {
    */
   static empty(): Resource {
     return Resource.EMPTY;
+  }
+
+  static createLibraryResource(language: string): Resource {
+    return new Resource({
+      [LIBRARY_RESOURCE.LANGUAGE]: language,
+      [LIBRARY_RESOURCE.NAME]: 'opentelemetry',
+      [LIBRARY_RESOURCE.VERSION]: VERSION,
+    });
   }
 
   constructor(
