@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { SDK_INFO } from '@opentelemetry/base';
 import { Resource } from '../src/Resource';
 import {
   CLOUD_RESOURCE,
@@ -132,9 +133,11 @@ describe('assertK8sResource', () => {
 });
 
 describe('assertTelemetrySDKResource', () => {
-  it('requires one library label', () => {
+  it('uses default validations', () => {
     const resource = new Resource({
-      [TELEMETRY_SDK_RESOURCE.NAME]: 'opentelemetry',
+      [TELEMETRY_SDK_RESOURCE.NAME]: SDK_INFO.NAME,
+      [TELEMETRY_SDK_RESOURCE.LANGUAGE]: SDK_INFO.LANGUAGE,
+      [TELEMETRY_SDK_RESOURCE.VERSION]: SDK_INFO.VERSION,
     });
     assertTelemetrySDKResource(resource, {});
   });

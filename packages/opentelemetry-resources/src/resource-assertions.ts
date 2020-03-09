@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
 import { Resource } from './Resource';
 import {
@@ -193,6 +194,14 @@ export const assertTelemetrySDKResource = (
     version?: string;
   }
 ) => {
+  const defaults = {
+    name: SDK_INFO.NAME,
+    language: SDK_INFO.LANGUAGE,
+    version: SDK_INFO.VERSION,
+  };
+
+  validations = { ...defaults, ...validations };
+
   assertHasOneLabel(TELEMETRY_SDK_RESOURCE, resource);
   if (validations.name)
     assert.strictEqual(

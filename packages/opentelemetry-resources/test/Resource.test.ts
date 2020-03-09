@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
+import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
-import { SDK_INFO } from '../src/constants';
 import { assertTelemetrySDKResource } from '../src/resource-assertions';
 
 describe('Resource', () => {
@@ -102,10 +102,10 @@ describe('Resource', () => {
 
   describe('.createTelemetrySDKResource()', () => {
     it('should return a telemetry SDK resource', () => {
-      const resource = Resource.createTelemetrySDKResource('nodejs');
+      const resource = Resource.createTelemetrySDKResource();
       assertTelemetrySDKResource(resource, {
-        language: 'nodejs',
-        name: 'opentelemetry',
+        language: SDK_INFO.LANGUAGE,
+        name: SDK_INFO.NAME,
         version: SDK_INFO.VERSION,
       });
     });

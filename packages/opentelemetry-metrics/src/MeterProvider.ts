@@ -25,7 +25,7 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
  */
 export class MeterProvider implements types.MeterProvider {
   private readonly _meters: Map<string, Meter> = new Map();
-  readonly resource: Resource = Resource.createTelemetrySDKResource('nodejs');
+  readonly resource: Resource = Resource.createTelemetrySDKResource();
   readonly logger: types.Logger;
 
   constructor(private _config: MeterConfig = DEFAULT_CONFIG) {

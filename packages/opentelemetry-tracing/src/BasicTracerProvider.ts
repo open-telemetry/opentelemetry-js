@@ -32,7 +32,7 @@ export class BasicTracerProvider implements api.TracerProvider {
 
   activeSpanProcessor = new NoopSpanProcessor();
   readonly logger: api.Logger;
-  readonly resource: Resource = Resource.empty();
+  readonly resource: Resource = Resource.createTelemetrySDKResource();
 
   constructor(private _config: TracerConfig = DEFAULT_CONFIG) {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);

@@ -35,7 +35,7 @@ import {
   ObserverAggregator,
 } from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
-import { assertTelemetrySDKResource, SDK_INFO } from '@opentelemetry/resources';
+import { assertTelemetrySDKResource } from '@opentelemetry/resources';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -92,9 +92,7 @@ describe('Meter', () => {
     it('should return counter with resource', () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assertTelemetrySDKResource(counter.resource, {
-        language: SDK_INFO.PLATFORM_NODE,
-        name: SDK_INFO.NAME,
-        version: SDK_INFO.VERSION,
+        name: 'opentelemetry',
       });
     });
 
@@ -288,9 +286,7 @@ describe('Meter', () => {
     it('should return a measure with resource', () => {
       const measure = meter.createMeasure('name') as MeasureMetric;
       assertTelemetrySDKResource(measure.resource, {
-        language: SDK_INFO.PLATFORM_NODE,
-        name: SDK_INFO.NAME,
-        version: SDK_INFO.VERSION,
+        name: 'opentelemetry',
       });
     });
 
@@ -480,9 +476,7 @@ describe('Meter', () => {
     it('should return an observer with resource', () => {
       const observer = meter.createObserver('name') as ObserverMetric;
       assertTelemetrySDKResource(observer.resource, {
-        language: SDK_INFO.PLATFORM_NODE,
-        name: SDK_INFO.NAME,
-        version: SDK_INFO.VERSION,
+        name: 'opentelemetry',
       });
     });
   });

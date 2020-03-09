@@ -25,7 +25,6 @@ import {
 import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import { assertTelemetrySDKResource } from '@opentelemetry/resources';
-import { SDK_INFO } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
 import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
@@ -168,9 +167,8 @@ describe('NodeTracerProvider', () => {
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);
       assertTelemetrySDKResource(span.resource, {
-        language: SDK_INFO.PLATFORM_NODE,
-        name: SDK_INFO.NAME,
-        version: SDK_INFO.VERSION,
+        language: 'nodejs',
+        name: 'opentelemetry',
       });
     });
   });
