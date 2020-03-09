@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
+    "@opentelemetry/resources": "^0.4.0",
     "@opentelemetry/scope-zone": "^0.4.0",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^5.2.5",
@@ -77,7 +78,6 @@
   "dependencies": {
     "@opentelemetry/api": "^0.4.0",
     "@opentelemetry/core": "^0.4.0",
-    "@opentelemetry/resources": "^0.4.0",
     "@opentelemetry/scope-base": "^0.4.0",
     "@opentelemetry/tracing": "^0.4.0"
   }
