@@ -181,7 +181,7 @@ export const assertK8sResource = (
 };
 
 /**
- * Test utility method to validate a telemetry library resource
+ * Test utility method to validate a telemetry sdk resource
  *
  * @param resource the Resource to validate
  * @param validations validations for the resource labels
@@ -199,10 +199,8 @@ export const assertTelemetrySDKResource = (
     language: SDK_INFO.LANGUAGE,
     version: SDK_INFO.VERSION,
   };
-
   validations = { ...defaults, ...validations };
 
-  assertHasOneLabel(TELEMETRY_SDK_RESOURCE, resource);
   if (validations.name)
     assert.strictEqual(
       resource.labels[TELEMETRY_SDK_RESOURCE.NAME],

@@ -25,12 +25,15 @@ export class Resource {
   static readonly EMPTY = new Resource({});
 
   /**
-   * Returns an empty resource
+   * Returns an empty Resource
    */
   static empty(): Resource {
     return Resource.EMPTY;
   }
 
+  /**
+   * Returns a Resource that indentifies the SDK in use.
+   */
   static createTelemetrySDKResource(): Resource {
     return new Resource({
       [TELEMETRY_SDK_RESOURCE.LANGUAGE]: SDK_INFO.LANGUAGE,
