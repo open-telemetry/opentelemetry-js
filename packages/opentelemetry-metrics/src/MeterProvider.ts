@@ -40,7 +40,7 @@ export class MeterProvider implements types.MeterProvider {
   getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
-      this._meters.set(key, new Meter(config || this._config, this.resource));
+      this._meters.set(key, new Meter(config || this._config));
     }
 
     return this._meters.get(key)!;

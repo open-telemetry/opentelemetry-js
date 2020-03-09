@@ -43,10 +43,10 @@ export class Meter implements types.Meter {
   /**
    * Constructs a new Meter instance.
    */
-  constructor(config: MeterConfig = DEFAULT_CONFIG, resource: Resource) {
+  constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = new UngroupedBatcher();
-    this.resource = resource;
+    this.resource = config.resource || Resource.createTelemetrySDKResource();
     // start the push controller
     const exporter = config.exporter || new NoopExporter();
     const interval = config.interval;
