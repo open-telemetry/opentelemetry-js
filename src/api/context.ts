@@ -42,7 +42,7 @@ export class ContextAPI {
   /**
    * Set the current context manager. Returns the initialized context manager
    */
-  public initGlobalContextManager(scopeManager: ScopeManager): ScopeManager {
+  public setGlobalContextManager(scopeManager: ScopeManager): ScopeManager {
     this._scopeManager = scopeManager;
     return scopeManager;
   }

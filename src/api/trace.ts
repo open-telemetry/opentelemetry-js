@@ -40,7 +40,7 @@ export class TraceAPI {
   /**
    * Set the current global tracer. Returns the initialized global tracer provider
    */
-  public initGlobalTracerProvider(provider: TracerProvider): TracerProvider {
+  public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
     this._tracerProvider = provider;
     return provider;
   }
