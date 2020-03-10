@@ -20,14 +20,14 @@ API entry points are defined as global singleton objects `trace` and `metrics` w
 const api = require("@opentelemetry/api")
 
 /* Initialize TraceProvider */
-api.trace.initGlobalTracerProvider(traceProvider);
+api.trace.setGlobalTracerProvider(traceProvider);
 /* returns traceProvider (no-op if a working provider has not been initialized) */
 api.trace.getTracerProvider();
 /* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */
 api.trace.getTracer(name, version);
 
 /* Initialize MeterProvider */
-api.metrics.initGlobalMeterProvider(meterProvider);
+api.metrics.setGlobalMeterProvider(meterProvider);
 /* returns meterProvider (no-op if a working provider has not been initialized) */
 api.metrics.getMeterProvider();
 /* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */
@@ -61,7 +61,7 @@ const provider = new sdk.NodeTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
-api.trace.initGlobalTracerProvider(provider);
+api.trace.setGlobalTracerProvider(provider);
 
 // your application code below this line
 ```

@@ -47,7 +47,7 @@ describe('API', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      api.trace.initGlobalTracerProvider(new NoopTracerProvider());
+      api.trace.setGlobalTracerProvider(new NoopTracerProvider());
     });
 
     it('should not crash', () => {
@@ -65,7 +65,7 @@ describe('API', () => {
     });
 
     it('should use the global tracer provider', () => {
-      api.trace.initGlobalTracerProvider(new TestTracerProvider());
+      api.trace.setGlobalTracerProvider(new TestTracerProvider());
       const tracer = api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);

@@ -40,7 +40,7 @@ export class MetricsAPI {
   /**
    * Set the current global meter. Returns the initialized global meter provider.
    */
-  public initGlobalMeterProvider(provider: MeterProvider): MeterProvider {
+  public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
     this._meterProvider = provider;
     return provider;
   }
