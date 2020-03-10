@@ -40,6 +40,7 @@ function getReadableSpan() {
     },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
+    ended: true,
     duration: [duration, 0],
     status: {
       code: types.CanonicalCode.OK,
@@ -136,6 +137,7 @@ describe('ZipkinExporter', () => {
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
+        ended: true,
         duration: [duration, 0],
         status: {
           code: types.CanonicalCode.OK,
@@ -163,6 +165,7 @@ describe('ZipkinExporter', () => {
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
+        ended: true,
         duration: [duration, 0],
         status: {
           code: types.CanonicalCode.OK,
