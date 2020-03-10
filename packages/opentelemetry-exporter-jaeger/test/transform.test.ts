@@ -20,11 +20,13 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as types from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
   const spanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
+    traceFlags: TraceFlags.NONE,
   };
 
   describe('spanToThrift', () => {
@@ -45,7 +47,7 @@ describe('transform', () => {
         },
         links: [
           {
-            spanContext: {
+            context: {
               traceId: 'a4cda95b652f4a1592b449d5929fda1b',
               spanId: '3e0c63257de34c92',
             },
@@ -194,7 +196,7 @@ describe('transform', () => {
         parentSpanId: '3e0c63257de34c92',
         links: [
           {
-            spanContext: {
+            context: {
               traceId: 'a4cda95b652f4a1592b449d5929fda1b',
               spanId: '3e0c63257de34c92',
             },
@@ -227,6 +229,7 @@ describe('transform', () => {
         spanContext: {
           traceId: '92b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],

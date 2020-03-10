@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CanonicalCode, SpanKind } from '@opentelemetry/api';
+import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import * as assert from 'assert';
@@ -256,7 +256,7 @@ describe('Utility', () => {
         const span = new Span(
           new BasicTracerProvider().getTracer('default'),
           'test',
-          { spanId: '', traceId: '' },
+          { spanId: '', traceId: '', traceFlags: TraceFlags.SAMPLED },
           SpanKind.INTERNAL
         );
         /* tslint:disable-next-line:no-any */

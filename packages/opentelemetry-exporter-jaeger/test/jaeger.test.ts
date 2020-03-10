@@ -21,6 +21,7 @@ import * as types from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
@@ -110,6 +111,7 @@ describe('JaegerExporter', () => {
       const spanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
       };
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
