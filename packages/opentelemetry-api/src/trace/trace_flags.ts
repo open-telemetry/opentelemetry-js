@@ -20,8 +20,8 @@
  * whether a Span should be traced. It is implemented as a bitmask.
  */
 export enum TraceFlags {
-  /** Bit to represent whether trace is unsampled in trace flags. */
-  UNSAMPLED = 0x0,
+  /** Represents no flag set. */
+  NONE = 0x0,
   /** Bit to represent whether trace is sampled in trace flags. */
-  SAMPLED = 0x1,
+  SAMPLED = 0x1 << 0,
 }

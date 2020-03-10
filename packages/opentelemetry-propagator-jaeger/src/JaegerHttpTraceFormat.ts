@@ -58,9 +58,9 @@ export class JaegerHttpTraceFormat implements HttpTextFormat {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
-    const traceFlags = `0${(
-      spanContext.traceFlags || TraceFlags.UNSAMPLED
-    ).toString(16)}`;
+    const traceFlags = `0${(spanContext.traceFlags || TraceFlags.NONE).toString(
+      16
+    )}`;
 
     setter(
       carrier,

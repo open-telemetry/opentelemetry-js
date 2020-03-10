@@ -80,9 +80,7 @@ export class B3Format implements HttpTextFormat {
         traceId,
         spanId,
         isRemote: true,
-        traceFlags: isNaN(Number(options))
-          ? TraceFlags.UNSAMPLED
-          : Number(options),
+        traceFlags: isNaN(Number(options)) ? TraceFlags.NONE : Number(options),
       });
     }
     return context;

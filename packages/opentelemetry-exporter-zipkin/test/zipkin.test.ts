@@ -23,6 +23,7 @@ import * as types from '@opentelemetry/api';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 import { OT_REQUEST_HEADER } from '../src/utils';
+import { TraceFlags } from '@opentelemetry/api';
 
 const MICROS_PER_SECS = 1e6;
 
@@ -35,6 +36,7 @@ function getReadableSpan() {
     spanContext: {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
     },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
@@ -130,6 +132,7 @@ describe('ZipkinExporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
@@ -156,6 +159,7 @@ describe('ZipkinExporter', () => {
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],

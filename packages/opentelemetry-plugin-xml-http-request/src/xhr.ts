@@ -94,7 +94,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   }
 
   /**
-   * checks if trace headers shoudl be propagated
+   * checks if trace headers should be propagated
    * @param spanUrl
    * @private
    */
