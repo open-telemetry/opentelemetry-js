@@ -44,7 +44,7 @@ releases will not attempt to maintain backwards compatibility with the alpha rel
 | Resources                   | Beta v1      | March 16 2020    |
 | Support for Tags/Baggage    | Beta v1      | March 16 2020    |
 | Metrics SDK (Complete)      | Beta v1      | March 16 2020    |
-| OpenCensus Bridge           | Beta v1      | March 16 2020    |
+| OpenCensus Bridge           | Beta v1      | Unknown          |
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
