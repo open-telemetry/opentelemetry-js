@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-import { BasicTracerProvider } from '@opentelemetry/tracing';
+import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import {
+  BasicTracerProvider,
+  SDKRegistrationConfig,
+} from '@opentelemetry/tracing';
 import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from './config';
 import { PluginLoader } from './instrumentation/PluginLoader';
 
 /**
- * This class represents a node tracer with `async_hooks` module.
+ * Register this TracerProvider for use with the OpenTelemetry API.
+ * Undefined values may be replaced with defaults, and
+ * null values will be skipped.
+ *
+ * @param config Configuration object for SDK registration
  */
 export class NodeTracerProvider extends BasicTracerProvider {
   private readonly _pluginLoader: PluginLoader;
@@ -36,5 +44,14 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
   stop() {
     this._pluginLoader.unload();
+  }
+
+  register(config: SDKRegistrationConfig = {}) {
+    if (config.contextManager === undefined) {
+      config.contextManager = new AsyncHooksScopeManager();
+      config.contextManager.enable();
+    }
+
+    super.register(config);
   }
 }
