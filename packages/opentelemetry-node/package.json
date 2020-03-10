@@ -43,6 +43,7 @@
   "devDependencies": {
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
+    "@opentelemetry/scope-base": "^0.4.0",
     "@types/semver": "^6.0.1",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
