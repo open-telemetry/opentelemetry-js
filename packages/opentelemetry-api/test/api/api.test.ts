@@ -42,12 +42,12 @@ describe('API', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.UNSAMPLED,
+      traceFlags: TraceFlags.NONE,
     };
     const dummySpan = new NoopSpan(spanContext);
 
     afterEach(() => {
-      api.trace.initGlobalTracerProvider(new NoopTracerProvider());
+      api.trace.setGlobalTracerProvider(new NoopTracerProvider());
     });
 
     it('should not crash', () => {
@@ -65,7 +65,7 @@ describe('API', () => {
     });
 
     it('should use the global tracer provider', () => {
-      api.trace.initGlobalTracerProvider(new TestTracerProvider());
+      api.trace.setGlobalTracerProvider(new TestTracerProvider());
       const tracer = api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);

@@ -303,12 +303,12 @@ describe('GrpcPlugin', () => {
   let scopeManger: ScopeManager;
 
   before(() => {
-    propagation.initGlobalPropagator(new HttpTraceContext());
+    propagation.setGlobalPropagator(new HttpTraceContext());
   });
 
   beforeEach(() => {
     scopeManger = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManger);
+    context.setGlobalContextManager(scopeManger);
   });
 
   afterEach(() => {

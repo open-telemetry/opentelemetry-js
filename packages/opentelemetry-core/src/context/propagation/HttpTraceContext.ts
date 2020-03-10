@@ -70,7 +70,7 @@ export class HttpTraceContext implements HttpTextFormat {
 
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
-    }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
+    }-0${Number(spanContext.traceFlags || TraceFlags.NONE).toString(16)}`;
 
     setter(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {

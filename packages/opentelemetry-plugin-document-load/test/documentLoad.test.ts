@@ -213,7 +213,7 @@ describe('DocumentLoad Plugin', () => {
 
   beforeEach(() => {
     scopeManager = new StackScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
     Object.defineProperty(window.document, 'readyState', {
       writable: true,
       value: 'complete',
@@ -237,7 +237,7 @@ describe('DocumentLoad Plugin', () => {
   });
 
   before(() => {
-    propagation.initGlobalPropagator(new HttpTraceContext());
+    propagation.setGlobalPropagator(new HttpTraceContext());
   });
 
   describe('constructor', () => {

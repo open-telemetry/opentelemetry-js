@@ -30,7 +30,7 @@ import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.initGlobalContextManager(new NoopScopeManager());
+    context.setGlobalContextManager(new NoopScopeManager());
   });
 
   describe('constructor', () => {
@@ -172,6 +172,7 @@ describe('BasicTracerProvider', () => {
         setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
           traceState: state,
         })
       );
@@ -256,6 +257,7 @@ describe('BasicTracerProvider', () => {
         setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: '0',
           spanId: '0',
+          traceFlags: TraceFlags.SAMPLED,
         })
       );
       assert.ok(span instanceof Span);
@@ -276,7 +278,7 @@ describe('BasicTracerProvider', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
       assert.deepStrictEqual(context.traceState, undefined);
       span.end();
     });
@@ -307,7 +309,7 @@ describe('BasicTracerProvider', () => {
 
   describe('.getCurrentSpan()', () => {
     it('should return current span when it exists', () => {
-      context.initGlobalContextManager({
+      context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
       } as ScopeManager);

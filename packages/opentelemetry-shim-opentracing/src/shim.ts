@@ -30,7 +30,7 @@ function translateReferences(references: opentracing.Reference[]): api.Link[] {
     const context = reference.referencedContext();
     if (context instanceof SpanContextShim) {
       links.push({
-        spanContext: (context as SpanContextShim).getSpanContext(),
+        context: (context as SpanContextShim).getSpanContext(),
         attributes: { 'span.kind': reference.type },
       });
     }

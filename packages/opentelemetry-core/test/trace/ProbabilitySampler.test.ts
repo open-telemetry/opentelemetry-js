@@ -24,13 +24,7 @@ import {
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
     const sampler = new ProbabilitySampler(1);
-    assert.strictEqual(
-      sampler.shouldSample({
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-      }),
-      true
-    );
+    assert.strictEqual(sampler.shouldSample(), true);
   });
 
   it('should return a always sampler for >1', () => {

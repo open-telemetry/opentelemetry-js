@@ -32,7 +32,7 @@ describe('OpenTracing Shim', () => {
     provider.getTracer('default')
   );
   opentracing.initGlobalTracer(shimTracer);
-  propagation.initGlobalPropagator(new HttpTraceContext());
+  propagation.setGlobalPropagator(new HttpTraceContext());
 
   describe('TracerShim', () => {
     let span: opentracing.Span;

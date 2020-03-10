@@ -143,7 +143,7 @@ describe('MongoDBPlugin', () => {
       done();
     });
     scopeManager = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
   });
 
   afterEach(done => {
