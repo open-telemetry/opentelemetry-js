@@ -74,7 +74,7 @@ describe('mysql@2.x', () => {
 
   beforeEach(function() {
     scopeManager = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
     plugin.enable(mysql, provider, logger);
     connection = mysql.createConnection({
       port,

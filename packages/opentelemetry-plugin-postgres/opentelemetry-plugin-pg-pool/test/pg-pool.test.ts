@@ -129,7 +129,7 @@ describe('pg-pool@2.x', () => {
     plugin.enable(pgPool, provider, logger);
     pgPlugin.enable(pg, provider, logger);
     scopeManager = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManager);
+    context.setGlobalContextManager(scopeManager);
   });
 
   afterEach(() => {

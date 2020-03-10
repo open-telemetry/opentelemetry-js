@@ -29,9 +29,9 @@ import { NodeTracerProvider } from '../src';
 
 describe('API registration', () => {
   beforeEach(() => {
-    context.initGlobalContextManager(new NoopScopeManager());
-    propagation.initGlobalPropagator(new NoopHttpTextFormat());
-    trace.initGlobalTracerProvider(new NoopTracerProvider());
+    context.setGlobalContextManager(new NoopScopeManager());
+    propagation.setGlobalPropagator(new NoopHttpTextFormat());
+    trace.setGlobalTracerProvider(new NoopTracerProvider());
   });
 
   it('should register default implementations', () => {

@@ -28,7 +28,7 @@ const provider = new WebTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 ```
 
@@ -46,7 +46,7 @@ const provider = new BasicTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 ```
 

@@ -49,7 +49,7 @@ describe('NodeTracerProvider', () => {
 
   beforeEach(() => {
     scopeManager = new AsyncHooksScopeManager();
-    context.initGlobalContextManager(scopeManager.enable());
+    context.setGlobalContextManager(scopeManager.enable());
   });
 
   afterEach(() => {

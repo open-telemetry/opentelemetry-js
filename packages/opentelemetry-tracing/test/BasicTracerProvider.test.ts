@@ -30,7 +30,7 @@ import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.initGlobalContextManager(new NoopScopeManager());
+    context.setGlobalContextManager(new NoopScopeManager());
   });
 
   describe('constructor', () => {
@@ -309,7 +309,7 @@ describe('BasicTracerProvider', () => {
 
   describe('.getCurrentSpan()', () => {
     it('should return current span when it exists', () => {
-      context.initGlobalContextManager({
+      context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
       } as ScopeManager);

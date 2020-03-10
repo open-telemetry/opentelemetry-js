@@ -48,7 +48,7 @@ describe('UserInteractionPlugin', () => {
     let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
       scopeManager = new ZoneScopeManager().enable();
-      context.initGlobalContextManager(scopeManager);
+      context.setGlobalContextManager(scopeManager);
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
       fakeXhr.onCreate = function(xhr: sinon.SinonFakeXMLHttpRequest) {

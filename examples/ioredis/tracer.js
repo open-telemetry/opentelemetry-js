@@ -12,6 +12,6 @@ const exporter = new JaegerExporter({ serviceName: 'ioredis-example' });
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 module.exports = opentelemetry.trace.getTracer('ioredis-example');

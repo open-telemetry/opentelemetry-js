@@ -68,7 +68,7 @@ const provider = new NodeTracerProvider({
 });
 
 // Initialize the provider
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
@@ -85,7 +85,7 @@ const { NodeTracerProvider } = require('@opentelemetry/node');
 const provider = new NodeTracerProvider();
 
 // Initialize the provider
-opentelemetry.trace.initGlobalTracerProvider(provider);
+opentelemetry.trace.setGlobalTracerProvider(provider);
 
 // Your application code
 // ...
