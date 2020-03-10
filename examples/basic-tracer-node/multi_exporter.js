@@ -61,5 +61,7 @@ function doWork(parent) {
   span.setAttribute('key', 'value');
 
   // Annotate our span to capture metadata about our operation
-  span.addEvent('invoking doWork').end();
+  span.addEvent('invoking doWork');
+
+  span.end();
 }
