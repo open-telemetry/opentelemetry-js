@@ -68,17 +68,17 @@ export class BasicTracerProvider implements api.TracerProvider {
    * @param config Configuration object for SDK registration
    */
   register(config: SDKRegistrationConfig = {}) {
-    api.trace.initGlobalTracerProvider(this);
+    api.trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
       config.propagator = new HttpTraceContext();
     }
 
     if (config.contextManager) {
-      api.context.initGlobalContextManager(config.contextManager);
+      api.context.setGlobalContextManager(config.contextManager);
     }
 
     if (config.propagator) {
-      api.propagation.initGlobalPropagator(config.propagator);
+      api.propagation.setGlobalPropagator(config.propagator);
     }
   }
 }
