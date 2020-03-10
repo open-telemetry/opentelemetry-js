@@ -36,4 +36,5 @@ export interface ReadableSpan {
   readonly links: Link[];
   readonly events: TimedEvent[];
   readonly duration: HrTime;
+  readonly ended: boolean;
 }

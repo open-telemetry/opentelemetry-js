@@ -180,6 +180,10 @@ export class Span implements types.Span, ReadableSpan {
     return this._duration;
   }
 
+  get ended(): boolean {
+    return this._ended;
+  }
+
   private _isSpanEnded(): boolean {
     if (this._ended) {
       this._logger.warn(

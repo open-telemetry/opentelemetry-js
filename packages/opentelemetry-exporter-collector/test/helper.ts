@@ -33,6 +33,7 @@ export const mockedReadableSpan: ReadableSpan = {
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
+  ended: true,
   status: { code: 0 },
   attributes: { component: 'document-load' },
   links: [

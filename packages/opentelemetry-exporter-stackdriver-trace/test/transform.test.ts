@@ -43,6 +43,7 @@ describe('transform', () => {
       duration: [32, 800000000],
       startTime: [1566156729, 709],
       endTime: [1566156731, 709],
+      ended: true,
       events: [],
       kind: types.SpanKind.CLIENT,
       links: [],

@@ -358,4 +358,11 @@ describe('Span', () => {
     span.updateName('bar-span');
     assert.strictEqual(span.name, 'foo-span');
   });
+
+  it('should have ended', () => {
+    const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+    assert.strictEqual(span.ended, false);
+    span.end();
+    assert.strictEqual(span.ended, true);
+  });
 });
