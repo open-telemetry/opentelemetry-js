@@ -41,9 +41,10 @@ releases will not attempt to maintain backwards compatibility with the alpha rel
 | Metrics SDK                 | Alpha v0.2.0 | November 04 2019 |
 | Prometheus Metric Exporter  | Alpha v0.3.0 | December 13 2019 |
 | Collector Exporter          | Alpha v0.3.0 | December 13 2019 |
-| Resources                   | Beta         | March 25 2020    |
-| Support for Tags/Baggage    | Beta         | March 25 2020    |
-| OpenCensus Bridge           | Beta         | March 25 2020    |
+| Resources                   | Beta v1      | March 16 2020    |
+| Support for Tags/Baggage    | Beta v1      | March 16 2020    |
+| Metrics SDK (Complete)      | Beta v1      | March 16 2020    |
+| OpenCensus Bridge           | Beta v1      | Unknown          |
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
