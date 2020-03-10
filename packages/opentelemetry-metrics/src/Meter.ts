@@ -37,8 +37,8 @@ export class Meter implements types.Meter {
   private readonly _logger: types.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
+  private readonly _resource: Resource;
   readonly labels = Meter.labels;
-  readonly resource: Resource;
 
   /**
    * Constructs a new Meter instance.
@@ -46,7 +46,7 @@ export class Meter implements types.Meter {
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = new UngroupedBatcher();
-    this.resource = config.resource || Resource.createTelemetrySDKResource();
+    this._resource = config.resource || Resource.createTelemetrySDKResource();
     // start the push controller
     const exporter = config.exporter || new NoopExporter();
     const interval = config.interval;
@@ -76,7 +76,7 @@ export class Meter implements types.Meter {
       ...options,
     };
 
-    const measure = new MeasureMetric(name, opt, this._batcher, this.resource);
+    const measure = new MeasureMetric(name, opt, this._batcher, this._resource);
     this._registerMetric(name, measure);
     return measure;
   }
@@ -105,7 +105,7 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, this._batcher, this.resource);
+    const counter = new CounterMetric(name, opt, this._batcher, this._resource);
     this._registerMetric(name, counter);
     return counter;
   }
@@ -136,7 +136,7 @@ export class Meter implements types.Meter {
       name,
       opt,
       this._batcher,
-      this.resource
+      this._resource
     );
     this._registerMetric(name, observer);
     return observer;
