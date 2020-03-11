@@ -7,7 +7,7 @@ const provider: NodeTracerProvider = new NodeTracerProvider({
   logLevel: opentelemetry.LogLevel.ERROR
 });
 
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register();
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(

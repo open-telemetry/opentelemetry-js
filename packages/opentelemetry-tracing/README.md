@@ -28,8 +28,9 @@ const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider } = require('@opentelemetry/tracing');
 
 // To start a trace, you first need to initialize the Tracer provider.
-// NOTE: the default OpenTelemetry tracer provider does not record any tracing information.
-opentelemetry.trace.setGlobalTracerProvider(new BasicTracerProvider());
+// NOTE: The default OpenTelemetry tracer provider does not record any tracing information.
+//       Registering a working tracer provider allows the API methods to record traces.
+new BasicTracerProvider().register();
 
 // To create a span in a trace, we used the global singleton tracer to start a new span.
 const span = opentelemetry.trace.getTracer('default').startSpan('foo');

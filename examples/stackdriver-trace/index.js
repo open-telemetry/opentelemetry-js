@@ -15,7 +15,7 @@ const provider = new BasicTracerProvider();
 // Configure span processor to send spans to the provided exporter
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
+// Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
 provider.register();
 const tracer = opentelemetry.trace.getTracer('stackdriver-basic');
 

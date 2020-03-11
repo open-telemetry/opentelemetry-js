@@ -6,7 +6,6 @@ const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
 const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
 
 const provider = new NodeTracerProvider({ logLevel: opentelemetry.LogLevel.ERROR });
-opentelemetry.trace.setGlobalTracerProvider(provider);
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
@@ -19,4 +18,5 @@ provider.addSpanProcessor(
   )
 );
 
+provider.register();
 console.log("tracing initialized");

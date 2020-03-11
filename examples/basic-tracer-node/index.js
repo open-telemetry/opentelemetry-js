@@ -11,7 +11,15 @@ const exporter = new JaegerExporter({ serviceName: 'basic-service' });
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
+/**
+ * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.
+ * 
+ * This registers the tracer provider with the OpenTelemetry API as the global
+ * tracer provider. This means when you call API methods like
+ * `opentelemetry.trace.getTracer`, they will use this tracer provider. If you
+ * do not register a global tracer provider, instrumentation which calls these
+ * methods will recieve no-op implementations.
+ */
 provider.register();
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 

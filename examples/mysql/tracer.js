@@ -27,7 +27,7 @@ module.exports = (serviceName) => {
     serviceName,
   })));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
+  // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
   provider.register();
 
   return opentelemetry.trace.getTracer('mysql-example');
