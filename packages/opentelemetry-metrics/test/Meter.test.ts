@@ -35,7 +35,7 @@ import {
   ObserverAggregator,
 } from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
-import { assertTelemetrySDKResource } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -91,9 +91,7 @@ describe('Meter', () => {
 
     it('should return counter with resource', () => {
       const counter = meter.createCounter('name') as CounterMetric;
-      assertTelemetrySDKResource(counter.resource, {
-        name: 'opentelemetry',
-      });
+      assert.ok(counter.resource instanceof Resource);
     });
 
     describe('.bind()', () => {
@@ -285,9 +283,7 @@ describe('Meter', () => {
 
     it('should return a measure with resource', () => {
       const measure = meter.createMeasure('name') as MeasureMetric;
-      assertTelemetrySDKResource(measure.resource, {
-        name: 'opentelemetry',
-      });
+      assert.ok(measure.resource instanceof Resource);
     });
 
     describe('names', () => {
@@ -475,9 +471,7 @@ describe('Meter', () => {
 
     it('should return an observer with resource', () => {
       const observer = meter.createObserver('name') as ObserverMetric;
-      assertTelemetrySDKResource(observer.resource, {
-        name: 'opentelemetry',
-      });
+      assert.ok(observer.resource instanceof Resource);
     });
   });
 

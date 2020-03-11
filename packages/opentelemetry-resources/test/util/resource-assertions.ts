@@ -16,7 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
-import { Resource } from './Resource';
+import { Resource } from '../../src/Resource';
 import {
   CLOUD_RESOURCE,
   CONTAINER_RESOURCE,
@@ -24,7 +24,8 @@ import {
   K8S_RESOURCE,
   TELEMETRY_SDK_RESOURCE,
   SERVICE_RESOURCE,
-} from './constants';
+} from '../../src/constants';
+
 /**
  * Test utility method to validate a cloud resource
  *

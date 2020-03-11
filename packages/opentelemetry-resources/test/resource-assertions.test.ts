@@ -31,7 +31,7 @@ import {
   assertK8sResource,
   assertTelemetrySDKResource,
   assertServiceResource,
-} from '../src/resource-assertions';
+} from './util/resource-assertions';
 
 describe('assertCloudResource', () => {
   it('requires one cloud label', () => {

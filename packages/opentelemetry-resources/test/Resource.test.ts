@@ -17,7 +17,7 @@
 import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
-import { assertTelemetrySDKResource } from '../src/resource-assertions';
+import { assertTelemetrySDKResource } from './util/resource-assertions';
 
 describe('Resource', () => {
   const resource1 = new Resource({
