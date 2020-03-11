@@ -13,7 +13,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 /**
  * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.
- * 
+ *
  * This registers the tracer provider with the OpenTelemetry API as the global
  * tracer provider. This means when you call API methods like
  * `opentelemetry.trace.getTracer`, they will use this tracer provider. If you
