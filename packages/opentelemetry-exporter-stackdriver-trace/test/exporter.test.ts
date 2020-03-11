@@ -122,11 +122,7 @@ describe('Stackdriver Trace Exporter', () => {
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
-        resource: new Resource({
-          service: 'ui',
-          version: 1,
-          cost: 112.12,
-        }),
+        resource: Resource.empty(),
       };
 
       const result = await new Promise((resolve, reject) => {
