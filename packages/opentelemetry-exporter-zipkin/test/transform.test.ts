@@ -21,6 +21,7 @@ import {
   NoopLogger,
   hrTimeToMicroseconds,
   hrTimeDuration,
+  VERSION,
 } from '@opentelemetry/core';
 import {
   toZipkinSpan,
@@ -48,7 +49,6 @@ const DUMMY_RESOUCE = new Resource({
   version: 1,
   cost: 112.12,
 });
-const EMPTY_RESOUCE = Resource.empty();
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
@@ -94,6 +94,9 @@ describe('transform', () => {
           key1: 'value1',
           key2: 'value2',
           [statusCodeTagName]: 'OK',
+          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.name': 'opentelemetry',
+          'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
@@ -128,6 +131,9 @@ describe('transform', () => {
         parentId: undefined,
         tags: {
           [statusCodeTagName]: 'OK',
+          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.name': 'opentelemetry',
+          'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
@@ -167,6 +173,9 @@ describe('transform', () => {
           parentId: undefined,
           tags: {
             [statusCodeTagName]: 'OK',
+            'telemetry.sdk.language': 'nodejs',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': VERSION,
           },
           timestamp: hrTimeToMicroseconds(span.startTime),
           traceId: span.spanContext.traceId,
@@ -226,7 +235,7 @@ describe('transform', () => {
         span.status,
         statusCodeTagName,
         statusDescriptionTagName,
-        EMPTY_RESOUCE
+        Resource.empty()
       );
 
       assert.deepStrictEqual(tags, {
