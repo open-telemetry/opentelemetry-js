@@ -12,7 +12,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register();
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
 // Create a span. A span must be closed.

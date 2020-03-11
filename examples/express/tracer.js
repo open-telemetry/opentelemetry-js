@@ -37,7 +37,7 @@ module.exports = (serviceName) => {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
   // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
-  opentelemetry.trace.setGlobalTracerProvider(provider);
+  provider.register();
 
   return opentelemetry.trace.getTracer('express-example');
 };
