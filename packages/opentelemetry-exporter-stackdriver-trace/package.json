@@ -41,6 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
+    "@opentelemetry/resources": "^0.4.0",
     "@types/mocha": "^5.2.7",
     "@types/nock": "^11.1.0",
     "@types/node": "^12.6.9",

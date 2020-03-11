@@ -16,6 +16,7 @@
 
 import { ConsoleLogger } from '@opentelemetry/core';
 import * as types from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
 import { DEFAULT_CONFIG, MeterConfig } from './types';
 
@@ -24,6 +25,7 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
  */
 export class MeterProvider implements types.MeterProvider {
   private readonly _meters: Map<string, Meter> = new Map();
+  readonly resource: Resource = Resource.createTelemetrySDKResource();
   readonly logger: types.Logger;
 
   constructor(private _config: MeterConfig = DEFAULT_CONFIG) {

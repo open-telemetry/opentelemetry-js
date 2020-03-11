@@ -35,6 +35,7 @@ import {
   ObserverAggregator,
 } from '../src/export/Aggregator';
 import { ValueType } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -86,6 +87,11 @@ describe('Meter', () => {
       assert.strictEqual(record1.aggregator.value(), 10);
       counter.add(10, labelSet);
       assert.strictEqual(record1.aggregator.value(), 20);
+    });
+
+    it('should return counter with resource', () => {
+      const counter = meter.createCounter('name') as CounterMetric;
+      assert.ok(counter.resource instanceof Resource);
     });
 
     describe('.bind()', () => {
@@ -275,6 +281,11 @@ describe('Meter', () => {
       assert.strictEqual((measure as MeasureMetric)['_absolute'], false);
     });
 
+    it('should return a measure with resource', () => {
+      const measure = meter.createMeasure('name') as MeasureMetric;
+      assert.ok(measure.resource instanceof Resource);
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const measure = meter.createMeasure('');
@@ -456,6 +467,11 @@ describe('Meter', () => {
       ensureMetric(metric2);
       ensureMetric(metric3);
       ensureMetric(metric4);
+    });
+
+    it('should return an observer with resource', () => {
+      const observer = meter.createObserver('name') as ObserverMetric;
+      assert.ok(observer.resource instanceof Resource);
     });
   });
 

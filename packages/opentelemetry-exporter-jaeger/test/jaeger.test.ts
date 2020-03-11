@@ -22,6 +22,7 @@ import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import { TraceFlags } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
@@ -127,6 +128,7 @@ describe('JaegerExporter', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
+        resource: Resource.empty(),
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {
