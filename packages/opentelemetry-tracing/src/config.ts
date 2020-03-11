@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ALWAYS_SAMPLER,
-  HttpTraceContext,
-  LogLevel,
-} from '@opentelemetry/core';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { ALWAYS_SAMPLER, LogLevel } from '@opentelemetry/core';
 
 /** Default limit for Message events per span */
 export const DEFAULT_MAX_EVENTS_PER_SPAN = 128;
