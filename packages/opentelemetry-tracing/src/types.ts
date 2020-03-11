@@ -22,6 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
 import { ScopeManager } from '@opentelemetry/scope-base';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
@@ -48,6 +49,9 @@ export interface TracerConfig {
 
   /** Trace Parameters */
   traceParams?: TraceParams;
+
+  /** Resource associated with trace telemetry  */
+  resource?: Resource;
 }
 
 /**

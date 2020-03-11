@@ -20,6 +20,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as types from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 import { OT_REQUEST_HEADER } from '../src/utils';
@@ -48,6 +49,7 @@ function getReadableSpan() {
     attributes: {},
     links: [],
     events: [],
+    resource: Resource.empty(),
   };
   return readableSpan;
 }
@@ -154,6 +156,7 @@ describe('ZipkinExporter', () => {
             attributes: { key3: 'value3' },
           },
         ],
+        resource: Resource.empty(),
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -173,6 +176,7 @@ describe('ZipkinExporter', () => {
         attributes: {},
         links: [],
         events: [],
+        resource: Resource.empty(),
       };
 
       const exporter = new ZipkinExporter({

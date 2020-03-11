@@ -25,6 +25,7 @@ import {
   randomTraceId,
   setActiveSpan,
 } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
 import { DEFAULT_CONFIG } from './config';
 import { Span } from './Span';
@@ -38,6 +39,7 @@ export class Tracer implements api.Tracer {
   private readonly _defaultAttributes: api.Attributes;
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
+  readonly resource: Resource;
   readonly logger: api.Logger;
 
   /**
@@ -51,6 +53,7 @@ export class Tracer implements api.Tracer {
     this._defaultAttributes = localConfig.defaultAttributes;
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
+    this.resource = _tracerProvider.resource;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 

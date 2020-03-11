@@ -16,6 +16,7 @@
 
 import { VERSION as CORE_VERSION } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { Resource } from '@opentelemetry/resources';
 import * as types from '@opentelemetry/api';
 import * as assert from 'assert';
 import { getReadableSpanTransformer } from '../src/transform';
@@ -50,6 +51,7 @@ describe('transform', () => {
       name: 'my-span',
       spanContext,
       status: { code: types.CanonicalCode.OK },
+      resource: Resource.empty(),
     };
   });
 

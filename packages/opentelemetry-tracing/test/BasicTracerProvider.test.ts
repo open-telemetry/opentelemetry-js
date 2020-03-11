@@ -24,6 +24,7 @@ import {
   setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
@@ -305,6 +306,13 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
+
+    it('should assign a resource', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span') as Span;
+      assert.ok(span);
+      assert.ok(span.resource instanceof Resource);
+    });
   });
 
   describe('.getCurrentSpan()', () => {
@@ -340,6 +348,13 @@ describe('BasicTracerProvider', () => {
       };
       const patchedFn = tracer.bind(fn, span);
       return patchedFn();
+    });
+  });
+
+  describe('.resource', () => {
+    it('should return a Resource', () => {
+      const tracerProvider = new BasicTracerProvider();
+      assert.ok(tracerProvider.resource instanceof Resource);
     });
   });
 });

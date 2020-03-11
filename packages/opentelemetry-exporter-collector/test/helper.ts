@@ -17,6 +17,7 @@
 import { TraceFlags } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as transform from '../src/transform';
 import * as collectorTypes from '../src/types';
@@ -68,6 +69,7 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   duration: [0, 8885000],
+  resource: Resource.empty(),
 };
 
 export function ensureSpanIsCorrect(span: collectorTypes.Span) {

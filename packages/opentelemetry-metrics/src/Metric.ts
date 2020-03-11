@@ -15,6 +15,7 @@
  */
 
 import * as types from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import {
   BoundCounter,
   BaseBoundInstrument,
@@ -39,7 +40,8 @@ export abstract class Metric<T extends BaseBoundInstrument>
   constructor(
     private readonly _name: string,
     private readonly _options: MetricOptions,
-    private readonly _kind: MetricKind
+    private readonly _kind: MetricKind,
+    readonly resource: Resource
   ) {
     this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
@@ -108,9 +110,10 @@ export class CounterMetric extends Metric<BoundCounter>
   constructor(
     name: string,
     options: MetricOptions,
-    private readonly _batcher: Batcher
+    private readonly _batcher: Batcher,
+    resource: Resource
   ) {
-    super(name, options, MetricKind.COUNTER);
+    super(name, options, MetricKind.COUNTER, resource);
   }
   protected _makeInstrument(labelSet: types.LabelSet): BoundCounter {
     return new BoundCounter(
@@ -141,9 +144,10 @@ export class MeasureMetric extends Metric<BoundMeasure>
   constructor(
     name: string,
     options: MetricOptions,
-    private readonly _batcher: Batcher
+    private readonly _batcher: Batcher,
+    resource: Resource
   ) {
-    super(name, options, MetricKind.MEASURE);
+    super(name, options, MetricKind.MEASURE, resource);
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
@@ -172,9 +176,10 @@ export class ObserverMetric extends Metric<BoundObserver>
   constructor(
     name: string,
     options: MetricOptions,
-    private readonly _batcher: Batcher
+    private readonly _batcher: Batcher,
+    resource: Resource
   ) {
-    super(name, options, MetricKind.OBSERVER);
+    super(name, options, MetricKind.OBSERVER, resource);
   }
 
   protected _makeInstrument(labelSet: types.LabelSet): BoundObserver {

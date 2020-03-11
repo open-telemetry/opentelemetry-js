@@ -21,6 +21,7 @@ import {
   isTimeInput,
   timeInputToHrTime,
 } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -39,6 +40,7 @@ export class Span implements types.Span, ReadableSpan {
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
   readonly startTime: types.HrTime;
+  readonly resource: Resource;
   name: string;
   status: types.Status = {
     code: types.CanonicalCode.OK,
@@ -66,6 +68,7 @@ export class Span implements types.Span, ReadableSpan {
     this.kind = kind;
     this.links = links;
     this.startTime = timeInputToHrTime(startTime);
+    this.resource = parentTracer.resource;
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
