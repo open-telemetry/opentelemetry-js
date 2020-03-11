@@ -36,13 +36,19 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  */
 export const DEFAULT_CONFIG = {
   defaultAttributes: {},
-  httpTextFormat: new HttpTraceContext(),
   logLevel: LogLevel.DEBUG,
   sampler: ALWAYS_SAMPLER,
-  scopeManager: new NoopScopeManager(),
   traceParams: {
     numberOfAttributesPerSpan: DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
     numberOfLinksPerSpan: DEFAULT_MAX_LINKS_PER_SPAN,
     numberOfEventsPerSpan: DEFAULT_MAX_EVENTS_PER_SPAN,
   },
+};
+
+/**
+ * Default Configuration options for registering the API with the SDK.
+ */
+export const DEFAULT_SDK_REGISTRATION_CONFIG = {
+  propagator: new HttpTraceContext(),
+  contextManager: new NoopScopeManager(),
 };
