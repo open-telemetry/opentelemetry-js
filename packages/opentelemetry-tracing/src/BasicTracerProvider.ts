@@ -21,6 +21,7 @@ import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * This class represents a basic tracer provider which platform libraries can extend
@@ -31,9 +32,11 @@ export class BasicTracerProvider implements api.TracerProvider {
 
   activeSpanProcessor = new NoopSpanProcessor();
   readonly logger: api.Logger;
+  readonly resource: Resource;
 
   constructor(private _config: TracerConfig = DEFAULT_CONFIG) {
     this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
+    this.resource = _config.resource || Resource.createTelemetrySDKResource();
   }
 
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {

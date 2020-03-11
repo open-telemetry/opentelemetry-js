@@ -17,6 +17,7 @@
 import { ExportResult } from '@opentelemetry/base';
 import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { Resource } from '@opentelemetry/resources';
 import * as types from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as nock from 'nock';
@@ -121,6 +122,7 @@ describe('Stackdriver Trace Exporter', () => {
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
+        resource: Resource.empty(),
       };
 
       const result = await new Promise((resolve, reject) => {
@@ -155,6 +157,7 @@ describe('Stackdriver Trace Exporter', () => {
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
+        resource: Resource.empty(),
       };
 
       getClientShouldFail = true;
@@ -188,6 +191,7 @@ describe('Stackdriver Trace Exporter', () => {
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
+        resource: Resource.empty(),
       };
 
       batchWriteShouldFail = true;
@@ -219,6 +223,7 @@ describe('Stackdriver Trace Exporter', () => {
           isRemote: true,
         },
         status: { code: types.CanonicalCode.OK },
+        resource: Resource.empty(),
       };
 
       await exporter['_projectId'];

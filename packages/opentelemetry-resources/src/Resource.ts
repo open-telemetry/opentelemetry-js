@@ -14,11 +14,34 @@
  * limitations under the License.
  */
 
+import { SDK_INFO } from '@opentelemetry/base';
+import { TELEMETRY_SDK_RESOURCE } from './constants';
+
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
  * collected.
  */
 export class Resource {
+  static readonly EMPTY = new Resource({});
+
+  /**
+   * Returns an empty Resource
+   */
+  static empty(): Resource {
+    return Resource.EMPTY;
+  }
+
+  /**
+   * Returns a Resource that indentifies the SDK in use.
+   */
+  static createTelemetrySDKResource(): Resource {
+    return new Resource({
+      [TELEMETRY_SDK_RESOURCE.LANGUAGE]: SDK_INFO.LANGUAGE,
+      [TELEMETRY_SDK_RESOURCE.NAME]: SDK_INFO.NAME,
+      [TELEMETRY_SDK_RESOURCE.VERSION]: SDK_INFO.VERSION,
+    });
+  }
+
   constructor(
     /**
      * A dictionary of labels with string keys and values that provide information

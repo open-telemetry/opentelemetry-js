@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
 import { Resource } from '../src/Resource';
+import { assertTelemetrySDKResource } from './util/resource-assertions';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -85,5 +87,27 @@ describe('Resource', () => {
     assert.equal(resource.labels['custom.string'], 'strvalue');
     assert.equal(resource.labels['custom.number'], 42);
     assert.equal(resource.labels['custom.boolean'], true);
+  });
+
+  describe('.empty()', () => {
+    it('should return an empty resource', () => {
+      const resource = Resource.empty();
+      assert.equal(Object.entries(resource.labels), 0);
+    });
+
+    it('should return the same empty resource', () => {
+      assert.strictEqual(Resource.empty(), Resource.empty());
+    });
+  });
+
+  describe('.createTelemetrySDKResource()', () => {
+    it('should return a telemetry SDK resource', () => {
+      const resource = Resource.createTelemetrySDKResource();
+      assertTelemetrySDKResource(resource, {
+        language: SDK_INFO.LANGUAGE,
+        name: SDK_INFO.NAME,
+        version: SDK_INFO.VERSION,
+      });
+    });
   });
 });
