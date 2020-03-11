@@ -107,7 +107,7 @@ $ # npm install @opentelemetry/exporter-jaeger
 After these dependencies are installed, we will need to initialize and register them. Modify `tracing.ts` so that it matches the following code snippet, replacing the service name `"getting-started"` with your own service name if you wish.
 
 ```typescript
-import * as opentelemetry from '@opentelemetry/api';
+import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
@@ -116,7 +116,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: opentelemetry.LogLevel.ERROR
+  logLevel: LogLevel.ERROR
 });
 
 provider.register();

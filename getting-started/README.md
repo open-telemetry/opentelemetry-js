@@ -73,10 +73,11 @@ Create a file named `tracing.js` and add the following code:
 ```javascript
 'use strict';
 
+const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 
 const provider = new NodeTracerProvider({
-  logLevel: opentelemetry.LogLevel.ERROR
+  logLevel: LogLevel.ERROR
 });
 
 provider.register();
