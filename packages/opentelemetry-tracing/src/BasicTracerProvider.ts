@@ -15,9 +15,9 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ConsoleLogger } from '@opentelemetry/core';
+import { ConsoleLogger, HttpTraceContext } from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
-import { DEFAULT_CONFIG, DEFAULT_SDK_REGISTRATION_CONFIG } from './config';
+import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
 import { SDKRegistrationConfig, TracerConfig } from './types';
@@ -70,11 +70,16 @@ export class BasicTracerProvider implements api.TracerProvider {
    *
    * @param config Configuration object for SDK registration
    */
-  register(config: SDKRegistrationConfig = DEFAULT_SDK_REGISTRATION_CONFIG) {
+  register(config: SDKRegistrationConfig = {}) {
     api.trace.setGlobalTracerProvider(this);
+    if (config.propagator === undefined) {
+      config.propagator = new HttpTraceContext();
+    }
+
     if (config.contextManager) {
       api.context.setGlobalContextManager(config.contextManager);
     }
+
     if (config.propagator) {
       api.propagation.setGlobalPropagator(config.propagator);
     }

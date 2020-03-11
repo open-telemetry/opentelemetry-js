@@ -44,11 +44,3 @@ export const DEFAULT_CONFIG = {
     numberOfEventsPerSpan: DEFAULT_MAX_EVENTS_PER_SPAN,
   },
 };
-
-/**
- * Default Configuration options for registering the API with the SDK.
- */
-export const DEFAULT_SDK_REGISTRATION_CONFIG = {
-  propagator: new HttpTraceContext(),
-  contextManager: new NoopScopeManager(),
-};
