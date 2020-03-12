@@ -29,7 +29,6 @@ describe('API', () => {
     'getCurrentSpan',
     'startSpan',
     'withSpan',
-    'getHttpTextPropagator',
   ];
 
   it('should expose a tracer provider via getTracerProvider', () => {

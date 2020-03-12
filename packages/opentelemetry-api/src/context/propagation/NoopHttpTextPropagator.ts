@@ -29,4 +29,4 @@ export class NoopHttpTextPropagator implements HttpTextPropagator {
   }
 }
 
-export const NOOP_HTTP_TEXT_FORMAT = new NoopHttpTextPropagator();
+export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();

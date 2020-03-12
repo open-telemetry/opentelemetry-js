@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextPropagator, Span, SpanOptions, Tracer } from '..';
-import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextPropagator';
+import { Span, SpanOptions, Tracer } from '..';
 import { NOOP_SPAN } from './NoopSpan';
 
 /**
@@ -40,11 +39,6 @@ export class NoopTracer implements Tracer {
 
   bind<T>(target: T, span?: Span): T {
     return target;
-  }
-
-  // By default does nothing
-  getHttpTextPropagator(): HttpTextPropagator {
-    return NOOP_HTTP_TEXT_FORMAT;
   }
 }
 
