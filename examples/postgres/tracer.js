@@ -46,7 +46,7 @@ module.exports = (serviceName) => {
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
   // Initialize the OpenTelemetry APIs to use the BasicTracer bindings
-  opentelemetry.trace.setGlobalTracerProvider(provider);
+  provider.register();
 
   return opentelemetry.trace.getTracer('example-postgres');
 };

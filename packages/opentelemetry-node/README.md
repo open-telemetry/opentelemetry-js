@@ -52,8 +52,7 @@ npm install --save @opentelemetry/plugin-https
 The following code will configure the `NodeTracerProvider` to instrument `http` using `@opentelemetry/plugin-http`.
 
 ```js
-const opentelemetry = require('@opentelemetry/api');
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider } = require('@/node');
 
 // Create and configure NodeTracerProvider
 const provider = new NodeTracerProvider({
@@ -61,14 +60,14 @@ const provider = new NodeTracerProvider({
     http: {
       enabled: true,
       // You may use a package name or absolute path to the file.
-      path: '@opentelemetry/plugin-http',
+      path: '@/plugin-http',
       // http plugin options
     }
   }
 });
 
 // Initialize the provider
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register()
 
 // Your application code - http will automatically be instrumented if
 // @opentelemetry/plugin-http is present
@@ -78,14 +77,13 @@ const http = require('http');
 To enable instrumentation for all [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins), create an instance of `NodeTracerProvider` without providing any plugin configuration to the constructor.
 
 ```js
-const opentelemetry = require('@opentelemetry/api');
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and initialize NodeTracerProvider
 const provider = new NodeTracerProvider();
 
 // Initialize the provider
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register()
 
 // Your application code
 // ...
