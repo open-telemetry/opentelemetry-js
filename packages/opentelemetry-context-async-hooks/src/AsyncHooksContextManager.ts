@@ -52,7 +52,9 @@ export class AsyncHooksContextManager implements ContextManager {
   }
 
   active(): Context {
-    return this._contexts[asyncHooks.executionAsyncId()] || Context.ROOT_CONTEXT;
+    return (
+      this._contexts[asyncHooks.executionAsyncId()] || Context.ROOT_CONTEXT
+    );
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(

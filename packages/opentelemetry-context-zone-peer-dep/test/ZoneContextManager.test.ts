@@ -42,7 +42,10 @@ describe('ZoneContextManager', () => {
     it('should work', () => {
       const ctx = Context.ROOT_CONTEXT.setValue(key1, 1);
       assert.doesNotThrow(() => {
-        assert(contextManager.enable() === contextManager, 'should return this');
+        assert(
+          contextManager.enable() === contextManager,
+          'should return this'
+        );
         contextManager.with(ctx, () => {
           assert(contextManager.active() === ctx, 'should have root context');
         });
@@ -54,7 +57,10 @@ describe('ZoneContextManager', () => {
     it('should work', () => {
       const ctx = Context.ROOT_CONTEXT.setValue(key1, 1);
       assert.doesNotThrow(() => {
-        assert(contextManager.disable() === contextManager, 'should return this');
+        assert(
+          contextManager.disable() === contextManager,
+          'should return this'
+        );
         contextManager.with(ctx, () => {
           assert(
             contextManager.active() === Context.ROOT_CONTEXT,
@@ -73,7 +79,11 @@ describe('ZoneContextManager', () => {
     it('should run the callback (object as target)', done => {
       const test = Context.ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
-        assert.strictEqual(contextManager.active(), test, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          test,
+          'should have context'
+        );
         return done();
       });
     });
@@ -234,7 +244,11 @@ describe('ZoneContextManager', () => {
     it('should return current context (when enabled)', done => {
       const context = Context.ROOT_CONTEXT.setValue(key1, { a: 1 });
       const fn: any = contextManager.bind(() => {
-        assert.strictEqual(contextManager.active(), context, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          context,
+          'should have context'
+        );
         return done();
       }, context);
       fn();

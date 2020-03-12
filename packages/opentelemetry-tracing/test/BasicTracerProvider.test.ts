@@ -25,7 +25,10 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { NoopContextManager, ContextManager } from '@opentelemetry/context-base';
+import {
+  NoopContextManager,
+  ContextManager,
+} from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 

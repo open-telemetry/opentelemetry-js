@@ -34,7 +34,10 @@ describe('StackContextManager', () => {
   describe('.enable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(contextManager.enable() === contextManager, 'should return this');
+        assert(
+          contextManager.enable() === contextManager,
+          'should return this'
+        );
         assert(
           contextManager.active() === Context.ROOT_CONTEXT,
           'should have root context'
@@ -46,7 +49,10 @@ describe('StackContextManager', () => {
   describe('.disable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(contextManager.disable() === contextManager, 'should return this');
+        assert(
+          contextManager.disable() === contextManager,
+          'should return this'
+        );
         assert(
           contextManager.active() === Context.ROOT_CONTEXT,
           'should have no context'
@@ -63,7 +69,11 @@ describe('StackContextManager', () => {
     it('should run the callback (object as target)', done => {
       const test = Context.ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
-        assert.strictEqual(contextManager.active(), test, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          test,
+          'should have context'
+        );
         return done();
       });
     });
@@ -161,7 +171,11 @@ describe('StackContextManager', () => {
     it('should return current context (when enabled)', done => {
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(() => {
-        assert.strictEqual(contextManager.active(), context, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          context,
+          'should have context'
+        );
         return done();
       }, context);
       fn();
@@ -171,7 +185,11 @@ describe('StackContextManager', () => {
       contextManager.disable();
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(() => {
-        assert.strictEqual(contextManager.active(), context, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          context,
+          'should have context'
+        );
         return done();
       }, context);
       fn();

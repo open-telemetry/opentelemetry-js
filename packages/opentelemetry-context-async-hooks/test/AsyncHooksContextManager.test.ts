@@ -36,7 +36,10 @@ describe('AsyncHooksContextManager', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
         contextManager = new AsyncHooksContextManager();
-        assert(contextManager.enable() === contextManager, 'should return this');
+        assert(
+          contextManager.enable() === contextManager,
+          'should return this'
+        );
       });
     });
   });
@@ -44,7 +47,10 @@ describe('AsyncHooksContextManager', () => {
   describe('.disable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(contextManager.disable() === contextManager, 'should return this');
+        assert(
+          contextManager.disable() === contextManager,
+          'should return this'
+        );
       });
       contextManager.enable();
     });
@@ -58,7 +64,11 @@ describe('AsyncHooksContextManager', () => {
     it('should run the callback (object as target)', done => {
       const test = Context.ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
-        assert.strictEqual(contextManager.active(), test, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          test,
+          'should have context'
+        );
         return done();
       });
     });
@@ -116,7 +126,11 @@ describe('AsyncHooksContextManager', () => {
     it('should return current context (when enabled)', done => {
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = contextManager.bind(() => {
-        assert.strictEqual(contextManager.active(), context, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          context,
+          'should have context'
+        );
         return done();
       }, context);
       fn();
@@ -130,7 +144,11 @@ describe('AsyncHooksContextManager', () => {
       contextManager.disable();
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = contextManager.bind(() => {
-        assert.strictEqual(contextManager.active(), context, 'should have context');
+        assert.strictEqual(
+          contextManager.active(),
+          context,
+          'should have context'
+        );
         return done();
       }, context);
       fn();
@@ -157,7 +175,11 @@ describe('AsyncHooksContextManager', () => {
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = contextManager.bind(() => {
         setTimeout(() => {
-          assert.strictEqual(contextManager.active(), context, 'should have context');
+          assert.strictEqual(
+            contextManager.active(),
+            context,
+            'should have context'
+          );
           return done();
         }, 100);
       }, context);

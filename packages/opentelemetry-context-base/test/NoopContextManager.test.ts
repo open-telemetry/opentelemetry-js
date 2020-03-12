@@ -24,7 +24,10 @@ describe('NoopContextManager', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
         contextManager = new NoopContextManager();
-        assert(contextManager.enable() === contextManager, 'should return this');
+        assert(
+          contextManager.enable() === contextManager,
+          'should return this'
+        );
       });
     });
   });
@@ -32,7 +35,10 @@ describe('NoopContextManager', () => {
   describe('.disable()', () => {
     it('should work', () => {
       assert.doesNotThrow(() => {
-        assert(contextManager.disable() === contextManager, 'should return this');
+        assert(
+          contextManager.disable() === contextManager,
+          'should return this'
+        );
       });
       contextManager.enable();
     });
