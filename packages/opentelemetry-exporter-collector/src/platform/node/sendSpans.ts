@@ -25,7 +25,6 @@ import * as collectorTypes from '../../types';
 
 import * as url from 'url';
 import { VERSION } from '../../version';
-import { Resource } from '@opentelemetry/resources';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
