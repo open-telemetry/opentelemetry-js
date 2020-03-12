@@ -37,14 +37,6 @@ describe('NoopTracer', () => {
     );
 
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
-    const HttpTextPropagator = tracer.getHttpTextPropagator();
-    assert.ok(HttpTextPropagator);
-
-    HttpTextPropagator.inject(Context.ROOT_CONTEXT, {}, defaultSetter);
-    assert.deepStrictEqual(
-      HttpTextPropagator.extract(Context.ROOT_CONTEXT, {}, defaultGetter),
-      Context.ROOT_CONTEXT
-    );
   });
 
   it('should not crash when .withSpan()', done => {
