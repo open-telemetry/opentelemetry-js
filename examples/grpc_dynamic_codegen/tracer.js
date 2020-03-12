@@ -34,8 +34,8 @@ module.exports = (serviceName) => {
   // and optimization, especially in production.
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-  // Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-  opentelemetry.trace.setGlobalTracerProvider(provider);
+  // Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
+  provider.register();
 
   return opentelemetry.trace.getTracer('grpc-dynamic-codegen-example');
 };
