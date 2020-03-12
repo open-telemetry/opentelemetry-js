@@ -69,7 +69,11 @@ export const mockedReadableSpan: ReadableSpan = {
     },
   ],
   duration: [0, 8885000],
-  resource: Resource.empty(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
 };
 
 export function ensureSpanIsCorrect(span: collectorTypes.Span) {

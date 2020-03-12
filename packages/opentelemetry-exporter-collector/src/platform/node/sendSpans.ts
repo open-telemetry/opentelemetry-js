@@ -55,27 +55,13 @@ export function sendSpans(
   onSuccess: () => void,
   onError: (status?: number) => void,
   collectorExporter: CollectorExporter,
-  resource: Resource
+  resource: collectorTypes.Resource
 ) {
-  const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
-    node: {
-      identifier: {
-        hostName: collectorExporter.hostName,
-        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
-      },
-      libraryInfo: {
-        language: collectorTypes.LibraryInfoLanguage.NODE_JS,
-        coreLibraryVersion: core.VERSION,
-        exporterVersion: VERSION,
-      },
-      serviceInfo: {
-        name: collectorExporter.serviceName,
-      },
-      attributes: collectorExporter.attributes,
-    },
-    resource: resource.labels,
+  const exportTraceServiceRequest = toCollectorTraceServiceRequest(
     spans,
-  };
+    collectorExporter,
+    resource
+  );
   const body = JSON.stringify(exportTraceServiceRequest);
   const parsedUrl = url.parse(collectorExporter.url);
 
@@ -107,4 +93,30 @@ export function sendSpans(
   });
   req.write(body);
   req.end();
+}
+
+export function toCollectorTraceServiceRequest(
+  spans: collectorTypes.Span[],
+  collectorExporter: CollectorExporter,
+  resource: collectorTypes.Resource
+): collectorTypes.ExportTraceServiceRequest {
+  return {
+    node: {
+      identifier: {
+        hostName: collectorExporter.hostName,
+        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
+      },
+      libraryInfo: {
+        language: collectorTypes.LibraryInfoLanguage.NODE_JS,
+        coreLibraryVersion: core.VERSION,
+        exporterVersion: VERSION,
+      },
+      serviceInfo: {
+        name: collectorExporter.serviceName,
+      },
+      attributes: collectorExporter.attributes,
+    },
+    resource,
+    spans,
+  };
 }
