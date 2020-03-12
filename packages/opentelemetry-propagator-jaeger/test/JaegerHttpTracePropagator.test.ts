@@ -34,7 +34,9 @@ import {
 describe('JaegerHttpTracePropagator', () => {
   const jaegerHttpTracePropagator = new JaegerHttpTracePropagator();
   const customHeader = 'new-header';
-  const customJaegerHttpTracePropagator = new JaegerHttpTracePropagator(customHeader);
+  const customJaegerHttpTracePropagator = new JaegerHttpTracePropagator(
+    customHeader
+  );
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {

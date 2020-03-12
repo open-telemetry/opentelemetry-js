@@ -45,7 +45,9 @@ export class PropagationAPI {
   /**
    * Set the current propagator. Returns the initialized propagator
    */
-  public setGlobalPropagator(propagator: HttpTextPropagator): HttpTextPropagator {
+  public setGlobalPropagator(
+    propagator: HttpTextPropagator
+  ): HttpTextPropagator {
     this._propagator = propagator;
     return propagator;
   }
