@@ -20,7 +20,7 @@ import {
   SDKRegistrationConfig,
   TracerConfig,
 } from '@opentelemetry/tracing';
-import { StackScopeManager } from './StackScopeManager';
+import { StackContextManager } from './StackContextManager';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -33,7 +33,7 @@ export interface WebTracerConfig extends TracerConfig {
 }
 
 /**
- * This class represents a web tracer with {@link StackScopeManager}
+ * This class represents a web tracer with {@link StackContextManager}
  */
 export class WebTracerProvider extends BasicTracerProvider {
   /**
@@ -60,7 +60,7 @@ export class WebTracerProvider extends BasicTracerProvider {
    */
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
-      config.contextManager = new StackScopeManager();
+      config.contextManager = new StackContextManager();
       config.contextManager.enable();
     }
 

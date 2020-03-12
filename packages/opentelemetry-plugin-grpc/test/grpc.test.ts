@@ -22,8 +22,8 @@ import {
 } from '@opentelemetry/api';
 import { NoopLogger, HttpTraceContext } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ContextManager } from '@opentelemetry/context-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -300,19 +300,19 @@ function createClient(grpc: GrpcModule, proto: any) {
 }
 
 describe('GrpcPlugin', () => {
-  let scopeManger: ScopeManager;
+  let contextManager: ContextManager;
 
   before(() => {
     propagation.setGlobalPropagator(new HttpTraceContext());
   });
 
   beforeEach(() => {
-    scopeManger = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManger);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManger.disable();
+    contextManager.disable();
   });
 
   it('should return a plugin', () => {

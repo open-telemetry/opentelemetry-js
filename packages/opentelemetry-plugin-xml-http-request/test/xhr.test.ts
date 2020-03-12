@@ -22,7 +22,7 @@ import {
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
 } from '@opentelemetry/core';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import {
   PerformanceTimingNames as PTN,
@@ -97,15 +97,15 @@ describe('xhr', () => {
   let requests: any[] = [];
   let prepareData: any;
   let clearData: any;
-  let scopeManager: ZoneScopeManager;
+  let contextManager: ZoneContextManager;
 
   beforeEach(() => {
-    scopeManager = new ZoneScopeManager().enable();
-    types.context.setGlobalContextManager(scopeManager);
+    contextManager = new ZoneContextManager().enable();
+    types.context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   before(() => {

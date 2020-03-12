@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
@@ -48,7 +48,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
-      config.contextManager = new AsyncHooksScopeManager();
+      config.contextManager = new AsyncHooksContextManager();
       config.contextManager.enable();
     }
 

@@ -17,7 +17,7 @@
 import { CanonicalCode, context } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
@@ -36,7 +36,7 @@ const user = process.env.MYSQL_USER || 'otel';
 const password = process.env.MYSQL_PASSWORD || 'secret';
 
 describe('mysql@2.x', () => {
-  let scopeManager: AsyncHooksScopeManager;
+  let contextManager: AsyncHooksContextManager;
   let connection: mysql.Connection;
   let pool: mysql.Pool;
   let poolCluster: mysql.PoolCluster;
@@ -73,8 +73,8 @@ describe('mysql@2.x', () => {
   });
 
   beforeEach(function() {
-    scopeManager = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManager);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
     plugin.enable(mysql, provider, logger);
     connection = mysql.createConnection({
       port,
@@ -101,7 +101,7 @@ describe('mysql@2.x', () => {
   });
 
   afterEach(done => {
-    scopeManager.disable();
+    contextManager.disable();
     memoryExporter.reset();
     plugin.disable();
     connection.end(() => {

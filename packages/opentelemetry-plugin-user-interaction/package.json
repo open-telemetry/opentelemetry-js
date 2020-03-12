@@ -44,7 +44,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@opentelemetry/plugin-xml-http-request": "^0.4.0",
-    "@opentelemetry/scope-zone-peer-dep": "^0.4.0",
+    "@opentelemetry/context-zone-peer-dep": "^0.4.0",
     "@opentelemetry/tracing": "^0.4.0",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^5.2.5",

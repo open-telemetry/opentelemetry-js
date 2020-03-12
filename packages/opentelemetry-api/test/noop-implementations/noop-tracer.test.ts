@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
 import { defaultGetter } from '../../src/context/propagation/getter';
