@@ -15,7 +15,6 @@ npm install --save @opentelemetry/exporter-collector
 
 ## Usage in Web
 ```js
-import * as opentelemetry from '@opentelemetry/api';
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorExporter } from '@opentelemetry/exporter-collector'
@@ -28,13 +27,12 @@ const provider = new WebTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register();
 
 ```
 
 ## Usage in Node
 ```js
-const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
@@ -46,7 +44,7 @@ const provider = new BasicTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register();
 
 ```
 

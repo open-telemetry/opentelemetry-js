@@ -1,13 +1,13 @@
-import * as opentelemetry from "@opentelemetry/api";
+import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from "@opentelemetry/node";
 import { SimpleSpanProcessor } from "@opentelemetry/tracing";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: opentelemetry.LogLevel.ERROR
+  logLevel: LogLevel.ERROR
 });
 
-opentelemetry.trace.setGlobalTracerProvider(provider);
+provider.register();
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
