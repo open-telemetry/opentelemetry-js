@@ -37,12 +37,12 @@ describe('NoopTracer', () => {
     );
 
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
-    const httpTextFormat = tracer.getHttpTextFormat();
-    assert.ok(httpTextFormat);
+    const HttpTextPropagator = tracer.getHttpTextPropagator();
+    assert.ok(HttpTextPropagator);
 
-    httpTextFormat.inject(Context.ROOT_CONTEXT, {}, defaultSetter);
+    HttpTextPropagator.inject(Context.ROOT_CONTEXT, {}, defaultSetter);
     assert.deepStrictEqual(
-      httpTextFormat.extract(Context.ROOT_CONTEXT, {}, defaultGetter),
+      HttpTextPropagator.extract(Context.ROOT_CONTEXT, {}, defaultGetter),
       Context.ROOT_CONTEXT
     );
   });

@@ -17,7 +17,7 @@
 import {
   Context,
   GetterFunction,
-  HttpTextFormat,
+  HttpTextPropagator,
   SetterFunction,
   SpanContext,
   TraceFlags,
@@ -63,7 +63,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class HttpTraceContext implements HttpTextFormat {
+export class HttpTraceContext implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;

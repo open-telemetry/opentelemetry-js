@@ -15,7 +15,7 @@
  */
 import * as types from '@opentelemetry/api';
 import {
-  B3Format,
+  B3Propagator,
   LogLevel,
   otperformance as performance,
   X_B3_SAMPLED,
@@ -109,7 +109,7 @@ describe('xhr', () => {
   });
 
   before(() => {
-    types.propagation.setGlobalPropagator(new B3Format());
+    types.propagation.setGlobalPropagator(new B3Propagator());
   });
 
   describe('when request is successful', () => {

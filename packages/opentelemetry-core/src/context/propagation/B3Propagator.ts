@@ -17,7 +17,7 @@
 import {
   Context,
   GetterFunction,
-  HttpTextFormat,
+  HttpTextPropagator,
   SetterFunction,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -42,7 +42,7 @@ function isValidSpanId(spanId: string): boolean {
  * Propagator for the B3 HTTP header format.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
-export class B3Format implements HttpTextFormat {
+export class B3Propagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
