@@ -70,7 +70,11 @@ describe('transform', () => {
           },
         ],
         duration: [32, 800000000],
-        resource: Resource.empty(),
+        resource: new Resource({
+          service: 'ui',
+          version: 1,
+          cost: 112.12,
+        }),
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -95,8 +99,18 @@ describe('transform', () => {
         thriftSpan.startTime,
         Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
-      assert.strictEqual(thriftSpan.tags.length, 6);
-      const [tag1, tag2, tag3, tag4, tag5, tag6] = thriftSpan.tags;
+      assert.strictEqual(thriftSpan.tags.length, 9);
+      const [
+        tag1,
+        tag2,
+        tag3,
+        tag4,
+        tag5,
+        tag6,
+        tag7,
+        tag8,
+        tag9,
+      ] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);
@@ -115,6 +129,15 @@ describe('transform', () => {
       assert.strictEqual(tag6.key, 'span.kind');
       assert.strictEqual(tag6.vType, 'STRING');
       assert.strictEqual(tag6.vStr, 'INTERNAL');
+      assert.strictEqual(tag7.key, 'service');
+      assert.strictEqual(tag7.vType, 'STRING');
+      assert.strictEqual(tag7.vStr, 'ui');
+      assert.strictEqual(tag8.key, 'version');
+      assert.strictEqual(tag8.vType, 'DOUBLE');
+      assert.strictEqual(tag8.vDouble, 1);
+      assert.strictEqual(tag9.key, 'cost');
+      assert.strictEqual(tag9.vType, 'DOUBLE');
+      assert.strictEqual(tag9.vDouble, 112.12);
       assert.strictEqual(thriftSpan.references.length, 0);
 
       assert.strictEqual(thriftSpan.logs.length, 1);

@@ -18,6 +18,7 @@ import { Attributes, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import { Resource } from '@opentelemetry/resources';
 
 describe('transform', () => {
   describe('toCollectorTruncatableString', () => {
@@ -147,6 +148,25 @@ describe('transform', () => {
   describe('toCollectorSpan', () => {
     it('should convert span', () => {
       ensureSpanIsCorrect(transform.toCollectorSpan(mockedReadableSpan));
+    });
+  });
+
+  describe('toCollectorResource', () => {
+    it('should convert resource', () => {
+      const resource = transform.toCollectorResource(
+        new Resource({
+          service: 'ui',
+          version: 1.0,
+          success: true,
+        })
+      );
+      assert.deepStrictEqual(resource, {
+        labels: {
+          service: 'ui',
+          version: '1',
+          success: 'true',
+        },
+      });
     });
   });
 });

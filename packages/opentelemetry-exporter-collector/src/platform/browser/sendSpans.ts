@@ -43,12 +43,14 @@ export function onShutdown(shutdownF: EventListener) {
  * @param onSuccess
  * @param onError
  * @param collectorExporter
+ * @param resource
  */
 export function sendSpans(
   spans: collectorTypes.Span[],
   onSuccess: () => void,
   onError: (status?: number) => void,
-  collectorExporter: CollectorExporter
+  collectorExporter: CollectorExporter,
+  resource: collectorTypes.Resource
 ) {
   const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
     node: {
@@ -66,7 +68,7 @@ export function sendSpans(
       },
       attributes: collectorExporter.attributes,
     },
-    // resource: '', not implemented
+    resource,
     spans,
   };
 
