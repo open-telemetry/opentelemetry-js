@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
 import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
-import { defaultGetter } from '../../src/context/propagation/getter';
-import { defaultSetter } from '../../src/context/propagation/setter';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {

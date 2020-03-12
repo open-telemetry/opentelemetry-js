@@ -25,11 +25,7 @@ import api, {
 } from '../../src';
 
 describe('API', () => {
-  const functions = [
-    'getCurrentSpan',
-    'startSpan',
-    'withSpan',
-  ];
+  const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];
 
   it('should expose a tracer provider via getTracerProvider', () => {
     const tracer = api.trace.getTracerProvider();
