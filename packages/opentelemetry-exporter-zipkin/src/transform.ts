@@ -18,6 +18,7 @@ import * as types from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
+import { Resource } from '@opentelemetry/resources';
 
 const ZIPKIN_SPAN_KIND_MAPPING = {
   [types.SpanKind.CLIENT]: zipkinTypes.SpanKind.CLIENT,
@@ -54,7 +55,8 @@ export function toZipkinSpan(
       span.attributes,
       span.status,
       statusCodeTagName,
-      statusDescriptionTagName
+      statusDescriptionTagName,
+      span.resource
     ),
     annotations: span.events.length
       ? _toZipkinAnnotations(span.events)
@@ -69,9 +71,10 @@ export function _toZipkinTags(
   attributes: types.Attributes,
   status: types.Status,
   statusCodeTagName: string,
-  statusDescriptionTagName: string
+  statusDescriptionTagName: string,
+  resource: Resource
 ): zipkinTypes.Tags {
-  const tags: { [key: string]: string } = {};
+  const tags: { [key: string]: unknown } = {};
   for (const key of Object.keys(attributes)) {
     tags[key] = String(attributes[key]);
   }
@@ -79,6 +82,11 @@ export function _toZipkinTags(
   if (status.message) {
     tags[statusDescriptionTagName] = status.message;
   }
+
+  Object.keys(resource.labels).forEach(
+    name => (tags[name] = resource.labels[name])
+  );
+
   return tags;
 }
 

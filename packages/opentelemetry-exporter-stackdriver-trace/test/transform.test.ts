@@ -51,7 +51,11 @@ describe('transform', () => {
       name: 'my-span',
       spanContext,
       status: { code: types.CanonicalCode.OK },
-      resource: Resource.empty(),
+      resource: new Resource({
+        service: 'ui',
+        version: 1,
+        cost: 112.12,
+      }),
     };
   });
 
@@ -67,6 +71,9 @@ describe('transform', () => {
               value: `opentelemetry-js [${CORE_VERSION}]; stackdriver-trace-exporter [${VERSION}]`,
             },
           },
+          cost: { intValue: '112' },
+          service: { stringValue: { value: 'ui' } },
+          version: { intValue: '1' },
         },
         droppedAttributesCount: 0,
       },
@@ -130,7 +137,7 @@ describe('transform', () => {
     assert.deepStrictEqual(result.attributes!.droppedAttributesCount, 1);
     assert.deepStrictEqual(
       Object.keys(result.attributes!.attributeMap!).length,
-      2
+      5
     );
   });
 

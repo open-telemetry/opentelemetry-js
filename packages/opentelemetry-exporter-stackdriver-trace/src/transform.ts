@@ -30,6 +30,7 @@ import {
   TruncatableString,
 } from './types';
 import { VERSION } from './version';
+import { Resource } from '@opentelemetry/resources';
 
 const AGENT_LABEL_KEY = 'g.co/agent';
 const AGENT_LABEL_VALUE = `opentelemetry-js [${CORE_VERSION}]; stackdriver-trace-exporter [${VERSION}]`;
@@ -38,10 +39,14 @@ export function getReadableSpanTransformer(
   projectId: string
 ): (span: ReadableSpan) => Span {
   return span => {
-    const attributes = transformAttributes(span.attributes, {
-      project_id: projectId,
-      [AGENT_LABEL_KEY]: AGENT_LABEL_VALUE,
-    });
+    const attributes = transformAttributes(
+      span.attributes,
+      {
+        project_id: projectId,
+        [AGENT_LABEL_KEY]: AGENT_LABEL_VALUE,
+      },
+      span.resource
+    );
 
     const out: Span = {
       attributes,
@@ -85,9 +90,16 @@ function transformLink(link: ot.Link): Link {
 
 function transformAttributes(
   requestAttributes: ot.Attributes = {},
-  serviceAttributes: ot.Attributes = {}
+  serviceAttributes: ot.Attributes = {},
+  resource: Resource = Resource.empty()
 ): Attributes {
-  const attributes = Object.assign({}, requestAttributes, serviceAttributes);
+  const attributes = Object.assign(
+    {},
+    requestAttributes,
+    serviceAttributes,
+    resource.labels
+  );
+
   const attributeMap = transformAttributeValues(attributes);
   return {
     attributeMap: attributeMap,
