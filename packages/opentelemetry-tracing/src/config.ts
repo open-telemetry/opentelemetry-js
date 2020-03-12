@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ALWAYS_SAMPLER,
-  HttpTraceContext,
-  LogLevel,
-} from '@opentelemetry/core';
-import { NoopScopeManager } from '@opentelemetry/scope-base';
+import { ALWAYS_SAMPLER, LogLevel } from '@opentelemetry/core';
 
 /** Default limit for Message events per span */
 export const DEFAULT_MAX_EVENTS_PER_SPAN = 128;
@@ -36,10 +31,8 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  */
 export const DEFAULT_CONFIG = {
   defaultAttributes: {},
-  httpTextFormat: new HttpTraceContext(),
   logLevel: LogLevel.DEBUG,
   sampler: ALWAYS_SAMPLER,
-  scopeManager: new NoopScopeManager(),
   traceParams: {
     numberOfAttributesPerSpan: DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
     numberOfLinksPerSpan: DEFAULT_MAX_LINKS_PER_SPAN,
