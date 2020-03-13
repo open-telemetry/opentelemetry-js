@@ -7,27 +7,32 @@
 
 This package provides everything needed to interact with the OpenTelemetry API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
 
-## Basic Use
+## Quick Start
 
 To get started tracing you need to install the SDK and plugins, create a TracerProvider, and register it with the API.
 
 ### Install Dependencies
 
 ```sh
+$ # Install tracing dependencies
 $ npm install \
     @opentelemetry/core \
     @opentelemetry/node \
     @opentelemetry/tracing \
-    @opentelemetry/exporter-jaeger \
-    @opentelemetry/exporter-prometheus \ # add exporters as needed
+    @opentelemetry/exporter-jaeger \ # add exporters as needed
     @opentelemetry/plugin-http # add plugins as needed
+
+$ # Install metrics dependencies
+$ npm install \
+    @opentelemetry/metrics \
+    @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
 ### Initialize the SDK
 
 Before any other module in your application is loaded, you must initialize the global tracer and meter providers. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
 
-To collect traces and metrics, you will have to tell the SDK where to export telemetry data to. This example uses Jaeger and Prometheus, but exporters exist for other tracing backends. If you're not sure if there is an exporter for your tracing backend, contact your tracing backend provider.
+To collect traces and metrics, you will have to tell the SDK where to export telemetry data to. This example uses Jaeger and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends]. If you're not sure if there is an exporter for your tracing backend, contact your tracing backend provider.
 
 #### Tracing
 
@@ -54,7 +59,7 @@ tracerProvider.addSpanProcessor(
 /** 
  * Registering the provider with the API allows it to be discovered
  * and used by instrumentation libraries. The OpenTelemetry API provides
- * methods to set global SDK implemetations, but the default SDK provides
+ * methods to set global SDK implementations, but the default SDK provides
  * a convenience method named `register` which registers sane defaults
  * for you.
  * 
@@ -82,10 +87,6 @@ const meterProvider = new MeterProvider({
 /** 
  * Registering the provider with the API allows it to be discovered
  * and used by instrumentation libraries.
- * 
- * Note that if you haven't registered a TracerProvider, you will
- * be responsible for configuring a context manager and registering
- * it using the context API.
  */
 api.metrics.setGlobalMeterProvider(meterProvider);
 ```
@@ -96,11 +97,11 @@ api.metrics.setGlobalMeterProvider(meterProvider);
 If you prefer to choose your own propagator or context manager, you may pass an options object into the `tracerProvider.register()` method. Omitted or `undefined` options will be replaced by a default value and `null` values will be skipped.
 
 ```javascript
-const { B3Format } = require("@opentelemetry/core");
+const { B3Propagator } = require("@opentelemetry/core");
 
 tracerProvider.register({
   // Use B3 Propagation
-  propagator: new B3Format(),
+  propagator: new B3Propagator(),
 
   // Skip registering a default context manager
   contextManager: null,
@@ -134,6 +135,7 @@ api.metrics.getMeterProvider();
 api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
+api.propagator.setGlobalPropagator(httpTraceContextPropagator)
 
 /* Initialize Context Manager */
 api.propagation.setGlobalContextManager(asyncHooksContextManager);
@@ -196,3 +198,5 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 [metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
+
+[other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters
