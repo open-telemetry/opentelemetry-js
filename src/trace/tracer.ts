@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/context-base';
 import { Span } from './span';
 import { SpanOptions } from './SpanOptions';
 
@@ -58,9 +58,9 @@ export interface Tracer {
   ): ReturnType<T>;
 
   /**
-   * Bind a span as the target's scope or propagate the current one.
+   * Bind a span as the target's context or propagate the current one.
    *
-   * @param target Any object to which a scope need to be set
+   * @param target Any object to which a context need to be set
    * @param [context] Optionally specify the context which you want to bind
    */
   bind<T>(target: T, context?: Span): T;
