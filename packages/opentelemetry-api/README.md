@@ -27,7 +27,7 @@ $ npm install \
 
 Before any other module in your application is loaded, you must initialize the global tracer and meter providers. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
 
-To collect traces and metrics, you will have to tell the SDK where to export telemetry data to. This example uses Jaeger and Prometheus, but exporters exist for other tracing backends. If you're not sure if there is an exporter for your tracing backend, contact your tracing backend provider.
+To collect traces and metrics, you will have to tell the SDK where to export telemetry data to. This example uses Jaeger and Prometheus, but exporters exist for other tracing backends. If you're not sure if there is an exporter for your tracing backend, contact your tracing provider.
 
 #### Tracing
 
