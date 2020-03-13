@@ -10,7 +10,7 @@ This package provides default and no-op implementations of the OpenTelemetry API
 ## Built-in Implementations
 
 - [Built-in Propagators](#built-in-propagators)
-  * [HttpTraceContext Propagator](#http-trace-context)
+  * [HttpTraceContext Propagator](#httptracecontext-propagator)
   * [B3 Propagator](#b3-propagator)
   * [Composite Propagator](#composite-propagator)
 - [Built-in Sampler](#built-in-sampler)
