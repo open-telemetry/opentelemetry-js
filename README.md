@@ -102,7 +102,6 @@ OpenTelemetry is vendor-agnostic and can upload data to any backend with various
 #### Trace Exporters
 - [@opentelemetry/exporter-jaeger][otel-exporter-jaeger]
 - [@opentelemetry/exporter-zipkin][otel-exporter-zipkin]
-- [@opentelemetry/exporter-stackdriver-trace][otel-exporter-stackdriver-trace]
 - [@opentelemetry/exporter-collector][otel-exporter-collector]
 
 #### Metric Exporters
@@ -164,7 +163,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-exporter-collector]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector
 [otel-exporter-jaeger]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-jaeger
 [otel-exporter-prometheus]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus
-[otel-exporter-stackdriver-trace]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-stackdriver-trace
 [otel-exporter-zipkin]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-zipkin
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
