@@ -65,8 +65,6 @@ describe('ConsoleLogger', () => {
       assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
       consoleLogger.info('info called %s', 'param1');
       assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
-      consoleLogger.debug('debug called %s', 'param1');
-      assert.deepStrictEqual(debugCalledArgs, ['debug called %s', 'param1']);
     });
 
     it('should log with debug', () => {
