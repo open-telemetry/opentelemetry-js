@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
 import * as assert from 'assert';
 import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
-import { defaultGetter } from '../../src/context/propagation/getter';
-import { defaultSetter } from '../../src/context/propagation/setter';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
@@ -37,14 +34,6 @@ describe('NoopTracer', () => {
     );
 
     assert.deepStrictEqual(tracer.getCurrentSpan(), NOOP_SPAN);
-    const httpTextFormat = tracer.getHttpTextFormat();
-    assert.ok(httpTextFormat);
-
-    httpTextFormat.inject(Context.ROOT_CONTEXT, {}, defaultSetter);
-    assert.deepStrictEqual(
-      httpTextFormat.extract(Context.ROOT_CONTEXT, {}, defaultGetter),
-      Context.ROOT_CONTEXT
-    );
   });
 
   it('should not crash when .withSpan()', done => {
