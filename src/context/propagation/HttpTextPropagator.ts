@@ -27,11 +27,11 @@ import { GetterFunction } from './getter';
  * The carrier of propagated data on both the client (injector) and server
  * (extractor) side is usually an object such as http headers.
  */
-export interface HttpTextFormat {
+export interface HttpTextPropagator {
   /**
    * Injects values from a given {@link Context} into a carrier.
    *
-   * OpenTelemetry defines a common set of format values (HTTPTextFormat), and
+   * OpenTelemetry defines a common set of format values (HttpTextPropagator), and
    * each has an expected `carrier` type.
    *
    * @param context the Context from which to extract values to transmit over

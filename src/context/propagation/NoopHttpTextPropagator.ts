@@ -15,12 +15,12 @@
  */
 
 import { Context } from '@opentelemetry/scope-base';
-import { HttpTextFormat } from './HttpTextFormat';
+import { HttpTextPropagator } from './HttpTextPropagator';
 
 /**
- * No-op implementations of {@link HttpTextFormat}.
+ * No-op implementations of {@link HttpTextPropagator}.
  */
-export class NoopHttpTextFormat implements HttpTextFormat {
+export class NoopHttpTextPropagator implements HttpTextPropagator {
   /** Noop inject function does nothing */
   inject(context: Context, carrier: unknown, setter: Function): void {}
   /** Noop extract function does nothing and returns the input context */
@@ -29,4 +29,4 @@ export class NoopHttpTextFormat implements HttpTextFormat {
   }
 }
 
-export const NOOP_HTTP_TEXT_FORMAT = new NoopHttpTextFormat();
+export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();

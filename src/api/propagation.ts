@@ -16,8 +16,8 @@
 
 import { Context } from '@opentelemetry/scope-base';
 import { defaultGetter, GetterFunction } from '../context/propagation/getter';
-import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
-import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
+import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
+import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPropagator';
 import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
 
@@ -28,7 +28,7 @@ const contextApi = ContextAPI.getInstance();
  */
 export class PropagationAPI {
   private static _instance?: PropagationAPI;
-  private _propagator: HttpTextFormat = NOOP_HTTP_TEXT_FORMAT;
+  private _propagator: HttpTextPropagator = NOOP_HTTP_TEXT_PROPAGATOR;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -45,7 +45,9 @@ export class PropagationAPI {
   /**
    * Set the current propagator. Returns the initialized propagator
    */
-  public setGlobalPropagator(propagator: HttpTextFormat): HttpTextFormat {
+  public setGlobalPropagator(
+    propagator: HttpTextPropagator
+  ): HttpTextPropagator {
     this._propagator = propagator;
     return propagator;
   }
