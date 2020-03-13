@@ -31,7 +31,7 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  */
 export const DEFAULT_CONFIG = {
   defaultAttributes: {},
-  logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.INFO,
   sampler: ALWAYS_SAMPLER,
   traceParams: {
     numberOfAttributesPerSpan: DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
