@@ -26,10 +26,10 @@ Format:
 Example of usage:
 ```javascript
 const { NodeTracerProvider } = require('@opentelemetry/node');
-const { JaegerHttpTraceFormat } = require('@opentelemetry/propagator-jaeger');
+const { JaegerHttpTracePropagator } = require('@opentelemetry/propagator-jaeger');
 
 const provider = new NodeTracerProvider({
-  httpTextFormat: new JaegerHttpTraceFormat()
+  HttpTextPropagator: new JaegerHttpTracePropagator()
 });
 ```
 

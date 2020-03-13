@@ -16,7 +16,7 @@
 
 import {
   Context,
-  HttpTextFormat,
+  HttpTextPropagator,
   SpanContext,
   TraceFlags,
   SetterFunction,
@@ -44,7 +44,7 @@ export const UBER_TRACE_ID_HEADER = 'uber-trace-id';
  * One byte bitmap, as two hex digits.
  * Inspired by jaeger-client-node project.
  */
-export class JaegerHttpTraceFormat implements HttpTextFormat {
+export class JaegerHttpTracePropagator implements HttpTextPropagator {
   private readonly _jaegerTraceHeader: string;
 
   /**
