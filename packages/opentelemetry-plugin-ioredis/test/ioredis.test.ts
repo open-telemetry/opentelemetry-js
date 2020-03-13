@@ -17,7 +17,7 @@
 import { CanonicalCode, context, SpanKind, Status } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
@@ -55,18 +55,18 @@ describe('ioredis', () => {
   const shouldTestLocal = process.env.RUN_REDIS_TESTS_LOCAL;
   const shouldTest = process.env.RUN_REDIS_TESTS || shouldTestLocal;
 
-  let scopeManager: AsyncHooksScopeManager;
+  let contextManager: AsyncHooksContextManager;
   beforeEach(() => {
-    scopeManager = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManager);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   before(function() {
-    // needs to be "function" to have MochaContext "this" scope
+    // needs to be "function" to have MochaContext "this" context
     if (!shouldTest) {
       // this.skip() workaround
       // https://github.com/mochajs/mocha/issues/2683#issuecomment-375629901

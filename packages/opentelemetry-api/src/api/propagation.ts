@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/context-base';
 import { defaultGetter, GetterFunction } from '../context/propagation/getter';
 import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
 import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPropagator';

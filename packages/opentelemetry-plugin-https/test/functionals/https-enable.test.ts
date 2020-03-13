@@ -29,8 +29,8 @@ import {
   HttpPluginConfig,
   OT_REQUEST_HEADER,
 } from '@opentelemetry/plugin-http';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ContextManager } from '@opentelemetry/context-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -83,15 +83,15 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpsPlugin', () => {
-  let scopeManger: ScopeManager;
+  let contextManager: ContextManager;
 
   beforeEach(() => {
-    scopeManger = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManger);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManger.disable();
+    contextManager.disable();
   });
 
   it('should return a plugin', () => {

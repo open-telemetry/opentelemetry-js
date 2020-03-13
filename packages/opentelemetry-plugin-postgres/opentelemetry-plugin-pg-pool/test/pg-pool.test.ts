@@ -26,7 +26,7 @@ import {
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { plugin as pgPlugin, PostgresPlugin } from '@opentelemetry/plugin-pg';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import * as testUtils from '@opentelemetry/test-utils';
 import {
   InMemorySpanExporter,
@@ -94,7 +94,7 @@ const runCallbackTest = (
 
 describe('pg-pool@2.x', () => {
   let pool: pgPool<pg.Client>;
-  let scopeManager: AsyncHooksScopeManager;
+  let contextManager: AsyncHooksContextManager;
   const provider = new NodeTracerProvider();
   const logger = new NoopLogger();
   const testPostgres = process.env.RUN_POSTGRES_TESTS; // For CI: assumes local postgres db is already available
@@ -128,15 +128,15 @@ describe('pg-pool@2.x', () => {
   beforeEach(function() {
     plugin.enable(pgPool, provider, logger);
     pgPlugin.enable(pg, provider, logger);
-    scopeManager = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManager);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
     memoryExporter.reset();
     plugin.disable();
     pgPlugin.disable();
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   it('should return a plugin', () => {

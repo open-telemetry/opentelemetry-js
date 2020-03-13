@@ -38,8 +38,8 @@ import { OT_REQUEST_HEADER } from '../../src/utils';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { ContextManager } from '@opentelemetry/context-base';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -77,15 +77,15 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpPlugin', () => {
-  let scopeManger: ScopeManager;
+  let contextManager: ContextManager;
 
   beforeEach(() => {
-    scopeManger = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManger);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManger.disable();
+    contextManager.disable();
   });
 
   it('should return a plugin', () => {

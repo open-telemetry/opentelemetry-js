@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/context-base';
 import { SetterFunction } from './setter';
 import { GetterFunction } from './getter';
 

@@ -1,7 +1,7 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 
 const provider = new WebTracerProvider({
@@ -12,7 +12,7 @@ const provider = new WebTracerProvider({
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 const providerWithZone = new WebTracerProvider({
-  scopeManager: new ZoneScopeManager(),
+  contextManager: new ZoneContextManager(),
   plugins: [
     new DocumentLoad(),
   ],
@@ -40,7 +40,7 @@ const getData = (url) => new Promise((resolve, reject) => {
   };
 });
 
-// example of keeping track of scope between async operations
+// example of keeping track of context between async operations
 const prepareClickEvent = () => {
   const url1 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
   const url2 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/packages/opentelemetry-web/package.json';

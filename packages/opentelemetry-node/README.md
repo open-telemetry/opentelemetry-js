@@ -27,7 +27,7 @@ This is done by wrapping all tracing-relevant functions.
 
 This instrumentation code will automatically
 - extract a trace-context identifier from inbound requests to allow distributed tracing (if applicable)
-- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/opentelemetry-scope-base](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-scope-base/README.md) for an in-depth explanation)
+- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/opentelemetry-context-base](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
 

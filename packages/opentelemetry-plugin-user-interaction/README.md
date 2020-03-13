@@ -7,8 +7,8 @@
 
 This module provides auto instrumentation of user interaction for web.
 This module can work either with [zone-js] or without it.
-With [zone-js] and ZoneScopeManager it will fully support the async operations.
-If you use Angular you already have the [zone-js]. It will be the same if you use [@opentelemetry/scope-zone].
+With [zone-js] and ZoneContextManager it will fully support the async operations.
+If you use Angular you already have the [zone-js]. It will be the same if you use [@opentelemetry/context-zone].
 Without [zone-js] it will still work but with limited support.
 
 ## Installation
@@ -23,12 +23,12 @@ npm install --save @opentelemetry/plugin-user-interaction
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 // or if you already have zone.js
-// import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
+// import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 
 const provider = new WebTracerProvider({
-  scopeManager: new ZoneScopeManager(), // optional
+  contextManager: new ZoneContextManager(), // optional
   plugins: [
     new UserInteractionPlugin()
   ]
@@ -101,4 +101,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-user-interaction
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-user-interaction.svg
 [zone-js]: https://www.npmjs.com/package/zone.js
-[@opentelemetry/scope-zone]: https://www.npmjs.com/package/@opentelemetry/scope-zone
+[@opentelemetry/context-zone]: https://www.npmjs.com/package/@opentelemetry/context-zone

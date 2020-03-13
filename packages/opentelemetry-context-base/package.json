@@ -1,0 +1,58 @@
+{
+  "name": "@opentelemetry/context-base",
+  "version": "0.4.0",
+  "description": "OpenTelemetry Base Context Manager",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "clean": "rimraf build/*",
+    "lint": "gts check",
+    "lint:fix": "gts fix",
+    "precompile": "tsc --version",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "prepare": "npm run compile"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "browser",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^12.6.8",
+    "codecov": "^3.6.1",
+    "gts": "^1.1.0",
+    "mocha": "^6.1.0",
+    "nyc": "^14.1.1",
+    "rimraf": "^3.0.0",
+    "ts-mocha": "^6.0.0",
+    "ts-node": "^8.6.2",
+    "tslint-consistent-codestyle": "^1.16.0",
+    "tslint-microsoft-contrib": "^6.2.0",
+    "typescript": "3.7.2"
+  }
+}
