@@ -16,8 +16,8 @@
 
 import { context } from '@opentelemetry/api';
 import { BasePlugin, NoopLogger } from '@opentelemetry/core';
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ContextManager } from '@opentelemetry/context-base';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { Tracer, Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -38,16 +38,16 @@ class DummyPlugin extends BasePlugin<unknown> {
 describe('WebTracerProvider', () => {
   describe('constructor', () => {
     let defaultOptions: WebTracerConfig;
-    let scopeManager: ScopeManager;
+    let contextManager: ContextManager;
 
     beforeEach(() => {
       defaultOptions = {};
-      scopeManager = new ZoneScopeManager().enable();
-      context.setGlobalContextManager(scopeManager);
+      contextManager = new ZoneContextManager().enable();
+      context.setGlobalContextManager(contextManager);
     });
 
     afterEach(() => {
-      scopeManager.disable();
+      contextManager.disable();
     });
 
     it('should construct an instance with required only options', () => {
@@ -73,14 +73,14 @@ describe('WebTracerProvider', () => {
       assert.ok(spyEnable2.calledOnce === true);
     });
 
-    it('should work without default scope manager', () => {
+    it('should work without default context manager', () => {
       assert.doesNotThrow(() => {
         new WebTracerProvider({});
       });
     });
 
-    describe('when scopeManager is "ZoneScopeManager"', () => {
-      it('should correctly return the scopes for 2 parallel actions', () => {
+    describe('when contextManager is "ZoneContextManager"', () => {
+      it('should correctly return the contexts for 2 parallel actions', () => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');

@@ -21,7 +21,7 @@ const originalSetTimeout = window.setTimeout;
 import { context } from '@opentelemetry/api';
 import { isWrapped, LogLevel } from '@opentelemetry/core';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone-peer-dep';
+import { ZoneContextManager } from '@opentelemetry/context-zone-peer-dep';
 import * as tracing from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import * as assert from 'assert';
@@ -39,7 +39,7 @@ const FILE_URL =
 
 describe('UserInteractionPlugin', () => {
   describe('when zone.js is NOT available', () => {
-    let scopeManager: ZoneScopeManager;
+    let contextManager: ZoneContextManager;
     let userInteractionPlugin: UserInteractionPlugin;
     let sandbox: sinon.SinonSandbox;
     let webTracerProvider: WebTracerProvider;
@@ -47,8 +47,8 @@ describe('UserInteractionPlugin', () => {
     let exportSpy: sinon.SinonSpy;
     let requests: sinon.SinonFakeXMLHttpRequest[] = [];
     beforeEach(() => {
-      scopeManager = new ZoneScopeManager().enable();
-      context.setGlobalContextManager(scopeManager);
+      contextManager = new ZoneContextManager().enable();
+      context.setGlobalContextManager(contextManager);
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
       fakeXhr.onCreate = function(xhr: sinon.SinonFakeXMLHttpRequest) {
@@ -81,7 +81,7 @@ describe('UserInteractionPlugin', () => {
         new tracing.SimpleSpanProcessor(dummySpanExporter)
       );
 
-      // this is needed as window is treated as scope and karma is adding
+      // this is needed as window is treated as context and karma is adding
       // context which is then detected as spanContext
       (window as { context?: {} }).context = undefined;
     });
@@ -89,7 +89,7 @@ describe('UserInteractionPlugin', () => {
       requests = [];
       sandbox.restore();
       exportSpy.restore();
-      scopeManager.disable();
+      contextManager.disable();
     });
 
     it('should handle task without async operation', () => {

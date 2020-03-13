@@ -28,7 +28,7 @@ import {
 import { AttributeNames } from './enums/AttributeNames';
 import { VERSION } from './version';
 
-const ZONE_SCOPE_KEY = 'OT_ZONE_SCOPE';
+const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
 const EVENT_CLICK_NAME = 'event_click:';
 const EVENT_NAVIGATION_NAME = 'Navigation:';
 
@@ -246,7 +246,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         task: AsyncTask
       ) {
         const currentZone = Zone.current;
-        const currentSpan = currentZone.get(ZONE_SCOPE_KEY);
+        const currentSpan = currentZone.get(ZONE_CONTEXT_KEY);
         if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
           plugin._decrementTask(currentSpan);
         }
@@ -269,7 +269,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         task: AsyncTask
       ) {
         const currentZone = Zone.current;
-        const currentSpan: types.Span = currentZone.get(ZONE_SCOPE_KEY);
+        const currentSpan: types.Span = currentZone.get(ZONE_CONTEXT_KEY);
         if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
           plugin._incrementTask(currentSpan);
           plugin._checkForTimeout(task, currentSpan);
@@ -310,7 +310,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
             }
           }
         } else {
-          span = this.get(ZONE_SCOPE_KEY);
+          span = this.get(ZONE_CONTEXT_KEY);
         }
 
         try {
@@ -337,7 +337,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
     if (!currentZone || !task.data || task.data.isPeriodic) {
       return false;
     }
-    const currentSpan = currentZone.get(ZONE_SCOPE_KEY);
+    const currentSpan = currentZone.get(ZONE_CONTEXT_KEY);
     if (!currentSpan) {
       return false;
     }

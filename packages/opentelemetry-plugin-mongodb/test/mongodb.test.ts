@@ -17,7 +17,7 @@
 import { CanonicalCode, context, SpanKind } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
   ReadableSpan,
@@ -103,7 +103,7 @@ describe('MongoDBPlugin', () => {
   const DB_NAME = process.env.MONGODB_DB || 'opentelemetry-tests';
   const COLLECTION_NAME = 'test';
 
-  let scopeManager: AsyncHooksScopeManager;
+  let contextManager: AsyncHooksContextManager;
   let client: mongodb.MongoClient;
   let collection: mongodb.Collection;
   const logger = new NoopLogger();
@@ -142,13 +142,13 @@ describe('MongoDBPlugin', () => {
     collection.insertMany(insertData, (err, result) => {
       done();
     });
-    scopeManager = new AsyncHooksScopeManager().enable();
-    context.setGlobalContextManager(scopeManager);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(done => {
     collection.deleteOne({}, done);
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   after(() => {

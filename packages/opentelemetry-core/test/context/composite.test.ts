@@ -20,7 +20,7 @@ import {
   HttpTextPropagator,
   SpanContext,
 } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/scope-base';
+import { Context } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import {
   CompositePropagator,

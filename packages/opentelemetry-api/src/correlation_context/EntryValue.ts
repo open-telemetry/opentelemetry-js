@@ -35,7 +35,7 @@ export interface EntryValue {
  */
 export enum EntryTtl {
   /**
-   * NO_PROPAGATION is considered to have local scope and is used within the
+   * NO_PROPAGATION is considered to have local context and is used within the
    * process it created.
    */
   NO_PROPAGATION = 0,

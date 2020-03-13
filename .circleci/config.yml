@@ -44,20 +44,22 @@ cache_1: &cache_1
   paths:
     - ./node_modules
     - ./package-lock.json
-    - packages/opentelemetry-base/node_modules
-    - packages/opentelemetry-scope-base/node_modules
     - packages/opentelemetry-api/node_modules
-    - packages/opentelemetry-scope-async-hooks/node_modules
+    - packages/opentelemetry-base/node_modules
+    - packages/opentelemetry-context-async-hooks/node_modules
+    - packages/opentelemetry-context-base/node_modules
+    - packages/opentelemetry-context-zone/node_modules
+    - packages/opentelemetry-context-zone-peer-dep/node_modules
     - packages/opentelemetry-core/node_modules
-    - packages/opentelemetry-exporter-prometheus/node_modules
-    - packages/opentelemetry-metrics/node_modules
-    - packages/opentelemetry-tracing/node_modules
     - packages/opentelemetry-exporter-jaeger/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
     - packages/opentelemetry-exporter-zipkin/node_modules
+    - packages/opentelemetry-metrics/node_modules
     - packages/opentelemetry-node/node_modules
-    - packages/opentelemetry-shim-opentracing/node_modules
-    - packages/opentelemetry-web/node_modules
     - packages/opentelemetry-plugin-dns/node_modules
+    - packages/opentelemetry-shim-opentracing/node_modules
+    - packages/opentelemetry-tracing/node_modules
+    - packages/opentelemetry-web/node_modules
 
 cache_2: &cache_2
   key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D

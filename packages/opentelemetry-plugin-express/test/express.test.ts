@@ -17,7 +17,7 @@
 import { context } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -59,20 +59,20 @@ describe('Express Plugin', () => {
   const spanProcessor = new SimpleSpanProcessor(memoryExporter);
   provider.addSpanProcessor(spanProcessor);
   const tracer = provider.getTracer('default');
-  let scopeManager: AsyncHooksScopeManager;
+  let contextManager: AsyncHooksContextManager;
 
   before(() => {
     plugin.enable(express, provider, logger);
   });
 
   beforeEach(() => {
-    scopeManager = new AsyncHooksScopeManager();
-    context.setGlobalContextManager(scopeManager.enable());
+    contextManager = new AsyncHooksContextManager();
+    context.setGlobalContextManager(contextManager.enable());
   });
 
   afterEach(() => {
     memoryExporter.reset();
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   describe('Instrumenting normal get operations', () => {
