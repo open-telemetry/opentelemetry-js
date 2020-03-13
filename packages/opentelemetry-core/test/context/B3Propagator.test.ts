@@ -27,15 +27,15 @@ import {
   setExtractedSpanContext,
 } from '../../src/context/context';
 import {
-  B3Format,
+  B3Propagator,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3Format';
+} from '../../src/context/propagation/B3Propagator';
 import { TraceState } from '../../src/trace/TraceState';
 
-describe('B3Format', () => {
-  const b3Format = new B3Format();
+describe('B3Propagator', () => {
+  const b3Propagator = new B3Propagator();
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
@@ -50,7 +50,7 @@ describe('B3Format', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 
-      b3Format.inject(
+      b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
         carrier,
         defaultSetter
@@ -72,7 +72,7 @@ describe('B3Format', () => {
         isRemote: false,
       };
 
-      b3Format.inject(
+      b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
         carrier,
         defaultSetter
@@ -91,7 +91,7 @@ describe('B3Format', () => {
         spanId: '',
         traceFlags: TraceFlags.NONE,
       };
-      b3Format.inject(
+      b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, emptySpanContext),
         carrier,
         defaultSetter
@@ -106,7 +106,7 @@ describe('B3Format', () => {
       carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       const extractedSpanContext = getExtractedSpanContext(
-        b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -122,7 +122,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       carrier[X_B3_SAMPLED] = '1';
       const extractedSpanContext = getExtractedSpanContext(
-        b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -138,7 +138,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       carrier[X_B3_SAMPLED] = true;
       const extractedSpanContext = getExtractedSpanContext(
-        b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -154,7 +154,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       carrier[X_B3_SAMPLED] = false;
       const extractedSpanContext = getExtractedSpanContext(
-        b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -170,7 +170,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
         ),
         undefined
       );
@@ -181,7 +181,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
         ),
         undefined
       );
@@ -190,7 +190,7 @@ describe('B3Format', () => {
     it('returns undefined if b3 header is missing', () => {
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
         ),
         undefined
       );
@@ -200,7 +200,7 @@ describe('B3Format', () => {
       carrier[X_B3_TRACE_ID] = 'invalid!';
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
         ),
         undefined
       );
@@ -211,7 +211,7 @@ describe('B3Format', () => {
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       carrier[X_B3_SAMPLED] = '01';
       const extractedSpanContext = getExtractedSpanContext(
-        b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
@@ -262,7 +262,7 @@ describe('B3Format', () => {
         carrier[X_B3_TRACE_ID] = testCases[testCase];
 
         const extractedSpanContext = getExtractedSpanContext(
-          b3Format.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
         );
         assert.deepStrictEqual(extractedSpanContext, undefined, testCase);
       });

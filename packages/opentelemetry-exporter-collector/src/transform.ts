@@ -18,6 +18,7 @@ import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
 import * as collectorTypes from './types';
+import { Resource } from '@opentelemetry/resources';
 
 const OT_MAX_STRING_LENGTH = 128;
 
@@ -199,6 +200,21 @@ export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
     links: toCollectorLinks(span),
     // childSpanCount: // not implemented
   };
+}
+
+/**
+ * converts span resource
+ * @param resource
+ */
+export function toCollectorResource(
+  resource: Resource
+): collectorTypes.Resource {
+  const labels: { [key: string]: string } = {};
+  Object.keys(resource.labels).forEach(
+    name => (labels[name] = String(resource.labels[name]))
+  );
+  // @TODO: add type support
+  return { labels };
 }
 
 /**

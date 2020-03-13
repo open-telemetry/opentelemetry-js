@@ -4,11 +4,9 @@ import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
-import { B3Format } from '@opentelemetry/core';
+import { B3Propagator } from '@opentelemetry/core';
 
 const providerWithZone = new WebTracerProvider({
-  httpTextFormat: new B3Format(),
-  contextManager: new ZoneContextManager(),
   plugins: [
     new UserInteractionPlugin(),
     new XMLHttpRequestPlugin({
@@ -22,6 +20,11 @@ const providerWithZone = new WebTracerProvider({
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+
+providerWithZone.register({
+  contextManager: new ZoneContextManager(),
+  propagator: new B3Propagator(),
+});
 
 let lastButtonId = 0;
 
