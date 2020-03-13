@@ -14,19 +14,6 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from './HttpTextPropagator';
-
-/**
- * No-op implementations of {@link HttpTextPropagator}.
- */
-export class NoopHttpTextPropagator implements HttpTextPropagator {
-  /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown, setter: Function): void {}
-  /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown, getter: Function): Context {
-    return context;
-  }
-}
-
-export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();
+export * from './types';
+export * from './context';
+export * from './NoopContextManager';

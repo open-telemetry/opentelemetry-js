@@ -15,22 +15,22 @@
  */
 
 import {
-  ScopeManager,
-  NoopScopeManager,
+  ContextManager,
+  NoopContextManager,
   Context,
-} from '@opentelemetry/scope-base';
+} from '@opentelemetry/context-base';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
  */
 export class ContextAPI {
   private static _instance?: ContextAPI;
-  private _scopeManager: ScopeManager = new NoopScopeManager();
+  private _contextManager: ContextManager = new NoopContextManager();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
 
-  /** Get the singleton instance of the Scope API */
+  /** Get the singleton instance of the Context API */
   public static getInstance(): ContextAPI {
     if (!this._instance) {
       this._instance = new ContextAPI();
@@ -42,16 +42,18 @@ export class ContextAPI {
   /**
    * Set the current context manager. Returns the initialized context manager
    */
-  public setGlobalContextManager(scopeManager: ScopeManager): ScopeManager {
-    this._scopeManager = scopeManager;
-    return scopeManager;
+  public setGlobalContextManager(
+    contextManager: ContextManager
+  ): ContextManager {
+    this._contextManager = contextManager;
+    return contextManager;
   }
 
   /**
    * Get the currently active context
    */
   public active(): Context {
-    return this._scopeManager.active();
+    return this._contextManager.active();
   }
 
   /**
@@ -64,7 +66,7 @@ export class ContextAPI {
     context: Context,
     fn: T
   ): ReturnType<T> {
-    return this._scopeManager.with(context, fn);
+    return this._contextManager.with(context, fn);
   }
 
   /**
@@ -74,6 +76,6 @@ export class ContextAPI {
    * @param context context to bind to the event emitter or function. Defaults to the currently active context
    */
   public bind<T>(target: T, context: Context = this.active()): T {
-    return this._scopeManager.bind(target, context);
+    return this._contextManager.bind(target, context);
   }
 }
