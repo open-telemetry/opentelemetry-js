@@ -18,7 +18,7 @@ import { Logger } from '@opentelemetry/api';
 import { LogLevel } from './types';
 
 export class ConsoleLogger implements Logger {
-  constructor(level: LogLevel = LogLevel.DEBUG) {
+  constructor(level: LogLevel = LogLevel.INFO) {
     if (level >= LogLevel.DEBUG) {
       this.debug = (...args) => {
         console.debug(...args);

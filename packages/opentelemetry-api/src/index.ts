@@ -49,7 +49,7 @@ export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
-export { Context } from '@opentelemetry/scope-base';
+export { Context } from '@opentelemetry/context-base';
 
 import { ContextAPI } from './api/context';
 /** Entrypoint for context API */

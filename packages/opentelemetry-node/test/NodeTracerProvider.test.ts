@@ -22,12 +22,12 @@ import {
   NoRecordingSpan,
   setActiveSpan,
 } from '@opentelemetry/core';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
-import { ScopeManager } from '../../opentelemetry-scope-base/build/src';
+import { ContextManager } from '@opentelemetry/context-base';
 import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
@@ -43,21 +43,21 @@ const INSTALLED_PLUGINS_PATH = path.join(
 
 describe('NodeTracerProvider', () => {
   let provider: NodeTracerProvider;
-  let scopeManager: ScopeManager;
+  let contextManager: ContextManager;
   before(() => {
     module.paths.push(INSTALLED_PLUGINS_PATH);
   });
 
   beforeEach(() => {
-    scopeManager = new AsyncHooksScopeManager();
-    context.setGlobalContextManager(scopeManager.enable());
+    contextManager = new AsyncHooksContextManager();
+    context.setGlobalContextManager(contextManager.enable());
   });
 
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
     provider.stop();
-    scopeManager.disable();
+    contextManager.disable();
   });
 
   describe('constructor', () => {
@@ -175,7 +175,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.getCurrentSpan()', () => {
-    it('should return undefined with AsyncHooksScopeManager when no span started', () => {
+    it('should return undefined with AsyncHooksContextManager when no span started', () => {
       provider = new NodeTracerProvider({});
       assert.deepStrictEqual(
         provider.getTracer('default').getCurrentSpan(),
@@ -185,7 +185,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run scope with AsyncHooksScopeManager scope manager', done => {
+    it('should run context with AsyncHooksContextManager context manager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       provider.getTracer('default').withSpan(span, () => {
@@ -201,7 +201,7 @@ describe('NodeTracerProvider', () => {
       );
     });
 
-    it('should run scope with AsyncHooksScopeManager scope manager with multiple spans', done => {
+    it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       provider.getTracer('default').withSpan(span, () => {
@@ -232,7 +232,7 @@ describe('NodeTracerProvider', () => {
       );
     });
 
-    it('should find correct scope with promises', async () => {
+    it('should find correct context with promises', async () => {
       provider = new NodeTracerProvider();
       const span = provider.getTracer('default').startSpan('my-span');
       await provider.getTracer('default').withSpan(span, async () => {
@@ -253,7 +253,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.bind()', () => {
-    it('should bind scope with AsyncHooksScopeManager scope manager', done => {
+    it('should bind context with AsyncHooksContextManager context manager', done => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {

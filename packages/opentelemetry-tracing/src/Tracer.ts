@@ -119,7 +119,7 @@ export class Tracer implements api.Tracer {
   }
 
   /**
-   * Enters the scope of code where the given Span is in the current context.
+   * Enters the context of code where the given Span is in the current context.
    */
   withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: api.Span,
@@ -130,7 +130,7 @@ export class Tracer implements api.Tracer {
   }
 
   /**
-   * Bind a span (or the current one) to the target's scope
+   * Bind a span (or the current one) to the target's context
    */
   bind<T>(target: T, span?: api.Span): T {
     return api.context.bind(

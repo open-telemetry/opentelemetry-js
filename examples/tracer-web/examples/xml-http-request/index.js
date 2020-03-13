@@ -1,13 +1,11 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/core';
 
 const providerWithZone = new WebTracerProvider({
-  HttpTextPropagator: new B3Propagator(),
-  scopeManager: new ZoneScopeManager(),
   plugins: [
     new XMLHttpRequestPlugin({
       ignoreUrls: [/localhost:8090\/sockjs-node/],
@@ -20,6 +18,11 @@ const providerWithZone = new WebTracerProvider({
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+
+providerWithZone.register({
+  contextManager: new ZoneContextManager(),
+  propagator: new B3Propagator(),
+});
 
 const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
@@ -35,7 +38,7 @@ const getData = (url) => new Promise((resolve, _reject) => {
   };
 });
 
-// example of keeping track of scope between async operations
+// example of keeping track of context between async operations
 const prepareClickEvent = () => {
   const url1 = 'https://httpbin.org/get';
 

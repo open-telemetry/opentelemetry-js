@@ -158,7 +158,7 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
     } as any;
   }
 
-  /** Patch each express layer to create span and propagate scope */
+  /** Patch each express layer to create span and propagate context */
   private _applyPatch(layer: ExpressLayer, layerPath?: string) {
     const plugin = this;
     if (layer[kLayerPatched] === true) return;

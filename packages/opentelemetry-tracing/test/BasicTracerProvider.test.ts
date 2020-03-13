@@ -25,13 +25,16 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
+import {
+  NoopContextManager,
+  ContextManager,
+} from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.setGlobalContextManager(new NoopScopeManager());
+    context.setGlobalContextManager(new NoopContextManager());
   });
 
   describe('constructor', () => {
@@ -320,7 +323,7 @@ describe('BasicTracerProvider', () => {
       context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
-      } as ScopeManager);
+      } as ContextManager);
 
       const tracer = new BasicTracerProvider().getTracer('default');
       assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
@@ -328,7 +331,7 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run scope with NoopScopeManager scope manager', done => {
+    it('should run context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
@@ -339,7 +342,7 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.bind()', () => {
-    it('should bind scope with NoopScopeManager scope manager', done => {
+    it('should bind context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {

@@ -38,7 +38,7 @@ import {
 } from '@opentelemetry/tracing';
 import {
   PerformanceTimingNames as PTN,
-  StackScopeManager,
+  StackContextManager,
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -209,11 +209,11 @@ describe('DocumentLoad Plugin', () => {
   let config: PluginConfig;
   let spanProcessor: SimpleSpanProcessor;
   let dummyExporter: DummyExporter;
-  let scopeManager: StackScopeManager;
+  let contextManager: StackContextManager;
 
   beforeEach(() => {
-    scopeManager = new StackScopeManager().enable();
-    context.setGlobalContextManager(scopeManager);
+    contextManager = new StackContextManager().enable();
+    context.setGlobalContextManager(contextManager);
     Object.defineProperty(window.document, 'readyState', {
       writable: true,
       value: 'complete',
@@ -229,7 +229,7 @@ describe('DocumentLoad Plugin', () => {
   });
 
   afterEach(() => {
-    scopeManager.disable();
+    contextManager.disable();
     Object.defineProperty(window.document, 'readyState', {
       writable: true,
       value: 'complete',
