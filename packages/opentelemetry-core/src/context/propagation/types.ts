@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextFormat, Logger } from '@opentelemetry/api';
+import { HttpTextPropagator, Logger } from '@opentelemetry/api';
 
 /** Configuration object for composite propagator */
 export interface CompositePropagatorConfig {
@@ -23,7 +23,7 @@ export interface CompositePropagatorConfig {
    * list order. If a propagator later in the list writes the same context
    * key as a propagator earlier in the list, the later on will "win".
    */
-  propagators?: HttpTextFormat[];
+  propagators?: HttpTextPropagator[];
 
   /** Instance of logger */
   logger?: Logger;

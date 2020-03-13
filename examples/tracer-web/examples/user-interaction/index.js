@@ -4,10 +4,10 @@ import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { ZoneScopeManager } from '@opentelemetry/scope-zone';
 import { CollectorExporter } from '@opentelemetry/exporter-collector';
-import { B3Format } from '@opentelemetry/core';
+import { B3Propagator } from '@opentelemetry/core';
 
 const providerWithZone = new WebTracerProvider({
-  httpTextFormat: new B3Format(),
+  HttpTextPropagator: new B3Propagator(),
   scopeManager: new ZoneScopeManager(),
   plugins: [
     new UserInteractionPlugin(),

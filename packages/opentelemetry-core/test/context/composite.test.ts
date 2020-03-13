@@ -17,7 +17,7 @@
 import {
   defaultGetter,
   defaultSetter,
-  HttpTextFormat,
+  HttpTextPropagator,
   SpanContext,
 } from '@opentelemetry/api';
 import { Context } from '@opentelemetry/scope-base';
@@ -33,11 +33,11 @@ import {
   setExtractedSpanContext,
 } from '../../src/context/context';
 import {
-  B3Format,
+  B3Propagator,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3Format';
+} from '../../src/context/propagation/B3Propagator';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -74,7 +74,7 @@ describe('Composite Propagator', () => {
 
     it('should inject context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Format(), new HttpTraceContext()],
+        propagators: [new B3Propagator(), new HttpTraceContext()],
       });
       composite.inject(ctxWithSpanContext, carrier, defaultSetter);
 
@@ -116,7 +116,7 @@ describe('Composite Propagator', () => {
 
     it('should extract context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Format(), new HttpTraceContext()],
+        propagators: [new B3Propagator(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
         composite.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
@@ -154,7 +154,7 @@ describe('Composite Propagator', () => {
   });
 });
 
-class ThrowingPropagator implements HttpTextFormat {
+class ThrowingPropagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown) {
     throw new Error('this propagator throws');
   }
