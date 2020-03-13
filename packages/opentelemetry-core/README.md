@@ -19,7 +19,6 @@ This package provides default and no-op implementations of the OpenTelemetry API
   * [Probability Sampler](#probability-sampler)
 
 ### Built-in Propagators
-Cross-cutting concerns send their state to the next process using `Propagator`s, which are defined as objects used to read and write context data to and from messages exchanged by the applications. Each concern creates a set of `Propagator`s for every supported `Format`.
 
 #### HttpTraceContext Propagator
 OpenTelemetry provides a text-based approach to propagate context to remote services using the [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP headers.
