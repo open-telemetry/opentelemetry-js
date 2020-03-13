@@ -72,7 +72,7 @@ export interface MeterConfig {
 
 /** Default Meter configuration. */
 export const DEFAULT_CONFIG = {
-  logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.INFO,
 };
 
 /** The default metric creation options value. */
