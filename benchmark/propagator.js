@@ -5,8 +5,8 @@ const opentelemetry = require('../packages/opentelemetry-core');
 
 const setups = [
   {
-    name: 'B3Format',
-    propagator: new opentelemetry.B3Format(),
+    name: 'B3Propagator',
+    propagator: new opentelemetry.B3Propagator(),
     injectCarrier: {},
     extractCarrier: {
       'x-b3-traceid': 'd4cda95b652f4a1592b449d5929fda1b',

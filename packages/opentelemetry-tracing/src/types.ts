@@ -16,7 +16,7 @@
 
 import {
   Attributes,
-  HttpTextFormat,
+  HttpTextPropagator,
   Logger,
   Sampler,
 } from '@opentelemetry/api';
@@ -61,7 +61,7 @@ export interface TracerConfig {
  */
 export interface SDKRegistrationConfig {
   /** Propagator to register as the global propagator */
-  propagator?: HttpTextFormat | null;
+  propagator?: HttpTextPropagator | null;
 
   /** Context manager to register as the global context manager */
   contextManager?: ScopeManager | null;

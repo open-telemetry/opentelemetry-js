@@ -16,7 +16,7 @@
 
 import {
   context,
-  NoopHttpTextFormat,
+  NoopHttpTextPropagator,
   NoopTracerProvider,
   propagation,
   trace,
@@ -29,7 +29,7 @@ import { WebTracerProvider, StackScopeManager } from '../src';
 describe('API registration', () => {
   beforeEach(() => {
     context.setGlobalContextManager(new NoopScopeManager());
-    propagation.setGlobalPropagator(new NoopHttpTextFormat());
+    propagation.setGlobalPropagator(new NoopHttpTextPropagator());
     trace.setGlobalTracerProvider(new NoopTracerProvider());
   });
 
@@ -46,7 +46,7 @@ describe('API registration', () => {
     const tracerProvider = new WebTracerProvider();
 
     const contextManager = new NoopScopeManager();
-    const propagator = new NoopHttpTextFormat();
+    const propagator = new NoopHttpTextPropagator();
 
     tracerProvider.register({
       contextManager,
@@ -77,7 +77,7 @@ describe('API registration', () => {
       propagator: null,
     });
 
-    assert.ok(propagation['_propagator'] instanceof NoopHttpTextFormat);
+    assert.ok(propagation['_propagator'] instanceof NoopHttpTextPropagator);
 
     assert.ok(context['_scopeManager'] instanceof StackScopeManager);
     assert.ok(trace['_tracerProvider'] === tracerProvider);

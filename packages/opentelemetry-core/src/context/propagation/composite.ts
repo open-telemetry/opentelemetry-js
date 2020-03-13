@@ -17,7 +17,7 @@
 import {
   Context,
   GetterFunction,
-  HttpTextFormat,
+  HttpTextPropagator,
   Logger,
   SetterFunction,
 } from '@opentelemetry/api';
@@ -25,8 +25,8 @@ import { NoopLogger } from '../../common/NoopLogger';
 import { CompositePropagatorConfig } from './types';
 
 /** Combines multiple propagators into a single propagator. */
-export class CompositePropagator implements HttpTextFormat {
-  private readonly _propagators: HttpTextFormat[];
+export class CompositePropagator implements HttpTextPropagator {
+  private readonly _propagators: HttpTextPropagator[];
   private readonly _logger: Logger;
 
   /**
