@@ -138,7 +138,7 @@ api.metrics.getMeter(name, version);
 api.propagator.setGlobalPropagator(httpTraceContextPropagator)
 
 /* Initialize Context Manager */
-api.propagation.setGlobalContextManager(asyncHooksContextManager);
+api.context.setGlobalContextManager(asyncHooksContextManager);
 ```
 
 ### Library Authors
