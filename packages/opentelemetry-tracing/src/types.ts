@@ -21,7 +21,7 @@ import {
   Sampler,
 } from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { ContextManager } from '@opentelemetry/context-base';
 import { Resource } from '@opentelemetry/resources';
 
 /**
@@ -64,7 +64,7 @@ export interface SDKRegistrationConfig {
   propagator?: HttpTextPropagator | null;
 
   /** Context manager to register as the global context manager */
-  contextManager?: ScopeManager | null;
+  contextManager?: ContextManager | null;
 }
 
 /** Global configuration of trace service */

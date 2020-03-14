@@ -21,7 +21,7 @@ Web Tracer currently supports one plugin for document load.
 Unlike Node Tracer (`NodeTracerProvider`), the plugins needs to be initialised and passed in configuration.
 The reason is to give user full control over which plugin will be bundled into web page.
 
-You can choose to use the `ZoneScopeManager` if you want to trace asynchronous operations.
+You can choose to use the `ZoneContextManager` if you want to trace asynchronous operations.
 
 ## Installation
 
@@ -35,7 +35,7 @@ npm install --save @opentelemetry/web
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 
 // Minimum required setup - supports only synchronous operations
 const provider = new WebTracerProvider({
@@ -46,9 +46,9 @@ const provider = new WebTracerProvider({
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
-// Changing default scopeManager to use ZoneScopeManager - supports asynchronous operations
+// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
 const providerWithZone = new WebTracerProvider({
-  scopeManager: new ZoneScopeManager(),
+  contextManager: new ZoneContextManager(),
   plugins: [
     new DocumentLoad()
   ]
