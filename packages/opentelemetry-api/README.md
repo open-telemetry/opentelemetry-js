@@ -56,13 +56,13 @@ tracerProvider.addSpanProcessor(
   )
 );
 
-/** 
+/**
  * Registering the provider with the API allows it to be discovered
  * and used by instrumentation libraries. The OpenTelemetry API provides
  * methods to set global SDK implementations, but the default SDK provides
  * a convenience method named `register` which registers sane defaults
  * for you.
- * 
+ *
  * By default the NodeTracerProvider uses Trace Context for propagation
  * and AsyncHooksScopeManager for context management. To learn about
  * customizing this behavior, see API Registration Options below.
@@ -84,7 +84,7 @@ const meterProvider = new MeterProvider({
   interval: 1000,
 });
 
-/** 
+/**
  * Registering the provider with the API allows it to be discovered
  * and used by instrumentation libraries.
  */
@@ -135,7 +135,7 @@ api.metrics.getMeterProvider();
 api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
-api.propagator.setGlobalPropagator(httpTraceContextPropagator)
+api.propagation.setGlobalPropagator(httpTraceContextPropagator)
 
 /* Initialize Context Manager */
 api.context.setGlobalContextManager(asyncHooksContextManager);
