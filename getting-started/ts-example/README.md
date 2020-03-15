@@ -301,13 +301,19 @@ import { MeterProvider } from '@opentelemetry/metrics';
 import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-const meter = new MeterProvider().getMeter('your-meter-name');
-
-meter.addExporter(
-  new PrometheusExporter({ startServer: true }, () => {
-    console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-  })
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  },
 );
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('your-meter-name');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
