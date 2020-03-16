@@ -49,15 +49,15 @@ releases will not attempt to maintain backwards compatibility with the alpha rel
 
 Last updated March 2020
 
-| Feature             | API Status | API Target | SDK Status  |
-| ------------------- | ---------- | ---------- | ----------- |
-| Tracing             | Beta       | v0.4       | Beta        |
-| Metrics             | Beta       | v0.4       | Beta        |
-| Context             | Beta       | v0.4       | Beta        |
-| Propagation         | Beta       | v0.4       | Beta        |
-| Correlation Context | Alpha      | v0.4       | Development |
-| OpenTracing Bridge  | N/A        |            | Beta        |
-| Resources           | N/A        |            | Beta        |
+| Feature             | API Status | Specification Target | SDK Status  |
+| ------------------- | ---------- | -------------------- | ----------- |
+| Tracing             | Beta       | v0.3                 | Beta        |
+| Metrics             | Beta       | v0.3                 | Beta        |
+| Context             | Beta       | v0.3                 | Beta        |
+| Propagation         | Beta       | v0.3                 | Beta        |
+| Correlation Context | Alpha      | v0.3                 | Development |
+| OpenTracing Bridge  | N/A        | v0.3                 | Beta        |
+| Resources           | N/A        | v0.3                 | Beta        |
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
