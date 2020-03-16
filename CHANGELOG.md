@@ -4,6 +4,48 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.5.0
+
+Released 2020-03-16
+
+### This is a first official beta release, which provides almost fully complete metrics, tracing, and context propagation functionality but makes no promises around breaking changes.
+
+#### :boom: Breaking Change
+* [#853](https://github.com/open-telemetry/opentelemetry-js/pull/853) Rename scope to context
+* [#851](https://github.com/open-telemetry/opentelemetry-js/pull/851) Rename formatter to propagator
+
+#### :rocket: (Enhancement)
+* [#828](https://github.com/open-telemetry/opentelemetry-js/pull/828) feat: metric observer
+* [#858](https://github.com/open-telemetry/opentelemetry-js/pull/858) chore: update out-of-date dependencies
+* [#856](https://github.com/open-telemetry/opentelemetry-js/pull/856) fix: change loglevel for beta
+* [#843](https://github.com/open-telemetry/opentelemetry-js/pull/843) export resource to exporters
+* [#846](https://github.com/open-telemetry/opentelemetry-js/pull/846) SDK Resource
+* [#625](https://github.com/open-telemetry/opentelemetry-js/pull/625) feat: introduce ended property on Span
+* [#837](https://github.com/open-telemetry/opentelemetry-js/pull/837) Simplify SDK registration
+* [#818](https://github.com/open-telemetry/opentelemetry-js/pull/818) fix: change SpanContext.traceFlags to mandatory
+* [#827](https://github.com/open-telemetry/opentelemetry-js/pull/827) Add getter and setter arguments to propagation API
+* [#821](https://github.com/open-telemetry/opentelemetry-js/pull/821) feat: add composite propagator
+* [#824](https://github.com/open-telemetry/opentelemetry-js/pull/824) Faster trace id generation
+* [#708](https://github.com/open-telemetry/opentelemetry-js/pull/708) Simplify and speed up trace context parsing
+* [#802](https://github.com/open-telemetry/opentelemetry-js/pull/802) chore: adding force flush to span processors
+* [#816](https://github.com/open-telemetry/opentelemetry-js/pull/816) feat: use context-based tracing
+* [#815](https://github.com/open-telemetry/opentelemetry-js/pull/815) Resources API: package, semantic conventions, and test utils
+* [#797](https://github.com/open-telemetry/opentelemetry-js/pull/797) Add propagation API
+* [#792](https://github.com/open-telemetry/opentelemetry-js/pull/792) Add context API
+* [#685](https://github.com/open-telemetry/opentelemetry-js/pull/685) feat: add express plugin #666
+* [#769](https://github.com/open-telemetry/opentelemetry-js/pull/769) Separate context propagation (OTEP 66)
+* [#653](https://github.com/open-telemetry/opentelemetry-js/pull/653) Prevent loading plugins for incorrect module #626
+* [#654](https://github.com/open-telemetry/opentelemetry-js/pull/654) feat: warn user when a instrumented package was already required #636
+* [#772](https://github.com/open-telemetry/opentelemetry-js/pull/772) chore: add typing to propagator carrier
+* [#735](https://github.com/open-telemetry/opentelemetry-js/pull/735) feat: decode jaeger header
+* [#719](https://github.com/open-telemetry/opentelemetry-js/pull/719) feat(plugin-http): sync. specs for statuscode
+* [#701](https://github.com/open-telemetry/opentelemetry-js/pull/701) feat: add jaeger http trace format (#696)
+
+#### :bug: (Bug Fix)
+* [#798](https://github.com/open-telemetry/opentelemetry-js/pull/798) Respect sampled bit in probability sampler
+* [#743](https://github.com/open-telemetry/opentelemetry-js/pull/743) fix: left pad jaeger trace ids
+* [#715](https://github.com/open-telemetry/opentelemetry-js/pull/715) fix: unref jaeger socket to prevent process running indefinitely
+
 ## 0.4.0
 
 Released 2020-02-05
