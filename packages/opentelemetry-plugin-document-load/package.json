@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-document-load",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "OpenTelemetry document-load automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -72,9 +72,9 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.4.0",
-    "@opentelemetry/core": "^0.4.0",
-    "@opentelemetry/tracing": "^0.4.0",
-    "@opentelemetry/web": "^0.4.0"
+    "@opentelemetry/api": "^0.5.0",
+    "@opentelemetry/core": "^0.5.0",
+    "@opentelemetry/tracing": "^0.5.0",
+    "@opentelemetry/web": "^0.5.0"
   }
 }

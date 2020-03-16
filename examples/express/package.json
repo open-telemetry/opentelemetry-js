@@ -1,7 +1,7 @@
 {
   "name": "express-example",
   "private": true,
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Example of Express integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -28,13 +28,13 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.4.0",
-    "@opentelemetry/exporter-jaeger": "^0.4.0",
-    "@opentelemetry/exporter-zipkin": "^0.4.0",
-    "@opentelemetry/node": "^0.4.0",
-    "@opentelemetry/plugin-http": "^0.4.0",
-    "@opentelemetry/plugin-express": "^0.4.0",
-    "@opentelemetry/tracing": "^0.4.0",
+    "@opentelemetry/api": "^0.5.0",
+    "@opentelemetry/exporter-jaeger": "^0.5.0",
+    "@opentelemetry/exporter-zipkin": "^0.5.0",
+    "@opentelemetry/node": "^0.5.0",
+    "@opentelemetry/plugin-express": "^0.5.0",
+    "@opentelemetry/plugin-http": "^0.5.0",
+    "@opentelemetry/tracing": "^0.5.0",
     "axios": "^0.19.0",
     "express": "^4.17.1"
   },
