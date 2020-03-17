@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Resource } from '../Resource';
+import { Resource, Labels } from '../Resource';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -69,12 +69,10 @@ export class EnvDetector {
    * of key/value pairs.
    * @returns The sanitized resource labels.
    */
-  private static parseResourceLabels(
-    rawEnvLabels?: string
-  ): { [key: string]: string } {
+  private static parseResourceLabels(rawEnvLabels?: string): Labels {
     if (!rawEnvLabels) return {};
 
-    const labels: { [key: string]: string } = {};
+    const labels: Labels = {};
     const rawLabels: string[] = rawEnvLabels.split(
       EnvDetector.COMMA_SEPARATOR,
       -1

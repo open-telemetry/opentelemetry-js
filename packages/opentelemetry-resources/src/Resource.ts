@@ -48,7 +48,7 @@ export class Resource {
      * about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on labels.
      */
-    readonly labels: { [key: string]: number | string | boolean }
+    readonly labels: Labels
   ) {}
 
   /**
@@ -66,4 +66,8 @@ export class Resource {
     const mergedLabels = Object.assign({}, other.labels, this.labels);
     return new Resource(mergedLabels);
   }
+}
+
+export interface Labels {
+  [key: string]: number | string | boolean;
 }
