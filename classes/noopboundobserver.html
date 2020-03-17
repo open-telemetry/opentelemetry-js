@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>HttpTextFormat | OpenTelemetry API for JavaScript</title>
+	<title>NoopBoundObserver | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,141 +56,80 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="httptextformat.html">HttpTextFormat</a>
+					<a href="noopboundobserver.html">NoopBoundObserver</a>
 				</li>
 			</ul>
-			<h1>Interface HttpTextFormat</h1>
+			<h1>Class NoopBoundObserver</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>Injects and extracts a value as text into carriers that travel in-band
-							across process boundaries. Encoding is expected to conform to the HTTP
-						Header Field semantics. Values are often encoded as RPC/HTTP request headers.</p>
-					</div>
-					<p>The carrier of propagated data on both the client (injector) and server
-						(extractor) side is usually an http request. Propagation is usually
-						implemented via library- specific request interceptors, where the
-					client-side injects values and the server-side extracts them.</p>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">HttpTextFormat</span>
+						<span class="target">NoopBoundObserver</span>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
-				<h3>Implemented by</h3>
+				<h3>Implements</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../classes/noophttptextformat.html" class="tsd-signature-type">NoopHttpTextFormat</a></li>
+					<li><a href="../interfaces/boundobserver.html" class="tsd-signature-type">BoundObserver</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="httptextformat.html#extract" class="tsd-kind-icon">extract</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="httptextformat.html#inject" class="tsd-kind-icon">inject</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopboundobserver.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="extract" class="tsd-anchor"></a>
-					<h3>extract</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">extract<span class="tsd-signature-symbol">(</span>format<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="setcallback" class="tsd-anchor"></a>
+					<h3>set<wbr>Callback</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Callback<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/HttpTextFormat.ts#L51">context/propagation/HttpTextFormat.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L155">src/metrics/NoopMeter.ts:155</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns a <a href="spancontext.html">SpanContext</a> instance extracted from <code>carrier</code> in the
-									given format from upstream.</p>
-								</div>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>format: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the format of the carrier.</p>
-									</div>
-								</li>
-								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the carrier of propagation fields, such as an http request.</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="spancontext.html" class="tsd-signature-type">SpanContext</a>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">null</span>
-							</h4>
-							<p>SpanContext The extracted SpanContext, or null if no such
-							SpanContext could be found in carrier.</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="inject" class="tsd-anchor"></a>
-					<h3>inject</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">inject<span class="tsd-signature-symbol">(</span>spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a>, format<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/HttpTextFormat.ts#L40">context/propagation/HttpTextFormat.ts:40</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Injects the given <a href="spancontext.html">SpanContext</a> instance to transmit over the wire.</p>
-								</div>
-								<p>OpenTelemetry defines a common set of format values (BinaryFormat and
-								HTTPTextFormat), and each has an expected <code>carrier</code> type.</p>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>spanContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the SpanContext to transmit over the wire.</p>
-									</div>
-								</li>
-								<li>
-									<h5>format: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the format of the carrier.</p>
-									</div>
-								</li>
-								<li>
-									<h5>carrier: <span class="tsd-signature-type">unknown</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the carrier of propagation fields, such as an http request.</p>
-									</div>
+									<h5>callback: <span class="tsd-signature-type">function</span></h5>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-siganture">
+											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">__type</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>observerResult: <a href="../interfaces/observerresult.html" class="tsd-signature-type">ObserverResult</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">__type</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -211,14 +150,11 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="httptextformat.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Format</a>
+					<li class="current tsd-kind-class tsd-is-external">
+						<a href="noopboundobserver.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Observer</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="httptextformat.html#extract" class="tsd-kind-icon">extract</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="httptextformat.html#inject" class="tsd-kind-icon">inject</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="noopboundobserver.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a>
 							</li>
 						</ul>
 					</li>

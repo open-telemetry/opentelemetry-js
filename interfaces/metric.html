@@ -94,41 +94,39 @@
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
 					<li><a href="../classes/noopcountermetric.html" class="tsd-signature-type">NoopCounterMetric</a></li>
-					<li><a href="../classes/noopgaugemetric.html" class="tsd-signature-type">NoopGaugeMetric</a></li>
 					<li><a href="../classes/noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a></li>
 					<li><a href="../classes/noopmetric.html" class="tsd-signature-type">NoopMetric</a></li>
+					<li><a href="../classes/noopobservermetric.html" class="tsd-signature-type">NoopObserverMetric</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#bind" class="tsd-kind-icon">bind</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#clear" class="tsd-kind-icon">clear</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="metric.html#unbind" class="tsd-kind-icon">unbind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="metric.html#bind" class="tsd-kind-icon">bind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="metric.html#clear" class="tsd-kind-icon">clear</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="metric.html#unbind" class="tsd-kind-icon">unbind</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="bind" class="tsd-anchor"></a>
 					<h3>bind</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">bind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L86">metrics/Metric.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Metric.ts#L88">src/metrics/Metric.ts:88</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -143,7 +141,8 @@
 								<li>
 									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
+										<p>the canonicalized LabelSet used to associate with this
+										metric instrument.</p>
 									</div>
 								</li>
 							</ul>
@@ -151,17 +150,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="clear" class="tsd-anchor"></a>
 					<h3>clear</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">clear<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L102">metrics/Metric.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Metric.ts#L100">src/metrics/Metric.ts:100</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -173,79 +172,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="getdefaultbound" class="tsd-anchor"></a>
-					<h3>get<wbr>Default<wbr>Bound</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Default<wbr>Bound<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L91">metrics/Metric.ts:91</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns a Instrument for a metric with all labels not set.</p>
-								</div>
-							</div>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="setcallback" class="tsd-anchor"></a>
-					<h3>set<wbr>Callback</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Callback<span class="tsd-signature-symbol">(</span>fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L107">metrics/Metric.ts:107</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>what should the callback signature be?</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>fn: <span class="tsd-signature-type">function</span></h5>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter-siganture">
-											<ul class="tsd-signatures tsd-kind-type-literal tsd-is-not-exported">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-											</ul>
-											<ul class="tsd-descriptions">
-												<li class="tsd-description">
-													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-												</li>
-											</ul>
-										</li>
-									</ul>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="unbind" class="tsd-anchor"></a>
 					<h3>unbind</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">unbind<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Metric.ts#L97">metrics/Metric.ts:97</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Metric.ts#L95">src/metrics/Metric.ts:95</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -258,7 +195,8 @@
 								<li>
 									<h5>labels: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>the canonicalized LabelSet used to associate with this metric instrument.</p>
+										<p>the canonicalized LabelSet used to associate with this
+										metric instrument.</p>
 									</div>
 								</li>
 							</ul>
@@ -280,22 +218,16 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-has-type-parameter">
+					<li class="current tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 						<a href="metric.html" class="tsd-kind-icon">Metric</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="metric.html#bind" class="tsd-kind-icon">bind</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="metric.html#clear" class="tsd-kind-icon">clear</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#getdefaultbound" class="tsd-kind-icon">get<wbr>Default<wbr>Bound</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="metric.html#setcallback" class="tsd-kind-icon">set<wbr>Callback</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="metric.html#unbind" class="tsd-kind-icon">unbind</a>
 							</li>
 						</ul>

@@ -94,38 +94,36 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter"><a href="tracer.html#bind" class="tsd-kind-icon">bind</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="tracer.html#getbinaryformat" class="tsd-kind-icon">get<wbr>Binary<wbr>Format</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="tracer.html#getcurrentspan" class="tsd-kind-icon">get<wbr>Current<wbr>Span</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="tracer.html#gethttptextformat" class="tsd-kind-icon">get<wbr>Http<wbr>Text<wbr>Format</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter"><a href="tracer.html#withspan" class="tsd-kind-icon">with<wbr>Span</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external"><a href="tracer.html#bind" class="tsd-kind-icon">bind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="tracer.html#getcurrentspan" class="tsd-kind-icon">get<wbr>Current<wbr>Span</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external"><a href="tracer.html#withspan" class="tsd-kind-icon">with<wbr>Span</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
 					<a name="bind" class="tsd-anchor"></a>
 					<h3>bind</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
-						<li class="tsd-signature tsd-kind-icon">bind&lt;T&gt;<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, span<span class="tsd-signature-symbol">?: </span><a href="span.html" class="tsd-signature-type">Span</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">bind&lt;T&gt;<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, context<span class="tsd-signature-symbol">?: </span><a href="span.html" class="tsd-signature-type">Span</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L66">trace/tracer.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/tracer.ts#L66">src/trace/tracer.ts:66</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Bind a span as the target&#39;s scope or propagate the current one.</p>
+									<p>Bind a span as the target&#39;s context or propagate the current one.</p>
 								</div>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -139,56 +137,28 @@
 								<li>
 									<h5>target: <span class="tsd-signature-type">T</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>Any object to which a scope need to be set</p>
+										<p>Any object to which a context need to be set</p>
 									</div>
 								</li>
 								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> span: <a href="span.html" class="tsd-signature-type">Span</a></h5>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> context: <a href="span.html" class="tsd-signature-type">Span</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="getbinaryformat" class="tsd-anchor"></a>
-					<h3>get<wbr>Binary<wbr>Format</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Binary<wbr>Format<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="binaryformat.html" class="tsd-signature-type">BinaryFormat</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L79">trace/tracer.ts:79</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns the <a href="binaryformat.html">BinaryFormat</a> interface which can serialize/deserialize
-									Spans.</p>
-								</div>
-								<p>If no tracer implementation is provided, this defaults to the W3C Trace
-									Context binary format <a href="binaryformat.html">BinaryFormat</a>. For more details see
-									<a href="https://w3c.github.io/trace-context-binary/">W3C Trace Context
-								binary protocol</a>.</p>
-							</div>
-							<h4 class="tsd-returns-title">Returns <a href="binaryformat.html" class="tsd-signature-type">BinaryFormat</a></h4>
-							<p>the <a href="binaryformat.html">BinaryFormat</a> for this implementation.</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="getcurrentspan" class="tsd-anchor"></a>
 					<h3>get<wbr>Current<wbr>Span</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">get<wbr>Current<wbr>Span<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="span.html" class="tsd-signature-type">Span</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">undefined</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L37">trace/tracer.ts:37</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/tracer.ts#L36">src/trace/tracer.ts:36</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -205,44 +175,17 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="gethttptextformat" class="tsd-anchor"></a>
-					<h3>get<wbr>Http<wbr>Text<wbr>Format</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Http<wbr>Text<wbr>Format<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="httptextformat.html" class="tsd-signature-type">HttpTextFormat</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L91">trace/tracer.ts:91</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns the <a href="httptextformat.html">HttpTextFormat</a> interface which can inject/extract
-									Spans.</p>
-								</div>
-								<p>If no tracer implementation is provided, this defaults to the W3C Trace
-									Context HTTP text format <a href="httptextformat.html">HttpTextFormat</a>. For more details see
-								<a href="https://w3c.github.io/trace-context/">W3C Trace Context</a>.</p>
-							</div>
-							<h4 class="tsd-returns-title">Returns <a href="httptextformat.html" class="tsd-signature-type">HttpTextFormat</a></h4>
-							<p>the <a href="httptextformat.html">HttpTextFormat</a> for this implementation.</p>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="startspan" class="tsd-anchor"></a>
 					<h3>start<wbr>Span</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">start<wbr>Span<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="spanoptions.html" class="tsd-signature-type">SpanOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="span.html" class="tsd-signature-type">Span</a></li>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">start<wbr>Span<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="spanoptions.html" class="tsd-signature-type">SpanOptions</a>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="span.html" class="tsd-signature-type">Span</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L45">trace/tracer.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/tracer.ts#L45">src/trace/tracer.ts:45</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -261,23 +204,26 @@
 								<li>
 									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="spanoptions.html" class="tsd-signature-type">SpanOptions</a></h5>
 								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> context: <span class="tsd-signature-type">Context</span></h5>
+								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <a href="span.html" class="tsd-signature-type">Span</a></h4>
 							<p>Span The newly created span</p>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
 					<a name="withspan" class="tsd-anchor"></a>
 					<h3>with<wbr>Span</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">with<wbr>Span&lt;T&gt;<span class="tsd-signature-symbol">(</span>span<span class="tsd-signature-symbol">: </span><a href="span.html" class="tsd-signature-type">Span</a>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/trace/tracer.ts#L55">trace/tracer.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/tracer.ts#L55">src/trace/tracer.ts:55</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -329,25 +275,19 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-is-external">
 						<a href="tracer.html" class="tsd-kind-icon">Tracer</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
 								<a href="tracer.html#bind" class="tsd-kind-icon">bind</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="tracer.html#getbinaryformat" class="tsd-kind-icon">get<wbr>Binary<wbr>Format</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="tracer.html#getcurrentspan" class="tsd-kind-icon">get<wbr>Current<wbr>Span</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="tracer.html#gethttptextformat" class="tsd-kind-icon">get<wbr>Http<wbr>Text<wbr>Format</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="tracer.html#startspan" class="tsd-kind-icon">start<wbr>Span</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-has-type-parameter tsd-is-external">
 								<a href="tracer.html#withspan" class="tsd-kind-icon">with<wbr>Span</a>
 							</li>
 						</ul>

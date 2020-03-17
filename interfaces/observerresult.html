@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>BinaryFormat | OpenTelemetry API for JavaScript</title>
+	<title>ObserverResult | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="binaryformat.html">BinaryFormat</a>
+					<a href="observerresult.html">ObserverResult</a>
 				</li>
 			</ul>
-			<h1>Interface BinaryFormat</h1>
+			<h1>Interface ObserverResult</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Formatter to serializing and deserializing a value with into a binary format.</p>
+						<p>Interface that is being used in function setCallback for Observer Metric</p>
 					</div>
 				</div>
 			</section>
@@ -77,96 +77,67 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">BinaryFormat</span>
+						<span class="target">ObserverResult</span>
 					</li>
-				</ul>
-			</section>
-			<section class="tsd-panel">
-				<h3>Implemented by</h3>
-				<ul class="tsd-hierarchy">
-					<li><a href="../classes/noopbinaryformat.html" class="tsd-signature-type">NoopBinaryFormat</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
+							<h3>Properties</h3>
+							<ul class="tsd-index-list">
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="observerresult.html#observers" class="tsd-kind-icon">observers</a></li>
+							</ul>
+						</section>
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="binaryformat.html#frombytes" class="tsd-kind-icon">from<wbr>Bytes</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="binaryformat.html#tobytes" class="tsd-kind-icon">to<wbr>Bytes</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="observerresult.html#observe" class="tsd-kind-icon">observe</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
-				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="frombytes" class="tsd-anchor"></a>
-					<h3>from<wbr>Bytes</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">from<wbr>Bytes<span class="tsd-signature-symbol">(</span>buffer<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">null</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/BinaryFormat.ts#L35">context/propagation/BinaryFormat.ts:35</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Deseralize the given span context from binary encoding. If the input is a
-										Buffer of incorrect size or unexpected fields, then this function will
-									return <code>null</code>.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>buffer: <span class="tsd-signature-type">ArrayBuffer</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The span context to deserialize.</p>
-									</div>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="spancontext.html" class="tsd-signature-type">SpanContext</a>
-								<span class="tsd-signature-symbol"> | </span>
-								<span class="tsd-signature-type">null</span>
-							</h4>
-						</li>
-					</ul>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Properties</h2>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="observers" class="tsd-anchor"></a>
+					<h3>observers</h3>
+					<div class="tsd-signature tsd-kind-icon">observers<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Map</span><span class="tsd-signature-symbol">&lt;</span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/ObserverResult.ts#L23">src/metrics/ObserverResult.ts:23</a></li>
+						</ul>
+					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="tobytes" class="tsd-anchor"></a>
-					<h3>to<wbr>Bytes</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">to<wbr>Bytes<span class="tsd-signature-symbol">(</span>spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ArrayBuffer</span></li>
+			</section>
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="observe" class="tsd-anchor"></a>
+					<h3>observe</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">observe<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span>, labelSet<span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/context/propagation/BinaryFormat.ts#L27">context/propagation/BinaryFormat.ts:27</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/ObserverResult.ts#L24">src/metrics/ObserverResult.ts:24</a></li>
 								</ul>
 							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Serialize the given span context into a Buffer.</p>
-								</div>
-							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>spanContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The span context to serialize.</p>
-									</div>
+									<h5>callback: <span class="tsd-signature-type">Function</span></h5>
+								</li>
+								<li>
+									<h5>labelSet: <a href="labelset.html" class="tsd-signature-type">LabelSet</a></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ArrayBuffer</span></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -184,14 +155,14 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
-						<a href="binaryformat.html" class="tsd-kind-icon">Binary<wbr>Format</a>
+					<li class="current tsd-kind-interface tsd-is-external">
+						<a href="observerresult.html" class="tsd-kind-icon">Observer<wbr>Result</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="binaryformat.html#frombytes" class="tsd-kind-icon">from<wbr>Bytes</a>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="observerresult.html#observers" class="tsd-kind-icon">observers</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="binaryformat.html#tobytes" class="tsd-kind-icon">to<wbr>Bytes</a>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="observerresult.html#observe" class="tsd-kind-icon">observe</a>
 							</li>
 						</ul>
 					</li>

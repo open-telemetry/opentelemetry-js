@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TraceAPI | OpenTelemetry API for JavaScript</title>
+	<title>ContextAPI | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="traceapi.html">TraceAPI</a>
+					<a href="contextapi.html">ContextAPI</a>
 				</li>
 			</ul>
-			<h1>Class TraceAPI</h1>
+			<h1>Class ContextAPI</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Singleton object which represents the entry point to the OpenTelemetry Tracing API</p>
+						<p>Singleton object which represents the entry point to the OpenTelemetry Context API</p>
 					</div>
 				</div>
 			</section>
@@ -77,7 +77,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">TraceAPI</span>
+						<span class="target">ContextAPI</span>
 					</li>
 				</ul>
 			</section>
@@ -88,23 +88,24 @@
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
 							<h3>Constructors</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="traceapi.html#constructor" class="tsd-kind-icon">constructor</a></li>
+								<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="contextapi.html#constructor" class="tsd-kind-icon">constructor</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="traceapi.html#_tracerprovider" class="tsd-kind-icon">_tracer<wbr>Provider</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external"><a href="traceapi.html#_instance" class="tsd-kind-icon">_instance</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="contextapi.html#_contextmanager" class="tsd-kind-icon">_context<wbr>Manager</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external"><a href="contextapi.html#_instance" class="tsd-kind-icon">_instance</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#gettracerprovider" class="tsd-kind-icon">get<wbr>Tracer<wbr>Provider</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#setglobaltracerprovider" class="tsd-kind-icon">set<wbr>Global<wbr>Tracer<wbr>Provider</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="traceapi.html#getinstance" class="tsd-kind-icon">get<wbr>Instance</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="contextapi.html#active" class="tsd-kind-icon">active</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external"><a href="contextapi.html#bind" class="tsd-kind-icon">bind</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="contextapi.html#setglobalcontextmanager" class="tsd-kind-icon">set<wbr>Global<wbr>Context<wbr>Manager</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external"><a href="contextapi.html#with" class="tsd-kind-icon">with</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external"><a href="contextapi.html#getinstance" class="tsd-kind-icon">get<wbr>Instance</a></li>
 							</ul>
 						</section>
 					</div>
@@ -116,13 +117,13 @@
 					<a name="constructor" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagPrivate">Private</span> constructor</h3>
 					<ul class="tsd-signatures tsd-kind-constructor tsd-parent-kind-class tsd-is-private tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">new <wbr>TraceAPI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></li>
+						<li class="tsd-signature tsd-kind-icon">new <wbr>ContextAPI<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="contextapi.html" class="tsd-signature-type">ContextAPI</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L26">src/api/trace.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L28">src/api/context.ts:28</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -130,7 +131,7 @@
 									<p>Empty private constructor prevents end users from constructing a new instance of the API</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="contextapi.html" class="tsd-signature-type">ContextAPI</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -138,22 +139,22 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-					<a name="_tracerprovider" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _tracer<wbr>Provider</h3>
-					<div class="tsd-signature tsd-kind-icon">_tracer<wbr>Provider<span class="tsd-signature-symbol">:</span> <a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a><span class="tsd-signature-symbol"> =&nbsp;NOOP_TRACER_PROVIDER</span></div>
+					<a name="_contextmanager" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _context<wbr>Manager</h3>
+					<div class="tsd-signature tsd-kind-icon">_context<wbr>Manager<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">ContextManager</span><span class="tsd-signature-symbol"> =&nbsp;new NoopContextManager()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L26">src/api/trace.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L28">src/api/context.ts:28</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external">
 					<a name="_instance" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagOptional">Optional</span> _instance</h3>
-					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></div>
+					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <a href="contextapi.html" class="tsd-signature-type">ContextAPI</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L25">src/api/trace.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L27">src/api/context.ts:27</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -161,83 +162,138 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="gettracer" class="tsd-anchor"></a>
-					<h3>get<wbr>Tracer</h3>
+					<a name="active" class="tsd-anchor"></a>
+					<h3>active</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Tracer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, version<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/tracer.html" class="tsd-signature-type">Tracer</a></li>
+						<li class="tsd-signature tsd-kind-icon">active<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L58">src/api/trace.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L55">src/api/context.ts:55</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns a tracer from the global tracer provider.</p>
+									<p>Get the currently active context</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">Context</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+					<a name="bind" class="tsd-anchor"></a>
+					<h3>bind</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">bind&lt;T&gt;<span class="tsd-signature-symbol">(</span>target<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span>, context<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L78">src/api/context.ts:78</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Bind a context to a target function or event emitter</p>
+								</div>
+							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T</h4>
+								</li>
+							</ul>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>target: <span class="tsd-signature-type">T</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>function or event emitter to bind</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagDefault value">Default value</span> context: <span class="tsd-signature-type">Context</span><span class="tsd-signature-symbol"> =&nbsp;this.active()</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>context to bind to the event emitter or function. Defaults to the currently active context</p>
+									</div>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">T</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="setglobalcontextmanager" class="tsd-anchor"></a>
+					<h3>set<wbr>Global<wbr>Context<wbr>Manager</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">set<wbr>Global<wbr>Context<wbr>Manager<span class="tsd-signature-symbol">(</span>contextManager<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ContextManager</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ContextManager</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L45">src/api/context.ts:45</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Set the current context manager. Returns the initialized context manager</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> version: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
+									<h5>contextManager: <span class="tsd-signature-type">ContextManager</span></h5>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/tracer.html" class="tsd-signature-type">Tracer</a></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ContextManager</span></h4>
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="gettracerprovider" class="tsd-anchor"></a>
-					<h3>get<wbr>Tracer<wbr>Provider</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Tracer<wbr>Provider<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a></li>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+					<a name="with" class="tsd-anchor"></a>
+					<h3>with</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">with&lt;T&gt;<span class="tsd-signature-symbol">(</span>context<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Context</span>, fn<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L51">src/api/trace.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L65">src/api/context.ts:65</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns the global tracer provider.</p>
+									<p>Execute a function with an active context</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="setglobaltracerprovider" class="tsd-anchor"></a>
-					<h3>set<wbr>Global<wbr>Tracer<wbr>Provider</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">set<wbr>Global<wbr>Tracer<wbr>Provider<span class="tsd-signature-symbol">(</span>provider<span class="tsd-signature-symbol">: </span><a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L43">src/api/trace.ts:43</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Set the current global tracer. Returns the initialized global tracer provider</p>
-								</div>
-							</div>
+							<h4 class="tsd-type-parameters-title">Type parameters</h4>
+							<ul class="tsd-type-parameters">
+								<li>
+									<h4>T<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">function</span></h4>
+								</li>
+							</ul>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>provider: <a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a></h5>
+									<h5>context: <span class="tsd-signature-type">Context</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>context to be active during function execution</p>
+									</div>
+								</li>
+								<li>
+									<h5>fn: <span class="tsd-signature-type">T</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>function to execute in a context</p>
+									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a></h4>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">ReturnType</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">T</span><span class="tsd-signature-symbol">&gt;</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -245,21 +301,21 @@
 					<a name="getinstance" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> get<wbr>Instance</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Instance<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></li>
+						<li class="tsd-signature tsd-kind-icon">get<wbr>Instance<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="contextapi.html" class="tsd-signature-type">ContextAPI</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/trace.ts#L32">src/api/trace.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/context.ts#L34">src/api/context.ts:34</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Get the singleton instance of the Trace API</p>
+									<p>Get the singleton instance of the Context API</p>
 								</div>
 							</div>
-							<h4 class="tsd-returns-title">Returns <a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></h4>
+							<h4 class="tsd-returns-title">Returns <a href="contextapi.html" class="tsd-signature-type">ContextAPI</a></h4>
 						</li>
 					</ul>
 				</section>
@@ -278,28 +334,31 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class tsd-is-external">
-						<a href="traceapi.html" class="tsd-kind-icon">TraceAPI</a>
+						<a href="contextapi.html" class="tsd-kind-icon">ContextAPI</a>
 						<ul>
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="traceapi.html#constructor" class="tsd-kind-icon">constructor</a>
+								<a href="contextapi.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="traceapi.html#_tracerprovider" class="tsd-kind-icon">_tracer<wbr>Provider</a>
+								<a href="contextapi.html#_contextmanager" class="tsd-kind-icon">_context<wbr>Manager</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external">
-								<a href="traceapi.html#_instance" class="tsd-kind-icon">_instance</a>
+								<a href="contextapi.html#_instance" class="tsd-kind-icon">_instance</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="traceapi.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a>
+								<a href="contextapi.html#active" class="tsd-kind-icon">active</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+								<a href="contextapi.html#bind" class="tsd-kind-icon">bind</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="traceapi.html#gettracerprovider" class="tsd-kind-icon">get<wbr>Tracer<wbr>Provider</a>
+								<a href="contextapi.html#setglobalcontextmanager" class="tsd-kind-icon">set<wbr>Global<wbr>Context<wbr>Manager</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="traceapi.html#setglobaltracerprovider" class="tsd-kind-icon">set<wbr>Global<wbr>Tracer<wbr>Provider</a>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-has-type-parameter tsd-is-external">
+								<a href="contextapi.html#with" class="tsd-kind-icon">with</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-static tsd-is-external">
-								<a href="traceapi.html#getinstance" class="tsd-kind-icon">get<wbr>Instance</a>
+								<a href="contextapi.html#getinstance" class="tsd-kind-icon">get<wbr>Instance</a>
 							</li>
 						</ul>
 					</li>

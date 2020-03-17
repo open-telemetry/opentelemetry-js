@@ -71,8 +71,8 @@
 					<div class="lead">
 						<p>An interface to allow the recording metrics.</p>
 					</div>
-					<p><a href="metric.html">Metric</a>s are used for recording pre-defined aggregation (Gauge and
-						Counter), or raw values ({@link Measure}) in which the aggregation and labels
+					<p><a href="metric.html">Metric</a>s are used for recording pre-defined aggregation (<code>Counter</code>),
+						or raw values (<code>Measure</code>) in which the aggregation and labels
 					for the exported metric are deferred.</p>
 				</div>
 			</section>
@@ -94,36 +94,36 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meter.html#creategauge" class="tsd-kind-icon">create<wbr>Gauge</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meter.html#createmeasure" class="tsd-kind-icon">create<wbr>Measure</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="meter.html#labels" class="tsd-kind-icon">labels</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createmeasure" class="tsd-kind-icon">create<wbr>Measure</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#labels" class="tsd-kind-icon">labels</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createcounter" class="tsd-anchor"></a>
 					<h3>create<wbr>Counter</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">create<wbr>Counter<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundcounter.html" class="tsd-signature-type">BoundCounter</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Meter.ts#L42">metrics/Meter.ts:42</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Meter.ts#L42">src/metrics/Meter.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates a new counter metric. Generally, this kind of metric when the
+									<p>Creates a new <code>Counter</code> metric. Generally, this kind of metric when the
 										value is a quantity, the sum is of primary interest, and the event count
 									and value distribution are not of primary interest.</p>
 								</div>
@@ -144,59 +144,22 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
-					<a name="creategauge" class="tsd-anchor"></a>
-					<h3>create<wbr>Gauge</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Gauge<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundgauge.html" class="tsd-signature-type">BoundGauge</a><span class="tsd-signature-symbol">&gt;</span></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Meter.ts#L60">metrics/Meter.ts:60</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Creates a new gauge metric. Generally, this kind of metric should be used
-										when the metric cannot be expressed as a sum or because the measurement
-										interval is arbitrary. Use this kind of metric when the measurement is not
-									a quantity, and the sum and event count are not of interest.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the name of the metric.</p>
-									</div>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundgauge.html" class="tsd-signature-type">BoundGauge</a><span class="tsd-signature-symbol">&gt;</span></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createmeasure" class="tsd-anchor"></a>
 					<h3>create<wbr>Measure</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">create<wbr>Measure<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundmeasure.html" class="tsd-signature-type">BoundMeasure</a><span class="tsd-signature-symbol">&gt;</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Meter.ts#L33">metrics/Meter.ts:33</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Meter.ts#L33">src/metrics/Meter.ts:33</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Creates and returns a new {@link Measure}.</p>
+									<p>Creates and returns a new <code>Measure</code>.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -215,17 +178,51 @@
 						</li>
 					</ul>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="createobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundobserver.html" class="tsd-signature-type">BoundObserver</a><span class="tsd-signature-symbol">&gt;</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Meter.ts#L49">src/metrics/Meter.ts:49</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new <code>Observer</code> metric.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="metric.html" class="tsd-signature-type">Metric</a><span class="tsd-signature-symbol">&lt;</span><a href="boundobserver.html" class="tsd-signature-type">BoundObserver</a><span class="tsd-signature-symbol">&gt;</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="labels" class="tsd-anchor"></a>
 					<h3>labels</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">labels<span class="tsd-signature-symbol">(</span>labels<span class="tsd-signature-symbol">: </span><a href="../globals.html#labels" class="tsd-signature-type">Labels</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="labelset.html" class="tsd-signature-type">LabelSet</a></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/Meter.ts#L68">metrics/Meter.ts:68</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Meter.ts#L57">src/metrics/Meter.ts:57</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -262,19 +259,19 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-is-external">
 						<a href="meter.html" class="tsd-kind-icon">Meter</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
-								<a href="meter.html#creategauge" class="tsd-kind-icon">create<wbr>Gauge</a>
-							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createmeasure" class="tsd-kind-icon">create<wbr>Measure</a>
 							</li>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="meter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#labels" class="tsd-kind-icon">labels</a>
 							</li>
 						</ul>

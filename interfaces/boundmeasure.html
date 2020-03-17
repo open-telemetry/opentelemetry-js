@@ -91,30 +91,30 @@
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
-						<section class="tsd-index-section ">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface"><a href="boundmeasure.html#record" class="tsd-kind-icon">record</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="boundmeasure.html#record" class="tsd-kind-icon">record</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group ">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface">
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="record" class="tsd-anchor"></a>
 					<h3>record</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface">
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, distContext<span class="tsd-signature-symbol">: </span><a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, distContext<span class="tsd-signature-symbol">: </span><a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a>, spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, correlationContext<span class="tsd-signature-symbol">: </span><a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, correlationContext<span class="tsd-signature-symbol">: </span><a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a>, spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L47">metrics/BoundInstrument.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L40">src/metrics/BoundInstrument.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -136,7 +136,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L48">metrics/BoundInstrument.ts:48</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L41">src/metrics/BoundInstrument.ts:41</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -145,7 +145,7 @@
 									<h5>value: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>distContext: <a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a></h5>
+									<h5>correlationContext: <a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a></h5>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -153,7 +153,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/0d52bf5/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L49">metrics/BoundInstrument.ts:49</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L42">src/metrics/BoundInstrument.ts:42</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -162,7 +162,7 @@
 									<h5>value: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
-									<h5>distContext: <a href="distributedcontext.html" class="tsd-signature-type">DistributedContext</a></h5>
+									<h5>correlationContext: <a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a></h5>
 								</li>
 								<li>
 									<h5>spanContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
@@ -186,10 +186,10 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface">
+					<li class="current tsd-kind-interface tsd-is-external">
 						<a href="boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
 						<ul>
-							<li class=" tsd-kind-method tsd-parent-kind-interface">
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="boundmeasure.html#record" class="tsd-kind-icon">record</a>
 							</li>
 						</ul>
