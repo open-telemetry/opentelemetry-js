@@ -10,7 +10,7 @@ This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a 
 
 ## Documentation
 
-For detailed documentation of the OpenTelemetry API, see [the documentation][docs], if you want to access the documentation for the latest master use [this][generate-api-documentation].
+For detailed documentation of the OpenTelemetry API, see [the documentation][docs], if you want to access the documentation for the latest master commit use [this command][generate-api-documentation].
 
 ## Quick start
 
