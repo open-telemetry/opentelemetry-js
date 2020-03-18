@@ -22,10 +22,14 @@ export class NoopContextManager implements types.ContextManager {
     return Context.ROOT_CONTEXT;
   }
 
-  with<T extends (...args: unknown[]) => ReturnType<T>>(
+  with(
     context: Context,
-    fn: T
-  ): ReturnType<T> {
+    fn: Function
+  ) {
+    return fn();
+  }
+
+  withAsync(context: Context, fn: Function) {
     return fn();
   }
 

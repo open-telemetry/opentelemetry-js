@@ -104,6 +104,68 @@ describe('AsyncHooksContextManager', () => {
     });
   });
 
+  describe('.withAsync()', () => {
+    it('should run the callback', async () => {
+      let done = false;
+      await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+        done = true;
+      });
+
+      assert.ok(done);
+    });
+
+    it('should run the callback with active scope', async () => {
+      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      await contextManager.withAsync(test, async () => {
+        assert.strictEqual(contextManager.active(), test, 'should have scope');
+      });
+    });
+
+    it('should run the callback (when disabled)', async () => {
+      contextManager.disable();
+      let done = false;
+      await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+        done = true;
+      });
+
+      assert.ok(done);
+    });
+
+    it('should rethrow errors', async () => {
+      contextManager.disable();
+      let done = false;
+      const err = new Error();
+
+      try {
+        await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+          throw err;
+        });
+      } catch (e) {
+        assert.ok(e === err);
+        done = true;
+      }
+
+      assert.ok(done);
+    });
+
+    it('should finally restore an old scope', async () => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+      let done = false;
+
+      await contextManager.withAsync(scope1, async () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        await contextManager.withAsync(scope2, async () => {
+          assert.strictEqual(contextManager.active(), scope2);
+          done = true;
+        });
+        assert.strictEqual(contextManager.active(), scope1);
+      });
+
+      assert.ok(done);
+    });
+  });
+
   describe('.bind(function)', () => {
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };

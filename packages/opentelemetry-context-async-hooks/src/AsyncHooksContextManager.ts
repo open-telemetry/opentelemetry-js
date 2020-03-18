@@ -77,6 +77,26 @@ export class AsyncHooksContextManager implements ContextManager {
     }
   }
 
+  async withAsync<T extends Promise<any>, U extends (...args: unknown[]) => T>(
+    context: Context,
+    fn: U
+  ): Promise<T> {
+    const uid = asyncHooks.executionAsyncId();
+    const oldContext = this._contexts[uid];
+    this._contexts[uid] = context;
+    try {
+      return await fn();
+    } catch (err) {
+      throw err;
+    } finally {
+      if (oldContext === undefined) {
+        this._destroy(uid);
+      } else {
+        this._contexts[uid] = oldContext;
+      }
+    }
+  }
+
   bind<T>(target: T, context: Context): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
