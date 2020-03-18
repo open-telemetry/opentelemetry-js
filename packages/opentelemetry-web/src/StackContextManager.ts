@@ -42,8 +42,8 @@ export class StackContextManager implements ContextManager {
     context = Context.ROOT_CONTEXT
   ): T {
     const manager = this;
-    const contextWrapper = function(...args: unknown[]) {
-      return manager.with(context, () => target.apply(context, args));
+    const contextWrapper = function(this: any, ...args: any[]) {
+      return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
       enumerable: false,
@@ -112,7 +112,7 @@ export class StackContextManager implements ContextManager {
     this._currentContext = context || Context.ROOT_CONTEXT;
 
     try {
-      return fn.apply(context);
+      return fn();
     } catch (err) {
       throw err;
     } finally {
