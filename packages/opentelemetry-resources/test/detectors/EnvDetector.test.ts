@@ -33,8 +33,8 @@ describe('EnvDetector()', () => {
       delete process.env.OTEL_RESOURCE_LABELS;
     });
 
-    it('should return resource information from environment variable', () => {
-      const resource: Resource = EnvDetector.detect();
+    it('should return resource information from environment variable', async () => {
+      const resource: Resource = await EnvDetector.detect();
       assertK8sResource(resource, {
         [K8S_RESOURCE.POD_NAME]: 'pod-xyz-123',
         [K8S_RESOURCE.CLUSTER_NAME]: 'c1',
@@ -44,8 +44,8 @@ describe('EnvDetector()', () => {
   });
 
   describe('with empty env', () => {
-    it('should return empty resource', () => {
-      const resource: Resource = EnvDetector.detect();
+    it('should return empty resource', async () => {
+      const resource: Resource = await EnvDetector.detect();
       assertEmptyResource(resource);
     });
   });

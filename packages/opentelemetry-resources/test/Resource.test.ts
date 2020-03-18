@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-import { SDK_INFO } from '@opentelemetry/base';
+import * as nock from 'nock';
 import * as assert from 'assert';
-import { Resource } from '../src/Resource';
-import { assertTelemetrySDKResource } from './util/resource-assertions';
+import { SDK_INFO } from '@opentelemetry/base';
+import { Resource, EnvDetector, K8S_RESOURCE } from '../src';
+import {
+  assertTelemetrySDKResource,
+  assertK8sResource,
+} from './util/resource-assertions';
 
 describe('Resource', () => {
   const resource1 = new Resource({
@@ -107,6 +111,31 @@ describe('Resource', () => {
         language: SDK_INFO.LANGUAGE,
         name: SDK_INFO.NAME,
         version: SDK_INFO.VERSION,
+      });
+    });
+  });
+
+  describe('.detect', () => {
+    before(() => {
+      process.env.OTEL_RESOURCE_LABELS =
+        'k8s.pod.name=my-pod,k8s.cluster.name=my-cluster,k8s.namespace.name=default';
+    });
+
+    after(() => {
+      delete process.env.OTEL_RESOURCE_LABELS;
+    });
+
+    it('returns merged resource', async () => {
+      const resource = await Resource.detect([EnvDetector]);
+      assertTelemetrySDKResource(resource, {
+        language: SDK_INFO.LANGUAGE,
+        name: SDK_INFO.NAME,
+        version: SDK_INFO.VERSION,
+      });
+      assertK8sResource(resource, {
+        podName: 'my-pod',
+        clusterName: 'my-cluster',
+        namespaceName: 'default',
       });
     });
   });

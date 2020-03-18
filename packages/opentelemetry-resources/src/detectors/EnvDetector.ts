@@ -42,9 +42,10 @@ export class EnvDetector {
 
   /**
    * Returns a {@link Resource} populated with labels from the
-   * OTEL_RESOURCE_LABELS environment variable
+   * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
+   * to conform to the Detector interface.
    */
-  static detect(): Resource {
+  static async detect(): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) return Resource.empty();

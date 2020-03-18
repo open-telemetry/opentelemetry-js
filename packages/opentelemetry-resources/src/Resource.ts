@@ -16,6 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/base';
 import { TELEMETRY_SDK_RESOURCE } from './constants';
+import { AwsEc2Detector, EnvDetector, GcpDetector } from './detectors';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -40,6 +41,22 @@ export class Resource {
       [TELEMETRY_SDK_RESOURCE.NAME]: SDK_INFO.NAME,
       [TELEMETRY_SDK_RESOURCE.VERSION]: SDK_INFO.VERSION,
     });
+  }
+
+  static DETECTORS = [EnvDetector, AwsEc2Detector, GcpDetector];
+
+  /**
+   * Runs all resource detectors and returns the results merged into a single
+   * Resource.
+   */
+  static async detect(detectors = Resource.DETECTORS): Promise<Resource> {
+    const resources: Array<Resource> = await Promise.all(
+      detectors.map(d => d.detect())
+    );
+    return resources.reduce(
+      (acc, resource) => acc.merge(resource),
+      Resource.createTelemetrySDKResource()
+    );
   }
 
   constructor(
