@@ -111,13 +111,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends. Currently, OpenTelemetry supports:
 
-#### Trace Exporters
-- [@opentelemetry/exporter-jaeger][otel-exporter-jaeger]
-- [@opentelemetry/exporter-zipkin][otel-exporter-zipkin]
-- [@opentelemetry/exporter-collector][otel-exporter-collector]
-
-#### Metric Exporters
-- [@opentelemetry/exporter-prometheus][otel-exporter-prometheus]
+See the [OpenTelemetry registry](https://opentelemetry.io/registry/?s=node) for a list of exporters available.
 
 ### Plugins
 
