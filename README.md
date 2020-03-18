@@ -6,13 +6,11 @@
 [![Beta Badge][beta-image]][beta-image]
 
 ## About this project
-This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces, metrics and logs from applications.
-
-> This project is currently in Alpha stage. Its APIs can change at any time and it is not intended to be used in production scenarios!
+This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
 
 ## Documentation
 
-For detailed documentation of the OpenTelemetry API, see [the documentation][docs].
+For detailed documentation of the OpenTelemetry API, see [the documentation][docs], if you want to access the documentation for the latest master commit use [this command][generate-api-documentation].
 
 ## Quick start
 
@@ -187,3 +185,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
 [otel-api]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-api
 [otel-core]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-core
+[generate-api-documentation]: https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md#generating-api-documentation
