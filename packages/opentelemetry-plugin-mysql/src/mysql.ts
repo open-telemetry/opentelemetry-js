@@ -179,11 +179,9 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       if (arguments[1]) {
         // this is the callback passed into a query
         // no need to unwrap
-        shimmer.wrap(
-          arguments[1],
-          'query',
-          thisPlugin._patchQuery(arguments[1])
-        );
+        if (!arguments[1].query.__wrapped) {
+          shimmer.wrap(arguments[1], 'query', thisPlugin._patchQuery(arguments[1]));
+        }
       }
       if (typeof cb === 'function') {
         cb(...arguments);
