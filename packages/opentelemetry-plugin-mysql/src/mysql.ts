@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin, isWrapped } from '@opentelemetry/core';
 import { CanonicalCode, Span, SpanKind } from '@opentelemetry/api';
 import * as mysqlTypes from 'mysql';
 import * as shimmer from 'shimmer';
@@ -179,11 +179,13 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
       if (arguments[1]) {
         // this is the callback passed into a query
         // no need to unwrap
-        shimmer.wrap(
-          arguments[1],
-          'query',
-          thisPlugin._patchQuery(arguments[1])
-        );
+        if (!isWrapped(arguments[1].query)) {
+          shimmer.wrap(
+            arguments[1],
+            'query',
+            thisPlugin._patchQuery(arguments[1])
+          );
+        }
       }
       if (typeof cb === 'function') {
         cb(...arguments);
