@@ -28,22 +28,35 @@ OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
-| Component                   | Version      | Release Date     |
-| --------------------------- | ------------ | ---------------- |
-| Tracing API                 | Alpha v0.1.0 | October 14 2019  |
-| Tracing SDK (Node and Web)  | Alpha v0.1.0 | October 14 2019  |
-| Jaeger Trace Exporter       | Alpha v0.1.0 | October 14 2019  |
-| Trace Context Propagation   | Alpha v0.1.0 | October 14 2019  |
-| Zipkin Trace Exporter       | Alpha v0.1.0 | October 14 2019  |
-| OpenTracing Bridge          | Alpha v0.1.0 | October 14 2019  |
-| Metrics API                 | Alpha v0.2.0 | November 04 2019 |
-| Metrics SDK                 | Alpha v0.2.0 | November 04 2019 |
-| Prometheus Metric Exporter  | Alpha v0.3.0 | December 13 2019 |
-| Collector Exporter          | Alpha v0.3.0 | December 13 2019 |
-| Resources                   | Beta v1      | March 16 2020    |
-| Support for Tags/Baggage    | Beta v1      | March 16 2020    |
-| Metrics SDK (Complete)      | Beta v1      | March 16 2020    |
-| OpenCensus Bridge           | Beta v1      | Unknown          |
+| Component                   | Initial Version | Release Date     |
+| --------------------------- | --------------- | ---------------- |
+| Tracing API                 | Alpha v0.1.0    | October 14 2019  |
+| Tracing SDK (Node and Web)  | Alpha v0.1.0    | October 14 2019  |
+| Jaeger Trace Exporter       | Alpha v0.1.0    | October 14 2019  |
+| Trace Context Propagation   | Alpha v0.1.0    | October 14 2019  |
+| Zipkin Trace Exporter       | Alpha v0.1.0    | October 14 2019  |
+| OpenTracing Bridge          | Alpha v0.1.0    | October 14 2019  |
+| Metrics API                 | Alpha v0.2.0    | November 04 2019 |
+| Metrics SDK                 | Alpha v0.2.0    | November 04 2019 |
+| Prometheus Metric Exporter  | Alpha v0.3.0    | December 13 2019 |
+| Resources                   | Beta v0.5.0     | March 16 2020    |
+| Metrics SDK (Complete)      | Beta v0.5.0     | March 16 2020    |
+| OpenCensus Bridge           | Unknown         | Unknown          |
+| Support for Tags/Baggage    | Unknown         | Unknown          |
+
+## Feature Status
+
+Last updated March 2020
+
+| Feature             | API Status | Specification Target | SDK Status  |
+| ------------------- | ---------- | -------------------- | ----------- |
+| Tracing             | Beta       | v0.3                 | Beta        |
+| Metrics             | Beta       | v0.3                 | Beta        |
+| Context             | Beta       | v0.3                 | Beta        |
+| Propagation         | Beta       | v0.3                 | Beta        |
+| Correlation Context | Alpha      | v0.3                 | Development |
+| OpenTracing Bridge  | N/A        | v0.3                 | Beta        |
+| Resources           | N/A        | v0.3                 | Beta        |
 
 See the [project
 milestones](https://github.com/open-telemetry/opentelemetry-js/milestones)
