@@ -28,7 +28,7 @@ import {
 import { LabelSet } from './LabelSet';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
-import { NoopExporter } from '../test/mocks/Exporter';
+import { NoopExporter } from './export/NoopExporter';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
