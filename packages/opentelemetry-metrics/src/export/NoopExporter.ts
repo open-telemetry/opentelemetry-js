@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-import { MetricExporter, MetricRecord } from '../../src/export/types';
+import { MetricExporter, MetricRecord } from './types';
 import { ExportResult } from '@opentelemetry/base';
-import { EventEmitter } from 'events';
 
-export class NoopExporter extends EventEmitter implements MetricExporter {
+export class NoopExporter implements MetricExporter {
+  // By default does nothing
   export(
     metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
-  ): void {
-    this.emit('export', metrics, resultCallback);
-  }
+  ): void {}
 
-  shutdown(): void {
-    this.emit('shutdown');
-  }
+  // By default does nothing
+  shutdown(): void {}
 }
