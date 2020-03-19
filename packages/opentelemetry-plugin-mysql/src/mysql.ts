@@ -180,7 +180,11 @@ export class MysqlPlugin extends BasePlugin<typeof mysqlTypes> {
         // this is the callback passed into a query
         // no need to unwrap
         if (!arguments[1].query.__wrapped) {
-          shimmer.wrap(arguments[1], 'query', thisPlugin._patchQuery(arguments[1]));
+          shimmer.wrap(
+            arguments[1],
+            'query',
+            thisPlugin._patchQuery(arguments[1])
+          );
         }
       }
       if (typeof cb === 'function') {
