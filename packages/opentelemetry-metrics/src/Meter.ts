@@ -18,17 +18,16 @@ import * as types from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, MeasureMetric, ObserverMetric } from './Metric';
-import {
-  MetricOptions,
-  DEFAULT_METRIC_OPTIONS,
-  DEFAULT_CONFIG,
-  MeterConfig,
-} from './types';
-import { LabelSet } from './LabelSet';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
-import { NoopExporter } from '../test/mocks/Exporter';
+import { LabelSet } from './LabelSet';
+import { CounterMetric, MeasureMetric, Metric, ObserverMetric } from './Metric';
+import {
+  DEFAULT_CONFIG,
+  DEFAULT_METRIC_OPTIONS,
+  MeterConfig,
+  MetricOptions,
+} from './types';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -48,9 +47,11 @@ export class Meter implements types.Meter {
     this._batcher = new UngroupedBatcher();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
     // start the push controller
-    const exporter = config.exporter || new NoopExporter();
+    const exporter = config.exporter;
     const interval = config.interval;
-    new PushController(this, exporter, interval);
+    if (exporter) {
+      new PushController(this, exporter, interval);
+    }
   }
 
   /**
