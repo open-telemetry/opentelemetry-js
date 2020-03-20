@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.5.1 
+
+Released 2020-03-19
+
+#### :bug: (Bug Fix)
+* `opentelemetry-web`
+  * [#873](https://github.com/open-telemetry/opentelemetry-js/pull/873) Remove unnecessary `this` overwrite in stack context manager ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-plugin-mysql`
+  * [#880](https://github.com/open-telemetry/opentelemetry-js/pull/880) Do not multiwrap pool queries ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-metrics`
+  * [#881](https://github.com/open-telemetry/opentelemetry-js/pull/881)  fix: @opentelemetry/metrics fails to run due to bad import ([@mayurkale22](https://github.com/mayurkale22))
+
+#### Committers: 2
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+
 ## 0.5.0
 
 Released 2020-03-16
