@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased (2020-03-19)
+## Unreleased
+
+## 0.5.1 
+
+Released 2020-03-19
 
 #### :bug: (Bug Fix)
 * `opentelemetry-web`
