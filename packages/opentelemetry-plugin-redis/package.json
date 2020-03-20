@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-redis",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "OpenTelemetry redis automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,10 +43,10 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "^0.5.0",
-    "@opentelemetry/node": "^0.5.0",
-    "@opentelemetry/test-utils": "^0.5.0",
-    "@opentelemetry/tracing": "^0.5.0",
+    "@opentelemetry/context-async-hooks": "^0.5.1",
+    "@opentelemetry/node": "^0.5.1",
+    "@opentelemetry/test-utils": "^0.5.1",
+    "@opentelemetry/tracing": "^0.5.1",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.6.9",
     "@types/redis": "^2.8.14",
@@ -65,8 +65,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.5.0",
-    "@opentelemetry/core": "^0.5.0",
+    "@opentelemetry/api": "^0.5.1",
+    "@opentelemetry/core": "^0.5.1",
     "shimmer": "^1.2.1"
   }
 }
