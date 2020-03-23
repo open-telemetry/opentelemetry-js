@@ -154,7 +154,10 @@ export class Tracer implements api.Tracer {
  * @param options span options
  * @param context context to check for parent
  */
-function getParent(options: api.SpanOptions, context: api.Context) {
+function getParent(
+  options: api.SpanOptions,
+  context: api.Context
+): api.SpanContext | undefined {
   if (options.parent === null) return undefined;
   if (options.parent) return getContext(options.parent);
   return getParentSpanContext(context);
