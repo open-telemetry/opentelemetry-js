@@ -15,7 +15,7 @@
  */
 
 import { ExportResult } from '@opentelemetry/base';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, hrTimeToMilliseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   LastValue,
@@ -124,27 +124,30 @@ export class PrometheusExporter implements MetricExporter {
     if (!metric) return;
 
     const labelKeys = record.descriptor.labelKeys;
-    const value = record.aggregator.value();
+    const point = record.aggregator.toPoint();
 
     if (metric instanceof Counter) {
       // Prometheus counter saves internal state and increments by given value.
       // MetricRecord value is the current state, not the delta to be incremented by.
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
-      metric.inc(this._getLabelValues(labelKeys, record.labels), value as Sum);
+      metric.inc(
+        this._getLabelValues(labelKeys, record.labels),
+        point.value as Sum
+      );
     }
 
     if (metric instanceof Gauge) {
       if (record.aggregator instanceof CounterSumAggregator) {
         metric.set(
           this._getLabelValues(labelKeys, record.labels),
-          value as Sum
+          point.value as Sum
         );
       } else if (record.aggregator instanceof ObserverAggregator) {
         metric.set(
           this._getLabelValues(labelKeys, record.labels),
-          value as LastValue,
-          new Date()
+          point.value as LastValue,
+          hrTimeToMilliseconds(point.timestamp)
         );
       }
     }

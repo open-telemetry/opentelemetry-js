@@ -37,11 +37,12 @@ export class ConsoleMetricExporter implements MetricExporter {
       console.log(metric.labels.labels);
       switch (metric.descriptor.metricKind) {
         case MetricKind.COUNTER:
-          const sum = metric.aggregator.value() as Sum;
+          const sum = metric.aggregator.toPoint().value as Sum;
           console.log('value: ' + sum);
           break;
         default:
-          const distribution = metric.aggregator.value() as Distribution;
+          const distribution = metric.aggregator.toPoint()
+            .value as Distribution;
           console.log(
             'min: ' +
               distribution.min +
