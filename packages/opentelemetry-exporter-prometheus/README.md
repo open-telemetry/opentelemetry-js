@@ -1,4 +1,4 @@
-# OpenTelemetry Prometheus Exporter
+# OpenTelemetry Prometheus Metric Exporter
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]

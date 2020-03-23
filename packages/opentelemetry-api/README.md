@@ -60,7 +60,7 @@ tracerProvider.addSpanProcessor(
  * Registering the provider with the API allows it to be discovered
  * and used by instrumentation libraries. The OpenTelemetry API provides
  * methods to set global SDK implementations, but the default SDK provides
- * a convenience method named `register` which registers sane defaults
+ * a convenience method named `register` which registers same defaults
  * for you.
  *
  * By default the NodeTracerProvider uses Trace Context for propagation
