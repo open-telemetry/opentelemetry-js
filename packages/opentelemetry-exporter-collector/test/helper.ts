@@ -19,7 +19,7 @@ import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import * as transform from '../src/transform';
+import { opentelemetry } from '../src/platform/node/grpc/types';
 import * as collectorTypes from '../src/types';
 import { VERSION } from '../src/version';
 
@@ -76,8 +76,179 @@ export const mockedReadableSpan: ReadableSpan = {
   }),
 };
 
+export function ensureProtoSpanIsCorrect(
+  span: opentelemetry.proto.trace.v1.Span
+) {
+  assert.deepStrictEqual(span, {
+    attributes: [
+      {
+        key: 'component',
+        type: 'STRING',
+        stringValue: 'document-load',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+    ],
+    events: [
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'fetchStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'connectStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'connectEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165435513088',
+        name: 'requestStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165436923136',
+        name: 'responseStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165438688000',
+        name: 'responseEnd',
+        droppedAttributesCount: 0,
+      },
+    ],
+    links: [
+      {
+        attributes: [
+          {
+            key: 'component',
+            type: 'STRING',
+            stringValue: 'document-load',
+            intValue: '0',
+            doubleValue: 0,
+            boolValue: false,
+          },
+        ],
+        traceId: Buffer.from([
+          31,
+          16,
+          8,
+          220,
+          142,
+          39,
+          14,
+          133,
+          196,
+          10,
+          13,
+          124,
+          57,
+          57,
+          178,
+          120,
+        ]),
+        spanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
+        traceState: '',
+        droppedAttributesCount: 0,
+      },
+    ],
+    traceId: Buffer.from([
+      31,
+      16,
+      8,
+      220,
+      142,
+      39,
+      14,
+      133,
+      196,
+      10,
+      13,
+      124,
+      57,
+      57,
+      178,
+      120,
+    ]),
+    spanId: Buffer.from([94, 16, 114, 97, 246, 79, 165, 62]),
+    traceState: '',
+    parentSpanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
+    name: '[object Object]',
+    kind: 'INTERNAL',
+    startTimeUnixNano: '1574120165429803008',
+    endTimeUnixNano: '1574120165438688000',
+    droppedAttributesCount: 0,
+    droppedEventsCount: 0,
+    droppedLinksCount: 0,
+    status: { code: 'Ok', message: '' },
+  });
+}
+
+export function ensureResourceIsCorrect(resource: collectorTypes.Resource) {
+  assert.deepStrictEqual(resource, {
+    labels: { service: 'ui', version: '1', cost: '112.12' },
+  });
+}
+
+export function ensureProtoResourceIsCorrect(
+  resource: opentelemetry.proto.resource.v1.Resource
+) {
+  assert.deepStrictEqual(resource, {
+    attributes: [
+      {
+        key: 'service',
+        type: 'STRING',
+        stringValue: 'ui',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+      {
+        key: 'version',
+        type: 'DOUBLE',
+        stringValue: '',
+        intValue: '0',
+        doubleValue: 1,
+        boolValue: false,
+      },
+      {
+        key: 'cost',
+        type: 'DOUBLE',
+        stringValue: '',
+        intValue: '0',
+        doubleValue: 112.12,
+        boolValue: false,
+      },
+    ],
+    droppedAttributesCount: 0,
+  });
+}
+
 export function ensureSpanIsCorrect(span: collectorTypes.Span) {
-  assert.deepStrictEqual(transform.toCollectorSpan(mockedReadableSpan), {
+  assert.deepStrictEqual(span, {
     traceId: 'HxAI3I4nDoXECg18OTmyeA==',
     spanId: 'XhByYfZPpT4=',
     parentSpanId: 'eKiRUJiGQ4g=',

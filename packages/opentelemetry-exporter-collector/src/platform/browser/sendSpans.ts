@@ -16,24 +16,27 @@
 
 import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporter } from '../../CollectorExporter';
+import { toCollectorResource, toCollectorSpan } from '../../transform';
 import * as collectorTypes from '../../types';
 import { VERSION } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
- * @param shutdownF shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onInit(shutdownF: EventListener) {
-  window.addEventListener('unload', shutdownF);
+export function onInit(collectorExporter: CollectorExporter) {
+  window.addEventListener('unload', collectorExporter.shutdown);
 }
 
 /**
  * function to be called once when {@link ExporterCollector} is shutdown
- * @param shutdownF - shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onShutdown(shutdownF: EventListener) {
-  window.removeEventListener('unload', shutdownF);
+export function onShutdown(collectorExporter: CollectorExporter) {
+  window.removeEventListener('unload', collectorExporter.shutdown);
 }
 
 /**
@@ -43,15 +46,20 @@ export function onShutdown(shutdownF: EventListener) {
  * @param onSuccess
  * @param onError
  * @param collectorExporter
- * @param resource
  */
 export function sendSpans(
-  spans: collectorTypes.Span[],
+  spans: ReadableSpan[],
   onSuccess: () => void,
   onError: (status?: number) => void,
-  collectorExporter: CollectorExporter,
-  resource: collectorTypes.Resource
+  collectorExporter: CollectorExporter
 ) {
+  const resource = toCollectorResource(
+    spans.length > 0 ? spans[0].resource : Resource.empty()
+  );
+  const spansToBeSent: collectorTypes.Span[] = spans.map(span =>
+    toCollectorSpan(span)
+  );
+
   const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
     node: {
       identifier: {
@@ -69,7 +77,7 @@ export function sendSpans(
       attributes: collectorExporter.attributes,
     },
     resource,
-    spans,
+    spans: spansToBeSent,
   };
 
   const body = JSON.stringify(exportTraceServiceRequest);

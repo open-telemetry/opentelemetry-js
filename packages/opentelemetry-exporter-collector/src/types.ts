@@ -515,6 +515,9 @@ export interface TruncatableString {
   truncatedByteCount?: number;
 }
 
+/**
+ * Interface to represent a trace state
+ */
 export interface TraceState {
   [key: string]: string;
 }

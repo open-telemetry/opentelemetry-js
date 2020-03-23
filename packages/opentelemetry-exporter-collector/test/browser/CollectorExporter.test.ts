@@ -26,6 +26,7 @@ import * as collectorTypes from '../../src/types';
 
 import {
   ensureExportTraceServiceRequestIsSet,
+  ensureResourceIsCorrect,
   ensureSpanIsCorrect,
   mockedReadableSpan,
 } from '../helper';
@@ -80,6 +81,13 @@ describe('CollectorExporter - web', () => {
           if (span1) {
             ensureSpanIsCorrect(span1);
           }
+
+          const resource = json.resource;
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+          if (resource) {
+            ensureResourceIsCorrect(resource);
+          }
+
           assert.strictEqual(url, 'http://foo.bar.com');
           assert.strictEqual(spyBeacon.callCount, 1);
 
@@ -155,6 +163,13 @@ describe('CollectorExporter - web', () => {
           if (span1) {
             ensureSpanIsCorrect(span1);
           }
+
+          const resource = json.resource;
+          assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
+          if (resource) {
+            ensureResourceIsCorrect(resource);
+          }
+
           assert.strictEqual(spyBeacon.callCount, 0);
 
           ensureExportTraceServiceRequestIsSet(json, 10);

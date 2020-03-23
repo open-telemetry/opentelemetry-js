@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/tracing';
 import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
-import * as collectorTypes from './types';
+import * as core from '@opentelemetry/core';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
+import * as collectorTypes from './types';
 
 const OT_MAX_STRING_LENGTH = 128;
 
@@ -78,7 +78,6 @@ export function toCollectorEventValue(
 /**
  * convert events
  * @param events array of events
- * @param maxAttributes - maximum number of event attributes to be converted
  */
 export function toCollectorEvents(
   events: TimedEvent[]
@@ -112,7 +111,7 @@ export function toCollectorEvents(
       // const messageEvent: collectorTypes.MessageEvent;
 
       const timeEvent: collectorTypes.TimeEvent = {
-        time: hrTimeToTimeStamp(event.time),
+        time: core.hrTimeToTimeStamp(event.time),
         // messageEvent,
       };
 
@@ -159,8 +158,8 @@ export function toCollectorLinkType(
 export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
   const collectorLinks: collectorTypes.Link[] = span.links.map((link: Link) => {
     const collectorLink: collectorTypes.Link = {
-      traceId: hexToBase64(link.context.traceId),
-      spanId: hexToBase64(link.context.spanId),
+      traceId: core.hexToBase64(link.context.traceId),
+      spanId: core.hexToBase64(link.context.spanId),
       type: toCollectorLinkType(span, link),
     };
 
@@ -182,16 +181,16 @@ export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
  */
 export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
   return {
-    traceId: hexToBase64(span.spanContext.traceId),
-    spanId: hexToBase64(span.spanContext.spanId),
+    traceId: core.hexToBase64(span.spanContext.traceId),
+    spanId: core.hexToBase64(span.spanContext.spanId),
     parentSpanId: span.parentSpanId
-      ? hexToBase64(span.parentSpanId)
+      ? core.hexToBase64(span.parentSpanId)
       : undefined,
     tracestate: toCollectorTraceState(span.spanContext.traceState),
     name: toCollectorTruncatableString(span.name),
     kind: span.kind,
-    startTime: hrTimeToTimeStamp(span.startTime),
-    endTime: hrTimeToTimeStamp(span.endTime),
+    startTime: core.hrTimeToTimeStamp(span.startTime),
+    endTime: core.hrTimeToTimeStamp(span.endTime),
     attributes: toCollectorAttributes(span.attributes),
     // stackTrace: // not implemented
     timeEvents: toCollectorEvents(span.events),
