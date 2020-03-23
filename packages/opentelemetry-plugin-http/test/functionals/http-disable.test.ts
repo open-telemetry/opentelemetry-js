@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { NoopTracerProvider, NOOP_TRACER } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
@@ -68,16 +67,10 @@ describe('HttpPlugin', () => {
         const options = { host: 'localhost', path: testPath, port: serverPort };
 
         await httpRequest.get(options).then(result => {
-          assert.strictEqual(
-            (NOOP_TRACER.startSpan as sinon.SinonSpy).called,
-            false
-          );
+          assert.strictEqual((NOOP_TRACER.startSpan as sinon.SinonSpy).called, false);
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual(
-            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
-            false
-          );
+          assert.strictEqual((NOOP_TRACER.withSpan as sinon.SinonSpy).called, false);
         });
       });
     });

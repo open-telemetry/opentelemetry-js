@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Status, CanonicalCode, Span, Attributes } from '@opentelemetry/api';
+import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/api';
 import {
-  RequestOptions,
-  IncomingMessage,
   ClientRequest,
   IncomingHttpHeaders,
+  IncomingMessage,
   OutgoingHttpHeaders,
-  ServerResponse,
+  RequestOptions,
+  ServerResponse
 } from 'http';
-import {
-  IgnoreMatcher,
-  Err,
-  ParsedRequestOptions,
-  SpecialHttpStatusCodeMapping,
-} from './types';
-import { AttributeNames } from './enums/AttributeNames';
-import * as url from 'url';
 import { Socket } from 'net';
+import * as url from 'url';
+import { AttributeNames } from './enums/AttributeNames';
+import { Err, IgnoreMatcher, ParsedRequestOptions, SpecialHttpStatusCodeMapping } from './types';
 
 /**
  * Specific header used by exporters to "mark" outgoing request to avoid creating
@@ -48,7 +42,7 @@ export const HTTP_STATUS_SPECIAL_CASES: SpecialHttpStatusCodeMapping = {
   503: CanonicalCode.UNAVAILABLE,
   504: CanonicalCode.DEADLINE_EXCEEDED,
   598: CanonicalCode.INTERNAL,
-  599: CanonicalCode.INTERNAL,
+  599: CanonicalCode.INTERNAL
 };
 
 /**
@@ -63,17 +57,11 @@ export const getAbsoluteUrl = (
   const protocol = reqUrlObject.protocol || fallbackProtocol;
   const port = (reqUrlObject.port || '').toString();
   const path = reqUrlObject.path || '/';
-  let host =
-    reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
+  let host = reqUrlObject.host || reqUrlObject.hostname || headers.host || 'localhost';
 
   // if there is no port in host and there is a port
   // it should be displayed if it's not 80 and 443 (default ports)
-  if (
-    (host as string).indexOf(':') === -1 &&
-    port &&
-    port !== '80' &&
-    port !== '443'
-  ) {
+  if ((host as string).indexOf(':') === -1 && port && port !== '80' && port !== '443') {
     host += `:${port}`;
   }
 
@@ -82,9 +70,7 @@ export const getAbsoluteUrl = (
 /**
  * Parse status code from HTTP response. [More details](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#status)
  */
-export const parseResponseStatus = (
-  statusCode: number
-): Omit<Status, 'message'> => {
+export const parseResponseStatus = (statusCode: number): Omit<Status, 'message'> => {
   // search for special case
   const code: number | undefined = HTTP_STATUS_SPECIAL_CASES[statusCode];
 
@@ -135,10 +121,7 @@ export const hasExpectHeader = (options: RequestOptions): boolean => {
  * @param obj obj to inspect
  * @param pattern Match pattern
  */
-export const satisfiesPattern = <T>(
-  constant: string,
-  pattern: IgnoreMatcher
-): boolean => {
+export const satisfiesPattern = <T>(constant: string, pattern: IgnoreMatcher): boolean => {
   if (typeof pattern === 'string') {
     return pattern === constant;
   } else if (pattern instanceof RegExp) {
@@ -158,11 +141,7 @@ export const satisfiesPattern = <T>(
  * @param [onException] callback for doing something when an exception has
  *     occurred
  */
-export const isIgnored = (
-  constant: string,
-  list?: IgnoreMatcher[],
-  onException?: (error: Error) => void
-): boolean => {
+export const isIgnored = (constant: string, list?: IgnoreMatcher[], onException?: (error: Error) => void): boolean => {
   if (!list) {
     // No ignored urls - trace everything
     return false;
@@ -189,16 +168,12 @@ export const isIgnored = (
  * @param {Error} error error that will be set to span
  * @param {(IncomingMessage | ClientRequest)} [obj] used for enriching the status by checking the statusCode.
  */
-export const setSpanWithError = (
-  span: Span,
-  error: Err,
-  obj?: IncomingMessage | ClientRequest
-) => {
+export const setSpanWithError = (span: Span, error: Err, obj?: IncomingMessage | ClientRequest) => {
   const message = error.message;
 
   span.setAttributes({
     [AttributeNames.HTTP_ERROR_NAME]: error.name,
-    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
+    [AttributeNames.HTTP_ERROR_MESSAGE]: message
   });
 
   if (!obj) {
@@ -226,15 +201,12 @@ export const setSpanWithError = (
  * @param options original options for the request
  * @param [extraOptions] additional options for the request
  */
-export const getRequestInfo = (
-  options: url.URL | RequestOptions | string,
-  extraOptions?: RequestOptions
-) => {
+export const getRequestInfo = (options: url.URL | RequestOptions | string, extraOptions?: RequestOptions) => {
   let pathname = '/';
   let origin = '';
   let optionsParsed: RequestOptions;
   if (typeof options === 'string') {
-    optionsParsed = url.parse(options);
+    optionsParsed = new url.URL(options);
     pathname = (optionsParsed as url.UrlWithStringQuery).pathname || '/';
     origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host}`;
     if (extraOptions !== undefined) {
@@ -247,7 +219,7 @@ export const getRequestInfo = (
         typeof options.hostname === 'string' && options.hostname.startsWith('[')
           ? options.hostname.slice(1, -1)
           : options.hostname,
-      path: `${options.pathname || ''}${options.search || ''}`,
+      path: `${options.pathname || ''}${options.search || ''}`
     };
     if (options.port !== '') {
       optionsParsed.port = Number(options.port);
@@ -264,7 +236,7 @@ export const getRequestInfo = (
     optionsParsed = Object.assign({}, options);
     pathname = (options as url.URL).pathname;
     if (!pathname && optionsParsed.path) {
-      pathname = url.parse(optionsParsed.path).pathname || '/';
+      pathname = new url.URL(optionsParsed.path).pathname || '/';
     }
     origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host ||
       `${optionsParsed.hostname}:${optionsParsed.port}`}`;
@@ -277,9 +249,7 @@ export const getRequestInfo = (
   }
   // some packages return method in lowercase..
   // ensure upperCase for consistency
-  const method = optionsParsed.method
-    ? optionsParsed.method.toUpperCase()
-    : 'GET';
+  const method = optionsParsed.method ? optionsParsed.method.toUpperCase() : 'GET';
 
   return { origin, pathname, method, optionsParsed };
 };
@@ -325,24 +295,17 @@ export const getOutgoingRequestAttributes = (
   options: { component: string; hostname: string }
 ): Attributes => {
   const host = requestOptions.host;
-  const hostname =
-    requestOptions.hostname ||
-    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
-    'localhost';
+  const hostname = requestOptions.hostname || host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
   const requestMethod = requestOptions.method;
   const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
 
   const attributes: Attributes = {
-    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
-      requestOptions,
-      headers,
-      `${options.component}:`
-    ),
+    [AttributeNames.HTTP_URL]: getAbsoluteUrl(requestOptions, headers, `${options.component}:`),
     [AttributeNames.HTTP_METHOD]: method,
     [AttributeNames.HTTP_TARGET]: requestOptions.path || '/',
-    [AttributeNames.NET_PEER_NAME]: hostname,
+    [AttributeNames.NET_PEER_NAME]: hostname
   };
 
   if (userAgent !== undefined) {
@@ -382,14 +345,12 @@ export const getOutgoingRequestAttributesOnResponse = (
   const attributes: Attributes = {
     [AttributeNames.NET_PEER_IP]: remoteAddress,
     [AttributeNames.NET_PEER_PORT]: remotePort,
-    [AttributeNames.HTTP_HOST]: `${options.hostname}:${remotePort}`,
+    [AttributeNames.HTTP_HOST]: `${options.hostname}:${remotePort}`
   };
 
   if (statusCode) {
     attributes[AttributeNames.HTTP_STATUS_CODE] = statusCode;
-    attributes[AttributeNames.HTTP_STATUS_TEXT] = (
-      statusMessage || ''
-    ).toUpperCase();
+    attributes[AttributeNames.HTTP_STATUS_TEXT] = (statusMessage || '').toUpperCase();
   }
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
@@ -410,22 +371,15 @@ export const getIncomingRequestAttributes = (
   const ips = headers['x-forwarded-for'];
   const method = request.method || 'GET';
   const httpVersion = request.httpVersion;
-  const requestUrl = request.url ? url.parse(request.url) : null;
+  const requestUrl = request.url ? new url.URL(request.url) : null;
   const host = requestUrl?.host || headers.host;
-  const hostname =
-    requestUrl?.hostname ||
-    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
-    'localhost';
+  const hostname = requestUrl?.hostname || host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
   const serverName = options.serverName;
   const attributes: Attributes = {
-    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
-      requestUrl,
-      headers,
-      `${options.component}:`
-    ),
+    [AttributeNames.HTTP_URL]: getAbsoluteUrl(requestUrl, headers, `${options.component}:`),
     [AttributeNames.HTTP_HOST]: host,
     [AttributeNames.NET_HOST_NAME]: hostname,
-    [AttributeNames.HTTP_METHOD]: method,
+    [AttributeNames.HTTP_METHOD]: method
   };
 
   if (typeof ips === 'string') {
@@ -454,7 +408,7 @@ export const getIncomingRequestAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
-  request: IncomingMessage,
+  request: IncomingMessage & { __ot_middlewares?: string[] },
   response: ServerResponse & { socket: Socket }
 ): Attributes => {
   const { statusCode, statusMessage, socket } = response;
@@ -477,7 +431,7 @@ export const getIncomingRequestAttributesOnResponse = (
     [AttributeNames.NET_PEER_IP]: remoteAddress,
     [AttributeNames.NET_PEER_PORT]: remotePort,
     [AttributeNames.HTTP_STATUS_CODE]: statusCode,
-    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase()
   };
 
   if (route !== undefined) {

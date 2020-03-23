@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Span, PluginConfig } from '@opentelemetry/api';
-import * as url from 'url';
-import {
-  ClientRequest,
-  IncomingMessage,
-  ServerResponse,
-  request,
-  get,
-} from 'http';
+import { PluginConfig, Span } from '@opentelemetry/api';
 import * as http from 'http';
+import { ClientRequest, get, IncomingMessage, request, ServerResponse } from 'http';
+import * as url from 'url';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
@@ -33,14 +26,11 @@ export type GetFunction = typeof get;
 export type HttpCallbackOptional = HttpCallback | undefined;
 
 // from node 10+
-export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
-  HttpCallback;
+export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] & HttpCallback;
 
 export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
-export type ParsedRequestOptions =
-  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
-  | http.RequestOptions;
+export type ParsedRequestOptions = (http.RequestOptions & Partial<url.UrlWithParsedQuery>) | http.RequestOptions;
 export type Http = typeof http;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;
@@ -50,11 +40,7 @@ export type ResponseEndArgs =
   | [unknown, string, ((() => void) | undefined)?];
 
 export interface HttpCustomAttributeFunction {
-  (
-    span: Span,
-    request: ClientRequest | IncomingMessage,
-    response: IncomingMessage | ServerResponse
-  ): void;
+  (span: Span, request: ClientRequest | IncomingMessage, response: IncomingMessage | ServerResponse): void;
 }
 
 export interface HttpRequestCustomAttributeFunction {

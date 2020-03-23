@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,7 @@
  * limitations under the License.
  */
 import { Context, HttpTextPropagator, TraceFlags } from '@opentelemetry/api';
-import {
-  setExtractedSpanContext,
-  getParentSpanContext,
-} from '@opentelemetry/core';
+import { getParentSpanContext, setExtractedSpanContext } from '@opentelemetry/core';
 import * as http from 'http';
 
 export class DummyPropagation implements HttpTextPropagator {
@@ -27,7 +24,7 @@ export class DummyPropagation implements HttpTextPropagator {
     const extractedSpanContext = {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
-      traceFlags: TraceFlags.SAMPLED,
+      traceFlags: TraceFlags.SAMPLED
     };
     if (extractedSpanContext.traceId && extractedSpanContext.spanId) {
       return setExtractedSpanContext(context, extractedSpanContext);

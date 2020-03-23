@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as http from 'http';
 import { URL } from 'url';
 
@@ -29,6 +28,7 @@ function get(input: string | URL, options?: http.RequestOptions): GetResult;
 function get(input: http.RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line prefer-const
     let req: http.ClientRequest;
 
     function onGetResponseCb(resp: http.IncomingMessage): void {
@@ -45,17 +45,15 @@ function get(input: any, options?: any): GetResult {
           statusCode: res.statusCode,
           reqHeaders: req.getHeaders ? req.getHeaders() : (req as any)._headers,
           resHeaders: res.headers,
-          method: res.req.method,
+          method: res.req.method
         });
       });
       resp.on('error', err => {
         reject(err);
       });
     }
-    req =
-      options != null
-        ? http.get(input, options, onGetResponseCb)
-        : http.get(input, onGetResponseCb);
+    const isValid = options !== null && options !== undefined;
+    req = isValid ? http.get(input, options, onGetResponseCb) : http.get(input, onGetResponseCb);
     req.on('error', err => {
       reject(err);
     });
@@ -64,5 +62,5 @@ function get(input: any, options?: any): GetResult {
 }
 
 export const httpRequest = {
-  get,
+  get
 };

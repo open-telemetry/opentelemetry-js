@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@ import { NoopLogger } from '@opentelemetry/core';
 import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as url from 'url';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import * as url from 'url';
 import * as utils from '../utils/utils';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -69,7 +69,7 @@ describe('HttpPlugin Integration tests', () => {
 
     const logger = new NoopLogger();
     const provider = new NodeTracerProvider({
-      logger,
+      logger
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
@@ -80,12 +80,12 @@ describe('HttpPlugin Integration tests', () => {
       const ignoreConfig = [
         `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith(`/ignored/function`),
+        (url: string) => url.endsWith(`/ignored/function`)
       ];
       const config: HttpPluginConfig = {
         ignoreIncomingPaths: ignoreConfig,
         ignoreOutgoingUrls: ignoreConfig,
-        applyCustomAttributesOnSpan: customAttributeFunction,
+        applyCustomAttributesOnSpan: customAttributeFunction
       };
       try {
         plugin.disable();
@@ -101,9 +101,7 @@ describe('HttpPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpRequest.get(
-        `${protocol}://google.fr/?query=test`
-      );
+      const result = await httpRequest.get(`${protocol}://google.fr/?query=test`);
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -115,7 +113,7 @@ describe('HttpPlugin Integration tests', () => {
         path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: plugin.component,
+        component: plugin.component
       };
 
       assert.strictEqual(spans.length, 1);
@@ -127,9 +125,7 @@ describe('HttpPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpRequest.get(
-        new url.URL(`${protocol}://google.fr/?query=test`)
-      );
+      const result = await httpRequest.get(new url.URL(`${protocol}://google.fr/?query=test`));
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -141,7 +137,7 @@ describe('HttpPlugin Integration tests', () => {
         path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: plugin.component,
+        component: plugin.component
       };
 
       assert.strictEqual(spans.length, 1);
@@ -153,10 +149,9 @@ describe('HttpPlugin Integration tests', () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
-      const result = await httpRequest.get(
-        new url.URL(`${protocol}://google.fr/?query=test`),
-        { headers: { 'x-foo': 'foo' } }
-      );
+      const result = await httpRequest.get(new url.URL(`${protocol}://google.fr/?query=test`), {
+        headers: { 'x-foo': 'foo' }
+      });
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -168,17 +163,14 @@ describe('HttpPlugin Integration tests', () => {
         path: '/?query=test',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: plugin.component,
+        component: plugin.component
       };
 
       assert.strictEqual(spans.length, 1);
       assert.ok(span.name.indexOf('GET /') >= 0);
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
       assert.strictEqual(span.attributes[AttributeNames.HTTP_FLAVOR], '1.1');
-      assert.strictEqual(
-        span.attributes[AttributeNames.NET_TRANSPORT],
-        AttributeNames.IP_TCP
-      );
+      assert.strictEqual(span.attributes[AttributeNames.NET_TRANSPORT], AttributeNames.IP_TCP);
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
@@ -193,7 +185,7 @@ describe('HttpPlugin Integration tests', () => {
         pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: plugin.component,
+        component: plugin.component
       };
 
       assert.strictEqual(spans.length, 1);
@@ -205,10 +197,7 @@ describe('HttpPlugin Integration tests', () => {
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
-      const options = Object.assign(
-        { headers: { Expect: '100-continue' } },
-        url.parse(`${protocol}://google.fr/`)
-      );
+      const options = Object.assign({ headers: { Expect: '100-continue' } }, new url.URL(`${protocol}://google.fr/`));
 
       const result = await httpRequest.get(options);
       spans = memoryExporter.getFinishedSpans();
@@ -220,7 +209,7 @@ describe('HttpPlugin Integration tests', () => {
         pathname: '/',
         resHeaders: result.resHeaders,
         reqHeaders: result.reqHeaders,
-        component: plugin.component,
+        component: plugin.component
       };
 
       assert.strictEqual(spans.length, 1);
@@ -236,7 +225,7 @@ describe('HttpPlugin Integration tests', () => {
     });
     for (const headers of [
       { Expect: '100-continue', 'user-agent': 'http-plugin-test' },
-      { 'user-agent': 'http-plugin-test' },
+      { 'user-agent': 'http-plugin-test' }
     ]) {
       it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
@@ -253,33 +242,27 @@ describe('HttpPlugin Integration tests', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(spans.length, 0);
         const options = { headers };
-        const req = http.get(
-          `${protocol}://google.fr/`,
-          options,
-          (resp: http.IncomingMessage) => {
-            const res = (resp as unknown) as http.IncomingMessage & {
-              req: http.IncomingMessage;
-            };
+        const req = http.get(`${protocol}://google.fr/`, options, (resp: http.IncomingMessage) => {
+          const res = (resp as unknown) as http.IncomingMessage & {
+            req: http.IncomingMessage;
+          };
 
-            resp.on('data', chunk => {
-              data += chunk;
-            });
-            resp.on('end', () => {
-              validations = {
-                hostname: 'google.fr',
-                httpStatusCode: 301,
-                httpMethod: 'GET',
-                pathname: '/',
-                resHeaders: resp.headers,
-                /* tslint:disable:no-any */
-                reqHeaders: (res.req as any).getHeaders
-                  ? (res.req as any).getHeaders()
-                  : (res.req as any)._headers,
-                /* tslint:enable:no-any */
-              };
-            });
-          }
-        );
+          resp.on('data', chunk => {
+            data += chunk;
+          });
+          resp.on('end', () => {
+            validations = {
+              hostname: 'google.fr',
+              httpStatusCode: 301,
+              httpMethod: 'GET',
+              pathname: '/',
+              resHeaders: resp.headers,
+              /* tslint:disable:no-any */
+              reqHeaders: (res.req as any).getHeaders ? (res.req as any).getHeaders() : (res.req as any)._headers
+              /* tslint:enable:no-any */
+            };
+          });
+        });
 
         req.on('close', () => {
           const spans = memoryExporter.getFinishedSpans();

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
@@ -24,13 +23,13 @@ import * as url from 'url';
 import { AttributeNames } from '../../src';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
+import { IncomingMessage, ServerResponse } from 'http';
+import { Socket } from 'net';
 
 describe('Utility', () => {
   describe('parseResponseStatus()', () => {
     it('should return UNKNOWN code by default', () => {
-      const status = utils.parseResponseStatus(
-        (undefined as unknown) as number
-      );
+      const status = utils.parseResponseStatus((undefined as unknown) as number);
       assert.deepStrictEqual(status, { code: CanonicalCode.UNKNOWN });
     });
 
@@ -71,7 +70,7 @@ describe('Utility', () => {
     it('should return true on Expect (no case sensitive)', () => {
       for (const headers of [{ Expect: 1 }, { expect: 1 }, { ExPect: 1 }]) {
         const result = utils.hasExpectHeader({
-          headers,
+          headers
         } as http.RequestOptions);
         assert.strictEqual(result, true);
       }
@@ -81,18 +80,13 @@ describe('Utility', () => {
   describe('getRequestInfo()', () => {
     it('should get options object', () => {
       const webUrl = 'http://u:p@google.fr/aPath?qu=ry';
-      const urlParsed = url.parse(webUrl);
+      const urlParsed = new url.URL(webUrl);
       const urlParsedWithoutPathname = {
         ...urlParsed,
-        pathname: undefined,
+        pathname: undefined
       };
       const whatWgUrl = new url.URL(webUrl);
-      for (const param of [
-        webUrl,
-        urlParsed,
-        urlParsedWithoutPathname,
-        whatWgUrl,
-      ]) {
+      for (const param of [webUrl, urlParsed, urlParsedWithoutPathname, whatWgUrl]) {
         const result = utils.getRequestInfo(param);
         assert.strictEqual(result.optionsParsed.hostname, 'google.fr');
         assert.strictEqual(result.optionsParsed.protocol, 'http:');
@@ -128,15 +122,9 @@ describe('Utility', () => {
     });
 
     it('function pattern', () => {
-      const answer1 = utils.satisfiesPattern(
-        '/test/home',
-        (url: string) => url === '/test/home'
-      );
+      const answer1 = utils.satisfiesPattern('/test/home', (url: string) => url === '/test/home');
       assert.strictEqual(answer1, true);
-      const answer2 = utils.satisfiesPattern(
-        '/test/home',
-        (url: string) => url !== '/test/home'
-      );
+      const answer2 = utils.satisfiesPattern('/test/home', (url: string) => url !== '/test/home');
       assert.strictEqual(answer2, false);
     });
   });
@@ -154,17 +142,12 @@ describe('Utility', () => {
     it('should call isSatisfyPattern, n match', () => {
       const answer1 = utils.isIgnored('/test/1', ['/test/11']);
       assert.strictEqual(answer1, false);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        1
-      );
+      assert.strictEqual((utils.satisfiesPattern as sinon.SinonSpy).callCount, 1);
     });
 
     it('should call isSatisfyPattern, match for function', () => {
       satisfiesPatternStub.restore();
-      const answer1 = utils.isIgnored('/test/1', [
-        url => url.endsWith('/test/1'),
-      ]);
+      const answer1 = utils.isIgnored('/test/1', [url => url.endsWith('/test/1')]);
       assert.strictEqual(answer1, true);
     });
 
@@ -179,9 +162,9 @@ describe('Utility', () => {
           utils.isIgnored(
             '/test/1',
             [
-              url => {
+              () => {
                 throw new Error('test');
-              },
+              }
             ],
             callback
           )
@@ -196,9 +179,9 @@ describe('Utility', () => {
         utils.isIgnored(
           '/test/1',
           [
-            url => {
+            () => {
               throw new Error('test');
-            },
+            }
           ],
           onException
         )
@@ -208,10 +191,7 @@ describe('Utility', () => {
 
     it('should not call isSatisfyPattern', () => {
       utils.isIgnored('/test/1', []);
-      assert.strictEqual(
-        (utils.satisfiesPattern as sinon.SinonSpy).callCount,
-        0
-      );
+      assert.strictEqual((utils.satisfiesPattern as sinon.SinonSpy).callCount, 0);
     });
 
     it('should return false on empty list', () => {
@@ -228,12 +208,12 @@ describe('Utility', () => {
   describe('getAbsoluteUrl()', () => {
     it('should return absolute url with localhost', () => {
       const path = '/test/1';
-      const result = utils.getAbsoluteUrl(url.parse(path), {});
+      const result = utils.getAbsoluteUrl(new url.URL(path), {});
       assert.strictEqual(result, `http://localhost${path}`);
     });
     it('should return absolute url', () => {
       const absUrl = 'http://www.google/test/1?query=1';
-      const result = utils.getAbsoluteUrl(url.parse(absUrl), {});
+      const result = utils.getAbsoluteUrl(new url.URL(absUrl), {});
       assert.strictEqual(result, absUrl);
     });
     it('should return default url', () => {
@@ -241,10 +221,7 @@ describe('Utility', () => {
       assert.strictEqual(result, 'http://localhost/');
     });
     it("{ path: '/helloworld', port: 8080 } should return http://localhost:8080/helloworld", () => {
-      const result = utils.getAbsoluteUrl(
-        { path: '/helloworld', port: 8080 },
-        {}
-      );
+      const result = utils.getAbsoluteUrl({ path: '/helloworld', port: 8080 }, {});
       assert.strictEqual(result, 'http://localhost:8080/helloworld');
     });
   });
@@ -274,24 +251,20 @@ describe('Utility', () => {
     [
       {},
       { headers: {} },
-      url.parse('http://url.com'),
+      new url.URL('http://url.com'),
       { headers: { [utils.OT_REQUEST_HEADER]: 0 } },
-      { headers: { [utils.OT_REQUEST_HEADER]: false } },
+      { headers: { [utils.OT_REQUEST_HEADER]: false } }
     ].forEach(options => {
-      it(`should return false with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
+      it(`should return false with the following value: ${JSON.stringify(options)}`, () => {
         /* tslint:disable-next-line:no-any */
         assert.strictEqual(utils.isOpenTelemetryRequest(options as any), false);
       });
     });
     for (const options of [
       { headers: { [utils.OT_REQUEST_HEADER]: 1 } },
-      { headers: { [utils.OT_REQUEST_HEADER]: true } },
+      { headers: { [utils.OT_REQUEST_HEADER]: true } }
     ]) {
-      it(`should return true with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
+      it(`should return true with the following value: ${JSON.stringify(options)}`, () => {
         /* tslint:disable-next-line:no-any */
         assert.strictEqual(utils.isOpenTelemetryRequest(options as any), true);
       });
@@ -300,16 +273,12 @@ describe('Utility', () => {
 
   describe('isValidOptionsType()', () => {
     ['', false, true, 1, 0, []].forEach(options => {
-      it(`should return false with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
+      it(`should return false with the following value: ${JSON.stringify(options)}`, () => {
         assert.strictEqual(utils.isValidOptionsType(options), false);
       });
     });
-    for (const options of ['url', url.parse('http://url.com'), {}]) {
-      it(`should return true with the following value: ${JSON.stringify(
-        options
-      )}`, () => {
+    for (const options of ['url', new url.URL('http://url.com'), {}]) {
+      it(`should return true with the following value: ${JSON.stringify(options)}`, () => {
         assert.strictEqual(utils.isValidOptionsType(options), true);
       });
     }
@@ -318,22 +287,20 @@ describe('Utility', () => {
   describe('getIncomingRequestAttributesOnResponse()', () => {
     it('should correctly parse the middleware stack if present', () => {
       const request = {
-        __ot_middlewares: ['/test', '/toto', '/'],
-      };
-      // @ts-ignore ignore error about invalid request types since we only want to
-      // check the parsing of the `__ot_middlewares` property
+        __ot_middlewares: ['/test', '/toto', '/']
+      } as IncomingMessage & { __ot_middlewares?: string[] };
+
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
-        socket: {},
-      });
+        socket: {}
+      } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], '/test/toto');
     });
+
     it('should succesfully process without middleware stack', () => {
-      const request = {};
-      // @ts-ignore ignore error about invalid request types since we only want to
-      // check the parsing of the `__ot_middlewares` property
+      const request = {} as IncomingMessage;
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
-        socket: {},
-      });
+        socket: {}
+      } as ServerResponse & { socket: Socket });
       assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], undefined);
     });
   });
