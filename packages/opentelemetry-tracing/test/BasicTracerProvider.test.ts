@@ -252,7 +252,7 @@ describe('BasicTracerProvider', () => {
       assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
       span.end();
       rootSpan.end();
-    })
+    });
 
     it('should start a span with name and with invalid parent span', () => {
       const tracer = new BasicTracerProvider().getTracer('default');

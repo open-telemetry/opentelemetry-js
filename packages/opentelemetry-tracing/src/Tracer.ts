@@ -150,7 +150,7 @@ export class Tracer implements api.Tracer {
 /**
  * Get the parent to assign to a started span. If options.parent is null,
  * do not assign a parent.
- * 
+ *
  * @param options span options
  * @param context context to check for parent
  */
