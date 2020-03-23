@@ -124,13 +124,13 @@ jobs:
       - checkout
       - run:
           name: Install minimal doc and lint modules globally
-          command: npm i -g tslint eslint lerna typedoc linkinator typescript tslint-consistent-codestyle tslint-microsoft-contrib
+          command: npm i -g tslint eslint eslint-plugin-node lerna typedoc linkinator typescript tslint-consistent-codestyle tslint-microsoft-contrib
       - run:
           name: Install gts version 2.0.0 globally
           command: npm i -g gts@2.0.0
       - run:
           name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint eslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
+          command: lerna exec 'npm link tslint eslint gts eslint-plugin-node lerna typedoc linkinator typescript tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
           command: npm run lint

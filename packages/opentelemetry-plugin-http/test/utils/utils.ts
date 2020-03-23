@@ -16,7 +16,7 @@
 import * as dns from 'dns';
 
 export const checkInternet = (cb: (isConnected: boolean) => void) => {
-  dns.lookup('google.com', err => {
+  dns.lookup('google.com', (err) => {
     if (err && err.code === 'ENOTFOUND') {
       cb(false);
     } else {

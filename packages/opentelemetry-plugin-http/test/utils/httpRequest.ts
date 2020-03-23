@@ -36,7 +36,7 @@ function get(input: any, options?: any): GetResult {
         req: http.IncomingMessage;
       };
       let data = '';
-      resp.on('data', chunk => {
+      resp.on('data', (chunk) => {
         data += chunk;
       });
       resp.on('end', () => {
@@ -45,16 +45,18 @@ function get(input: any, options?: any): GetResult {
           statusCode: res.statusCode,
           reqHeaders: req.getHeaders ? req.getHeaders() : (req as any)._headers,
           resHeaders: res.headers,
-          method: res.req.method
+          method: res.req.method,
         });
       });
-      resp.on('error', err => {
+      resp.on('error', (err) => {
         reject(err);
       });
     }
     const isValid = options !== null && options !== undefined;
-    req = isValid ? http.get(input, options, onGetResponseCb) : http.get(input, onGetResponseCb);
-    req.on('error', err => {
+    req = isValid
+      ? http.get(input, options, onGetResponseCb)
+      : http.get(input, onGetResponseCb);
+    req.on('error', (err) => {
       reject(err);
     });
     return req;
@@ -62,5 +64,5 @@ function get(input: any, options?: any): GetResult {
 }
 
 export const httpRequest = {
-  get
+  get,
 };

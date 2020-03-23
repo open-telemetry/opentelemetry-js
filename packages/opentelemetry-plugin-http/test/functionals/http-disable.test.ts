@@ -66,11 +66,17 @@ describe('HttpPlugin', () => {
 
         const options = { host: 'localhost', path: testPath, port: serverPort };
 
-        await httpRequest.get(options).then(result => {
-          assert.strictEqual((NOOP_TRACER.startSpan as sinon.SinonSpy).called, false);
+        await httpRequest.get(options).then((result) => {
+          assert.strictEqual(
+            (NOOP_TRACER.startSpan as sinon.SinonSpy).called,
+            false
+          );
 
           assert.strictEqual(http.Server.prototype.emit.__wrapped, undefined);
-          assert.strictEqual((NOOP_TRACER.withSpan as sinon.SinonSpy).called, false);
+          assert.strictEqual(
+            (NOOP_TRACER.withSpan as sinon.SinonSpy).called,
+            false
+          );
         });
       });
     });

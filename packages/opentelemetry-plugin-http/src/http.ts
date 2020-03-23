@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
   context,
@@ -42,7 +41,15 @@ import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
 import { AttributeNames } from './enums/AttributeNames';
-import { Err, Func, Http, HttpPluginConfig, HttpRequestArgs, ParsedRequestOptions, ResponseEndArgs } from './types';
+import {
+  Err,
+  Func,
+  Http,
+  HttpPluginConfig,
+  HttpRequestArgs,
+  ParsedRequestOptions,
+  ResponseEndArgs,
+} from './types';
 import * as utils from './utils';
 import { VERSION } from './version';
 
@@ -71,20 +78,43 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   /** Patches HTTP incoming and outcoming request functions. */
   protected patch() {
-    this._logger.debug('applying patch to %s@%s', this.moduleName, this.version);
+    this._logger.debug(
+      'applying patch to %s@%s',
+      this.moduleName,
+      this.version
+    );
 
-    shimmer.wrap(this._moduleExports, 'request', this._getPatchOutgoingRequestFunction());
+    shimmer.wrap(
+      this._moduleExports,
+      'request',
+      this._getPatchOutgoingRequestFunction()
+    );
 
     // In Node >=8, http.get calls a private request method, therefore we patch it
     // here too.
     if (semver.satisfies(this.version, '>=8.0.0')) {
-      shimmer.wrap(this._moduleExports, 'get', this._getPatchOutgoingGetFunction(request));
+      shimmer.wrap(
+        this._moduleExports,
+        'get',
+        this._getPatchOutgoingGetFunction(request)
+      );
     }
 
-    if (this._moduleExports && this._moduleExports.Server && this._moduleExports.Server.prototype) {
-      shimmer.wrap(this._moduleExports.Server.prototype, 'emit', this._getPatchIncomingRequestFunction());
+    if (
+      this._moduleExports &&
+      this._moduleExports.Server &&
+      this._moduleExports.Server.prototype
+    ) {
+      shimmer.wrap(
+        this._moduleExports.Server.prototype,
+        'emit',
+        this._getPatchIncomingRequestFunction()
+      );
     } else {
-      this._logger.error('Could not apply patch to %s.emit. Interface is not as expected.', this.moduleName);
+      this._logger.error(
+        'Could not apply patch to %s.emit. Interface is not as expected.',
+        this.moduleName
+      );
     }
 
     return this._moduleExports;
@@ -96,7 +126,11 @@ export class HttpPlugin extends BasePlugin<Http> {
     if (semver.satisfies(this.version, '>=8.0.0')) {
       shimmer.unwrap(this._moduleExports, 'get');
     }
-    if (this._moduleExports && this._moduleExports.Server && this._moduleExports.Server.prototype) {
+    if (
+      this._moduleExports &&
+      this._moduleExports.Server &&
+      this._moduleExports.Server.prototype
+    ) {
       shimmer.unwrap(this._moduleExports.Server.prototype, 'emit');
     }
   }
@@ -154,11 +188,18 @@ export class HttpPlugin extends BasePlugin<Http> {
    * @param options The arguments to the original function.
    * @param span representing the current operation
    */
-  private _traceClientRequest(request: ClientRequest, options: ParsedRequestOptions, span: Span): ClientRequest {
-    const hostname = options.hostname || options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') || 'localhost';
+  private _traceClientRequest(
+    request: ClientRequest,
+    options: ParsedRequestOptions,
+    span: Span
+  ): ClientRequest {
+    const hostname =
+      options.hostname ||
+      options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
+      'localhost';
     const attributes = utils.getOutgoingRequestAttributes(options, {
       component: this.component,
-      hostname
+      hostname,
     });
     span.setAttributes(attributes);
     if (this._config.requestHook) {
@@ -177,31 +218,41 @@ export class HttpPlugin extends BasePlugin<Http> {
           this._callResponseHook(span, response);
         }
 
-      this._tracer.bind(response);
-      this._logger.debug('outgoingRequest on response()');
-      response.on('end', () => {
-        this._logger.debug('outgoingRequest on end()');
-        let status: Status;
+        this._tracer.bind(response);
+        this._logger.debug('outgoingRequest on response()');
+        response.on('end', () => {
+          this._logger.debug('outgoingRequest on end()');
+          let status: Status;
 
-        if (response.aborted && !response.complete) {
-          status = { code: CanonicalCode.ABORTED };
-        } else {
-          status = utils.parseResponseStatus(response.statusCode!);
-        }
+          if (response.aborted && !response.complete) {
+            status = { code: CanonicalCode.ABORTED };
+          } else {
+            status = utils.parseResponseStatus(response.statusCode!);
+          }
 
-        span.setStatus(status);
+          span.setStatus(status);
 
-        if (this._config.applyCustomAttributesOnSpan) {
-          this._safeExecute(span, () => this._config.applyCustomAttributesOnSpan!(span, request, response), false);
-        }
+          if (this._config.applyCustomAttributesOnSpan) {
+            this._safeExecute(
+              span,
+              () =>
+                this._config.applyCustomAttributesOnSpan!(
+                  span,
+                  request,
+                  response
+                ),
+              false
+            );
+          }
 
-        this._closeHttpSpan(span);
-      });
-      response.on('error', (error: Err) => {
-        utils.setSpanWithError(span, error, response);
-        this._closeHttpSpan(span);
-      });
-    });
+          this._closeHttpSpan(span);
+        });
+        response.on('error', (error: Err) => {
+          utils.setSpanWithError(span, error, response);
+          this._closeHttpSpan(span);
+        });
+      }
+    );
     request.on('close', () => {
       if (!request.aborted) {
         this._closeHttpSpan(span);
@@ -216,9 +267,15 @@ export class HttpPlugin extends BasePlugin<Http> {
     return request;
   }
 
-  private _incomingRequestFunction(original: (event: string, ...args: unknown[]) => boolean) {
+  private _incomingRequestFunction(
+    original: (event: string, ...args: unknown[]) => boolean
+  ) {
     const plugin = this;
-    return function incomingRequest(this: {}, event: string, ...args: unknown[]): boolean {
+    return function incomingRequest(
+      this: {},
+      event: string,
+      ...args: unknown[]
+    ): boolean {
       // Only traces request events
       if (event !== 'request') {
         return original.apply(this, [event, ...args]);
@@ -226,14 +283,19 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const request = args[0] as IncomingMessage;
       const response = args[1] as ServerResponse & { socket: Socket };
-      const pathname = request.url ? new url.URL(request.url).pathname || '/' : '/';
+      const pathname = request.url
+        ? url.parse(request.url).pathname || '/'
+        : '/';
       const method = request.method || 'GET';
 
       plugin._logger.debug('%s plugin incomingRequest', plugin.moduleName);
 
       if (
-        utils.isIgnored(pathname, plugin._config.ignoreIncomingPaths, (e: Error) =>
-          plugin._logger.error('caught ignoreIncomingPaths error: ', e)
+        utils.isIgnored(
+          pathname,
+          plugin._config.ignoreIncomingPaths,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreIncomingPaths error: ', e)
         )
       ) {
         return original.apply(this, [event, ...args]);
@@ -245,12 +307,15 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.SERVER,
         attributes: utils.getIncomingRequestAttributes(request, {
           component: plugin.component,
-          serverName: plugin._config.serverName
-        })
+          serverName: plugin._config.serverName,
+        }),
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
+        const span = plugin._startHttpSpan(
+          `${method} ${pathname}`,
+          spanOptions
+        );
 
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
@@ -266,7 +331,10 @@ export class HttpPlugin extends BasePlugin<Http> {
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
           const originalEnd = response.end;
-          response.end = function(this: ServerResponse, ...args: ResponseEndArgs) {
+          response.end = function (
+            this: ServerResponse,
+            ...args: ResponseEndArgs
+          ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
             // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
@@ -277,14 +345,24 @@ export class HttpPlugin extends BasePlugin<Http> {
               true
             );
 
-            const attributes = utils.getIncomingRequestAttributesOnResponse(request, response);
+            const attributes = utils.getIncomingRequestAttributesOnResponse(
+              request,
+              response
+            );
 
-            span.setAttributes(attributes).setStatus(utils.parseResponseStatus(response.statusCode));
+            span
+              .setAttributes(attributes)
+              .setStatus(utils.parseResponseStatus(response.statusCode));
 
             if (plugin._config.applyCustomAttributesOnSpan) {
               plugin._safeExecute(
                 span,
-                () => plugin._config.applyCustomAttributesOnSpan!(span, request, response),
+                () =>
+                  plugin._config.applyCustomAttributesOnSpan!(
+                    span,
+                    request,
+                    response
+                  ),
                 false
               );
             }
@@ -293,13 +371,19 @@ export class HttpPlugin extends BasePlugin<Http> {
             return returned;
           };
 
-          return plugin._safeExecute(span, () => original.apply(this, [event, ...args]), true);
+          return plugin._safeExecute(
+            span,
+            () => original.apply(this, [event, ...args]),
+            true
+          );
         });
       });
     };
   }
 
-  private _outgoingRequestFunction(original: Func<ClientRequest>): Func<ClientRequest> {
+  private _outgoingRequestFunction(
+    original: Func<ClientRequest>
+  ): Func<ClientRequest> {
     const plugin = this;
     return function outgoingRequest(
       this: {},
@@ -311,10 +395,14 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       const extraOptions =
-        typeof args[0] === 'object' && (typeof options === 'string' || options instanceof url.URL)
+        typeof args[0] === 'object' &&
+        (typeof options === 'string' || options instanceof url.URL)
           ? (args.shift() as RequestOptions)
           : undefined;
-      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(options, extraOptions);
+      const { origin, pathname, method, optionsParsed } = utils.getRequestInfo(
+        options,
+        extraOptions
+      );
 
       if (utils.isOpenTelemetryRequest(optionsParsed)) {
         // clone the headers so delete will not modify the user's object
@@ -325,8 +413,11 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       if (
         utils.isOpenTelemetryRequest(optionsParsed) ||
-        utils.isIgnored(origin + pathname, plugin._config.ignoreOutgoingUrls, (e: Error) =>
-          plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
+        utils.isIgnored(
+          origin + pathname,
+          plugin._config.ignoreOutgoingUrls,
+          (e: Error) =>
+            plugin._logger.error('caught ignoreOutgoingUrls error: ', e)
         )
       ) {
         return original.apply(this, [optionsParsed, ...args]);
@@ -334,7 +425,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
       const operationName = `${method} ${pathname}`;
       const spanOptions: SpanOptions = {
-        kind: SpanKind.CLIENT
+        kind: SpanKind.CLIENT,
       };
       const span = plugin._startHttpSpan(operationName, spanOptions);
 

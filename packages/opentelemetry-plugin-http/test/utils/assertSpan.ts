@@ -41,17 +41,39 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.traceId.length, 32);
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
-  assert.strictEqual(span.name, `${validations.httpMethod} ${validations.pathname}`);
-  assert.strictEqual(span.attributes[AttributeNames.COMPONENT], validations.component);
-  assert.strictEqual(span.attributes[AttributeNames.HTTP_ERROR_MESSAGE], span.status.message);
-  assert.strictEqual(span.attributes[AttributeNames.HTTP_METHOD], validations.httpMethod);
-  assert.strictEqual(span.attributes[AttributeNames.HTTP_TARGET], validations.path || validations.pathname);
-  assert.strictEqual(span.attributes[AttributeNames.HTTP_STATUS_CODE], validations.httpStatusCode);
+  assert.strictEqual(
+    span.name,
+    `${validations.httpMethod} ${validations.pathname}`
+  );
+  assert.strictEqual(
+    span.attributes[AttributeNames.COMPONENT],
+    validations.component
+  );
+  assert.strictEqual(
+    span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+    span.status.message
+  );
+  assert.strictEqual(
+    span.attributes[AttributeNames.HTTP_METHOD],
+    validations.httpMethod
+  );
+  assert.strictEqual(
+    span.attributes[AttributeNames.HTTP_TARGET],
+    validations.path || validations.pathname
+  );
+  assert.strictEqual(
+    span.attributes[AttributeNames.HTTP_STATUS_CODE],
+    validations.httpStatusCode
+  );
 
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 0);
 
-  assert.deepStrictEqual(span.status, validations.forceStatus || utils.parseResponseStatus(validations.httpStatusCode));
+  assert.deepStrictEqual(
+    span.status,
+    validations.forceStatus ||
+      utils.parseResponseStatus(validations.httpStatusCode)
+  );
 
   assert.ok(span.endTime, 'must be finished');
   assert.ok(hrTimeToNanoseconds(span.duration), 'must have positive duration');
@@ -59,7 +81,10 @@ export const assertSpan = (
   if (validations.reqHeaders) {
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
-      assert.strictEqual(span.attributes[AttributeNames.HTTP_USER_AGENT], userAgent);
+      assert.strictEqual(
+        span.attributes[AttributeNames.HTTP_USER_AGENT],
+        userAgent
+      );
     }
   }
   if (span.kind === SpanKind.CLIENT) {
@@ -69,7 +94,10 @@ export const assertSpan = (
       'must be consistent (PEER_NAME and hostname)'
     );
     assert.ok(span.attributes[AttributeNames.NET_PEER_IP], 'must have PEER_IP');
-    assert.ok(span.attributes[AttributeNames.NET_PEER_PORT], 'must have PEER_PORT');
+    assert.ok(
+      span.attributes[AttributeNames.NET_PEER_PORT],
+      'must have PEER_PORT'
+    );
     assert.ok(
       (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
         span.attributes[AttributeNames.NET_PEER_NAME] as string
@@ -84,8 +112,14 @@ export const assertSpan = (
         validations.serverName,
         ' must have serverName attribute'
       );
-      assert.ok(span.attributes[AttributeNames.NET_HOST_PORT], 'must have HOST_PORT');
-      assert.ok(span.attributes[AttributeNames.NET_HOST_IP], 'must have HOST_IP');
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_PORT],
+        'must have HOST_PORT'
+      );
+      assert.ok(
+        span.attributes[AttributeNames.NET_HOST_IP],
+        'must have HOST_IP'
+      );
     }
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
   } else if (validations.reqHeaders) {

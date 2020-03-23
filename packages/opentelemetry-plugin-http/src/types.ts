@@ -15,7 +15,13 @@
  */
 import { PluginConfig, Span } from '@opentelemetry/api';
 import * as http from 'http';
-import { ClientRequest, get, IncomingMessage, request, ServerResponse } from 'http';
+import {
+  ClientRequest,
+  get,
+  IncomingMessage,
+  request,
+  ServerResponse,
+} from 'http';
 import * as url from 'url';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
@@ -26,11 +32,14 @@ export type GetFunction = typeof get;
 export type HttpCallbackOptional = HttpCallback | undefined;
 
 // from node 10+
-export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] & HttpCallback;
+export type RequestSignature = [http.RequestOptions, HttpCallbackOptional] &
+  HttpCallback;
 
 export type HttpRequestArgs = Array<HttpCallbackOptional | RequestSignature>;
 
-export type ParsedRequestOptions = (http.RequestOptions & Partial<url.UrlWithParsedQuery>) | http.RequestOptions;
+export type ParsedRequestOptions =
+  | (http.RequestOptions & Partial<url.UrlWithParsedQuery>)
+  | http.RequestOptions;
 export type Http = typeof http;
 /* tslint:disable-next-line:no-any */
 export type Func<T> = (...args: any[]) => T;
@@ -40,7 +49,11 @@ export type ResponseEndArgs =
   | [unknown, string, ((() => void) | undefined)?];
 
 export interface HttpCustomAttributeFunction {
-  (span: Span, request: ClientRequest | IncomingMessage, response: IncomingMessage | ServerResponse): void;
+  (
+    span: Span,
+    request: ClientRequest | IncomingMessage,
+    response: IncomingMessage | ServerResponse
+  ): void;
 }
 
 export interface HttpRequestCustomAttributeFunction {

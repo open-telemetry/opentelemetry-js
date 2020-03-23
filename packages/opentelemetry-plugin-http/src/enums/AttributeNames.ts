@@ -37,5 +37,5 @@ export enum AttributeNames {
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME = 'http.error_name',
   HTTP_ERROR_MESSAGE = 'http.error_message',
-  HTTP_USER_AGENT = 'http.user_agent'
+  HTTP_USER_AGENT = 'http.user_agent',
 }

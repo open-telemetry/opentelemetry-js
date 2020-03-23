@@ -18,7 +18,10 @@ import { context, SpanKind } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import * as got from 'got';
@@ -48,7 +51,7 @@ describe('Packages', () => {
   describe('get', () => {
     const logger = new NoopLogger();
     const provider = new NodeTracerProvider({
-      logger
+      logger,
     });
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
     beforeEach(() => {
@@ -57,7 +60,7 @@ describe('Packages', () => {
 
     before(() => {
       const config: HttpPluginConfig = {
-        applyCustomAttributesOnSpan: customAttributeFunction
+        applyCustomAttributesOnSpan: customAttributeFunction,
       };
       plugin.enable(http, provider, provider.logger, config);
     });
@@ -75,8 +78,8 @@ describe('Packages', () => {
       { name: 'got', httpPackage: { get: (url: string) => got(url) } },
       {
         name: 'request',
-        httpPackage: { get: (url: string) => request(url) }
-      }
+        httpPackage: { get: (url: string) => request(url) },
+      },
     ].forEach(({ name, httpPackage }) => {
       it(`should create a span for GET requests and add propagation headers by using ${name} package`, async () => {
         if (process.versions.node.startsWith('12') && name === 'got') {
@@ -89,7 +92,7 @@ describe('Packages', () => {
           nock.load(path.join(__dirname, '../', '/fixtures/google.json'));
         }
 
-        const urlparsed = new url.URL(
+        const urlparsed = url.parse(
           name === 'got' && process.versions.node.startsWith('12')
             ? // there is an issue with got 9.6 version and node 12 when redirecting so url above will not work
               // https://github.com/nock/nock/pull/1551
@@ -112,7 +115,7 @@ describe('Packages', () => {
           pathname: urlparsed.pathname!,
           path: urlparsed.path,
           resHeaders,
-          component: plugin.component
+          component: plugin.component,
         };
 
         assert.strictEqual(spans.length, 1);
@@ -120,8 +123,12 @@ describe('Packages', () => {
 
         switch (name) {
           case 'axios':
-            assert.ok(result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]);
-            assert.ok(result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]);
+            assert.ok(
+              result.request._headers[DummyPropagation.TRACE_CONTEXT_KEY]
+            );
+            assert.ok(
+              result.request._headers[DummyPropagation.SPAN_CONTEXT_KEY]
+            );
             break;
           case 'got':
           case 'superagent':

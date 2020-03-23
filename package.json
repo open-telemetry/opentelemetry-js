@@ -22,7 +22,7 @@
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
     "docs-deploy": "gh-pages --dist packages/opentelemetry-api/docs/out",
-    "lint": "lerna run lint",
+    "lint": "lerna run lint --scope @opentelemetry/plugin-http",
     "lint:fix": "lerna run lint:fix",
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix"
