@@ -89,7 +89,7 @@ export class BatchSpanProcessor implements SpanProcessor {
 
   private _shouldFlush(): boolean {
     return (
-      this._finishedSpans.length >= 0 &&
+      this._finishedSpans.length > 0 &&
       Date.now() - this._lastSpanFlush >= this._bufferTimeout
     );
   }
