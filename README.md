@@ -1,16 +1,47 @@
-# OpenTelemetry - distributed tracing and stats collection framework
-[![Gitter chat][node-gitter-image]][node-gitter-url]
-[![CircleCI][circleci-image]][circleci-url]
-[![Coverage Status][codecov-image]][codecov-url]
-[![Apache License][license-image]][license-image]
-[![Beta Badge][beta-image]][beta-image]
+
+---
+
+<p align="center">
+  <strong>
+    <a href="getting-started/README.md">Getting Started<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://open-telemetry.github.io/opentelemetry-js">API Documentation<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="https://gitter.im/open-telemetry/opentelemetry-node">Getting In Touch<a/>
+  </strong>
+</p>
+
+<p align="center">
+  <a href="https://circleci.com/gh/open-telemetry/opentelemetry-js">
+    <img alt="Build Status" src="https://circleci.com/gh/open-telemetry/opentelemetry-js.svg?style=shield">
+  </a>
+  <a href="https://codecov.io/gh/open-telemetry/opentelemetry-js/branch/master/">
+    <img alt="Codecov Status" src="https://img.shields.io/codecov/c/github/open-telemetry/opentelemetry-js?style=for-the-badge">
+  </a>
+  <a href="license">
+    <img alt="license" src="https://img.shields.io/badge/license-Apache_2.0-green.svg?style=for-the-badge">
+  </a>
+  <a href="releases">
+    <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/open-telemetry/opentelemetry-js?include_prereleases&style=for-the-badge">
+  </a>
+</p>
+
+<p align="center">
+  <strong>
+    <a href="CONTRIBUTING.md">Contributing<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="doc/development-guide.md">Development Guide<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="benchmark/README.md">Benchmarks<a/>
+    &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+    <a href="examples/">Examples<a/>
+  </strong>
+</p>
+
+---
 
 ## About this project
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
-
-## Documentation
-
-For detailed documentation of the OpenTelemetry API, see [the documentation][docs], if you want to access the documentation for the latest master commit use [this command][generate-api-documentation].
 
 ## Quick start
 
