@@ -30,7 +30,14 @@ import {
  * the instance. Returns an empty Resource if detection fails.
  */
 export class GcpDetector {
+  /** Determine if the GCP metadata server is currently available. */
+  static async isRunningOnComputeEngine(): Promise<Boolean> {
+    return gcpMetadata.isAvailable();
+  }
   static async detect(): Promise<Resource> {
+    const isRunning = await GcpDetector.isRunningOnComputeEngine();
+    if (!isRunning) return Resource.empty();
+
     const [projectId, instanceId, zoneId, clusterName] = await Promise.all([
       GcpDetector.getProjectId(),
       GcpDetector.getInstanceId(),
@@ -39,11 +46,13 @@ export class GcpDetector {
     ]);
 
     const labels: Labels = {};
-    if (projectId) labels[CLOUD_RESOURCE.ACCOUNT_ID] = projectId;
-    if (instanceId) labels[HOST_RESOURCE.ID] = instanceId;
-    if (zoneId) labels[CLOUD_RESOURCE.ZONE] = zoneId;
-    if (clusterName) GcpDetector.addK8sLabels(labels, clusterName);
-    if (Object.keys(labels).length > 0) labels[CLOUD_RESOURCE.PROVIDER] = 'gcp';
+    labels[CLOUD_RESOURCE.ACCOUNT_ID] = projectId;
+    labels[HOST_RESOURCE.ID] = instanceId;
+    labels[CLOUD_RESOURCE.ZONE] = zoneId;
+    labels[CLOUD_RESOURCE.PROVIDER] = 'gcp';
+
+    if (process.env.KUBERNETES_SERVICE_HOST)
+      GcpDetector.addK8sLabels(labels, clusterName);
 
     return new Resource(labels);
   }
