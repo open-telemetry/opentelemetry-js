@@ -78,13 +78,6 @@ export class NoopMetric<T> implements Metric<T> {
   }
 
   /**
-   * Returns a Bound Instrument for a metric with all labels not set.
-   */
-  getDefaultBound(): T {
-    return this._instrument;
-  }
-
-  /**
    * Removes the Binding from the metric, if it is present.
    * @param labels the canonicalized LabelSet used to associate with this
    *     metric instrument.
@@ -97,10 +90,6 @@ export class NoopMetric<T> implements Metric<T> {
    * Clears all timeseries from the Metric.
    */
   clear(): void {
-    return;
-  }
-
-  setCallback(fn: () => void): void {
     return;
   }
 }
