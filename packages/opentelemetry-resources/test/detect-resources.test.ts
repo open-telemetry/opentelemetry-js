@@ -15,6 +15,7 @@
  */
 
 import * as nock from 'nock';
+import { URL } from 'url';
 import { Resource } from '../src';
 import { detectResources, AwsEc2Detector } from '../src';
 import {
