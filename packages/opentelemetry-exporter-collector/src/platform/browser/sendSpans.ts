@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporter } from '../../CollectorExporter';
-import { toCollectorResource, toCollectorSpan } from '../../transform';
+import {
+  toCollectorExportTraceServiceRequest,
+  toCollectorResource,
+  toCollectorSpan,
+} from '../../transform';
 import * as collectorTypes from '../../types';
-import { VERSION } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
@@ -50,35 +52,19 @@ export function onShutdown(collectorExporter: CollectorExporter) {
 export function sendSpans(
   spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   collectorExporter: CollectorExporter
 ) {
-  const resource = toCollectorResource(
-    spans.length > 0 ? spans[0].resource : Resource.empty()
+  const spansToBeSent: collectorTypes.opentelemetryProto.trace.v1.Span[] = spans.map(
+    span => toCollectorSpan(span)
   );
-  const spansToBeSent: collectorTypes.Span[] = spans.map(span =>
-    toCollectorSpan(span)
-  );
+  const resource: Resource | undefined =
+    spans.length > 0 ? spans[0].resource : Resource.empty();
 
-  const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
-    node: {
-      identifier: {
-        hostName: collectorExporter.hostName || window.location.host,
-        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
-      },
-      libraryInfo: {
-        language: collectorTypes.LibraryInfoLanguage.WEB_JS,
-        coreLibraryVersion: core.VERSION,
-        exporterVersion: VERSION,
-      },
-      serviceInfo: {
-        name: collectorExporter.serviceName,
-      },
-      attributes: collectorExporter.attributes,
-    },
-    resource,
-    spans: spansToBeSent,
-  };
+  const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
+    spansToBeSent,
+    toCollectorResource(resource)
+  );
 
   const body = JSON.stringify(exportTraceServiceRequest);
 
@@ -112,7 +98,7 @@ export function sendSpans(
 function sendSpansWithBeacon(
   body: string,
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   logger: Logger,
   collectorUrl: string
 ) {
@@ -121,7 +107,7 @@ function sendSpansWithBeacon(
     onSuccess();
   } else {
     logger.error('sendBeacon - cannot send', body);
-    onError();
+    onError({});
   }
 }
 
@@ -135,15 +121,16 @@ function sendSpansWithBeacon(
  * @param collectorUrl
  */
 function sendSpansWithXhr(
-  body: string,
+  body: any,
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   logger: Logger,
   collectorUrl: string
 ) {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', collectorUrl);
   xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
+  // xhr.setRequestHeader('Content-Length', String(body.length));
   xhr.send(body);
 
   xhr.onreadystatechange = () => {
@@ -153,7 +140,10 @@ function sendSpansWithXhr(
         onSuccess();
       } else {
         logger.error('xhr error', xhr.status, body);
-        onError(xhr.status);
+        onError({
+          code: xhr.status,
+          message: xhr.responseText,
+        });
       }
     }
   };

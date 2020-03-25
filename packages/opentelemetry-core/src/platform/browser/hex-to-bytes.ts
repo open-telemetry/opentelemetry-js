@@ -1,5 +1,5 @@
 /*!
- * Copyright 2020, OpenTelemetry Authors
+ * Copyright 2019, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,5 +14,17 @@
  * limitations under the License.
  */
 
-export * from './opentelemetry';
-export * from './types';
+/**
+ * converts id string into Uint8Array
+ * @param hexStr - id of span
+ */
+export function hexToBytes(hexStr: string): any {
+  const hexStrLen = hexStr.length;
+  const arr = [];
+  for (let i = 0; i < hexStrLen; i += 2) {
+    const hexPair = hexStr.substring(i, i + 2);
+    const hexVal = parseInt(hexPair, 16);
+    arr.push(hexVal);
+  }
+  return new Uint8Array(arr);
+}

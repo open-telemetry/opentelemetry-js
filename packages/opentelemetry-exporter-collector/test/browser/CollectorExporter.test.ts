@@ -25,9 +25,9 @@ import {
 import * as collectorTypes from '../../src/types';
 
 import {
+  ensureBrowserSpanIsCorrect,
   ensureExportTraceServiceRequestIsSet,
-  ensureResourceIsCorrect,
-  ensureSpanIsCorrect,
+  ensureWebResourceIsCorrect,
   mockedReadableSpan,
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
@@ -74,18 +74,19 @@ describe('CollectorExporter - web', () => {
           const body = args[1];
           const json = JSON.parse(
             body
-          ) as collectorTypes.ExportTraceServiceRequest;
-          const span1 = json.spans && json.spans[0];
+          ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          const span1 =
+            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
-            ensureSpanIsCorrect(span1);
+            ensureBrowserSpanIsCorrect(span1);
           }
 
-          const resource = json.resource;
+          const resource = json.resourceSpans[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           if (resource) {
-            ensureResourceIsCorrect(resource);
+            ensureWebResourceIsCorrect(resource);
           }
 
           assert.strictEqual(url, 'http://foo.bar.com');
@@ -93,7 +94,7 @@ describe('CollectorExporter - web', () => {
 
           assert.strictEqual(spyOpen.callCount, 0);
 
-          ensureExportTraceServiceRequestIsSet(json, 10);
+          ensureExportTraceServiceRequestIsSet(json);
 
           done();
         });
@@ -156,23 +157,24 @@ describe('CollectorExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as collectorTypes.ExportTraceServiceRequest;
-          const span1 = json.spans && json.spans[0];
+          ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+          const span1 =
+            json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
-            ensureSpanIsCorrect(span1);
+            ensureBrowserSpanIsCorrect(span1);
           }
 
-          const resource = json.resource;
+          const resource = json.resourceSpans[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           if (resource) {
-            ensureResourceIsCorrect(resource);
+            ensureWebResourceIsCorrect(resource);
           }
 
           assert.strictEqual(spyBeacon.callCount, 0);
 
-          ensureExportTraceServiceRequestIsSet(json, 10);
+          ensureExportTraceServiceRequestIsSet(json);
 
           done();
         });

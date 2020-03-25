@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,59 +46,36 @@ describe('transform', () => {
       const attributes: Attributes = {
         foo: 'bar',
       };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
-        attributeMap: {
-          foo: {
-            stringValue: {
-              truncatedByteCount: 0,
-              value: 'bar',
-            },
-          },
-        },
-        droppedAttributesCount: 0,
-      });
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        { key: 'foo', type: 0, stringValue: 'bar' },
+      ]);
     });
 
     it('should convert attribute integer', () => {
       const attributes: Attributes = {
         foo: 13,
       };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
-        attributeMap: {
-          foo: {
-            doubleValue: 13,
-          },
-        },
-        droppedAttributesCount: 0,
-      });
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        { key: 'foo', type: 2, doubleValue: 13 },
+      ]);
     });
 
     it('should convert attribute boolean', () => {
       const attributes: Attributes = {
         foo: true,
       };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
-        attributeMap: {
-          foo: {
-            boolValue: true,
-          },
-        },
-        droppedAttributesCount: 0,
-      });
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        { key: 'foo', type: 3, boolValue: true },
+      ]);
     });
 
     it('should convert attribute double', () => {
       const attributes: Attributes = {
         foo: 1.34,
       };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), {
-        attributeMap: {
-          foo: {
-            doubleValue: 1.34,
-          },
-        },
-        droppedAttributesCount: 0,
-      });
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        { key: 'foo', type: 2, doubleValue: 1.34 },
+      ]);
     });
   });
 
@@ -112,36 +89,20 @@ describe('transform', () => {
           attributes: { c: 'd' },
         },
       ];
-      assert.deepStrictEqual(transform.toCollectorEvents(events), {
-        timeEvent: [
-          {
-            time: '1970-01-01T00:02:03.000000123Z',
-            annotation: {
-              description: { value: 'foo', truncatedByteCount: 0 },
-              attributes: {
-                droppedAttributesCount: 0,
-                attributeMap: {
-                  a: { stringValue: { value: 'b', truncatedByteCount: 0 } },
-                },
-              },
-            },
-          },
-          {
-            time: '1970-01-01T00:05:21.000000321Z',
-            annotation: {
-              description: { value: 'foo2', truncatedByteCount: 0 },
-              attributes: {
-                droppedAttributesCount: 0,
-                attributeMap: {
-                  c: { stringValue: { value: 'd', truncatedByteCount: 0 } },
-                },
-              },
-            },
-          },
-        ],
-        droppedAnnotationsCount: 0,
-        droppedMessageEventsCount: 0,
-      });
+      assert.deepStrictEqual(transform.toCollectorEvents(events), [
+        {
+          timeUnixNano: 123000000123,
+          name: 'foo',
+          attributes: [{ key: 'a', type: 0, stringValue: 'b' }],
+          droppedAttributesCount: 0,
+        },
+        {
+          timeUnixNano: 321000000321,
+          name: 'foo2',
+          attributes: [{ key: 'c', type: 0, stringValue: 'd' }],
+          droppedAttributesCount: 0,
+        },
+      ]);
     });
   });
 
@@ -161,11 +122,20 @@ describe('transform', () => {
         })
       );
       assert.deepStrictEqual(resource, {
-        labels: {
-          service: 'ui',
-          version: '1',
-          success: 'true',
-        },
+        attributes: [
+          {
+            key: 'service',
+            type: 0,
+            stringValue: 'ui',
+          },
+          {
+            key: 'version',
+            type: 2,
+            doubleValue: 1,
+          },
+          { key: 'success', type: 3, boolValue: true },
+        ],
+        droppedAttributesCount: 0,
       });
     });
   });

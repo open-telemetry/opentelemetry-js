@@ -18,14 +18,16 @@ import * as protoLoader from '@grpc/proto-loader';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as grpc from 'grpc';
+import * as path from 'path';
 
 import { CollectorExporter } from '../../CollectorExporter';
+import * as collectorTypes from '../../types';
 import {
-  toCollectorProtoExportTraceServiceRequest,
-  toCollectorProtoResource,
-  toCollectorProtoSpan,
-} from './transform';
-import { CollectorData, GRPCQueueItem, opentelemetry } from './grpc/types';
+  toCollectorExportTraceServiceRequest,
+  toCollectorResource,
+  toCollectorSpan,
+} from '../../transform';
+import { CollectorData, GRPCQueueItem } from './types';
 
 const traceServiceClients: WeakMap<
   CollectorExporter,
@@ -46,7 +48,7 @@ export function onInit(collectorExporter: CollectorExporter) {
 
   const traceServiceProtoPath =
     'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-  const includeDirs = [__dirname + '/grpc/protos'];
+  const includeDirs = [path.resolve(__dirname, 'protos')];
 
   protoLoader
     .load(traceServiceProtoPath, {
@@ -108,7 +110,7 @@ export function onShutdown(collectorExporter: CollectorExporter) {
 export function sendSpans(
   spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   collectorExporter: CollectorExporter
 ) {
   const exporter = traceServiceClients.get(collectorExporter);
@@ -116,22 +118,28 @@ export function sendSpans(
     return;
   }
   if (exporter.traceServiceClient) {
-    const spansToBeSent: opentelemetry.proto.trace.v1.Span[] = spans.map(span =>
-      toCollectorProtoSpan(span)
+    const spansToBeSent: collectorTypes.opentelemetryProto.trace.v1.Span[] = spans.map(
+      span => toCollectorSpan(span)
     );
     const resource: Resource | undefined =
-      spans.length > 0 ? spans[0].resource : undefined;
+      spans.length > 0 ? spans[0].resource : Resource.empty();
 
-    const exportTraceServiceRequest = toCollectorProtoExportTraceServiceRequest(
+    const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
       spansToBeSent,
-      toCollectorProtoResource(resource)
+      toCollectorResource(resource)
     );
 
     exporter.traceServiceClient.export(
       exportTraceServiceRequest,
-      (err: opentelemetry.proto.collector.trace.v1.ExportTraceServiceError) => {
+      (
+        err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+      ) => {
         if (err) {
-          onError(err.code);
+          onError({
+            code: err.code,
+            message: err.message,
+            stack: err.stack,
+          });
         } else {
           onSuccess();
         }

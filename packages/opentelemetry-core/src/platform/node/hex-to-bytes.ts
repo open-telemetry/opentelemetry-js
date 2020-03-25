@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-export * from './id';
-export * from './performance';
-export * from './timer-util';
-export * from './hex-to-base64';
-export * from './hex-to-bytes';
+/**
+ * converts id string into bytes
+ * @param hexStr - id of span
+ */
+export function hexToBytes(hexStr: string): Uint8Array {
+  const hexStrLen = hexStr.length;
+  let hexAsciiCharsStr = '';
+  for (let i = 0; i < hexStrLen; i += 2) {
+    const hexPair = hexStr.substring(i, i + 2);
+    const hexVal = parseInt(hexPair, 16);
+    hexAsciiCharsStr += String.fromCharCode(hexVal);
+  }
+
+  return Buffer.from(hexAsciiCharsStr, 'ascii');
+}

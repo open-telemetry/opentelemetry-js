@@ -25,27 +25,26 @@ import {
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorExporter } from '../../src/CollectorExporter';
-import { opentelemetry } from '../../src/platform/node/grpc/types';
+import * as collectorTypes from '../../src/types';
 
 import {
-  ensureProtoResourceIsCorrect,
-  ensureProtoSpanIsCorrect,
+  ensureResourceIsCorrect,
+  ensureExportedSpanIsCorrect,
   mockedReadableSpan,
 } from '../helper';
 
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-const includeDirs = [
-  path.resolve(__dirname, '../../src/platform/node/grpc/protos'),
-];
-
+const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 // const address = '127.0.0.1:55679';
 const address = '127.0.0.1:1501';
 
 describe('CollectorExporter - node', () => {
   let collectorExporter: CollectorExporter;
   let server: grpc.Server;
-  let exportedData: opentelemetry.proto.trace.v1.ResourceSpans | undefined;
+  let exportedData:
+    | collectorTypes.opentelemetryProto.trace.v1.ResourceSpans
+    | undefined;
 
   before(done => {
     server = new grpc.Server();
@@ -67,7 +66,7 @@ describe('CollectorExporter - node', () => {
             .service,
           {
             Export: (data: {
-              request: opentelemetry.proto.collector.trace.v1.ExportTraceServiceRequest;
+              request: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
             }) => {
               try {
                 exportedData = data.request.resourceSpans[0];
@@ -121,11 +120,11 @@ describe('CollectorExporter - node', () => {
         if (exportedData) {
           spans = exportedData.instrumentationLibrarySpans[0].spans;
           resource = exportedData.resource;
-          ensureProtoSpanIsCorrect(spans[0]);
+          ensureExportedSpanIsCorrect(spans[0]);
 
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
           if (resource) {
-            ensureProtoResourceIsCorrect(resource);
+            ensureResourceIsCorrect(resource);
           }
         }
         done();

@@ -1,5 +1,5 @@
 receivers:
-  opencensus:
+  opentelemetry:
     endpoint: 0.0.0.0:55678
 
 exporters:
@@ -13,6 +13,6 @@ processors:
 service:
   pipelines:
     traces:
-      receivers: [opencensus]
+      receivers: [opentelemetry]
       exporters: [zipkin]
       processors: [batch, queued_retry]
