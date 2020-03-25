@@ -22,22 +22,22 @@ import { Resource, Labels } from '../../../Resource';
  */
 export class EnvDetector {
   // Type, label keys, and label values should not exceed 256 characters.
-  private static readonly MAX_LENGTH = 255;
+  private static readonly _MAX_LENGTH = 255;
 
   // OTEL_RESOURCE_LABELS is a comma-separated list of labels.
-  private static readonly COMMA_SEPARATOR = ',';
+  private static readonly _COMMA_SEPARATOR = ',';
 
   // OTEL_RESOURCE_LABELS contains key value pair separated by '='.
-  private static readonly LABEL_KEY_VALUE_SPLITTER = '=';
+  private static readonly _LABEL_KEY_VALUE_SPLITTER = '=';
 
-  private static readonly ERROR_MESSAGE_INVALID_CHARS =
+  private static readonly _ERROR_MESSAGE_INVALID_CHARS =
     'should be a ASCII string with a length greater than 0 and not exceed ' +
-    EnvDetector.MAX_LENGTH +
+    EnvDetector._MAX_LENGTH +
     ' characters.';
 
-  private static readonly ERROR_MESSAGE_INVALID_VALUE =
+  private static readonly _ERROR_MESSAGE_INVALID_VALUE =
     'should be a ASCII string with a length not exceed ' +
-    EnvDetector.MAX_LENGTH +
+    EnvDetector._MAX_LENGTH +
     ' characters.';
 
   /**
@@ -75,12 +75,12 @@ export class EnvDetector {
 
     const labels: Labels = {};
     const rawLabels: string[] = rawEnvLabels.split(
-      EnvDetector.COMMA_SEPARATOR,
+      EnvDetector._COMMA_SEPARATOR,
       -1
     );
     for (const rawLabel of rawLabels) {
       const keyValuePair: string[] = rawLabel.split(
-        EnvDetector.LABEL_KEY_VALUE_SPLITTER,
+        EnvDetector._LABEL_KEY_VALUE_SPLITTER,
         -1
       );
       if (keyValuePair.length !== 2) {
@@ -94,11 +94,13 @@ export class EnvDetector {
         .split('^"|"$')
         .join('');
       if (!EnvDetector._isValidAndNotEmpty(key)) {
-        throw new Error(`Label key ${EnvDetector.ERROR_MESSAGE_INVALID_CHARS}`);
+        throw new Error(
+          `Label key ${EnvDetector._ERROR_MESSAGE_INVALID_CHARS}`
+        );
       }
       if (!EnvDetector._isValid(value)) {
         throw new Error(
-          `Label value ${EnvDetector.ERROR_MESSAGE_INVALID_VALUE}`
+          `Label value ${EnvDetector._ERROR_MESSAGE_INVALID_VALUE}`
         );
       }
       labels[key] = value;
@@ -108,14 +110,14 @@ export class EnvDetector {
 
   /**
    * Determines whether the given String is a valid printable ASCII string with
-   * a length not exceed MAX_LENGTH characters.
+   * a length not exceed _MAX_LENGTH characters.
    *
    * @param str The String to be validated.
    * @returns Whether the String is valid.
    */
   private static _isValid(name: string): boolean {
     return (
-      name.length <= EnvDetector.MAX_LENGTH &&
+      name.length <= EnvDetector._MAX_LENGTH &&
       EnvDetector._isPrintableString(name)
     );
   }
@@ -132,7 +134,7 @@ export class EnvDetector {
 
   /**
    * Determines whether the given String is a valid printable ASCII string with
-   * a length greater than 0 and not exceed MAX_LENGTH characters.
+   * a length greater than 0 and not exceed _MAX_LENGTH characters.
    *
    * @param str The String to be validated.
    * @returns Whether the String is valid and not empty.
