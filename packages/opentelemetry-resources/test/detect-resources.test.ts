@@ -50,7 +50,7 @@ const mockedAwsResponse = {
   region: 'my-region',
 };
 
-describe('detectResource', async () => {
+describe('detectResources', async () => {
   before(() => {
     nock.disableNetConnect();
     process.env.OTEL_RESOURCE_LABELS =

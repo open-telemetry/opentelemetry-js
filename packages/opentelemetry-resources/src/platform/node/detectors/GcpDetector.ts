@@ -30,13 +30,8 @@ import {
  * the instance. Returns an empty Resource if detection fails.
  */
 export class GcpDetector {
-  /** Determine if the GCP metadata server is currently available. */
-  static async isRunningOnComputeEngine(): Promise<Boolean> {
-    return gcpMetadata.isAvailable();
-  }
   static async detect(): Promise<Resource> {
-    const isRunning = await GcpDetector.isRunningOnComputeEngine();
-    if (!isRunning) return Resource.empty();
+    if (!(await gcpMetadata.isAvailable())) return Resource.empty();
 
     const [projectId, instanceId, zoneId, clusterName] = await Promise.all([
       GcpDetector.getProjectId(),
@@ -57,6 +52,7 @@ export class GcpDetector {
     return new Resource(labels);
   }
 
+  /** Add resource labels for K8s */
   private static addK8sLabels(labels: Labels, clusterName: string): void {
     labels[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
     labels[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';

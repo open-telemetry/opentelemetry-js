@@ -33,7 +33,6 @@ import {
   assertEmptyResource,
 } from '../util/resource-assertions';
 
-// NOTE: nodejs switches all incoming header names to lower case.
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
 };
@@ -54,8 +53,6 @@ describe('GcpDetector', () => {
       delete process.env.KUBERNETES_SERVICE_HOST;
       delete process.env.NAMESPACE;
       delete process.env.CONTAINER_NAME;
-      delete process.env.OC_RESOURCE_TYPE;
-      delete process.env.OC_RESOURCE_LABELS;
       delete process.env.HOSTNAME;
     });
 
@@ -65,132 +62,128 @@ describe('GcpDetector', () => {
       delete process.env.KUBERNETES_SERVICE_HOST;
       delete process.env.NAMESPACE;
       delete process.env.CONTAINER_NAME;
-      delete process.env.OC_RESOURCE_TYPE;
-      delete process.env.OC_RESOURCE_LABELS;
       delete process.env.HOSTNAME;
     });
 
-    describe('when running in GCP', () => {
-      it('should return resource with GCP metadata', async () => {
-        const scope = nock(HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS)
-          .get(INSTANCE_ID_PATH)
-          .reply(200, () => 4520031799277581759, HEADERS)
-          .get(PROJECT_ID_PATH)
-          .reply(200, () => 'my-project-id', HEADERS)
-          .get(ZONE_PATH)
-          .reply(200, () => 'project/zone/my-zone', HEADERS)
-          .get(CLUSTER_NAME_PATH)
-          .reply(404);
-        const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS);
-        const resource: Resource = await GcpDetector.detect();
-        secondaryScope.done();
-        scope.done();
+    it('should return resource with GCP metadata', async () => {
+      const scope = nock(HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS)
+        .get(INSTANCE_ID_PATH)
+        .reply(200, () => 4520031799277581759, HEADERS)
+        .get(PROJECT_ID_PATH)
+        .reply(200, () => 'my-project-id', HEADERS)
+        .get(ZONE_PATH)
+        .reply(200, () => 'project/zone/my-zone', HEADERS)
+        .get(CLUSTER_NAME_PATH)
+        .reply(404);
+      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS);
+      const resource: Resource = await GcpDetector.detect();
+      secondaryScope.done();
+      scope.done();
 
-        assertCloudResource(resource, {
-          provider: 'gcp',
-          accountId: 'my-project-id',
-          zone: 'my-zone',
-        });
-        assertHostResource(resource, { id: '4520031799277582000' });
+      assertCloudResource(resource, {
+        provider: 'gcp',
+        accountId: 'my-project-id',
+        zone: 'my-zone',
+      });
+      assertHostResource(resource, { id: '4520031799277582000' });
+    });
+
+    it('should populate K8s labels resource when KUBERNETES_SERVICE_HOST is set', async () => {
+      process.env.KUBERNETES_SERVICE_HOST = 'my-host';
+      process.env.NAMESPACE = 'my-namespace';
+      process.env.HOSTNAME = 'my-hostname';
+      process.env.CONTAINER_NAME = 'my-container-name';
+      const scope = nock(HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS)
+        .get(INSTANCE_ID_PATH)
+        .reply(200, () => 4520031799277581759, HEADERS)
+        .get(CLUSTER_NAME_PATH)
+        .reply(200, () => 'my-cluster', HEADERS)
+        .get(PROJECT_ID_PATH)
+        .reply(200, () => 'my-project-id', HEADERS)
+        .get(ZONE_PATH)
+        .reply(200, () => 'project/zone/my-zone', HEADERS);
+      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS);
+      const resource = await GcpDetector.detect();
+      secondaryScope.done();
+      scope.done();
+
+      assertCloudResource(resource, {
+        provider: 'gcp',
+        accountId: 'my-project-id',
+        zone: 'my-zone',
+      });
+      assertK8sResource(resource, {
+        clusterName: 'my-cluster',
+        podName: 'my-hostname',
+        namespaceName: 'my-namespace',
+      });
+      assertContainerResource(resource, { name: 'my-container-name' });
+    });
+
+    it('should return resource and empty data for non-available metadata attributes', async () => {
+      const scope = nock(HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS)
+        .get(PROJECT_ID_PATH)
+        .reply(200, () => 'my-project-id', HEADERS)
+        .get(ZONE_PATH)
+        .reply(413)
+        .get(INSTANCE_ID_PATH)
+        .reply(400, undefined, HEADERS)
+        .get(CLUSTER_NAME_PATH)
+        .reply(413);
+      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS);
+      const resource = await GcpDetector.detect();
+      secondaryScope.done();
+      scope.done();
+
+      assertCloudResource(resource, {
+        provider: 'gcp',
+        accountId: 'my-project-id',
+        zone: '',
+      });
+    });
+
+    it('should retry if the initial request fails', async () => {
+      const scope = nock(HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(500)
+        .get(PROJECT_ID_PATH)
+        .reply(200, () => 'my-project-id', HEADERS)
+        .get(ZONE_PATH)
+        .reply(200, () => 'project/zone/my-zone', HEADERS)
+        .get(INSTANCE_ID_PATH)
+        .reply(200, () => 4520031799277581759, HEADERS)
+        .get(CLUSTER_NAME_PATH)
+        .reply(413);
+      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
+        .get(INSTANCE_PATH)
+        .reply(200, {}, HEADERS);
+      const resource = await GcpDetector.detect();
+      secondaryScope.done();
+      scope.done();
+
+      assertCloudResource(resource, {
+        accountId: 'my-project-id',
+        zone: 'my-zone',
       });
 
-      it('should populate K8s labels resource when KUBERNETES_SERVICE_HOST is set', async () => {
-        process.env.KUBERNETES_SERVICE_HOST = 'my-host';
-        process.env.NAMESPACE = 'my-namespace';
-        process.env.HOSTNAME = 'my-hostname';
-        process.env.CONTAINER_NAME = 'my-container-name';
-        const scope = nock(HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS)
-          .get(INSTANCE_ID_PATH)
-          .reply(200, () => 4520031799277581759, HEADERS)
-          .get(CLUSTER_NAME_PATH)
-          .reply(200, () => 'my-cluster', HEADERS)
-          .get(PROJECT_ID_PATH)
-          .reply(200, () => 'my-project-id', HEADERS)
-          .get(ZONE_PATH)
-          .reply(200, () => 'project/zone/my-zone', HEADERS);
-        const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS);
-        const resource = await GcpDetector.detect();
-        secondaryScope.done();
-        scope.done();
+      assertHostResource(resource, { id: '4520031799277582000' });
+    });
 
-        assertCloudResource(resource, {
-          provider: 'gcp',
-          accountId: 'my-project-id',
-          zone: 'my-zone',
-        });
-        assertK8sResource(resource, {
-          clusterName: 'my-cluster',
-          podName: 'my-hostname',
-          namespaceName: 'my-namespace',
-        });
-        assertContainerResource(resource, { name: 'my-container-name' });
-      });
-
-      it('should return resource and empty data for non-available metadata attributes', async () => {
-        const scope = nock(HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS)
-          .get(PROJECT_ID_PATH)
-          .reply(200, () => 'my-project-id', HEADERS)
-          .get(ZONE_PATH)
-          .reply(413)
-          .get(INSTANCE_ID_PATH)
-          .reply(400, undefined, HEADERS)
-          .get(CLUSTER_NAME_PATH)
-          .reply(413);
-        const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS);
-        const resource = await GcpDetector.detect();
-        secondaryScope.done();
-        scope.done();
-
-        assertCloudResource(resource, {
-          provider: 'gcp',
-          accountId: 'my-project-id',
-          zone: '',
-        });
-      });
-
-      it('should retry if the initial request fails', async () => {
-        const scope = nock(HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(500)
-          .get(PROJECT_ID_PATH)
-          .reply(200, () => 'my-project-id', HEADERS)
-          .get(ZONE_PATH)
-          .reply(200, () => 'project/zone/my-zone', HEADERS)
-          .get(INSTANCE_ID_PATH)
-          .reply(200, () => 4520031799277581759, HEADERS)
-          .get(CLUSTER_NAME_PATH)
-          .reply(413);
-        const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS);
-        const resource = await GcpDetector.detect();
-        secondaryScope.done();
-        scope.done();
-
-        assertCloudResource(resource, {
-          accountId: 'my-project-id',
-          zone: 'my-zone',
-        });
-
-        assertHostResource(resource, { id: '4520031799277582000' });
-      });
-
-      it('returns empty resource if not detected', async () => {
-        const resource = await GcpDetector.detect();
-        assertEmptyResource(resource);
-      });
+    it('returns empty resource if not detected', async () => {
+      const resource = await GcpDetector.detect();
+      assertEmptyResource(resource);
     });
   });
 });
