@@ -15,8 +15,8 @@
  */
 
 import * as http from 'http';
-import { Resource } from '../Resource';
-import { CLOUD_RESOURCE, HOST_RESOURCE } from '../constants';
+import { Resource } from '../../../Resource';
+import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2

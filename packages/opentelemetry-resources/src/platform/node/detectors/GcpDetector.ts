@@ -16,13 +16,13 @@
 
 import * as os from 'os';
 import * as gcpMetadata from 'gcp-metadata';
-import { Resource, Labels } from '../Resource';
+import { Resource, Labels } from '../../../Resource';
 import {
   CLOUD_RESOURCE,
   HOST_RESOURCE,
   K8S_RESOURCE,
   CONTAINER_RESOURCE,
-} from '../constants';
+} from '../../../constants';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google

@@ -14,6 +14,21 @@
  * limitations under the License.
  */
 
-export { Resource, Labels } from './Resource';
-export * from './platform';
-export * from './constants';
+import { Resource } from '../../Resource';
+import { EnvDetector, AwsEc2Detector, GcpDetector } from './detectors';
+
+const DETECTORS = [EnvDetector, AwsEc2Detector, GcpDetector];
+
+/**
+ * Runs all resource detectors and returns the results merged into a single
+ * Resource.
+ */
+export const detectResources = async (): Promise<Resource> => {
+  const resources: Array<Resource> = await Promise.all(
+    DETECTORS.map(d => d.detect())
+  );
+  return resources.reduce(
+    (acc, resource) => acc.merge(resource),
+    Resource.createTelemetrySDKResource()
+  );
+};

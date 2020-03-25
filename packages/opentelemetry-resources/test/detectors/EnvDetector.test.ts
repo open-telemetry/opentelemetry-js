@@ -15,7 +15,7 @@
  */
 
 import { Resource } from '../../src/Resource';
-import { EnvDetector } from '../../src/detectors/EnvDetector';
+import { EnvDetector } from '../../src/platform/node/detectors/EnvDetector';
 import {
   assertK8sResource,
   assertEmptyResource,

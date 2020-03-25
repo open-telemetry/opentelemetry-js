@@ -18,7 +18,7 @@ import * as nock from 'nock';
 import * as assert from 'assert';
 import { URL } from 'url';
 import { Resource } from '../../src';
-import { AwsEc2Detector } from '../../src';
+import { AwsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
 import {
   assertCloudResource,
   assertHostResource,

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Resource, Labels } from '../Resource';
+import { Resource, Labels } from '../../../Resource';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
