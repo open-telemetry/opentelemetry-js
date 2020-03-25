@@ -34,10 +34,10 @@ export class GcpDetector {
     if (!(await gcpMetadata.isAvailable())) return Resource.empty();
 
     const [projectId, instanceId, zoneId, clusterName] = await Promise.all([
-      GcpDetector.getProjectId(),
-      GcpDetector.getInstanceId(),
-      GcpDetector.getZone(),
-      GcpDetector.getClusterName(),
+      GcpDetector._getProjectId(),
+      GcpDetector._getInstanceId(),
+      GcpDetector._getZone(),
+      GcpDetector._getClusterName(),
     ]);
 
     const labels: Labels = {};
@@ -47,13 +47,13 @@ export class GcpDetector {
     labels[CLOUD_RESOURCE.PROVIDER] = 'gcp';
 
     if (process.env.KUBERNETES_SERVICE_HOST)
-      GcpDetector.addK8sLabels(labels, clusterName);
+      GcpDetector._addK8sLabels(labels, clusterName);
 
     return new Resource(labels);
   }
 
   /** Add resource labels for K8s */
-  private static addK8sLabels(labels: Labels, clusterName: string): void {
+  private static _addK8sLabels(labels: Labels, clusterName: string): void {
     labels[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
     labels[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';
     labels[K8S_RESOURCE.POD_NAME] = process.env.HOSTNAME || os.hostname();
@@ -61,7 +61,7 @@ export class GcpDetector {
   }
 
   /** Gets project id from GCP project metadata. */
-  private static async getProjectId(): Promise<string> {
+  private static async _getProjectId(): Promise<string> {
     try {
       return await gcpMetadata.project('project-id');
     } catch {
@@ -70,7 +70,7 @@ export class GcpDetector {
   }
 
   /** Gets instance id from GCP instance metadata. */
-  private static async getInstanceId(): Promise<string> {
+  private static async _getInstanceId(): Promise<string> {
     try {
       const id = await gcpMetadata.instance('id');
       return id.toString();
@@ -80,7 +80,7 @@ export class GcpDetector {
   }
 
   /** Gets zone from GCP instance metadata. */
-  private static async getZone(): Promise<string> {
+  private static async _getZone(): Promise<string> {
     try {
       const zoneId = await gcpMetadata.instance('zone');
       if (zoneId) {
@@ -93,7 +93,7 @@ export class GcpDetector {
   }
 
   /** Gets cluster name from GCP instance metadata. */
-  private static async getClusterName(): Promise<string> {
+  private static async _getClusterName(): Promise<string> {
     try {
       return await gcpMetadata.instance('attributes/cluster-name');
     } catch {

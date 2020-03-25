@@ -49,7 +49,7 @@ export class EnvDetector {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) return Resource.empty();
-      const labels = EnvDetector.parseResourceLabels(
+      const labels = EnvDetector._parseResourceLabels(
         process.env.OTEL_RESOURCE_LABELS
       );
       return new Resource(labels);
@@ -70,7 +70,7 @@ export class EnvDetector {
    * of key/value pairs.
    * @returns The sanitized resource labels.
    */
-  private static parseResourceLabels(rawEnvLabels?: string): Labels {
+  private static _parseResourceLabels(rawEnvLabels?: string): Labels {
     if (!rawEnvLabels) return {};
 
     const labels: Labels = {};
@@ -93,10 +93,10 @@ export class EnvDetector {
         .trim()
         .split('^"|"$')
         .join('');
-      if (!EnvDetector.isValidAndNotEmpty(key)) {
+      if (!EnvDetector._isValidAndNotEmpty(key)) {
         throw new Error(`Label key ${EnvDetector.ERROR_MESSAGE_INVALID_CHARS}`);
       }
-      if (!EnvDetector.isValid(value)) {
+      if (!EnvDetector._isValid(value)) {
         throw new Error(
           `Label value ${EnvDetector.ERROR_MESSAGE_INVALID_VALUE}`
         );
@@ -113,14 +113,14 @@ export class EnvDetector {
    * @param str The String to be validated.
    * @returns Whether the String is valid.
    */
-  private static isValid(name: string): boolean {
+  private static _isValid(name: string): boolean {
     return (
       name.length <= EnvDetector.MAX_LENGTH &&
-      EnvDetector.isPrintableString(name)
+      EnvDetector._isPrintableString(name)
     );
   }
 
-  private static isPrintableString(str: string): boolean {
+  private static _isPrintableString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
       const ch: string = str.charAt(i);
       if (ch <= ' ' || ch >= '~') {
@@ -137,7 +137,7 @@ export class EnvDetector {
    * @param str The String to be validated.
    * @returns Whether the String is valid and not empty.
    */
-  private static isValidAndNotEmpty(str: string): boolean {
-    return str.length > 0 && EnvDetector.isValid(str);
+  private static _isValidAndNotEmpty(str: string): boolean {
+    return str.length > 0 && EnvDetector._isValid(str);
   }
 }

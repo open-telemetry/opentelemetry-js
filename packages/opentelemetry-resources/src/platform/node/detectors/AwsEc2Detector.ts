@@ -40,7 +40,7 @@ export class AwsEc2Detector {
         accountId,
         instanceId,
         region,
-      } = await AwsEc2Detector.awsMetadataAccessor();
+      } = await AwsEc2Detector._awsMetadataAccessor();
       return new Resource({
         [CLOUD_RESOURCE.PROVIDER]: 'aws',
         [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
@@ -58,7 +58,7 @@ export class AwsEc2Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private static async awsMetadataAccessor<T>(): Promise<T> {
+  private static async _awsMetadataAccessor<T>(): Promise<T> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         reject(new Error('EC2 metadata api request timed out.'));
