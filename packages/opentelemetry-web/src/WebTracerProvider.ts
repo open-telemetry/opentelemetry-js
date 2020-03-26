@@ -49,6 +49,14 @@ export class WebTracerProvider extends BasicTracerProvider {
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger);
     }
+
+    if ((config as SDKRegistrationConfig).contextManager) {
+      throw 'contextManager should be defined in register method not in' +
+        ' constructor';
+    }
+    if ((config as SDKRegistrationConfig).propagator) {
+      throw 'propagator should be defined in register method not in constructor';
+    }
   }
 
   /**
@@ -61,6 +69,8 @@ export class WebTracerProvider extends BasicTracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
       config.contextManager = new StackContextManager();
+    }
+    if (config.contextManager) {
       config.contextManager.enable();
     }
 
