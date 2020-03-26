@@ -84,7 +84,7 @@ export class HttpTraceContext implements HttpTextPropagator {
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
       : traceParentHeader;
-    if (typeof traceParent !== "string") return context;
+    if (typeof traceParent !== 'string') return context;
     const spanContext = parseTraceParent(traceParent);
     if (!spanContext) return context;
 
@@ -97,7 +97,9 @@ export class HttpTraceContext implements HttpTextPropagator {
       const state = Array.isArray(traceStateHeader)
         ? traceStateHeader.join(',')
         : traceStateHeader;
-      spanContext.traceState = new TraceState(typeof state === 'string' ? state : undefined);
+      spanContext.traceState = new TraceState(
+        typeof state === 'string' ? state : undefined
+      );
     }
     return setExtractedSpanContext(context, spanContext);
   }

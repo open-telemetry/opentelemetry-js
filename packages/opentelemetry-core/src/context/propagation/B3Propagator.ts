@@ -74,7 +74,8 @@ export class B3Propagator implements HttpTextPropagator {
       ? sampledHeader[0]
       : sampledHeader;
 
-    if (typeof traceId !== 'string' || typeof spanId !== 'string') return context;
+    if (typeof traceId !== 'string' || typeof spanId !== 'string')
+      return context;
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
       return setExtractedSpanContext(context, {
