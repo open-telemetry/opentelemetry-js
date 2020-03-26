@@ -73,6 +73,7 @@ export class MeasureExactAggregator implements Aggregator {
     this._distribution.sum += value;
     this._distribution.min = Math.min(this._distribution.min, value);
     this._distribution.max = Math.max(this._distribution.max, value);
+    this._lastUpdateTime = hrTime();
   }
 
   toPoint(): Point {
