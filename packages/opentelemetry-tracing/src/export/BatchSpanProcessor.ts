@@ -66,7 +66,6 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return;
     }
-    this._clearTimer();
     this.forceFlush();
     this._isShutdown = true;
     this._exporter.shutdown();
