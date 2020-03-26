@@ -44,6 +44,9 @@ export interface SpanOptions {
    * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
    * span will be the child of. This overrides the parent span extracted from
    * the currently active context.
+   *
+   * A null value here should prevent the SDK from extracting a parent from
+   * the current context, forcing the new span to be a root span.
    */
   parent?: Span | SpanContext | null;
 
