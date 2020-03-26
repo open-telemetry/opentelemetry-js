@@ -239,6 +239,21 @@ describe('BasicTracerProvider', () => {
       childSpan.end();
     });
 
+    it('should create a root span when parent is null', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const overrideParent = tracer.startSpan('my-parent-override-span');
+      const rootSpan = tracer.startSpan(
+        'root-span',
+        { parent: null },
+        setActiveSpan(Context.ROOT_CONTEXT, span)
+      );
+      const context = rootSpan.context();
+      assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
+      span.end();
+      rootSpan.end();
+    });
+
     it('should start a span with name and with invalid parent span', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan(
