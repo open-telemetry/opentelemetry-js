@@ -29,7 +29,7 @@ import {
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   ObserverAggregator,
@@ -63,6 +63,8 @@ describe('Meter', () => {
   });
 
   describe('#counter', () => {
+    const performanceTimeOrigin = hrTime();
+
     it('should create a counter', () => {
       const counter = meter.createCounter('name');
       assert.ok(counter instanceof Metric);
@@ -85,8 +87,18 @@ describe('Meter', () => {
       const [record1] = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record1.aggregator.toPoint().value, 10);
+      const lastTimestamp = record1.aggregator.toPoint().timestamp;
+      assert.ok(
+        hrTimeToNanoseconds(lastTimestamp) >
+          hrTimeToNanoseconds(performanceTimeOrigin)
+      );
       counter.add(10, labelSet);
       assert.strictEqual(record1.aggregator.toPoint().value, 20);
+
+      assert.ok(
+        hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+          hrTimeToNanoseconds(lastTimestamp)
+      );
     });
 
     it('should return counter with resource', () => {
@@ -306,6 +318,8 @@ describe('Meter', () => {
     });
 
     describe('.bind()', () => {
+      const performanceTimeOrigin = hrTime();
+
       it('should create a measure instrument', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
         const boundMeasure = measure.bind(labelSet);
@@ -368,6 +382,10 @@ describe('Meter', () => {
             min: -10,
             sum: 40,
           }
+        );
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
         );
       });
 
