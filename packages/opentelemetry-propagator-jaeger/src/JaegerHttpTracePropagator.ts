@@ -71,10 +71,11 @@ export class JaegerHttpTracePropagator implements HttpTextPropagator {
 
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
     const uberTraceIdHeader = getter(carrier, this._jaegerTraceHeader);
-    if (!uberTraceIdHeader) return context;
     const uberTraceId = Array.isArray(uberTraceIdHeader)
       ? uberTraceIdHeader[0]
       : uberTraceIdHeader;
+
+    if (typeof uberTraceId !== 'string') return context;
 
     const spanContext = deserializeSpanContext(uberTraceId);
     if (!spanContext) return context;
