@@ -14,37 +14,50 @@
  * limitations under the License.
  */
 
-import { Aggregator, Distribution, LastValue, Sum } from './types';
+import { Aggregator, Distribution, Point } from './types';
+import { HrTime } from '@opentelemetry/api';
+import { hrTime } from '@opentelemetry/core';
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {
   private _current: number = 0;
+  private _lastUpdateTime: HrTime = [0, 0];
 
   update(value: number): void {
     this._current += value;
+    this._lastUpdateTime = hrTime();
   }
 
-  value(): Sum {
-    return this._current;
+  toPoint(): Point {
+    return {
+      value: this._current,
+      timestamp: this._lastUpdateTime,
+    };
   }
 }
 
 /** Basic aggregator for Observer which keeps the last recorded value. */
 export class ObserverAggregator implements Aggregator {
   private _current: number = 0;
+  private _lastUpdateTime: HrTime = [0, 0];
 
   update(value: number): void {
     this._current = value;
+    this._lastUpdateTime = hrTime();
   }
 
-  value(): LastValue {
-    return this._current;
+  toPoint(): Point {
+    return {
+      value: this._current,
+      timestamp: this._lastUpdateTime,
+    };
   }
 }
 
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
 export class MeasureExactAggregator implements Aggregator {
   private _distribution: Distribution;
+  private _lastUpdateTime: HrTime = [0, 0];
 
   constructor() {
     this._distribution = {
@@ -60,9 +73,13 @@ export class MeasureExactAggregator implements Aggregator {
     this._distribution.sum += value;
     this._distribution.min = Math.min(this._distribution.min, value);
     this._distribution.max = Math.max(this._distribution.max, value);
+    this._lastUpdateTime = hrTime();
   }
 
-  value(): Distribution {
-    return this._distribution;
+  toPoint(): Point {
+    return {
+      value: this._distribution,
+      timestamp: this._lastUpdateTime,
+    };
   }
 }
