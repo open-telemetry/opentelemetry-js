@@ -267,5 +267,27 @@ describe('B3Propagator', () => {
         assert.deepStrictEqual(extractedSpanContext, undefined, testCase);
       });
     });
+
+    it('should fail gracefully on bad responses from getter', () => {
+      const ctx1 = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        (c, k) => 1 // not a number
+      );
+      const ctx2 = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        (c, k) => [] // empty array
+      );
+      const ctx3 = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        (c, k) => undefined // missing value
+      );
+
+      assert.ok(ctx1 === Context.ROOT_CONTEXT);
+      assert.ok(ctx2 === Context.ROOT_CONTEXT);
+      assert.ok(ctx3 === Context.ROOT_CONTEXT);
+    });
   });
 });
