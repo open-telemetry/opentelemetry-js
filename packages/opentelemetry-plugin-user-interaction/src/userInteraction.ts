@@ -15,8 +15,13 @@
  */
 
 import * as shimmer from 'shimmer';
-import { BasePlugin, hrTime, isWrapped } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import {
+  ACTIVE_SPAN_KEY,
+  BasePlugin,
+  hrTime,
+  isWrapped,
+} from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
 import { getElementXPath } from '@opentelemetry/web';
 import {
   AsyncTask,
@@ -41,7 +46,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
   readonly component: string = 'user-interaction';
   readonly version = VERSION;
   moduleName = this.component;
-  private _spansData = new WeakMap<types.Span, SpanData>();
+  private _spansData = new WeakMap<api.Span, SpanData>();
   private _zonePatched = false;
 
   constructor() {
@@ -56,7 +61,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param task
    * @param span
    */
-  private _checkForTimeout(task: AsyncTask, span: types.Span) {
+  private _checkForTimeout(task: AsyncTask, span: api.Span) {
     const spanData = this._spansData.get(span);
     if (spanData) {
       if (task.source === 'setTimeout') {
@@ -78,7 +83,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
   private _createSpan(
     element: HTMLElement,
     eventName: string
-  ): types.Span | undefined {
+  ): api.Span | undefined {
     if (!element.getAttribute) {
       return undefined;
     }
@@ -114,7 +119,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * This is needed to be able to end span when no more tasks left
    * @param span
    */
-  private _decrementTask(span: types.Span) {
+  private _decrementTask(span: api.Span) {
     const spanData = this._spansData.get(span);
     if (spanData) {
       spanData.taskCount--;
@@ -122,6 +127,19 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         this._tryToEndSpan(span, spanData.hrTimeLastTimeout);
       }
     }
+  }
+
+  /**
+   * Return the current span
+   * @param zone
+   * @private
+   */
+  private _getCurrentSpan(zone: Zone): api.Span | undefined {
+    const context: api.Context | undefined = zone.get(ZONE_CONTEXT_KEY);
+    if (context) {
+      return context.getValue(ACTIVE_SPAN_KEY) as api.Span;
+    }
+    return context;
   }
 
   /**
@@ -140,7 +158,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    *     This is needed to be able to end span when no more tasks left
    * @param span
    */
-  private _incrementTask(span: types.Span) {
+  private _incrementTask(span: api.Span) {
     const spanData = this._spansData.get(span);
     if (spanData) {
       spanData.taskCount++;
@@ -228,7 +246,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param url
    */
   _updateInteractionName(url: string) {
-    const span: types.Span | undefined = this._tracer.getCurrentSpan();
+    const span: api.Span | undefined = this._tracer.getCurrentSpan();
     if (span && typeof span.updateName === 'function') {
       span.updateName(`${EVENT_NAVIGATION_NAME} ${url}`);
     }
@@ -246,7 +264,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         task: AsyncTask
       ) {
         const currentZone = Zone.current;
-        const currentSpan = currentZone.get(ZONE_CONTEXT_KEY);
+        const currentSpan = plugin._getCurrentSpan(currentZone);
         if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
           plugin._decrementTask(currentSpan);
         }
@@ -269,7 +287,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         task: AsyncTask
       ) {
         const currentZone = Zone.current;
-        const currentSpan: types.Span = currentZone.get(ZONE_CONTEXT_KEY);
+        const currentSpan = plugin._getCurrentSpan(currentZone);
         if (currentSpan && plugin._shouldCountTask(task, currentZone)) {
           plugin._incrementTask(currentSpan);
           plugin._checkForTimeout(task, currentSpan);
@@ -294,7 +312,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
         applyArgs?: any
       ): Zone {
         const target: HTMLElement | undefined = plugin._getClickedElement(task);
-        let span: types.Span | undefined;
+        let span: api.Span | undefined;
         if (target) {
           span = plugin._createSpan(target, 'click');
           if (span) {
@@ -310,7 +328,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
             }
           }
         } else {
-          span = this.get(ZONE_CONTEXT_KEY);
+          span = plugin._getCurrentSpan(this);
         }
 
         try {
@@ -337,7 +355,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
     if (!currentZone || !task.data || task.data.isPeriodic) {
       return false;
     }
-    const currentSpan = currentZone.get(ZONE_CONTEXT_KEY);
+    const currentSpan = this._getCurrentSpan(currentZone);
     if (!currentSpan) {
       return false;
     }
@@ -353,7 +371,7 @@ export class UserInteractionPlugin extends BasePlugin<unknown> {
    * @param endTime
    * @private
    */
-  private _tryToEndSpan(span: types.Span, endTime?: types.HrTime) {
+  private _tryToEndSpan(span: api.Span, endTime?: api.HrTime) {
     if (span) {
       const spanData = this._spansData.get(span);
       if (spanData) {
