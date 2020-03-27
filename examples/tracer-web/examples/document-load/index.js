@@ -10,19 +10,13 @@ const provider = new WebTracerProvider({
   ],
 });
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
-const providerWithZone = new WebTracerProvider({
+provider.register({
   contextManager: new ZoneContextManager(),
-  plugins: [
-    new DocumentLoad(),
-  ],
 });
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
 
-const tracerWithZone = providerWithZone.getTracer('example-tracer-web');
-let window;
-console.log('Current span is window', tracerWithZone.getCurrentSpan() === window);
+const tracer = provider.getTracer('example-tracer-web');
 
 const getData = (url) => new Promise((resolve, reject) => {
   // eslint-disable-next-line no-undef
@@ -45,37 +39,48 @@ const prepareClickEvent = () => {
   const url1 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
   const url2 = 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/packages/opentelemetry-web/package.json';
 
-  let document;
   const element = document.getElementById('button1');
-  const mainSpan = tracerWithZone.startSpan('main-span');
-  tracerWithZone.bind(element, mainSpan);
 
   const onClick = () => {
-    const span1 = tracerWithZone.startSpan('files-series-info-1', {
-      parent: tracerWithZone.getCurrentSpan(),
-    });
+    let count = 0;
 
-    const span2 = tracerWithZone.startSpan('files-series-info-2', {
-      parent: tracerWithZone.getCurrentSpan(),
-    });
+    function finish() {
+      count++;
+      if (count === 2) {
+        mainSpan.end();
+      }
+    }
 
-    tracerWithZone.withSpan(span1, () => {
-      getData(url1).then((data) => {
-        console.log('current span is span1', tracerWithZone.getCurrentSpan() === span1);
-        console.log('info from package.json', data.description, data.version);
-        tracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
-        span1.end();
+    const mainSpan = tracer.startSpan('click button');
+    tracer.withSpan(mainSpan, () => {
+      const span1 = tracer.startSpan('files-series-info-1', {
+        parent: tracer.getCurrentSpan(),
       });
-    });
 
-    tracerWithZone.withSpan(span2, () => {
-      getData(url2).then((data) => {
-        setTimeout(() => {
-          console.log('current span is span2', tracerWithZone.getCurrentSpan() === span2);
+      const span2 = tracer.startSpan('files-series-info-2', {
+        parent: tracer.getCurrentSpan(),
+      });
+
+      tracer.withSpan(span1, () => {
+        getData(url1).then((data) => {
+          console.log('current span is span1', tracer.getCurrentSpan() === span1);
           console.log('info from package.json', data.description, data.version);
-          tracerWithZone.getCurrentSpan().addEvent('fetching-span2-completed');
-          span2.end();
-        }, 100);
+          tracer.getCurrentSpan().addEvent('fetching-span1-completed');
+          span1.end();
+          finish();
+        });
+      });
+
+      tracer.withSpan(span2, () => {
+        getData(url2).then((data) => {
+          setTimeout(() => {
+            console.log('current span is span2', tracer.getCurrentSpan() === span2);
+            console.log('info from package.json', data.description, data.version);
+            tracer.getCurrentSpan().addEvent('fetching-span2-completed');
+            span2.end();
+            finish();
+          }, 100);
+        });
       });
     });
   };
