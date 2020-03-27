@@ -89,12 +89,12 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   private _maybeStartTimer() {
-    if (this._timer === undefined) {
-      this._timer = setTimeout(() => {
-        this._flush();
-      }, this._bufferTimeout);
-      unrefTimer(this._timer);
-    }
+    if (this._timer !== undefined) return;
+
+    this._timer = setTimeout(() => {
+      this._flush();
+    }, this._bufferTimeout);
+    unrefTimer(this._timer);
   }
 
   private _clearTimer() {
