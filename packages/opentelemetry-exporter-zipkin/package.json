@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-zipkin",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -55,10 +55,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.5.1",
-    "@opentelemetry/base": "^0.5.1",
-    "@opentelemetry/core": "^0.5.1",
-    "@opentelemetry/resources": "^0.5.1",
-    "@opentelemetry/tracing": "^0.5.1"
+    "@opentelemetry/api": "^0.5.2",
+    "@opentelemetry/base": "^0.5.2",
+    "@opentelemetry/core": "^0.5.2",
+    "@opentelemetry/resources": "^0.5.2",
+    "@opentelemetry/tracing": "^0.5.2"
   }
 }

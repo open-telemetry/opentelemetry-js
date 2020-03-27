@@ -4,6 +4,37 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.5.2
+
+Released 2020-03-27
+
+#### :rocket: (Enhancement)
+* `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
+  * [#893](https://github.com/open-telemetry/opentelemetry-js/pull/893) Metrics: Add lastUpdateTimestamp associated with point ([@mayurkale22](https://github.com/mayurkale22))
+* `opentelemetry-tracing`
+  * [#896](https://github.com/open-telemetry/opentelemetry-js/pull/896) Do not export empty span lists ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api`, `opentelemetry-tracing`
+  * [#889](https://github.com/open-telemetry/opentelemetry-js/pull/889) feat: start a root span with spanOptions.parent = null ([@dyladan](https://github.com/dyladan))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-core`, `opentelemetry-propagator-jaeger`
+  * [#904](https://github.com/open-telemetry/opentelemetry-js/pull/904) fix: add type checking in propagators ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-context-base`, `opentelemetry-core`, `opentelemetry-plugin-document-load`, `opentelemetry-plugin-user-interaction`, `opentelemetry-web`
+  * [#906](https://github.com/open-telemetry/opentelemetry-js/pull/906) chore: fixing documentation for web tracer provider, fixing examples … ([@obecny](https://github.com/obecny))
+* Other
+  * [#884](https://github.com/open-telemetry/opentelemetry-js/pull/884) chore: fixing main package.json version ([@obecny](https://github.com/obecny))
+
+#### :books: (Refine Doc)
+* `opentelemetry-context-base`, `opentelemetry-core`, `opentelemetry-plugin-document-load`, `opentelemetry-plugin-user-interaction`, `opentelemetry-web`
+  * [#906](https://github.com/open-telemetry/opentelemetry-js/pull/906) chore: fixing documentation for web tracer provider, fixing examples … ([@obecny](https://github.com/obecny))
+
+#### Committers: 4
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Mark Robert Henderson ([@aphelionz](https://github.com/aphelionz))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+
+
 ## 0.5.1 
 
 Released 2020-03-19
