@@ -42,7 +42,6 @@ const getData = (url) => new Promise((resolve, _reject) => {
 const prepareClickEvent = () => {
   const url1 = 'https://httpbin.org/get';
 
-  let document;
   const element = document.getElementById('button1');
 
   const onClick = () => {
@@ -61,5 +60,4 @@ const prepareClickEvent = () => {
   element.addEventListener('click', onClick);
 };
 
-let window;
 window.addEventListener('load', prepareClickEvent);

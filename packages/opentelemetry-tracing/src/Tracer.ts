@@ -66,9 +66,7 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    const parentContext = options.parent
-      ? getContext(options.parent)
-      : getParentSpanContext(context);
+    const parentContext = getParent(options, context);
     // make sampling decision
     const samplingDecision = this._sampler.shouldSample(parentContext);
     const spanId = randomSpanId();
@@ -147,6 +145,22 @@ export class Tracer implements api.Tracer {
   getActiveSpanProcessor() {
     return this._tracerProvider.getActiveSpanProcessor();
   }
+}
+
+/**
+ * Get the parent to assign to a started span. If options.parent is null,
+ * do not assign a parent.
+ *
+ * @param options span options
+ * @param context context to check for parent
+ */
+function getParent(
+  options: api.SpanOptions,
+  context: api.Context
+): api.SpanContext | undefined {
+  if (options.parent === null) return undefined;
+  if (options.parent) return getContext(options.parent);
+  return getParentSpanContext(context);
 }
 
 function getContext(span: api.Span | api.SpanContext) {

@@ -76,7 +76,7 @@ export class DocumentLoad extends BasePlugin<unknown> {
     ) as PerformanceResourceTiming[];
     if (resources) {
       resources.forEach(resource => {
-        this._initResourceSpan(resource);
+        this._initResourceSpan(resource, { parent: rootSpan });
       });
     }
   }

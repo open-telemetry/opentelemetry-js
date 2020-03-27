@@ -31,9 +31,9 @@ const DEFAULT_BUFFER_TIMEOUT_MS = 20_000;
 export class BatchSpanProcessor implements SpanProcessor {
   private readonly _bufferSize: number;
   private readonly _bufferTimeout: number;
+
   private _finishedSpans: ReadableSpan[] = [];
-  private _lastSpanFlush = Date.now();
-  private _timer: NodeJS.Timeout;
+  private _timer: NodeJS.Timeout | undefined;
   private _isShutdown = false;
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
@@ -43,13 +43,6 @@ export class BatchSpanProcessor implements SpanProcessor {
       config && typeof config.bufferTimeout === 'number'
         ? config.bufferTimeout
         : DEFAULT_BUFFER_TIMEOUT_MS;
-
-    this._timer = setInterval(() => {
-      if (this._shouldFlush()) {
-        this._flush();
-      }
-    }, this._bufferTimeout);
-    unrefTimer(this._timer);
   }
 
   forceFlush(): void {
@@ -73,7 +66,6 @@ export class BatchSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return;
     }
-    clearInterval(this._timer);
     this.forceFlush();
     this._isShutdown = true;
     this._exporter.shutdown();
@@ -82,22 +74,33 @@ export class BatchSpanProcessor implements SpanProcessor {
   /** Add a span in the buffer. */
   private _addToBuffer(span: ReadableSpan) {
     this._finishedSpans.push(span);
+    this._maybeStartTimer();
     if (this._finishedSpans.length > this._bufferSize) {
       this._flush();
     }
   }
 
-  private _shouldFlush(): boolean {
-    return (
-      this._finishedSpans.length >= 0 &&
-      Date.now() - this._lastSpanFlush >= this._bufferTimeout
-    );
-  }
-
   /** Send the span data list to exporter */
   private _flush() {
+    this._clearTimer();
+    if (this._finishedSpans.length === 0) return;
     this._exporter.export(this._finishedSpans, () => {});
     this._finishedSpans = [];
-    this._lastSpanFlush = Date.now();
+  }
+
+  private _maybeStartTimer() {
+    if (this._timer !== undefined) return;
+
+    this._timer = setTimeout(() => {
+      this._flush();
+    }, this._bufferTimeout);
+    unrefTimer(this._timer);
+  }
+
+  private _clearTimer() {
+    if (this._timer !== undefined) {
+      clearTimeout(this._timer);
+      this._timer = undefined;
+    }
   }
 }

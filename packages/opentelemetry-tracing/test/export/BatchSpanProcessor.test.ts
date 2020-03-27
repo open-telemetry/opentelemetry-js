@@ -45,6 +45,7 @@ describe('BatchSpanProcessor', () => {
   });
   afterEach(() => {
     exporter.reset();
+    sinon.restore();
   });
 
   describe('constructor', () => {
@@ -141,6 +142,36 @@ describe('BatchSpanProcessor', () => {
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
       processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 5);
+    });
+
+    it('should not export empty span lists', done => {
+      const spy = sinon.spy(exporter, 'export');
+      const clock = sinon.useFakeTimers();
+
+      const tracer = new BasicTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+      }).getTracer('default');
+      const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+
+      // start but do not end spans
+      for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
+        const span = tracer.startSpan('spanName');
+        processor.onStart(span as Span);
+      }
+
+      setTimeout(() => {
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
+        // after the timeout, export should not have been called
+        // because no spans are ended
+        sinon.assert.notCalled(spy);
+        done();
+      }, defaultBufferConfig.bufferTimeout + 1000);
+
+      // no spans have been finished
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      clock.tick(defaultBufferConfig.bufferTimeout + 1000);
+
+      clock.restore();
     });
   });
 });
