@@ -15,7 +15,7 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { B3Propagator, BasePlugin, NoopLogger } from '@opentelemetry/core';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { Tracer, Span } from '@opentelemetry/tracing';
@@ -79,8 +79,40 @@ describe('WebTracerProvider', () => {
       });
     });
 
+    it('should throw error when context manager is passed in constructor', () => {
+      let error = '';
+      try {
+        new WebTracerProvider({
+          contextManager: new ZoneContextManager(),
+        } as any);
+      } catch (e) {
+        error = e;
+      }
+      assert.strictEqual(
+        error,
+        'contextManager should be defined in' +
+          ' register method not in constructor'
+      );
+    });
+
+    it('should throw error when propagator is passed in constructor', () => {
+      let error = '';
+      try {
+        new WebTracerProvider({
+          propagator: new B3Propagator(),
+        } as any);
+      } catch (e) {
+        error = e;
+      }
+      assert.strictEqual(
+        error,
+        'propagator should be defined in register' +
+          ' method not in constructor'
+      );
+    });
+
     describe('when contextManager is "ZoneContextManager"', () => {
-      it('should correctly return the contexts for 2 parallel actions', () => {
+      it('should correctly return the contexts for 2 parallel actions', done => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
@@ -112,6 +144,7 @@ describe('WebTracerProvider', () => {
                 webTracerWithZone.getCurrentSpan() === concurrentSpan2,
                 'Current span is concurrentSpan2'
               );
+              done();
             }, 20);
           });
         });
