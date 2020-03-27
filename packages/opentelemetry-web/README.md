@@ -45,15 +45,19 @@ const provider = new WebTracerProvider({
 });
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+provider.register();
 
-// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
 const providerWithZone = new WebTracerProvider({
-  contextManager: new ZoneContextManager(),
   plugins: [
     new DocumentLoad()
   ]
 });
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
+// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
+providerWithZone.register({
+  contextManager: new ZoneContextManager(),
+});
 
 ```
 
