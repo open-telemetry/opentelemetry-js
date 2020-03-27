@@ -102,3 +102,4 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-user-interaction.svg
 [zone-js]: https://www.npmjs.com/package/zone.js
 [@opentelemetry/context-zone]: https://www.npmjs.com/package/@opentelemetry/context-zone
+
