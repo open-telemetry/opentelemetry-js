@@ -18,7 +18,7 @@ import * as nock from 'nock';
 import * as assert from 'assert';
 import { URL } from 'url';
 import { Resource } from '../../src';
-import { AwsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
+import { awsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
 import {
   assertCloudResource,
   assertHostResource,
@@ -26,7 +26,7 @@ import {
 } from '../util/resource-assertions';
 
 const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
-  AwsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
+  awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
 );
 
 const mockedAwsResponse = {
@@ -35,7 +35,7 @@ const mockedAwsResponse = {
   region: 'my-region',
 };
 
-describe('AwsEc2Detector', () => {
+describe('awsEc2Detector', () => {
   before(() => {
     nock.disableNetConnect();
     nock.cleanAll();
@@ -50,7 +50,7 @@ describe('AwsEc2Detector', () => {
       const scope = nock(AWS_HOST)
         .get(AWS_PATH)
         .reply(200, () => mockedAwsResponse);
-      const resource: Resource = await AwsEc2Detector.detect();
+      const resource: Resource = await awsEc2Detector.detect();
       scope.done();
 
       assert.ok(resource);
@@ -72,7 +72,7 @@ describe('AwsEc2Detector', () => {
         .replyWithError({
           code: 'ENOTFOUND',
         });
-      const resource: Resource = await AwsEc2Detector.detect();
+      const resource: Resource = await awsEc2Detector.detect();
       scope.done();
 
       assert.ok(resource);

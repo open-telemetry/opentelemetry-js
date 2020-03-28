@@ -23,8 +23,8 @@ import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
  * and return a {@link Resource} populated with metadata about the EC2
  * instance. Returns an empty Resource if detection fails.
  */
-export class AwsEc2Detector {
-  static AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
+class AwsEc2Detector {
+  readonly AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
     'http://169.254.169.254/latest/dynamic/instance-identity/document';
 
   /**
@@ -34,13 +34,13 @@ export class AwsEc2Detector {
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
    */
-  static async detect(): Promise<Resource> {
+  async detect(): Promise<Resource> {
     try {
       const {
         accountId,
         instanceId,
         region,
-      } = await AwsEc2Detector._awsMetadataAccessor();
+      } = await this._awsMetadataAccessor();
       return new Resource({
         [CLOUD_RESOURCE.PROVIDER]: 'aws',
         [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
@@ -58,38 +58,35 @@ export class AwsEc2Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private static async _awsMetadataAccessor<T>(): Promise<T> {
+  private async _awsMetadataAccessor<T>(): Promise<T> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
         reject(new Error('EC2 metadata api request timed out.'));
       }, 1000);
 
-      const req = http.get(
-        AwsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI,
-        res => {
-          clearTimeout(timeoutId);
-          const { statusCode } = res;
-          res.setEncoding('utf8');
-          let rawData = '';
-          res.on('data', chunk => (rawData += chunk));
-          res.on('end', () => {
-            if (statusCode && statusCode >= 200 && statusCode < 300) {
-              try {
-                resolve(JSON.parse(rawData));
-              } catch (e) {
-                res.resume(); // consume response data to free up memory
-                reject(e);
-              }
-            } else {
+      const req = http.get(this.AWS_INSTANCE_IDENTITY_DOCUMENT_URI, res => {
+        clearTimeout(timeoutId);
+        const { statusCode } = res;
+        res.setEncoding('utf8');
+        let rawData = '';
+        res.on('data', chunk => (rawData += chunk));
+        res.on('end', () => {
+          if (statusCode && statusCode >= 200 && statusCode < 300) {
+            try {
+              resolve(JSON.parse(rawData));
+            } catch (e) {
               res.resume(); // consume response data to free up memory
-              reject(
-                new Error('Failed to load page, status code: ' + statusCode)
-              );
+              reject(e);
             }
-          });
-        }
-      );
+          } else {
+            res.resume(); // consume response data to free up memory
+            reject(
+              new Error('Failed to load page, status code: ' + statusCode)
+            );
+          }
+        });
+      });
       req.on('error', err => {
         clearTimeout(timeoutId);
         reject(err);
@@ -97,3 +94,5 @@ export class AwsEc2Detector {
     });
   }
 }
+
+export const awsEc2Detector = new AwsEc2Detector();

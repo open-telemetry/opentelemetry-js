@@ -17,7 +17,7 @@
 import * as nock from 'nock';
 import { URL } from 'url';
 import { Resource, detectResources } from '../src';
-import { AwsEc2Detector } from '../src/platform/node/detectors';
+import { awsEc2Detector } from '../src/platform/node/detectors';
 import {
   assertServiceResource,
   assertCloudResource,
@@ -42,7 +42,7 @@ const ZONE_PATH = BASE_PATH + '/instance/zone';
 const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
 
 const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
-  AwsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
+  awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
 );
 
 const mockedAwsResponse = {

@@ -24,7 +24,7 @@ import {
 } from 'gcp-metadata';
 import * as nock from 'nock';
 import { Resource } from '../../src';
-import { GcpDetector } from '../../src/platform/node/detectors';
+import { gcpDetector } from '../../src/platform/node/detectors';
 import {
   assertCloudResource,
   assertHostResource,
@@ -42,7 +42,7 @@ const PROJECT_ID_PATH = BASE_PATH + '/project/project-id';
 const ZONE_PATH = BASE_PATH + '/instance/zone';
 const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
 
-describe('GcpDetector', () => {
+describe('gcpDetector', () => {
   describe('.detect', () => {
     before(() => {
       nock.disableNetConnect();
@@ -80,7 +80,7 @@ describe('GcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource: Resource = await GcpDetector.detect();
+      const resource: Resource = await gcpDetector.detect();
       secondaryScope.done();
       scope.done();
 
@@ -111,7 +111,7 @@ describe('GcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource = await GcpDetector.detect();
+      const resource = await gcpDetector.detect();
       secondaryScope.done();
       scope.done();
 
@@ -143,7 +143,7 @@ describe('GcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource = await GcpDetector.detect();
+      const resource = await gcpDetector.detect();
       secondaryScope.done();
       scope.done();
 
@@ -169,7 +169,7 @@ describe('GcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource = await GcpDetector.detect();
+      const resource = await gcpDetector.detect();
       secondaryScope.done();
       scope.done();
 
@@ -182,7 +182,7 @@ describe('GcpDetector', () => {
     });
 
     it('returns empty resource if not detected', async () => {
-      const resource = await GcpDetector.detect();
+      const resource = await gcpDetector.detect();
       assertEmptyResource(resource);
     });
   });

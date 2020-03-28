@@ -20,24 +20,24 @@ import { Resource, Labels } from '../../../Resource';
  * EnvDetector can be used to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_LABELS environment variable.
  */
-export class EnvDetector {
+class EnvDetector {
   // Type, label keys, and label values should not exceed 256 characters.
-  private static readonly _MAX_LENGTH = 255;
+  private readonly _MAX_LENGTH = 255;
 
   // OTEL_RESOURCE_LABELS is a comma-separated list of labels.
-  private static readonly _COMMA_SEPARATOR = ',';
+  private readonly _COMMA_SEPARATOR = ',';
 
   // OTEL_RESOURCE_LABELS contains key value pair separated by '='.
-  private static readonly _LABEL_KEY_VALUE_SPLITTER = '=';
+  private readonly _LABEL_KEY_VALUE_SPLITTER = '=';
 
-  private static readonly _ERROR_MESSAGE_INVALID_CHARS =
+  private readonly _ERROR_MESSAGE_INVALID_CHARS =
     'should be a ASCII string with a length greater than 0 and not exceed ' +
-    EnvDetector._MAX_LENGTH +
+    this._MAX_LENGTH +
     ' characters.';
 
-  private static readonly _ERROR_MESSAGE_INVALID_VALUE =
+  private readonly _ERROR_MESSAGE_INVALID_VALUE =
     'should be a ASCII string with a length not exceed ' +
-    EnvDetector._MAX_LENGTH +
+    this._MAX_LENGTH +
     ' characters.';
 
   /**
@@ -45,11 +45,11 @@ export class EnvDetector {
    * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
    * to conform to the Detector interface.
    */
-  static async detect(): Promise<Resource> {
+  async detect(): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) return Resource.empty();
-      const labels = EnvDetector._parseResourceLabels(
+      const labels = this._parseResourceLabels(
         process.env.OTEL_RESOURCE_LABELS
       );
       return new Resource(labels);
@@ -70,17 +70,14 @@ export class EnvDetector {
    * of key/value pairs.
    * @returns The sanitized resource labels.
    */
-  private static _parseResourceLabels(rawEnvLabels?: string): Labels {
+  private _parseResourceLabels(rawEnvLabels?: string): Labels {
     if (!rawEnvLabels) return {};
 
     const labels: Labels = {};
-    const rawLabels: string[] = rawEnvLabels.split(
-      EnvDetector._COMMA_SEPARATOR,
-      -1
-    );
+    const rawLabels: string[] = rawEnvLabels.split(this._COMMA_SEPARATOR, -1);
     for (const rawLabel of rawLabels) {
       const keyValuePair: string[] = rawLabel.split(
-        EnvDetector._LABEL_KEY_VALUE_SPLITTER,
+        this._LABEL_KEY_VALUE_SPLITTER,
         -1
       );
       if (keyValuePair.length !== 2) {
@@ -93,15 +90,11 @@ export class EnvDetector {
         .trim()
         .split('^"|"$')
         .join('');
-      if (!EnvDetector._isValidAndNotEmpty(key)) {
-        throw new Error(
-          `Label key ${EnvDetector._ERROR_MESSAGE_INVALID_CHARS}`
-        );
+      if (!this._isValidAndNotEmpty(key)) {
+        throw new Error(`Label key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
       }
-      if (!EnvDetector._isValid(value)) {
-        throw new Error(
-          `Label value ${EnvDetector._ERROR_MESSAGE_INVALID_VALUE}`
-        );
+      if (!this._isValid(value)) {
+        throw new Error(`Label value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
       }
       labels[key] = value;
     }
@@ -115,14 +108,11 @@ export class EnvDetector {
    * @param str The String to be validated.
    * @returns Whether the String is valid.
    */
-  private static _isValid(name: string): boolean {
-    return (
-      name.length <= EnvDetector._MAX_LENGTH &&
-      EnvDetector._isPrintableString(name)
-    );
+  private _isValid(name: string): boolean {
+    return name.length <= this._MAX_LENGTH && this._isPrintableString(name);
   }
 
-  private static _isPrintableString(str: string): boolean {
+  private _isPrintableString(str: string): boolean {
     for (let i = 0; i < str.length; i++) {
       const ch: string = str.charAt(i);
       if (ch <= ' ' || ch >= '~') {
@@ -139,7 +129,9 @@ export class EnvDetector {
    * @param str The String to be validated.
    * @returns Whether the String is valid and not empty.
    */
-  private static _isValidAndNotEmpty(str: string): boolean {
-    return str.length > 0 && EnvDetector._isValid(str);
+  private _isValidAndNotEmpty(str: string): boolean {
+    return str.length > 0 && this._isValid(str);
   }
 }
+
+export const envDetector = new EnvDetector();

@@ -15,14 +15,14 @@
  */
 
 import { Resource } from '../../src/Resource';
-import { EnvDetector } from '../../src/platform/node/detectors/EnvDetector';
+import { envDetector } from '../../src/platform/node/detectors/EnvDetector';
 import {
   assertK8sResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
 import { K8S_RESOURCE } from '../../src';
 
-describe('EnvDetector()', () => {
+describe('envDetector()', () => {
   describe('with valid env', () => {
     before(() => {
       process.env.OTEL_RESOURCE_LABELS =
@@ -34,7 +34,7 @@ describe('EnvDetector()', () => {
     });
 
     it('should return resource information from environment variable', async () => {
-      const resource: Resource = await EnvDetector.detect();
+      const resource: Resource = await envDetector.detect();
       assertK8sResource(resource, {
         [K8S_RESOURCE.POD_NAME]: 'pod-xyz-123',
         [K8S_RESOURCE.CLUSTER_NAME]: 'c1',
@@ -45,7 +45,7 @@ describe('EnvDetector()', () => {
 
   describe('with empty env', () => {
     it('should return empty resource', async () => {
-      const resource: Resource = await EnvDetector.detect();
+      const resource: Resource = await envDetector.detect();
       assertEmptyResource(resource);
     });
   });
