@@ -61,6 +61,7 @@ export class AwsEc2Detector {
   private static async _awsMetadataAccessor<T>(): Promise<T> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
+        req.abort();
         reject(new Error('EC2 metadata api request timed out.'));
       }, 1000);
 
