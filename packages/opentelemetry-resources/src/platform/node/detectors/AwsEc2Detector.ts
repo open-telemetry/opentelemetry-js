@@ -17,13 +17,14 @@
 import * as http from 'http';
 import { Resource } from '../../../Resource';
 import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
+import { Detector } from '../../../types';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2
  * and return a {@link Resource} populated with metadata about the EC2
  * instance. Returns an empty Resource if detection fails.
  */
-class AwsEc2Detector {
+class AwsEc2Detector implements Detector {
   readonly AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
     'http://169.254.169.254/latest/dynamic/instance-identity/document';
 

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-export * from './Resource';
-export * from './platform';
-export * from './constants';
-export * from './types';
+import { Resource } from './Resource';
+
+export interface Labels {
+  [key: string]: number | string | boolean;
+}
+
+export interface Detector {
+  detect(): Promise<Resource>;
+}

@@ -16,7 +16,8 @@
 
 import * as os from 'os';
 import * as gcpMetadata from 'gcp-metadata';
-import { Resource, Labels } from '../../../Resource';
+import { Resource } from '../../../Resource';
+import { Detector, Labels } from '../../../types';
 import {
   CLOUD_RESOURCE,
   HOST_RESOURCE,
@@ -29,7 +30,7 @@ import {
  * Cloud Platofrm and return a {@link Resource} populated with metadata about
  * the instance. Returns an empty Resource if detection fails.
  */
-class GcpDetector {
+class GcpDetector implements Detector {
   async detect(): Promise<Resource> {
     if (!(await gcpMetadata.isAvailable())) return Resource.empty();
 

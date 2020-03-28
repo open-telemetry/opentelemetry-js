@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { Resource, Labels } from '../../../Resource';
+import { Resource } from '../../../Resource';
+import { Detector, Labels } from '../../../types';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
  * from the OTEL_RESOURCE_LABELS environment variable.
  */
-class EnvDetector {
+class EnvDetector implements Detector {
   // Type, label keys, and label values should not exceed 256 characters.
   private readonly _MAX_LENGTH = 255;
 

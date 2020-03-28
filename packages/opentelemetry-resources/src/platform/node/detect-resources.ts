@@ -16,8 +16,9 @@
 
 import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
+import { Detector } from '../../types';
 
-const DETECTORS = [envDetector, awsEc2Detector, gcpDetector];
+const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
 /**
  * Runs all resource detectors and returns the results merged into a single

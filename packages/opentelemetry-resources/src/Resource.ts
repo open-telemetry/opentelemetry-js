@@ -16,6 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/base';
 import { TELEMETRY_SDK_RESOURCE } from './constants';
+import { Labels } from './types';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -66,8 +67,4 @@ export class Resource {
     const mergedLabels = Object.assign({}, other.labels, this.labels);
     return new Resource(mergedLabels);
   }
-}
-
-export interface Labels {
-  [key: string]: number | string | boolean;
 }
