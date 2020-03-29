@@ -15,7 +15,7 @@
  */
 
 export enum AttributeNames {
-  // required by https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-semantic-conventions.md#databases-client-calls
+  // required by https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-database.md
   COMPONENT = 'component',
   DB_TYPE = 'db.type',
   DB_INSTANCE = 'db.instance',
