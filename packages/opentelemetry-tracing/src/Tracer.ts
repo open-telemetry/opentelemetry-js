@@ -27,7 +27,6 @@ import {
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
-import { DEFAULT_CONFIG } from './config';
 import { Span } from './Span';
 import { TraceParams, TracerConfig } from './types';
 import { mergeConfig } from './utility';
@@ -46,7 +45,7 @@ export class Tracer implements api.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(
-    config: TracerConfig = DEFAULT_CONFIG,
+    config: TracerConfig,
     private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
@@ -163,7 +162,7 @@ function getParent(
   return getParentSpanContext(context);
 }
 
-function getContext(span: api.Span | api.SpanContext) {
+function getContext(span: api.Span | api.SpanContext): api.SpanContext {
   return isSpan(span) ? span.context() : span;
 }
 
