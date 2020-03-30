@@ -261,8 +261,8 @@ const handles = new Map();
 export const countAllRequests = () => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const handle = requestCount.bind(labels);
       handles.set(req.path, handle);
     }
 
@@ -326,8 +326,8 @@ const handles = new Map();
 export const countAllRequests = () => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const handle = requestCount.bind(labels);
       handles.set(req.path, handle);
     }
 

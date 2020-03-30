@@ -44,9 +44,10 @@ describe('ConsoleMetricExporter', () => {
         description: 'a test description',
         labelKeys: ['key1', 'key2'],
       });
-      const boundCounter = counter.bind(
-        meter.labels({ key1: 'labelValue1', key2: 'labelValue2' })
-      );
+      const boundCounter = counter.bind({
+        key1: 'labelValue1',
+        key2: 'labelValue2',
+      });
       boundCounter.add(10);
 
       meter.collect();
