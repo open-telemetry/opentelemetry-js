@@ -26,8 +26,8 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/exporter-prometheus": "^0.5.1",
-    "@opentelemetry/metrics": "^0.5.1"
+    "@opentelemetry/exporter-prometheus": "^0.5.2",
+    "@opentelemetry/metrics": "^0.5.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

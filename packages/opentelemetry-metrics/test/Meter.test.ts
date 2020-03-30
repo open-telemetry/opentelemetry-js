@@ -29,7 +29,7 @@ import {
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { LabelSet } from '../src/LabelSet';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   ObserverAggregator,
@@ -63,6 +63,8 @@ describe('Meter', () => {
   });
 
   describe('#counter', () => {
+    const performanceTimeOrigin = hrTime();
+
     it('should create a counter', () => {
       const counter = meter.createCounter('name');
       assert.ok(counter instanceof Metric);
@@ -84,9 +86,19 @@ describe('Meter', () => {
       meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
 
-      assert.strictEqual(record1.aggregator.value(), 10);
+      assert.strictEqual(record1.aggregator.toPoint().value, 10);
+      const lastTimestamp = record1.aggregator.toPoint().timestamp;
+      assert.ok(
+        hrTimeToNanoseconds(lastTimestamp) >
+          hrTimeToNanoseconds(performanceTimeOrigin)
+      );
       counter.add(10, labelSet);
-      assert.strictEqual(record1.aggregator.value(), 20);
+      assert.strictEqual(record1.aggregator.toPoint().value, 20);
+
+      assert.ok(
+        hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+          hrTimeToNanoseconds(lastTimestamp)
+      );
     });
 
     it('should return counter with resource', () => {
@@ -102,9 +114,9 @@ describe('Meter', () => {
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
-        assert.strictEqual(record1.aggregator.value(), 10);
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
         boundCounter.add(10);
-        assert.strictEqual(record1.aggregator.value(), 20);
+        assert.strictEqual(record1.aggregator.toPoint().value, 20);
       });
 
       it('should return the aggregator', () => {
@@ -123,9 +135,9 @@ describe('Meter', () => {
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
-        assert.strictEqual(record1.aggregator.value(), 10);
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
         boundCounter.add(-100);
-        assert.strictEqual(record1.aggregator.value(), 10);
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
       });
 
       it('should not add the instrument data when disabled', () => {
@@ -136,7 +148,7 @@ describe('Meter', () => {
         boundCounter.add(10);
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.strictEqual(record1.aggregator.value(), 0);
+        assert.strictEqual(record1.aggregator.toPoint().value, 0);
       });
 
       it('should add negative value when monotonic is set to false', () => {
@@ -147,7 +159,7 @@ describe('Meter', () => {
         boundCounter.add(-10);
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.strictEqual(record1.aggregator.value(), -10);
+        assert.strictEqual(record1.aggregator.toPoint().value, -10);
       });
 
       it('should return same instrument on same label values', () => {
@@ -159,7 +171,7 @@ describe('Meter', () => {
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
-        assert.strictEqual(record1.aggregator.value(), 20);
+        assert.strictEqual(record1.aggregator.toPoint().value, 20);
         assert.strictEqual(boundCounter, boundCounter1);
       });
     });
@@ -214,7 +226,7 @@ describe('Meter', () => {
           unit: '1',
           valueType: ValueType.DOUBLE,
         });
-        assert.strictEqual(record[0].aggregator.value(), 10);
+        assert.strictEqual(record[0].aggregator.toPoint().value, 10);
       });
     });
 
@@ -306,6 +318,8 @@ describe('Meter', () => {
     });
 
     describe('.bind()', () => {
+      const performanceTimeOrigin = hrTime();
+
       it('should create a measure instrument', () => {
         const measure = meter.createMeasure('name') as MeasureMetric;
         const boundMeasure = measure.bind(labelSet);
@@ -319,12 +333,15 @@ describe('Meter', () => {
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
-          count: 0,
-          max: -Infinity,
-          min: Infinity,
-          sum: 0,
-        });
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 0,
+            max: -Infinity,
+            min: Infinity,
+            sum: 0,
+          }
+        );
       });
 
       it('should not set the instrument data when disabled', () => {
@@ -336,12 +353,15 @@ describe('Meter', () => {
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
-          count: 0,
-          max: -Infinity,
-          min: Infinity,
-          sum: 0,
-        });
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 0,
+            max: -Infinity,
+            min: Infinity,
+            sum: 0,
+          }
+        );
       });
 
       it('should accept negative (and positive) values when absolute is set to false', () => {
@@ -354,12 +374,19 @@ describe('Meter', () => {
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
-          count: 2,
-          max: 50,
-          min: -10,
-          sum: 40,
-        });
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 2,
+            max: 50,
+            min: -10,
+            sum: 40,
+          }
+        );
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
+        );
       });
 
       it('should return same instrument on same label values', () => {
@@ -370,12 +397,15 @@ describe('Meter', () => {
         boundMeasure2.record(100);
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(record1.aggregator.value() as Distribution, {
-          count: 2,
-          max: 100,
-          min: 10,
-          sum: 110,
-        });
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 2,
+            max: 100,
+            min: 10,
+            sum: 110,
+          }
+        );
         assert.strictEqual(boundMeasure1, boundMeasure2);
       });
     });
@@ -500,7 +530,7 @@ describe('Meter', () => {
         labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labelSet);
-      const value = record[0].aggregator.value() as Sum;
+      const value = record[0].aggregator.toPoint().value as Sum;
       assert.strictEqual(value, 10.45);
     });
 
@@ -529,7 +559,7 @@ describe('Meter', () => {
         labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labelSet);
-      const value = record[0].aggregator.value() as Sum;
+      const value = record[0].aggregator.toPoint().value as Sum;
       assert.strictEqual(value, 10);
     });
   });
@@ -537,8 +567,14 @@ describe('Meter', () => {
 
 function ensureMetric(metric: MetricRecord) {
   assert.ok(metric.aggregator instanceof ObserverAggregator);
-  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
-  assert.ok(metric.aggregator.value() >= 0 && metric.aggregator.value() <= 1);
+  assert.ok(
+    metric.aggregator.toPoint().value >= 0 &&
+      metric.aggregator.toPoint().value <= 1
+  );
+  assert.ok(
+    metric.aggregator.toPoint().value >= 0 &&
+      metric.aggregator.toPoint().value <= 1
+  );
   const descriptor = metric.descriptor;
   assert.strictEqual(descriptor.name, 'name');
   assert.strictEqual(descriptor.description, 'desc');

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType } from '@opentelemetry/api';
+import { ValueType, HrTime } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
 import { LabelSet } from '../LabelSet';
 
@@ -76,6 +76,11 @@ export interface Aggregator {
   /** Updates the current with the new value. */
   update(value: number): void;
 
-  /** Returns snapshot of the current value. */
-  value(): Sum | Distribution;
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point;
+}
+
+export interface Point {
+  value: Sum | LastValue | Distribution;
+  timestamp: HrTime;
 }
