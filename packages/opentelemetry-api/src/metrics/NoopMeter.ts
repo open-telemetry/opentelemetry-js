@@ -148,5 +148,3 @@ export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
 
 export const NOOP_BOUND_OBSERVER = new NoopBoundObserver();
 export const NOOP_OBSERVER_METRIC = new NoopObserverMetric(NOOP_BOUND_OBSERVER);
-
-export const NOOP_LABELS = {} as Labels;

@@ -26,6 +26,7 @@ import { ObserverResult } from './ObserverResult';
 import { MetricOptions } from './types';
 import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
+import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
@@ -58,10 +59,11 @@ export abstract class Metric<T extends BaseBoundInstrument>
    *     that you want to record.
    */
   bind(labels: types.Labels): T {
-    if (this._instruments.has(labels)) return this._instruments.get(labels)!;
+    const hash = hashLabels(labels);
+    if (this._instruments.has(hash)) return this._instruments.get(hash)!;
 
     const instrument = this._makeInstrument(labels);
-    this._instruments.set(labels, instrument);
+    this._instruments.set(hash, instrument);
     return instrument;
   }
 
@@ -70,7 +72,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
    * @param labels key-values pairs that are associated with a specific metric.
    */
   unbind(labels: types.Labels): void {
-    this._instruments.delete(labels);
+    this._instruments.delete(hashLabels(labels));
   }
 
   /**

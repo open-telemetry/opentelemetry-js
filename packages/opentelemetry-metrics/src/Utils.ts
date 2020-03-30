@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { Labels } from '@opentelemetry/api';
+
 /**
  * Type guard to remove nulls from arrays
  *
@@ -21,4 +23,21 @@
  */
 export function notNull<T>(value: T | null): value is T {
   return value !== null;
+}
+
+/**
+ * Converting the unordered labels into unique identifier string.
+ * @param labels user provided unordered Labels.
+ */
+export function hashLabels(labels: Labels): string {
+  let keys = Object.keys(labels);
+  if (keys.length === 0) return '';
+
+  keys = keys.sort();
+  return keys.reduce((result, key) => {
+    if (result.length > 2) {
+      result += ',';
+    }
+    return (result += key + ':' + labels[key]);
+  }, '|#');
 }

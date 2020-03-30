@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import {
-  Labels,
   NoopMeterProvider,
   NOOP_BOUND_COUNTER,
   NOOP_BOUND_MEASURE,
@@ -28,7 +27,7 @@ describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
-    const labels = {} as Labels;
+    const labels = {};
 
     // ensure NoopMetric does not crash.
     counter.bind(labels).add(1);

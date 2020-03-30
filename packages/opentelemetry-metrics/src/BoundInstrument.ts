@@ -45,9 +45,7 @@ export class BaseBoundInstrument {
 
     if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
-        `INT value type cannot accept a floating-point value for ${Object.values(
-          this._labels
-        )}, ignoring the fractional digits.`
+        `INT value type cannot accept a floating-point value for ${this._labels}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
     }
@@ -84,7 +82,7 @@ export class BoundCounter extends BaseBoundInstrument
   add(value: number): void {
     if (this._monotonic && value < 0) {
       this._logger.error(
-        `Monotonic counter cannot descend for ${Object.values(this._labels)}`
+        `Monotonic counter cannot descend for ${this._labels}`
       );
       return;
     }
@@ -120,9 +118,7 @@ export class BoundMeasure extends BaseBoundInstrument
   ): void {
     if (this._absolute && value < 0) {
       this._logger.error(
-        `Absolute measure cannot contain negative values for ${Object.values(
-          this._labels
-        )}}`
+        `Absolute measure cannot contain negative values for $${this._labels}`
       );
       return;
     }

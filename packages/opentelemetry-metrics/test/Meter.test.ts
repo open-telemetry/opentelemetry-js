@@ -33,8 +33,9 @@ import {
   CounterSumAggregator,
   ObserverAggregator,
 } from '../src/export/Aggregator';
-import { ValueType, Labels } from '@opentelemetry/api';
+import { ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { hashLabels } from '../src/Utils';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -176,7 +177,7 @@ describe('Meter', () => {
 
       it('should not fail when removing non existing instrument', () => {
         const counter = meter.createCounter('name');
-        counter.unbind({} as Labels);
+        counter.unbind({});
       });
 
       it('should clear all instruments', () => {
@@ -462,10 +463,10 @@ describe('Meter', () => {
       const metric3 = metricRecords[2];
       const metric4 = metricRecords[3];
 
-      assert.ok(metric1.labels.identifier.indexOf('|#core:1,pid:123') === 0);
-      assert.ok(metric2.labels.identifier.indexOf('|#core:2,pid:123') === 0);
-      assert.ok(metric3.labels.identifier.indexOf('|#core:3,pid:123') === 0);
-      assert.ok(metric4.labels.identifier.indexOf('|#core:4,pid:123') === 0);
+      assert.strictEqual(hashLabels(metric1.labels), '|#core:1,pid:123');
+      assert.strictEqual(hashLabels(metric2.labels), '|#core:2,pid:123');
+      assert.strictEqual(hashLabels(metric3.labels), '|#core:3,pid:123');
+      assert.strictEqual(hashLabels(metric4.labels), '|#core:4,pid:123');
 
       ensureMetric(metric1);
       ensureMetric(metric2);

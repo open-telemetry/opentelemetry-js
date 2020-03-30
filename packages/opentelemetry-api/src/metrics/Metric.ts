@@ -139,4 +139,4 @@ export interface MetricUtils {
 /**
  * key-value pairs passed by the user.
  */
-export type Labels = Record<string, string>;
+export type Labels = { [key: string]: string };
