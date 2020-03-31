@@ -64,7 +64,7 @@
     "karma-webpack": "^4.0.2",
     "linkinator": "^2.0.3",
     "mocha": "^6.1.0",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^6.0.0",
     "tslint-consistent-codestyle": "^1.16.0",
