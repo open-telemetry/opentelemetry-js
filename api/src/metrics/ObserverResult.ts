@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { LabelSet } from './Metric';
+import { Labels } from './Metric';
 
 /**
  * Interface that is being used in function setCallback for Observer Metric
  */
 export interface ObserverResult {
-  observers: Map<LabelSet, Function>;
-  observe(callback: Function, labelSet: LabelSet): void;
+  observers: Map<Labels, Function>;
+  observe(callback: Function, labels: Labels): void;
 }
