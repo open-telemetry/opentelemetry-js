@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
+import { Metric, MetricOptions } from './Metric';
 import { BoundCounter, BoundMeasure, BoundObserver } from './BoundInstrument';
 
 /**
@@ -47,12 +47,4 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createObserver(name: string, options?: MetricOptions): Metric<BoundObserver>;
-
-  /**
-   * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered labels into a canonicalized
-   * set of labels with an unique identifier, useful for pre-aggregation.
-   * @param labels user provided unordered Labels.
-   */
-  labels(labels: Labels): LabelSet;
 }
