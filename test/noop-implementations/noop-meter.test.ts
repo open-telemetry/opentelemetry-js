@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import {
-  Labels,
   NoopMeterProvider,
   NOOP_BOUND_COUNTER,
   NOOP_BOUND_MEASURE,
@@ -28,24 +27,23 @@ describe('NoopMeter', () => {
   it('should not crash', () => {
     const meter = new NoopMeterProvider().getMeter('test-noop');
     const counter = meter.createCounter('some-name');
-    const labels = {} as Labels;
-    const labelSet = meter.labels(labels);
+    const labels = {};
 
     // ensure NoopMetric does not crash.
-    counter.bind(labelSet).add(1);
-    counter.unbind(labelSet);
+    counter.bind(labels).add(1);
+    counter.unbind(labels);
 
     // ensure the correct noop const is returned
     assert.strictEqual(counter, NOOP_COUNTER_METRIC);
-    assert.strictEqual(counter.bind(labelSet), NOOP_BOUND_COUNTER);
+    assert.strictEqual(counter.bind(labels), NOOP_BOUND_COUNTER);
     counter.clear();
 
     const measure = meter.createMeasure('some-name');
-    measure.bind(labelSet).record(1);
+    measure.bind(labels).record(1);
 
     // ensure the correct noop const is returned
     assert.strictEqual(measure, NOOP_MEASURE_METRIC);
-    assert.strictEqual(measure.bind(labelSet), NOOP_BOUND_MEASURE);
+    assert.strictEqual(measure.bind(labels), NOOP_BOUND_MEASURE);
 
     const options = {
       component: 'tests',

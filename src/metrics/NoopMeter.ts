@@ -15,7 +15,7 @@
  */
 
 import { Meter } from './Meter';
-import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
+import { MetricOptions, Metric, Labels, MetricUtils } from './Metric';
 import { BoundMeasure, BoundCounter, BoundObserver } from './BoundInstrument';
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
@@ -54,10 +54,6 @@ export class NoopMeter implements Meter {
   createObserver(name: string, options?: MetricOptions): Metric<BoundObserver> {
     return NOOP_OBSERVER_METRIC;
   }
-
-  labels(labels: Labels): LabelSet {
-    return NOOP_LABEL_SET;
-  }
 }
 
 export class NoopMetric<T> implements Metric<T> {
@@ -67,22 +63,21 @@ export class NoopMetric<T> implements Metric<T> {
     this._instrument = instrument;
   }
   /**
-   * Returns a Bound Instrument associated with specified LabelSet.
+   * Returns a Bound Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Bound Instrument instead of
    * always calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  bind(labels: LabelSet): T {
+  bind(labels: Labels): T {
     return this._instrument;
   }
 
   /**
    * Removes the Binding from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: LabelSet): void {
+  unbind(labels: Labels): void {
     return;
   }
 
@@ -96,8 +91,8 @@ export class NoopMetric<T> implements Metric<T> {
 
 export class NoopCounterMetric extends NoopMetric<BoundCounter>
   implements Pick<MetricUtils, 'add'> {
-  add(value: number, labelSet: LabelSet) {
-    this.bind(labelSet).add(value);
+  add(value: number, labels: Labels) {
+    this.bind(labels).add(value);
   }
 }
 
@@ -105,16 +100,16 @@ export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   implements Pick<MetricUtils, 'record'> {
   record(
     value: number,
-    labelSet: LabelSet,
+    labels: Labels,
     correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ) {
     if (typeof correlationContext === 'undefined') {
-      this.bind(labelSet).record(value);
+      this.bind(labels).record(value);
     } else if (typeof spanContext === 'undefined') {
-      this.bind(labelSet).record(value, correlationContext);
+      this.bind(labels).record(value, correlationContext);
     } else {
-      this.bind(labelSet).record(value, correlationContext, spanContext);
+      this.bind(labels).record(value, correlationContext, spanContext);
     }
   }
 }
@@ -153,5 +148,3 @@ export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
 
 export const NOOP_BOUND_OBSERVER = new NoopBoundObserver();
 export const NOOP_OBSERVER_METRIC = new NoopObserverMetric(NOOP_BOUND_OBSERVER);
-
-export const NOOP_LABEL_SET = {} as LabelSet;
