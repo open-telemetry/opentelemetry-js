@@ -25,7 +25,6 @@ import {
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
-import { LabelSet } from './LabelSet';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
@@ -38,7 +37,6 @@ export class Meter implements types.Meter {
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
   private readonly _resource: Resource;
-  readonly labels = Meter.labels;
 
   /**
    * Constructs a new Meter instance.
@@ -159,27 +157,6 @@ export class Meter implements types.Meter {
 
   getBatcher(): Batcher {
     return this._batcher;
-  }
-
-  /**
-   * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered labels into a canonicalized
-   * set of labels with an unique identifier, useful for pre-aggregation.
-   * @param labels user provided unordered Labels.
-   */
-  static labels(labels: types.Labels): types.LabelSet {
-    const keys = Object.keys(labels).sort();
-    const identifier = keys.reduce((result, key) => {
-      if (result.length > 2) {
-        result += ',';
-      }
-      return (result += key + ':' + labels[key]);
-    }, '|#');
-    const sortedLabels: types.Labels = {};
-    keys.forEach(key => {
-      sortedLabels[key] = labels[key];
-    });
-    return new LabelSet(identifier, sortedLabels);
   }
 
   /**

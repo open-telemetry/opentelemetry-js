@@ -28,8 +28,8 @@ function getCpuUsage() {
 }
 
 otelCpuUsage.setCallback((observerResult) => {
-  observerResult.observe(getCpuUsage, meter.labels({ pid: process.pid, core: '1' }));
-  observerResult.observe(getCpuUsage, meter.labels({ pid: process.pid, core: '2' }));
-  observerResult.observe(getCpuUsage, meter.labels({ pid: process.pid, core: '3' }));
-  observerResult.observe(getCpuUsage, meter.labels({ pid: process.pid, core: '4' }));
+  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
+  observerResult.observe(getCpuUsage, { pid: process.pid, core: '2' });
+  observerResult.observe(getCpuUsage, { pid: process.pid, core: '3' });
+  observerResult.observe(getCpuUsage, { pid: process.pid, core: '4' });
 });

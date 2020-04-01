@@ -23,19 +23,19 @@ import { ObserverResult } from './ObserverResult';
  * the TimeSeries.
  */
 export class BaseBoundInstrument {
-  protected _labelSet: types.LabelSet;
+  protected _labels: types.Labels;
   protected _logger: types.Logger;
   protected _monotonic: boolean;
 
   constructor(
-    labelSet: types.LabelSet,
+    labels: types.Labels,
     logger: types.Logger,
     monotonic: boolean,
     private readonly _disabled: boolean,
     private readonly _valueType: types.ValueType,
     private readonly _aggregator: Aggregator
   ) {
-    this._labelSet = labelSet;
+    this._labels = labels;
     this._logger = logger;
     this._monotonic = monotonic;
   }
@@ -46,7 +46,7 @@ export class BaseBoundInstrument {
     if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
         `INT value type cannot accept a floating-point value for ${Object.values(
-          this._labelSet.labels
+          this._labels
         )}, ignoring the fractional digits.`
       );
       value = Math.trunc(value);
@@ -55,8 +55,8 @@ export class BaseBoundInstrument {
     this._aggregator.update(value);
   }
 
-  getLabelSet(): types.LabelSet {
-    return this._labelSet;
+  getLabels(): types.Labels {
+    return this._labels;
   }
 
   getAggregator(): Aggregator {
@@ -66,27 +66,25 @@ export class BaseBoundInstrument {
 
 /**
  * BoundCounter allows the SDK to observe/record a single metric event. The
- * value of single instrument in the `Counter` associated with specified LabelSet.
+ * value of single instrument in the `Counter` associated with specified Labels.
  */
 export class BoundCounter extends BaseBoundInstrument
   implements types.BoundCounter {
   constructor(
-    labelSet: types.LabelSet,
+    labels: types.Labels,
     disabled: boolean,
     monotonic: boolean,
     valueType: types.ValueType,
     logger: types.Logger,
     aggregator: Aggregator
   ) {
-    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, monotonic, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
     if (this._monotonic && value < 0) {
       this._logger.error(
-        `Monotonic counter cannot descend for ${Object.values(
-          this._labelSet.labels
-        )}`
+        `Monotonic counter cannot descend for ${Object.values(this._labels)}`
       );
       return;
     }
@@ -103,7 +101,7 @@ export class BoundMeasure extends BaseBoundInstrument
   private readonly _absolute: boolean;
 
   constructor(
-    labelSet: types.LabelSet,
+    labels: types.Labels,
     disabled: boolean,
     monotonic: boolean,
     absolute: boolean,
@@ -111,7 +109,7 @@ export class BoundMeasure extends BaseBoundInstrument
     logger: types.Logger,
     aggregator: Aggregator
   ) {
-    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, monotonic, disabled, valueType, aggregator);
     this._absolute = absolute;
   }
 
@@ -122,9 +120,9 @@ export class BoundMeasure extends BaseBoundInstrument
   ): void {
     if (this._absolute && value < 0) {
       this._logger.error(
-        `Absolute measure cannot contain negative values for ${Object.values(
-          this._labelSet.labels
-        )}}`
+        `Absolute measure cannot contain negative values for $${Object.values(
+          this._labels
+        )}`
       );
       return;
     }
@@ -139,14 +137,14 @@ export class BoundMeasure extends BaseBoundInstrument
 export class BoundObserver extends BaseBoundInstrument
   implements types.BoundObserver {
   constructor(
-    labelSet: types.LabelSet,
+    labels: types.Labels,
     disabled: boolean,
     monotonic: boolean,
     valueType: types.ValueType,
     logger: types.Logger,
     aggregator: Aggregator
   ) {
-    super(labelSet, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, monotonic, disabled, valueType, aggregator);
   }
 
   setCallback(callback: (observerResult: types.ObserverResult) => {}): void {
