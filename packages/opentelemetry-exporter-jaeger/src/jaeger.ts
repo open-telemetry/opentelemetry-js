@@ -29,14 +29,11 @@ export class JaegerExporter implements SpanExporter {
   private readonly _logger: api.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
-  private readonly _forceFlushOnShutdown: boolean = true;
   private readonly _onShutdownFlushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = config.tags || [];
-    this._forceFlushOnShutdown =
-      typeof config.forceFlush === 'boolean' ? config.forceFlush : true;
     this._onShutdownFlushTimeout =
       typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
 
@@ -69,7 +66,6 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): void {
-    if (!this._forceFlushOnShutdown) return;
     // Make an optimistic flush.
     this._flush();
     // Sleeping x seconds before closing the sender's connection to ensure
