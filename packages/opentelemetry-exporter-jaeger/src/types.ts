@@ -26,8 +26,6 @@ export interface ExporterConfig {
   host?: string; // default: 'localhost'
   port?: number; // default: 6832
   maxPacketSize?: number; // default: 65000
-  /** Force a flush on shutdown */
-  forceFlush?: boolean; // default: true
   /** Time to wait for an onShutdown flush to finish before closing the sender */
   flushTimeout?: number; // default: 2000
 }

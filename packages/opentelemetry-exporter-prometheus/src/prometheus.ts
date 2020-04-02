@@ -155,9 +155,8 @@ export class PrometheusExporter implements MetricExporter {
     // TODO: only counter and gauge are implemented in metrics so far
   }
 
-  private _getLabelValues(keys: string[], values: types.LabelSet) {
+  private _getLabelValues(keys: string[], labels: types.Labels) {
     const labelValues: labelValues = {};
-    const labels = values.labels;
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {
         labelValues[keys[i]] = labels[keys[i]];

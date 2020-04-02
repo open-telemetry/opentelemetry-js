@@ -79,20 +79,19 @@ export enum ValueType {
  */
 export interface Metric<T> {
   /**
-   * Returns a Instrument associated with specified LabelSet.
+   * Returns a Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  bind(labels: LabelSet): T;
+  bind(labels: Labels): T;
 
   /**
    * Removes the Instrument from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: LabelSet): void;
+  unbind(labels: Labels): void;
 
   /**
    * Clears all timeseries from the Metric.
@@ -104,7 +103,7 @@ export interface MetricUtils {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    */
-  add(value: number, labelSet: LabelSet): void;
+  add(value: number, labels: Labels): void;
 
   /**
    * Sets a callback where user can observe value for certain labels
@@ -116,22 +115,22 @@ export interface MetricUtils {
   /**
    * Sets the given value. Values can be negative.
    */
-  set(value: number, labelSet: LabelSet): void;
+  set(value: number, labels: Labels): void;
 
   /**
    * Records the given value to this measure.
    */
-  record(value: number, labelSet: LabelSet): void;
+  record(value: number, labels: Labels): void;
 
   record(
     value: number,
-    labelSet: LabelSet,
+    labels: Labels,
     correlationContext: CorrelationContext
   ): void;
 
   record(
     value: number,
-    labelSet: LabelSet,
+    labels: Labels,
     correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
@@ -140,12 +139,4 @@ export interface MetricUtils {
 /**
  * key-value pairs passed by the user.
  */
-export type Labels = Record<string, string>;
-
-/**
- * Canonicalized labels with an unique string identifier.
- */
-export interface LabelSet {
-  identifier: string;
-  labels: Labels;
-}
+export type Labels = { [key: string]: string };

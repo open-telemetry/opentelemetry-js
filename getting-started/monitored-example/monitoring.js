@@ -28,8 +28,8 @@ const boundInstruments = new Map();
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
     if (!boundInstruments.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const boundCounter = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const boundCounter = requestCount.bind(labels);
       boundInstruments.set(req.path, boundCounter);
     }
 

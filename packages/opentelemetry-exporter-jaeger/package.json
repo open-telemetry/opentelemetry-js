@@ -15,7 +15,8 @@
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -46,7 +47,7 @@
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
     "mocha": "^6.2.0",
-    "nyc": "^14.1.1",
+    "nyc": "^15.0.0",
     "rimraf": "^3.0.0",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
