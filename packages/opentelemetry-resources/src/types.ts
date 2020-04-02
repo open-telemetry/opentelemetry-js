@@ -16,7 +16,7 @@
 
 import { Resource } from './Resource';
 
-export interface Labels {
+export interface ResourceLabels {
   [key: string]: number | string | boolean;
 }
 

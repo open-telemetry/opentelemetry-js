@@ -15,7 +15,7 @@
  */
 
 import { Resource } from '../../../Resource';
-import { Detector, Labels } from '../../../types';
+import { Detector, ResourceLabels } from '../../../types';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -71,10 +71,10 @@ class EnvDetector implements Detector {
    * of key/value pairs.
    * @returns The sanitized resource labels.
    */
-  private _parseResourceLabels(rawEnvLabels?: string): Labels {
+  private _parseResourceLabels(rawEnvLabels?: string): ResourceLabels {
     if (!rawEnvLabels) return {};
 
-    const labels: Labels = {};
+    const labels: ResourceLabels = {};
     const rawLabels: string[] = rawEnvLabels.split(this._COMMA_SEPARATOR, -1);
     for (const rawLabel of rawLabels) {
       const keyValuePair: string[] = rawLabel.split(

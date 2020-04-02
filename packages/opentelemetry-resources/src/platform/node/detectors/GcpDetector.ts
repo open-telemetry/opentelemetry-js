@@ -17,7 +17,7 @@
 import * as os from 'os';
 import * as gcpMetadata from 'gcp-metadata';
 import { Resource } from '../../../Resource';
-import { Detector, Labels } from '../../../types';
+import { Detector, ResourceLabels } from '../../../types';
 import {
   CLOUD_RESOURCE,
   HOST_RESOURCE,
@@ -41,7 +41,7 @@ class GcpDetector implements Detector {
       this._getClusterName(),
     ]);
 
-    const labels: Labels = {};
+    const labels: ResourceLabels = {};
     labels[CLOUD_RESOURCE.ACCOUNT_ID] = projectId;
     labels[HOST_RESOURCE.ID] = instanceId;
     labels[CLOUD_RESOURCE.ZONE] = zoneId;
@@ -54,7 +54,7 @@ class GcpDetector implements Detector {
   }
 
   /** Add resource labels for K8s */
-  private _addK8sLabels(labels: Labels, clusterName: string): void {
+  private _addK8sLabels(labels: ResourceLabels, clusterName: string): void {
     labels[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
     labels[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';
     labels[K8S_RESOURCE.POD_NAME] = process.env.HOSTNAME || os.hostname();
