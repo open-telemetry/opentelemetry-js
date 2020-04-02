@@ -21,26 +21,6 @@ import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 import { Resource } from '@opentelemetry/resources';
 
 describe('transform', () => {
-  describe('toCollectorTruncatableString', () => {
-    it('should convert string to TruncatableString', () => {
-      assert.deepStrictEqual(transform.toCollectorTruncatableString('foo'), {
-        truncatedByteCount: 0,
-        value: 'foo',
-      });
-    });
-
-    it('should convert long string to TruncatableString', () => {
-      let foo =
-        'foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890';
-      foo += foo;
-      assert.deepStrictEqual(transform.toCollectorTruncatableString(foo), {
-        truncatedByteCount: 54,
-        value:
-          'foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo1234567890foo12345678',
-      });
-    });
-  });
-
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
       const attributes: Attributes = {

@@ -18,26 +18,10 @@ import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorExporter } from './CollectorExporter';
 import { opentelemetryProto } from './types';
-import * as collectorTypes from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { SDK_INFO } from '@opentelemetry/base';
-
-const OT_MAX_STRING_LENGTH = 128;
-
-/**
- * convert string to maximum length of 128, providing information of truncated bytes
- * @param name - string to be converted
- */
-export function toCollectorTruncatableString(
-  name: string
-): collectorTypes.TruncatableString {
-  const value = name.substr(0, OT_MAX_STRING_LENGTH);
-  const truncatedByteCount =
-    name.length > OT_MAX_STRING_LENGTH ? name.length - OT_MAX_STRING_LENGTH : 0;
-
-  return { value, truncatedByteCount };
-}
 
 /**
  * convert attributes to proto
@@ -49,7 +33,7 @@ export function toCollectorAttributes(
   const keys = Object.keys(attributes);
   const protoAttributes: opentelemetryProto.common.v1.AttributeKeyValue[] = [];
   keys.forEach(key => {
-    protoAttributes.push(toCollectorEventValue(key, attributes[key]));
+    protoAttributes.push(toCollectorAttributeKeyValue(key, attributes[key]));
   });
 
   return protoAttributes;
@@ -59,29 +43,29 @@ export function toCollectorAttributes(
  * convert event value
  * @param value event value
  */
-export function toCollectorEventValue(
+export function toCollectorAttributeKeyValue(
   key: string,
   value: unknown
 ): opentelemetryProto.common.v1.AttributeKeyValue {
   let aType: opentelemetryProto.common.v1.ValueType = ValueType.STRING;
-  const attributeValue: opentelemetryProto.common.v1.AttributeKeyValue = {
+  const AttributeKeyValue: opentelemetryProto.common.v1.AttributeKeyValue = {
     key,
     type: 0,
   };
   if (typeof value === 'string') {
-    attributeValue.stringValue = value;
+    AttributeKeyValue.stringValue = value;
   } else if (typeof value === 'boolean') {
     aType = ValueType.BOOL;
-    attributeValue.boolValue = value;
+    AttributeKeyValue.boolValue = value;
   } else if (typeof value === 'number') {
     // all numbers will be treated as double
     aType = ValueType.DOUBLE;
-    attributeValue.doubleValue = value;
+    AttributeKeyValue.doubleValue = value;
   }
 
-  attributeValue.type = aType;
+  AttributeKeyValue.type = aType;
 
-  return attributeValue;
+  return AttributeKeyValue;
 }
 
 /**
@@ -117,8 +101,8 @@ export function toCollectorLinks(
   const protoLinks: opentelemetryProto.trace.v1.Span.Link[] = span.links.map(
     (link: Link) => {
       const protoLink: opentelemetryProto.trace.v1.Span.Link = {
-        traceId: core.hexToBytes(link.context.traceId),
-        spanId: core.hexToBytes(link.context.spanId),
+        traceId: core.hexToBase64(link.context.traceId),
+        spanId: core.hexToBase64(link.context.spanId),
         attributes: toCollectorAttributes(link.attributes || {}),
         droppedAttributesCount: 0,
       };
@@ -132,13 +116,13 @@ export function toCollectorSpan(
   span: ReadableSpan
 ): opentelemetryProto.trace.v1.Span {
   return {
-    traceId: core.hexToBytes(span.spanContext.traceId),
-    spanId: core.hexToBytes(span.spanContext.spanId),
+    traceId: core.hexToBase64(span.spanContext.traceId),
+    spanId: core.hexToBase64(span.spanContext.spanId),
     parentSpanId: span.parentSpanId
-      ? core.hexToBytes(span.parentSpanId)
+      ? core.hexToBase64(span.parentSpanId)
       : undefined,
     traceState: toCollectorTraceState(span.spanContext.traceState),
-    name: toCollectorTruncatableString(span.name),
+    name: span.name,
     kind: span.kind + 1,
     startTimeUnixNano: core.hrTimeToNanoseconds(span.startTime),
     endTimeUnixNano: core.hrTimeToNanoseconds(span.endTime),
@@ -153,10 +137,16 @@ export function toCollectorSpan(
 }
 
 export function toCollectorResource(
-  resource?: Resource
+  resource?: Resource,
+  additionalAttributes: { [key: string]: any } = {}
 ): opentelemetryProto.resource.v1.Resource {
+  const attr = Object.assign(
+    {},
+    additionalAttributes,
+    resource ? resource.labels : {}
+  );
   const resourceProto: opentelemetryProto.resource.v1.Resource = {
-    attributes: toCollectorAttributes(resource ? resource.labels : {}),
+    attributes: toCollectorAttributes(attr),
     droppedAttributesCount: 0,
   };
 
@@ -174,25 +164,41 @@ export function toCollectorTraceState(
 }
 
 /**
- *
- * @param spans spans in proto format
- * @param resource Resource in proto format
+ * @param spans spans
+ * @param collectorExporter
  * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest(
-  spans: opentelemetryProto.trace.v1.Span[],
-  resource: opentelemetryProto.resource.v1.Resource,
+  spans: ReadableSpan[],
+  collectorExporter: CollectorExporter,
   name: string = ''
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+  const spansToBeSent: opentelemetryProto.trace.v1.Span[] = spans.map(span =>
+    toCollectorSpan(span)
+  );
+  const resource: Resource | undefined =
+    spans.length > 0 ? spans[0].resource : Resource.empty();
+
+  const additionalAttributes = Object.assign(
+    {},
+    collectorExporter.attributes || {},
+    {
+      'service.name': collectorExporter.serviceName,
+    }
+  );
+  const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
+    resource,
+    additionalAttributes
+  );
   const instrumentationLibrarySpans: opentelemetryProto.trace.v1.InstrumentationLibrarySpans = {
-    spans,
+    spans: spansToBeSent,
     instrumentationLibrary: {
       name: name || `${SDK_INFO.NAME} - ${SDK_INFO.LANGUAGE}`,
       version: SDK_INFO.VERSION,
     },
   };
   const resourceSpan: opentelemetryProto.trace.v1.ResourceSpans = {
-    resource,
+    resource: protoResource,
     instrumentationLibrarySpans: [instrumentationLibrarySpans],
   };
 

@@ -15,19 +15,15 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
-import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as grpc from 'grpc';
 import * as path from 'path';
 
 import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
-import {
-  toCollectorExportTraceServiceRequest,
-  toCollectorResource,
-  toCollectorSpan,
-} from '../../transform';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorData, GRPCQueueItem } from './types';
+import { fixGRPCUrl } from './util';
 
 const traceServiceClients: WeakMap<
   CollectorExporter,
@@ -43,7 +39,7 @@ export function onInit(collectorExporter: CollectorExporter) {
     isShutDown: false,
     grpcSpansQueue: [],
   });
-  const serverAddress = collectorExporter.url;
+  const serverAddress = fixGRPCUrl(collectorExporter.url);
   const credentials: grpc.ChannelCredentials = grpc.credentials.createInsecure();
 
   const traceServiceProtoPath =
@@ -118,15 +114,9 @@ export function sendSpans(
     return;
   }
   if (exporter.traceServiceClient) {
-    const spansToBeSent: collectorTypes.opentelemetryProto.trace.v1.Span[] = spans.map(
-      span => toCollectorSpan(span)
-    );
-    const resource: Resource | undefined =
-      spans.length > 0 ? spans[0].resource : Resource.empty();
-
     const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-      spansToBeSent,
-      toCollectorResource(resource)
+      spans,
+      collectorExporter
     );
 
     exporter.traceServiceClient.export(
@@ -135,11 +125,11 @@ export function sendSpans(
         err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
       ) => {
         if (err) {
-          onError({
-            code: err.code,
-            message: err.message,
-            stack: err.stack,
-          });
+          collectorExporter.logger.error(
+            'exportTraceServiceRequest',
+            exportTraceServiceRequest
+          );
+          onError(err);
         } else {
           onSuccess();
         }

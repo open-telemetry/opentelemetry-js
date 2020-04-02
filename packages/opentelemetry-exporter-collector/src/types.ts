@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -66,9 +66,9 @@ export namespace opentelemetryProto {
       }
 
       export interface Link {
-        traceId: Uint8Array;
-        spanId: Uint8Array;
-        traceState?: TraceState;
+        traceId: string;
+        spanId: string;
+        traceState?: opentelemetryProto.trace.v1.Span.TraceState;
         attributes?: opentelemetryProto.common.v1.AttributeKeyValue[];
         droppedAttributesCount: number;
       }
@@ -89,7 +89,7 @@ export namespace opentelemetryProto {
     }
 
     export interface InstrumentationLibrarySpans {
-      instrumentationLibrary: opentelemetryProto.common.v1.InstrumentationLibrary | null;
+      instrumentationLibrary?: opentelemetryProto.common.v1.InstrumentationLibrary;
       spans: opentelemetryProto.trace.v1.Span[];
     }
 
@@ -107,11 +107,11 @@ export namespace opentelemetryProto {
     }
 
     export interface Span {
-      traceId: Uint8Array;
-      spanId: Uint8Array;
+      traceId: string;
+      spanId: string;
       traceState: opentelemetryProto.trace.v1.Span.TraceState;
-      parentSpanId?: Uint8Array;
-      name?: opentelemetryProto.trace.v1.TruncatableString;
+      parentSpanId?: string;
+      name?: string;
       kind?: opentelemetryProto.trace.v1.Span.SpanKind;
       startTimeUnixNano?: number;
       endTimeUnixNano?: number;
@@ -164,33 +164,6 @@ export namespace opentelemetryProto {
       BOOL,
     }
   }
-}
-
-/**
- * A string that might be shortened to a specified length.
- */
-export interface TruncatableString {
-  /**
-   * The shortened string. For example, if the original string was 500 bytes
-   * long and the limit of the string was 128 bytes, then this value contains
-   * the first 128 bytes of the 500-byte string. Note that truncation always
-   * happens on a character boundary, to ensure that a truncated string is still
-   * valid UTF-8. Because it may contain multi-byte characters, the size of the
-   * truncated string may be less than the truncation limit.
-   */
-  value?: string;
-  /**
-   * The number of bytes removed from the original string. If this value is 0,
-   * then the string was not shortened.
-   */
-  truncatedByteCount?: number;
-}
-
-/**
- * Interface to represent a trace state
- */
-export interface TraceState {
-  [key: string]: string;
 }
 
 /**

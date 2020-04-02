@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import { TraceFlags } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
 
 if (typeof Buffer === 'undefined') {
@@ -28,6 +29,31 @@ if (typeof Buffer === 'undefined') {
     },
   };
 }
+
+const traceIdArr = [
+  31,
+  16,
+  8,
+  220,
+  142,
+  39,
+  14,
+  133,
+  196,
+  10,
+  13,
+  124,
+  57,
+  57,
+  178,
+  120,
+];
+const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
+const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
+
+const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
+const spanIdBase64 = 'XhByYfZPpT4=';
+const parentIdBase64 = 'eKiRUJiGQ4g=';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -82,270 +108,12 @@ export const mockedReadableSpan: ReadableSpan = {
   }),
 };
 
-export function ensureSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
+export function ensureExportedEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
 ) {
-  assert.deepStrictEqual(span, {
-    traceId: Buffer.from([
-      31,
-      16,
-      8,
-      220,
-      142,
-      39,
-      14,
-      133,
-      196,
-      10,
-      13,
-      124,
-      57,
-      57,
-      178,
-      120,
-    ]),
-    spanId: Buffer.from([94, 16, 114, 97, 246, 79, 165, 62]),
-    parentSpanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
-    traceState: undefined,
-    name: { value: 'documentFetch', truncatedByteCount: 0 },
-    kind: 1,
-    startTimeUnixNano: 1574120165429803000,
-    endTimeUnixNano: 1574120165438688000,
-    attributes: [
-      {
-        key: 'component',
-        type: 0,
-        stringValue: 'document-load',
-      },
-    ],
-    droppedAttributesCount: 0,
-    events: [
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'fetchStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'domainLookupStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'domainLookupEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'connectStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'connectEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165435513000,
-        name: 'requestStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165436923100,
-        name: 'responseStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165438688000,
-        name: 'responseEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-    ],
-    droppedEventsCount: 0,
-    status: { code: 0 },
-    links: [
-      {
-        traceId: Buffer.from([
-          31,
-          16,
-          8,
-          220,
-          142,
-          39,
-          14,
-          133,
-          196,
-          10,
-          13,
-          124,
-          57,
-          57,
-          178,
-          120,
-        ]),
-        spanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
-        attributes: [
-          {
-            key: 'component',
-            type: 0,
-            stringValue: 'document-load',
-          },
-        ],
-        droppedAttributesCount: 0,
-      },
-    ],
-    droppedLinksCount: 0,
-  });
-}
-
-export function ensureBrowserSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
-) {
-  const expected = {
-    traceId: new Uint8Array([
-      31,
-      16,
-      8,
-      220,
-      142,
-      39,
-      14,
-      133,
-      196,
-      10,
-      13,
-      124,
-      57,
-      57,
-      178,
-      120,
-    ]),
-    spanId: new Uint8Array([94, 16, 114, 97, 246, 79, 165, 62]),
-    parentSpanId: new Uint8Array([120, 168, 145, 80, 152, 134, 67, 136]),
-    traceState: undefined,
-    name: { value: 'documentFetch', truncatedByteCount: 0 },
-    kind: 1,
-    startTimeUnixNano: 1574120165429803000,
-    endTimeUnixNano: 1574120165438688000,
-    attributes: [
-      {
-        key: 'component',
-        type: 0,
-        stringValue: 'document-load',
-      },
-    ],
-    droppedAttributesCount: 0,
-    events: [
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'fetchStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'domainLookupStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'domainLookupEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'connectStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165429803000,
-        name: 'connectEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165435513000,
-        name: 'requestStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165436923100,
-        name: 'responseStart',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-      {
-        timeUnixNano: 1574120165438688000,
-        name: 'responseEnd',
-        attributes: [],
-        droppedAttributesCount: 0,
-      },
-    ],
-    droppedEventsCount: 0,
-    status: { code: 0 },
-    links: [
-      {
-        traceId: new Uint8Array([
-          31,
-          16,
-          8,
-          220,
-          142,
-          39,
-          14,
-          133,
-          196,
-          10,
-          13,
-          124,
-          57,
-          57,
-          178,
-          120,
-        ]),
-        spanId: new Uint8Array([120, 168, 145, 80, 152, 134, 67, 136]),
-        attributes: [
-          {
-            key: 'component',
-            type: 0,
-            stringValue: 'document-load',
-          },
-        ],
-        droppedAttributesCount: 0,
-      },
-    ],
-    droppedLinksCount: 0,
-  };
-  assert.deepStrictEqual(span, JSON.parse(JSON.stringify(expected)));
-}
-
-export function ensureExportedSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
-) {
-  assert.deepStrictEqual(span, {
-    attributes: [
-      {
-        key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-    ],
-    events: [
+  assert.deepStrictEqual(
+    events,
+    [
       {
         attributes: [],
         timeUnixNano: '1574120165429803008',
@@ -395,7 +163,35 @@ export function ensureExportedSpanIsCorrect(
         droppedAttributesCount: 0,
       },
     ],
-    links: [
+    'exported events are incorrect'
+  );
+}
+
+export function ensureExportedAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 'STRING',
+        stringValue: 'document-load',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+    ],
+    'exported attributes are incorrect'
+  );
+}
+
+export function ensureExportedLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
       {
         attributes: [
           {
@@ -407,59 +203,211 @@ export function ensureExportedSpanIsCorrect(
             boolValue: false,
           },
         ],
-        traceId: Buffer.from([
-          31,
-          16,
-          8,
-          220,
-          142,
-          39,
-          14,
-          133,
-          196,
-          10,
-          13,
-          124,
-          57,
-          57,
-          178,
-          120,
-        ]),
-        spanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
+        traceId: Buffer.from(traceIdArr),
+        spanId: Buffer.from(parentIdArr),
         traceState: '',
         droppedAttributesCount: 0,
       },
     ],
-    traceId: Buffer.from([
-      31,
-      16,
-      8,
-      220,
-      142,
-      39,
-      14,
-      133,
-      196,
-      10,
-      13,
-      124,
-      57,
-      57,
-      178,
-      120,
-    ]),
-    spanId: Buffer.from([94, 16, 114, 97, 246, 79, 165, 62]),
-    traceState: '',
-    parentSpanId: Buffer.from([120, 168, 145, 80, 152, 134, 67, 136]),
-    name: '[object Object]',
-    kind: 'INTERNAL',
-    startTimeUnixNano: '1574120165429803008',
-    endTimeUnixNano: '1574120165438688000',
-    droppedAttributesCount: 0,
-    droppedEventsCount: 0,
-    droppedLinksCount: 0,
-    status: { code: 'Ok', message: '' },
-  });
+    'exported links are incorrect'
+  );
+}
+
+export function ensureEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'fetchStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'domainLookupStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'domainLookupEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'connectStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'connectEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165435513000,
+        name: 'requestStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165436923100,
+        name: 'responseStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165438688000,
+        name: 'responseEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'events are incorrect'
+  );
+}
+
+export function ensureAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 0,
+        stringValue: 'document-load',
+      },
+    ],
+    'attributes are incorrect'
+  );
+}
+
+export function ensureLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        traceId: traceIdBase64,
+        spanId: parentIdBase64,
+        attributes: [
+          {
+            key: 'component',
+            type: 0,
+            stringValue: 'document-load',
+          },
+        ],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'links are incorrect'
+  );
+}
+
+export function ensureSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    parentIdBase64,
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(
+    span.kind,
+    opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
+    'kind is wrong'
+  );
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    1574120165429803008,
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    1574120165438688000,
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
+}
+
+export function ensureExportedSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureExportedAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureExportedEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureExportedLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(
+    span.traceId,
+    Buffer.from(traceIdArr),
+    'traceId is wrong'
+  );
+  assert.deepStrictEqual(
+    span.spanId,
+    Buffer.from(spanIdArr),
+    'spanId is wrong'
+  );
+  assert.strictEqual(span.traceState, '', 'traceState is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    Buffer.from(parentIdArr),
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    '1574120165429803008',
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    '1574120165438688000',
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(
+    span.status,
+    { code: 'Ok', message: '' },
+    'status is wrong'
+  );
 }
 
 export function ensureWebResourceIsCorrect(
@@ -467,6 +415,11 @@ export function ensureWebResourceIsCorrect(
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [
+      {
+        key: 'service.name',
+        type: 0,
+        stringValue: 'bar',
+      },
       {
         key: 'service',
         type: 0,
@@ -488,6 +441,14 @@ export function ensureResourceIsCorrect(
 ) {
   assert.deepStrictEqual(resource, {
     attributes: [
+      {
+        key: 'service.name',
+        type: 'STRING',
+        stringValue: 'basic-service',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
       {
         key: 'service',
         type: 'STRING',

@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,9 @@
  */
 
 import { Logger } from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporter } from '../../CollectorExporter';
-import {
-  toCollectorExportTraceServiceRequest,
-  toCollectorResource,
-  toCollectorSpan,
-} from '../../transform';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
 
 /**
@@ -55,15 +50,9 @@ export function sendSpans(
   onError: (error: collectorTypes.CollectorExporterError) => void,
   collectorExporter: CollectorExporter
 ) {
-  const spansToBeSent: collectorTypes.opentelemetryProto.trace.v1.Span[] = spans.map(
-    span => toCollectorSpan(span)
-  );
-  const resource: Resource | undefined =
-    spans.length > 0 ? spans[0].resource : Resource.empty();
-
   const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-    spansToBeSent,
-    toCollectorResource(resource)
+    spans,
+    collectorExporter
   );
 
   const body = JSON.stringify(exportTraceServiceRequest);
@@ -121,7 +110,7 @@ function sendSpansWithBeacon(
  * @param collectorUrl
  */
 function sendSpansWithXhr(
-  body: any,
+  body: string,
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void,
   logger: Logger,
@@ -130,7 +119,8 @@ function sendSpansWithXhr(
   const xhr = new XMLHttpRequest();
   xhr.open('POST', collectorUrl);
   xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
-  // xhr.setRequestHeader('Content-Length', String(body.length));
+  xhr.setRequestHeader('Accept', 'application/octet-stream');
+  xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(body);
 
   xhr.onreadystatechange = () => {
@@ -139,7 +129,8 @@ function sendSpansWithXhr(
         logger.debug('xhr success', body);
         onSuccess();
       } else {
-        logger.error('xhr error', xhr.status, body);
+        logger.error('body', body);
+        logger.error('xhr error', xhr);
         onError({
           code: xhr.status,
           message: xhr.responseText,

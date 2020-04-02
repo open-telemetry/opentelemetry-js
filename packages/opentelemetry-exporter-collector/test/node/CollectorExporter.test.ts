@@ -36,7 +36,7 @@ import {
 const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
 const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
-// const address = '127.0.0.1:55679';
+
 const address = '127.0.0.1:1501';
 
 describe('CollectorExporter - node', () => {
@@ -78,9 +78,7 @@ describe('CollectorExporter - node', () => {
         );
         server.bind(address, grpc.ServerCredentials.createInsecure());
         server.start();
-        setTimeout(() => {
-          done();
-        }, 200);
+        done();
       });
   });
 
@@ -96,9 +94,7 @@ describe('CollectorExporter - node', () => {
 
     const provider = new BasicTracerProvider();
     provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
-    setTimeout(() => {
-      done();
-    }, 200);
+    done();
   });
 
   afterEach(() => {

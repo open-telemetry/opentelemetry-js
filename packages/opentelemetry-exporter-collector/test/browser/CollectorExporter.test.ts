@@ -25,7 +25,7 @@ import {
 import * as collectorTypes from '../../src/types';
 
 import {
-  ensureBrowserSpanIsCorrect,
+  ensureSpanIsCorrect,
   ensureExportTraceServiceRequestIsSet,
   ensureWebResourceIsCorrect,
   mockedReadableSpan,
@@ -80,7 +80,7 @@ describe('CollectorExporter - web', () => {
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
-            ensureBrowserSpanIsCorrect(span1);
+            ensureSpanIsCorrect(span1);
           }
 
           const resource = json.resourceSpans[0].resource;
@@ -163,7 +163,7 @@ describe('CollectorExporter - web', () => {
 
           assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
           if (span1) {
-            ensureBrowserSpanIsCorrect(span1);
+            ensureSpanIsCorrect(span1);
           }
 
           const resource = json.resourceSpans[0].resource;
@@ -208,8 +208,10 @@ describe('CollectorExporter - web', () => {
           const request = server.requests[0];
           request.respond(400);
 
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'xhr error');
+          const response1: any = spyLoggerError.args[0][0];
+          const response2: any = spyLoggerError.args[1][0];
+          assert.strictEqual(response1, 'body');
+          assert.strictEqual(response2, 'xhr error');
 
           assert.strictEqual(spyBeacon.callCount, 0);
           done();
