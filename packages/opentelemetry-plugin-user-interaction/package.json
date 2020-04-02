@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-user-interaction",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "OpenTelemetry UserInteraction automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,9 +43,9 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@opentelemetry/context-zone-peer-dep": "^0.5.2",
-    "@opentelemetry/plugin-xml-http-request": "^0.5.2",
-    "@opentelemetry/tracing": "^0.5.2",
+    "@opentelemetry/context-zone-peer-dep": "^0.6.0",
+    "@opentelemetry/plugin-xml-http-request": "^0.6.0",
+    "@opentelemetry/tracing": "^0.6.0",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^5.2.5",
     "@types/node": "^12.6.8",
@@ -79,9 +79,9 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.5.2",
-    "@opentelemetry/core": "^0.5.2",
-    "@opentelemetry/web": "^0.5.2",
+    "@opentelemetry/api": "^0.6.0",
+    "@opentelemetry/core": "^0.6.0",
+    "@opentelemetry/web": "^0.6.0",
     "shimmer": "^1.2.1"
   },
   "peerDependencies": {

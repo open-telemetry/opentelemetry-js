@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.6.0
+
+Released 2020-04-01
+
+#### :boom: Breaking Change
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#915](https://github.com/open-telemetry/opentelemetry-js/pull/915) Remove label set from metrics API ([@mayurkale22](https://github.com/mayurkale22))
+
+#### :rocket: (Enhancement)
+* `opentelemetry-tracing`
+  * [#913](https://github.com/open-telemetry/opentelemetry-js/pull/913) chore: remove unused default argument in Tracer ([@Flarna](https://github.com/Flarna))
+* `opentelemetry-exporter-jaeger`
+  * [#916](https://github.com/open-telemetry/opentelemetry-js/pull/916) chore: removing force flush ([@obecny](https://github.com/obecny))
+
+#### :books: (Refine Doc)
+* `opentelemetry-node`
+  * [#921](https://github.com/open-telemetry/opentelemetry-js/pull/921) chore: fix Require Path in README [@shivkanya9146](https://github.com/shivkanya9146))
+
+#### Committers: 4
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Gerhard Stöbich ([@Flarna](https://github.com/Flarna))
+- Shivkanya Andhare ([@shivkanya9146](https://github.com/shivkanya9146))
+
 ## 0.5.2
 
 Released 2020-03-27
@@ -35,7 +59,7 @@ Released 2020-03-27
 - Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
 
 
-## 0.5.1 
+## 0.5.1
 
 Released 2020-03-19
 
