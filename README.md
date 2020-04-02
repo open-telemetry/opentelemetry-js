@@ -190,6 +190,9 @@ To request automatic tracing support for a module not on this list, please [file
 
 Apache 2.0 - See [LICENSE][license-url] for more information.
 
+[node-gitter-url]: https://gitter.im/open-telemetry/opentelemetry-node?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
+[license-url]: https://github.com/open-telemetry/opentelemetry-js/blob/master/LICENSE
+
 [up-for-grabs-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3Aup-for-grabs
 [good-first-issues]: https://github.com/open-telemetry/OpenTelemetry-js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22
 
