@@ -37,6 +37,8 @@ export class JaegerExporter implements SpanExporter {
     this._onShutdownFlushTimeout =
       typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
 
+    config.host = config.host || process.env.JAEGER_AGENT_HOST;
+
     this._sender = new jaegerTypes.UDPSender(config);
     if (this._sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
