@@ -110,7 +110,6 @@
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/event.html" class="tsd-kind-icon">Event</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/httptextpropagator.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Propagator</a></li>
-								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/labelset.html" class="tsd-kind-icon">Label<wbr>Set</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/link.html" class="tsd-kind-icon">Link</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a></li>
@@ -156,7 +155,6 @@
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_bound_observer" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>OBSERVER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_http_text_propagator" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</a></li>
-								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_label_set" class="tsd-kind-icon">NOOP_<wbr>LABEL_<wbr>SET</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_measure_metric" class="tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_meter_provider" class="tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER</a></li>
@@ -195,7 +193,7 @@
 					<div class="tsd-signature tsd-kind-icon">Getter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/context/propagation/getter.ts#L17">src/context/propagation/getter.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/context/propagation/getter.ts#L17">src/context/propagation/getter.ts:17</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -235,7 +233,7 @@
 					<div class="tsd-signature tsd-kind-icon">Hr<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/common/Time.ts#L18">src/common/Time.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/common/Time.ts#L18">src/common/Time.ts:18</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -247,16 +245,24 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
 					<a name="labels" class="tsd-anchor"></a>
 					<h3>Labels</h3>
-					<div class="tsd-signature tsd-kind-icon">Labels<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Record</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">Labels<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/Metric.ts#L143">src/metrics/Metric.ts:143</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/Metric.ts#L142">src/metrics/Metric.ts:142</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
 							<p>key-value pairs passed by the user.</p>
 						</div>
+					</div>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span></h5>
+							</li>
+						</ul>
 					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
@@ -265,7 +271,7 @@
 					<div class="tsd-signature tsd-kind-icon">Link<wbr>Context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"traceId"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"spanId"</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/link_context.ts#L22">src/trace/link_context.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/link_context.ts#L22">src/trace/link_context.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -280,7 +286,7 @@
 					<div class="tsd-signature tsd-kind-icon">Log<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/common/Logger.ts#L17">src/common/Logger.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/common/Logger.ts#L17">src/common/Logger.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -314,7 +320,7 @@
 					<div class="tsd-signature tsd-kind-icon">Setter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/context/propagation/setter.ts#L17">src/context/propagation/setter.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/context/propagation/setter.ts#L17">src/context/propagation/setter.ts:17</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -357,7 +363,7 @@
 					<div class="tsd-signature tsd-kind-icon">Time<wbr>Input<span class="tsd-signature-symbol">:</span> <a href="globals.html#hrtime" class="tsd-signature-type">HrTime</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Date</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/common/Time.ts#L25">src/common/Time.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/common/Time.ts#L25">src/common/Time.ts:25</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -376,7 +382,7 @@
 					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;0&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L25">src/trace/NoopSpan.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L25">src/trace/NoopSpan.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -386,7 +392,7 @@
 					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;0&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L24">src/trace/NoopSpan.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L24">src/trace/NoopSpan.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -396,7 +402,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundcounter.html" class="tsd-signature-type">NoopBoundCounter</a><span class="tsd-signature-symbol"> =&nbsp;new NoopBoundCounter()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L159">src/metrics/NoopMeter.ts:159</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L143">src/metrics/NoopMeter.ts:143</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -406,7 +412,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundmeasure.html" class="tsd-signature-type">NoopBoundMeasure</a><span class="tsd-signature-symbol"> =&nbsp;new NoopBoundMeasure()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L162">src/metrics/NoopMeter.ts:162</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L146">src/metrics/NoopMeter.ts:146</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -416,7 +422,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>OBSERVER<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundobserver.html" class="tsd-signature-type">NoopBoundObserver</a><span class="tsd-signature-symbol"> =&nbsp;new NoopBoundObserver()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L165">src/metrics/NoopMeter.ts:165</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L149">src/metrics/NoopMeter.ts:149</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -426,7 +432,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopcountermetric.html" class="tsd-signature-type">NoopCounterMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopCounterMetric(NOOP_BOUND_COUNTER)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L160">src/metrics/NoopMeter.ts:160</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L144">src/metrics/NoopMeter.ts:144</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -436,17 +442,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR<span class="tsd-signature-symbol">:</span> <a href="classes/noophttptextpropagator.html" class="tsd-signature-type">NoopHttpTextPropagator</a><span class="tsd-signature-symbol"> =&nbsp;new NoopHttpTextPropagator()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/context/propagation/NoopHttpTextPropagator.ts#L32">src/context/propagation/NoopHttpTextPropagator.ts:32</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
-					<a name="noop_label_set" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>LABEL_<wbr>SET</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>LABEL_<wbr>SET<span class="tsd-signature-symbol">:</span> <a href="interfaces/labelset.html" class="tsd-signature-type">LabelSet</a><span class="tsd-signature-symbol"> =&nbsp;{} as LabelSet</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L168">src/metrics/NoopMeter.ts:168</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/context/propagation/NoopHttpTextPropagator.ts#L32">src/context/propagation/NoopHttpTextPropagator.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -456,7 +452,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeasureMetric(NOOP_BOUND_MEASURE)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L163">src/metrics/NoopMeter.ts:163</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L147">src/metrics/NoopMeter.ts:147</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -466,7 +462,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeter.html" class="tsd-signature-type">NoopMeter</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeter()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L158">src/metrics/NoopMeter.ts:158</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L142">src/metrics/NoopMeter.ts:142</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -476,7 +472,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeterprovider.html" class="tsd-signature-type">NoopMeterProvider</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeterProvider()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeterProvider.ts#L31">src/metrics/NoopMeterProvider.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeterProvider.ts#L31">src/metrics/NoopMeterProvider.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -486,7 +482,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>OBSERVER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopobservermetric.html" class="tsd-signature-type">NoopObserverMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopObserverMetric(NOOP_BOUND_OBSERVER)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L166">src/metrics/NoopMeter.ts:166</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L150">src/metrics/NoopMeter.ts:150</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -496,7 +492,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>SPAN<span class="tsd-signature-symbol">:</span> <a href="classes/noopspan.html" class="tsd-signature-type">NoopSpan</a><span class="tsd-signature-symbol"> =&nbsp;new NoopSpan()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L81">src/trace/NoopSpan.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L81">src/trace/NoopSpan.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -506,7 +502,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracer.html" class="tsd-signature-type">NoopTracer</a><span class="tsd-signature-symbol"> =&nbsp;new NoopTracer()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopTracer.ts#L45">src/trace/NoopTracer.ts:45</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopTracer.ts#L45">src/trace/NoopTracer.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -516,7 +512,7 @@
 					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracerprovider.html" class="tsd-signature-type">NoopTracerProvider</a><span class="tsd-signature-symbol"> =&nbsp;new NoopTracerProvider()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopTracerProvider.ts#L31">src/trace/NoopTracerProvider.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopTracerProvider.ts#L31">src/trace/NoopTracerProvider.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -526,7 +522,7 @@
 					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> =&nbsp;ContextAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/index.ts#L56">src/index.ts:56</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/index.ts#L56">src/index.ts:56</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -541,7 +537,7 @@
 					<div class="tsd-signature tsd-kind-icon">context<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> =&nbsp;ContextAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/api/propagation.ts#L24">src/api/propagation.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/api/propagation.ts#L24">src/api/propagation.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -551,7 +547,7 @@
 					<div class="tsd-signature tsd-kind-icon">metrics<span class="tsd-signature-symbol">:</span> <a href="classes/metricsapi.html" class="tsd-signature-type">MetricsAPI</a><span class="tsd-signature-symbol"> =&nbsp;MetricsAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/index.ts#L64">src/index.ts:64</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/index.ts#L64">src/index.ts:64</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -566,7 +562,7 @@
 					<div class="tsd-signature tsd-kind-icon">propagation<span class="tsd-signature-symbol">:</span> <a href="classes/propagationapi.html" class="tsd-signature-type">PropagationAPI</a><span class="tsd-signature-symbol"> =&nbsp;PropagationAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/index.ts#L68">src/index.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/index.ts#L68">src/index.ts:68</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -581,7 +577,7 @@
 					<div class="tsd-signature tsd-kind-icon">trace<span class="tsd-signature-symbol">:</span> <a href="classes/traceapi.html" class="tsd-signature-type">TraceAPI</a><span class="tsd-signature-symbol"> =&nbsp;TraceAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/index.ts#L60">src/index.ts:60</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/index.ts#L60">src/index.ts:60</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -603,7 +599,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/context/propagation/getter.ts#L29">src/context/propagation/getter.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/context/propagation/getter.ts#L29">src/context/propagation/getter.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -637,7 +633,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/context/propagation/setter.ts#L29">src/context/propagation/setter.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/context/propagation/setter.ts#L29">src/context/propagation/setter.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -672,7 +668,7 @@
 					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L26">src/trace/NoopSpan.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L26">src/trace/NoopSpan.ts:26</a></li>
 						</ul>
 					</aside>
 					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external tsd-is-not-exported">
@@ -681,7 +677,7 @@
 						<div class="tsd-signature tsd-kind-icon">span<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;INVALID_SPAN_ID</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L28">src/trace/NoopSpan.ts:28</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L28">src/trace/NoopSpan.ts:28</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -691,7 +687,7 @@
 						<div class="tsd-signature tsd-kind-icon">trace<wbr>Flags<span class="tsd-signature-symbol">:</span> <a href="enums/traceflags.html" class="tsd-signature-type">TraceFlags</a><span class="tsd-signature-symbol"> =&nbsp;TraceFlags.NONE</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L29">src/trace/NoopSpan.ts:29</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L29">src/trace/NoopSpan.ts:29</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -701,7 +697,7 @@
 						<div class="tsd-signature tsd-kind-icon">trace<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;INVALID_TRACE_ID</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c013f3a/packages/opentelemetry-api/src/trace/NoopSpan.ts#L27">src/trace/NoopSpan.ts:27</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b0e8a5c/packages/opentelemetry-api/src/trace/NoopSpan.ts#L27">src/trace/NoopSpan.ts:27</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -809,9 +805,6 @@
 						<a href="interfaces/httptextpropagator.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Propagator</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/labelset.html" class="tsd-kind-icon">Label<wbr>Set</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/link.html" class="tsd-kind-icon">Link</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
@@ -915,9 +908,6 @@
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_http_text_propagator" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_label_set" class="tsd-kind-icon">NOOP_<wbr>LABEL_<wbr>SET</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_measure_metric" class="tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC</a>
