@@ -15,6 +15,7 @@
  */
 
 import * as nock from 'nock';
+import * as sinon from 'sinon';
 import { URL } from 'url';
 import { Resource, detectResources } from '../src';
 import { awsEc2Detector } from '../src/platform/node/detectors';
@@ -135,6 +136,22 @@ describe('detectResources', async () => {
         namespace: 'default',
         version: '0.0.1',
       });
+    });
+  });
+
+  describe('with a buggy detector', () => {
+    it('returns a merged resource', async () => {
+      const stub = sinon.stub(awsEc2Detector, 'detect').throws();
+      const resource: Resource = await detectResources();
+
+      assertServiceResource(resource, {
+        instanceId: '627cc493',
+        name: 'my-service',
+        namespace: 'default',
+        version: '0.0.1',
+      });
+
+      stub.restore();
     });
   });
 });

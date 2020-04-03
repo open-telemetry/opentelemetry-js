@@ -26,7 +26,13 @@ const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
  */
 export const detectResources = async (): Promise<Resource> => {
   const resources: Array<Resource> = await Promise.all(
-    DETECTORS.map(d => d.detect())
+    DETECTORS.map(d => {
+      try {
+        return d.detect();
+      } catch {
+        return Resource.empty();
+      }
+    })
   );
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
