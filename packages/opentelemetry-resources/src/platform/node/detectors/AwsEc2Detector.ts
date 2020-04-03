@@ -77,11 +77,9 @@ class AwsEc2Detector implements Detector {
             try {
               resolve(JSON.parse(rawData));
             } catch (e) {
-              res.resume(); // consume response data to free up memory
               reject(e);
             }
           } else {
-            res.resume(); // consume response data to free up memory
             reject(
               new Error('Failed to load page, status code: ' + statusCode)
             );
