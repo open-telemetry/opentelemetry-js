@@ -16,10 +16,15 @@
 
 import { Resource } from './Resource';
 
+/** Interface for Resource labels  */
 export interface ResourceLabels {
   [key: string]: number | string | boolean;
 }
 
+/**
+ * Interface for a Resource Detector. In order to detect resources in parallel
+ * a detector returns a Promise containing a Resource.
+ */
 export interface Detector {
   detect(): Promise<Resource>;
 }

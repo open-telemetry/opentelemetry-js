@@ -25,6 +25,10 @@ import { Detector } from '../../../types';
  * instance. Returns an empty Resource if detection fails.
  */
 class AwsEc2Detector implements Detector {
+  /**
+   * See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.html
+   * for documentation about the AWS instance identity document endpoint.
+   */
   readonly AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
     'http://169.254.169.254/latest/dynamic/instance-identity/document';
 
