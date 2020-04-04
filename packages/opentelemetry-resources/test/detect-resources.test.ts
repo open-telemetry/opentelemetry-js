@@ -53,13 +53,13 @@ const mockedAwsResponse = {
 };
 
 describe('detectResources', async () => {
-  before(() => {
+  beforeEach(() => {
     nock.disableNetConnect();
     process.env.OTEL_RESOURCE_LABELS =
       'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
   });
 
-  after(() => {
+  afterEach(() => {
     nock.cleanAll();
     nock.enableNetConnect();
     delete process.env.OTEL_RESOURCE_LABELS;
@@ -71,7 +71,7 @@ describe('detectResources', async () => {
     });
 
     it('returns a merged resource', async () => {
-      const scope = nock(HOST_ADDRESS)
+      const gcpScope = nock(HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS)
         .get(INSTANCE_ID_PATH)
@@ -82,12 +82,16 @@ describe('detectResources', async () => {
         .reply(200, () => 'project/zone/my-zone', HEADERS)
         .get(CLUSTER_NAME_PATH)
         .reply(404);
-      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
+      const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
+      const awsScope = nock(AWS_HOST)
+        .get(AWS_PATH)
+        .replyWithError({ code: 'ENOTFOUND' });
       const resource: Resource = await detectResources();
-      secondaryScope.done();
-      scope.done();
+      awsScope.done();
+      gcpSecondaryScope.done();
+      gcpScope.done();
 
       assertCloudResource(resource, {
         provider: 'gcp',

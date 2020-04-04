@@ -154,33 +154,6 @@ describe('gcpDetector', () => {
       });
     });
 
-    it('should retry if the initial request fails', async () => {
-      const scope = nock(HOST_ADDRESS)
-        .get(INSTANCE_PATH)
-        .reply(500)
-        .get(PROJECT_ID_PATH)
-        .reply(200, () => 'my-project-id', HEADERS)
-        .get(ZONE_PATH)
-        .reply(200, () => 'project/zone/my-zone', HEADERS)
-        .get(INSTANCE_ID_PATH)
-        .reply(200, () => 4520031799277581759, HEADERS)
-        .get(CLUSTER_NAME_PATH)
-        .reply(413);
-      const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
-        .get(INSTANCE_PATH)
-        .reply(200, {}, HEADERS);
-      const resource = await gcpDetector.detect();
-      secondaryScope.done();
-      scope.done();
-
-      assertCloudResource(resource, {
-        accountId: 'my-project-id',
-        zone: 'my-zone',
-      });
-
-      assertHostResource(resource, { id: '4520031799277582000' });
-    });
-
     it('returns empty resource if not detected', async () => {
       const resource = await gcpDetector.detect();
       assertEmptyResource(resource);
