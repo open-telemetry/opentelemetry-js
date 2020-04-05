@@ -29,6 +29,19 @@ type PatchedEventEmitter = {
   __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
 } & EventEmitter;
 
+class Reference<T> {
+  constructor(private _value: T) {}
+
+  set(value: T) {
+    this._value = value;
+    return this;
+  }
+
+  get() {
+    return this._value;
+  }
+}
+
 const ADD_LISTENER_METHODS = [
   'addListener' as 'addListener',
   'on' as 'on',
@@ -39,9 +52,7 @@ const ADD_LISTENER_METHODS = [
 
 export class AsyncHooksContextManager implements ContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
-  private _contexts: {
-    [uid: number]: Context | undefined | null;
-  } = Object.create(null);
+  private _contextRefs: Map<number, Reference<Context> | undefined> = new Map();
 
   constructor() {
     this._asyncHook = asyncHooks.createHook({
@@ -52,9 +63,8 @@ export class AsyncHooksContextManager implements ContextManager {
   }
 
   active(): Context {
-    return (
-      this._contexts[asyncHooks.executionAsyncId()] || Context.ROOT_CONTEXT
-    );
+    const ref = this._contextRefs.get(asyncHooks.executionAsyncId());
+    return ref === undefined ? Context.ROOT_CONTEXT : ref.get();
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
@@ -62,8 +72,15 @@ export class AsyncHooksContextManager implements ContextManager {
     fn: T
   ): ReturnType<T> {
     const uid = asyncHooks.executionAsyncId();
-    const oldContext = this._contexts[uid];
-    this._contexts[uid] = context;
+    let ref = this._contextRefs.get(uid);
+    let oldContext: Context | undefined = undefined;
+    if (ref === undefined) {
+      ref = new Reference(context);
+      this._contextRefs.set(uid, ref);
+    } else {
+      oldContext = ref.get();
+      ref.set(context);
+    }
     try {
       return fn();
     } catch (err) {
@@ -72,7 +89,7 @@ export class AsyncHooksContextManager implements ContextManager {
       if (oldContext === undefined) {
         this._destroy(uid);
       } else {
-        this._contexts[uid] = oldContext;
+        ref.set(oldContext);
       }
     }
   }
@@ -82,8 +99,15 @@ export class AsyncHooksContextManager implements ContextManager {
     fn: U
   ): Promise<T> {
     const uid = asyncHooks.executionAsyncId();
-    const oldContext = this._contexts[uid];
-    this._contexts[uid] = context;
+    let ref = this._contextRefs.get(uid);
+    let oldContext: Context | undefined = undefined;
+    if (ref === undefined) {
+      ref = new Reference(context);
+      this._contextRefs.set(uid, ref);
+    } else {
+      oldContext = ref.get();
+      ref.set(context);
+    }
     try {
       return await fn();
     } catch (err) {
@@ -92,7 +116,7 @@ export class AsyncHooksContextManager implements ContextManager {
       if (oldContext === undefined) {
         this._destroy(uid);
       } else {
-        this._contexts[uid] = oldContext;
+        ref.set(oldContext);
       }
     }
   }
@@ -117,7 +141,7 @@ export class AsyncHooksContextManager implements ContextManager {
 
   disable(): this {
     this._asyncHook.disable();
-    this._contexts = {};
+    this._contextRefs.clear();
     return this;
   }
 
@@ -252,7 +276,10 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid id of the async context
    */
   private _init(uid: number) {
-    this._contexts[uid] = this._contexts[asyncHooks.executionAsyncId()];
+    this._contextRefs.set(
+      uid,
+      this._contextRefs.get(asyncHooks.executionAsyncId())
+    );
   }
 
   /**
@@ -261,6 +288,6 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid uid of the async context
    */
   private _destroy(uid: number) {
-    delete this._contexts[uid];
+    this._contextRefs.delete(uid);
   }
 }

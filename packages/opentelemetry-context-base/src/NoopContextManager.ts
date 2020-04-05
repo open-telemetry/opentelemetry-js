@@ -22,10 +22,7 @@ export class NoopContextManager implements types.ContextManager {
     return Context.ROOT_CONTEXT;
   }
 
-  with(
-    context: Context,
-    fn: Function
-  ) {
+  with(context: Context, fn: Function) {
     return fn();
   }
 
