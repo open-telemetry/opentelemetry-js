@@ -16,6 +16,7 @@
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
+import { Distribution, Checkpoint } from './aggregators';
 
 /** The kind of metric. */
 export enum MetricKind {
@@ -29,13 +30,6 @@ export type Sum = number;
 
 /** LastValue returns last value. */
 export type LastValue = number;
-
-export interface Distribution {
-  min: number;
-  max: number;
-  count: number;
-  sum: number;
-}
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
@@ -80,6 +74,6 @@ export interface Aggregator {
 }
 
 export interface Point {
-  value: Sum | LastValue | Distribution;
+  value: Sum | LastValue | Distribution | Checkpoint;
   timestamp: HrTime;
 }

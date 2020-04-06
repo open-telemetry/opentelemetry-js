@@ -17,3 +17,4 @@
 export * from './countersum';
 export * from './observer';
 export * from './measureexact';
+export * from './histogram';

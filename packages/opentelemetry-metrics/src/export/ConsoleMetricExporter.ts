@@ -14,13 +14,8 @@
  * limitations under the License.
  */
 
-import {
-  MetricExporter,
-  MetricRecord,
-  MetricKind,
-  Sum,
-  Distribution,
-} from './types';
+import { MetricExporter, MetricRecord, MetricKind, Sum } from './types';
+import { Distribution } from './aggregators';
 import { ExportResult } from '@opentelemetry/base';
 
 /**
