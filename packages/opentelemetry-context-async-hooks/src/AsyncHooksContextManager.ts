@@ -276,10 +276,10 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid id of the async context
    */
   private _init(uid: number) {
-    this._contextRefs.set(
-      uid,
-      this._contextRefs.get(asyncHooks.executionAsyncId())
-    );
+    const ref = this._contextRefs.get(asyncHooks.executionAsyncId());
+    if (ref !== undefined) {
+      this._contextRefs.set(uid, ref);
+    }
   }
 
   /**
