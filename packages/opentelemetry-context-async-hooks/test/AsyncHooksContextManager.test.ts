@@ -167,7 +167,7 @@ describe('AsyncHooksContextManager', () => {
   });
 
   describe('.withAsync/with()', () => {
-    it('should correctly restore scope', async () => {
+    it('with() inside withAsync() should correctly restore context', async () => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
       let done = false;
@@ -184,7 +184,7 @@ describe('AsyncHooksContextManager', () => {
       assert.ok(done);
     });
 
-    it('should correctly restore scope', done => {
+    it('withAsync() inside with() should correctly restore conxtext', done => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
 
@@ -192,15 +192,17 @@ describe('AsyncHooksContextManager', () => {
         assert.strictEqual(contextManager.active(), scope1);
         await contextManager.withAsync(scope2, async () => {
           assert.strictEqual(contextManager.active(), scope2);
-          return done();
         });
         assert.strictEqual(contextManager.active(), scope1);
+        return done();
       });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
 
-    it('should correctly restore scope', done => {
+    it('not awaited withAsync() inside with() should not restore context', done => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
+      let _done: boolean = false;
 
       contextManager.with(scope1, () => {
         assert.strictEqual(contextManager.active(), scope1);
@@ -210,15 +212,21 @@ describe('AsyncHooksContextManager', () => {
           })
           .then(() => {
             assert.strictEqual(contextManager.active(), scope1);
-            return done();
+            _done = true;
           });
         // in this case the current scope is 2 since we
         // didnt waited the withAsync call
         assert.strictEqual(contextManager.active(), scope2);
+        setTimeout(() => {
+          assert.strictEqual(contextManager.active(), scope1);
+          assert(_done);
+          return done();
+        }, 100);
       });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
 
-    it('should correctly restore scope', done => {
+    it('withAsync() inside a setTimeout inside a with() should correctly restore context', done => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
 
@@ -237,9 +245,10 @@ describe('AsyncHooksContextManager', () => {
         }, 5);
         assert.strictEqual(contextManager.active(), scope1);
       });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
 
-    it('should correctly restore scope', done => {
+    it('with() inside a setTimeout inside withAsync() should correctly restore context', done => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
 
