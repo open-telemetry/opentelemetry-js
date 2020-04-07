@@ -18,6 +18,7 @@ import { LogLevel } from '@opentelemetry/core';
 import { Logger, ValueType } from '@opentelemetry/api';
 import { MetricExporter } from './export/types';
 import { Resource } from '@opentelemetry/resources';
+import { Batcher } from './export/Batcher';
 
 /** Options needed for SDK metric creation. */
 export interface MetricOptions {
@@ -68,6 +69,9 @@ export interface MeterConfig {
 
   /** Resource associated with metric telemetry */
   resource?: Resource;
+
+  /** Metric batcher. */
+  batcher?: Batcher;
 }
 
 /** Default Meter configuration. */
