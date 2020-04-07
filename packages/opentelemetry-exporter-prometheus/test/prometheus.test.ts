@@ -266,13 +266,14 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export multiple aggregations', done => {
+    it('should export multiple labelsets', done => {
       const counter = meter.createCounter('counter', {
         description: 'a test description',
         labelKeys: ['counterKey1'],
       }) as CounterMetric;
 
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
       meter.collect();
       exporter.export(meter.getBatcher().checkPointSet(), () => {
         http
@@ -285,6 +286,7 @@ describe('PrometheusExporter', () => {
                 '# HELP counter a test description',
                 '# TYPE counter counter',
                 'counter{counterKey1="labelValue1"} 10',
+                'counter{counterKey1="labelValue2"} 20',
                 '',
               ]);
 
