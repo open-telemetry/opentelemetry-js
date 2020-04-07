@@ -131,11 +131,6 @@ export namespace opentelemetryProto {
       probabilitySampler?: ProbabilitySampler | null;
       rateLimitingSampler?: RateLimitingSampler | null;
     }
-
-    export interface TruncatableString {
-      value?: string | null;
-      truncatedByteCount?: number | null;
-    }
   }
   export namespace common.v1 {
     export interface AttributeKeyValue {
