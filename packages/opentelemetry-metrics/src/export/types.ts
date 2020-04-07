@@ -37,14 +37,14 @@ export interface Distribution {
   sum: number;
 }
 
-export type Histogram = {
+export interface Histogram {
   buckets: {
     boundaries: number[];
     counts: number[];
   };
   sum: number;
   count: number;
-};
+}
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
