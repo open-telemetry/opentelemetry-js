@@ -23,7 +23,7 @@ import { CollectorExporter } from '../../CollectorExporter';
 import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorData, GRPCQueueItem } from './types';
-import { fixGRPCUrl } from './util';
+import { removeProtocol } from './util';
 
 const traceServiceClients: WeakMap<
   CollectorExporter,
@@ -39,7 +39,7 @@ export function onInit(collectorExporter: CollectorExporter) {
     isShutDown: false,
     grpcSpansQueue: [],
   });
-  const serverAddress = fixGRPCUrl(collectorExporter.url);
+  const serverAddress = removeProtocol(collectorExporter.url);
   const credentials: grpc.ChannelCredentials = grpc.credentials.createInsecure();
 
   const traceServiceProtoPath =

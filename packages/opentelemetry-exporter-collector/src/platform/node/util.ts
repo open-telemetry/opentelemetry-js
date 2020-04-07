@@ -19,13 +19,6 @@
  * protocol
  * @param url
  */
-export function fixGRPCUrl(url: string): string {
-  let fixedUrl = url;
-  const removeArr = ['http://', 'https://'];
-  removeArr.forEach(el => {
-    if (fixedUrl.indexOf(el) === 0) {
-      fixedUrl = fixedUrl.replace(el, '');
-    }
-  });
-  return fixedUrl;
+export function removeProtocol(url: string): string {
+  return url.replace(/^https?\:\/\//, '');
 }

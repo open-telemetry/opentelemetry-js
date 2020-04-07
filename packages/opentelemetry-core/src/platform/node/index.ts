@@ -18,4 +18,3 @@ export * from './id';
 export * from './performance';
 export * from './timer-util';
 export * from './hex-to-base64';
-export * from './hex-to-bytes';

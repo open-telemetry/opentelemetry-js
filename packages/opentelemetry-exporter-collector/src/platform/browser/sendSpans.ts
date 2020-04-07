@@ -119,7 +119,7 @@ function sendSpansWithXhr(
   const xhr = new XMLHttpRequest();
   xhr.open('POST', collectorUrl);
   xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
-  xhr.setRequestHeader('Accept', 'application/octet-stream');
+  xhr.setRequestHeader('Accept', 'application/json');
   xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(body);
 
