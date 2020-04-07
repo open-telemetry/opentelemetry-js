@@ -104,6 +104,7 @@ export class ContextAPI {
     return (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY](API_VERSION);
   }
 
+  /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
     delete (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY];

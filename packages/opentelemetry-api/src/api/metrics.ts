@@ -77,6 +77,7 @@ export class MetricsAPI {
     return this.getMeterProvider().getMeter(name, version);
   }
 
+  /** Remove the global meter provider */
   public disable() {
     delete (global as any)[GLOBAL_METRICS_API_KEY];
   }

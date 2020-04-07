@@ -78,6 +78,7 @@ export class TraceAPI {
     return this.getTracerProvider().getTracer(name, version);
   }
 
+  /** Remove the global tracer provider */
   public disable() {
     delete (global as any)[GLOBAL_TRACE_API_KEY];
   }

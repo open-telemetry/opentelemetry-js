@@ -96,6 +96,7 @@ export class PropagationAPI {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }
 
+  /** Remove the global propagator */
   public disable() {
     delete (global as any)[GLOBAL_PROPAGATION_API_KEY];
   }
