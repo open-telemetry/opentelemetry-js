@@ -43,7 +43,7 @@ export class Meter implements types.Meter {
    */
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
-    this._batcher = new UngroupedBatcher();
+    this._batcher = config.batcher ?? new UngroupedBatcher();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
     // start the push controller
     const exporter = config.exporter || new NoopExporter();

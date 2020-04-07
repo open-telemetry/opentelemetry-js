@@ -26,6 +26,7 @@ import {
   Distribution,
   ObserverMetric,
   MetricRecord,
+  Aggregator,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -36,6 +37,7 @@ import {
 import { ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
+import { Batcher } from '../src/export/Batcher';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -538,7 +540,26 @@ describe('Meter', () => {
       assert.strictEqual(value, 10);
     });
   });
+
+  it('should allow custom batcher', () => {
+    const customMeter = new MeterProvider().getMeter('custom-batcher', '*', {
+      batcher: new CustomBatcher(),
+    });
+    assert.throws(() => {
+      const measure = customMeter.createMeasure('myMeasure');
+      measure.bind({}).record(1);
+    }, /aggregatorFor method not implemented/);
+  });
 });
+
+class CustomBatcher extends Batcher {
+  process(record: MetricRecord): void {
+    throw new Error('process method not implemented.');
+  }
+  aggregatorFor(metricKind: MetricKind): Aggregator {
+    throw new Error('aggregatorFor method not implemented.');
+  }
+}
 
 function ensureMetric(metric: MetricRecord) {
   assert.ok(metric.aggregator instanceof ObserverAggregator);
