@@ -18,12 +18,14 @@ import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { TracerProvider } from '../trace/tracer_provider';
 import { Tracer } from '../trace/tracer';
 
+const GLOBAL_TRACE_API_KEY = Symbol.for("io.opentelemetry.js.api.trace");
+const API_VERSION = 0;
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
  */
 export class TraceAPI {
   private static _instance?: TraceAPI;
-  private _tracerProvider: TracerProvider = NOOP_TRACER_PROVIDER;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -41,15 +43,32 @@ export class TraceAPI {
    * Set the current global tracer. Returns the initialized global tracer provider
    */
   public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
-    this._tracerProvider = provider;
-    return provider;
+    if ((global as any)[GLOBAL_TRACE_API_KEY]) {
+      // global tracer provider has already been set
+      return NOOP_TRACER_PROVIDER;
+    }
+
+    (global as any)[GLOBAL_TRACE_API_KEY] = function getTraceApi (version: number) {
+      if (version !== API_VERSION) {
+        return NOOP_TRACER_PROVIDER;
+      }
+
+      return provider;
+    }
+
+    return this.getTracerProvider();
   }
 
   /**
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    return this._tracerProvider;
+    if (!(global as any)[GLOBAL_TRACE_API_KEY]) {
+      // global tracer provider has already been set
+      return NOOP_TRACER_PROVIDER;
+    }
+
+    return (global as any)[GLOBAL_TRACE_API_KEY](API_VERSION);
   }
 
   /**
@@ -57,5 +76,9 @@ export class TraceAPI {
    */
   public getTracer(name: string, version?: string): Tracer {
     return this.getTracerProvider().getTracer(name, version);
+  }
+
+  public disable() {
+    delete (global as any)[GLOBAL_TRACE_API_KEY];
   }
 }

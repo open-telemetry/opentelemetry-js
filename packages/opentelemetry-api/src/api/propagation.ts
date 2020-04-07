@@ -23,12 +23,14 @@ import { ContextAPI } from './context';
 
 const contextApi = ContextAPI.getInstance();
 
+const GLOBAL_PROPAGATION_API_KEY = Symbol.for("io.opentelemetry.js.api.propagation");
+const API_VERSION = 0;
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Propagation API
  */
 export class PropagationAPI {
   private static _instance?: PropagationAPI;
-  private _propagator: HttpTextPropagator = NOOP_HTTP_TEXT_PROPAGATOR;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -48,7 +50,19 @@ export class PropagationAPI {
   public setGlobalPropagator(
     propagator: HttpTextPropagator
   ): HttpTextPropagator {
-    this._propagator = propagator;
+    if ((global as any)[GLOBAL_PROPAGATION_API_KEY]) {
+      // global propagator has already been set
+      return NOOP_HTTP_TEXT_PROPAGATOR;
+    }
+
+    (global as any)[GLOBAL_PROPAGATION_API_KEY] = function getTraceApi (version: number) {
+      if (version !== API_VERSION) {
+        return NOOP_HTTP_TEXT_PROPAGATOR;
+      }
+
+      return propagator;
+    }
+
     return propagator;
   }
 
@@ -64,7 +78,7 @@ export class PropagationAPI {
     setter: SetterFunction<Carrier> = defaultSetter,
     context = contextApi.active()
   ): void {
-    return this._propagator.inject(context, carrier, setter);
+    return this._getGlobalPropagator().inject(context, carrier, setter);
   }
 
   /**
@@ -79,6 +93,18 @@ export class PropagationAPI {
     getter: GetterFunction<Carrier> = defaultGetter,
     context = contextApi.active()
   ): Context {
-    return this._propagator.extract(context, carrier, getter);
+    return this._getGlobalPropagator().extract(context, carrier, getter);
+  }
+
+  public disable() {
+    delete (global as any)[GLOBAL_PROPAGATION_API_KEY];
+  }
+
+  private _getGlobalPropagator(): HttpTextPropagator {
+    if (!(global as any)[GLOBAL_PROPAGATION_API_KEY]) {
+      return NOOP_HTTP_TEXT_PROPAGATOR;
+    }
+
+    return (global as any)[GLOBAL_PROPAGATION_API_KEY](API_VERSION);
   }
 }

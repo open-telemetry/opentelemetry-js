@@ -18,12 +18,14 @@ import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 
+const GLOBAL_METRICS_API_KEY = Symbol.for("io.opentelemetry.js.api.metrics");
+const API_VERSION = 0;
+
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
  */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;
-  private _meterProvider: MeterProvider = NOOP_METER_PROVIDER;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -41,7 +43,19 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    this._meterProvider = provider;
+    if ((global as any)[GLOBAL_METRICS_API_KEY]) {
+      // global meter provider has already been set
+      return NOOP_METER_PROVIDER;
+    }
+
+    (global as any)[GLOBAL_METRICS_API_KEY] = function getTraceApi (version: number) {
+      if (version !== API_VERSION) {
+        return NOOP_METER_PROVIDER;
+      }
+
+      return provider;
+    }
+
     return provider;
   }
 
@@ -49,7 +63,11 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    return this._meterProvider;
+    if (!(global as any)[GLOBAL_METRICS_API_KEY]) {
+      return NOOP_METER_PROVIDER;
+    }
+
+    return (global as any)[GLOBAL_METRICS_API_KEY](API_VERSION);
   }
 
   /**
@@ -57,5 +75,9 @@ export class MetricsAPI {
    */
   public getMeter(name: string, version?: string): Meter {
     return this.getMeterProvider().getMeter(name, version);
+  }
+
+  public disable() {
+    delete (global as any)[GLOBAL_METRICS_API_KEY];
   }
 }

@@ -22,6 +22,10 @@ import api, {
   NoopTracer,
   SpanOptions,
   Span,
+  context,
+  trace,
+  propagation,
+  metrics,
 } from '../../src';
 
 describe('API', () => {
@@ -41,9 +45,12 @@ describe('API', () => {
     };
     const dummySpan = new NoopSpan(spanContext);
 
-    afterEach(() => {
-      api.trace.setGlobalTracerProvider(new NoopTracerProvider());
-    });
+    beforeEach(() => {
+      context.disable()
+      trace.disable();
+      propagation.disable();
+      metrics.disable();
+    })
 
     it('should not crash', () => {
       functions.forEach(fn => {
