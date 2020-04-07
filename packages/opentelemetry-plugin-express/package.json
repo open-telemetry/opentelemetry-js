@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-express",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "description": "OpenTelemetry express automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,9 +41,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "^0.5.2",
-    "@opentelemetry/node": "^0.5.2",
-    "@opentelemetry/tracing": "^0.5.2",
+    "@opentelemetry/context-async-hooks": "^0.6.0",
+    "@opentelemetry/node": "^0.6.0",
+    "@opentelemetry/tracing": "^0.6.0",
     "@types/express": "^4.17.2",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.7.2",
@@ -61,8 +61,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.5.2",
-    "@opentelemetry/core": "^0.5.2",
+    "@opentelemetry/api": "^0.6.0",
+    "@opentelemetry/core": "^0.6.0",
     "shimmer": "^1.2.1"
   }
 }

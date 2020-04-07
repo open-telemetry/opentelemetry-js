@@ -1,7 +1,7 @@
 {
   "name": "http-example",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Example of HTTP integration with OpenTelemetry",
   "main": "index.js",
   "scripts": {
@@ -28,12 +28,12 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.5.2",
-    "@opentelemetry/exporter-jaeger": "^0.5.2",
-    "@opentelemetry/exporter-zipkin": "^0.5.2",
-    "@opentelemetry/node": "^0.5.2",
-    "@opentelemetry/plugin-http": "^0.5.2",
-    "@opentelemetry/tracing": "^0.5.2"
+    "@opentelemetry/api": "^0.6.0",
+    "@opentelemetry/exporter-jaeger": "^0.6.0",
+    "@opentelemetry/exporter-zipkin": "^0.6.0",
+    "@opentelemetry/node": "^0.6.0",
+    "@opentelemetry/plugin-http": "^0.6.0",
+    "@opentelemetry/tracing": "^0.6.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {
