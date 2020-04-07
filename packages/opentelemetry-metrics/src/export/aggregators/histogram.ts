@@ -14,45 +14,30 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
+import { Aggregator, Point, Histogram } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
-export type Checkpoint = {
-  buckets: {
-    boundaries: number[];
-    counts: number[];
-  };
-  sum: number;
-  count: number;
-};
-
-/** Basic aggregator which calculates a Sum from individual measurements. */
+/**
+ * Basic aggregator which observe events and counts them in pre-defined buckets
+ * and provides the total sum and count of all observations.
+ */
 export class HistogramAggregator implements Aggregator {
-  private _lastCheckpoint: Checkpoint;
-  private _currentCheckpoint: Checkpoint;
-  private _lastCheckpointTime: HrTime = [0, 0];
+  private _lastCheckpoint: Histogram;
+  private _currentCheckpoint: Histogram;
+  private _lastCheckpointTime: HrTime;
   private _boundaries: number[];
 
   constructor(boundaries: number[]) {
     if (boundaries === undefined || boundaries.length === 0) {
       throw new Error(`HistogramAggregator should be created with boundaries.`);
     }
+    // we need to an ordered set to be able to correctly compute count for each
+    // boundary since we'll iterate on each in order.
     this._boundaries = boundaries.sort();
     this._lastCheckpoint = this._newEmptyCheckpoint();
+    this._lastCheckpointTime = hrTime();
     this._currentCheckpoint = this._newEmptyCheckpoint();
-  }
-
-  get sum() {
-    return this._lastCheckpoint.sum;
-  }
-
-  get count() {
-    return this._lastCheckpoint.count;
-  }
-
-  get checkpoint() {
-    return this._lastCheckpoint;
   }
 
   update(value: number): void {
@@ -70,7 +55,7 @@ export class HistogramAggregator implements Aggregator {
     this._currentCheckpoint.buckets.counts[this._boundaries.length] += 1;
   }
 
-  resetCheckpoint(): void {
+  reset(): void {
     this._lastCheckpointTime = hrTime();
     this._lastCheckpoint = this._currentCheckpoint;
     this._currentCheckpoint = this._newEmptyCheckpoint();
@@ -83,7 +68,7 @@ export class HistogramAggregator implements Aggregator {
     };
   }
 
-  private _newEmptyCheckpoint(): Checkpoint {
+  private _newEmptyCheckpoint(): Histogram {
     return {
       buckets: {
         boundaries: this._boundaries,

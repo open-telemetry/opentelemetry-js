@@ -16,6 +16,7 @@
 
 import * as assert from 'assert';
 import { HistogramAggregator } from '../../../src/export/aggregators';
+import { Histogram } from '../../../src';
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {
@@ -27,11 +28,8 @@ describe('HistogramAggregator', () => {
 
     it('should sort boundaries', () => {
       const aggregator = new HistogramAggregator([500, 300, 700]);
-      assert.deepEqual(aggregator.checkpoint.buckets.boundaries, [
-        300,
-        500,
-        700,
-      ]);
+      const point = aggregator.toPoint().value as Histogram;
+      assert.deepEqual(point.buckets.boundaries, [300, 500, 700]);
     });
 
     it('should throw if no boundaries are defined', () => {
@@ -45,103 +43,111 @@ describe('HistogramAggregator', () => {
     it('should not update checkpoint', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(150);
-      assert.equal(aggregator.checkpoint.count, 0);
-      assert.equal(aggregator.checkpoint.sum, 0);
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 0);
+      assert.equal(point.sum, 0);
     });
 
     it('should update the second bucket', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(150);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.count, 1);
-      assert.equal(aggregator.checkpoint.sum, 150);
-      assert.equal(aggregator.checkpoint.buckets.counts[0], 0);
-      assert.equal(aggregator.checkpoint.buckets.counts[1], 1);
-      assert.equal(aggregator.checkpoint.buckets.counts[2], 0);
+      aggregator.reset();
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.sum, 150);
+      assert.equal(point.buckets.counts[0], 0);
+      assert.equal(point.buckets.counts[1], 1);
+      assert.equal(point.buckets.counts[2], 0);
     });
 
     it('should update the second bucket', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(50);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.count, 1);
-      assert.equal(aggregator.checkpoint.sum, 50);
-      assert.equal(aggregator.checkpoint.buckets.counts[0], 1);
-      assert.equal(aggregator.checkpoint.buckets.counts[1], 0);
-      assert.equal(aggregator.checkpoint.buckets.counts[2], 0);
+      aggregator.reset();
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.sum, 50);
+      assert.equal(point.buckets.counts[0], 1);
+      assert.equal(point.buckets.counts[1], 0);
+      assert.equal(point.buckets.counts[2], 0);
     });
 
     it('should update the third bucket since value is above all boundaries', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(250);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.count, 1);
-      assert.equal(aggregator.checkpoint.sum, 250);
-      assert.equal(aggregator.checkpoint.buckets.counts[0], 0);
-      assert.equal(aggregator.checkpoint.buckets.counts[1], 0);
-      assert.equal(aggregator.checkpoint.buckets.counts[2], 1);
+      aggregator.reset();
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.sum, 250);
+      assert.equal(point.buckets.counts[0], 0);
+      assert.equal(point.buckets.counts[1], 0);
+      assert.equal(point.buckets.counts[2], 1);
     });
   });
 
   describe('.count', () => {
     it('should return last checkpoint count', () => {
       const aggregator = new HistogramAggregator([100]);
-      assert.equal(aggregator.count, aggregator.checkpoint.count);
+      let point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, point.count);
       aggregator.update(10);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.count, 1);
-      assert.equal(aggregator.count, aggregator.checkpoint.count);
+      aggregator.reset();
+      point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.count, point.count);
     });
   });
 
   describe('.sum', () => {
     it('should return last checkpoint sum', () => {
       const aggregator = new HistogramAggregator([100]);
-      assert.equal(aggregator.sum, aggregator.checkpoint.sum);
+      let point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.sum, point.sum);
       aggregator.update(10);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.sum, 10);
-      assert.deepEqual(aggregator.sum, aggregator.checkpoint.sum);
+      aggregator.reset();
+      point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.sum, 10);
     });
   });
 
-  describe('.resetCheckpoint()', () => {
+  describe('.reset()', () => {
     it('should create a empty checkoint by default', () => {
       const aggregator = new HistogramAggregator([100]);
-      assert.deepEqual(aggregator.checkpoint.buckets.boundaries, [100]);
-      assert(aggregator.checkpoint.buckets.counts.every(count => count === 0));
+      const point = aggregator.toPoint().value as Histogram;
+      assert.deepEqual(point.buckets.boundaries, [100]);
+      assert(point.buckets.counts.every(count => count === 0));
       // should contains one bucket for each boundary + one for values outside of the largest boundary
-      assert.equal(aggregator.checkpoint.buckets.counts.length, 2);
-      assert.deepEqual(aggregator.checkpoint.buckets.boundaries, [100]);
-      assert.equal(aggregator.checkpoint.count, 0);
-      assert.equal(aggregator.checkpoint.sum, 0);
+      assert.equal(point.buckets.counts.length, 2);
+      assert.deepEqual(point.buckets.boundaries, [100]);
+      assert.equal(point.count, 0);
+      assert.equal(point.sum, 0);
     });
 
     it('should update checkpoint', () => {
       const aggregator = new HistogramAggregator([100]);
       aggregator.update(10);
-      aggregator.resetCheckpoint();
-      assert.equal(aggregator.checkpoint.count, 1);
-      assert.equal(aggregator.checkpoint.sum, 10);
-      assert.deepEqual(aggregator.checkpoint.buckets.boundaries, [100]);
-      assert.equal(aggregator.checkpoint.buckets.counts.length, 2);
-      assert.deepEqual(aggregator.checkpoint.buckets.counts, [1, 0]);
+      aggregator.reset();
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.sum, 10);
+      assert.deepEqual(point.buckets.boundaries, [100]);
+      assert.equal(point.buckets.counts.length, 2);
+      assert.deepEqual(point.buckets.counts, [1, 0]);
     });
   });
 
   describe('.toPoint()', () => {
     it('should return default checkpoint', () => {
       const aggregator = new HistogramAggregator([100]);
-      assert.deepEqual(aggregator.toPoint().value, aggregator.checkpoint);
-      assert.deepEqual(aggregator.toPoint().timestamp, [0, 0]);
+      const point = aggregator.toPoint().value as Histogram;
+      assert.deepEqual(aggregator.toPoint().value, point);
+      assert(aggregator.toPoint().timestamp.every(nbr => nbr > 0));
     });
 
     it('should return last checkpoint if updated', () => {
       const aggregator = new HistogramAggregator([100]);
       aggregator.update(100);
-      aggregator.resetCheckpoint();
-      assert.deepEqual(aggregator.toPoint().value, aggregator.checkpoint);
-      console.log(aggregator.toPoint().timestamp);
+      aggregator.reset();
       assert(
         aggregator
           .toPoint()
