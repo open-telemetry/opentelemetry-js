@@ -19,42 +19,43 @@ import * as types from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { Meter, MeterProvider } from '../src';
 
-
 describe('Batcher', () => {
-    describe('Ungrouped', () => {
-        let meter: Meter;
-        let fooCounter: types.BoundCounter
-        let barCounter: types.BoundCounter
-        let counter: types.Metric<types.BoundCounter>
-        beforeEach(() => {
-            meter = new MeterProvider({
-                logger: new NoopLogger(),
-                interval: 10000,
-            }).getMeter('test-meter');
-            counter = meter.createCounter("ungrouped-batcher-test", { labelKeys: ['key'] });
-            fooCounter = counter.bind({ key: 'foo' });
-            barCounter = counter.bind({ key: 'bar' });
-        });
-
-        it('should process a batch', () => {
-            fooCounter.add(1);
-            barCounter.add(1);
-            barCounter.add(2);
-            meter.collect();
-            const checkPointSet = meter.getBatcher().checkPointSet();
-            assert.strictEqual(checkPointSet.length, 2);
-            for (const record of checkPointSet) {
-                switch(record.labels.key) {
-                    case 'foo':
-                        assert.strictEqual(record.aggregator.toPoint().value, 1);
-                        break;
-                    case 'bar':
-                        assert.strictEqual(record.aggregator.toPoint().value, 3);
-                        break;
-                    default:
-                        throw new Error('Unknown labelset')
-                }
-            }
-        })
+  describe('Ungrouped', () => {
+    let meter: Meter;
+    let fooCounter: types.BoundCounter;
+    let barCounter: types.BoundCounter;
+    let counter: types.Metric<types.BoundCounter>;
+    beforeEach(() => {
+      meter = new MeterProvider({
+        logger: new NoopLogger(),
+        interval: 10000,
+      }).getMeter('test-meter');
+      counter = meter.createCounter('ungrouped-batcher-test', {
+        labelKeys: ['key'],
+      });
+      fooCounter = counter.bind({ key: 'foo' });
+      barCounter = counter.bind({ key: 'bar' });
     });
+
+    it('should process a batch', () => {
+      fooCounter.add(1);
+      barCounter.add(1);
+      barCounter.add(2);
+      meter.collect();
+      const checkPointSet = meter.getBatcher().checkPointSet();
+      assert.strictEqual(checkPointSet.length, 2);
+      for (const record of checkPointSet) {
+        switch (record.labels.key) {
+          case 'foo':
+            assert.strictEqual(record.aggregator.toPoint().value, 1);
+            break;
+          case 'bar':
+            assert.strictEqual(record.aggregator.toPoint().value, 3);
+            break;
+          default:
+            throw new Error('Unknown labelset');
+        }
+      }
+    });
+  });
 });
