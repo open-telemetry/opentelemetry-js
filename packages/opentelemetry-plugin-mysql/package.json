@@ -45,7 +45,7 @@
     "@opentelemetry/node": "^0.6.0",
     "@opentelemetry/test-utils": "^0.6.0",
     "@opentelemetry/tracing": "^0.6.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/mysql": "^2.15.4",
     "@types/node": "^12.6.9",
     "@types/shimmer": "^1.0.1",

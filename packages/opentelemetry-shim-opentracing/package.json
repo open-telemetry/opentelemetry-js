@@ -40,7 +40,7 @@
   },
   "devDependencies": {
     "@opentelemetry/tracing": "^0.6.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.9",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",

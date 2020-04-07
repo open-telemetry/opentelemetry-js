@@ -44,7 +44,7 @@
     "@opentelemetry/context-async-hooks": "^0.6.0",
     "@opentelemetry/node": "^0.6.0",
     "@opentelemetry/tracing": "^0.6.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/mongodb": "^3.2.3",
     "@types/node": "^12.7.2",
     "@types/shimmer": "^1.0.1",

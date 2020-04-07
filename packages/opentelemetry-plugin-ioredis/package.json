@@ -49,7 +49,7 @@
     "@opentelemetry/test-utils": "^0.6.0",
     "@opentelemetry/tracing": "^0.6.0",
     "@types/ioredis": "^4.14.3",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^13.1.0",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",

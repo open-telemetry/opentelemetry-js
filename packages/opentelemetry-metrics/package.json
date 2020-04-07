@@ -41,7 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.9",
     "@types/sinon": "^7.0.13",
     "codecov": "^3.6.1",

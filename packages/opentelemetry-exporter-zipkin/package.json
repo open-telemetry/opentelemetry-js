@@ -39,7 +39,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/nock": "^10.0.3",
     "@types/node": "^12.6.9",
     "codecov": "^3.6.1",
