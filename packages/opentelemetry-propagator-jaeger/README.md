@@ -32,7 +32,7 @@ const provider = new NodeTracerProvider();
 provider.register({
   // Use Jaeger propagator
   propagator: new JaegerHttpTracePropagator()
-})
+});
 ```
 
 ## Trace on Jaeger UI
