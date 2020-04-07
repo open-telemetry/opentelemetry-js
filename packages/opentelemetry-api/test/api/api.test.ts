@@ -46,11 +46,11 @@ describe('API', () => {
     const dummySpan = new NoopSpan(spanContext);
 
     beforeEach(() => {
-      context.disable()
+      context.disable();
       trace.disable();
       propagation.disable();
       metrics.disable();
-    })
+    });
 
     it('should not crash', () => {
       functions.forEach(fn => {

@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { context, NoopHttpTextPropagator, propagation, trace } from '@opentelemetry/api';
+import {
+  context,
+  NoopHttpTextPropagator,
+  propagation,
+  trace,
+} from '@opentelemetry/api';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { HttpTraceContext } from '@opentelemetry/core';
 import * as assert from 'assert';
@@ -22,7 +27,7 @@ import { StackContextManager, WebTracerProvider } from '../src';
 
 describe('API registration', () => {
   beforeEach(() => {
-    context.disable()
+    context.disable();
     trace.disable();
     propagation.disable();
   });
@@ -31,9 +36,10 @@ describe('API registration', () => {
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register();
 
-
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    assert.ok(propagation['_getGlobalPropagator']() instanceof HttpTraceContext);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+    );
     assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
@@ -62,7 +68,9 @@ describe('API registration', () => {
 
     assert.ok(context['_getContextManager']() instanceof NoopContextManager);
 
-    assert.ok(propagation['_getGlobalPropagator']() instanceof HttpTraceContext);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+    );
     assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
@@ -72,7 +80,9 @@ describe('API registration', () => {
       propagator: null,
     });
 
-    assert.ok(propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+    );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
     assert.ok(trace.getTracerProvider() === tracerProvider);

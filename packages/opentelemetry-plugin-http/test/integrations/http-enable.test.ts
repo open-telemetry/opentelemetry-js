@@ -48,8 +48,8 @@ describe('HttpPlugin Integration tests', () => {
   });
 
   afterEach(() => {
-    context.disable()
-  })
+    context.disable();
+  });
   describe('enable()', () => {
     before(function(done) {
       // mandatory

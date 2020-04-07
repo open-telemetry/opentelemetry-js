@@ -31,8 +31,8 @@ class DummyPlugin extends BasePlugin<unknown> {
   }
   moduleName = 'dummy';
 
-  patch() { }
-  unpatch() { }
+  patch() {}
+  unpatch() {}
 }
 
 describe('WebTracerProvider', () => {
@@ -48,7 +48,7 @@ describe('WebTracerProvider', () => {
 
     afterEach(() => {
       contextManager.disable();
-      context.disable()
+      context.disable();
     });
 
     it('should construct an instance with required only options', () => {
@@ -92,7 +92,7 @@ describe('WebTracerProvider', () => {
       assert.strictEqual(
         error,
         'contextManager should be defined in' +
-        ' register method not in constructor'
+          ' register method not in constructor'
       );
     });
 
@@ -108,7 +108,7 @@ describe('WebTracerProvider', () => {
       assert.strictEqual(
         error,
         'propagator should be defined in register' +
-        ' method not in constructor'
+          ' method not in constructor'
       );
     });
 

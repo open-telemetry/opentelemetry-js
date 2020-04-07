@@ -23,7 +23,9 @@ import { ContextAPI } from './context';
 
 const contextApi = ContextAPI.getInstance();
 
-const GLOBAL_PROPAGATION_API_KEY = Symbol.for("io.opentelemetry.js.api.propagation");
+const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.propagation'
+);
 const API_VERSION = 0;
 
 /**
@@ -55,13 +57,15 @@ export class PropagationAPI {
       return NOOP_HTTP_TEXT_PROPAGATOR;
     }
 
-    (global as any)[GLOBAL_PROPAGATION_API_KEY] = function getTraceApi (version: number) {
+    (global as any)[GLOBAL_PROPAGATION_API_KEY] = function getTraceApi(
+      version: number
+    ) {
       if (version !== API_VERSION) {
         return NOOP_HTTP_TEXT_PROPAGATOR;
       }
 
       return propagator;
-    }
+    };
 
     return propagator;
   }

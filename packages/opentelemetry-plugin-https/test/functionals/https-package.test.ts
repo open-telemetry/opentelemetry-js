@@ -19,7 +19,10 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { Http } from '@opentelemetry/plugin-http';
-import { InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import {
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import axios, { AxiosResponse } from 'axios';
 import * as got from 'got';
@@ -47,8 +50,8 @@ describe('Packages', () => {
   });
 
   afterEach(() => {
-    context.disable()
-  })
+    context.disable();
+  });
   describe('get', () => {
     const logger = new NoopLogger();
 

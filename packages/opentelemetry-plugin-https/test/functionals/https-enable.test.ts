@@ -92,7 +92,7 @@ describe('HttpsPlugin', () => {
 
   afterEach(() => {
     contextManager.disable();
-    context.disable()
+    context.disable();
   });
 
   it('should return a plugin', () => {

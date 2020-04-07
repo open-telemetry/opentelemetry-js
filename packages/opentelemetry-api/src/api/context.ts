@@ -22,7 +22,9 @@ import {
 
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
-const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for("io.opentelemetry.js.api.context");
+const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
+  'io.opentelemetry.js.api.context'
+);
 const API_VERSION = 0;
 
 /**
@@ -54,17 +56,18 @@ export class ContextAPI {
       return NOOP_CONTEXT_MANAGER;
     }
 
-    (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY] = function getTraceApi (version: number) {
+    (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY] = function getTraceApi(
+      version: number
+    ) {
       if (version !== API_VERSION) {
         return NOOP_CONTEXT_MANAGER;
       }
 
       return contextManager;
-    }
+    };
 
     return contextManager;
   }
-
 
   /**
    * Get the currently active context

@@ -16,14 +16,22 @@
 
 import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
-import { ALWAYS_SAMPLER, NEVER_SAMPLER, NoopLogger, NoRecordingSpan, setActiveSpan, setExtractedSpanContext, TraceState } from '@opentelemetry/core';
+import {
+  ALWAYS_SAMPLER,
+  NEVER_SAMPLER,
+  NoopLogger,
+  NoRecordingSpan,
+  setActiveSpan,
+  setExtractedSpanContext,
+  TraceState,
+} from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.disable()
+    context.disable();
   });
 
   describe('constructor', () => {

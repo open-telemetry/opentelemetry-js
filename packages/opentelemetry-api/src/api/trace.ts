@@ -18,7 +18,7 @@ import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { TracerProvider } from '../trace/tracer_provider';
 import { Tracer } from '../trace/tracer';
 
-const GLOBAL_TRACE_API_KEY = Symbol.for("io.opentelemetry.js.api.trace");
+const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 const API_VERSION = 0;
 
 /**
@@ -48,13 +48,15 @@ export class TraceAPI {
       return NOOP_TRACER_PROVIDER;
     }
 
-    (global as any)[GLOBAL_TRACE_API_KEY] = function getTraceApi (version: number) {
+    (global as any)[GLOBAL_TRACE_API_KEY] = function getTraceApi(
+      version: number
+    ) {
       if (version !== API_VERSION) {
         return NOOP_TRACER_PROVIDER;
       }
 
       return provider;
-    }
+    };
 
     return this.getTracerProvider();
   }

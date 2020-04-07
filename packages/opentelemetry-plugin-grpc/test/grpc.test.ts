@@ -312,7 +312,7 @@ describe('GrpcPlugin', () => {
   });
 
   afterEach(() => {
-    context.disable()
+    context.disable();
   });
 
   it('should return a plugin', () => {

@@ -18,7 +18,7 @@ import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
 
-const GLOBAL_METRICS_API_KEY = Symbol.for("io.opentelemetry.js.api.metrics");
+const GLOBAL_METRICS_API_KEY = Symbol.for('io.opentelemetry.js.api.metrics');
 const API_VERSION = 0;
 
 /**
@@ -48,13 +48,15 @@ export class MetricsAPI {
       return NOOP_METER_PROVIDER;
     }
 
-    (global as any)[GLOBAL_METRICS_API_KEY] = function getTraceApi (version: number) {
+    (global as any)[GLOBAL_METRICS_API_KEY] = function getTraceApi(
+      version: number
+    ) {
       if (version !== API_VERSION) {
         return NOOP_METER_PROVIDER;
       }
 
       return provider;
-    }
+    };
 
     return provider;
   }
