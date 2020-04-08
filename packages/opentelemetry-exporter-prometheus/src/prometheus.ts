@@ -134,7 +134,11 @@ export class PrometheusExporter implements MetricExporter {
       // MetricRecord value is the current state, not the delta to be incremented by.
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
-      metric.inc(labelValues, point.value as Sum);
+      metric.inc(
+        labelValues,
+        point.value as Sum,
+        hrTimeToMilliseconds(point.timestamp)
+      );
     }
 
     if (metric instanceof Gauge) {
