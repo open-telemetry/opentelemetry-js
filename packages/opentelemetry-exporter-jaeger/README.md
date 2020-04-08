@@ -1,4 +1,5 @@
 # OpenTelemetry Jaeger Trace Exporter
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -54,6 +55,10 @@ npm install --save @opentelemetry/exporter-jaeger
 
 Install the exporter on your application and pass the options, it must contain a service name.
 
+Furthermore, the `host` option (which defaults to `localhost`), can instead be set by the
+`JAEGER_AGENT_HOST` environment variable to reduce in-code config. If both are
+set, the value set by the option in code is authoritative.
+
 ```js
 import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
@@ -78,8 +83,8 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 - [SimpleSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#simple-processor): The implementation of `SpanProcessor` that passes ended span directly to the configured `SpanExporter`.
 - [BatchSpanProcessor](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sdk-tracing.md#batching-processor): The implementation of the `SpanProcessor` that batches ended spans and pushes them to the configured `SpanExporter`. It is recommended to use this `SpanProcessor` for better performance and optimization.
 
-
 ## Useful links
+
 - To know more about Jaeger, visit: https://www.jaegertracing.io/docs/latest/getting-started/
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
