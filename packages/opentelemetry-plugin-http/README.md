@@ -55,6 +55,8 @@ Http plugin has few options available to choose from. You can set the following:
 | [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
 | [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `string` | The primary server name of the matched virtual host. |
+| `requireParentforOutgoingSpans` | Boolean | Require that is a parent span to create new span for outgoing requests. |
+| `requireParentforIncomingSpans` | Boolean | Require that is a parent span to create new span for incoming requests. |
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

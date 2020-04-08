@@ -22,8 +22,15 @@ import {
   SpanKind,
   SpanOptions,
   Status,
+  SpanContext,
+  TraceFlags,
+  NoopSpan,
 } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  NoRecordingSpan,
+  getExtractedSpanContext,
+} from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -56,6 +63,12 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _config!: HttpPluginConfig;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
+
+  private readonly _emptySpanContext: SpanContext = {
+    traceId: '',
+    spanId: '',
+    traceFlags: TraceFlags.NONE,
+  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);
@@ -295,10 +308,23 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(
-          `${method} ${pathname}`,
-          spanOptions
-        );
+        let span: Span = new NoopSpan();
+        const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
+        /*
+         * If a parent is required but not present, we use a `NoRecordingSpan` to still
+         * propagate context without recording it.
+         */
+        if (
+          plugin._config.requireParentforIncomingSpans === true &&
+          hasParent === false
+        ) {
+          const spanContext =
+            getExtractedSpanContext(context.active()) ??
+            plugin._emptySpanContext;
+          span = new NoRecordingSpan(spanContext);
+        } else {
+          span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
+        }
 
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
@@ -396,8 +422,22 @@ export class HttpPlugin extends BasePlugin<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-
-      const span = plugin._startHttpSpan(operationName, spanOptions);
+      const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
+      let span: Span = new NoopSpan();
+      /*
+       * If a parent is required but not present, we use a `NoRecordingSpan` to still
+       * propagate context without recording it.
+       */
+      if (
+        plugin._config.requireParentforOutgoingSpans === true &&
+        hasParent === false
+      ) {
+        const spanContext =
+          getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+        span = new NoRecordingSpan(spanContext);
+      } else {
+        span = plugin._startHttpSpan(operationName, spanOptions);
+      }
 
       return plugin._tracer.withSpan(span, () => {
         if (!optionsParsed.headers) optionsParsed.headers = {};
