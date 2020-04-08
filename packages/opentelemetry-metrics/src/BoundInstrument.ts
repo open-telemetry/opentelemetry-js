@@ -147,7 +147,7 @@ export class BoundObserver extends BaseBoundInstrument
     super(labels, logger, monotonic, disabled, valueType, aggregator);
   }
 
-  setCallback(callback: (observerResult: types.ObserverResult) => {}): void {
+  setCallback(callback: (observerResult: types.ObserverResult) => void): void {
     const observerResult = new ObserverResult();
     callback(observerResult);
   }
