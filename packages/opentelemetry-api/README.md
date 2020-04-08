@@ -1,6 +1,6 @@
 # OpenTelemetry API for JavaScript
 [![Gitter chat][gitter-image]][gitter-url]
-[![NPM Published Version][npm-img]][npm-url]
+[![NPM Published Version][npm-img]][npm-url];
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
