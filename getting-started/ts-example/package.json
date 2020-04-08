@@ -13,14 +13,14 @@
     "ts-node": "^8.6.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.6.0",
-    "@opentelemetry/core": "^0.6.0",
-    "@opentelemetry/exporter-prometheus": "^0.6.0",
-    "@opentelemetry/exporter-zipkin": "^0.6.0",
-    "@opentelemetry/metrics": "^0.6.0",
-    "@opentelemetry/node": "^0.6.0",
-    "@opentelemetry/plugin-http": "^0.6.0",
-    "@opentelemetry/tracing": "^0.6.0",
+    "@opentelemetry/api": "^0.6.1",
+    "@opentelemetry/core": "^0.6.1",
+    "@opentelemetry/exporter-prometheus": "^0.6.1",
+    "@opentelemetry/exporter-zipkin": "^0.6.1",
+    "@opentelemetry/metrics": "^0.6.1",
+    "@opentelemetry/node": "^0.6.1",
+    "@opentelemetry/plugin-http": "^0.6.1",
+    "@opentelemetry/tracing": "^0.6.1",
     "axios": "^0.19.1",
     "express": "^4.17.1"
   }
