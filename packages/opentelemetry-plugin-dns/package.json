@@ -43,7 +43,7 @@
   "devDependencies": {
     "@opentelemetry/node": "^0.6.0",
     "@opentelemetry/tracing": "^0.6.0",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.7.12",
     "@types/semver": "^6.2.0",
     "@types/shimmer": "^1.0.1",
