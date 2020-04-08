@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-jaeger",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "OpenTelemetry Exporter Jaeger allows user to send collected traces to Jaeger",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -41,7 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/resources": "^0.6.0",
+    "@opentelemetry/resources": "^0.6.1",
     "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.9",
     "codecov": "^3.6.1",
@@ -56,10 +56,10 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.6.0",
-    "@opentelemetry/base": "^0.6.0",
-    "@opentelemetry/core": "^0.6.0",
-    "@opentelemetry/tracing": "^0.6.0",
+    "@opentelemetry/api": "^0.6.1",
+    "@opentelemetry/base": "^0.6.1",
+    "@opentelemetry/core": "^0.6.1",
+    "@opentelemetry/tracing": "^0.6.1",
     "jaeger-client": "^3.15.0"
   }
 }
