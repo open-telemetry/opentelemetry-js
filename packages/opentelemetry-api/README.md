@@ -105,7 +105,7 @@ tracerProvider.register({
 
   // Skip registering a default context manager
   contextManager: null,
-})
+});
 ```
 
 ### API Methods
@@ -118,7 +118,7 @@ If you are writing an instrumentation library, or prefer to call the API methods
 - [Context API Documentation][context-api-docs]
 
 ```javascript
-const api = require("@opentelemetry/api")
+const api = require("@opentelemetry/api");
 
 /* Initialize TraceProvider */
 api.trace.setGlobalTracerProvider(traceProvider);
@@ -135,7 +135,7 @@ api.metrics.getMeterProvider();
 api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
-api.propagation.setGlobalPropagator(httpTraceContextPropagator)
+api.propagation.setGlobalPropagator(httpTraceContextPropagator);
 
 /* Initialize Context Manager */
 api.context.setGlobalContextManager(asyncHooksContextManager);
