@@ -54,5 +54,5 @@ export interface BoundObserver {
    * retrieve the value.
    * @param callback
    */
-  setCallback(callback: (observerResult: ObserverResult) => {}): void;
+  setCallback(callback: (observerResult: ObserverResult) => void): void;
 }
