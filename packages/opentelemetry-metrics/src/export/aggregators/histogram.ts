@@ -19,14 +19,14 @@ import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
 /**
- * Basic aggregator which observe events and counts them in pre-defined buckets
+ * Basic aggregator which observes events and counts them in pre-defined buckets
  * and provides the total sum and count of all observations.
  */
 export class HistogramAggregator implements Aggregator {
   private _lastCheckpoint: Histogram;
   private _currentCheckpoint: Histogram;
   private _lastCheckpointTime: HrTime;
-  private _boundaries: number[];
+  private readonly _boundaries: number[];
 
   constructor(boundaries: number[]) {
     if (boundaries === undefined || boundaries.length === 0) {
