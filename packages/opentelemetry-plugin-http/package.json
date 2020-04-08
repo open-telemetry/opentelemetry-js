@@ -46,7 +46,7 @@
     "@opentelemetry/node": "^0.6.0",
     "@opentelemetry/tracing": "^0.6.0",
     "@types/got": "^9.6.7",
-    "@types/mocha": "^5.2.7",
+    "@types/mocha": "^7.0.0",
     "@types/nock": "^11.1.0",
     "@types/node": "^12.12.9",
     "@types/request-promise-native": "^1.0.17",

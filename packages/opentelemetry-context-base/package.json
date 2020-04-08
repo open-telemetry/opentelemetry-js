@@ -43,7 +43,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.8",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
