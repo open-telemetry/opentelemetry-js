@@ -136,7 +136,7 @@ export class NoopBoundMeasure implements BoundMeasure {
 }
 
 export class NoopBoundObserver implements BoundObserver {
-  setCallback(callback: (observerResult: ObserverResult) => {}): void {}
+  setCallback(callback: (observerResult: ObserverResult) => void): void {}
 }
 
 export const NOOP_METER = new NoopMeter();
