@@ -17,8 +17,8 @@
 import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
+import { GLOBAL_METRICS_API_KEY, makeGetter, _global } from './global-utils';
 
-const GLOBAL_METRICS_API_KEY = Symbol.for('io.opentelemetry.js.api.metrics');
 const API_VERSION = 0;
 
 /**
@@ -43,20 +43,16 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    if ((global as any)[GLOBAL_METRICS_API_KEY]) {
+    if (_global[GLOBAL_METRICS_API_KEY]) {
       // global meter provider has already been set
       return NOOP_METER_PROVIDER;
     }
 
-    (global as any)[GLOBAL_METRICS_API_KEY] = function getTraceApi(
-      version: number
-    ) {
-      if (version !== API_VERSION) {
-        return NOOP_METER_PROVIDER;
-      }
-
-      return provider;
-    };
+    _global[GLOBAL_METRICS_API_KEY] = makeGetter(
+      API_VERSION,
+      provider,
+      NOOP_METER_PROVIDER
+    );
 
     return provider;
   }
@@ -65,11 +61,11 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    if (!(global as any)[GLOBAL_METRICS_API_KEY]) {
+    if (!_global[GLOBAL_METRICS_API_KEY]) {
       return NOOP_METER_PROVIDER;
     }
 
-    return (global as any)[GLOBAL_METRICS_API_KEY](API_VERSION);
+    return _global[GLOBAL_METRICS_API_KEY]!(API_VERSION);
   }
 
   /**
@@ -81,6 +77,6 @@ export class MetricsAPI {
 
   /** Remove the global meter provider */
   public disable() {
-    delete (global as any)[GLOBAL_METRICS_API_KEY];
+    delete _global[GLOBAL_METRICS_API_KEY];
   }
 }

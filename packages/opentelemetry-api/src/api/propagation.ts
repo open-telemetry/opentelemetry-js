@@ -20,12 +20,14 @@ import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
 import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPropagator';
 import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
+import {
+  GLOBAL_PROPAGATION_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 const contextApi = ContextAPI.getInstance();
 
-const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.propagation'
-);
 const API_VERSION = 0;
 
 /**
@@ -52,20 +54,16 @@ export class PropagationAPI {
   public setGlobalPropagator(
     propagator: HttpTextPropagator
   ): HttpTextPropagator {
-    if ((global as any)[GLOBAL_PROPAGATION_API_KEY]) {
+    if (_global[GLOBAL_PROPAGATION_API_KEY]) {
       // global propagator has already been set
       return NOOP_HTTP_TEXT_PROPAGATOR;
     }
 
-    (global as any)[GLOBAL_PROPAGATION_API_KEY] = function getTraceApi(
-      version: number
-    ) {
-      if (version !== API_VERSION) {
-        return NOOP_HTTP_TEXT_PROPAGATOR;
-      }
-
-      return propagator;
-    };
+    _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
+      API_VERSION,
+      propagator,
+      NOOP_HTTP_TEXT_PROPAGATOR
+    );
 
     return propagator;
   }
@@ -102,14 +100,14 @@ export class PropagationAPI {
 
   /** Remove the global propagator */
   public disable() {
-    delete (global as any)[GLOBAL_PROPAGATION_API_KEY];
+    delete _global[GLOBAL_PROPAGATION_API_KEY];
   }
 
   private _getGlobalPropagator(): HttpTextPropagator {
-    if (!(global as any)[GLOBAL_PROPAGATION_API_KEY]) {
+    if (!_global[GLOBAL_PROPAGATION_API_KEY]) {
       return NOOP_HTTP_TEXT_PROPAGATOR;
     }
 
-    return (global as any)[GLOBAL_PROPAGATION_API_KEY](API_VERSION);
+    return _global[GLOBAL_PROPAGATION_API_KEY]!(API_VERSION);
   }
 }

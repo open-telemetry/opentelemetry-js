@@ -15,16 +15,17 @@
  */
 
 import {
+  Context,
   ContextManager,
   NoopContextManager,
-  Context,
 } from '@opentelemetry/context-base';
+import {
+  GLOBAL_CONTEXT_MANAGER_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
-
-const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
-  'io.opentelemetry.js.api.context'
-);
 const API_VERSION = 0;
 
 /**
@@ -51,20 +52,16 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    if ((global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
+    if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
       // global context manager has already been set
       return NOOP_CONTEXT_MANAGER;
     }
 
-    (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY] = function getTraceApi(
-      version: number
-    ) {
-      if (version !== API_VERSION) {
-        return NOOP_CONTEXT_MANAGER;
-      }
-
-      return contextManager;
-    };
+    _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
+      API_VERSION,
+      contextManager,
+      NOOP_CONTEXT_MANAGER
+    );
 
     return contextManager;
   }
@@ -100,16 +97,16 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    if (!(global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
+    if (!_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
       return NOOP_CONTEXT_MANAGER;
     }
 
-    return (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY](API_VERSION);
+    return _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(API_VERSION);
   }
 
   /** Disable and remove the global context manager */
   public disable() {
     this._getContextManager().disable();
-    delete (global as any)[GLOBAL_CONTEXT_MANAGER_API_KEY];
+    delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
   }
 }
