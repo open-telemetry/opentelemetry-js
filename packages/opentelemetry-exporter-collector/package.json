@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -53,7 +53,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.6.0",
-    "@types/mocha": "^5.2.5",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.8",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
@@ -84,11 +84,11 @@
   },
   "dependencies": {
     "@grpc/proto-loader":  "^0.5.3",
-    "@opentelemetry/api": "^0.6.0",
-    "@opentelemetry/base": "^0.6.0",
-    "@opentelemetry/core": "^0.6.0",
-    "@opentelemetry/resources": "^0.6.0",
-    "@opentelemetry/tracing": "^0.6.0",
+    "@opentelemetry/api": "^0.6.1",
+    "@opentelemetry/base": "^0.6.1",
+    "@opentelemetry/core": "^0.6.1",
+    "@opentelemetry/resources": "^0.6.1",
+    "@opentelemetry/tracing": "^0.6.1",
     "google-protobuf": "^3.11.4",
     "grpc": "^1.24.2"
   }

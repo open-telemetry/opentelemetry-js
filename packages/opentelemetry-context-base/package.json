@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-base",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "OpenTelemetry Base Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -43,7 +43,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "^5.2.5",
+    "@types/mocha": "^7.0.0",
     "@types/node": "^12.6.8",
     "codecov": "^3.6.1",
     "gts": "^1.1.0",
