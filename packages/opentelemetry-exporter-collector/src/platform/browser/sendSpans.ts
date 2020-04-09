@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
-import * as core from '@opentelemetry/core';
 import { Logger } from '@opentelemetry/api';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporter } from '../../CollectorExporter';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
-import { VERSION } from '../../version';
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
- * @param shutdownF shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onInit(shutdownF: EventListener) {
-  window.addEventListener('unload', shutdownF);
+export function onInit(collectorExporter: CollectorExporter) {
+  window.addEventListener('unload', collectorExporter.shutdown);
 }
 
 /**
  * function to be called once when {@link ExporterCollector} is shutdown
- * @param shutdownF - shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onShutdown(shutdownF: EventListener) {
-  window.removeEventListener('unload', shutdownF);
+export function onShutdown(collectorExporter: CollectorExporter) {
+  window.removeEventListener('unload', collectorExporter.shutdown);
 }
 
 /**
@@ -43,34 +43,17 @@ export function onShutdown(shutdownF: EventListener) {
  * @param onSuccess
  * @param onError
  * @param collectorExporter
- * @param resource
  */
 export function sendSpans(
-  spans: collectorTypes.Span[],
+  spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (status?: number) => void,
-  collectorExporter: CollectorExporter,
-  resource: collectorTypes.Resource
+  onError: (error: collectorTypes.CollectorExporterError) => void,
+  collectorExporter: CollectorExporter
 ) {
-  const exportTraceServiceRequest: collectorTypes.ExportTraceServiceRequest = {
-    node: {
-      identifier: {
-        hostName: collectorExporter.hostName || window.location.host,
-        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
-      },
-      libraryInfo: {
-        language: collectorTypes.LibraryInfoLanguage.WEB_JS,
-        coreLibraryVersion: core.VERSION,
-        exporterVersion: VERSION,
-      },
-      serviceInfo: {
-        name: collectorExporter.serviceName,
-      },
-      attributes: collectorExporter.attributes,
-    },
-    resource,
+  const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
     spans,
-  };
+    collectorExporter
+  );
 
   const body = JSON.stringify(exportTraceServiceRequest);
 
@@ -104,7 +87,7 @@ export function sendSpans(
 function sendSpansWithBeacon(
   body: string,
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   logger: Logger,
   collectorUrl: string
 ) {
@@ -113,7 +96,7 @@ function sendSpansWithBeacon(
     onSuccess();
   } else {
     logger.error('sendBeacon - cannot send', body);
-    onError();
+    onError({});
   }
 }
 
@@ -129,13 +112,15 @@ function sendSpansWithBeacon(
 function sendSpansWithXhr(
   body: string,
   onSuccess: () => void,
-  onError: (status?: number) => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void,
   logger: Logger,
   collectorUrl: string
 ) {
   const xhr = new XMLHttpRequest();
   xhr.open('POST', collectorUrl);
   xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
+  xhr.setRequestHeader('Accept', 'application/json');
+  xhr.setRequestHeader('Content-Type', 'application/json');
   xhr.send(body);
 
   xhr.onreadystatechange = () => {
@@ -144,8 +129,12 @@ function sendSpansWithXhr(
         logger.debug('xhr success', body);
         onSuccess();
       } else {
-        logger.error('xhr error', xhr.status, body);
-        onError(xhr.status);
+        logger.error('body', body);
+        logger.error('xhr error', xhr);
+        onError({
+          code: xhr.status,
+          message: xhr.responseText,
+        });
       }
     }
   };

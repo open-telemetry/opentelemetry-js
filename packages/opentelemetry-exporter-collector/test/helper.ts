@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,13 +15,45 @@
  */
 
 import { TraceFlags } from '@opentelemetry/api';
-import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
-import * as transform from '../src/transform';
+import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
-import { VERSION } from '../src/version';
+
+if (typeof Buffer === 'undefined') {
+  // @ts-ignore
+  window.Buffer = {
+    from: function(arr: []) {
+      return new Uint8Array(arr);
+    },
+  };
+}
+
+const traceIdArr = [
+  31,
+  16,
+  8,
+  220,
+  142,
+  39,
+  14,
+  133,
+  196,
+  10,
+  13,
+  124,
+  57,
+  57,
+  178,
+  120,
+];
+const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
+const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
+
+const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
+const spanIdBase64 = 'XhByYfZPpT4=';
+const parentIdBase64 = 'eKiRUJiGQ4g=';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -76,127 +108,405 @@ export const mockedReadableSpan: ReadableSpan = {
   }),
 };
 
-export function ensureSpanIsCorrect(span: collectorTypes.Span) {
-  assert.deepStrictEqual(transform.toCollectorSpan(mockedReadableSpan), {
-    traceId: 'HxAI3I4nDoXECg18OTmyeA==',
-    spanId: 'XhByYfZPpT4=',
-    parentSpanId: 'eKiRUJiGQ4g=',
-    tracestate: {},
-    name: { value: 'documentFetch', truncatedByteCount: 0 },
-    kind: 0,
-    startTime: '2019-11-18T23:36:05.429803070Z',
-    endTime: '2019-11-18T23:36:05.438688070Z',
-    attributes: {
-      droppedAttributesCount: 0,
-      attributeMap: {
-        component: {
-          stringValue: { value: 'document-load', truncatedByteCount: 0 },
-        },
+export function ensureExportedEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'fetchStart',
+        droppedAttributesCount: 0,
       },
-    },
-    timeEvents: {
-      timeEvent: [
-        {
-          time: '2019-11-18T23:36:05.429803070Z',
-          annotation: {
-            description: { value: 'fetchStart', truncatedByteCount: 0 },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'connectStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165429803008',
+        name: 'connectEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165435513088',
+        name: 'requestStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165436923136',
+        name: 'responseStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        attributes: [],
+        timeUnixNano: '1574120165438688000',
+        name: 'responseEnd',
+        droppedAttributesCount: 0,
+      },
+    ],
+    'exported events are incorrect'
+  );
+}
+
+export function ensureExportedAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 'STRING',
+        stringValue: 'document-load',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+    ],
+    'exported attributes are incorrect'
+  );
+}
+
+export function ensureExportedLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        attributes: [
+          {
+            key: 'component',
+            type: 'STRING',
+            stringValue: 'document-load',
+            intValue: '0',
+            doubleValue: 0,
+            boolValue: false,
           },
-        },
-        {
-          time: '2019-11-18T23:36:05.429803070Z',
-          annotation: {
-            description: {
-              value: 'domainLookupStart',
-              truncatedByteCount: 0,
-            },
+        ],
+        traceId: Buffer.from(traceIdArr),
+        spanId: Buffer.from(parentIdArr),
+        traceState: '',
+        droppedAttributesCount: 0,
+      },
+    ],
+    'exported links are incorrect'
+  );
+}
+
+export function ensureEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'fetchStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'domainLookupStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'domainLookupEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'connectStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165429803000,
+        name: 'connectEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165435513000,
+        name: 'requestStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165436923100,
+        name: 'responseStart',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: 1574120165438688000,
+        name: 'responseEnd',
+        attributes: [],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'events are incorrect'
+  );
+}
+
+export function ensureAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 0,
+        stringValue: 'document-load',
+      },
+    ],
+    'attributes are incorrect'
+  );
+}
+
+export function ensureLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        traceId: traceIdBase64,
+        spanId: parentIdBase64,
+        attributes: [
+          {
+            key: 'component',
+            type: 0,
+            stringValue: 'document-load',
           },
-        },
-        {
-          time: '2019-11-18T23:36:05.429803070Z',
-          annotation: {
-            description: {
-              value: 'domainLookupEnd',
-              truncatedByteCount: 0,
-            },
-          },
-        },
-        {
-          time: '2019-11-18T23:36:05.429803070Z',
-          annotation: {
-            description: { value: 'connectStart', truncatedByteCount: 0 },
-          },
-        },
-        {
-          time: '2019-11-18T23:36:05.429803070Z',
-          annotation: {
-            description: { value: 'connectEnd', truncatedByteCount: 0 },
-          },
-        },
-        {
-          time: '2019-11-18T23:36:05.435513070Z',
-          annotation: {
-            description: { value: 'requestStart', truncatedByteCount: 0 },
-          },
-        },
-        {
-          time: '2019-11-18T23:36:05.436923070Z',
-          annotation: {
-            description: { value: 'responseStart', truncatedByteCount: 0 },
-          },
-        },
-        {
-          time: '2019-11-18T23:36:05.438688070Z',
-          annotation: {
-            description: { value: 'responseEnd', truncatedByteCount: 0 },
-          },
-        },
-      ],
-      droppedAnnotationsCount: 0,
-      droppedMessageEventsCount: 0,
-    },
-    status: { code: 0 },
-    sameProcessAsParentSpan: true,
-    links: {
-      droppedLinksCount: 0,
-      link: [
-        {
-          traceId: 'HxAI3I4nDoXECg18OTmyeA==',
-          spanId: 'eKiRUJiGQ4g=',
-          type: 2,
-          attributes: {
-            droppedAttributesCount: 0,
-            attributeMap: {
-              component: {
-                stringValue: { value: 'document-load', truncatedByteCount: 0 },
-              },
-            },
-          },
-        },
-      ],
-    },
+        ],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'links are incorrect'
+  );
+}
+
+export function ensureSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    parentIdBase64,
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(
+    span.kind,
+    opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
+    'kind is wrong'
+  );
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    1574120165429803008,
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    1574120165438688000,
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
+}
+
+export function ensureExportedSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureExportedAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureExportedEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureExportedLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(
+    span.traceId,
+    Buffer.from(traceIdArr),
+    'traceId is wrong'
+  );
+  assert.deepStrictEqual(
+    span.spanId,
+    Buffer.from(spanIdArr),
+    'spanId is wrong'
+  );
+  assert.strictEqual(span.traceState, '', 'traceState is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    Buffer.from(parentIdArr),
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    '1574120165429803008',
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    '1574120165438688000',
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(
+    span.status,
+    { code: 'Ok', message: '' },
+    'status is wrong'
+  );
+}
+
+export function ensureWebResourceIsCorrect(
+  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+) {
+  assert.deepStrictEqual(resource, {
+    attributes: [
+      {
+        key: 'service.name',
+        type: 0,
+        stringValue: 'bar',
+      },
+      {
+        key: 'service',
+        type: 0,
+        stringValue: 'ui',
+      },
+      { key: 'version', type: 2, doubleValue: 1 },
+      {
+        key: 'cost',
+        type: 2,
+        doubleValue: 112.12,
+      },
+    ],
+    droppedAttributesCount: 0,
+  });
+}
+
+export function ensureResourceIsCorrect(
+  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+) {
+  assert.deepStrictEqual(resource, {
+    attributes: [
+      {
+        key: 'service.name',
+        type: 'STRING',
+        stringValue: 'basic-service',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+      {
+        key: 'service',
+        type: 'STRING',
+        stringValue: 'ui',
+        intValue: '0',
+        doubleValue: 0,
+        boolValue: false,
+      },
+      {
+        key: 'version',
+        type: 'DOUBLE',
+        stringValue: '',
+        intValue: '0',
+        doubleValue: 1,
+        boolValue: false,
+      },
+      {
+        key: 'cost',
+        type: 'DOUBLE',
+        stringValue: '',
+        intValue: '0',
+        doubleValue: 112.12,
+        boolValue: false,
+      },
+    ],
+    droppedAttributesCount: 0,
   });
 }
 
 export function ensureExportTraceServiceRequestIsSet(
-  json: collectorTypes.ExportTraceServiceRequest,
-  languageInfo: collectorTypes.LibraryInfoLanguage
+  json: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 ) {
-  const libraryInfo = json.node && json.node.libraryInfo;
-  const serviceInfo = json.node && json.node.serviceInfo;
-  const identifier = json.node && json.node.identifier;
+  const resourceSpans = json.resourceSpans;
+  assert.strictEqual(
+    resourceSpans && resourceSpans.length,
+    1,
+    'resourceSpans is missing'
+  );
 
-  const language = libraryInfo && libraryInfo.language;
-  assert.strictEqual(language, languageInfo, 'language is missing');
+  const resource = resourceSpans[0].resource;
+  assert.strictEqual(!!resource, true, 'resource is missing');
 
-  const exporterVersion = libraryInfo && libraryInfo.exporterVersion;
-  assert.strictEqual(exporterVersion, VERSION, 'version is missing');
+  const instrumentationLibrarySpans =
+    resourceSpans[0].instrumentationLibrarySpans;
+  assert.strictEqual(
+    instrumentationLibrarySpans && instrumentationLibrarySpans.length,
+    1,
+    'instrumentationLibrarySpans is missing'
+  );
 
-  const coreVersion = libraryInfo && libraryInfo.coreLibraryVersion;
-  assert.strictEqual(coreVersion, core.VERSION, 'core version is missing');
+  const instrumentationLibrary =
+    instrumentationLibrarySpans[0].instrumentationLibrary;
+  assert.strictEqual(
+    !!instrumentationLibrary,
+    true,
+    'instrumentationLibrary is missing'
+  );
 
-  const name = serviceInfo && serviceInfo.name;
-  assert.strictEqual(name, 'bar', 'name is missing');
-
-  const hostName = identifier && identifier.hostName;
-  assert.strictEqual(hostName, 'foo', 'hostName is missing');
+  const spans = instrumentationLibrarySpans[0].spans;
+  assert.strictEqual(spans && spans.length, 1, 'spans are missing');
 }
