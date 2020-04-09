@@ -26,7 +26,7 @@ import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporter } from './CollectorExporter';
-import { opentelemetryProto } from './types';
+import { COLLETOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
 /**
@@ -170,19 +170,10 @@ export function toCollectorResource(
 export function toCollectorKind(
   kind: SpanKind
 ): opentelemetryProto.trace.v1.Span.SpanKind {
-  if (kind === SpanKind.INTERNAL) {
-    return opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL;
-  } else if (kind === SpanKind.SERVER) {
-    return opentelemetryProto.trace.v1.Span.SpanKind.SERVER;
-  } else if (kind === SpanKind.CLIENT) {
-    return opentelemetryProto.trace.v1.Span.SpanKind.CLIENT;
-  } else if (kind === SpanKind.PRODUCER) {
-    return opentelemetryProto.trace.v1.Span.SpanKind.PRODUCER;
-  } else if (kind === SpanKind.CONSUMER) {
-    return opentelemetryProto.trace.v1.Span.SpanKind.CONSUMER;
-  }
-
-  return opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
+  const collectorKind = COLLETOR_SPAN_KIND_MAPPING[kind];
+  return typeof collectorKind === 'number'
+    ? collectorKind
+    : opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
 }
 
 /**

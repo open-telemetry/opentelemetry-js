@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { SpanKind } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
 
 // header to prevent instrumentation on request
@@ -169,3 +170,14 @@ export interface CollectorExporterError {
   message?: string;
   stack?: string;
 }
+
+/**
+ * Mapping between api SpanKind and proto SpanKind
+ */
+export const COLLETOR_SPAN_KIND_MAPPING = {
+  [SpanKind.INTERNAL]: opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
+  [SpanKind.SERVER]: opentelemetryProto.trace.v1.Span.SpanKind.SERVER,
+  [SpanKind.CLIENT]: opentelemetryProto.trace.v1.Span.SpanKind.CLIENT,
+  [SpanKind.PRODUCER]: opentelemetryProto.trace.v1.Span.SpanKind.PRODUCER,
+  [SpanKind.CONSUMER]: opentelemetryProto.trace.v1.Span.SpanKind.CONSUMER,
+};
