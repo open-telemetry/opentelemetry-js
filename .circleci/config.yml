@@ -162,14 +162,17 @@ browsers_unit_tests: &browsers_unit_tests
 jobs:
   lint_&_docs:
     docker:
-      - image: node:12
+      - image: node:13
         environment:
           NPM_CONFIG_UNSAFE_PERM: true
     steps:
       - checkout
       - run:
-          name: Boostrap all
-          command: npm install
+          name: Install minimal doc and lint modules globally
+          command: npm i -g tslint lerna typedoc linkinator typescript gts@1.1.0 tslint-consistent-codestyle tslint-microsoft-contrib
+      - run:
+          name: Symlink global modules into all lerna packages
+          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts@1.1.0 tslint-consistent-codestyle tslint-microsoft-contrib'
       - run:
           name: Check code style and linting
           command: npm run lint
