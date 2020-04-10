@@ -168,11 +168,8 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install minimal doc and lint modules globally
-          command: npm i -g tslint@5.0.0 lerna@3.17.0 typedoc linkinator typescript@3.7.2 gts@1.1.0 tslint-consistent-codestyle@1.16.0 tslint-microsoft-contrib@6.2.0
-      - run:
-          name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint@5.0.0 lerna@3.17.0 typedoc linkinator typescript@3.7.2 gts@1.1.0 tslint-consistent-codestyle@1.16.0 tslint-microsoft-contrib@6.2.0'
+          name: Boostrap all
+          command: npm install
       - run:
           name: Check code style and linting
           command: npm run lint
@@ -260,16 +257,16 @@ workflows:
           filters:
             branches:
               only: /.*/
-      - docs-deploy:
-          requires:
-            - lint_&_docs
-          filters:
-            tags:
-              only: /^v\d+\.\d+\.\d$/
-            branches:
-              ignore: /.*/
-      - node8
-      - node10
-      - node12
-      - node13
-      - node12-browsers
+#      - docs-deploy:
+#          requires:
+#            - lint_&_docs
+#          filters:
+#            tags:
+#              only: /^v\d+\.\d+\.\d$/
+#            branches:
+#              ignore: /.*/
+#      - node8
+#      - node10
+#      - node12
+#      - node13
+#      - node12-browsers
