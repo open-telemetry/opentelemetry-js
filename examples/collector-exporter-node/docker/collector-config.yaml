@@ -3,9 +3,6 @@ receivers:
     endpoint: 0.0.0.0:55678
     cors_allowed_origins:
       - http://localhost:8090
-  otlp/cors:
-    cors_allowed_origins:
-      - http://localhost:8090
 
 exporters:
   zipkin:
