@@ -18,8 +18,6 @@ $ npm install
 ```shell script
 $ # from this directory
 $ npm docker:start
-$ # and in new tab
-$ npm start
 ```
 
 2. Run app
