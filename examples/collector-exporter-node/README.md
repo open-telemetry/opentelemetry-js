@@ -1,6 +1,6 @@
 # Overview
 
-This example shows how to use [@opentelemetry/exporter-collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector) to instrument a simple Node.js application - e.g. a batch job.
+This example shows how to use [@opentelemetry/exporter-collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector) to instrument a simple Node.js application.
 
 This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector) and grpc. It will use [proto format](https://github.com/open-telemetry/opentelemetry-proto).
 
