@@ -171,7 +171,7 @@ jobs:
           name: Install minimal doc and lint modules globally
           command: npm i -g tslint lerna typedoc linkinator typescript tslint-consistent-codestyle tslint-microsoft-contrib
       - run:
-          name: Install minimal doc and lint modules globally
+          name: Install gts version 1.1.0 globally
           command: npm i -g gts@1.1.0
       - run:
           name: Symlink global modules into all lerna packages
