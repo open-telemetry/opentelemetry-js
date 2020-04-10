@@ -1,0 +1,19 @@
+version: "2"
+services:
+
+  # Collector
+  collector:
+    image: omnition/opentelemetry-collector-contrib:0.2.8
+    command: ["--config=/conf/collector-config.yaml", "--log-level=DEBUG"]
+    volumes:
+      - ./collector-config.yaml:/conf/collector-config.yaml
+    ports:
+      - "55678:55678"
+    depends_on:
+      - zipkin-all-in-one
+
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
