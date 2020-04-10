@@ -48,5 +48,5 @@ function doWork(parent) {
   span.addEvent('invoking doWork');
 
   // end span
-  span.end()
+  span.end();
 }
