@@ -263,17 +263,17 @@ workflows:
           filters:
             branches:
               only: /.*/
-#      - docs-deploy:
-#          requires:
-#            - lint_&_docs
-#          filters:
-#            tags:
-#              only: /^v\d+\.\d+\.\d$/
-#            branches:
-#              ignore: /.*/
-#      - node8
-#      - node10
-#      - node12
-#      - node13
-#      - node12-browsers
+      - docs-deploy:
+          requires:
+            - lint_&_docs
+          filters:
+            tags:
+              only: /^v\d+\.\d+\.\d$/
+            branches:
+              ignore: /.*/
+      - node8
+      - node10
+      - node12
+      - node13
+      - node12-browsers
 
