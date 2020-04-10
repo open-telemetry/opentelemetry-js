@@ -162,7 +162,7 @@ browsers_unit_tests: &browsers_unit_tests
 jobs:
   lint_&_docs:
     docker:
-      - image: node:10
+      - image: node:12
         environment:
           NPM_CONFIG_UNSAFE_PERM: true
     steps:
@@ -276,3 +276,4 @@ workflows:
 #      - node12
 #      - node13
 #      - node12-browsers
+
