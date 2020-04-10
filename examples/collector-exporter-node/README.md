@@ -17,7 +17,7 @@ $ npm install
 1. Run docker
 ```shell script
 $ # from this directory
-$ npm docker:start
+$ npm run docker:start
 ```
 
 2. Run app
