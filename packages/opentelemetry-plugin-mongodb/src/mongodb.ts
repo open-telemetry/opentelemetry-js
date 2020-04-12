@@ -34,6 +34,7 @@ import { VERSION } from './version';
 export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
   private readonly _SERVER_METHODS = ['insert', 'update', 'remove', 'command'];
   private readonly _CURSOR_METHODS = ['_next', 'next'];
+  private _hasPatched: boolean = false;
 
   private readonly _COMPONENT = 'mongodb';
   private readonly _DB_TYPE = 'mongodb';
@@ -48,7 +49,11 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
    * Patches MongoDB operations.
    */
   protected patch() {
-    this._logger.debug('Patched MongoDB');
+    this._logger.debug('Patching MongoDB');
+    if (this._hasPatched === true) {
+      this._logger.debug(`Patch is already applied, ignoring.`);
+      return this._moduleExports;
+    }
 
     if (this._moduleExports.Server) {
       for (const fn of this._SERVER_METHODS) {
@@ -77,6 +82,7 @@ export class MongoDBPlugin extends BasePlugin<typeof mongodb> {
       );
     }
 
+    this._hasPatched = true;
     return this._moduleExports;
   }
 
