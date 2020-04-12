@@ -248,8 +248,4 @@ export class ZoneContextManager implements ContextManager {
 
     return newZone.run(fn, context);
   }
-
-  withAsync(context: Context, fn: Function) {
-    return fn();
-  }
 }

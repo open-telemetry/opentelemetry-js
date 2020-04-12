@@ -119,8 +119,4 @@ export class StackContextManager implements ContextManager {
       this._currentContext = previousContext;
     }
   }
-
-  withAsync(context: Context, fn: Function) {
-    return fn();
-  }
 }
