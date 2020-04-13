@@ -48,7 +48,8 @@ export const Utils = require('jaeger-client/dist/src/util').default;
 // tslint:disable-next-line:variable-name
 export const ThriftUtils = require('jaeger-client/dist/src/thrift').default;
 
-export const HTTPSender = require('jaeger-client/dist/src/reporters/http_sender').default;
+export const HTTPSender = require('jaeger-client/dist/src/reporters/http_sender')
+  .default;
 
 export type TagValue = string | number | boolean;
 
