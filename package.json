@@ -7,12 +7,6 @@
   "scripts": {
     "bench": "node benchmark",
     "clean": "lerna run clean",
-    "clean:examples": "find examples -name 'node_modules' -type d -prune -exec rm -rf '{}' +",
-    "clean:packages": "lerna clean -y",
-    "clean:examples:locks": "find examples -name 'yarn.lock' -type f -exec rm '{}' + && find examples -name 'package-lock.json' -type f -exec rm '{}' +",
-    "clean:packages:locks": "find packages -name 'yarn.lock' -type f -exec rm '{}' + && find packages -name 'package-lock.json' -type f -exec rm '{}' +",
-    "clean:main:locks": "rm -fr 'yarn.lock' && rm -fr 'package-lock.json'",
-    "clean:all": "npm run clean && npm run clean:examples && npm run clean:packages && npm run clean:packages:locks && npm run clean:examples:locks && npm run clean:main:locks && rm -fr node_modules",
     "postinstall": "npm run bootstrap",
     "precompile": "tsc --version",
     "version:update": "lerna run version:update",
