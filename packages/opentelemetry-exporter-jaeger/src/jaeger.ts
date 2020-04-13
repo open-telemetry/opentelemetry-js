@@ -38,7 +38,17 @@ export class JaegerExporter implements SpanExporter {
       typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
 
     config.host = config.host || process.env.JAEGER_AGENT_HOST;
-
+    config.endpoint = config.endpoint || process.env.JAEGER_ENDPOINT;
+    config.username = config.username || process.env.JAEGER_USER;
+    config.password = config.password || process.env.JAEGER_PASSWORD;
+    // https://github.com/jaegertracing/jaeger-client-node#environment-variables
+    // By default, the client sends traces via UDP to the agent at localhost:6832. Use JAEGER_AGENT_HOST and
+    // JAEGER_AGENT_PORT to send UDP traces to a different host:port. If JAEGER_ENDPOINT is set, the client sends traces
+    // to the endpoint via HTTP, making the JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If JAEGER_ENDPOINT is secured,
+    // HTTP basic authentication can be performed by setting the JAEGER_USER and JAEGER_PASSWORD environment variables.
+    this._sender = config.endpoint
+      ? new jaegerTypes.HTTPSender(config)
+      : new jaegerTypes.UDPSender(config);
     this._sender = new jaegerTypes.UDPSender(config);
     if (this._sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
