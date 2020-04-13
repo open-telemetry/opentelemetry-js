@@ -25,9 +25,9 @@ export class MetricObservable implements api.MetricObservable {
   private _subscribers: Subscriber[] = [];
 
   next(value: number) {
-    this._subscribers.forEach(subscriber => {
+    for (const subscriber of this._subscribers) {
       subscriber(value);
-    });
+    }
   }
 
   subscribe(subscriber: Function) {
@@ -36,7 +36,7 @@ export class MetricObservable implements api.MetricObservable {
     }
   }
 
-  unSubscribe(subscriber?: Function) {
+  unsubscribe(subscriber?: Function) {
     if (typeof subscriber === 'function') {
       for (let i = 0, j = this._subscribers.length; i < j; i++) {
         if (this._subscribers[i] === subscriber) {

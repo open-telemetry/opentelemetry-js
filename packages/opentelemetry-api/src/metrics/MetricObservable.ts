@@ -32,5 +32,5 @@ export interface MetricObservable {
    * Removes the subscriber
    * @param [callback]
    */
-  unSubscribe: (callback?: (value: number) => void) => void;
+  unsubscribe: (callback?: (value: number) => void) => void;
 }
