@@ -27,6 +27,7 @@ import {
   ObserverMetric,
   MetricRecord,
   Aggregator,
+  MetricObservable,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -440,6 +441,7 @@ describe('Meter', () => {
       }) as ObserverMetric;
       assert.ok(measure instanceof Metric);
     });
+
     it('should set callback and observe value ', () => {
       const measure = meter.createObserver('name', {
         description: 'desc',
@@ -450,21 +452,28 @@ describe('Meter', () => {
         return Math.random();
       }
 
+      const metricObservable = new MetricObservable();
+
       measure.setCallback((observerResult: types.ObserverResult) => {
         observerResult.observe(getCpuUsage, { pid: '123', core: '1' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '2' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '3' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '4' });
+        observerResult.observe(metricObservable, { pid: '123', core: '5' });
       });
 
+      metricObservable.next(0.123);
+
       const metricRecords: MetricRecord[] = measure.getMetricRecord();
-      assert.strictEqual(metricRecords.length, 4);
+      assert.strictEqual(metricRecords.length, 5);
 
-      const metric1 = metricRecords[0];
-      const metric2 = metricRecords[1];
-      const metric3 = metricRecords[2];
-      const metric4 = metricRecords[3];
+      const metric5 = metricRecords[0];
+      assert.strictEqual(hashLabels(metric5.labels), '|#core:5,pid:123');
 
+      const metric1 = metricRecords[1];
+      const metric2 = metricRecords[2];
+      const metric3 = metricRecords[3];
+      const metric4 = metricRecords[4];
       assert.strictEqual(hashLabels(metric1.labels), '|#core:1,pid:123');
       assert.strictEqual(hashLabels(metric2.labels), '|#core:2,pid:123');
       assert.strictEqual(hashLabels(metric3.labels), '|#core:3,pid:123');
@@ -474,6 +483,7 @@ describe('Meter', () => {
       ensureMetric(metric2);
       ensureMetric(metric3);
       ensureMetric(metric4);
+      ensureMetric(metric5);
     });
 
     it('should return an observer with resource', () => {

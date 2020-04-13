@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
-export * from './MetricObservable';
-export * from './export/Aggregator';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
+/**
+ * Metric Observable class to handle asynchronous metrics
+ */
+export interface MetricObservable {
+  /**
+   * Sets the next value for observable metric
+   * @param value
+   */
+  next: (value: number) => void;
+  /**
+   * Subscribes for every value change
+   * @param callback
+   */
+  subscribe: (callback: (value: number) => void) => void;
+  /**
+   * Removes the subscriber
+   * @param [callback]
+   */
+  unSubscribe: (callback?: (value: number) => void) => void;
+}
