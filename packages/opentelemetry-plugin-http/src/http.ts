@@ -442,10 +442,10 @@ export class HttpPlugin extends BasePlugin<Http> {
     span: Span,
     response: IncomingMessage | ServerResponse
   ) {
-    if (plugin._config.responseHook) {
-      plugin._safeExecute(
+    if (this._config.responseHook) {
+      this._safeExecute(
         span,
-        () => plugin._config.responseHook!(span, response),
+        () => this._config.responseHook!(span, response),
         false
       );
     }
