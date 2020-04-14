@@ -1,0 +1,34 @@
+{
+  "name": "example-collector-exporter-node",
+  "private": true,
+  "version": "0.6.1",
+  "description": "Example of using @opentelemetry/collector-exporter in Node.js",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./start.js",
+    "docker:start": "cd ./docker && docker-compose down && docker-compose up",
+    "docker:stop": "cd ./docker && docker-compose down"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.6.1",
+    "@opentelemetry/exporter-collector": "^0.6.1",
+    "@opentelemetry/tracing": "^0.6.1"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
+}
