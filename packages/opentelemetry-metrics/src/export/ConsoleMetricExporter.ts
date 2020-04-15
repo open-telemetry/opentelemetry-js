@@ -34,7 +34,7 @@ export class ConsoleMetricExporter implements MetricExporter {
   ): void {
     for (const metric of metrics) {
       console.log(metric.descriptor);
-      console.log(metric.labels.labels);
+      console.log(metric.labels);
       switch (metric.descriptor.metricKind) {
         case MetricKind.COUNTER:
           const sum = metric.aggregator.toPoint().value as Sum;

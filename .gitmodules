@@ -1,0 +1,3 @@
+[submodule "packages/opentelemetry-exporter-collector/src/platform/node/protos"]
+	path = packages/opentelemetry-exporter-collector/src/platform/node/protos
+	url = git@github.com:open-telemetry/opentelemetry-proto.git

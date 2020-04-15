@@ -29,7 +29,7 @@ const counter = meter.createCounter('metric_name', {
   description: "Example of a counter"
 });
 
-const labels = meter.labels({ pid: process.pid });
+const labels = { pid: process.pid };
 
 // Create a BoundInstrument associated with specified label values.
 const boundCounter = counter.bind(labels);

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/**
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import { Resource } from '../../Resource';
 
 /**
- * Canonicalized labels with an unique string identifier.
+ * Detects resources for the browser platform, which is currently only the
+ * telemetry SDK resource. More could be added in the future. This method
+ * is async to match the signature of corresponding method for node.
  */
-export class LabelSet implements types.LabelSet {
-  identifier: string;
-  labels: types.Labels;
-
-  constructor(identifier: string, labels: types.Labels) {
-    this.identifier = identifier;
-    this.labels = labels;
-  }
-}
+export const detectResources = async (): Promise<Resource> => {
+  return Resource.createTelemetrySDKResource();
+};

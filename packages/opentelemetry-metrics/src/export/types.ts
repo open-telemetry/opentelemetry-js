@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-import { ValueType, HrTime } from '@opentelemetry/api';
+import { ValueType, HrTime, Labels } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/base';
-import { LabelSet } from '../LabelSet';
 
 /** The kind of metric. */
 export enum MetricKind {
@@ -40,7 +39,7 @@ export interface Distribution {
 
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
-  readonly labels: LabelSet;
+  readonly labels: Labels;
   readonly aggregator: Aggregator;
 }
 

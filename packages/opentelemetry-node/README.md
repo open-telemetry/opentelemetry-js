@@ -27,7 +27,7 @@ This is done by wrapping all tracing-relevant functions.
 
 This instrumentation code will automatically
 - extract a trace-context identifier from inbound requests to allow distributed tracing (if applicable)
-- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/opentelemetry-context-base](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
+- make sure that this current trace-context is propagated while the transaction traverses an application (see [@opentelemetry/context-base](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-context-base/README.md) for an in-depth explanation)
 - add this trace-context identifier to outbound requests to allow continuing the distributed trace on the next hop (if applicable)
 - create and end spans
 
@@ -52,7 +52,7 @@ npm install --save @opentelemetry/plugin-https
 The following code will configure the `NodeTracerProvider` to instrument `http` using `@opentelemetry/plugin-http`.
 
 ```js
-const { NodeTracerProvider } = require('@/node');
+const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and configure NodeTracerProvider
 const provider = new NodeTracerProvider({
@@ -60,7 +60,7 @@ const provider = new NodeTracerProvider({
     http: {
       enabled: true,
       // You may use a package name or absolute path to the file.
-      path: '@/plugin-http',
+      path: '@opentelemetry/plugin-http',
       // http plugin options
     }
   }

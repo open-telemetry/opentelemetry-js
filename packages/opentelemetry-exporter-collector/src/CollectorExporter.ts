@@ -18,10 +18,8 @@ import { ExportResult } from '@opentelemetry/base';
 import { NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Attributes, Logger } from '@opentelemetry/api';
-import * as collectorTypes from './types';
-import { toCollectorSpan, toCollectorResource } from './transform';
 import { onInit, onShutdown, sendSpans } from './platform/index';
-import { Resource } from '@opentelemetry/resources';
+import { opentelemetryProto } from './types';
 
 /**
  * Collector Exporter Config
@@ -65,7 +63,7 @@ export class CollectorExporter implements SpanExporter {
     this.shutdown = this.shutdown.bind(this);
 
     // platform dependent
-    onInit(this.shutdown);
+    onInit(this);
   }
 
   /**
@@ -81,33 +79,34 @@ export class CollectorExporter implements SpanExporter {
       resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
       return;
     }
+
     this._exportSpans(spans)
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch((status: number = 0) => {
-        if (status < 500) {
-          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-        } else {
-          resultCallback(ExportResult.FAILED_RETRYABLE);
+      .catch(
+        (
+          error: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+        ) => {
+          if (error.message) {
+            this.logger.error(error.message);
+          }
+          if (error.code && error.code < 500) {
+            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+          } else {
+            resultCallback(ExportResult.FAILED_RETRYABLE);
+          }
         }
-      });
+      );
   }
 
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        const spansToBeSent: collectorTypes.Span[] = spans.map(span =>
-          toCollectorSpan(span)
-        );
-        this.logger.debug('spans to be sent', spansToBeSent);
-        const resource = toCollectorResource(
-          spansToBeSent.length > 0 ? spans[0].resource : Resource.empty()
-        );
-
+        this.logger.debug('spans to be sent', spans);
         // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
         // it will use the appropriate transport layer automatically depends on platform
-        sendSpans(spansToBeSent, resolve, reject, this, resource);
+        sendSpans(spans, resolve, reject, this);
       } catch (e) {
         reject(e);
       }
@@ -126,6 +125,6 @@ export class CollectorExporter implements SpanExporter {
     this.logger.debug('shutdown started');
 
     // platform dependent
-    onShutdown(this.shutdown);
+    onShutdown(this);
   }
 }

@@ -23,10 +23,9 @@ import {
   CollectorExporter,
   CollectorExporterConfig,
 } from '../../src/CollectorExporter';
-import * as collectorTypes from '../../src/types';
 import * as platform from '../../src/platform/index';
 
-import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import { mockedReadableSpan } from '../helper';
 
 describe('CollectorExporter - common', () => {
   let collectorExporter: CollectorExporter;
@@ -55,7 +54,7 @@ describe('CollectorExporter - common', () => {
 
     it('should call onInit', () => {
       assert.strictEqual(onInitSpy.callCount, 1);
-      assert.ok(onInitSpy.args[0][0] === collectorExporter.shutdown);
+      assert.ok(onInitSpy.args[0][0] === collectorExporter);
     });
 
     describe('when config contains certain params', () => {
@@ -107,8 +106,8 @@ describe('CollectorExporter - common', () => {
 
       collectorExporter.export(spans, function() {});
       setTimeout(() => {
-        const span1 = spySend.args[0][0][0] as collectorTypes.Span;
-        ensureSpanIsCorrect(span1);
+        const span1 = spySend.args[0][0][0] as ReadableSpan;
+        assert.deepStrictEqual(spans[0], span1);
         done();
       });
       assert.strictEqual(spySend.callCount, 1);
@@ -155,7 +154,7 @@ describe('CollectorExporter - common', () => {
     it('should call onShutdown', done => {
       collectorExporter.shutdown();
       setTimeout(() => {
-        assert.ok(onShutdownSpy.args[0][0] === collectorExporter.shutdown);
+        assert.ok(onShutdownSpy.args[0][0] === collectorExporter);
         done();
       });
     });

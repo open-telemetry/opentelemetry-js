@@ -123,7 +123,10 @@ export class PrometheusExporter implements MetricExporter {
     const metric = this._registerMetric(record);
     if (!metric) return;
 
-    const labelKeys = record.descriptor.labelKeys;
+    const labelValues = this._getLabelValues(
+      record.descriptor.labelKeys,
+      record.labels
+    );
     const point = record.aggregator.toPoint();
 
     if (metric instanceof Counter) {
@@ -132,20 +135,18 @@ export class PrometheusExporter implements MetricExporter {
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
       metric.inc(
-        this._getLabelValues(labelKeys, record.labels),
-        point.value as Sum
+        labelValues,
+        point.value as Sum,
+        hrTimeToMilliseconds(point.timestamp)
       );
     }
 
     if (metric instanceof Gauge) {
       if (record.aggregator instanceof CounterSumAggregator) {
-        metric.set(
-          this._getLabelValues(labelKeys, record.labels),
-          point.value as Sum
-        );
+        metric.set(labelValues, point.value as Sum);
       } else if (record.aggregator instanceof ObserverAggregator) {
         metric.set(
-          this._getLabelValues(labelKeys, record.labels),
+          labelValues,
           point.value as LastValue,
           hrTimeToMilliseconds(point.timestamp)
         );
@@ -155,9 +156,8 @@ export class PrometheusExporter implements MetricExporter {
     // TODO: only counter and gauge are implemented in metrics so far
   }
 
-  private _getLabelValues(keys: string[], values: types.LabelSet) {
+  private _getLabelValues(keys: string[], labels: types.Labels) {
     const labelValues: labelValues = {};
-    const labels = values.labels;
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {
         labelValues[keys[i]] = labels[keys[i]];
@@ -180,8 +180,12 @@ export class PrometheusExporter implements MetricExporter {
      * https://prometheus.io/docs/instrumenting/exposition_formats/
      */
     if (metric instanceof Counter) {
-      this._registry.removeSingleMetric(metricName);
-    } else if (metric) return metric;
+      metric.remove(
+        ...record.descriptor.labelKeys.map(k => record.labels[k].toString())
+      );
+    }
+
+    if (metric) return metric;
 
     return this._newMetric(record, metricName);
   }

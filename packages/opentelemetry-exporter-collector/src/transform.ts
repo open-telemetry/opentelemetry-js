@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,221 +14,220 @@
  * limitations under the License.
  */
 
-import { hexToBase64, hrTimeToTimeStamp } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { Attributes, Link, TimedEvent, TraceState } from '@opentelemetry/api';
-import * as collectorTypes from './types';
+import {
+  Attributes,
+  Link,
+  SpanKind,
+  TimedEvent,
+  TraceState,
+} from '@opentelemetry/api';
+import { SDK_INFO } from '@opentelemetry/base';
+import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-
-const OT_MAX_STRING_LENGTH = 128;
-
-/**
- * convert string to maximum length of 128, providing information of truncated bytes
- * @param name - string to be converted
- */
-export function toCollectorTruncatableString(
-  name: string
-): collectorTypes.TruncatableString {
-  const value = name.substr(0, OT_MAX_STRING_LENGTH);
-  const truncatedByteCount =
-    name.length > OT_MAX_STRING_LENGTH ? name.length - OT_MAX_STRING_LENGTH : 0;
-
-  return { value, truncatedByteCount };
-}
+import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorExporter } from './CollectorExporter';
+import { COLLETOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
+import ValueType = opentelemetryProto.common.v1.ValueType;
 
 /**
- * convert attributes
+ * Converts attributes
  * @param attributes
  */
 export function toCollectorAttributes(
   attributes: Attributes
-): collectorTypes.Attributes {
-  const attributeMap: collectorTypes.AttributeMap = {};
-  Object.keys(attributes || {}).forEach(key => {
-    attributeMap[key] = toCollectorEventValue(attributes[key]);
+): opentelemetryProto.common.v1.AttributeKeyValue[] {
+  return Object.keys(attributes).map(key => {
+    return toCollectorAttributeKeyValue(key, attributes[key]);
   });
-
-  return {
-    droppedAttributesCount: 0,
-    attributeMap,
-  };
 }
 
 /**
- * convert event value
+ * Converts key and value to AttributeKeyValue
  * @param value event value
  */
-export function toCollectorEventValue(
+export function toCollectorAttributeKeyValue(
+  key: string,
   value: unknown
-): collectorTypes.AttributeValue {
-  const attributeValue: collectorTypes.AttributeValue = {};
-
+): opentelemetryProto.common.v1.AttributeKeyValue {
+  let aType: opentelemetryProto.common.v1.ValueType = ValueType.STRING;
+  const AttributeKeyValue: opentelemetryProto.common.v1.AttributeKeyValue = {
+    key,
+    type: 0,
+  };
   if (typeof value === 'string') {
-    attributeValue.stringValue = toCollectorTruncatableString(value);
+    AttributeKeyValue.stringValue = value;
   } else if (typeof value === 'boolean') {
-    attributeValue.boolValue = value;
+    aType = ValueType.BOOL;
+    AttributeKeyValue.boolValue = value;
   } else if (typeof value === 'number') {
     // all numbers will be treated as double
-    attributeValue.doubleValue = value;
+    aType = ValueType.DOUBLE;
+    AttributeKeyValue.doubleValue = value;
   }
 
-  return attributeValue;
+  AttributeKeyValue.type = aType;
+
+  return AttributeKeyValue;
 }
 
 /**
- * convert events
+ *
+ * Converts events
  * @param events array of events
- * @param maxAttributes - maximum number of event attributes to be converted
  */
 export function toCollectorEvents(
-  events: TimedEvent[]
-): collectorTypes.TimeEvents {
-  let droppedAnnotationsCount = 0;
-  let droppedMessageEventsCount = 0; // not counting yet as messageEvent is not implemented
+  timedEvents: TimedEvent[]
+): opentelemetryProto.trace.v1.Span.Event[] {
+  return timedEvents.map(timedEvent => {
+    const timeUnixNano = core.hrTimeToNanoseconds(timedEvent.time);
+    const name = timedEvent.name;
+    const attributes = toCollectorAttributes(timedEvent.attributes || {});
+    const droppedAttributesCount = 0;
 
-  const timeEvent: collectorTypes.TimeEvent[] = events.map(
-    (event: TimedEvent) => {
-      let attributes: collectorTypes.Attributes | undefined;
-
-      if (event && event.attributes) {
-        attributes = toCollectorAttributes(event.attributes);
-        droppedAnnotationsCount += attributes.droppedAttributesCount || 0;
-      }
-
-      let annotation: collectorTypes.Annotation = {};
-      if (event.name || attributes) {
-        annotation = {};
-      }
-
-      if (event.name) {
-        annotation.description = toCollectorTruncatableString(event.name);
-      }
-
-      if (typeof attributes !== 'undefined') {
-        annotation.attributes = attributes;
-      }
-
-      // @TODO convert from event.attributes into appropriate MessageEvent
-      // const messageEvent: collectorTypes.MessageEvent;
-
-      const timeEvent: collectorTypes.TimeEvent = {
-        time: hrTimeToTimeStamp(event.time),
-        // messageEvent,
-      };
-
-      if (annotation) {
-        timeEvent.annotation = annotation;
-      }
-
-      return timeEvent;
-    }
-  );
-
-  return {
-    timeEvent,
-    droppedAnnotationsCount,
-    droppedMessageEventsCount,
-  };
-}
-
-/**
- * determines the type of link, only parent link type can be determined now
- * @TODO refactor this once such data is directly available from {@link Link}
- * @param span
- * @param link
- */
-export function toCollectorLinkType(
-  span: ReadableSpan,
-  link: Link
-): collectorTypes.LinkType {
-  const linkSpanId = link.context.spanId;
-  const linkTraceId = link.context.traceId;
-  const spanParentId = span.parentSpanId;
-  const spanTraceId = span.spanContext.traceId;
-
-  if (linkSpanId === spanParentId && linkTraceId === spanTraceId) {
-    return collectorTypes.LinkType.PARENT_LINKED_SPAN;
-  }
-  return collectorTypes.LinkType.UNSPECIFIED;
-}
-
-/**
- * converts span links
- * @param span
- */
-export function toCollectorLinks(span: ReadableSpan): collectorTypes.Links {
-  const collectorLinks: collectorTypes.Link[] = span.links.map((link: Link) => {
-    const collectorLink: collectorTypes.Link = {
-      traceId: hexToBase64(link.context.traceId),
-      spanId: hexToBase64(link.context.spanId),
-      type: toCollectorLinkType(span, link),
+    const protoEvent: opentelemetryProto.trace.v1.Span.Event = {
+      timeUnixNano,
+      name,
+      attributes,
+      droppedAttributesCount,
     };
 
-    if (link.attributes) {
-      collectorLink.attributes = toCollectorAttributes(link.attributes);
-    }
-
-    return collectorLink;
+    return protoEvent;
   });
+}
 
+/**
+ * Converts links
+ * @param span
+ */
+export function toCollectorLinks(
+  span: ReadableSpan
+): opentelemetryProto.trace.v1.Span.Link[] {
+  return span.links.map((link: Link) => {
+    const protoLink: opentelemetryProto.trace.v1.Span.Link = {
+      traceId: core.hexToBase64(link.context.traceId),
+      spanId: core.hexToBase64(link.context.spanId),
+      attributes: toCollectorAttributes(link.attributes || {}),
+      droppedAttributesCount: 0,
+    };
+    return protoLink;
+  });
+}
+
+/**
+ * Converts span
+ * @param span
+ */
+export function toCollectorSpan(
+  span: ReadableSpan
+): opentelemetryProto.trace.v1.Span {
   return {
-    link: collectorLinks,
+    traceId: core.hexToBase64(span.spanContext.traceId),
+    spanId: core.hexToBase64(span.spanContext.spanId),
+    parentSpanId: span.parentSpanId
+      ? core.hexToBase64(span.parentSpanId)
+      : undefined,
+    traceState: toCollectorTraceState(span.spanContext.traceState),
+    name: span.name,
+    kind: toCollectorKind(span.kind),
+    startTimeUnixNano: core.hrTimeToNanoseconds(span.startTime),
+    endTimeUnixNano: core.hrTimeToNanoseconds(span.endTime),
+    attributes: toCollectorAttributes(span.attributes),
+    droppedAttributesCount: 0,
+    events: toCollectorEvents(span.events),
+    droppedEventsCount: 0,
+    status: span.status,
+    links: toCollectorLinks(span),
     droppedLinksCount: 0,
   };
 }
 
 /**
- * @param span
- */
-export function toCollectorSpan(span: ReadableSpan): collectorTypes.Span {
-  return {
-    traceId: hexToBase64(span.spanContext.traceId),
-    spanId: hexToBase64(span.spanContext.spanId),
-    parentSpanId: span.parentSpanId
-      ? hexToBase64(span.parentSpanId)
-      : undefined,
-    tracestate: toCollectorTraceState(span.spanContext.traceState),
-    name: toCollectorTruncatableString(span.name),
-    kind: span.kind,
-    startTime: hrTimeToTimeStamp(span.startTime),
-    endTime: hrTimeToTimeStamp(span.endTime),
-    attributes: toCollectorAttributes(span.attributes),
-    // stackTrace: // not implemented
-    timeEvents: toCollectorEvents(span.events),
-    status: span.status,
-    sameProcessAsParentSpan: !!span.parentSpanId,
-    links: toCollectorLinks(span),
-    // childSpanCount: // not implemented
-  };
-}
-
-/**
- * converts span resource
+ * Converts resource
  * @param resource
+ * @param additionalAttributes
  */
 export function toCollectorResource(
-  resource: Resource
-): collectorTypes.Resource {
-  const labels: { [key: string]: string } = {};
-  Object.keys(resource.labels).forEach(
-    name => (labels[name] = String(resource.labels[name]))
+  resource?: Resource,
+  additionalAttributes: { [key: string]: any } = {}
+): opentelemetryProto.resource.v1.Resource {
+  const attr = Object.assign(
+    {},
+    additionalAttributes,
+    resource ? resource.labels : {}
   );
-  // @TODO: add type support
-  return { labels };
+  const resourceProto: opentelemetryProto.resource.v1.Resource = {
+    attributes: toCollectorAttributes(attr),
+    droppedAttributesCount: 0,
+  };
+
+  return resourceProto;
 }
 
 /**
+ * Converts span kind
+ * @param kind
+ */
+export function toCollectorKind(
+  kind: SpanKind
+): opentelemetryProto.trace.v1.Span.SpanKind {
+  const collectorKind = COLLETOR_SPAN_KIND_MAPPING[kind];
+  return typeof collectorKind === 'number'
+    ? collectorKind
+    : opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
+}
+
+/**
+ * Converts traceState
  * @param traceState
  */
-function toCollectorTraceState(
+export function toCollectorTraceState(
   traceState?: TraceState
-): collectorTypes.TraceState {
-  if (!traceState) return {};
-  const entries = traceState.serialize().split(',');
-  const apiTraceState: collectorTypes.TraceState = {};
-  for (const entry of entries) {
-    const [key, value] = entry.split('=');
-    apiTraceState[key] = value;
-  }
-  return apiTraceState;
+): opentelemetryProto.trace.v1.Span.TraceState | undefined {
+  if (!traceState) return undefined;
+  return traceState.serialize();
+}
+
+/**
+ * Prepares trace service request to be sent to collector
+ * @param spans spans
+ * @param collectorExporter
+ * @param [name] Instrumentation Library Name
+ */
+export function toCollectorExportTraceServiceRequest(
+  spans: ReadableSpan[],
+  collectorExporter: CollectorExporter,
+  name: string = ''
+): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+  const spansToBeSent: opentelemetryProto.trace.v1.Span[] = spans.map(span =>
+    toCollectorSpan(span)
+  );
+  const resource: Resource =
+    spans.length > 0 ? spans[0].resource : Resource.empty();
+
+  const additionalAttributes = Object.assign(
+    {},
+    collectorExporter.attributes || {},
+    {
+      'service.name': collectorExporter.serviceName,
+    }
+  );
+  const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
+    resource,
+    additionalAttributes
+  );
+  const instrumentationLibrarySpans: opentelemetryProto.trace.v1.InstrumentationLibrarySpans = {
+    spans: spansToBeSent,
+    instrumentationLibrary: {
+      name: name || `${SDK_INFO.NAME} - ${SDK_INFO.LANGUAGE}`,
+      version: SDK_INFO.VERSION,
+    },
+  };
+  const resourceSpan: opentelemetryProto.trace.v1.ResourceSpans = {
+    resource: protoResource,
+    instrumentationLibrarySpans: [instrumentationLibrarySpans],
+  };
+
+  return {
+    resourceSpans: [resourceSpan],
+  };
 }

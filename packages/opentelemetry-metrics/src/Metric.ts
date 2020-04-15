@@ -26,6 +26,7 @@ import { ObserverResult } from './ObserverResult';
 import { MetricOptions } from './types';
 import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
+import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
@@ -51,27 +52,27 @@ export abstract class Metric<T extends BaseBoundInstrument>
   }
 
   /**
-   * Returns an Instrument associated with specified LabelSet.
+   * Returns an Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Instrument instead of always
    * calling this method for each operation.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  bind(labelSet: types.LabelSet): T {
-    if (this._instruments.has(labelSet.identifier))
-      return this._instruments.get(labelSet.identifier)!;
+  bind(labels: types.Labels): T {
+    const hash = hashLabels(labels);
+    if (this._instruments.has(hash)) return this._instruments.get(hash)!;
 
-    const instrument = this._makeInstrument(labelSet);
-    this._instruments.set(labelSet.identifier, instrument);
+    const instrument = this._makeInstrument(labels);
+    this._instruments.set(hash, instrument);
     return instrument;
   }
 
   /**
    * Removes the Instrument from the metric, if it is present.
-   * @param labelSet the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labelSet: types.LabelSet): void {
-    this._instruments.delete(labelSet.identifier);
+  unbind(labels: types.Labels): void {
+    this._instruments.delete(hashLabels(labels));
   }
 
   /**
@@ -84,7 +85,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
   getMetricRecord(): MetricRecord[] {
     return Array.from(this._instruments.values()).map(instrument => ({
       descriptor: this._descriptor,
-      labels: instrument.getLabelSet(),
+      labels: instrument.getLabels(),
       aggregator: instrument.getAggregator(),
     }));
   }
@@ -101,7 +102,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     };
   }
 
-  protected abstract _makeInstrument(labelSet: types.LabelSet): T;
+  protected abstract _makeInstrument(labels: types.Labels): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
@@ -115,9 +116,9 @@ export class CounterMetric extends Metric<BoundCounter>
   ) {
     super(name, options, MetricKind.COUNTER, resource);
   }
-  protected _makeInstrument(labelSet: types.LabelSet): BoundCounter {
+  protected _makeInstrument(labels: types.Labels): BoundCounter {
     return new BoundCounter(
-      labelSet,
+      labels,
       this._disabled,
       this._monotonic,
       this._valueType,
@@ -130,10 +131,11 @@ export class CounterMetric extends Metric<BoundCounter>
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param labelSet the canonicalized LabelSet used to associate with this metric's instrument.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  add(value: number, labelSet: types.LabelSet) {
-    this.bind(labelSet).add(value);
+  add(value: number, labels: types.Labels) {
+    this.bind(labels).add(value);
   }
 }
 
@@ -151,9 +153,9 @@ export class MeasureMetric extends Metric<BoundMeasure>
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
-  protected _makeInstrument(labelSet: types.LabelSet): BoundMeasure {
+  protected _makeInstrument(labels: types.Labels): BoundMeasure {
     return new BoundMeasure(
-      labelSet,
+      labels,
       this._disabled,
       this._monotonic,
       this._absolute,
@@ -163,8 +165,8 @@ export class MeasureMetric extends Metric<BoundMeasure>
     );
   }
 
-  record(value: number, labelSet: types.LabelSet) {
-    this.bind(labelSet).record(value);
+  record(value: number, labels: types.Labels) {
+    this.bind(labels).record(value);
   }
 }
 
@@ -182,9 +184,9 @@ export class ObserverMetric extends Metric<BoundObserver>
     super(name, options, MetricKind.OBSERVER, resource);
   }
 
-  protected _makeInstrument(labelSet: types.LabelSet): BoundObserver {
+  protected _makeInstrument(labels: types.Labels): BoundObserver {
     return new BoundObserver(
-      labelSet,
+      labels,
       this._disabled,
       this._monotonic,
       this._valueType,
@@ -194,8 +196,8 @@ export class ObserverMetric extends Metric<BoundObserver>
   }
 
   getMetricRecord(): MetricRecord[] {
-    this._observerResult.observers.forEach((callback, labelSet) => {
-      const instrument = this.bind(labelSet);
+    this._observerResult.observers.forEach((callback, labels) => {
+      const instrument = this.bind(labels);
       instrument.update(callback());
     });
     return super.getMetricRecord();

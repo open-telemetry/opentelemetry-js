@@ -14,31 +14,86 @@
  * limitations under the License.
  */
 
-import * as http from 'http';
-import * as https from 'https';
+import * as protoLoader from '@grpc/proto-loader';
+import { ReadableSpan } from '@opentelemetry/tracing';
+import * as grpc from 'grpc';
+import * as path from 'path';
 
-import { IncomingMessage } from 'http';
-import * as core from '@opentelemetry/core';
 import { CollectorExporter } from '../../CollectorExporter';
-
 import * as collectorTypes from '../../types';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorData, GRPCQueueItem } from './types';
+import { removeProtocol } from './util';
 
-import * as url from 'url';
-import { VERSION } from '../../version';
+const traceServiceClients: WeakMap<
+  CollectorExporter,
+  CollectorData
+> = new WeakMap<CollectorExporter, CollectorData>();
 
 /**
  * function that is called once when {@link ExporterCollector} is initialised
- * in node version this is not used
- * @param shutdownF shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onInit(shutdownF: Function) {}
+export function onInit(collectorExporter: CollectorExporter) {
+  traceServiceClients.set(collectorExporter, {
+    isShutDown: false,
+    grpcSpansQueue: [],
+  });
+  const serverAddress = removeProtocol(collectorExporter.url);
+  const credentials: grpc.ChannelCredentials = grpc.credentials.createInsecure();
+
+  const traceServiceProtoPath =
+    'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+  const includeDirs = [path.resolve(__dirname, 'protos')];
+
+  protoLoader
+    .load(traceServiceProtoPath, {
+      keepCase: false,
+      longs: String,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+      includeDirs,
+    })
+    .then(packageDefinition => {
+      const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
+      const exporter = traceServiceClients.get(collectorExporter);
+      if (!exporter) {
+        return;
+      }
+      exporter.traceServiceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+        serverAddress,
+        credentials
+      );
+      if (exporter.grpcSpansQueue.length > 0) {
+        const queue = exporter.grpcSpansQueue.splice(0);
+        queue.forEach((item: GRPCQueueItem) => {
+          sendSpans(
+            item.spans,
+            item.onSuccess,
+            item.onError,
+            collectorExporter
+          );
+        });
+      }
+    });
+}
 
 /**
  * function to be called once when {@link ExporterCollector} is shutdown
- * in node version this is not used
- * @param shutdownF - shutdown method of {@link ExporterCollector}
+ * @param collectorExporter CollectorExporter {@link ExporterCollector}
  */
-export function onShutdown(shutdownF: Function) {}
+export function onShutdown(collectorExporter: CollectorExporter) {
+  const exporter = traceServiceClients.get(collectorExporter);
+  if (!exporter) {
+    return;
+  }
+  exporter.isShutDown = true;
+
+  if (exporter.traceServiceClient) {
+    exporter.traceServiceClient.close();
+  }
+}
 
 /**
  * function to send spans to the [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
@@ -47,75 +102,44 @@ export function onShutdown(shutdownF: Function) {}
  * @param onSuccess
  * @param onError
  * @param collectorExporter
- * @param resource
  */
 export function sendSpans(
-  spans: collectorTypes.Span[],
+  spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (status?: number) => void,
-  collectorExporter: CollectorExporter,
-  resource: collectorTypes.Resource
+  onError: (error: collectorTypes.CollectorExporterError) => void,
+  collectorExporter: CollectorExporter
 ) {
-  const exportTraceServiceRequest = toCollectorTraceServiceRequest(
-    spans,
-    collectorExporter,
-    resource
-  );
-  const body = JSON.stringify(exportTraceServiceRequest);
-  const parsedUrl = url.parse(collectorExporter.url);
+  const exporter = traceServiceClients.get(collectorExporter);
+  if (!exporter || exporter.isShutDown) {
+    return;
+  }
+  if (exporter.traceServiceClient) {
+    const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
+      spans,
+      collectorExporter
+    );
 
-  const options = {
-    hostname: parsedUrl.hostname,
-    port: parsedUrl.port,
-    path: parsedUrl.path,
-    method: 'POST',
-    headers: {
-      'Content-Length': Buffer.byteLength(body),
-      [collectorTypes.OT_REQUEST_HEADER]: 1,
-    },
-  };
-
-  const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
-  const req = request(options, (res: IncomingMessage) => {
-    if (res.statusCode && res.statusCode < 299) {
-      collectorExporter.logger.debug(`statusCode: ${res.statusCode}`);
-      onSuccess();
-    } else {
-      collectorExporter.logger.error(`statusCode: ${res.statusCode}`);
-      onError(res.statusCode);
-    }
-  });
-
-  req.on('error', (error: Error) => {
-    collectorExporter.logger.error('error', error.message);
-    onError();
-  });
-  req.write(body);
-  req.end();
-}
-
-export function toCollectorTraceServiceRequest(
-  spans: collectorTypes.Span[],
-  collectorExporter: CollectorExporter,
-  resource: collectorTypes.Resource
-): collectorTypes.ExportTraceServiceRequest {
-  return {
-    node: {
-      identifier: {
-        hostName: collectorExporter.hostName,
-        startTimestamp: core.hrTimeToTimeStamp(core.hrTime()),
-      },
-      libraryInfo: {
-        language: collectorTypes.LibraryInfoLanguage.NODE_JS,
-        coreLibraryVersion: core.VERSION,
-        exporterVersion: VERSION,
-      },
-      serviceInfo: {
-        name: collectorExporter.serviceName,
-      },
-      attributes: collectorExporter.attributes,
-    },
-    resource,
-    spans,
-  };
+    exporter.traceServiceClient.export(
+      exportTraceServiceRequest,
+      (
+        err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+      ) => {
+        if (err) {
+          collectorExporter.logger.error(
+            'exportTraceServiceRequest',
+            exportTraceServiceRequest
+          );
+          onError(err);
+        } else {
+          onSuccess();
+        }
+      }
+    );
+  } else {
+    exporter.grpcSpansQueue.push({
+      spans,
+      onSuccess,
+      onError,
+    });
+  }
 }

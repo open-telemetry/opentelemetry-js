@@ -26,6 +26,10 @@ import { Resource } from '@opentelemetry/resources';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
+    afterEach(() => {
+      delete process.env.JAEGER_AGENT_HOST;
+    });
+
     it('should construct an exporter', () => {
       const exporter = new JaegerExporter({ serviceName: 'opentelemetry' });
       assert.ok(typeof exporter.export === 'function');
@@ -38,7 +42,7 @@ describe('JaegerExporter', () => {
     it('should construct an exporter with host, port, logger and tags', () => {
       const exporter = new JaegerExporter({
         serviceName: 'opentelemetry',
-        host: 'localhost',
+        host: 'remotehost',
         port: 8080,
         logger: new NoopLogger(),
         tags: [{ key: 'opentelemetry-exporter-jaeger', value: '0.1.0' }],
@@ -47,6 +51,7 @@ describe('JaegerExporter', () => {
       assert.ok(typeof exporter.shutdown === 'function');
 
       const process: ThriftProcess = exporter['_sender']._process;
+      assert.strictEqual(exporter['_sender']._host, 'remotehost');
       assert.strictEqual(process.serviceName, 'opentelemetry');
       assert.strictEqual(process.tags.length, 1);
       assert.strictEqual(process.tags[0].key, 'opentelemetry-exporter-jaeger');
@@ -54,39 +59,49 @@ describe('JaegerExporter', () => {
       assert.strictEqual(process.tags[0].vStr, '0.1.0');
     });
 
-    it('should construct an exporter with forceFlush and flushTimeout', () => {
+    it('should default to localhost if no host is configured', () => {
       const exporter = new JaegerExporter({
         serviceName: 'opentelemetry',
-        forceFlush: true,
+      });
+      assert.strictEqual(exporter['_sender']._host, 'localhost');
+    });
+
+    it('should respect jaeger host env variable', () => {
+      process.env.JAEGER_AGENT_HOST = 'env-set-host';
+      const exporter = new JaegerExporter({
+        serviceName: 'test-service',
+      });
+      assert.strictEqual(exporter['_sender']._host, 'env-set-host');
+    });
+
+    it('should prioritize host option over env variable', () => {
+      process.env.JAEGER_AGENT_HOST = 'env-set-host';
+      const exporter = new JaegerExporter({
+        serviceName: 'test-service',
+        host: 'option-set-host',
+      });
+      assert.strictEqual(exporter['_sender']._host, 'option-set-host');
+    });
+
+    it('should construct an exporter with flushTimeout', () => {
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
         flushTimeout: 5000,
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.ok(exporter['_forceFlushOnShutdown']);
       assert.strictEqual(exporter['_onShutdownFlushTimeout'], 5000);
     });
 
-    it('should construct an exporter without forceFlush and flushTimeout', () => {
+    it('should construct an exporter without flushTimeout', () => {
       const exporter = new JaegerExporter({
         serviceName: 'opentelemetry',
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.ok(exporter['_forceFlushOnShutdown']);
       assert.strictEqual(exporter['_onShutdownFlushTimeout'], 2000);
-    });
-
-    it('should construct an exporter with forceFlush = false', () => {
-      const exporter = new JaegerExporter({
-        serviceName: 'opentelemetry',
-        forceFlush: false,
-      });
-      assert.ok(typeof exporter.export === 'function');
-      assert.ok(typeof exporter.shutdown === 'function');
-
-      assert.ok(!exporter['_forceFlushOnShutdown']);
     });
   });
 

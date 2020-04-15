@@ -116,12 +116,12 @@ export const parseResponseStatus = (
  * Returns whether the Expect header is on the given options object.
  * @param options Options for http.request.
  */
-export const hasExpectHeader = (options: RequestOptions | url.URL): boolean => {
-  if (typeof (options as RequestOptions).headers !== 'object') {
+export const hasExpectHeader = (options: RequestOptions): boolean => {
+  if (!options.headers) {
     return false;
   }
 
-  const keys = Object.keys((options as RequestOptions).headers!);
+  const keys = Object.keys(options.headers);
   return !!keys.find(key => key.toLowerCase() === 'expect');
 };
 

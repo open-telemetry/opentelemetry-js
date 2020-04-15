@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-import { ObserverResult as TypeObserverResult } from '@opentelemetry/api';
-import { LabelSet } from './LabelSet';
+import {
+  ObserverResult as TypeObserverResult,
+  Labels,
+} from '@opentelemetry/api';
 
 /**
  * Implementation of {@link TypeObserverResult}
  */
 export class ObserverResult implements TypeObserverResult {
-  observers = new Map<LabelSet, Function>();
-  observe(callback: any, labelSet: LabelSet): void {
-    this.observers.set(labelSet, callback);
+  observers = new Map<Labels, Function>();
+  observe(callback: any, labels: Labels): void {
+    this.observers.set(labels, callback);
   }
 }

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export * from './LabelSet';
 export * from './BoundInstrument';
 export * from './Meter';
 export * from './Metric';
