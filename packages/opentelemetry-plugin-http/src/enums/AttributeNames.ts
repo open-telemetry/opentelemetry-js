@@ -13,6 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Attributes Names according to [OpenTelemetry attributes specs](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes)
+ */
 export enum AttributeNames {
   HTTP_HOST = 'http.host',
   COMPONENT = 'component',
