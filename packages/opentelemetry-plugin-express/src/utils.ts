@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { CanonicalCode, Span, Attributes } from '@opentelemetry/api';
+import { Attributes } from '@opentelemetry/api';
 import {
   ExpressLayer,
   AttributeNames,
@@ -67,7 +67,7 @@ export const getLayerMetadata = (
         [AttributeNames.EXPRESS_NAME]: layerPath ?? 'request handler',
         [AttributeNames.EXPRESS_TYPE]: ExpressLayerType.REQUEST_HANDLER,
       },
-      name: 'request handler',
+      name: `request handler${layer.path ? ` - ${layerPath}` : ''}`,
     };
   } else {
     return {
@@ -78,29 +78,6 @@ export const getLayerMetadata = (
       name: `middleware - ${layer.name}`,
     };
   }
-};
-
-/**
- * Ends a created span.
- * @param span The created span to end.
- * @param resultHandler A callback function.
- */
-export const patchEnd = (span: Span, resultHandler: Function): Function => {
-  return function patchedEnd(this: {}, ...args: unknown[]) {
-    const error = args[0];
-    if (error instanceof Error) {
-      span.setStatus({
-        code: CanonicalCode.INTERNAL,
-        message: error.message,
-      });
-    } else {
-      span.setStatus({
-        code: CanonicalCode.OK,
-      });
-    }
-    span.end();
-    return resultHandler.apply(this, args);
-  };
 };
 
 /**

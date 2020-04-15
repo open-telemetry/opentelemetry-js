@@ -81,7 +81,7 @@ describe('Express Plugin', () => {
       const app = express();
       app.use(express.json());
       app.use(function customMiddleware(req, res, next) {
-        for (let i = 0; i < 1000; i++) {
+        for (let i = 0; i < 1000000; i++) {
           continue;
         }
         return next();
