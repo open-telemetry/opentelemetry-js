@@ -16,6 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/base';
 import { TELEMETRY_SDK_RESOURCE } from './constants';
+import { ResourceLabels } from './types';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -48,7 +49,7 @@ export class Resource {
      * about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on labels.
      */
-    readonly labels: { [key: string]: number | string | boolean }
+    readonly labels: ResourceLabels
   ) {}
 
   /**
