@@ -24,7 +24,6 @@ import {
   Status,
   SpanContext,
   TraceFlags,
-  NoopSpan,
 } from '@opentelemetry/api';
 import {
   BasePlugin,
@@ -308,7 +307,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        let span: Span = new NoopSpan();
+        let span: Span;
         const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
         /*
          * If a parent is required but not present, we use a `NoRecordingSpan` to still
@@ -423,7 +422,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.CLIENT,
       };
       const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
-      let span: Span = new NoopSpan();
+      let span: Span;
       /*
        * If a parent is required but not present, we use a `NoRecordingSpan` to still
        * propagate context without recording it.
