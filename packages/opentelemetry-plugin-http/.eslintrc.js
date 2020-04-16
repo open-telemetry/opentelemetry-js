@@ -1,6 +1,7 @@
 module.exports = {
     "env": {
-        "mocha": true
+        "mocha": true,
+        "node": true
     },
     "plugins": [
         "@typescript-eslint",
@@ -13,5 +14,5 @@ module.exports = {
     "parserOptions": {
         "project": "./tsconfig.json"
     },
-    "rules": require('../../eslint.rules.js')
+    ...require('../../eslint.config.js')
 }
