@@ -58,9 +58,7 @@ describe('ConsoleSpanExporter', () => {
         const firstEvent = firstSpan.events[0];
         const consoleArgs = spyConsole.args[0];
         const consoleSpan = consoleArgs[0];
-        const keys = Object.keys(consoleSpan)
-          .sort()
-          .join(',');
+        const keys = Object.keys(consoleSpan).sort().join(',');
 
         const expectedKeys = [
           'attributes',
