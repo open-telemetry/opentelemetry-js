@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { SDK_INFO } from '@opentelemetry/base';
 import * as assert from 'assert';
-import { Resource } from '../src/Resource';
+import { SDK_INFO } from '@opentelemetry/base';
+import { Resource } from '../src';
 import { assertTelemetrySDKResource } from './util/resource-assertions';
 
 describe('Resource', () => {

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin, hrTime } from '@opentelemetry/core';
 import { Attributes } from '@opentelemetry/api';
 import * as express from 'express';
 import * as core from 'express-serve-static-core';
@@ -30,12 +30,7 @@ import {
   ExpressPluginConfig,
   ExpressLayerType,
 } from './types';
-import {
-  getLayerMetadata,
-  storeLayerPath,
-  patchEnd,
-  isLayerIgnored,
-} from './utils';
+import { getLayerMetadata, storeLayerPath, isLayerIgnored } from './utils';
 import { VERSION } from './version';
 
 /**
@@ -190,26 +185,40 @@ export class ExpressPlugin extends BasePlugin<typeof express> {
         const span = plugin._tracer.startSpan(metadata.name, {
           attributes: Object.assign(attributes, metadata.attributes),
         });
+        const startTime = hrTime();
+        let spanHasEnded: boolean = false;
+        // If we found anything that isnt a middleware, there no point of measuring
+        // stheir time ince they dont have callback.
+        if (
+          metadata.attributes[AttributeNames.EXPRESS_TYPE] !==
+          ExpressLayerType.MIDDLEWARE
+        ) {
+          span.end(startTime);
+          spanHasEnded = true;
+        }
         // verify we have a callback
-        let callbackIdx = Array.from(arguments).findIndex(
-          arg => typeof arg === 'function'
-        );
-        let callbackHasBeenCalled = false;
+        const args = Array.from(arguments);
+        const callbackIdx = args.findIndex(arg => typeof arg === 'function');
         if (callbackIdx >= 0) {
           arguments[callbackIdx] = function() {
-            callbackHasBeenCalled = true;
+            if (spanHasEnded === false) {
+              span.end();
+              spanHasEnded = true;
+            }
             if (!(req.route && arguments[0] instanceof Error)) {
               (req[_LAYERS_STORE_PROPERTY] as string[]).pop();
             }
-            return patchEnd(span, plugin._tracer.bind(next))();
+            const callback = args[callbackIdx] as Function;
+            return plugin._tracer.bind(callback).apply(this, arguments);
           };
         }
         const result = original.apply(this, arguments);
-        // if the layer return a response, the callback will never
-        // be called, so we need to manually close the span
-        if (callbackHasBeenCalled === false) {
-          span.end();
-        }
+        // If the callback is never called, we need to close the span.
+        setImmediate(() => {
+          if (spanHasEnded === false) {
+            span.end(startTime);
+          }
+        }).unref();
         return result;
       };
     });
