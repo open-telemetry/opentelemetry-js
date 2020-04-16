@@ -26,7 +26,7 @@ import {
 } from '../../src/instrumentation/PluginLoader';
 
 const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
-
+/* eslint-disable node/no-extraneous-require */
 const simplePlugins: Plugins = {
   'simple-module': {
     enabled: true,
@@ -227,14 +227,14 @@ describe('PluginLoader', () => {
       pluginLoader.unload();
     });
 
-    it(`doesn't patch modules for which plugins aren't specified`, () => {
+    it("doesn't patch modules for which plugins aren't specified", () => {
       const pluginLoader = new PluginLoader(provider, logger);
       pluginLoader.load({});
       assert.strictEqual(require('simple-module').value(), 0);
       pluginLoader.unload();
     });
 
-    it(`should warn when module was already loaded`, callback => {
+    it('should warn when module was already loaded', callback => {
       const verifyWarnLogger = {
         error: logger.error,
         info: logger.info,
@@ -255,8 +255,7 @@ describe('PluginLoader', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load(differentNamePlugins);
-      // @ts-ignore only to trigger the loading of the plugin
-      const randomModule = require('random-module');
+      require('random-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.unload();
     });

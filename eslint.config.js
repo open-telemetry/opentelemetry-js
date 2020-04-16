@@ -22,7 +22,7 @@ module.exports = {
   },
   overrides: [
     {
-      "files": ["test/*/*.ts"],
+      "files": ["test/**/*.ts"],
       "rules": {
         "no-empty": "off",
         "@typescript-eslint/no-empty-function": "off", 
