@@ -337,10 +337,8 @@ export class HttpPlugin extends BasePlugin<Http> {
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
-            // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
             const returned = plugin._safeExecute(
               span,
-              // tslint:disable-next-line:no-any
               () => response.end.apply(this, arguments as any),
               true
             );
