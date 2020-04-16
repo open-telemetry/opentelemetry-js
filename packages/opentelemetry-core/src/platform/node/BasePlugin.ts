@@ -69,7 +69,7 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
       );
       return {};
     }
-    let extraModules: PluginInternalFiles = {};
+    const extraModules: PluginInternalFiles = {};
     this._logger.debug('loadInternalFiles %o', this._internalFilesList);
     Object.keys(this._internalFilesList).forEach(versionRange => {
       this._loadInternalModule(versionRange, extraModules);
