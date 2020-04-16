@@ -208,14 +208,14 @@ describe('HttpsPlugin', () => {
       before(() => {
         const config: HttpPluginConfig = {
           ignoreIncomingPaths: [
-            `/ignored/string`,
+            '/ignored/string',
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
           serverName,
@@ -503,8 +503,7 @@ describe('HttpsPlugin', () => {
           arg
         )}`, async () => {
           try {
-            // @ts-ignore
-            await httpsRequest.get(arg);
+            await httpsRequest.get(arg as any);
           } catch (error) {
             // request has been made
             // nock throw
@@ -677,9 +676,7 @@ describe('HttpsPlugin', () => {
 
       it("should have 1 ended span when response is listened by using req.on('response')", done => {
         const host = `${protocol}://${hostname}`;
-        nock(host)
-          .get('/')
-          .reply(404);
+        nock(host).get('/').reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
           response.on('data', () => {});

@@ -32,6 +32,7 @@ function get(input: string | URL, options?: https.RequestOptions): GetResult;
 function get(input: https.RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line prefer-const
     let req: http.ClientRequest;
 
     function onGetResponseCb(resp: http.IncomingMessage): void {
@@ -55,10 +56,10 @@ function get(input: any, options?: any): GetResult {
         reject(err);
       });
     }
-    req =
-      options != null
-        ? https.get(input, options, onGetResponseCb)
-        : https.get(input, onGetResponseCb);
+    const isValid = options !== null && options !== undefined;
+    req = isValid
+      ? https.get(input, options, onGetResponseCb)
+      : https.get(input, onGetResponseCb);
     req.on('error', err => {
       reject(err);
     });
