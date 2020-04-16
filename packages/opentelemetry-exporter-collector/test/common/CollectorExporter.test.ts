@@ -110,7 +110,7 @@ describe('CollectorExporter - common', () => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, function() {});
+      collectorExporter.export(spans, () => {});
       setTimeout(() => {
         const span1 = spySend.args[0][0][0] as ReadableSpan;
         assert.deepStrictEqual(spans[0], span1);

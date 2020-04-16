@@ -22,9 +22,8 @@ import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
 
 if (typeof Buffer === 'undefined') {
-  // @ts-ignore
-  window.Buffer = {
-    from: function(arr: []) {
+  (window as any).Buffer = {
+    from: function (arr: []) {
       return new Uint8Array(arr);
     },
   };

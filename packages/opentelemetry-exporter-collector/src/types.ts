@@ -20,6 +20,7 @@ import * as api from '@opentelemetry/api';
 // header to prevent instrumentation on request
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
 
+/* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
   export namespace collector {
     export namespace trace.v1 {
@@ -30,7 +31,7 @@ export namespace opentelemetryProto {
       export interface ExportTraceServiceRequest {
         resourceSpans: opentelemetryProto.trace.v1.ResourceSpans[];
       }
-
+      // eslint-disable-next-line @typescript-eslint/no-empty-interface
       export interface ExportTraceServiceResponse {}
 
       export interface ExportTraceServiceError {
@@ -125,7 +126,7 @@ export namespace opentelemetryProto {
       status?: Status;
     }
 
-    export interface Status extends api.Status {}
+    export type Status = api.Status;
 
     export interface TraceConfig {
       constantSampler?: ConstantSampler | null;
