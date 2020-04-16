@@ -66,7 +66,7 @@ describe('HttpPlugin', () => {
 
         const options = { host: 'localhost', path: testPath, port: serverPort };
 
-        await httpRequest.get(options).then((result) => {
+        await httpRequest.get(options).then(result => {
           assert.strictEqual(
             (NOOP_TRACER.startSpan as sinon.SinonSpy).called,
             false

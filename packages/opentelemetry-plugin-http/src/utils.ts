@@ -125,7 +125,7 @@ export const hasExpectHeader = (options: RequestOptions): boolean => {
   }
 
   const keys = Object.keys(options.headers);
-  return !!keys.find((key) => key.toLowerCase() === 'expect');
+  return !!keys.find(key => key.toLowerCase() === 'expect');
 };
 
 /**
@@ -463,8 +463,8 @@ export const getIncomingRequestAttributesOnResponse = (
   };
   const route = Array.isArray(__ot_middlewares)
     ? __ot_middlewares
-        .filter((path) => path !== '/')
-        .map((path) => {
+        .filter(path => path !== '/')
+        .map(path => {
           return path[0] === '/' ? path : '/' + path;
         })
         .join('')

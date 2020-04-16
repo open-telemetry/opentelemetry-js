@@ -547,7 +547,7 @@ describe('HttpPlugin', () => {
             `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
-              resp.on('data', (chunk) => {
+              resp.on('data', chunk => {
                 data += chunk;
               });
               resp.on('end', () => {
@@ -588,7 +588,7 @@ describe('HttpPlugin', () => {
             `${protocol}://${hostname}${testPath}`,
             (resp: http.IncomingMessage) => {
               let data = '';
-              resp.on('data', (chunk) => {
+              resp.on('data', chunk => {
                 data += chunk;
               });
               resp.on('end', () => {
@@ -619,7 +619,7 @@ describe('HttpPlugin', () => {
             `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
-              resp.on('data', (chunk) => {
+              resp.on('data', chunk => {
                 data += chunk;
               });
               resp.on('end', () => {
@@ -659,7 +659,7 @@ describe('HttpPlugin', () => {
             `${protocol}://my.server.com`,
             (resp: http.IncomingMessage) => {
               let data = '';
-              resp.on('data', (chunk) => {
+              resp.on('data', chunk => {
                 req.abort();
                 data += chunk;
               });
@@ -684,7 +684,7 @@ describe('HttpPlugin', () => {
         }
       });
 
-      it("should have 1 ended span when request doesn't listening response", (done) => {
+      it("should have 1 ended span when request doesn't listening response", done => {
         nock.cleanAll();
         nock.enableNetConnect();
         const req = http.request(`${protocol}://${hostname}/`);
@@ -698,11 +698,11 @@ describe('HttpPlugin', () => {
         req.end();
       });
 
-      it("should have 1 ended span when response is listened by using req.on('response')", (done) => {
+      it("should have 1 ended span when response is listened by using req.on('response')", done => {
         const host = `${protocol}://${hostname}`;
         nock(host).get('/').reply(404);
         const req = http.request(`${host}/`);
-        req.on('response', (response) => {
+        req.on('response', response => {
           response.on('data', () => {});
           response.on('end', () => {
             const spans = memoryExporter.getFinishedSpans();

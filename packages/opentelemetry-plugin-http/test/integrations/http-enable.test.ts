@@ -58,7 +58,7 @@ describe('HttpPlugin Integration tests', () => {
         return;
       }
 
-      utils.checkInternet((isConnected) => {
+      utils.checkInternet(isConnected => {
         if (!isConnected) {
           this.skip();
           // don't disturb people
@@ -242,7 +242,7 @@ describe('HttpPlugin Integration tests', () => {
     ]) {
       it(`should create a span for GET requests and add propagation when using the following signature: get(url, options, callback) and following headers: ${JSON.stringify(
         headers
-      )}`, (done) => {
+      )}`, done => {
         let validations: {
           hostname: string;
           httpStatusCode: number;
@@ -263,7 +263,7 @@ describe('HttpPlugin Integration tests', () => {
               req: http.IncomingMessage;
             };
 
-            resp.on('data', (chunk) => {
+            resp.on('data', chunk => {
               data += chunk;
             });
             resp.on('end', () => {

@@ -164,7 +164,7 @@ describe('Utility', () => {
     it('should call isSatisfyPattern, match for function', () => {
       satisfiesPatternStub.restore();
       const answer1 = utils.isIgnored('/test/1', [
-        (url) => url.endsWith('/test/1'),
+        url => url.endsWith('/test/1'),
       ]);
       assert.strictEqual(answer1, true);
     });
@@ -278,7 +278,7 @@ describe('Utility', () => {
       url.parse('http://url.com'),
       { headers: { [utils.OT_REQUEST_HEADER]: 0 } },
       { headers: { [utils.OT_REQUEST_HEADER]: false } },
-    ].forEach((options) => {
+    ].forEach(options => {
       it(`should return false with the following value: ${JSON.stringify(
         options
       )}`, () => {
@@ -300,7 +300,7 @@ describe('Utility', () => {
   });
 
   describe('isValidOptionsType()', () => {
-    ['', false, true, 1, 0, []].forEach((options) => {
+    ['', false, true, 1, 0, []].forEach(options => {
       it(`should return false with the following value: ${JSON.stringify(
         options
       )}`, () => {
