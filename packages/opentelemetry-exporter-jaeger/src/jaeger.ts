@@ -21,6 +21,7 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
+import { OT_REQUEST_HEADER } from './utils';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -46,10 +47,13 @@ export class JaegerExporter implements SpanExporter {
     // JAEGER_AGENT_PORT to send UDP traces to a different host:port. If JAEGER_ENDPOINT is set, the client sends traces
     // to the endpoint via HTTP, making the JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If JAEGER_ENDPOINT is secured,
     // HTTP basic authentication can be performed by setting the JAEGER_USER and JAEGER_PASSWORD environment variables.
-    this._sender = config.endpoint
-      ? new jaegerTypes.HTTPSender(config)
-      : new jaegerTypes.UDPSender(config);
-    this._sender = new jaegerTypes.UDPSender(config);
+    if (config.endpoint) {
+      this._sender = new jaegerTypes.HTTPSender(config);
+      this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
+    } else {
+      this._sender = config.endpoint = new jaegerTypes.UDPSender(config);
+    }
+
     if (this._sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
       this._sender._client.unref();
