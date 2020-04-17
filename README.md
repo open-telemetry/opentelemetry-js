@@ -144,17 +144,11 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 | [@opentelemetry/web][otel-web] | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only. |
 | [@opentelemetry/base][otel-base] | This package provides base code for the SDK packages (tracing and metrics). |
 
-### Exporters
+### Compatible Exporters
 
-OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends. Currently, OpenTelemetry supports:
+OpenTelemetry is vendor-agnostic and can upload data to any backend with various exporter implementations. Even though, OpenTelemetry provides support for many backends, vendors/users can also implement their own exporters for proprietary and unofficially supported backends.
 
-#### Trace Exporters
-- [@opentelemetry/exporter-jaeger][otel-exporter-jaeger]
-- [@opentelemetry/exporter-zipkin][otel-exporter-zipkin]
-- [@opentelemetry/exporter-collector][otel-exporter-collector]
-
-#### Metric Exporters
-- [@opentelemetry/exporter-prometheus][otel-exporter-prometheus]
+See the [OpenTelemetry registry](https://opentelemetry.io/registry/?s=node.js) for a list of exporters available.
 
 ### Plugins
 
@@ -209,10 +203,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 
 [otel-base]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-base
-[otel-exporter-collector]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector
-[otel-exporter-jaeger]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-jaeger
-[otel-exporter-prometheus]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus
-[otel-exporter-zipkin]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-zipkin
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 
