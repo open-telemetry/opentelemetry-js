@@ -138,7 +138,7 @@ describe('CollectorExporter - web', () => {
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
       beforeEach(() => {
-        window.navigator.sendBeacon = () => false;
+        (window.navigator as any).sendBeacon = false;
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
