@@ -23,6 +23,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import { ExportResult } from '@opentelemetry/base';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { OT_REQUEST_HEADER } from '../src/utils';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
@@ -149,6 +150,18 @@ describe('JaegerExporter', () => {
       exporter.export([readableSpan], (result: ExportResult) => {
         assert.strictEqual(result, ExportResult.SUCCESS);
       });
+    });
+
+    it('should use httpSender if config.endpoint is setten and set x-opentelemetry-outgoing-request header', () => {
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+        endpoint: 'http://testendpoint',
+      });
+      assert.strictEqual(exporter['_sender'].constructor.name, 'HTTPSender');
+      assert.strictEqual(
+        exporter['_sender']._httpOptions.headers[OT_REQUEST_HEADER],
+        1
+      );
     });
   });
 });
