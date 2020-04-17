@@ -1,7 +1,7 @@
 {
   "name": "@opentelemetry/test-utils",
   "private": true,
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Test utilities.",
   "main": "build/testUtils.js",
   "scripts": {
@@ -23,9 +23,9 @@
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {
-    "@opentelemetry/api": "^0.6.1",
-    "@opentelemetry/core": "^0.6.1",
-    "@opentelemetry/tracing": "^0.6.1",
+    "@opentelemetry/api": "^0.7.0",
+    "@opentelemetry/core": "^0.7.0",
+    "@opentelemetry/tracing": "^0.7.0",
     "gts": "^1.1.2",
     "ts-node": "^8.6.2",
     "tslint-consistent-codestyle": "^1.16.0",

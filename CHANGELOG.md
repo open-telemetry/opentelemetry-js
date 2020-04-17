@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.7.0
+
+Released 2020-04-17
+
+#### :boom: Breaking Change
+* `opentelemetry-exporter-collector`
+  * [#901](https://github.com/open-telemetry/opentelemetry-js/pull/901) grpc for node and support for new proto format for node and browser ([@obecny](https://github.com/obecny))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-http`
+  * [#960](https://github.com/open-telemetry/opentelemetry-js/pull/960) [http] fix: use url.URL ([@naseemkullah](https://github.com/naseemkullah))
+* `opentelemetry-plugin-express`
+  * [#910](https://github.com/open-telemetry/opentelemetry-js/pull/910) fix(plugin-express): fix double span end #908 ([@vmarchaud](https://github.com/vmarchaud))
+
+#### :rocket: (Enhancement)
+* `opentelemetry-resources`
+  * [#899](https://github.com/open-telemetry/opentelemetry-js/pull/899) feat: resource auto-detection ([@mwear](https://github.com/mwear))
+* `opentelemetry-plugin-express`
+  * [#914](https://github.com/open-telemetry/opentelemetry-js/pull/914) feat: add express to default list of instrumented plugins ([@mayurkale22](https://github.com/mayurkale22))
+
+#### Committers: 5
+- Naseem ([@naseemkullah](https://github.com/naseemkullah))
+- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+- Matthew Wear ([@mwear](https://github.com/mwear))
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+
 ## 0.6.1
 
 Released 2020-04-08

@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/resources",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "OpenTelemetry SDK resources",
   "main": "build/src/index.js",
   "browser": {
@@ -61,8 +61,8 @@
     "typescript": "3.7.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.6.1",
-    "@opentelemetry/base": "^0.6.1",
+    "@opentelemetry/api": "^0.7.0",
+    "@opentelemetry/base": "^0.7.0",
     "gcp-metadata": "^3.5.0"
   }
 }
