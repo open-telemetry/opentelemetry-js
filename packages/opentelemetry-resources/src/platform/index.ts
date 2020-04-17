@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export * from './Resource';
-export * from './platform';
-export * from './constants';
-export * from './types';
+// Use the node platform by default. The "browser" field of package.json is used
+// to override this file to use `./browser/index.ts` when packaged with
+// webpack, Rollup, etc.
+export * from './node';

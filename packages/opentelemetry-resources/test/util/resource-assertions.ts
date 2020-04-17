@@ -251,6 +251,15 @@ export const assertServiceResource = (
     );
 };
 
+/**
+ * Test utility method to validate an empty resource
+ *
+ * @param resource the Resource to validate
+ */
+export const assertEmptyResource = (resource: Resource) => {
+  assert.strictEqual(Object.keys(resource.labels).length, 0);
+};
+
 const assertHasOneLabel = (
   constants: { [key: string]: string },
   resource: Resource

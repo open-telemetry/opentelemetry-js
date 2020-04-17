@@ -1,4 +1,4 @@
-/**
+/*!
  * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export * from './Resource';
-export * from './platform';
-export * from './constants';
-export * from './types';
+export { awsEc2Detector } from './AwsEc2Detector';
+export { envDetector } from './EnvDetector';
+export { gcpDetector } from './GcpDetector';
