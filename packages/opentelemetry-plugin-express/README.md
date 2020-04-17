@@ -45,6 +45,10 @@ const provider = new NodeTracerProvider();
 
 See [examples/express](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/express) for a short example.
 
+### Caveats
+
+Because of the way express works, it's hard to correctly compute the time taken by asynchronous middlewares and request handlers. For this reason, the time you'll see reported for asynchronous middlewares and request handlers will only represent the synchronous execution time, and **not** any asynchronous work.
+
 ### Express Plugin Options
 
 Express plugin has few options available to choose from. You can set the following:
