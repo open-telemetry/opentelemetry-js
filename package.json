@@ -22,7 +22,7 @@
     "docs-test": "lerna run docs-test",
     "docs": "lerna run docs",
     "docs-deploy": "gh-pages --dist packages/opentelemetry-api/docs/out",
-    "lint": "lerna run lint --scope '{@opentelemetry/plugin-http,@opentelemetry/plugin-https,@opentelemetry/plugin-grpc,@opentelemetry/api,@opentelemetry/base}'",
+    "lint": "lerna run lint --scope '{@opentelemetry/plugin-http,@opentelemetry/plugin-https,@opentelemetry/plugin-grpc,@opentelemetry/context-async-hooks,@opentelemetry/api,@opentelemetry/context-base,@opentelemetry/context-zone-peer-dep,@opentelemetry/context-zone,@opentelemetry/base,@opentelemetry/core,@opentelemetry/metrics,@opentelemetry/exporter-collector,@opentelemetry/exporter-zipkin,@opentelemetry/exporter-jaeger,@opentelemetry/exporter-prometheus,@opentelemetry/web,@opentelemetry/node,@opentelemetry/tracing,@opentelemetry/propagator-jaeger,@opentelemetry/resources,@opentelemetry/shim-opentracing,@opentelemetry/test-utils}'",
     "lint:fix": "lerna run lint:fix",
     "lint:examples": "eslint ./examples/**/*.js",
     "lint:examples:fix": "eslint ./examples/**/*.js --fix"
