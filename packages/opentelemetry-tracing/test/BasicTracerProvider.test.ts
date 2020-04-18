@@ -307,6 +307,18 @@ describe('BasicTracerProvider', () => {
       span.end();
     });
 
+    it('should not sample a trace when OTEL_SAMPLING_PROBABILITY is 0', () => {
+      process.env.OTEL_SAMPLING_PROBABILITY = '0';
+      const tracer = new BasicTracerProvider({
+        logger: new NoopLogger(),
+      }).getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const context = span.context();
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
+      span.end();
+      delete process.env.OTEL_SAMPLING_PROBABILITY;
+    });
+
     it('should create real span when sampled', () => {
       const tracer = new BasicTracerProvider({
         sampler: ALWAYS_SAMPLER,
