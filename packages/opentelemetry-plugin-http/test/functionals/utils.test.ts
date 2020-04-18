@@ -87,7 +87,7 @@ describe('Utility', () => {
         ...urlParsed,
         pathname: undefined,
       };
-      const whatWgUrl = url.parse(webUrl);
+      const whatWgUrl = new url.URL(webUrl);
       for (const param of [
         webUrl,
         urlParsed,

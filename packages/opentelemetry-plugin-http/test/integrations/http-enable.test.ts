@@ -128,7 +128,7 @@ describe('HttpPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 0);
 
       const result = await httpRequest.get(
-        url.parse(`${protocol}://google.fr/?query=test`)
+        new url.URL(`${protocol}://google.fr/?query=test`)
       );
 
       spans = memoryExporter.getFinishedSpans();
