@@ -56,10 +56,10 @@ function get(input: any, options?: any): GetResult {
         reject(err);
       });
     }
-    const isValid = options !== null && options !== undefined;
-    req = isValid
-      ? https.get(input, options, onGetResponseCb)
-      : https.get(input, onGetResponseCb);
+    req =
+      options != null
+        ? https.get(input, options, onGetResponseCb)
+        : https.get(input, onGetResponseCb);
     req.on('error', err => {
       reject(err);
     });

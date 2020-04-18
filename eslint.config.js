@@ -1,6 +1,7 @@
 module.exports = {
   rules: {
     "@typescript-eslint/no-this-alias": "off",
+    "eqeqeq": "off",
     "prefer-rest-params": "off",
     "@typescript-eslint/naming-convention": [
         "error",
