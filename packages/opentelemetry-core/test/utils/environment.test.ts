@@ -18,38 +18,12 @@ import { getEnv } from '../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
-  ENVIRONMENT_MAP,
+  removeMockEnvironment,
+  mockEnvironment,
 } from '../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-
-let lastMock: ENVIRONMENT_MAP = {};
-
-function mockEnvironment(values: ENVIRONMENT_MAP) {
-  lastMock = values;
-  if (typeof process !== 'undefined') {
-    Object.keys(values).forEach(key => {
-      process.env[key] = String(values[key]);
-    });
-  } else {
-    Object.keys(values).forEach(key => {
-      ((window as unknown) as ENVIRONMENT_MAP)[key] = String(values[key]);
-    });
-  }
-}
-
-function removeMockEnvironment() {
-  if (typeof process !== 'undefined') {
-    Object.keys(lastMock).forEach(key => {
-      delete process.env[key];
-    });
-  } else {
-    Object.keys(lastMock).forEach(key => {
-      delete ((window as unknown) as ENVIRONMENT_MAP)[key];
-    });
-  }
-  lastMock = {};
-}
+import { LogLevel } from '../../src';
 
 describe('environment', () => {
   let sandbox: sinon.SinonSandbox;
@@ -68,13 +42,21 @@ describe('environment', () => {
       mockEnvironment({
         FOO: '1',
         OTEL_NO_PATCH_MODULES: 'a,b,c',
-        OTEL_LOG_LEVEL: '1',
+        OTEL_LOG_LEVEL: 'WARN',
         OTEL_SAMPLING_PROBABILITY: '0.5',
       });
       const env = getEnv();
       assert.strictEqual(env.OTEL_NO_PATCH_MODULES, 'a,b,c');
-      assert.strictEqual(env.OTEL_LOG_LEVEL, 1);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.WARN);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
+    });
+
+    it('should parse OTEL_LOG_LEVEL despite casing', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'waRn',
+      });
+      const env = getEnv();
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.WARN);
     });
 
     it('should parse environment variables and use defaults', () => {
