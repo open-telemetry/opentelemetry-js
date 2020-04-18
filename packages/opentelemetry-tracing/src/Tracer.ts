@@ -24,6 +24,7 @@ import {
   randomSpanId,
   randomTraceId,
   setActiveSpan,
+  ProbabilitySampler,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -50,7 +51,11 @@ export class Tracer implements api.Tracer {
   ) {
     const localConfig = mergeConfig(config);
     this._defaultAttributes = localConfig.defaultAttributes;
-    this._sampler = localConfig.sampler;
+    this._sampler =
+      config.sampler ||
+      new ProbabilitySampler(
+        Number(process.env.OTEL_SAMPLING_PROBABILITY || 1)
+      );
     this._traceParams = localConfig.traceParams;
     this.resource = _tracerProvider.resource;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
