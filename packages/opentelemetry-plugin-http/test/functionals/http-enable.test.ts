@@ -698,13 +698,13 @@ describe('HttpPlugin', () => {
     });
 
     describe('with require parent span', () => {
-      beforeEach(() => {
+      beforeEach(done => {
         memoryExporter.reset();
         plugin.enable(http, provider, provider.logger, {});
         server = http.createServer((request, response) => {
           response.end('Test Server Response');
         });
-        server.listen(serverPort);
+        server.listen(serverPort, done);
       });
 
       afterEach(() => {
@@ -773,6 +773,47 @@ describe('HttpPlugin', () => {
           spans.every(span => span.kind === SpanKind.CLIENT),
           true
         );
+      });
+
+      it(`should trace with parent with both requireParent options enabled`, done => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = `/test/test`;
+        const tracer = provider.getTracer('default');
+        const span = tracer.startSpan('parentSpan', {
+          kind: SpanKind.INTERNAL,
+        });
+        tracer.withSpan(span, () => {
+          httpRequest
+            .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
+            .then(result => {
+              span.end();
+              assert(
+                result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !==
+                  undefined
+              );
+              assert(
+                result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !==
+                  undefined
+              );
+              const spans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(spans.length, 2);
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.CLIENT).length,
+                1
+              );
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.INTERNAL).length,
+                1
+              );
+              return done();
+            })
+            .catch(done);
+        });
       });
     });
   });
