@@ -15,21 +15,18 @@ Released 2020-04-17
 #### :bug: (Bug Fix)
 * `opentelemetry-plugin-http`
   * [#960](https://github.com/open-telemetry/opentelemetry-js/pull/960) [http] fix: use url.URL ([@naseemkullah](https://github.com/naseemkullah))
-* `opentelemetry-plugin-express`
-  * [#910](https://github.com/open-telemetry/opentelemetry-js/pull/910) fix(plugin-express): fix double span end #908 ([@vmarchaud](https://github.com/vmarchaud))
 
 #### :rocket: (Enhancement)
 * `opentelemetry-resources`
   * [#899](https://github.com/open-telemetry/opentelemetry-js/pull/899) feat: resource auto-detection ([@mwear](https://github.com/mwear))
-* `opentelemetry-plugin-express`
-  * [#914](https://github.com/open-telemetry/opentelemetry-js/pull/914) feat: add express to default list of instrumented plugins ([@mayurkale22](https://github.com/mayurkale22))
+* `opentelemetry-metrics`
+  * [#930](https://github.com/open-telemetry/opentelemetry-js/pull/930) feat(aggregators): implement histogram aggregator ([@vmarchaud](https://github.com/vmarchaud))
 
-#### Committers: 5
+#### Committers: 4
 - Naseem ([@naseemkullah](https://github.com/naseemkullah))
-- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 - Matthew Wear ([@mwear](https://github.com/mwear))
 - Bartlomiej Obecny ([@obecny](https://github.com/obecny))
-- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 
 ## 0.6.1
 
