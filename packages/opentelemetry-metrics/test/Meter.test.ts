@@ -33,7 +33,7 @@ import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   ObserverAggregator,
-} from '../src/export/Aggregator';
+} from '../src/export/aggregators';
 import { ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';

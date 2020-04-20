@@ -14,13 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  MetricExporter,
-  MetricRecord,
-  MetricKind,
-  Sum,
-  Distribution,
-} from './types';
+import { MetricExporter, MetricRecord, Distribution, Histogram } from './types';
 import { ExportResult } from '@opentelemetry/base';
 
 /**
@@ -35,25 +29,26 @@ export class ConsoleMetricExporter implements MetricExporter {
     for (const metric of metrics) {
       console.log(metric.descriptor);
       console.log(metric.labels);
-      switch (metric.descriptor.metricKind) {
-        case MetricKind.COUNTER:
-          const sum = metric.aggregator.toPoint().value as Sum;
-          console.log('value: ' + sum);
-          break;
-        default:
-          const distribution = metric.aggregator.toPoint()
-            .value as Distribution;
-          console.log(
-            'min: ' +
-              distribution.min +
-              ', max: ' +
-              distribution.max +
-              ', count: ' +
-              distribution.count +
-              ', sum: ' +
-              distribution.sum
-          );
-          break;
+      const point = metric.aggregator.toPoint();
+      if (typeof point.value === 'number') {
+        console.log('value: ' + point.value);
+      } else if (typeof (point.value as Histogram).buckets === 'object') {
+        const histogram = point.value as Histogram;
+        console.log(
+          `count: ${histogram.count}, sum: ${histogram.sum}, buckets: ${histogram.buckets}`
+        );
+      } else {
+        const distribution = point.value as Distribution;
+        console.log(
+          'min: ' +
+            distribution.min +
+            ', max: ' +
+            distribution.max +
+            ', count: ' +
+            distribution.count +
+            ', sum: ' +
+            distribution.sum
+        );
       }
     }
     return resultCallback(ExportResult.SUCCESS);
