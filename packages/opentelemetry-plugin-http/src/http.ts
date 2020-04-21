@@ -191,7 +191,9 @@ export class HttpPlugin extends BasePlugin<Http> {
       hostname,
     });
     span.setAttributes(attributes);
-    this._onNewRequest(span, request);
+    if (this._config.requestHook) {
+      this._callRequestHook(span, request);
+    }
 
     request.on(
       'response',
@@ -201,7 +203,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           { hostname }
         );
         span.setAttributes(attributes);
-        this._onNewResponse(span, response);
+        if (this._config.responseHook) {
+          this._callResponseHook(span, response);
+        }
 
         this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
@@ -306,8 +310,12 @@ export class HttpPlugin extends BasePlugin<Http> {
           context.bind(request);
           context.bind(response);
 
-          plugin._onNewRequest(span, request);
-          plugin._onNewResponse(span, response);
+          if (plugin._config.requestHook) {
+            plugin._callRequestHook(span, request);
+          }
+          if (plugin._config.responseHook) {
+            plugin._callResponseHook(span, response);
+          }
 
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
@@ -438,27 +446,23 @@ export class HttpPlugin extends BasePlugin<Http> {
     this._spanNotEnded.delete(span);
   }
 
-  private _onNewResponse(
+  private _callResponseHook(
     span: Span,
     response: IncomingMessage | ServerResponse
   ) {
-    if (this._config.responseHook) {
-      this._safeExecute(
-        span,
-        () => this._config.responseHook!(span, response),
-        false
-      );
-    }
+    this._safeExecute(
+      span,
+      () => this._config.responseHook!(span, response),
+      false
+    );
   }
 
-  private _onNewRequest(span: Span, request: ClientRequest | IncomingMessage) {
-    if (this._config.requestHook) {
-      this._safeExecute(
-        span,
-        () => this._config.requestHook!(span, request),
-        false
-      );
-    }
+  private _callRequestHook(span: Span, request: ClientRequest | IncomingMessage) {
+    this._safeExecute(
+      span,
+      () => this._config.requestHook!(span, request),
+      false
+    );
   }
 
   private _safeExecute<
