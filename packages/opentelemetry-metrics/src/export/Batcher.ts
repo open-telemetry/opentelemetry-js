@@ -18,7 +18,7 @@ import {
   CounterSumAggregator,
   MeasureExactAggregator,
   ObserverAggregator,
-} from './Aggregator';
+} from './aggregators';
 import { MetricRecord, MetricKind, Aggregator } from './types';
 
 /**

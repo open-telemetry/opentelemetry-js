@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-export * from './Resource';
-export * from './platform';
-export * from './constants';
-export * from './types';
+import { Resource } from '../../Resource';
+
+/**
+ * Detects resources for the browser platform, which is currently only the
+ * telemetry SDK resource. More could be added in the future. This method
+ * is async to match the signature of corresponding method for node.
+ */
+export const detectResources = async (): Promise<Resource> => {
+  return Resource.createTelemetrySDKResource();
+};
