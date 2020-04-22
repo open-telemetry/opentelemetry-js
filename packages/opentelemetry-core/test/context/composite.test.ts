@@ -80,7 +80,7 @@ describe('Composite Propagator', () => {
 
       assert.strictEqual(carrier[X_B3_TRACE_ID], traceId);
       assert.strictEqual(carrier[X_B3_SPAN_ID], spanId);
-      assert.strictEqual(carrier[X_B3_SAMPLED], 1);
+      assert.strictEqual(carrier[X_B3_SAMPLED], '1');
       assert.strictEqual(
         carrier[TRACE_PARENT_HEADER],
         `00-${traceId}-${spanId}-01`

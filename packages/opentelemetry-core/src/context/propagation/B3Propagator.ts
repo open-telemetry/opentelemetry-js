@@ -57,7 +57,7 @@ export class B3Propagator implements HttpTextPropagator {
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
       if (spanContext.traceFlags !== undefined) {
-        setter(carrier, X_B3_SAMPLED, Number(spanContext.traceFlags));
+        setter(carrier, X_B3_SAMPLED, String(spanContext.traceFlags));
       }
     }
   }
