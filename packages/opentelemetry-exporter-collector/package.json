@@ -77,7 +77,7 @@
     "ts-node": "^8.6.2",
     "tslint-consistent-codestyle": "^1.16.0",
     "tslint-microsoft-contrib": "^6.2.0",
-    "typescript": "3.6.4",
+    "typescript": "3.7.2",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "webpack-merge": "^4.2.2"

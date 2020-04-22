@@ -25,8 +25,8 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
-  labelKeys: ["pid"],
-  description: "Example of a counter"
+  labelKeys: ['pid'],
+  description: 'Example of a counter'
 });
 
 const labels = { pid: process.pid };
@@ -34,6 +34,41 @@ const labels = { pid: process.pid };
 // Create a BoundInstrument associated with specified label values.
 const boundCounter = counter.bind(labels);
 boundCounter.add(10);
+
+```
+
+### Observable
+Choose this kind of metric when only last value is important without worry about aggregation
+
+```js
+const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+
+// Initialize the Meter to capture measurements in various ways.
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+const observer = meter.createObserver('metric_name', {
+  labelKeys: ['pid', 'core'],
+  description: 'Example of a observer'
+});
+
+function getCpuUsage() {
+  return Math.random();
+}
+
+const metricObservable = new MetricObservable();
+
+observer.setCallback((observerResult) => {
+  // synchronous callback
+  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
+  // asynchronous callback
+  observerResult.observe(metricObservable, { pid: process.pid, core: '2' });
+});
+
+// simulate asynchronous operation
+setInterval(()=> {
+  metricObservable.next(getCpuUsage());
+}, 2000)
+
 ```
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.

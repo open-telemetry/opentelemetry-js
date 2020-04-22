@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import {
   BoundCounter,
@@ -30,11 +30,11 @@ import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
-  implements types.Metric<T> {
+  implements api.Metric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
-  protected readonly _valueType: types.ValueType;
-  protected readonly _logger: types.Logger;
+  protected readonly _valueType: api.ValueType;
+  protected readonly _logger: api.Logger;
   private readonly _descriptor: MetricDescriptor;
   private readonly _instruments: Map<string, T> = new Map();
 
@@ -58,7 +58,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
    * @param labels key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  bind(labels: types.Labels): T {
+  bind(labels: api.Labels): T {
     const hash = hashLabels(labels);
     if (this._instruments.has(hash)) return this._instruments.get(hash)!;
 
@@ -71,7 +71,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
    * Removes the Instrument from the metric, if it is present.
    * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: types.Labels): void {
+  unbind(labels: api.Labels): void {
     this._instruments.delete(hashLabels(labels));
   }
 
@@ -102,12 +102,12 @@ export abstract class Metric<T extends BaseBoundInstrument>
     };
   }
 
-  protected abstract _makeInstrument(labels: types.Labels): T;
+  protected abstract _makeInstrument(labels: api.Labels): T;
 }
 
 /** This is a SDK implementation of Counter Metric. */
 export class CounterMetric extends Metric<BoundCounter>
-  implements Pick<types.MetricUtils, 'add'> {
+  implements Pick<api.MetricUtils, 'add'> {
   constructor(
     name: string,
     options: MetricOptions,
@@ -116,7 +116,7 @@ export class CounterMetric extends Metric<BoundCounter>
   ) {
     super(name, options, MetricKind.COUNTER, resource);
   }
-  protected _makeInstrument(labels: types.Labels): BoundCounter {
+  protected _makeInstrument(labels: api.Labels): BoundCounter {
     return new BoundCounter(
       labels,
       this._disabled,
@@ -134,13 +134,13 @@ export class CounterMetric extends Metric<BoundCounter>
    * @param labels key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  add(value: number, labels: types.Labels) {
+  add(value: number, labels: api.Labels) {
     this.bind(labels).add(value);
   }
 }
 
 export class MeasureMetric extends Metric<BoundMeasure>
-  implements Pick<types.MetricUtils, 'record'> {
+  implements Pick<api.MetricUtils, 'record'> {
   protected readonly _absolute: boolean;
 
   constructor(
@@ -153,7 +153,7 @@ export class MeasureMetric extends Metric<BoundMeasure>
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
-  protected _makeInstrument(labels: types.Labels): BoundMeasure {
+  protected _makeInstrument(labels: api.Labels): BoundMeasure {
     return new BoundMeasure(
       labels,
       this._disabled,
@@ -165,15 +165,15 @@ export class MeasureMetric extends Metric<BoundMeasure>
     );
   }
 
-  record(value: number, labels: types.Labels) {
+  record(value: number, labels: api.Labels) {
     this.bind(labels).record(value);
   }
 }
 
 /** This is a SDK implementation of Observer Metric. */
 export class ObserverMetric extends Metric<BoundObserver>
-  implements Pick<types.MetricUtils, 'setCallback'> {
-  private _observerResult: types.ObserverResult = new ObserverResult();
+  implements Pick<api.MetricUtils, 'setCallback'> {
+  private _observerResult = new ObserverResult();
 
   constructor(
     name: string,
@@ -184,7 +184,7 @@ export class ObserverMetric extends Metric<BoundObserver>
     super(name, options, MetricKind.OBSERVER, resource);
   }
 
-  protected _makeInstrument(labels: types.Labels): BoundObserver {
+  protected _makeInstrument(labels: api.Labels): BoundObserver {
     return new BoundObserver(
       labels,
       this._disabled,
@@ -196,7 +196,7 @@ export class ObserverMetric extends Metric<BoundObserver>
   }
 
   getMetricRecord(): MetricRecord[] {
-    this._observerResult.observers.forEach((callback, labels) => {
+    this._observerResult.callbackObservers.forEach((callback, labels) => {
       const instrument = this.bind(labels);
       instrument.update(callback());
     });
@@ -207,7 +207,13 @@ export class ObserverMetric extends Metric<BoundObserver>
    * Sets a callback where user can observe value for certain labels
    * @param callback
    */
-  setCallback(callback: (observerResult: types.ObserverResult) => void): void {
+  setCallback(callback: (observerResult: api.ObserverResult) => void): void {
     callback(this._observerResult);
+    this._observerResult.observers.forEach((observer, labels) => {
+      observer.subscribe(value => {
+        const instrument = this.bind(labels);
+        instrument.update(value);
+      });
+    });
   }
 }
