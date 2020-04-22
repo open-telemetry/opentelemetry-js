@@ -26,6 +26,7 @@ export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
+export * from './metrics/MetricObservable';
 export * from './metrics/NoopMeter';
 export * from './metrics/NoopMeterProvider';
 export * from './metrics/ObserverResult';
