@@ -14,12 +14,23 @@
  * limitations under the License.
  */
 
-import { Labels } from './Metric';
-import { MetricObservable } from './MetricObservable';
-
 /**
- * Interface that is being used in function setCallback for Observer Metric
+ * Metric Observable class to handle asynchronous metrics
  */
-export interface ObserverResult {
-  observe(callback: Function | MetricObservable, labels: Labels): void;
+export interface MetricObservable {
+  /**
+   * Sets the next value for observable metric
+   * @param value
+   */
+  next: (value: number) => void;
+  /**
+   * Subscribes for every value change
+   * @param callback
+   */
+  subscribe: (callback: (value: number) => void) => void;
+  /**
+   * Removes the subscriber
+   * @param [callback]
+   */
+  unsubscribe: (callback?: (value: number) => void) => void;
 }
