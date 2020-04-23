@@ -60,7 +60,7 @@ describe('B3Propagator', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.SAMPLED);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], '1');
     });
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
@@ -82,7 +82,7 @@ describe('B3Propagator', () => {
         'd4cda95b652f4a1592b449d5929fda1b'
       );
       assert.deepStrictEqual(carrier[X_B3_SPAN_ID], '6e0c63257de34c92');
-      assert.deepStrictEqual(carrier[X_B3_SAMPLED], TraceFlags.NONE);
+      assert.deepStrictEqual(carrier[X_B3_SAMPLED], '0');
     });
 
     it('should not inject empty spancontext', () => {
