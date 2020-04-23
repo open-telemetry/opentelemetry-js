@@ -81,20 +81,25 @@ describe('NodeTracerProvider', () => {
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should load user configured plugins', () => {
+    it('should load a merge of user configured and default plugins and implictly enable non-default plugins', () => {
       provider = new NodeTracerProvider({
         logger: new NoopLogger(),
         plugins: {
           'simple-module': {
-            enabled: true,
             path: '@opentelemetry/plugin-simple-module',
           },
           'supported-module': {
-            enabled: true,
             path: '@opentelemetry/plugin-supported-module',
             enhancedDatabaseReporting: false,
             ignoreMethods: [],
             ignoreUrls: [],
+          },
+          'random-module': {
+            enabled: false,
+            path: '@opentelemetry/random-module',
+          },
+          http: {
+            path: '@opentelemetry/plugin-http-module',
           },
         },
       });
@@ -104,6 +109,10 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(pluginLoader['_plugins'].length, 1);
       require('supported-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 2);
+      require('random-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 2);
+      require('http');
+      assert.strictEqual(pluginLoader['_plugins'].length, 3);
     });
 
     it('should construct an instance with default attributes', () => {

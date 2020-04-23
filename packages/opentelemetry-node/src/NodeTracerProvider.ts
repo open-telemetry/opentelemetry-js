@@ -20,7 +20,7 @@ import {
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
 import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from './config';
-import { PluginLoader } from './instrumentation/PluginLoader';
+import { PluginLoader, Plugins } from './instrumentation/PluginLoader';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -39,7 +39,34 @@ export class NodeTracerProvider extends BasicTracerProvider {
     super(config);
 
     this._pluginLoader = new PluginLoader(this, this.logger);
-    this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);
+
+    /**
+     * For user supplied config of plugin(s) that are loaded by default,
+     * merge the user supplied and default configs of said plugin(s)
+     */
+    let mergedUserSuppliedPlugins: Plugins = {};
+
+    for (const pluginName in config.plugins) {
+      if (DEFAULT_INSTRUMENTATION_PLUGINS.hasOwnProperty(pluginName)) {
+        mergedUserSuppliedPlugins[pluginName] = {
+          ...DEFAULT_INSTRUMENTATION_PLUGINS[pluginName],
+          ...config.plugins[pluginName],
+        };
+      } else {
+        mergedUserSuppliedPlugins[pluginName] = config.plugins[pluginName];
+        // enable user-supplied plugins unless explicitly disabled
+        if (mergedUserSuppliedPlugins[pluginName].enabled === undefined) {
+          mergedUserSuppliedPlugins[pluginName].enabled = true;
+        }
+      }
+    }
+
+    const mergedPlugins: Plugins = {
+      ...DEFAULT_INSTRUMENTATION_PLUGINS,
+      ...mergedUserSuppliedPlugins,
+    };
+
+    this._pluginLoader.load(mergedPlugins);
   }
 
   stop() {
