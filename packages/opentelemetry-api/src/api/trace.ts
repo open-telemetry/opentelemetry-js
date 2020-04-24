@@ -48,7 +48,7 @@ export class TraceAPI {
   public setGlobalTracerProvider(provider: TracerProvider): TracerProvider {
     if (_global[GLOBAL_TRACE_API_KEY]) {
       // global tracer provider has already been set
-      return NOOP_TRACER_PROVIDER;
+      return this.getTracerProvider();
     }
 
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(

@@ -48,7 +48,7 @@ export class MetricsAPI {
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
     if (_global[GLOBAL_METRICS_API_KEY]) {
       // global meter provider has already been set
-      return NOOP_METER_PROVIDER;
+      return this.getMeterProvider();
     }
 
     _global[GLOBAL_METRICS_API_KEY] = makeGetter(

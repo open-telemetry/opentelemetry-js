@@ -55,7 +55,7 @@ export class PropagationAPI {
   ): HttpTextPropagator {
     if (_global[GLOBAL_PROPAGATION_API_KEY]) {
       // global propagator has already been set
-      return NOOP_HTTP_TEXT_PROPAGATOR;
+      return this._getGlobalPropagator();
     }
 
     _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
