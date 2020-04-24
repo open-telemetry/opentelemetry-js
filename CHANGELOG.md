@@ -4,6 +4,35 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.7.0
+
+Released 2020-04-23
+
+#### :boom: Breaking Change
+* `opentelemetry-exporter-collector`
+  * [#901](https://github.com/open-telemetry/opentelemetry-js/pull/901) grpc for node and support for new proto format for node and browser ([@obecny](https://github.com/obecny))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#964](https://github.com/open-telemetry/opentelemetry-js/pull/964) chore: adding metric observable to be able to support async update ([@obecny](https://github.com/obecny))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-http`
+  * [#960](https://github.com/open-telemetry/opentelemetry-js/pull/960) [http] fix: use url.URL ([@naseemkullah](https://github.com/naseemkullah))
+* `opentelemetry-core`
+  * [#977](https://github.com/open-telemetry/opentelemetry-js/pull/977) fix(B3Propagator): B3 sampled causing gRPC error ([@mayurkale22](https://github.com/mayurkale22))
+
+#### :rocket: (Enhancement)
+* `opentelemetry-resources`
+  * [#899](https://github.com/open-telemetry/opentelemetry-js/pull/899) feat: resource auto-detection ([@mwear](https://github.com/mwear))
+* `opentelemetry-metrics`
+  * [#930](https://github.com/open-telemetry/opentelemetry-js/pull/930) feat(aggregators): implement histogram aggregator ([@vmarchaud](https://github.com/vmarchaud))
+
+#### Committers: 5
+- Naseem ([@naseemkullah](https://github.com/naseemkullah))
+- Matthew Wear ([@mwear](https://github.com/mwear))
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+
 ## 0.6.1
 
 Released 2020-04-08
