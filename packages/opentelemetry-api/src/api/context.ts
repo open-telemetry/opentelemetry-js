@@ -20,13 +20,13 @@ import {
   NoopContextManager,
 } from '@opentelemetry/context-base';
 import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_CONTEXT_MANAGER_API_KEY,
   makeGetter,
   _global,
 } from './global-utils';
 
 const NOOP_CONTEXT_MANAGER = new NoopContextManager();
-const API_VERSION = 0;
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
@@ -54,11 +54,11 @@ export class ContextAPI {
   ): ContextManager {
     if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
       // global context manager has already been set
-      return NOOP_CONTEXT_MANAGER;
+      return this._getContextManager();
     }
 
     _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
-      API_VERSION,
+      API_BACKWARDS_COMPATIBILITY_VERSION,
       contextManager,
       NOOP_CONTEXT_MANAGER
     );
@@ -97,11 +97,11 @@ export class ContextAPI {
   }
 
   private _getContextManager(): ContextManager {
-    if (!_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
-      return NOOP_CONTEXT_MANAGER;
-    }
-
-    return _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(API_VERSION);
+    return (
+      _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION
+      ) ?? NOOP_CONTEXT_MANAGER
+    );
   }
 
   /** Disable and remove the global context manager */

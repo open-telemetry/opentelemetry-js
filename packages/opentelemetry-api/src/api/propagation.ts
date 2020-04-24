@@ -21,14 +21,13 @@ import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPr
 import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
 import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_PROPAGATION_API_KEY,
   makeGetter,
   _global,
 } from './global-utils';
 
 const contextApi = ContextAPI.getInstance();
-
-const API_VERSION = 0;
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Propagation API
@@ -60,7 +59,7 @@ export class PropagationAPI {
     }
 
     _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
-      API_VERSION,
+      API_BACKWARDS_COMPATIBILITY_VERSION,
       propagator,
       NOOP_HTTP_TEXT_PROPAGATOR
     );
@@ -104,10 +103,10 @@ export class PropagationAPI {
   }
 
   private _getGlobalPropagator(): HttpTextPropagator {
-    if (!_global[GLOBAL_PROPAGATION_API_KEY]) {
-      return NOOP_HTTP_TEXT_PROPAGATOR;
-    }
-
-    return _global[GLOBAL_PROPAGATION_API_KEY]!(API_VERSION);
+    return (
+      _global[GLOBAL_PROPAGATION_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION
+      ) ?? NOOP_HTTP_TEXT_PROPAGATOR
+    );
   }
 }

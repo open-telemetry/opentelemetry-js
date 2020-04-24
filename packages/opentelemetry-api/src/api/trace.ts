@@ -17,9 +17,12 @@
 import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
-import { GLOBAL_TRACE_API_KEY, makeGetter, _global } from './global-utils';
-
-const API_VERSION = 0;
+import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
+  GLOBAL_TRACE_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Tracing API
@@ -49,7 +52,7 @@ export class TraceAPI {
     }
 
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(
-      API_VERSION,
+      API_BACKWARDS_COMPATIBILITY_VERSION,
       provider,
       NOOP_TRACER_PROVIDER
     );
@@ -61,12 +64,10 @@ export class TraceAPI {
    * Returns the global tracer provider.
    */
   public getTracerProvider(): TracerProvider {
-    if (!_global[GLOBAL_TRACE_API_KEY]) {
-      // global tracer provider has already been set
-      return NOOP_TRACER_PROVIDER;
-    }
-
-    return _global[GLOBAL_TRACE_API_KEY]!(API_VERSION);
+    return (
+      _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
+      NOOP_TRACER_PROVIDER
+    );
   }
 
   /**
