@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './BasePlugin';
 export * from './id';
 export * from './performance';
 export * from './timer-util';

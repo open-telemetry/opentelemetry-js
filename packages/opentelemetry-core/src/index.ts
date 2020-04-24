@@ -25,7 +25,6 @@ export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
 export * from './platform';
-export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoRecordingSpan';
 export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/spancontext-utils';
