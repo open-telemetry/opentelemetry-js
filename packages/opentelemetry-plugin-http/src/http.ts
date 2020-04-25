@@ -307,23 +307,10 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        let span: Span;
-        const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
-        /*
-         * If a parent is required but not present, we use a `NoRecordingSpan` to still
-         * propagate context without recording it.
-         */
-        if (
-          plugin._config.requireParentforIncomingSpans === true &&
-          hasParent === false
-        ) {
-          const spanContext =
-            getExtractedSpanContext(context.active()) ??
-            plugin._emptySpanContext;
-          span = new NoRecordingSpan(spanContext);
-        } else {
-          span = plugin._startHttpSpan(`${method} ${pathname}`, spanOptions);
-        }
+        const span = plugin._startHttpSpan(
+          `${method} ${pathname}`,
+          spanOptions
+        );
 
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
@@ -421,22 +408,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-      const hasParent = plugin._tracer.getCurrentSpan() !== undefined;
-      let span: Span;
-      /*
-       * If a parent is required but not present, we use a `NoRecordingSpan` to still
-       * propagate context without recording it.
-       */
-      if (
-        plugin._config.requireParentforOutgoingSpans === true &&
-        hasParent === false
-      ) {
-        const spanContext =
-          getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
-        span = new NoRecordingSpan(spanContext);
-      } else {
-        span = plugin._startHttpSpan(operationName, spanOptions);
-      }
+      const span = plugin._startHttpSpan(operationName, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
         if (!optionsParsed.headers) optionsParsed.headers = {};
@@ -456,9 +428,25 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 
   private _startHttpSpan(name: string, options: SpanOptions) {
-    const span = this._tracer
-      .startSpan(name, options)
-      .setAttribute(AttributeNames.COMPONENT, this.component);
+    /*
+     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * propagate context without recording it.
+     */
+    const hasParent = this._tracer.getCurrentSpan() !== undefined;
+    const requireParent =
+      options.kind === SpanKind.CLIENT
+        ? this._config.requireParentforOutgoingSpans
+        : this._config.requireParentforIncomingSpans;
+    let span: Span;
+    if (hasParent === false && requireParent === true) {
+      const spanContext =
+        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+      span = new NoRecordingSpan(spanContext);
+    } else {
+      span = this._tracer
+        .startSpan(name, options)
+        .setAttribute(AttributeNames.COMPONENT, this.component);
+    }
     this._spanNotEnded.add(span);
     return span;
   }
