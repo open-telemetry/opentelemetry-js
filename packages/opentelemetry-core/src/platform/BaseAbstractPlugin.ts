@@ -28,15 +28,14 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   abstract readonly moduleName: string; // required for internalFilesExports
   supportedVersions?: string[];
   readonly version?: string; // required for internalFilesExports
-  protected readonly _basedir?: string; // required for internalFilesExports
 
-  protected _moduleExports!: T;
+  protected readonly _basedir?: string; // required for internalFilesExports
+  protected _config!: PluginConfig;
   protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
   protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
-
-  protected _tracer!: Tracer;
   protected _logger!: Logger;
-  protected _config!: PluginConfig;
+  protected _moduleExports!: T;
+  protected _tracer!: Tracer;
 
   constructor(
     protected readonly _tracerName: string,
@@ -49,8 +48,8 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
 
   abstract enable(
     moduleExports: T,
-    TracerProvider: TracerProvider,
-    logger: Logger,
+    tracerProvider: TracerProvider,
+      logger: Logger,
     config?: PluginConfig
   ): T;
 

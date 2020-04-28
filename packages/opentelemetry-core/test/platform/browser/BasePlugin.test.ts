@@ -27,9 +27,11 @@ describe('BasePlugin', () => {
       const plugin = new TestPlugin('foo', '1');
       const patch = plugin.enable(moduleExports, provider, logger);
 
-      assert.ok(plugin['_tracer'] === NOOP_TRACER);
-      assert.ok(plugin['_logger'] === logger);
-      assert.ok(patch === moduleExports);
+      assert.strictEqual(plugin['_tracer'], NOOP_TRACER);
+      assert.strictEqual(plugin['_tracerName'], 'foo');
+      assert.strictEqual(plugin['_tracerVersion'], '1');
+      assert.strictEqual(plugin['_logger'], logger);
+      assert.strictEqual(patch, moduleExports);
     });
   });
 });
