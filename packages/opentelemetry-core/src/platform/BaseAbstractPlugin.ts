@@ -49,7 +49,7 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   abstract enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-      logger: Logger,
+    logger: Logger,
     config?: PluginConfig
   ): T;
 
