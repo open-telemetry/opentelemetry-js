@@ -15,7 +15,7 @@
  */
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/base';
+import { ExportResult } from '@opentelemetry/core';
 
 /** The kind of metric. */
 export enum MetricKind {
