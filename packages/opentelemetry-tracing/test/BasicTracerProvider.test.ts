@@ -15,6 +15,7 @@
  */
 
 import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
+import { ContextManager } from '@opentelemetry/context-base';
 import {
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
@@ -25,16 +26,12 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import {
-  NoopContextManager,
-  ContextManager,
-} from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.setGlobalContextManager(new NoopContextManager());
+    context.disable();
   });
 
   describe('constructor', () => {
@@ -338,6 +335,7 @@ describe('BasicTracerProvider', () => {
       context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
+        disable: () => {},
       } as ContextManager);
 
       const tracer = new BasicTracerProvider().getTracer('default');
