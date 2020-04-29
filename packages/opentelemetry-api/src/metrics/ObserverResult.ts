@@ -23,3 +23,7 @@ import { MetricObservable } from './MetricObservable';
 export interface ObserverResult {
   observe(callback: Function | MetricObservable, labels: Labels): void;
 }
+
+export interface BoundObserverResult {
+  observe(callback: Function | MetricObservable): void;
+}

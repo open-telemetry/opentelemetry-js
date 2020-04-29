@@ -486,6 +486,41 @@ describe('Meter', () => {
       ensureMetric(metric5);
     });
 
+    it('should set callback and observe value with bound observer', () => {
+      const observer = meter.createObserver('name', {
+        description: 'desc',
+        labelKeys: ['pid', 'core'],
+      }) as ObserverMetric;
+      const boundObserver = observer.bind({ pid: '123' });
+
+      function getCpuUsage() {
+        const val = [0.1, 0.2];
+        let idx = 0;
+        return () => val[idx++];
+      }
+
+      boundObserver.setCallback(observerResult => {
+        observerResult.observe(getCpuUsage());
+      });
+
+      let metricRecords: MetricRecord[] = observer.getMetricRecord();
+      assert.strictEqual(metricRecords.length, 1);
+
+      const metric1 = metricRecords[0];
+      assert.strictEqual(hashLabels(metric1.labels), '|#pid:123');
+      assert.strictEqual(metric1.aggregator.toPoint().value, 0.1);
+
+      metricRecords = observer.getMetricRecord();
+      assert.strictEqual(metricRecords.length, 1);
+
+      const metric2 = metricRecords[0];
+      assert.strictEqual(hashLabels(metric2.labels), '|#pid:123');
+      assert.strictEqual(metric2.aggregator.toPoint().value, 0.2);
+
+      ensureMetric(metric1);
+      ensureMetric(metric2);
+    });
+
     it('should return an observer with resource', () => {
       const observer = meter.createObserver('name') as ObserverMetric;
       assert.ok(observer.resource instanceof Resource);
@@ -573,10 +608,6 @@ class CustomBatcher extends Batcher {
 
 function ensureMetric(metric: MetricRecord) {
   assert.ok(metric.aggregator instanceof ObserverAggregator);
-  assert.ok(
-    metric.aggregator.toPoint().value >= 0 &&
-      metric.aggregator.toPoint().value <= 1
-  );
   assert.ok(
     metric.aggregator.toPoint().value >= 0 &&
       metric.aggregator.toPoint().value <= 1

@@ -17,6 +17,7 @@
 import {
   MetricObservable,
   ObserverResult as TypeObserverResult,
+  BoundObserverResult as TypeBoundObserverResult,
   Labels,
 } from '@opentelemetry/api';
 
@@ -35,6 +36,21 @@ export class ObserverResult implements TypeObserverResult {
       this.callbackObservers.set(labels, callback);
     } else {
       this.observers.set(labels, callback);
+    }
+  }
+}
+
+export class BoundObserverResult implements TypeBoundObserverResult {
+  constructor(
+    private _observerResult: ObserverResult,
+    private _labels: Labels
+  ) {}
+
+  observe(callback: Function | MetricObservable): void {
+    if (typeof callback === 'function') {
+      this._observerResult.callbackObservers.set(this._labels, callback);
+    } else {
+      this._observerResult.observers.set(this._labels, callback);
     }
   }
 }

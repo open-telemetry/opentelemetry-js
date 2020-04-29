@@ -191,7 +191,8 @@ export class ObserverMetric extends Metric<BoundObserver>
       this._monotonic,
       this._valueType,
       this._logger,
-      this._batcher.aggregatorFor(MetricKind.OBSERVER)
+      this._batcher.aggregatorFor(MetricKind.OBSERVER),
+      this._observerResult
     );
   }
 
