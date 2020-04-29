@@ -58,6 +58,7 @@ describe('NodeTracerProvider', () => {
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
     provider.stop();
     contextManager.disable();
+    context.disable();
   });
 
   describe('constructor', () => {

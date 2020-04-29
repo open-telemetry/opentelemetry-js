@@ -15,11 +15,11 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { B3Propagator, BasePlugin, NoopLogger } from '@opentelemetry/core';
 import { ContextManager } from '@opentelemetry/context-base';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { Tracer, Span } from '@opentelemetry/tracing';
+import { B3Propagator, BasePlugin, NoopLogger } from '@opentelemetry/core';
 import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
+import { Span, Tracer } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
@@ -48,6 +48,7 @@ describe('WebTracerProvider', () => {
 
     afterEach(() => {
       contextManager.disable();
+      context.disable();
     });
 
     it('should construct an instance with required only options', () => {
