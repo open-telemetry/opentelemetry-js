@@ -20,6 +20,12 @@ import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
 import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPropagator';
 import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
+import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
+  GLOBAL_PROPAGATION_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 const contextApi = ContextAPI.getInstance();
 
@@ -28,7 +34,6 @@ const contextApi = ContextAPI.getInstance();
  */
 export class PropagationAPI {
   private static _instance?: PropagationAPI;
-  private _propagator: HttpTextPropagator = NOOP_HTTP_TEXT_PROPAGATOR;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -48,7 +53,17 @@ export class PropagationAPI {
   public setGlobalPropagator(
     propagator: HttpTextPropagator
   ): HttpTextPropagator {
-    this._propagator = propagator;
+    if (_global[GLOBAL_PROPAGATION_API_KEY]) {
+      // global propagator has already been set
+      return this._getGlobalPropagator();
+    }
+
+    _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
+      API_BACKWARDS_COMPATIBILITY_VERSION,
+      propagator,
+      NOOP_HTTP_TEXT_PROPAGATOR
+    );
+
     return propagator;
   }
 
@@ -64,7 +79,7 @@ export class PropagationAPI {
     setter: SetterFunction<Carrier> = defaultSetter,
     context = contextApi.active()
   ): void {
-    return this._propagator.inject(context, carrier, setter);
+    return this._getGlobalPropagator().inject(context, carrier, setter);
   }
 
   /**
@@ -79,6 +94,19 @@ export class PropagationAPI {
     getter: GetterFunction<Carrier> = defaultGetter,
     context = contextApi.active()
   ): Context {
-    return this._propagator.extract(context, carrier, getter);
+    return this._getGlobalPropagator().extract(context, carrier, getter);
+  }
+
+  /** Remove the global propagator */
+  public disable() {
+    delete _global[GLOBAL_PROPAGATION_API_KEY];
+  }
+
+  private _getGlobalPropagator(): HttpTextPropagator {
+    return (
+      _global[GLOBAL_PROPAGATION_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION
+      ) ?? NOOP_HTTP_TEXT_PROPAGATOR
+    );
   }
 }

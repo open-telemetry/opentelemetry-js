@@ -15,17 +15,24 @@
  */
 
 import {
+  Context,
   ContextManager,
   NoopContextManager,
-  Context,
 } from '@opentelemetry/context-base';
+import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
+  GLOBAL_CONTEXT_MANAGER_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
+
+const NOOP_CONTEXT_MANAGER = new NoopContextManager();
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Context API
  */
 export class ContextAPI {
   private static _instance?: ContextAPI;
-  private _contextManager: ContextManager = new NoopContextManager();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -45,7 +52,17 @@ export class ContextAPI {
   public setGlobalContextManager(
     contextManager: ContextManager
   ): ContextManager {
-    this._contextManager = contextManager;
+    if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
+      // global context manager has already been set
+      return this._getContextManager();
+    }
+
+    _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
+      API_BACKWARDS_COMPATIBILITY_VERSION,
+      contextManager,
+      NOOP_CONTEXT_MANAGER
+    );
+
     return contextManager;
   }
 
@@ -53,7 +70,7 @@ export class ContextAPI {
    * Get the currently active context
    */
   public active(): Context {
-    return this._contextManager.active();
+    return this._getContextManager().active();
   }
 
   /**
@@ -66,7 +83,7 @@ export class ContextAPI {
     context: Context,
     fn: T
   ): ReturnType<T> {
-    return this._contextManager.with(context, fn);
+    return this._getContextManager().with(context, fn);
   }
 
   /**
@@ -76,6 +93,20 @@ export class ContextAPI {
    * @param context context to bind to the event emitter or function. Defaults to the currently active context
    */
   public bind<T>(target: T, context: Context = this.active()): T {
-    return this._contextManager.bind(target, context);
+    return this._getContextManager().bind(target, context);
+  }
+
+  private _getContextManager(): ContextManager {
+    return (
+      _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION
+      ) ?? NOOP_CONTEXT_MANAGER
+    );
+  }
+
+  /** Disable and remove the global context manager */
+  public disable() {
+    this._getContextManager().disable();
+    delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
   }
 }
