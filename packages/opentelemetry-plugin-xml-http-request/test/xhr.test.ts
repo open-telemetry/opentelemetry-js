@@ -105,7 +105,7 @@ describe('xhr', () => {
   });
 
   afterEach(() => {
-    contextManager.disable();
+    types.context.disable();
   });
 
   before(() => {

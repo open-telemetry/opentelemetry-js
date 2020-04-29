@@ -4,7 +4,7 @@ const http = require('http');
 const opentracing = require('opentracing');
 const shim = require('./shim').shim('http_client_service');
 
-opentracing.setGlobalTracer(shim);
+opentracing.initGlobalTracer(shim);
 const tracer = opentracing.globalTracer();
 
 makeRequest();
