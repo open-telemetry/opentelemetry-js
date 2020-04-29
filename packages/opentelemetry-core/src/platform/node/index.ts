@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './sdk-info';
 export * from './id';
 export * from './performance';
 export * from './timer-util';

@@ -21,7 +21,6 @@ import {
   TimedEvent,
   TraceState,
 } from '@opentelemetry/api';
-import { SDK_INFO } from '@opentelemetry/base';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
@@ -218,8 +217,8 @@ export function toCollectorExportTraceServiceRequest(
   const instrumentationLibrarySpans: opentelemetryProto.trace.v1.InstrumentationLibrarySpans = {
     spans: spansToBeSent,
     instrumentationLibrary: {
-      name: name || `${SDK_INFO.NAME} - ${SDK_INFO.LANGUAGE}`,
-      version: SDK_INFO.VERSION,
+      name: name || `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
+      version: core.SDK_INFO.VERSION,
     },
   };
   const resourceSpan: opentelemetryProto.trace.v1.ResourceSpans = {

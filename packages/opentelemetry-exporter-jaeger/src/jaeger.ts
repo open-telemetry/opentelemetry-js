@@ -15,8 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/base';
-import { NoopLogger } from '@opentelemetry/core';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';

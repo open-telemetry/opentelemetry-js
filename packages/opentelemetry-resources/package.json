@@ -62,7 +62,7 @@
   },
   "dependencies": {
     "@opentelemetry/api": "^0.7.0",
-    "@opentelemetry/base": "^0.7.0",
+    "@opentelemetry/core": "^0.7.0",
     "gcp-metadata": "^3.5.0"
   }
 }

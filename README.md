@@ -142,7 +142,6 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 | [@opentelemetry/metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data. |
 | [@opentelemetry/node][otel-node] | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
 | [@opentelemetry/web][otel-web] | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only. |
-| [@opentelemetry/base][otel-base] | This package provides base code for the SDK packages (tracing and metrics). |
 
 ### Compatible Exporters
 
@@ -202,7 +201,6 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [docs]: https://open-telemetry.github.io/opentelemetry-js
 
-[otel-base]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-base
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 

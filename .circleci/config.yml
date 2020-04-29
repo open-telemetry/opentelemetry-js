@@ -10,7 +10,6 @@ cache_1: &cache_1
     - ./node_modules
     - ./package-lock.json
     - packages/opentelemetry-api/node_modules
-    - packages/opentelemetry-base/node_modules
     - packages/opentelemetry-context-async-hooks/node_modules
     - packages/opentelemetry-context-base/node_modules
     - packages/opentelemetry-context-zone/node_modules
