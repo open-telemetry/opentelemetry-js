@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import { Aggregator } from './export/types';
-import { ObserverResult } from './ObserverResult';
 
 /**
  * This class represent the base to BoundInstrument, which is responsible for generating
@@ -134,8 +133,7 @@ export class BoundMeasure extends BaseBoundInstrument
 /**
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
-export class BoundObserver extends BaseBoundInstrument
-  implements api.BoundObserver {
+export class BoundObserver extends BaseBoundInstrument {
   constructor(
     labels: api.Labels,
     disabled: boolean,
@@ -145,10 +143,5 @@ export class BoundObserver extends BaseBoundInstrument
     aggregator: Aggregator
   ) {
     super(labels, logger, monotonic, disabled, valueType, aggregator);
-  }
-
-  setCallback(callback: (observerResult: api.ObserverResult) => void): void {
-    const observerResult = new ObserverResult();
-    callback(observerResult);
   }
 }
