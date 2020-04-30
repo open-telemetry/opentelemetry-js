@@ -54,6 +54,14 @@ To get started tracing your own application, see the [Getting Started Guide](get
 
 If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an [Application Owner](#application-owner) uses a different SDK implementation.
 
+## Supported Runtimes
+
+Node.js v10 and greater is officially supported, but the tests are also run against the latest release of Node.js v8.
+Note that versions of Node.js older than 8.5.0 are known to not work.
+
+Browser tests are run in Chrome.
+There is currently no list of officially supported browsers, but OpenTelemetry should work in supported versions of major browsers.
+
 ## Release Schedule
 
 OpenTelemetry JS is under active development.
