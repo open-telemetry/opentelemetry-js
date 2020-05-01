@@ -210,6 +210,15 @@ describe('xhr', () => {
       assert.strictEqual(span.name, url, 'span has wrong name');
     });
 
+    it('span should have correct kind', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(
+        span.kind,
+        types.SpanKind.CLIENT,
+        'span has wrong kind'
+      );
+    });
+
     it('span should have correct attributes', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       const attributes = span.attributes;
