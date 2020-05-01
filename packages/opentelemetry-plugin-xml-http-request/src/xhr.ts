@@ -316,6 +316,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
 
     const currentSpan = this._tracer.startSpan(url, {
+      kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.component,
         [AttributeNames.HTTP_METHOD]: method,
