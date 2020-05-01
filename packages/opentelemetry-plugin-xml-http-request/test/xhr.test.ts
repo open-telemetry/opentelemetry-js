@@ -212,7 +212,11 @@ describe('xhr', () => {
 
     it('span should have correct kind', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-      assert.strictEqual(span.kind, types.SpanKind.CLIENT, 'span has wrong kind');
+      assert.strictEqual(
+        span.kind,
+        types.SpanKind.CLIENT,
+        'span has wrong kind'
+      );
     });
 
     it('span should have correct attributes', () => {
