@@ -56,11 +56,22 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-Node.js v10 and greater is officially supported, but the tests are also run against the latest release of Node.js v8.
-Note that versions of Node.js older than 8.5.0 are known to not work.
+Platform Version | Supported
+---------------- | ---------
+Node.JS `v14`    | ✅
+Node.JS `v12`    | ✅
+Node.JS `v10`    | ✅
+Node.JS `v8`     | See [Node Support](#node-support) below
+Web Browsers     | ✅ See [Browser Support](#browser-support) below
 
-Browser tests are run in Chrome.
-There is currently no list of officially supported browsers, but OpenTelemetry should work in supported versions of major browsers.
+### Node Support
+Automated tests are run using the latest release of each currently supported LTS version of Node.JS.
+While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
+Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
+
+### Browser Support
+Automated browser tests are run in the latest version of Headless Chrome.
+There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
 
 ## Release Schedule
 
