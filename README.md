@@ -54,6 +54,25 @@ To get started tracing your own application, see the [Getting Started Guide](get
 
 If you are a library author looking to build OpenTelemetry into your library, please see [the documentation][docs]. As a library author, it is important that you only depend on properties and methods published on the public API. If you use any properties or methods from the SDK that are not officially a part of the public API, your library may break if an [Application Owner](#application-owner) uses a different SDK implementation.
 
+## Supported Runtimes
+
+Platform Version | Supported
+---------------- | ---------
+Node.JS `v14`    | ✅
+Node.JS `v12`    | ✅
+Node.JS `v10`    | ✅
+Node.JS `v8`     | See [Node Support](#node-support) below
+Web Browsers     | ✅ See [Browser Support](#browser-support) below
+
+### Node Support
+Automated tests are run using the latest release of each currently supported LTS version of Node.JS.
+While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
+Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
+
+### Browser Support
+Automated browser tests are run in the latest version of Headless Chrome.
+There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
+
 ## Release Schedule
 
 OpenTelemetry JS is under active development.
