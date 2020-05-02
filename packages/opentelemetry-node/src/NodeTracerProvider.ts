@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,11 @@ import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
+  TracerConfig,
 } from '@opentelemetry/tracing';
 import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from './config';
 import { PluginLoader } from './instrumentation/PluginLoader';
+import { NodeTracer } from './NodeTracer';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -31,15 +33,16 @@ import { PluginLoader } from './instrumentation/PluginLoader';
  */
 export class NodeTracerProvider extends BasicTracerProvider {
   private readonly _pluginLoader: PluginLoader;
+  private readonly _nodeTracers: Map<string, NodeTracer> = new Map();
 
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: NodeTracerConfig = {}) {
+  constructor(config?: NodeTracerConfig) {
     super(config);
 
     this._pluginLoader = new PluginLoader(this, this.logger);
-    this._pluginLoader.load(config.plugins || DEFAULT_INSTRUMENTATION_PLUGINS);
+    this._pluginLoader.load(config?.plugins ?? DEFAULT_INSTRUMENTATION_PLUGINS);
   }
 
   stop() {
@@ -51,7 +54,15 @@ export class NodeTracerProvider extends BasicTracerProvider {
       config.contextManager = new AsyncHooksContextManager();
       config.contextManager.enable();
     }
-
     super.register(config);
+  }
+
+  getTracer(name: string, version = '*', config?: TracerConfig): NodeTracer {
+    const key = `${name}@${version}`;
+    if (!this._nodeTracers.has(key)) {
+      this._nodeTracers.set(key, new NodeTracer(config ?? this._config, this));
+    }
+
+    return this._nodeTracers.get(key)!;
   }
 }

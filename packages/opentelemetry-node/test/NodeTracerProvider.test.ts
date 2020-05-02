@@ -186,7 +186,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run context with AsyncHooksContextManager context manager', done => {
+    it('should run context with AsyncHooksContextManager', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       provider.getTracer('default').withSpan(span, () => {
@@ -202,7 +202,7 @@ describe('NodeTracerProvider', () => {
       );
     });
 
-    it('should run context with AsyncHooksContextManager context manager with multiple spans', done => {
+    it('should run context with AsyncHooksContextManager with multiple spans', done => {
       provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       provider.getTracer('default').withSpan(span, () => {
@@ -254,7 +254,7 @@ describe('NodeTracerProvider', () => {
   });
 
   describe('.bind()', () => {
-    it('should bind context with AsyncHooksContextManager context manager', done => {
+    it('should bind context with AsyncHooksContextManager', done => {
       const provider = new NodeTracerProvider({});
       const span = provider.getTracer('default').startSpan('my-span');
       const fn = () => {
@@ -266,6 +266,74 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
       return patchedFn();
+    });
+  });
+
+  describe('.withSpanAsync()', () => {
+    it('should run async context with AsyncHooksContextManager', done => {
+      provider = new NodeTracerProvider({});
+      const span = provider.getTracer('default').startSpan('my-span');
+      void provider.getTracer('default').withSpanAsync(span, async () => {
+        assert.deepStrictEqual(
+          provider.getTracer('default').getCurrentSpan(),
+          span
+        );
+        return done();
+      });
+      assert.deepStrictEqual(
+        provider.getTracer('default').getCurrentSpan(),
+        undefined
+      );
+    });
+
+    it('should run context with AsyncHooksContextManager with multiple spans', async () => {
+      provider = new NodeTracerProvider({});
+      let nestedHasBeenRun: boolean = false;
+      const span = provider.getTracer('default').startSpan('my-span');
+      await provider.getTracer('default').withSpanAsync(span, async () => {
+        assert.deepStrictEqual(
+          provider.getTracer('default').getCurrentSpan(),
+          span
+        );
+
+        const span1 = provider.getTracer('default').startSpan('my-span1');
+
+        await provider.getTracer('default').withSpanAsync(span1, async () => {
+          assert.deepStrictEqual(
+            provider.getTracer('default').getCurrentSpan(),
+            span1
+          );
+          assert.deepStrictEqual(
+            span1.context().traceId,
+            span.context().traceId
+          );
+          nestedHasBeenRun = true;
+        });
+      });
+      assert.deepStrictEqual(
+        provider.getTracer('default').getCurrentSpan(),
+        undefined
+      );
+      assert(nestedHasBeenRun);
+    });
+
+    it('should find correct context with promises', async () => {
+      provider = new NodeTracerProvider();
+      const span = provider.getTracer('default').startSpan('my-span');
+      await provider.getTracer('default').withSpanAsync(span, async () => {
+        for (let i = 0; i < 3; i++) {
+          await sleep(5).then(() => {
+            assert.deepStrictEqual(
+              provider.getTracer('default').getCurrentSpan(),
+              span
+            );
+          });
+        }
+      });
+      assert.deepStrictEqual(
+        provider.getTracer('default').getCurrentSpan(),
+        undefined
+      );
     });
   });
 });
