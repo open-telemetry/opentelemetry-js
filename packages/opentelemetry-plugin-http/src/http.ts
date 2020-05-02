@@ -441,6 +441,8 @@ export class HttpPlugin extends BasePlugin<Http> {
     if (hasParent === false && requireParent === true) {
       const spanContext =
         getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+      // TODO: Refactor this when a solution is found in
+      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
       span = new NoRecordingSpan(spanContext);
     } else {
       span = this._tracer
