@@ -457,7 +457,10 @@ export class HttpPlugin extends BasePlugin<Http> {
     );
   }
 
-  private _callRequestHook(span: Span, request: ClientRequest | IncomingMessage) {
+  private _callRequestHook(
+    span: Span,
+    request: ClientRequest | IncomingMessage
+  ) {
     this._safeExecute(
       span,
       () => this._config.requestHook!(span, request),
