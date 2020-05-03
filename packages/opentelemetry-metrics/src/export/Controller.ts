@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-import { unrefTimer } from '@opentelemetry/core';
+import { ExportResult, unrefTimer } from '@opentelemetry/core';
 import { Meter } from '../Meter';
 import { MetricExporter } from './types';
-import { ExportResult } from '@opentelemetry/base';
 
 const DEFAULT_EXPORT_INTERVAL = 60_000;
 

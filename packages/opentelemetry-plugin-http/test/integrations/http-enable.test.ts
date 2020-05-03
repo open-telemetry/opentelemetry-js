@@ -15,7 +15,7 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/api';
+import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import { plugin } from '../../src/http';
@@ -31,6 +31,7 @@ import {
 } from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
 import { AttributeNames } from '../../src/enums/AttributeNames';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -41,6 +42,14 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('HttpPlugin Integration tests', () => {
+  beforeEach(() => {
+    memoryExporter.reset();
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+  });
+
+  afterEach(() => {
+    context.disable();
+  });
   describe('enable()', () => {
     before(function(done) {
       // mandatory

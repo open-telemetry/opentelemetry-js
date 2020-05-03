@@ -145,7 +145,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   protected _getPatchOutgoingGetFunction(
     clientRequest: (
-      options: RequestOptions | string | URL,
+      options: RequestOptions | string | url.URL,
       ...args: HttpRequestArgs
     ) => ClientRequest
   ) {
@@ -161,7 +161,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
       return function outgoingGetRequest<
-        T extends RequestOptions | string | URL
+        T extends RequestOptions | string | url.URL
       >(options: T, ...args: HttpRequestArgs): ClientRequest {
         const req = clientRequest(options, ...args);
         req.end();

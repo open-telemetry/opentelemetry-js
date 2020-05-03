@@ -1,6 +1,6 @@
 'use strict';
 
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -14,7 +14,7 @@ const exporter = new PrometheusExporter(
 
 const meter = new MeterProvider({
   exporter,
-  interval: 1000,
+  interval: 2000,
 }).getMeter('example-observer');
 
 const otelCpuUsage = meter.createObserver('metric_observer', {
@@ -27,9 +27,16 @@ function getCpuUsage() {
   return Math.random();
 }
 
+const observable = new MetricObservable();
+
+setInterval(() => {
+  observable.next(getCpuUsage());
+}, 5000);
+
 otelCpuUsage.setCallback((observerResult) => {
   observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
   observerResult.observe(getCpuUsage, { pid: process.pid, core: '2' });
   observerResult.observe(getCpuUsage, { pid: process.pid, core: '3' });
   observerResult.observe(getCpuUsage, { pid: process.pid, core: '4' });
+  observerResult.observe(observable, { pid: process.pid, core: '5' });
 });

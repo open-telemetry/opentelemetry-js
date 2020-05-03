@@ -14,5 +14,7 @@
  * limitations under the License.
  */
 
-export { Resource } from './Resource';
+export * from './Resource';
+export * from './platform';
 export * from './constants';
+export * from './types';

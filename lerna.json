@@ -3,10 +3,9 @@
   "npmClient": "npm",
   "packages": [
     "benchmark/*",
-    "packages/*",
-    "packages/opentelemetry-plugin-postgres/*"
+    "packages/*"
   ],
-  "version": "0.6.1",
+  "version": "0.7.0",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
