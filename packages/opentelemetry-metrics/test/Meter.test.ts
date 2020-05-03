@@ -28,6 +28,7 @@ import {
   MetricRecord,
   Aggregator,
   MetricObservable,
+  MetricDescriptor,
 } from '../src';
 import * as types from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -566,7 +567,7 @@ class CustomBatcher extends Batcher {
   process(record: MetricRecord): void {
     throw new Error('process method not implemented.');
   }
-  aggregatorFor(metricKind: MetricKind): Aggregator {
+  aggregatorFor(metricKind: MetricDescriptor): Aggregator {
     throw new Error('aggregatorFor method not implemented.');
   }
 }
