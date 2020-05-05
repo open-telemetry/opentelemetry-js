@@ -72,16 +72,27 @@ export class B3Propagator implements HttpTextPropagator {
     const traceIdHeader = getter(carrier, X_B3_TRACE_ID);
     const spanIdHeader = getter(carrier, X_B3_SPAN_ID);
     const sampledHeader = getter(carrier, X_B3_SAMPLED);
-    const traceId = Array.isArray(traceIdHeader)
+
+    const traceIdHeaderValue = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]
       : traceIdHeader;
-    const spanId = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
+    const spanIdHeaderValue = Array.isArray(spanIdHeader)
+      ? spanIdHeader[0]
+      : spanIdHeader;
+
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
 
-    if (typeof traceId !== 'string' || typeof spanId !== 'string')
+    if (
+      typeof traceIdHeaderValue !== 'string' ||
+      typeof spanIdHeaderValue !== 'string'
+    ) {
       return context;
+    }
+
+    const traceId = traceIdHeaderValue.padStart(32, '0');
+    const spanId = spanIdHeaderValue.padStart(16, '0');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
       return setExtractedSpanContext(context, {
