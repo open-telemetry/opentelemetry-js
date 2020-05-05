@@ -290,17 +290,17 @@ describe('B3Propagator', () => {
       assert.ok(ctx3 === Context.ROOT_CONTEXT);
     });
 
-    it('should left-pad short ids with 0', () => {
-      carrier[X_B3_TRACE_ID] = 'dd8448eb211c80319c';
-      carrier[X_B3_SPAN_ID] = '9203331';
+    it('should left-pad 64 bit trace ids with 0', () => {
+      carrier[X_B3_TRACE_ID] = '8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
       carrier[X_B3_SAMPLED] = '1';
       const extractedSpanContext = getExtractedSpanContext(
         b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       assert.deepStrictEqual(extractedSpanContext, {
-        spanId: '0000000009203331',
-        traceId: '00000000000000dd8448eb211c80319c',
+        spanId: 'b7ad6b7169203331',
+        traceId: '00000000000000008448eb211c80319c',
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
