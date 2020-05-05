@@ -175,8 +175,8 @@ export function isTimeInput(value: unknown) {
 }
 
 /** Add two high resolution times */
-export function addHrTime(t1: types.HrTime, t2: types.HrTime): types.HrTime {
-  const time: types.HrTime = [t1[0] + t2[0], t1[1] + t2[1]];
+export function addHrTime(t1: api.HrTime, t2: api.HrTime): api.HrTime {
+  const time: api.HrTime = [t1[0] + t2[0], t1[1] + t2[1]];
 
   if (time[1] >= 1e9) {
     // nanoseconds overflow, carry seconds field
