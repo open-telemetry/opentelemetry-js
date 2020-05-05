@@ -29,7 +29,7 @@ import {
   ObserverAggregator,
   Sum,
 } from '@opentelemetry/metrics';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
@@ -44,7 +44,7 @@ export class PrometheusExporter implements MetricExporter {
   };
 
   private readonly _registry = new Registry();
-  private readonly _logger: types.Logger;
+  private readonly _logger: api.Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
   private readonly _server: Server;
@@ -159,7 +159,7 @@ export class PrometheusExporter implements MetricExporter {
     // TODO: only counter and gauge are implemented in metrics so far
   }
 
-  private _getLabelValues(keys: string[], labels: types.Labels) {
+  private _getLabelValues(keys: string[], labels: api.Labels) {
     const labelValues: labelValues = {};
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {

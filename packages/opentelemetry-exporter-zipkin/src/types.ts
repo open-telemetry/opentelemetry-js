@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 
 /**
  * Exporter config
  */
 export interface ExporterConfig {
-  logger?: types.Logger;
+  logger?: api.Logger;
   serviceName: string;
   url?: string;
   // Optional mapping overrides for OpenTelemetry status code and description.
