@@ -16,6 +16,7 @@
 
 import * as types from '@opentelemetry/api';
 import {
+  addHrTime,
   hrTime,
   hrTimeDuration,
   isTimeInput,
@@ -39,18 +40,23 @@ export class Span implements types.Span, ReadableSpan {
   readonly attributes: types.Attributes = {};
   readonly links: types.Link[] = [];
   readonly events: types.TimedEvent[] = [];
-  readonly startTime: types.HrTime;
   readonly resource: Resource;
   name: string;
   status: types.Status = {
     code: types.CanonicalCode.OK,
   };
-  endTime: types.HrTime = [0, 0];
   private _ended = false;
-  private _duration: types.HrTime = [-1, -1];
+  private _duration: types.HrTime = [0, 0];
   private readonly _logger: types.Logger;
   private readonly _spanProcessor: SpanProcessor;
   private readonly _traceParams: TraceParams;
+
+  /** Performance clock is only used to calculate durations, not real timestamps */
+  private readonly _perfStartTime: types.HrTime;
+  /** System clock is used to generate start time when a start time is not input by the user */
+  private readonly _dateStartTime: types.HrTime;
+  /** A user input start time takes precedence over the system clock */
+  private readonly _inputStartTime?: types.HrTime;
 
   /** Constructs a new Span instance. */
   constructor(
@@ -60,14 +66,20 @@ export class Span implements types.Span, ReadableSpan {
     kind: types.SpanKind,
     parentSpanId?: string,
     links: types.Link[] = [],
-    startTime: types.TimeInput = hrTime()
+    startTime?: types.TimeInput
   ) {
     this.name = spanName;
     this.spanContext = spanContext;
     this.parentSpanId = parentSpanId;
     this.kind = kind;
     this.links = links;
-    this.startTime = timeInputToHrTime(startTime);
+
+    if (startTime != null) {
+      this._inputStartTime = timeInputToHrTime(startTime);
+    }
+    this._perfStartTime = hrTime();
+    this._dateStartTime = timeInputToHrTime(Date.now());
+
     this.resource = parentTracer.resource;
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
@@ -151,15 +163,43 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime: types.TimeInput = hrTime()): void {
+  end(endTime?: types.TimeInput): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
     }
     this._ended = true;
-    this.endTime = timeInputToHrTime(endTime);
 
-    this._duration = hrTimeDuration(this.startTime, this.endTime);
+    if (this._inputStartTime) {
+      if (endTime) {
+        // user specified start and end time
+        this._duration = hrTimeDuration(
+          this._inputStartTime,
+          timeInputToHrTime(endTime)
+        );
+      } else {
+        // if user specifies start time but not end time, we lose the benefits of the
+        // monotonic clock, so we should use the system clock
+        this._duration = hrTimeDuration(
+          this._inputStartTime,
+          timeInputToHrTime(Date.now())
+        );
+      }
+    } else {
+      if (endTime) {
+        // if user specifies end time but not start time, we lose the benefits of the
+        // monotonic clock, so we should used the system clock
+        this._duration = hrTimeDuration(
+          this._dateStartTime,
+          timeInputToHrTime(endTime)
+        );
+      } else {
+        // if no user timestamps are provided, the start time comes from Date, and the end
+        // time is calculated using duration from the performance timer
+        this._duration = hrTimeDuration(this._perfStartTime, hrTime());
+      }
+    }
+
     if (this._duration[0] < 0) {
       this._logger.warn(
         'Inconsistent start and end time, startTime > endTime',
@@ -177,6 +217,16 @@ export class Span implements types.Span, ReadableSpan {
 
   toReadableSpan(): ReadableSpan {
     return this;
+  }
+
+  get startTime(): types.HrTime {
+    // if user did not specify the start time, use the system clock
+    return this._inputStartTime ?? this._dateStartTime;
+  }
+
+  get endTime(): types.HrTime {
+    // end time is a calculated field based on the start time and duration of the span
+    return addHrTime(this.startTime, this.duration);
   }
 
   get duration(): types.HrTime {
