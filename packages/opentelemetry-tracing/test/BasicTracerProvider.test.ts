@@ -30,7 +30,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span, Tracer } from '../src';
-import { performance } from 'perf_hooks';
+import { otperformance } from '@opentelemetry/core';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
@@ -337,7 +337,7 @@ describe('BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider().getTracer('default') as Tracer;
       beforeEach(() => {
         // assume the performance timer is incorrect
-        sandbox.replaceGetter(performance, 'timeOrigin', () => 10_000);
+        sandbox.replaceGetter(otperformance, 'timeOrigin', () => 10_000);
       });
 
       afterEach(() => {
