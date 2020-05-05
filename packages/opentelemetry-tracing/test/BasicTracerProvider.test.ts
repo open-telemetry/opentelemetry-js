@@ -24,7 +24,6 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
-  hrTimeToMilliseconds,
   addHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
