@@ -38,8 +38,9 @@ export enum AttributeNames {
   IP_UDP = 'IP.UDP',
   HTTP_SERVER_NAME = 'http.server_name',
   HTTP_CLIENT_IP = 'http.client_ip',
+  HTTP_USER_AGENT = 'http.user_agent',
+  HTTP_SCHEME = 'http.scheme',
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME = 'http.error_name',
   HTTP_ERROR_MESSAGE = 'http.error_message',
-  HTTP_USER_AGENT = 'http.user_agent',
 }
