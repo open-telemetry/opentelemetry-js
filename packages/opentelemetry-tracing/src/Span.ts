@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   hrTime,
   hrTimeDuration,
@@ -30,25 +30,25 @@ import { TraceParams } from './types';
 /**
  * This class represents a span.
  */
-export class Span implements types.Span, ReadableSpan {
+export class Span implements api.Span, ReadableSpan {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
-  readonly spanContext: types.SpanContext;
-  readonly kind: types.SpanKind;
+  readonly spanContext: api.SpanContext;
+  readonly kind: api.SpanKind;
   readonly parentSpanId?: string;
-  readonly attributes: types.Attributes = {};
-  readonly links: types.Link[] = [];
-  readonly events: types.TimedEvent[] = [];
-  readonly startTime: types.HrTime;
+  readonly attributes: api.Attributes = {};
+  readonly links: api.Link[] = [];
+  readonly events: api.TimedEvent[] = [];
+  readonly startTime: api.HrTime;
   readonly resource: Resource;
   name: string;
-  status: types.Status = {
-    code: types.CanonicalCode.OK,
+  status: api.Status = {
+    code: api.CanonicalCode.OK,
   };
-  endTime: types.HrTime = [0, 0];
+  endTime: api.HrTime = [0, 0];
   private _ended = false;
-  private _duration: types.HrTime = [-1, -1];
-  private readonly _logger: types.Logger;
+  private _duration: api.HrTime = [-1, -1];
+  private readonly _logger: api.Logger;
   private readonly _spanProcessor: SpanProcessor;
   private readonly _traceParams: TraceParams;
 
@@ -56,11 +56,11 @@ export class Span implements types.Span, ReadableSpan {
   constructor(
     parentTracer: Tracer,
     spanName: string,
-    spanContext: types.SpanContext,
-    kind: types.SpanKind,
+    spanContext: api.SpanContext,
+    kind: api.SpanKind,
     parentSpanId?: string,
-    links: types.Link[] = [],
-    startTime: types.TimeInput = hrTime()
+    links: api.Link[] = [],
+    startTime: api.TimeInput = hrTime()
   ) {
     this.name = spanName;
     this.spanContext = spanContext;
@@ -75,7 +75,7 @@ export class Span implements types.Span, ReadableSpan {
     this._spanProcessor.onStart(this);
   }
 
-  context(): types.SpanContext {
+  context(): api.SpanContext {
     return this.spanContext;
   }
 
@@ -98,7 +98,7 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  setAttributes(attributes: types.Attributes): this {
+  setAttributes(attributes: api.Attributes): this {
     Object.keys(attributes).forEach(key => {
       this.setAttribute(key, attributes[key]);
     });
@@ -114,8 +114,8 @@ export class Span implements types.Span, ReadableSpan {
    */
   addEvent(
     name: string,
-    attributesOrStartTime?: types.Attributes | types.TimeInput,
-    startTime?: types.TimeInput
+    attributesOrStartTime?: api.Attributes | api.TimeInput,
+    startTime?: api.TimeInput
   ): this {
     if (this._isSpanEnded()) return this;
     if (this.events.length >= this._traceParams.numberOfEventsPerSpan!) {
@@ -124,7 +124,7 @@ export class Span implements types.Span, ReadableSpan {
     }
     if (isTimeInput(attributesOrStartTime)) {
       if (typeof startTime === 'undefined') {
-        startTime = attributesOrStartTime as types.TimeInput;
+        startTime = attributesOrStartTime as api.TimeInput;
       }
       attributesOrStartTime = undefined;
     }
@@ -133,13 +133,13 @@ export class Span implements types.Span, ReadableSpan {
     }
     this.events.push({
       name,
-      attributes: attributesOrStartTime as types.Attributes,
+      attributes: attributesOrStartTime as api.Attributes,
       time: timeInputToHrTime(startTime),
     });
     return this;
   }
 
-  setStatus(status: types.Status): this {
+  setStatus(status: api.Status): this {
     if (this._isSpanEnded()) return this;
     this.status = status;
     return this;
@@ -151,7 +151,7 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  end(endTime: types.TimeInput = hrTime()): void {
+  end(endTime: api.TimeInput = hrTime()): void {
     if (this._isSpanEnded()) {
       this._logger.error('You can only call end() on a span once.');
       return;
@@ -179,7 +179,7 @@ export class Span implements types.Span, ReadableSpan {
     return this;
   }
 
-  get duration(): types.HrTime {
+  get duration(): api.HrTime {
     return this._duration;
   }
 
