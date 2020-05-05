@@ -19,10 +19,10 @@ npm install --save @opentelemetry/metrics
 Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { PushController } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new MeterProvider().getMeter('your-meter-name');
+const meter = new PushController().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
   labelKeys: ['pid'],
@@ -41,10 +41,10 @@ boundCounter.add(10);
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
-const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+const { PushController, MetricObservable } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new MeterProvider().getMeter('your-meter-name');
+const meter = new PushController().getMeter('your-meter-name');
 
 const observer = meter.createObserver('metric_name', {
   labelKeys: ['pid', 'core'],

@@ -1,4 +1,4 @@
-import { MeterProvider } from '@opentelemetry/metrics';
+import { PushController } from '@opentelemetry/metrics';
 import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
@@ -11,7 +11,7 @@ const exporter = new PrometheusExporter(
   },
 );
 
-const meter = new MeterProvider({
+const meter = new PushController({
   exporter,
   interval: 1000,
 }).getMeter('example-ts');

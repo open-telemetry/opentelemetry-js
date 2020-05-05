@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
-import { Meter, MeterProvider } from '../src';
+import { Meter, PushController } from '../src';
 
 describe('Batcher', () => {
   describe('Ungrouped', () => {
@@ -26,7 +26,7 @@ describe('Batcher', () => {
     let barCounter: api.BoundCounter;
     let counter: api.Metric<api.BoundCounter>;
     beforeEach(() => {
-      meter = new MeterProvider({
+      meter = new PushController({
         logger: new NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');

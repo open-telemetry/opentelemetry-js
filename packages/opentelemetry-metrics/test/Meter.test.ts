@@ -21,7 +21,7 @@ import {
   CounterMetric,
   MetricKind,
   Sum,
-  MeterProvider,
+  PushController,
   MeasureMetric,
   Distribution,
   ObserverMetric,
@@ -48,7 +48,7 @@ describe('Meter', () => {
   const labels: api.Labels = { [keyb]: 'value2', [keya]: 'value1' };
 
   beforeEach(() => {
-    meter = new MeterProvider({
+    meter = new PushController({
       logger: new NoopLogger(),
     }).getMeter('test-meter');
   });
@@ -553,7 +553,7 @@ describe('Meter', () => {
   });
 
   it('should allow custom batcher', () => {
-    const customMeter = new MeterProvider().getMeter('custom-batcher', '*', {
+    const customMeter = new PushController().getMeter('custom-batcher', '*', {
       batcher: new CustomBatcher(),
     });
     assert.throws(() => {

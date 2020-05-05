@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ConsoleMetricExporter, MeterProvider, MetricKind } from '../../src';
+import { ConsoleMetricExporter, PushController, MetricKind } from '../../src';
 import { ValueType } from '@opentelemetry/api';
 
 describe('ConsoleMetricExporter', () => {
@@ -37,7 +37,7 @@ describe('ConsoleMetricExporter', () => {
     it('should export information about metrics', () => {
       const spyConsole = sinon.spy(console, 'log');
 
-      const meter = new MeterProvider().getMeter(
+      const meter = new PushController().getMeter(
         'test-console-metric-exporter'
       );
       const counter = meter.createCounter('counter', {

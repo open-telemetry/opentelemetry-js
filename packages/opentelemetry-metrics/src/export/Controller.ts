@@ -14,36 +14,27 @@
  * limitations under the License.
  */
 
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import { ExportResult } from '@opentelemetry/core';
 import { Meter } from '../Meter';
 import { MetricExporter } from './types';
+import { Batcher } from './Batcher';
 
-const DEFAULT_EXPORT_INTERVAL = 60_000;
-
-export class Controller {}
-
-/** Controller organizes a periodic push of metric data. */
-export class PushController extends Controller {
-  private _timer: NodeJS.Timeout;
+export abstract class Controller {
+  protected readonly _meters: Map<string, Meter> = new Map();
 
   constructor(
-    private readonly _meter: Meter,
-    private readonly _exporter: MetricExporter,
-    interval: number = DEFAULT_EXPORT_INTERVAL
-  ) {
-    super();
-    this._timer = setInterval(() => {
-      this._collect();
-    }, interval);
-    unrefTimer(this._timer);
-  }
+    protected readonly _batcher: Batcher,
+    protected readonly _exporter: MetricExporter
+  ) {}
 
-  private _collect() {
-    this._meter.collect();
-    this._exporter.export(this._meter.getBatcher().checkPointSet(), result => {
-      if (result !== ExportResult.SUCCESS) {
-        // @todo: log error
-      }
+  protected collect() {
+    for (const meter of this._meters.values()) {
+      meter.collect();
+    }
+    this._exporter.export(this._batcher.checkPointSet(), result => {
+      this.onExportResult(result);
     });
   }
+
+  protected abstract onExportResult(result: ExportResult): void;
 }

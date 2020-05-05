@@ -19,7 +19,7 @@ import {
   CounterMetric,
   CounterSumAggregator,
   Meter,
-  MeterProvider,
+  PushController,
   ObserverMetric,
   Point,
 } from '@opentelemetry/metrics';
@@ -189,7 +189,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterProvider().getMeter('test-prometheus');
+      meter = new PushController().getMeter('test-prometheus');
       exporter.startServer(done);
     });
 
@@ -418,7 +418,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new MeterProvider().getMeter('test-prometheus');
+      meter = new PushController().getMeter('test-prometheus');
       counter = meter.createCounter('counter') as CounterMetric;
       counter.bind({ key1: 'labelValue1' }).add(10);
     });

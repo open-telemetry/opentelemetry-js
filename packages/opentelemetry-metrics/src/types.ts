@@ -64,9 +64,6 @@ export interface MeterConfig {
   /** Metric exporter. */
   exporter?: MetricExporter;
 
-  /** Metric collect interval */
-  interval?: number;
-
   /** Resource associated with metric telemetry */
   resource?: Resource;
 

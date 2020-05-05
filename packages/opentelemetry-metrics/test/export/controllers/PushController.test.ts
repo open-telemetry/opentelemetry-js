@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,46 +15,46 @@
  */
 
 import * as assert from 'assert';
-import { MeterProvider, Meter } from '../src';
+import { PushController, Meter } from '../../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
-describe('MeterProvider', () => {
+describe('PushController', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
-      const provider = new MeterProvider();
-      assert.ok(provider instanceof MeterProvider);
+      const provider = new PushController();
+      assert.ok(provider instanceof PushController);
     });
 
     it('should construct an instance with logger', () => {
-      const provider = new MeterProvider({
+      const provider = new PushController({
         logger: new NoopLogger(),
       });
-      assert.ok(provider instanceof MeterProvider);
+      assert.ok(provider instanceof PushController);
     });
   });
 
   describe('getMeter', () => {
     it('should return an instance of Meter', () => {
-      const meter = new MeterProvider().getMeter('test-meter-provider');
+      const meter = new PushController().getMeter('test-push-controller');
       assert.ok(meter instanceof Meter);
     });
 
     it('should return the meter with default version without a version option', () => {
-      const provider = new MeterProvider();
+      const provider = new PushController();
       const meter1 = provider.getMeter('default');
       const meter2 = provider.getMeter('default', '*');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return the same Meter instance with same name & version', () => {
-      const provider = new MeterProvider();
+      const provider = new PushController();
       const meter1 = provider.getMeter('meter1', 'ver1');
       const meter2 = provider.getMeter('meter1', 'ver1');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return different Meter instance with different name or version', () => {
-      const provider = new MeterProvider();
+      const provider = new PushController();
 
       const meter1 = provider.getMeter('meter1', 'ver1');
       const meter2 = provider.getMeter('meter1');
