@@ -170,34 +170,30 @@ export class Span implements types.Span, ReadableSpan {
     }
     this._ended = true;
 
-    if (!this._inputStartTime) {
-      if (!endTime) {
-        // if no user timestamps are provided, the start time comes from Date, and the end
-        // time is calculated using duration from the performance timer
-        this._duration = hrTimeDuration(this._perfStartTime, hrTime());
-      } else {
-        // if user specifies end time but not start time, we lose the benefits of the
-        // monotonic clock, so we should used the system clock
-        this._duration = hrTimeDuration(
-          this._dateStartTime,
-          timeInputToHrTime(endTime)
-        );
-      }
-    } else {
-      if (endTime) {
-        // user specified start and end time
-        this._duration = hrTimeDuration(
-          this._inputStartTime,
-          timeInputToHrTime(endTime)
-        );
-      } else {
-        // if user specifies start time but not end time, we lose the benefits of the
-        // monotonic clock, so we should use the system clock
-        this._duration = hrTimeDuration(
-          this._inputStartTime,
-          timeInputToHrTime(Date.now())
-        );
-      }
+    if (!this._inputStartTime && !endTime) {
+      // if no user timestamps are provided, the start time comes from Date, and the end
+      // time is calculated using duration from the performance timer
+      this._duration = hrTimeDuration(this._perfStartTime, hrTime());
+    } else if (this._inputStartTime && endTime) {
+      // user specified start and end time
+      this._duration = hrTimeDuration(
+        this._inputStartTime,
+        timeInputToHrTime(endTime)
+      );
+    } else if (this._inputStartTime) {
+      // if user specifies start time but not end time, we lose the benefits of the
+      // monotonic clock, so we should use the system clock
+      this._duration = hrTimeDuration(
+        this._inputStartTime,
+        timeInputToHrTime(Date.now())
+      );
+    } else if (endTime) {
+      // if user specifies end time but not start time, we lose the benefits of the
+      // monotonic clock, so we should used the system clock
+      this._duration = hrTimeDuration(
+        this._dateStartTime,
+        timeInputToHrTime(endTime)
+      );
     }
 
     if (this._duration[0] < 0) {
