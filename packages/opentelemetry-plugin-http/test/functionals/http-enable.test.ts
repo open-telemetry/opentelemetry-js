@@ -696,5 +696,125 @@ describe('HttpPlugin', () => {
         req.end();
       });
     });
+
+    describe('with require parent span', () => {
+      beforeEach(done => {
+        memoryExporter.reset();
+        plugin.enable(http, provider, provider.logger, {});
+        server = http.createServer((request, response) => {
+          response.end('Test Server Response');
+        });
+        server.listen(serverPort, done);
+      });
+
+      afterEach(() => {
+        server.close();
+        plugin.disable();
+      });
+
+      it(`should not trace without parent with options enabled (both client & server)`, async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = `/test/test`;
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 0);
+      });
+
+      it(`should not trace without parent with options enabled (client only)`, async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = `/test/test`;
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(
+          spans.every(span => span.kind === SpanKind.SERVER),
+          true
+        );
+      });
+
+      it(`should not trace without parent with options enabled (server only)`, async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = `/test/test`;
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(
+          spans.every(span => span.kind === SpanKind.CLIENT),
+          true
+        );
+      });
+
+      it(`should trace with parent with both requireParent options enabled`, done => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = `/test/test`;
+        const tracer = provider.getTracer('default');
+        const span = tracer.startSpan('parentSpan', {
+          kind: SpanKind.INTERNAL,
+        });
+        tracer.withSpan(span, () => {
+          httpRequest
+            .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
+            .then(result => {
+              span.end();
+              assert(
+                result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !==
+                  undefined
+              );
+              assert(
+                result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !==
+                  undefined
+              );
+              const spans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(spans.length, 2);
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.CLIENT).length,
+                1
+              );
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.INTERNAL).length,
+                1
+              );
+              return done();
+            })
+            .catch(done);
+        });
+      });
+    });
   });
 });

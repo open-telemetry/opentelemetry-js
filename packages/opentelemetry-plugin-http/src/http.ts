@@ -22,8 +22,14 @@ import {
   SpanKind,
   SpanOptions,
   Status,
+  SpanContext,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  NoRecordingSpan,
+  getExtractedSpanContext,
+} from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -56,6 +62,12 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _config!: HttpPluginConfig;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
+
+  private readonly _emptySpanContext: SpanContext = {
+    traceId: '',
+    spanId: '',
+    traceFlags: TraceFlags.NONE,
+  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);
@@ -396,7 +408,6 @@ export class HttpPlugin extends BasePlugin<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-
       const span = plugin._startHttpSpan(operationName, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
@@ -417,9 +428,26 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 
   private _startHttpSpan(name: string, options: SpanOptions) {
-    const span = this._tracer
-      .startSpan(name, options)
-      .setAttribute(AttributeNames.COMPONENT, this.component);
+    /*
+     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * propagate context without recording it.
+     */
+    const requireParent =
+      options.kind === SpanKind.CLIENT
+        ? this._config.requireParentforOutgoingSpans
+        : this._config.requireParentforIncomingSpans;
+    let span: Span;
+    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
+      const spanContext =
+        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+      // TODO: Refactor this when a solution is found in
+      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
+      span = new NoRecordingSpan(spanContext);
+    } else {
+      span = this._tracer
+        .startSpan(name, options)
+        .setAttribute(AttributeNames.COMPONENT, this.component);
+    }
     this._spanNotEnded.add(span);
     return span;
   }
