@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { Metric, MetricOptions } from './Metric';
-import { BoundCounter, BoundMeasure, BoundObserver } from './BoundInstrument';
+import { MetricOptions, Counter, Measure, Observer } from './Metric';
 
 /**
  * An interface to allow the recording metrics.
@@ -30,7 +29,7 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure>;
+  createMeasure(name: string, options?: MetricOptions): Measure;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
@@ -39,12 +38,12 @@ export interface Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter>;
+  createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
    * Creates a new `Observer` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObserver(name: string, options?: MetricOptions): Metric<BoundObserver>;
+  createObserver(name: string, options?: MetricOptions): Observer;
 }

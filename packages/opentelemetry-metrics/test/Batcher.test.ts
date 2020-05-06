@@ -24,7 +24,7 @@ describe('Batcher', () => {
     let meter: Meter;
     let fooCounter: api.BoundCounter;
     let barCounter: api.BoundCounter;
-    let counter: api.Metric<api.BoundCounter>;
+    let counter: api.Counter;
     beforeEach(() => {
       meter = new MeterProvider({
         logger: new NoopLogger(),
