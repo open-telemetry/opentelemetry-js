@@ -59,13 +59,14 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 Platform Version | Supported
 ---------------- | ---------
 Node.JS `v14`    | ✅
+Node.JS `v13`    | ✅
 Node.JS `v12`    | ✅
 Node.JS `v10`    | ✅
 Node.JS `v8`     | See [Node Support](#node-support) below
 Web Browsers     | ✅ See [Browser Support](#browser-support) below
 
 ### Node Support
-Automated tests are run using the latest release of each currently supported LTS version of Node.JS.
+Automated tests are run using the latest release of each currently active version of Node.JS.
 While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
 Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
 
