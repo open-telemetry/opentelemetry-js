@@ -25,7 +25,7 @@ import * as sinon from 'sinon';
 import { plugin } from '../../src/https';
 import { httpsRequest } from '../utils/httpsRequest';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 
 describe('HttpsPlugin', () => {
   let server: https.Server;
@@ -37,7 +37,7 @@ describe('HttpsPlugin', () => {
       logger,
     });
     // const tracer = provider.getTracer('test-https')
-    let tracer: types.Tracer;
+    let tracer: api.Tracer;
     before(() => {
       nock.cleanAll();
       nock.enableNetConnect();

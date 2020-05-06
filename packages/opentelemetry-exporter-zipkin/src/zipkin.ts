@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
@@ -32,7 +32,7 @@ import { OT_REQUEST_HEADER } from './utils';
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
-  private readonly _logger: types.Logger;
+  private readonly _logger: api.Logger;
   private readonly _serviceName: string;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;

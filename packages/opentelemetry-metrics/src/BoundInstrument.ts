@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { Aggregator } from './export/types';
 import { ObserverResult } from './ObserverResult';
 
@@ -23,16 +23,16 @@ import { ObserverResult } from './ObserverResult';
  * the TimeSeries.
  */
 export class BaseBoundInstrument {
-  protected _labels: types.Labels;
-  protected _logger: types.Logger;
+  protected _labels: api.Labels;
+  protected _logger: api.Logger;
   protected _monotonic: boolean;
 
   constructor(
-    labels: types.Labels,
-    logger: types.Logger,
+    labels: api.Labels,
+    logger: api.Logger,
     monotonic: boolean,
     private readonly _disabled: boolean,
-    private readonly _valueType: types.ValueType,
+    private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
   ) {
     this._labels = labels;
@@ -43,7 +43,7 @@ export class BaseBoundInstrument {
   update(value: number): void {
     if (this._disabled) return;
 
-    if (this._valueType === types.ValueType.INT && !Number.isInteger(value)) {
+    if (this._valueType === api.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
         `INT value type cannot accept a floating-point value for ${Object.values(
           this._labels
@@ -55,7 +55,7 @@ export class BaseBoundInstrument {
     this._aggregator.update(value);
   }
 
-  getLabels(): types.Labels {
+  getLabels(): api.Labels {
     return this._labels;
   }
 
@@ -69,13 +69,13 @@ export class BaseBoundInstrument {
  * value of single instrument in the `Counter` associated with specified Labels.
  */
 export class BoundCounter extends BaseBoundInstrument
-  implements types.BoundCounter {
+  implements api.BoundCounter {
   constructor(
-    labels: types.Labels,
+    labels: api.Labels,
     disabled: boolean,
     monotonic: boolean,
-    valueType: types.ValueType,
-    logger: types.Logger,
+    valueType: api.ValueType,
+    logger: api.Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, monotonic, disabled, valueType, aggregator);
@@ -97,16 +97,16 @@ export class BoundCounter extends BaseBoundInstrument
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
 export class BoundMeasure extends BaseBoundInstrument
-  implements types.BoundMeasure {
+  implements api.BoundMeasure {
   private readonly _absolute: boolean;
 
   constructor(
-    labels: types.Labels,
+    labels: api.Labels,
     disabled: boolean,
     monotonic: boolean,
     absolute: boolean,
-    valueType: types.ValueType,
-    logger: types.Logger,
+    valueType: api.ValueType,
+    logger: api.Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, monotonic, disabled, valueType, aggregator);
@@ -115,8 +115,8 @@ export class BoundMeasure extends BaseBoundInstrument
 
   record(
     value: number,
-    correlationContext?: types.CorrelationContext,
-    spanContext?: types.SpanContext
+    correlationContext?: api.CorrelationContext,
+    spanContext?: api.SpanContext
   ): void {
     if (this._absolute && value < 0) {
       this._logger.error(
@@ -135,19 +135,19 @@ export class BoundMeasure extends BaseBoundInstrument
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
 export class BoundObserver extends BaseBoundInstrument
-  implements types.BoundObserver {
+  implements api.BoundObserver {
   constructor(
-    labels: types.Labels,
+    labels: api.Labels,
     disabled: boolean,
     monotonic: boolean,
-    valueType: types.ValueType,
-    logger: types.Logger,
+    valueType: api.ValueType,
+    logger: api.Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, monotonic, disabled, valueType, aggregator);
   }
 
-  setCallback(callback: (observerResult: types.ObserverResult) => void): void {
+  setCallback(callback: (observerResult: api.ObserverResult) => void): void {
     const observerResult = new ObserverResult();
     callback(observerResult);
   }

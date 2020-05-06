@@ -19,7 +19,12 @@ import {
   MeasureExactAggregator,
   ObserverAggregator,
 } from './aggregators';
-import { MetricRecord, MetricKind, Aggregator } from './types';
+import {
+  MetricRecord,
+  MetricKind,
+  Aggregator,
+  MetricDescriptor,
+} from './types';
 
 /**
  * Base class for all batcher types.
@@ -31,8 +36,8 @@ import { MetricRecord, MetricKind, Aggregator } from './types';
 export abstract class Batcher {
   protected readonly _batchMap = new Map<string, MetricRecord>();
 
-  /** Returns an aggregator based off metric kind. */
-  abstract aggregatorFor(metricKind: MetricKind): Aggregator;
+  /** Returns an aggregator based off metric descriptor. */
+  abstract aggregatorFor(metricKind: MetricDescriptor): Aggregator;
 
   /** Stores record information to be ready for exporting. */
   abstract process(record: MetricRecord): void;
@@ -47,8 +52,8 @@ export abstract class Batcher {
  * passes them for exporting.
  */
 export class UngroupedBatcher extends Batcher {
-  aggregatorFor(metricKind: MetricKind): Aggregator {
-    switch (metricKind) {
+  aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
+    switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
         return new CounterSumAggregator();
       case MetricKind.OBSERVER:

@@ -35,7 +35,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
   protected readonly _logger: api.Logger;
-  private readonly _descriptor: MetricDescriptor;
+  protected readonly _descriptor: MetricDescriptor;
   private readonly _instruments: Map<string, T> = new Map();
 
   constructor(
@@ -124,7 +124,7 @@ export class CounterMetric extends Metric<BoundCounter>
       this._valueType,
       this._logger,
       // @todo: consider to set to CounterSumAggregator always.
-      this._batcher.aggregatorFor(MetricKind.COUNTER)
+      this._batcher.aggregatorFor(this._descriptor)
     );
   }
 
@@ -161,7 +161,7 @@ export class MeasureMetric extends Metric<BoundMeasure>
       this._absolute,
       this._valueType,
       this._logger,
-      this._batcher.aggregatorFor(MetricKind.MEASURE)
+      this._batcher.aggregatorFor(this._descriptor)
     );
   }
 
@@ -191,7 +191,7 @@ export class ObserverMetric extends Metric<BoundObserver>
       this._monotonic,
       this._valueType,
       this._logger,
-      this._batcher.aggregatorFor(MetricKind.OBSERVER)
+      this._batcher.aggregatorFor(this._descriptor)
     );
   }
 

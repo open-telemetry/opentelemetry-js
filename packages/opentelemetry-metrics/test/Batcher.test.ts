@@ -15,16 +15,16 @@
  */
 
 import * as assert from 'assert';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { Meter, MeterProvider } from '../src';
 
 describe('Batcher', () => {
   describe('Ungrouped', () => {
     let meter: Meter;
-    let fooCounter: types.BoundCounter;
-    let barCounter: types.BoundCounter;
-    let counter: types.Metric<types.BoundCounter>;
+    let fooCounter: api.BoundCounter;
+    let barCounter: api.BoundCounter;
+    let counter: api.Metric<api.BoundCounter>;
     beforeEach(() => {
       meter = new MeterProvider({
         logger: new NoopLogger(),
