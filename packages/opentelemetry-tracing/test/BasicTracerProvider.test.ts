@@ -121,6 +121,14 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
     });
 
+    it('should propagate resources', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const tracer = tracerProvider.getTracer('default');
+      const span = tracer.startSpan('my-span') as Span;
+      assert.strictEqual(tracer.resource, tracerProvider.resource);
+      assert.strictEqual(span.resource, tracerProvider.resource);
+    });
+
     it('should start a span with name and options', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
