@@ -16,7 +16,6 @@
 
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
-import { ObserverResult } from './ObserverResult';
 
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
@@ -44,15 +43,4 @@ export interface BoundMeasure {
     correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
-}
-
-/** Base interface for the Observer metrics. */
-export interface BoundObserver {
-  /**
-   * Sets callback for the observer. The callback is called once and then it
-   * sets observers for values. The observers are called periodically to
-   * retrieve the value.
-   * @param callback
-   */
-  setCallback(callback: (observerResult: ObserverResult) => void): void;
 }
