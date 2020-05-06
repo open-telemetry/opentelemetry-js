@@ -17,6 +17,7 @@
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 import { ObserverResult } from './ObserverResult';
+import { BoundCounter, BoundMeasure } from './BoundInstrument';
 
 /**
  * Options needed for metric creation
@@ -77,7 +78,18 @@ export enum ValueType {
  * Metric represents a base class for different types of metric
  * pre aggregations.
  */
-export interface Metric<T> {
+export interface Metric {
+  /**
+   * Clears all bound instruments from the Metric.
+   */
+  clear(): void;
+}
+
+/**
+ * UnboundMetric represents a base class for different types of metric
+ * pre aggregations without label value bound yet.
+ */
+export interface UnboundMetric<T> extends Metric {
   /**
    * Returns a Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Instrument instead of always
@@ -92,31 +104,16 @@ export interface Metric<T> {
    * @param labels key-values pairs that are associated with a specific metric.
    */
   unbind(labels: Labels): void;
-
-  /**
-   * Clears all timeseries from the Metric.
-   */
-  clear(): void;
 }
 
-export interface MetricUtils {
+export interface Counter extends UnboundMetric<BoundCounter> {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    */
   add(value: number, labels: Labels): void;
+}
 
-  /**
-   * Sets a callback where user can observe value for certain labels
-   * @param callback a function that will be called once to set observers
-   *     for values
-   */
-  setCallback(callback: (observerResult: ObserverResult) => void): void;
-
-  /**
-   * Sets the given value. Values can be negative.
-   */
-  set(value: number, labels: Labels): void;
-
+export interface Measure extends UnboundMetric<BoundMeasure> {
   /**
    * Records the given value to this measure.
    */
@@ -134,6 +131,17 @@ export interface MetricUtils {
     correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
+}
+
+/** Base interface for the Observer metrics. */
+export interface Observer extends Metric {
+  /**
+   * Sets a callback where user can observe value for certain labels. The
+   * observers are called periodically to retrieve the value.
+   * @param callback a function that will be called once to set observers
+   *     for values
+   */
+  setCallback(callback: (observerResult: ObserverResult) => void): void;
 }
 
 /**

@@ -30,7 +30,7 @@ import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
-  implements api.Metric<T> {
+  implements api.UnboundMetric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
@@ -106,8 +106,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
 }
 
 /** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<BoundCounter>
-  implements Pick<api.MetricUtils, 'add'> {
+export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   constructor(
     name: string,
     options: MetricOptions,
@@ -139,8 +138,7 @@ export class CounterMetric extends Metric<BoundCounter>
   }
 }
 
-export class MeasureMetric extends Metric<BoundMeasure>
-  implements Pick<api.MetricUtils, 'record'> {
+export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
   protected readonly _absolute: boolean;
 
   constructor(
@@ -172,7 +170,7 @@ export class MeasureMetric extends Metric<BoundMeasure>
 
 /** This is a SDK implementation of Observer Metric. */
 export class ObserverMetric extends Metric<BoundObserver>
-  implements Pick<api.MetricUtils, 'setCallback'> {
+  implements api.Observer {
   private _observerResult = new ObserverResult();
 
   constructor(
