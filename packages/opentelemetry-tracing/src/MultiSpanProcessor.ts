@@ -25,7 +25,9 @@ export class MultiSpanProcessor implements SpanProcessor {
   constructor(private readonly _spanProcessors: SpanProcessor[]) {}
 
   forceFlush(): void {
-    // do nothing as all spans are being exported without waiting
+    for (const spanProcessor of this._spanProcessors) {
+      spanProcessor.forceFlush();
+    }
   }
 
   onStart(span: Span): void {
