@@ -432,13 +432,12 @@ export class HttpPlugin extends BasePlugin<Http> {
      * If a parent is required but not present, we use a `NoRecordingSpan` to still
      * propagate context without recording it.
      */
-    const hasParent = this._tracer.getCurrentSpan() !== undefined;
     const requireParent =
       options.kind === SpanKind.CLIENT
         ? this._config.requireParentforOutgoingSpans
         : this._config.requireParentforIncomingSpans;
     let span: Span;
-    if (hasParent === false && requireParent === true) {
+    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
       const spanContext =
         getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
       // TODO: Refactor this when a solution is found in
