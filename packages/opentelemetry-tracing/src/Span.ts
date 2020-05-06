@@ -74,7 +74,7 @@ export class Span implements api.Span, ReadableSpan {
     this.kind = kind;
     this.links = links;
 
-    if (startTime != null) {
+    if (startTime != undefined) {
       this._inputStartTime = timeInputToHrTime(startTime);
     }
     this._perfStartTime = hrTime();
