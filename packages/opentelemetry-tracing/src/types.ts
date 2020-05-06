@@ -29,7 +29,7 @@ import { Resource } from '@opentelemetry/resources';
  */
 export interface TracerConfig {
   /**
-   * Attributed that will be applied on every span created by Tracer.
+   * Attributes that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.
    */
   defaultAttributes?: Attributes;
