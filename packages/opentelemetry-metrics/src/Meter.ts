@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
@@ -32,8 +32,8 @@ import { NoopExporter } from './export/NoopExporter';
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
-export class Meter implements types.Meter {
-  private readonly _logger: types.Logger;
+export class Meter implements api.Meter {
+  private readonly _logger: api.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
   private readonly _resource: Resource;
@@ -56,15 +56,12 @@ export class Meter implements types.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(
-    name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundMeasure> {
+  createMeasure(name: string, options?: api.MetricOptions): api.Measure {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return types.NOOP_MEASURE_METRIC;
+      return api.NOOP_MEASURE_METRIC;
     }
     const opt: MetricOptions = {
       absolute: true, // Measures are defined as absolute by default
@@ -86,15 +83,12 @@ export class Meter implements types.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(
-    name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundCounter> {
+  createCounter(name: string, options?: api.MetricOptions): api.Counter {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return types.NOOP_COUNTER_METRIC;
+      return api.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
       monotonic: true, // Counters are defined as monotonic by default
@@ -113,15 +107,12 @@ export class Meter implements types.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObserver(
-    name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundObserver> {
+  createObserver(name: string, options?: api.MetricOptions): api.Observer {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return types.NOOP_OBSERVER_METRIC;
+      return api.NOOP_OBSERVER_METRIC;
     }
     const opt: MetricOptions = {
       monotonic: false, // Observers are defined as non-monotonic by default

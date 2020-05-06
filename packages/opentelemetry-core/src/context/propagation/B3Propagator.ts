@@ -26,7 +26,7 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
-const VALID_TRACEID_REGEX = /^[0-9a-f]{32}$/i;
+const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
 
@@ -72,16 +72,21 @@ export class B3Propagator implements HttpTextPropagator {
     const traceIdHeader = getter(carrier, X_B3_TRACE_ID);
     const spanIdHeader = getter(carrier, X_B3_SPAN_ID);
     const sampledHeader = getter(carrier, X_B3_SAMPLED);
-    const traceId = Array.isArray(traceIdHeader)
+
+    const traceIdHeaderValue = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]
       : traceIdHeader;
     const spanId = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
+
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
 
-    if (typeof traceId !== 'string' || typeof spanId !== 'string')
+    if (typeof traceIdHeaderValue !== 'string' || typeof spanId !== 'string') {
       return context;
+    }
+
+    const traceId = traceIdHeaderValue.padStart(32, '0');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
       return setExtractedSpanContext(context, {

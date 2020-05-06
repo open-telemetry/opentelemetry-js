@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import * as zipkinTypes from './types';
 import { Resource } from '@opentelemetry/resources';
 
 const ZIPKIN_SPAN_KIND_MAPPING = {
-  [types.SpanKind.CLIENT]: zipkinTypes.SpanKind.CLIENT,
-  [types.SpanKind.SERVER]: zipkinTypes.SpanKind.SERVER,
-  [types.SpanKind.CONSUMER]: zipkinTypes.SpanKind.CONSUMER,
-  [types.SpanKind.PRODUCER]: zipkinTypes.SpanKind.PRODUCER,
+  [api.SpanKind.CLIENT]: zipkinTypes.SpanKind.CLIENT,
+  [api.SpanKind.SERVER]: zipkinTypes.SpanKind.SERVER,
+  [api.SpanKind.CONSUMER]: zipkinTypes.SpanKind.CONSUMER,
+  [api.SpanKind.PRODUCER]: zipkinTypes.SpanKind.PRODUCER,
   // When absent, the span is local.
-  [types.SpanKind.INTERNAL]: undefined,
+  [api.SpanKind.INTERNAL]: undefined,
 };
 
 export const statusCodeTagName = 'ot.status_code';
@@ -68,8 +68,8 @@ export function toZipkinSpan(
 
 /** Converts OpenTelemetry Attributes and Status to Zipkin Tags format. */
 export function _toZipkinTags(
-  attributes: types.Attributes,
-  status: types.Status,
+  attributes: api.Attributes,
+  status: api.Status,
   statusCodeTagName: string,
   statusDescriptionTagName: string,
   resource: Resource
@@ -78,7 +78,7 @@ export function _toZipkinTags(
   for (const key of Object.keys(attributes)) {
     tags[key] = String(attributes[key]);
   }
-  tags[statusCodeTagName] = String(types.CanonicalCode[status.code]);
+  tags[statusCodeTagName] = String(api.CanonicalCode[status.code]);
   if (status.message) {
     tags[statusDescriptionTagName] = status.message;
   }
@@ -94,7 +94,7 @@ export function _toZipkinTags(
  * Converts OpenTelemetry Events to Zipkin Annotations format.
  */
 export function _toZipkinAnnotations(
-  events: types.TimedEvent[]
+  events: api.TimedEvent[]
 ): zipkinTypes.Annotation[] {
   return events.map(event => ({
     timestamp: hrTimeToMicroseconds(event.time),

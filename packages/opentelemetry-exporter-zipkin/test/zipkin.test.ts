@@ -22,7 +22,7 @@ import {
   NoopLogger,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
@@ -36,7 +36,7 @@ function getReadableSpan() {
   const duration = 2000;
   const readableSpan: ReadableSpan = {
     name: 'my-span',
-    kind: types.SpanKind.INTERNAL,
+    kind: api.SpanKind.INTERNAL,
     spanContext: {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
@@ -47,7 +47,7 @@ function getReadableSpan() {
     ended: true,
     duration: [duration, 0],
     status: {
-      code: types.CanonicalCode.OK,
+      code: api.CanonicalCode.OK,
     },
     attributes: {},
     links: [],
@@ -133,7 +133,7 @@ describe('ZipkinExporter', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -145,7 +145,7 @@ describe('ZipkinExporter', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -163,7 +163,7 @@ describe('ZipkinExporter', () => {
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.SERVER,
+        kind: api.SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -174,7 +174,7 @@ describe('ZipkinExporter', () => {
         ended: true,
         duration: [duration, 0],
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {},
         links: [],
