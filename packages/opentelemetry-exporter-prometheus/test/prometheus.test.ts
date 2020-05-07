@@ -522,5 +522,5 @@ describe('PrometheusExporter', () => {
 });
 
 function errorHandler(done: Mocha.Done): (err: Error) => void {
-  return (err) => done(err);
+  return err => done(err);
 }
