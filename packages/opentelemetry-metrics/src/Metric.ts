@@ -163,7 +163,7 @@ export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
     );
   }
 
-  record(value: number, labels: api.Labels) {
+  record(value: number, labels: api.Labels = {}) {
     this.bind(labels).record(value);
   }
 }
