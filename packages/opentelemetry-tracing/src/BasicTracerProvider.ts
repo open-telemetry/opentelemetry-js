@@ -27,6 +27,7 @@ import { Resource } from '@opentelemetry/resources';
  * This class represents a basic tracer provider which platform libraries can extend
  */
 export class BasicTracerProvider implements api.TracerProvider {
+  private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
@@ -34,9 +35,13 @@ export class BasicTracerProvider implements api.TracerProvider {
   readonly logger: api.Logger;
   readonly resource: Resource;
 
-  constructor(private _config: TracerConfig = DEFAULT_CONFIG) {
-    this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
-    this.resource = _config.resource || Resource.createTelemetrySDKResource();
+  constructor(config: TracerConfig = DEFAULT_CONFIG) {
+    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
+    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this._config = Object.assign({}, config, {
+      logger: this.logger,
+      resource: this.resource,
+    });
   }
 
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {

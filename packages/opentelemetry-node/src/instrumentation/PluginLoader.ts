@@ -120,7 +120,7 @@ export class PluginLoader {
         }
 
         this.logger.info(
-          `PluginLoader#load: trying loading ${name}@${version}`
+          `PluginLoader#load: trying to load ${name}@${version}`
         );
 
         if (!version) return exports;

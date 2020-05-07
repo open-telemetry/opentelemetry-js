@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { MeterProvider, Meter } from '../src';
+import { MeterProvider, Meter, CounterMetric } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('MeterProvider', () => {
@@ -37,6 +37,14 @@ describe('MeterProvider', () => {
     it('should return an instance of Meter', () => {
       const meter = new MeterProvider().getMeter('test-meter-provider');
       assert.ok(meter instanceof Meter);
+    });
+
+    it('should propagate resources', () => {
+      const meterProvider = new MeterProvider();
+      const meter = meterProvider.getMeter('test-meter-provider');
+      const counter = meter.createCounter('test-counter') as CounterMetric;
+      assert.strictEqual((meter as any)._resource, meterProvider.resource);
+      assert.strictEqual(counter.resource, meterProvider.resource);
     });
 
     it('should return the meter with default version without a version option', () => {

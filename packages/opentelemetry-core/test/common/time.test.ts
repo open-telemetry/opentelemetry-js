@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import { otperformance as performance } from '../../src/platform';
 import * as sinon from 'sinon';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   hrTime,
   timeInputToHrTime,
@@ -141,16 +141,16 @@ describe('time', () => {
 
   describe('#hrTimeDuration', () => {
     it('should return duration', () => {
-      const startTime: types.HrTime = [22, 400000000];
-      const endTime: types.HrTime = [32, 800000000];
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [32, 800000000];
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [10, 400000000]);
     });
 
     it('should handle nanosecond overflow', () => {
-      const startTime: types.HrTime = [22, 400000000];
-      const endTime: types.HrTime = [32, 200000000];
+      const startTime: api.HrTime = [22, 400000000];
+      const endTime: api.HrTime = [32, 200000000];
 
       const output = hrTimeDuration(startTime, endTime);
       assert.deepStrictEqual(output, [9, 800000000]);
@@ -159,7 +159,7 @@ describe('time', () => {
 
   describe('#hrTimeToTimeStamp', () => {
     it('should return timestamp', () => {
-      const time: types.HrTime = [1573513121, 123456];
+      const time: api.HrTime = [1573513121, 123456];
 
       const output = hrTimeToTimeStamp(time);
       assert.deepStrictEqual(output, '2019-11-11T22:58:41.000123456Z');

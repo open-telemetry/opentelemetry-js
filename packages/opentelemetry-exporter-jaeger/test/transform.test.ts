@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import { TraceFlags } from '@opentelemetry/api';
@@ -34,13 +34,13 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Thrift', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {
           testBool: true,
@@ -155,13 +155,13 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Thrift when links, events and attributes are empty', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
-        kind: types.SpanKind.CLIENT,
+        kind: api.SpanKind.CLIENT,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: types.CanonicalCode.DATA_LOSS,
+          code: api.CanonicalCode.DATA_LOSS,
           message: 'data loss',
         },
         attributes: {},
@@ -213,13 +213,13 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Thrift with ThriftReference', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {},
         parentSpanId: '3e0c63257de34c92',
@@ -255,7 +255,7 @@ describe('transform', () => {
     it('should left pad trace ids', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
-        kind: types.SpanKind.CLIENT,
+        kind: api.SpanKind.CLIENT,
         spanContext: {
           traceId: '92b449d5929fda1b',
           spanId: '6e0c63257de34c92',
@@ -265,7 +265,7 @@ describe('transform', () => {
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: types.CanonicalCode.DATA_LOSS,
+          code: api.CanonicalCode.DATA_LOSS,
           message: 'data loss',
         },
         attributes: {},

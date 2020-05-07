@@ -15,7 +15,7 @@
  */
 
 import { MetricExporter, MetricRecord, Distribution, Histogram } from './types';
-import { ExportResult } from '@opentelemetry/base';
+import { ExportResult } from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link MetricExporter} that prints metrics data to

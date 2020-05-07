@@ -65,4 +65,19 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 0);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
   });
+
+  it('should force span processors to flush', () => {
+    let flushed = false;
+    const processor: SpanProcessor = {
+      forceFlush: () => {
+        flushed = true;
+      },
+      onStart: span => {},
+      onEnd: span => {},
+      shutdown: () => {},
+    };
+    const multiSpanProcessor = new MultiSpanProcessor([processor]);
+    multiSpanProcessor.forceFlush();
+    assert.ok(flushed);
+  });
 });

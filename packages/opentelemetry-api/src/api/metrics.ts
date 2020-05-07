@@ -17,13 +17,18 @@
 import { Meter } from '../metrics/Meter';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { NOOP_METER_PROVIDER } from '../metrics/NoopMeterProvider';
+import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
+  GLOBAL_METRICS_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 /**
  * Singleton object which represents the entry point to the OpenTelemetry Metrics API
  */
 export class MetricsAPI {
   private static _instance?: MetricsAPI;
-  private _meterProvider: MeterProvider = NOOP_METER_PROVIDER;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -41,7 +46,17 @@ export class MetricsAPI {
    * Set the current global meter. Returns the initialized global meter provider.
    */
   public setGlobalMeterProvider(provider: MeterProvider): MeterProvider {
-    this._meterProvider = provider;
+    if (_global[GLOBAL_METRICS_API_KEY]) {
+      // global meter provider has already been set
+      return this.getMeterProvider();
+    }
+
+    _global[GLOBAL_METRICS_API_KEY] = makeGetter(
+      API_BACKWARDS_COMPATIBILITY_VERSION,
+      provider,
+      NOOP_METER_PROVIDER
+    );
+
     return provider;
   }
 
@@ -49,7 +64,10 @@ export class MetricsAPI {
    * Returns the global meter provider.
    */
   public getMeterProvider(): MeterProvider {
-    return this._meterProvider;
+    return (
+      _global[GLOBAL_METRICS_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
+      NOOP_METER_PROVIDER
+    );
   }
 
   /**
@@ -57,5 +75,10 @@ export class MetricsAPI {
    */
   public getMeter(name: string, version?: string): Meter {
     return this.getMeterProvider().getMeter(name, version);
+  }
+
+  /** Remove the global meter provider */
+  public disable() {
+    delete _global[GLOBAL_METRICS_API_KEY];
   }
 }

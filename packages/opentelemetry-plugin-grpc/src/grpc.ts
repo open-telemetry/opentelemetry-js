@@ -297,6 +297,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     });
 
     call.on('error', (err: grpcTypes.ServiceError) => {
+      span.setStatus({
+        code: _grpcStatusCodeToCanonicalCode(err.code),
+        message: err.message,
+      });
       span.addEvent('finished with error');
       span.setAttributes({
         [AttributeNames.GRPC_ERROR_NAME]: err.name,
