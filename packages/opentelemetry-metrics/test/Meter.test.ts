@@ -99,11 +99,11 @@ describe('Meter', () => {
         disabled: false,
         monotonic: true,
       });
-      counter.add(1)
-      meter.collect()
+      counter.add(1);
+      meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
       assert.strictEqual(record1.aggregator.toPoint().value, 1);
-    })
+    });
 
     it('should return counter with resource', () => {
       const counter = meter.createCounter('name') as CounterMetric;
