@@ -184,8 +184,8 @@ export class PrometheusExporter implements MetricExporter {
      */
     if (metric instanceof Counter) {
       metric.remove(
-        ...record.descriptor.labelKeys.map(
-          k => record.labels[k] ? record.labels[k].toString() : ''
+        ...record.descriptor.labelKeys.map(k =>
+          record.labels[k] ? record.labels[k].toString() : ''
         )
       );
     }
