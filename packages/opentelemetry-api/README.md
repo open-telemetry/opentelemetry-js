@@ -91,6 +91,10 @@ const meterProvider = new MeterProvider({
 api.metrics.setGlobalMeterProvider(meterProvider);
 ```
 
+## Version Compatibility
+
+Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
+
 ## Advanced Use
 ### API Registration Options
 

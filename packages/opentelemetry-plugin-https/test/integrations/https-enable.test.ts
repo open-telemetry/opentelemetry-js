@@ -20,7 +20,7 @@ import {
   Http,
   AttributeNames,
 } from '@opentelemetry/plugin-http';
-import { SpanKind, Span } from '@opentelemetry/api';
+import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as https from 'https';
@@ -35,6 +35,7 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
 const protocol = 'https';
 const serverPort = 42345;
@@ -46,6 +47,15 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('HttpsPlugin Integration tests', () => {
+  beforeEach(() => {
+    memoryExporter.reset();
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+  });
+
+  afterEach(() => {
+    context.disable();
+  });
+
   describe('enable()', () => {
     before(function(done) {
       // mandatory

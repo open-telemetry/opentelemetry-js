@@ -104,6 +104,172 @@ describe('AsyncHooksContextManager', () => {
     });
   });
 
+  describe('.withAsync()', () => {
+    it('should run the callback', async () => {
+      let done = false;
+      await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+        done = true;
+      });
+
+      assert.ok(done);
+    });
+
+    it('should run the callback with active scope', async () => {
+      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      await contextManager.withAsync(test, async () => {
+        assert.strictEqual(contextManager.active(), test, 'should have scope');
+      });
+    });
+
+    it('should run the callback (when disabled)', async () => {
+      contextManager.disable();
+      let done = false;
+      await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+        done = true;
+      });
+
+      assert.ok(done);
+    });
+
+    it('should rethrow errors', async () => {
+      contextManager.disable();
+      let done = false;
+      const err = new Error();
+
+      try {
+        await contextManager.withAsync(Context.ROOT_CONTEXT, async () => {
+          throw err;
+        });
+      } catch (e) {
+        assert.ok(e === err);
+        done = true;
+      }
+
+      assert.ok(done);
+    });
+
+    it('should finally restore an old scope', async () => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+      let done = false;
+
+      await contextManager.withAsync(scope1, async () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        await contextManager.withAsync(scope2, async () => {
+          assert.strictEqual(contextManager.active(), scope2);
+          done = true;
+        });
+        assert.strictEqual(contextManager.active(), scope1);
+      });
+
+      assert.ok(done);
+    });
+  });
+
+  describe('.withAsync/with()', () => {
+    it('with() inside withAsync() should correctly restore context', async () => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+      let done = false;
+
+      await contextManager.withAsync(scope1, async () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        contextManager.with(scope2, () => {
+          assert.strictEqual(contextManager.active(), scope2);
+          done = true;
+        });
+        assert.strictEqual(contextManager.active(), scope1);
+      });
+
+      assert.ok(done);
+    });
+
+    it('withAsync() inside with() should correctly restore conxtext', done => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+
+      contextManager.with(scope1, async () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        await contextManager.withAsync(scope2, async () => {
+          assert.strictEqual(contextManager.active(), scope2);
+        });
+        assert.strictEqual(contextManager.active(), scope1);
+        return done();
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
+    });
+
+    it('not awaited withAsync() inside with() should not restore context', done => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+      let _done: boolean = false;
+
+      contextManager.with(scope1, () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        contextManager
+          .withAsync(scope2, async () => {
+            assert.strictEqual(contextManager.active(), scope2);
+          })
+          .then(() => {
+            assert.strictEqual(contextManager.active(), scope1);
+            _done = true;
+          });
+        // in this case the current scope is 2 since we
+        // didnt waited the withAsync call
+        assert.strictEqual(contextManager.active(), scope2);
+        setTimeout(() => {
+          assert.strictEqual(contextManager.active(), scope1);
+          assert(_done);
+          return done();
+        }, 100);
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
+    });
+
+    it('withAsync() inside a setTimeout inside a with() should correctly restore context', done => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+
+      contextManager.with(scope1, () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        setTimeout(() => {
+          assert.strictEqual(contextManager.active(), scope1);
+          contextManager
+            .withAsync(scope2, async () => {
+              assert.strictEqual(contextManager.active(), scope2);
+            })
+            .then(() => {
+              assert.strictEqual(contextManager.active(), scope1);
+              return done();
+            });
+        }, 5);
+        assert.strictEqual(contextManager.active(), scope1);
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
+    });
+
+    it('with() inside a setTimeout inside withAsync() should correctly restore context', done => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+
+      contextManager
+        .withAsync(scope1, async () => {
+          assert.strictEqual(contextManager.active(), scope1);
+          setTimeout(() => {
+            assert.strictEqual(contextManager.active(), scope1);
+            contextManager.with(scope2, () => {
+              assert.strictEqual(contextManager.active(), scope2);
+              return done();
+            });
+          }, 5);
+          assert.strictEqual(contextManager.active(), scope1);
+        })
+        .then(() => {
+          assert.strictEqual(contextManager.active(), scope1);
+        });
+    });
+  });
+
   describe('.bind(function)', () => {
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };

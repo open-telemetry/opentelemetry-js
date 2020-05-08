@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
 import { SpanProcessor } from './SpanProcessor';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /**
  * Implementation of the {@link SpanProcessor} that simply forwards all
@@ -25,16 +25,18 @@ export class MultiSpanProcessor implements SpanProcessor {
   constructor(private readonly _spanProcessors: SpanProcessor[]) {}
 
   forceFlush(): void {
-    // do nothing as all spans are being exported without waiting
+    for (const spanProcessor of this._spanProcessors) {
+      spanProcessor.forceFlush();
+    }
   }
 
-  onStart(span: Span): void {
+  onStart(span: ReadableSpan): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onStart(span);
     }
   }
 
-  onEnd(span: Span): void {
+  onEnd(span: ReadableSpan): void {
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.onEnd(span);
     }

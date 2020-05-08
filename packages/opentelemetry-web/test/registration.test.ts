@@ -17,29 +17,30 @@
 import {
   context,
   NoopHttpTextPropagator,
-  NoopTracerProvider,
   propagation,
   trace,
 } from '@opentelemetry/api';
-import { HttpTraceContext } from '@opentelemetry/core';
 import { NoopContextManager } from '@opentelemetry/context-base';
+import { HttpTraceContext } from '@opentelemetry/core';
 import * as assert from 'assert';
-import { WebTracerProvider, StackContextManager } from '../src';
+import { StackContextManager, WebTracerProvider } from '../src';
 
 describe('API registration', () => {
   beforeEach(() => {
-    context.setGlobalContextManager(new NoopContextManager());
-    propagation.setGlobalPropagator(new NoopHttpTextPropagator());
-    trace.setGlobalTracerProvider(new NoopTracerProvider());
+    context.disable();
+    trace.disable();
+    propagation.disable();
   });
 
   it('should register default implementations', () => {
     const tracerProvider = new WebTracerProvider();
     tracerProvider.register();
 
-    assert.ok(context['_contextManager'] instanceof StackContextManager);
-    assert.ok(propagation['_propagator'] instanceof HttpTraceContext);
-    assert.ok(trace['_tracerProvider'] === tracerProvider);
+    assert.ok(context['_getContextManager']() instanceof StackContextManager);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+    );
+    assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
   it('should register configured implementations', () => {
@@ -53,10 +54,10 @@ describe('API registration', () => {
       propagator,
     });
 
-    assert.ok(context['_contextManager'] === contextManager);
-    assert.ok(propagation['_propagator'] === propagator);
+    assert.ok(context['_getContextManager']() === contextManager);
+    assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
-    assert.ok(trace['_tracerProvider'] === tracerProvider);
+    assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
   it('should skip null context manager', () => {
@@ -65,10 +66,12 @@ describe('API registration', () => {
       contextManager: null,
     });
 
-    assert.ok(context['_contextManager'] instanceof NoopContextManager);
+    assert.ok(context['_getContextManager']() instanceof NoopContextManager);
 
-    assert.ok(propagation['_propagator'] instanceof HttpTraceContext);
-    assert.ok(trace['_tracerProvider'] === tracerProvider);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+    );
+    assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
   it('should skip null propagator', () => {
@@ -77,9 +80,11 @@ describe('API registration', () => {
       propagator: null,
     });
 
-    assert.ok(propagation['_propagator'] instanceof NoopHttpTextPropagator);
+    assert.ok(
+      propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+    );
 
-    assert.ok(context['_contextManager'] instanceof StackContextManager);
-    assert.ok(trace['_tracerProvider'] === tracerProvider);
+    assert.ok(context['_getContextManager']() instanceof StackContextManager);
+    assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 });

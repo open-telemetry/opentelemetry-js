@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 
 /**
  * Configuration interface for prometheus exporter
@@ -49,5 +49,5 @@ export interface ExporterConfig {
   startServer?: boolean;
 
   /** Standard logging interface */
-  logger?: types.Logger;
+  logger?: api.Logger;
 }

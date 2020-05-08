@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
 import { SpanProcessor } from './SpanProcessor';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /** No-op implementation of SpanProcessor */
 export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: Span): void {}
-  onEnd(span: Span): void {}
+  onStart(span: ReadableSpan): void {}
+  onEnd(span: ReadableSpan): void {}
   shutdown(): void {}
   forceFlush(): void {}
 }

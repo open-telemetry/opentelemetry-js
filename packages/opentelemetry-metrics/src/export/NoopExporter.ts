@@ -15,7 +15,7 @@
  */
 
 import { MetricExporter, MetricRecord } from './types';
-import { ExportResult } from '@opentelemetry/base';
+import { ExportResult } from '@opentelemetry/core';
 
 export class NoopExporter implements MetricExporter {
   // By default does nothing

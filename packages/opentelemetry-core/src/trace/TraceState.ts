@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { validateKey, validateValue } from '../internal/validators';
 
 const MAX_TRACE_STATE_ITEMS = 32;
@@ -31,7 +31,7 @@ const LIST_MEMBER_KEY_VALUE_SPLITTER = '=';
  * - The value of any key can be updated. Modified keys MUST be moved to the
  * beginning of the list.
  */
-export class TraceState implements types.TraceState {
+export class TraceState implements api.TraceState {
   private _internalState: Map<string, string> = new Map();
 
   constructor(rawTraceState?: string) {

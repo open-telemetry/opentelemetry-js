@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 
-import { ExportResult } from '@opentelemetry/base';
-import { NoopLogger } from '@opentelemetry/core';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Attributes, Logger } from '@opentelemetry/api';
 import { onInit, onShutdown, sendSpans } from './platform/index';

@@ -69,6 +69,10 @@ export interface HttpPluginConfig extends PluginConfig {
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
   /** The primary server name of the matched virtual host. */
   serverName?: string;
+  /** Require parent to create span for outgoing requests */
+  requireParentforOutgoingSpans?: boolean;
+  /** Require parent to create span for incoming requests */
+  requireParentforIncomingSpans?: boolean;
 }
 
 export interface Err extends Error {

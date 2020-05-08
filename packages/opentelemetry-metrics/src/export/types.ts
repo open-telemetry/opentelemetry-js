@@ -15,7 +15,7 @@
  */
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/base';
+import { ExportResult } from '@opentelemetry/core';
 
 /** The kind of metric. */
 export enum MetricKind {
@@ -35,6 +35,33 @@ export interface Distribution {
   max: number;
   count: number;
   sum: number;
+}
+
+export interface Histogram {
+  /**
+   * Buckets are implemented using two different array:
+   *  - boundaries contains every boundary (which are upper boundary for each slice)
+   *  - counts contains count of event for each slice
+   *
+   * Note that we'll always have n+1 (where n is the number of boundaries) slice
+   * because we need to count event that are above the highest boundary. This is the
+   * reason why it's not implement using array of object, because the last slice
+   * dont have any boundary.
+   *
+   * Example if we measure the values: [5, 30, 5, 40, 5, 15, 15, 15, 25]
+   *  with the boundaries [ 10, 20, 30 ], we will have the following state:
+   *
+   * buckets: {
+   *	boundaries: [10, 20, 30],
+   *	counts: [3, 3, 2, 1],
+   * }
+   */
+  buckets: {
+    boundaries: number[];
+    counts: number[];
+  };
+  sum: number;
+  count: number;
 }
 
 export interface MetricRecord {
@@ -80,6 +107,6 @@ export interface Aggregator {
 }
 
 export interface Point {
-  value: Sum | LastValue | Distribution;
+  value: Sum | LastValue | Distribution | Histogram;
   timestamp: HrTime;
 }

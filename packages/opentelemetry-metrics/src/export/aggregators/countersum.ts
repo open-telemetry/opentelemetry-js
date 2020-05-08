@@ -14,7 +14,24 @@
  * limitations under the License.
  */
 
-// Use the node platform by default. The "browser" field of package.json is used
-// to override this file to use `./browser/index.ts` when packaged with
-// webpack, Rollup, etc.
-export * from './node';
+import { Aggregator, Point } from '../types';
+import { HrTime } from '@opentelemetry/api';
+import { hrTime } from '@opentelemetry/core';
+
+/** Basic aggregator which calculates a Sum from individual measurements. */
+export class CounterSumAggregator implements Aggregator {
+  private _current: number = 0;
+  private _lastUpdateTime: HrTime = [0, 0];
+
+  update(value: number): void {
+    this._current += value;
+    this._lastUpdateTime = hrTime();
+  }
+
+  toPoint(): Point {
+    return {
+      value: this._current,
+      timestamp: this._lastUpdateTime,
+    };
+  }
+}

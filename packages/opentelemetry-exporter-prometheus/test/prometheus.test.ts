@@ -522,8 +522,5 @@ describe('PrometheusExporter', () => {
 });
 
 function errorHandler(done: Mocha.Done): (err: Error) => void {
-  return () => {
-    assert.ok(false, 'error getting metrics');
-    done();
-  };
+  return err => done(err);
 }
