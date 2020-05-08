@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /**
  * SpanProcessor is the interface Tracer SDK uses to allow synchronous hooks
@@ -27,18 +27,18 @@ export interface SpanProcessor {
   forceFlush(): void;
 
   /**
-   * Called when a {@link Span} is started, if the `span.isRecording()`
+   * Called when a {@link ReadableSpan} is started, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just started.
    */
-  onStart(span: Span): void;
+  onStart(span: ReadableSpan): void;
 
   /**
-   * Called when a {@link Span} is ended, if the `span.isRecording()`
+   * Called when a {@link ReadableSpan} is ended, if the `span.isRecording()`
    * returns true.
    * @param span the Span that just ended.
    */
-  onEnd(span: Span): void;
+  onEnd(span: ReadableSpan): void;
 
   /**
    * Shuts down the processor. Called when SDK is shut down. This is an

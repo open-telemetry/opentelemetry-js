@@ -68,7 +68,7 @@ describe('transform', () => {
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span.toReadableSpan(),
+        span,
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -112,7 +112,7 @@ describe('transform', () => {
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span.toReadableSpan(),
+        span,
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -154,7 +154,7 @@ describe('transform', () => {
         span.end();
 
         const zipkinSpan = toZipkinSpan(
-          span.toReadableSpan(),
+          span,
           'my-service',
           statusCodeTagName,
           statusDescriptionTagName
