@@ -220,28 +220,25 @@ describe('Span', () => {
       parentId
     );
 
-    const readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.name, 'my-span');
-    assert.strictEqual(readableSpan.kind, SpanKind.INTERNAL);
-    assert.strictEqual(readableSpan.parentSpanId, parentId);
-    assert.strictEqual(readableSpan.spanContext.traceId, spanContext.traceId);
-    assert.deepStrictEqual(readableSpan.status, {
+    assert.strictEqual(span.name, 'my-span');
+    assert.strictEqual(span.kind, SpanKind.INTERNAL);
+    assert.strictEqual(span.parentSpanId, parentId);
+    assert.strictEqual(span.spanContext.traceId, spanContext.traceId);
+    assert.deepStrictEqual(span.status, {
       code: CanonicalCode.OK,
     });
-    assert.deepStrictEqual(readableSpan.attributes, {});
-    assert.deepStrictEqual(readableSpan.links, []);
-    assert.deepStrictEqual(readableSpan.events, []);
+    assert.deepStrictEqual(span.attributes, {});
+    assert.deepStrictEqual(span.links, []);
+    assert.deepStrictEqual(span.events, []);
   });
 
   it('should return ReadableSpan with attributes', () => {
     const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.setAttribute('attr1', 'value1');
-    let readableSpan = span.toReadableSpan();
-    assert.deepStrictEqual(readableSpan.attributes, { attr1: 'value1' });
+    assert.deepStrictEqual(span.attributes, { attr1: 'value1' });
 
     span.setAttributes({ attr2: 123, attr1: false });
-    readableSpan = span.toReadableSpan();
-    assert.deepStrictEqual(readableSpan.attributes, {
+    assert.deepStrictEqual(span.attributes, {
       attr1: false,
       attr2: 123,
     });
@@ -249,8 +246,7 @@ describe('Span', () => {
     span.end();
     // shouldn't add new attribute
     span.setAttribute('attr3', 'value3');
-    readableSpan = span.toReadableSpan();
-    assert.deepStrictEqual(readableSpan.attributes, {
+    assert.deepStrictEqual(span.attributes, {
       attr1: false,
       attr2: 123,
     });
@@ -271,9 +267,8 @@ describe('Span', () => {
         },
       ]
     );
-    const readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.links.length, 2);
-    assert.deepStrictEqual(readableSpan.links, [
+    assert.strictEqual(span.links.length, 2);
+    assert.deepStrictEqual(span.links, [
       {
         context: linkContext,
       },
@@ -289,17 +284,15 @@ describe('Span', () => {
   it('should return ReadableSpan with events', () => {
     const span = new Span(tracer, 'my-span', spanContext, SpanKind.CLIENT);
     span.addEvent('sent');
-    let readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.events.length, 1);
-    const [event] = readableSpan.events;
+    assert.strictEqual(span.events.length, 1);
+    const [event] = span.events;
     assert.deepStrictEqual(event.name, 'sent');
     assert.ok(!event.attributes);
     assert.ok(event.time[0] > 0);
 
     span.addEvent('rev', { attr1: 'value', attr2: 123, attr3: true });
-    readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.events.length, 2);
-    const [event1, event2] = readableSpan.events;
+    assert.strictEqual(span.events.length, 2);
+    const [event1, event2] = span.events;
     assert.deepStrictEqual(event1.name, 'sent');
     assert.ok(!event1.attributes);
     assert.ok(event1.time[0] > 0);
@@ -314,9 +307,7 @@ describe('Span', () => {
     span.end();
     // shouldn't add new event
     span.addEvent('sent');
-    assert.strictEqual(readableSpan.events.length, 2);
-    readableSpan = span.toReadableSpan();
-    assert.strictEqual(readableSpan.events.length, 2);
+    assert.strictEqual(span.events.length, 2);
   });
 
   it('should return ReadableSpan with new status', () => {
@@ -325,12 +316,8 @@ describe('Span', () => {
       code: CanonicalCode.PERMISSION_DENIED,
       message: 'This is an error',
     });
-    const readableSpan = span.toReadableSpan();
-    assert.strictEqual(
-      readableSpan.status.code,
-      CanonicalCode.PERMISSION_DENIED
-    );
-    assert.strictEqual(readableSpan.status.message, 'This is an error');
+    assert.strictEqual(span.status.code, CanonicalCode.PERMISSION_DENIED);
+    assert.strictEqual(span.status.message, 'This is an error');
     span.end();
 
     // shouldn't update status
