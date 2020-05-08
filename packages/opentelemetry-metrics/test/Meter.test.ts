@@ -27,13 +27,15 @@ import {
   ObserverMetric,
   MetricRecord,
   Aggregator,
+  MetricObservable,
+  MetricDescriptor,
 } from '../src';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   ObserverAggregator,
-} from '../src/export/Aggregator';
+} from '../src/export/aggregators';
 import { ValueType } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
@@ -43,7 +45,7 @@ describe('Meter', () => {
   let meter: Meter;
   const keya = 'keya';
   const keyb = 'keyb';
-  const labels: types.Labels = { [keyb]: 'value2', [keya]: 'value1' };
+  const labels: api.Labels = { [keyb]: 'value2', [keya]: 'value1' };
 
   beforeEach(() => {
     meter = new MeterProvider({
@@ -198,7 +200,7 @@ describe('Meter', () => {
 
         // should skip below metric
         const counter2 = meter.createCounter('name1', {
-          valueType: types.ValueType.INT,
+          valueType: api.ValueType.INT,
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
@@ -231,19 +233,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof types.NoopMetric);
+        assert.ok(counter instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof types.NoopMetric);
-        assert.ok(counter_ instanceof types.NoopMetric);
+        assert.ok(counter1 instanceof api.NoopMetric);
+        assert.ok(counter_ instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof types.NoopMetric);
+        assert.ok(counter instanceof api.NoopMetric);
       });
     });
   });
@@ -290,19 +292,19 @@ describe('Meter', () => {
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const measure = meter.createMeasure('');
-        assert.ok(measure instanceof types.NoopMetric);
+        assert.ok(measure instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const measure1 = meter.createMeasure('1name');
         const measure_ = meter.createMeasure('_name');
-        assert.ok(measure1 instanceof types.NoopMetric);
-        assert.ok(measure_ instanceof types.NoopMetric);
+        assert.ok(measure1 instanceof api.NoopMetric);
+        assert.ok(measure_ instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const measure = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(measure instanceof types.NoopMetric);
+        assert.ok(measure instanceof api.NoopMetric);
       });
     });
 
@@ -440,6 +442,7 @@ describe('Meter', () => {
       }) as ObserverMetric;
       assert.ok(measure instanceof Metric);
     });
+
     it('should set callback and observe value ', () => {
       const measure = meter.createObserver('name', {
         description: 'desc',
@@ -450,21 +453,28 @@ describe('Meter', () => {
         return Math.random();
       }
 
-      measure.setCallback((observerResult: types.ObserverResult) => {
+      const metricObservable = new MetricObservable();
+
+      measure.setCallback((observerResult: api.ObserverResult) => {
         observerResult.observe(getCpuUsage, { pid: '123', core: '1' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '2' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '3' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '4' });
+        observerResult.observe(metricObservable, { pid: '123', core: '5' });
       });
 
+      metricObservable.next(0.123);
+
       const metricRecords: MetricRecord[] = measure.getMetricRecord();
-      assert.strictEqual(metricRecords.length, 4);
+      assert.strictEqual(metricRecords.length, 5);
 
-      const metric1 = metricRecords[0];
-      const metric2 = metricRecords[1];
-      const metric3 = metricRecords[2];
-      const metric4 = metricRecords[3];
+      const metric5 = metricRecords[0];
+      assert.strictEqual(hashLabels(metric5.labels), '|#core:5,pid:123');
 
+      const metric1 = metricRecords[1];
+      const metric2 = metricRecords[2];
+      const metric3 = metricRecords[3];
+      const metric4 = metricRecords[4];
       assert.strictEqual(hashLabels(metric1.labels), '|#core:1,pid:123');
       assert.strictEqual(hashLabels(metric2.labels), '|#core:2,pid:123');
       assert.strictEqual(hashLabels(metric3.labels), '|#core:3,pid:123');
@@ -474,6 +484,7 @@ describe('Meter', () => {
       ensureMetric(metric2);
       ensureMetric(metric3);
       ensureMetric(metric4);
+      ensureMetric(metric5);
     });
 
     it('should return an observer with resource', () => {
@@ -516,7 +527,7 @@ describe('Meter', () => {
       const counter = meter.createCounter('counter', {
         description: 'test',
         labelKeys: [key],
-        valueType: types.ValueType.INT,
+        valueType: api.ValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
@@ -556,7 +567,7 @@ class CustomBatcher extends Batcher {
   process(record: MetricRecord): void {
     throw new Error('process method not implemented.');
   }
-  aggregatorFor(metricKind: MetricKind): Aggregator {
+  aggregatorFor(metricKind: MetricDescriptor): Aggregator {
     throw new Error('aggregatorFor method not implemented.');
   }
 }

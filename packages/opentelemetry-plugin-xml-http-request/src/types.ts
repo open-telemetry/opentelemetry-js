@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 
 /**
  * method "open" from XMLHttpRequest
@@ -51,11 +51,11 @@ export interface XhrMem {
   status?: number;
   statusText?: string;
   // span assigned to xhr
-  span: types.Span;
+  span: api.Span;
   // span url - not available on types.Span
   spanUrl?: string;
   // startTime of send function - used to filter cors preflight requests
-  sendStartTime?: types.HrTime;
+  sendStartTime?: api.HrTime;
   // resources created between send and end plus some additional timeout
   createdResources?: {
     observer: PerformanceObserver;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   B3Propagator,
   LogLevel,
@@ -101,23 +101,23 @@ describe('xhr', () => {
 
   beforeEach(() => {
     contextManager = new ZoneContextManager().enable();
-    types.context.setGlobalContextManager(contextManager);
+    api.context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    contextManager.disable();
+    api.context.disable();
   });
 
   before(() => {
-    types.propagation.setGlobalPropagator(new B3Propagator());
+    api.propagation.setGlobalPropagator(new B3Propagator());
   });
 
   describe('when request is successful', () => {
-    let webTracerWithZone: types.Tracer;
+    let webTracerWithZone: api.Tracer;
     let webTracerProviderWithZone: WebTracerProvider;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
-    let rootSpan: types.Span;
+    let rootSpan: api.Span;
     let spyEntries: any;
     const url = `${window.location.origin}/xml-http-request.js`;
     let fakeNow = 0;
@@ -208,6 +208,11 @@ describe('xhr', () => {
     it('span should have correct name', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
       assert.strictEqual(span.name, url, 'span has wrong name');
+    });
+
+    it('span should have correct kind', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(span.kind, api.SpanKind.CLIENT, 'span has wrong kind');
     });
 
     it('span should have correct attributes', () => {
@@ -326,7 +331,7 @@ describe('xhr', () => {
 
     describe('AND origin match with window.location', () => {
       it('should set trace headers', () => {
-        const span: types.Span = exportSpy.args[0][0][0];
+        const span: api.Span = exportSpy.args[0][0][0];
         assert.strictEqual(
           requests[0].requestHeaders[X_B3_TRACE_ID],
           span.context().traceId,
@@ -358,7 +363,7 @@ describe('xhr', () => {
           );
         });
         it('should set trace headers', () => {
-          const span: types.Span = exportSpy.args[0][0][0];
+          const span: api.Span = exportSpy.args[0][0][0];
           assert.strictEqual(
             requests[0].requestHeaders[X_B3_TRACE_ID],
             span.context().traceId,
@@ -411,10 +416,10 @@ describe('xhr', () => {
 
   describe('when request is NOT successful', () => {
     let webTracerWithZoneProvider: WebTracerProvider;
-    let webTracerWithZone: types.Tracer;
+    let webTracerWithZone: api.Tracer;
     let dummySpanExporter: DummySpanExporter;
     let exportSpy: any;
-    let rootSpan: types.Span;
+    let rootSpan: api.Span;
     let spyEntries: any;
     const url =
       'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';

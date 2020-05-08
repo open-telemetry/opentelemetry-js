@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { SDK_INFO } from '@opentelemetry/base';
+import { SDK_INFO } from '@opentelemetry/core';
 import { Resource } from '../src';
 import { assertTelemetrySDKResource } from './util/resource-assertions';
 

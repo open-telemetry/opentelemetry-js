@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,23 @@
  * limitations under the License.
  */
 
-export enum ExportResult {
-  SUCCESS,
-  FAILED_NOT_RETRYABLE,
-  FAILED_RETRYABLE,
+/**
+ * Metric Observable class to handle asynchronous metrics
+ */
+export interface MetricObservable {
+  /**
+   * Sets the next value for observable metric
+   * @param value
+   */
+  next: (value: number) => void;
+  /**
+   * Subscribes for every value change
+   * @param callback
+   */
+  subscribe: (callback: (value: number) => void) => void;
+  /**
+   * Removes the subscriber
+   * @param [callback]
+   */
+  unsubscribe: (callback?: (value: number) => void) => void;
 }

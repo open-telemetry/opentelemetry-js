@@ -16,11 +16,10 @@
 
 import * as assert from 'assert';
 import { JaegerExporter } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { ExportResult } from '@opentelemetry/base';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { OT_REQUEST_HEADER } from '../src/utils';
@@ -132,13 +131,13 @@ describe('JaegerExporter', () => {
       };
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
-        kind: types.SpanKind.CLIENT,
+        kind: api.SpanKind.CLIENT,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
         status: {
-          code: types.CanonicalCode.DATA_LOSS,
+          code: api.CanonicalCode.DATA_LOSS,
         },
         attributes: {},
         links: [],

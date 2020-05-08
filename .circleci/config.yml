@@ -10,7 +10,6 @@ cache_1: &cache_1
     - ./node_modules
     - ./package-lock.json
     - packages/opentelemetry-api/node_modules
-    - packages/opentelemetry-base/node_modules
     - packages/opentelemetry-context-async-hooks/node_modules
     - packages/opentelemetry-context-base/node_modules
     - packages/opentelemetry-context-zone/node_modules
@@ -190,6 +189,11 @@ jobs:
       - image: node:13
         environment: *node_test_env
     <<: *node_unit_tests
+  node14:
+    docker:
+      - image: node:14
+        environment: *node_test_env
+    <<: *node_unit_tests
   node12-browsers:
     docker:
       - image: circleci/node:12-browsers
@@ -215,5 +219,6 @@ workflows:
       - node10
       - node12
       - node13
+      - node14
       - node12-browsers
 

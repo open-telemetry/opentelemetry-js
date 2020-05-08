@@ -15,11 +15,11 @@
  */
 
 import { Labels } from './Metric';
+import { MetricObservable } from './MetricObservable';
 
 /**
  * Interface that is being used in function setCallback for Observer Metric
  */
 export interface ObserverResult {
-  observers: Map<Labels, Function>;
-  observe(callback: Function, labels: Labels): void;
+  observe(callback: Function | MetricObservable, labels: Labels): void;
 }
