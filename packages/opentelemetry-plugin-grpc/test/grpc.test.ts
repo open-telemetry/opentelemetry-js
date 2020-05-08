@@ -436,8 +436,7 @@ describe('GrpcPlugin', () => {
       return provider.getTracer('default').withSpan(span, async () => {
         const rootSpan = provider.getTracer('default').getCurrentSpan();
         if (!rootSpan) {
-          assert.ok(false);
-          return; // return so typechecking passes for rootSpan.end()
+          return assert.ok(false);
         }
         assert.deepStrictEqual(rootSpan, span);
 
@@ -531,8 +530,7 @@ describe('GrpcPlugin', () => {
       return provider.getTracer('default').withSpan(span, async () => {
         const rootSpan = provider.getTracer('default').getCurrentSpan();
         if (!rootSpan) {
-          assert.ok(false);
-          return; // return so typechecking passes for rootSpan.end()
+          return assert.ok(false);
         }
         assert.deepStrictEqual(rootSpan, span);
 
