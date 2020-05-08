@@ -15,6 +15,10 @@
  */
 
 import { SpanContext } from './span_context';
+import { SpanKind } from './span_kind';
+import { Attributes } from './attributes';
+import { Link } from './link';
+import { SamplingResult } from './SamplingResult';
 
 /**
  * This interface represent a sampler. Sampling is a mechanism to control the
@@ -25,12 +29,19 @@ export interface Sampler {
   /**
    * Checks whether span needs to be created and tracked.
    *
-   * TODO: Consider to add required arguments https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/sampling-api.md#shouldsample
    * @param [parentContext] Parent span context. Typically taken from the wire.
    *     Can be null.
    * @returns whether span should be sampled or not.
    */
-  shouldSample(parentContext?: SpanContext): boolean;
+  shouldSample(
+    parentContext: SpanContext | undefined,
+    traceId: string,
+    spanId: string,
+    spanName: string,
+    spanKind: SpanKind,
+    attributes: Attributes,
+    links: Link[]
+  ): SamplingResult;
 
   /** Returns the sampler name or short description with the configuration. */
   toString(): string;
