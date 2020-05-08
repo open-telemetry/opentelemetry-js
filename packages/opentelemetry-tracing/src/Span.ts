@@ -175,10 +175,6 @@ export class Span implements api.Span, ReadableSpan {
     return true;
   }
 
-  toReadableSpan(): ReadableSpan {
-    return this;
-  }
-
   get duration(): api.HrTime {
     return this._duration;
   }
