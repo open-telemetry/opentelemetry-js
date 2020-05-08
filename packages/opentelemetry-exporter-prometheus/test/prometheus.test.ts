@@ -22,6 +22,9 @@ import {
   MeterProvider,
   ObserverMetric,
   Point,
+  MetricDescriptor,
+  HistogramAggregator,
+  UngroupedBatcher,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -400,7 +403,73 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(chunk.toString().split('\n'), [
                 '# HELP counter a test description',
                 '# TYPE counter gauge',
-                'counter{key1="labelValue1"} 20',
+                `counter{key1="labelValue1"} 20 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
+
+    it('should export a measure as a summary', done => {
+      const counter = meter.createMeasure('measure', {
+        description: 'a test description',
+        monotonic: false,
+        labelKeys: ['key1'],
+      });
+
+      counter.bind({ key1: 'labelValue1' }).record(20);
+      meter.collect();
+      exporter.export(meter.getBatcher().checkPointSet(), () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              assert.deepStrictEqual(chunk.toString().split('\n'), [
+                '# HELP measure a test description',
+                '# TYPE measure summary',
+                'measure_sum{key1="labelValue1"} 20',
+                'measure_count{key1="labelValue1"} 1',
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
+
+    it('should export a measure aggregated as a histogram', done => {
+      class CustomBatcher extends UngroupedBatcher {
+        aggregatorFor(metric: MetricDescriptor) {
+          return new HistogramAggregator([10]);
+        }
+      }
+      const customBatcher = new CustomBatcher();
+      const customMeterProvider = new MeterProvider({ batcher: customBatcher });
+      const customMeter = customMeterProvider.getMeter('aaa');
+      const counter = customMeter.createMeasure('measure', {
+        description: 'a test description',
+        monotonic: false,
+      });
+
+      counter.bind({}).record(20);
+      counter.bind({}).record(5);
+      customMeter.collect();
+      exporter.export(customBatcher.checkPointSet(), () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              assert.deepStrictEqual(chunk.toString().split('\n'), [
+                '# HELP measure a test description',
+                '# TYPE measure histogram',
+                'measure_bucket{le="10"} 1',
+                'measure_bucket{le="+Inf"} 2',
+                'measure_sum 25',
+                'measure_count 2',
                 '',
               ]);
 

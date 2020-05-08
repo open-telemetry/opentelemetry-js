@@ -21,19 +21,22 @@ import {
 } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
-  LastValue,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
-  MetricKind,
   ObserverAggregator,
+  HistogramAggregator,
+  MeasureExactAggregator,
   Sum,
+  Histogram,
+  Distribution,
 } from '@opentelemetry/metrics';
 import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
+import * as prom from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
+import { FakeHistogram, FakeSummary } from './utils';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -43,7 +46,7 @@ export class PrometheusExporter implements MetricExporter {
     prefix: '',
   };
 
-  private readonly _registry = new Registry();
+  private readonly _registry = new prom.Registry();
   private readonly _logger: api.Logger;
   private readonly _port: number;
   private readonly _endpoint: string;
@@ -132,7 +135,7 @@ export class PrometheusExporter implements MetricExporter {
     );
     const point = record.aggregator.toPoint();
 
-    if (metric instanceof Counter) {
+    if (metric instanceof prom.Counter) {
       // Prometheus counter saves internal state and increments by given value.
       // MetricRecord value is the current state, not the delta to be incremented by.
       // Currently, _registerMetric creates a new counter every time the value changes,
@@ -142,25 +145,24 @@ export class PrometheusExporter implements MetricExporter {
         point.value as Sum,
         hrTimeToMilliseconds(point.timestamp)
       );
+    } else if (metric instanceof prom.Gauge) {
+      // Gauge are either non-monotonic counter or simply observed value
+      metric.set(
+        labelValues,
+        point.value as number,
+        hrTimeToMilliseconds(point.timestamp)
+      );
+    } else if (metric instanceof FakeSummary) {
+      const distribution = point.value as Distribution;
+      metric.setValues(distribution, labelValues);
+    } else if (metric instanceof FakeHistogram) {
+      const histogram = point.value as Histogram;
+      metric.setValues(histogram, labelValues);
     }
-
-    if (metric instanceof Gauge) {
-      if (record.aggregator instanceof CounterSumAggregator) {
-        metric.set(labelValues, point.value as Sum);
-      } else if (record.aggregator instanceof ObserverAggregator) {
-        metric.set(
-          labelValues,
-          point.value as LastValue,
-          hrTimeToMilliseconds(point.timestamp)
-        );
-      }
-    }
-
-    // TODO: only counter and gauge are implemented in metrics so far
   }
 
   private _getLabelValues(keys: string[], labels: api.Labels) {
-    const labelValues: labelValues = {};
+    const labelValues: prom.labelValues = {};
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {
         labelValues[keys[i]] = labels[keys[i]];
@@ -169,7 +171,7 @@ export class PrometheusExporter implements MetricExporter {
     return labelValues;
   }
 
-  private _registerMetric(record: MetricRecord): Metric | undefined {
+  private _registerMetric(record: MetricRecord): prom.Metric | undefined {
     const metricName = this._getPrometheusMetricName(record.descriptor);
     const metric = this._registry.getSingleMetric(metricName);
 
@@ -182,7 +184,7 @@ export class PrometheusExporter implements MetricExporter {
      * This works because counters are identified by their name and no other internal ID
      * https://prometheus.io/docs/instrumenting/exposition_formats/
      */
-    if (metric instanceof Counter) {
+    if (metric instanceof prom.Counter) {
       metric.remove(
         ...record.descriptor.labelKeys.map(k => record.labels[k].toString())
       );
@@ -193,7 +195,10 @@ export class PrometheusExporter implements MetricExporter {
     return this._newMetric(record, metricName);
   }
 
-  private _newMetric(record: MetricRecord, name: string): Metric | undefined {
+  private _newMetric(
+    record: MetricRecord,
+    name: string
+  ): prom.Metric | undefined {
     const metricObject = {
       name,
       // prom-client throws with empty description which is our default
@@ -203,18 +208,23 @@ export class PrometheusExporter implements MetricExporter {
       registers: [this._registry],
     };
 
-    switch (record.descriptor.metricKind) {
-      case MetricKind.COUNTER:
-        // there is no such thing as a non-monotonic counter in prometheus
-        return record.descriptor.monotonic
-          ? new Counter(metricObject)
-          : new Gauge(metricObject);
-      case MetricKind.OBSERVER:
-        return new Gauge(metricObject);
-      default:
-        // Other metric types are currently unimplemented
-        return undefined;
+    if (
+      record.aggregator instanceof CounterSumAggregator &&
+      record.descriptor.monotonic
+    ) {
+      return new prom.Counter(metricObject);
+    } else if (record.aggregator instanceof CounterSumAggregator) {
+      // there is no such thing as a non-monotonic counter in prometheus
+      return new prom.Gauge(metricObject);
+    } else if (record.aggregator instanceof ObserverAggregator) {
+      return new prom.Gauge(metricObject);
+    } else if (record.aggregator instanceof MeasureExactAggregator) {
+      return new FakeSummary(Object.assign(metricObject, { percentiles: [] }));
+    } else if (record.aggregator instanceof HistogramAggregator) {
+      return new FakeHistogram(metricObject);
     }
+    // other aggregator are not implemented right now
+    return undefined;
   }
 
   private _getPrometheusMetricName(descriptor: MetricDescriptor): string {

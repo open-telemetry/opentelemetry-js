@@ -15,7 +15,6 @@
  */
 
 import { Aggregator, Point, Histogram } from '../types';
-import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
 /**
@@ -23,9 +22,7 @@ import { hrTime } from '@opentelemetry/core';
  * and provides the total sum and count of all observations.
  */
 export class HistogramAggregator implements Aggregator {
-  private _lastCheckpoint: Histogram;
-  private _currentCheckpoint: Histogram;
-  private _lastCheckpointTime: HrTime;
+  private _histogram: Histogram;
   private readonly _boundaries: number[];
 
   constructor(boundaries: number[]) {
@@ -35,40 +32,36 @@ export class HistogramAggregator implements Aggregator {
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
     this._boundaries = boundaries.sort();
-    this._lastCheckpoint = this._newEmptyCheckpoint();
-    this._lastCheckpointTime = hrTime();
-    this._currentCheckpoint = this._newEmptyCheckpoint();
+    this._histogram = this._getEmptyHistogram();
   }
 
   update(value: number): void {
-    this._currentCheckpoint.count += 1;
-    this._currentCheckpoint.sum += value;
+    this._histogram.count += 1;
+    this._histogram.sum += value;
 
     for (let i = 0; i < this._boundaries.length; i++) {
       if (value < this._boundaries[i]) {
-        this._currentCheckpoint.buckets.counts[i] += 1;
+        this._histogram.buckets.counts[i] += 1;
         return;
       }
     }
 
     // value is above all observed boundaries
-    this._currentCheckpoint.buckets.counts[this._boundaries.length] += 1;
+    this._histogram.buckets.counts[this._boundaries.length] += 1;
   }
 
   reset(): void {
-    this._lastCheckpointTime = hrTime();
-    this._lastCheckpoint = this._currentCheckpoint;
-    this._currentCheckpoint = this._newEmptyCheckpoint();
+    this._histogram = this._getEmptyHistogram();
   }
 
   toPoint(): Point {
     return {
-      value: this._lastCheckpoint,
-      timestamp: this._lastCheckpointTime,
+      value: this._histogram,
+      timestamp: hrTime(),
     };
   }
 
-  private _newEmptyCheckpoint(): Histogram {
+  private _getEmptyHistogram(): Histogram {
     return {
       buckets: {
         boundaries: this._boundaries,
