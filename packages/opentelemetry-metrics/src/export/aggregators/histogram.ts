@@ -16,6 +16,7 @@
 
 import { Aggregator, Point, Histogram } from '../types';
 import { hrTime } from '@opentelemetry/core';
+import { HrTime } from '@opentelemetry/api';
 
 /**
  * Basic aggregator which observes events and counts them in pre-defined buckets
@@ -24,6 +25,7 @@ import { hrTime } from '@opentelemetry/core';
 export class HistogramAggregator implements Aggregator {
   private _histogram: Histogram;
   private readonly _boundaries: number[];
+  private _lastUpdate: HrTime = hrTime();
 
   constructor(boundaries: number[]) {
     if (boundaries === undefined || boundaries.length === 0) {
@@ -37,6 +39,7 @@ export class HistogramAggregator implements Aggregator {
 
   update(value: number): void {
     this._histogram.count += 1;
+    this._lastUpdate = hrTime();
     this._histogram.sum += value;
 
     for (let i = 0; i < this._boundaries.length; i++) {
@@ -57,7 +60,7 @@ export class HistogramAggregator implements Aggregator {
   toPoint(): Point {
     return {
       value: this._histogram,
-      timestamp: hrTime(),
+      timestamp: this._lastUpdate,
     };
   }
 

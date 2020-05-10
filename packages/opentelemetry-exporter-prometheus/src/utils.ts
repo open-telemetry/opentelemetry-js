@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,21 +24,21 @@ import { Histogram, Distribution } from '@opentelemetry/metrics';
  * using the Opentelemetry data.
  */
 
-// Fake implementation of the prom Histogram that allows us to set its internal state
-export class FakeHistogram extends prom.Histogram {
-  // @ts-ignore
-  // tslint:disable-next-line
-  private upperBounds: number[] = [];
+// Mock implementation of the prom Histogram that allows us to set its internal state
+export class MockHistogram extends prom.Histogram {
+  // tslint:disable-next-line naming-convention / name used by prom internally
+  protected upperBounds: number[] = [];
   // ref https://github.com/siimon/prom-client/blob/master/lib/histogram.js#L34
-  // tslint:disable-next-line
-  private hashMap: {
-    [key: string]: {
+  // tslint:disable-next-line naming-convention / name used by prom internally
+  protected hashMap: Record<
+    string,
+    {
       labels: prom.labelValues;
       bucketValues: { [key: number]: number };
       sum: number;
       count: number;
-    };
-  } = {};
+    }
+  > = {};
 
   constructor(config: prom.HistogramConfiguration) {
     super(config);
@@ -46,7 +46,6 @@ export class FakeHistogram extends prom.Histogram {
 
   setValues(histogram: Histogram, labels: prom.labelValues) {
     this.upperBounds = histogram.buckets.boundaries;
-    console.log(histogram);
     // key inside the map are just hash of labels, don't need to set to a specific value
     this.hashMap['_hash_'] = {
       labels,
@@ -65,21 +64,24 @@ export class FakeHistogram extends prom.Histogram {
   }
 }
 
-// Fake implementation of the prom Summary that allows us to set its internal state
-export class FakeSummary extends prom.Summary {
+// Mock implementation of the prom Summary that allows us to set its internal state
+export class MockSummary extends prom.Summary {
   // ref: https://github.com/siimon/prom-client/blob/master/lib/summary.js#L29
-  // tslint:disable-next-line
-  private hashMap: {
-    [key: string]: {
+  // tslint:disable-next-line naming-convention / name used by prom internally
+  protected hashMap: Record<
+    string,
+    {
       labels: prom.labelValues;
+      // internal object that computes percentiles in prom-client, we are mocking it
+      // see https://github.com/siimon/prom-client/blob/master/lib/summary.js#L32
       td: {
         compress: () => void;
         percentile: (percentile: number) => undefined;
       };
       sum: number;
       count: number;
-    };
-  } = {};
+    }
+  > = {};
 
   constructor(config: prom.SummaryConfiguration) {
     super(config);
