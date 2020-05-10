@@ -92,6 +92,14 @@ provider.register()
 ## Examples
 See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) using node-sdk.
 
+## Experimental API methods
+
+#### withSpanAsync
+
+The `NodeTracer` expose a method called `withSpanAsync` that allows you to set a current span in the context of a `async` function. This previously was a problem with `withSpan` because its synchronous behavior, read about that in [this issue](https://github.com/open-telemetry/opentelemetry-js/issues/752).
+This method have two drawback:
+ - strict requirement of the `AsyncHooksScopeManager`, you **cannot** use it without.
+ - the underlying implementation inside `AsyncHooksScopeManager` is experimental, so is this method, please open an issue if you have a problem with it.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

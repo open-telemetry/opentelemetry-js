@@ -54,7 +54,7 @@ export class ContextAPI {
   ): ContextManager {
     if (_global[GLOBAL_CONTEXT_MANAGER_API_KEY]) {
       // global context manager has already been set
-      return this._getContextManager();
+      return this.getContextManager();
     }
 
     _global[GLOBAL_CONTEXT_MANAGER_API_KEY] = makeGetter(
@@ -70,7 +70,7 @@ export class ContextAPI {
    * Get the currently active context
    */
   public active(): Context {
-    return this._getContextManager().active();
+    return this.getContextManager().active();
   }
 
   /**
@@ -83,7 +83,7 @@ export class ContextAPI {
     context: Context,
     fn: T
   ): ReturnType<T> {
-    return this._getContextManager().with(context, fn);
+    return this.getContextManager().with(context, fn);
   }
 
   /**
@@ -93,10 +93,10 @@ export class ContextAPI {
    * @param context context to bind to the event emitter or function. Defaults to the currently active context
    */
   public bind<T>(target: T, context: Context = this.active()): T {
-    return this._getContextManager().bind(target, context);
+    return this.getContextManager().bind(target, context);
   }
 
-  private _getContextManager(): ContextManager {
+  public getContextManager(): ContextManager {
     return (
       _global[GLOBAL_CONTEXT_MANAGER_API_KEY]?.(
         API_BACKWARDS_COMPATIBILITY_VERSION
@@ -106,7 +106,7 @@ export class ContextAPI {
 
   /** Disable and remove the global context manager */
   public disable() {
-    this._getContextManager().disable();
+    this.getContextManager().disable();
     delete _global[GLOBAL_CONTEXT_MANAGER_API_KEY];
   }
 }
