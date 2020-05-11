@@ -33,6 +33,10 @@ import { AttributeNames } from './enums/AttributeNames';
 import * as url from 'url';
 import { Socket } from 'net';
 
+/**
+ * Specific header used by exporters to "mark" outgoing request to avoid creating
+ * spans for request that export them which would create a infinite loop.
+ */
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
 
 export const HTTP_STATUS_SPECIAL_CASES: SpecialHttpStatusCodeMapping = {
@@ -298,9 +302,16 @@ export const isValidOptionsType = (options: unknown): boolean => {
  * Use case: Typically, exporter `SpanExporter` can use http module to send spans.
  * This will also generate spans (from the http-plugin) that will be sended through the exporter
  * and here we have loop.
+ *
+ * TODO: Refactor this logic when a solution is found in
+ * https://github.com/open-telemetry/opentelemetry-specification/issues/530
+ *
+ *
  * @param {RequestOptions} options
  */
-export const isOpenTelemetryRequest = (options: RequestOptions) => {
+export const isOpenTelemetryRequest = (
+  options: RequestOptions
+): options is { headers: {} } & RequestOptions => {
   return !!(options && options.headers && options.headers[OT_REQUEST_HEADER]);
 };
 

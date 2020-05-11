@@ -180,6 +180,10 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
@@ -293,6 +297,10 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
