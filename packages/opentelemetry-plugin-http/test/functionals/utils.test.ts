@@ -261,7 +261,7 @@ describe('Utility', () => {
         );
         /* tslint:disable-next-line:no-any */
         utils.setSpanWithError(span, new Error(errorMessage), obj as any);
-        const attributes = span.toReadableSpan().attributes;
+        const attributes = span.attributes;
         assert.strictEqual(
           attributes[AttributeNames.HTTP_ERROR_MESSAGE],
           errorMessage
