@@ -6,13 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ## 0.8.0
 
-Released 2020-05-11
+Released 2020-05-12
+
+#### :boom: Breaking Change
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1001](https://github.com/open-telemetry/opentelemetry-js/pull/1001) fix: observers should not expose bind/unbind method ([@legendecas](https://github.com/legendecas))
 
 #### :bug: (Bug Fix)
 * `opentelemetry-plugin-http`
   * [#984](https://github.com/open-telemetry/opentelemetry-js/pull/984) fix(http-plugin): strip otel custom http header #983 ([@vmarchaud](https://github.com/vmarchaud))
-* `opentelemetry-api`, `opentelemetry-metrics`
-  * [#1001](https://github.com/open-telemetry/opentelemetry-js/pull/1001) fix: observers should not expose bind/unbind method ([@legendecas](https://github.com/legendecas))
 * `opentelemetry-core`
   * [#1021](https://github.com/open-telemetry/opentelemetry-js/pull/1021) fix: left pad short b3 trace identifiers ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-plugin-xml-http-reques`
@@ -39,20 +41,22 @@ Released 2020-05-11
   * [#1016](https://github.com/open-telemetry/opentelemetry-js/pull/1016) refactor: normalize namespace import name for @opentelemetry/api ([@legendecas](https://github.com/legendecas))
 * `opentelemetry-core`, `opentelemetry-base`
   * [#991](https://github.com/open-telemetry/opentelemetry-js/pull/991) refactor: merge opentelemetry-base to opentelemetry-core ([@legendecas](https://github.com/legendecas))
-
+* `opentelemetry-core`
+  * [#981](https://github.com/open-telemetry/opentelemetry-js/pull/981) chore: splitting BasePlugin into browser and node ([@obecny](https://github.com/obecny))
 
 #### :books: (Refine Doc)
 * Other
   * [#1003](https://github.com/open-telemetry/opentelemetry-js/pull/1003) chore: test on node 14 ([@dyladan](https://github.com/dyladan))
   * [#990](https://github.com/open-telemetry/opentelemetry-js/pull/990) fix(opentracing-shim): update opentracing shim example ([@sleighzy](https://github.com/sleighzy))
 
-#### Committers: 6
+#### Committers: 7
 - legendecas ([@legendecas](https://github.com/legendecas))
 - Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
 - Daniel Dyla ([@dyladan](https://github.com/dyladan))
 - Ivan Senic ([@ivansenic](https://github.com/ivansenic))
 - Mark Wolff ([@markwolff](https://github.com/markwolff))
 - Simon Leigh ([@sleighzy](https://github.com/sleighzy))
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
 
 ## 0.7.0
 
