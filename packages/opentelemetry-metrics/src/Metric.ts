@@ -87,6 +87,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       descriptor: this._descriptor,
       labels: instrument.getLabels(),
       aggregator: instrument.getAggregator(),
+      resource: this.resource,
     }));
   }
 
