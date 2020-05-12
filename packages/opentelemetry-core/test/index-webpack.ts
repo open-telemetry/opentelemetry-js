@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
 
 // This file is the webpack entry point for the browser Karma tests. It requires
 // all modules ending in "test" from the current folder and all its subfolders.
-const testsContext = require.context('.', true, /test$/);
-testsContext.keys().forEach(testsContext);
+const testsContextCommon = require.context('.', true, /test$/);
+testsContextCommon.keys().forEach(key => {
+  if (key.indexOf('./platform/BasePlugin.test') >= 0) {
+    return function() {};
+  }
+  return testsContextCommon(key);
+});
 
 const srcContext = require.context('.', true, /src$/);
 srcContext.keys().forEach(srcContext);
