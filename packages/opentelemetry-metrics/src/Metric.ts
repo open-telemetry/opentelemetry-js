@@ -131,10 +131,10 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param labels key-values pairs that are associated with a specific metric
+   * @param [labels = {}] key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  add(value: number, labels: api.Labels) {
+  add(value: number, labels: api.Labels = {}) {
     this.bind(labels).add(value);
   }
 }
@@ -164,7 +164,7 @@ export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
     );
   }
 
-  record(value: number, labels: api.Labels) {
+  record(value: number, labels: api.Labels = {}) {
     this.bind(labels).record(value);
   }
 }
