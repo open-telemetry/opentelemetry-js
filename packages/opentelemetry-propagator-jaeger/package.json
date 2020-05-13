@@ -70,7 +70,7 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.6.1",
-    "@opentelemetry/core": "^0.6.1"
+    "@opentelemetry/api": "^0.8.0",
+    "@opentelemetry/core": "^0.8.0"
   }
 }
