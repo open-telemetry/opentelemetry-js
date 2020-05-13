@@ -16,6 +16,7 @@
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 /** The kind of metric. */
 export enum MetricKind {
@@ -68,6 +69,7 @@ export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
   readonly labels: Labels;
   readonly aggregator: Aggregator;
+  readonly resource: Resource;
 }
 
 export interface MetricDescriptor {
