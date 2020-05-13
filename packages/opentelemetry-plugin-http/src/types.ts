@@ -57,6 +57,14 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
+export interface HttpRequestCustomAttributeFunction {
+  (span: Span, request: ClientRequest | IncomingMessage): void;
+}
+
+export interface HttpResponseCustomAttributeFunction {
+  (span: Span, response: IncomingMessage | ServerResponse): void;
+}
+
 /**
  * Options available for the HTTP Plugin (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http#http-plugin-options))
  */
@@ -65,8 +73,12 @@ export interface HttpPluginConfig extends PluginConfig {
   ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all outgoing requests that match urls */
   ignoreOutgoingUrls?: IgnoreMatcher[];
-  /** Function for adding custom attributes */
+  /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+  /** Function for adding custom attributes before request is handled */
+  requestHook?: HttpRequestCustomAttributeFunction;
+  /** Function for adding custom attributes before response is handled */
+  responseHook?: HttpResponseCustomAttributeFunction;
   /** The primary server name of the matched virtual host. */
   serverName?: string;
   /** Require parent to create span for outgoing requests */

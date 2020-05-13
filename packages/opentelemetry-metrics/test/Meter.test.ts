@@ -92,6 +92,19 @@ describe('Meter', () => {
       );
     });
 
+    it('should be able to call add with no labels', () => {
+      const counter = meter.createCounter('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        monotonic: true,
+      });
+      counter.add(1);
+      meter.collect();
+      const [record1] = meter.getBatcher().checkPointSet();
+      assert.strictEqual(record1.aggregator.toPoint().value, 1);
+    });
+
     it('should pipe through resource', () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assert.ok(counter.resource instanceof Resource);
