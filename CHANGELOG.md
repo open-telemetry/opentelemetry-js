@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.8.1
+
+#### :rocket: (Enhancement)
+* `opentelemetry-plugin-http`
+  * [#963](https://github.com/open-telemetry/opentelemetry-js/pull/963) feat(plugin-http): add plugin hooks before processing req and res ([@BlumAmir](https://github.com/BlumAmir))
+* `opentelemetry-metrics`
+  * [#1049](https://github.com/open-telemetry/opentelemetry-js/pull/1049) chore: pipe resource through to MetricRecord ([@mwear](https://github.com/mwear))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1032](https://github.com/open-telemetry/opentelemetry-js/pull/1032) Make Labels Optional for CounterMetric::add ([@astorm](https://github.com/astorm))
+
+
+#### :bug: (Bug Fix)
+* `opentelemetry-exporter-collector`
+  * [#1053](https://github.com/open-telemetry/opentelemetry-js/pull/1053) fix: include proto files in deployment package ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1032](https://github.com/open-telemetry/opentelemetry-js/pull/1032) Make Labels Optional for CounterMetric::add ([@astorm](https://github.com/astorm))
+
+#### :books: (Refine Doc)
+* [#1051](https://github.com/open-telemetry/opentelemetry-js/pull/1051) chore: deploy docs using github action ([@dyladan](https://github.com/dyladan))
+
+#### Committers: 5
+- Alan Storm ([@astorm](https://github.com/astorm))
+- Amir Blum ([@BlumAmir](https://github.com/BlumAmir))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Matthew Wear ([@mwear](https://github.com/mwear))
+- [@shivkanya9146](https://github.com/shivkanya9146)
+
 ## 0.8.0
 
 Released 2020-05-12
