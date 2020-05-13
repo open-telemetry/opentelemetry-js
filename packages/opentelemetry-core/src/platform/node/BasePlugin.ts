@@ -15,7 +15,6 @@
  */
 
 import {
-  Tracer,
   Plugin,
   Logger,
   PluginConfig,
@@ -25,26 +24,11 @@ import {
 } from '@opentelemetry/api';
 import * as semver from 'semver';
 import * as path from 'path';
+import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
 /** This class represent the base to patch plugin. */
-export abstract class BasePlugin<T> implements Plugin<T> {
-  supportedVersions?: string[];
-  abstract readonly moduleName: string; // required for internalFilesExports
-  readonly version?: string; // required for internalFilesExports
-  protected readonly _basedir?: string; // required for internalFilesExports
-
-  protected _moduleExports!: T;
-  protected _tracer!: Tracer;
-  protected _logger!: Logger;
-  protected _internalFilesExports!: { [module: string]: unknown }; // output for internalFilesExports
-  protected readonly _internalFilesList?: PluginInternalFiles; // required for internalFilesExports
-  protected _config!: PluginConfig;
-
-  constructor(
-    protected readonly _tracerName: string,
-    protected readonly _tracerVersion?: string
-  ) {}
-
+export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
+  implements Plugin<T> {
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
@@ -147,5 +131,6 @@ export abstract class BasePlugin<T> implements Plugin<T> {
   }
 
   protected abstract patch(): T;
+
   protected abstract unpatch(): void;
 }

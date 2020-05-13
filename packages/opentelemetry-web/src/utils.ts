@@ -16,7 +16,7 @@
 
 import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { hrTimeToNanoseconds, timeInputToHrTime } from '@opentelemetry/core';
 
 /**
@@ -35,10 +35,10 @@ export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
  * @param entries
  */
 export function addSpanNetworkEvent(
-  span: types.Span,
+  span: api.Span,
   performanceName: string,
   entries: PerformanceEntries
-): types.Span | undefined {
+): api.Span | undefined {
   if (
     hasKey(entries, performanceName) &&
     typeof entries[performanceName] === 'number'
@@ -82,8 +82,8 @@ export function sortResources(filteredResources: PerformanceResourceTiming[]) {
  */
 export function getResource(
   spanUrl: string,
-  startTimeHR: types.HrTime,
-  endTimeHR: types.HrTime,
+  startTimeHR: api.HrTime,
+  endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
   ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<
     PerformanceResourceTiming
@@ -147,7 +147,7 @@ export function getResource(
 function findMainRequest(
   resources: PerformanceResourceTiming[],
   corsPreFlightRequestEndTime: number,
-  spanEndTimeHR: types.HrTime
+  spanEndTimeHR: api.HrTime
 ): PerformanceResourceTiming {
   const spanEndTime = hrTimeToNanoseconds(spanEndTimeHR);
   const minTime = hrTimeToNanoseconds(
@@ -189,8 +189,8 @@ function findMainRequest(
  */
 function filterResourcesForSpan(
   spanUrl: string,
-  startTimeHR: types.HrTime,
-  endTimeHR: types.HrTime,
+  startTimeHR: api.HrTime,
+  endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
   ignoredResources: WeakSet<PerformanceResourceTiming>
 ) {

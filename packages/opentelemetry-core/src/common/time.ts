@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { otperformance as performance } from '../platform';
 import { TimeOriginLegacy } from './types';
 
@@ -25,7 +25,7 @@ const SECOND_TO_NANOSECONDS = Math.pow(10, NANOSECOND_DIGITS);
  * Converts a number to HrTime
  * @param epochMillis
  */
-function numberToHrtime(epochMillis: number): types.HrTime {
+function numberToHrtime(epochMillis: number): api.HrTime {
   const epochSeconds = epochMillis / 1000;
   // Decimals only.
   const seconds = Math.trunc(epochSeconds);
@@ -49,7 +49,7 @@ function getTimeOrigin(): number {
  * Returns an hrtime calculated via performance component.
  * @param performanceNow
  */
-export function hrTime(performanceNow?: number): types.HrTime {
+export function hrTime(performanceNow?: number): api.HrTime {
   const timeOrigin = numberToHrtime(getTimeOrigin());
   const now = numberToHrtime(
     typeof performanceNow === 'number' ? performanceNow : performance.now()
@@ -72,10 +72,10 @@ export function hrTime(performanceNow?: number): types.HrTime {
  * Converts a TimeInput to an HrTime, defaults to _hrtime().
  * @param time
  */
-export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
+export function timeInputToHrTime(time: api.TimeInput): api.HrTime {
   // process.hrtime
   if (isTimeInputHrTime(time)) {
-    return time as types.HrTime;
+    return time as api.HrTime;
   } else if (typeof time === 'number') {
     // Must be a performance.now() if it's smaller than process start time.
     if (time < getTimeOrigin()) {
@@ -97,9 +97,9 @@ export function timeInputToHrTime(time: types.TimeInput): types.HrTime {
  * @param endTime
  */
 export function hrTimeDuration(
-  startTime: types.HrTime,
-  endTime: types.HrTime
-): types.HrTime {
+  startTime: api.HrTime,
+  endTime: api.HrTime
+): api.HrTime {
   let seconds = endTime[0] - startTime[0];
   let nanos = endTime[1] - startTime[1];
 
@@ -117,7 +117,7 @@ export function hrTimeDuration(
  * Convert hrTime to timestamp, for example "2019-05-14T17:00:00.000123456Z"
  * @param hrTime
  */
-export function hrTimeToTimeStamp(hrTime: types.HrTime): string {
+export function hrTimeToTimeStamp(hrTime: api.HrTime): string {
   const precision = NANOSECOND_DIGITS;
   const tmp = `${'0'.repeat(precision)}${hrTime[1]}Z`;
   const nanoString = tmp.substr(tmp.length - precision - 1);
@@ -129,7 +129,7 @@ export function hrTimeToTimeStamp(hrTime: types.HrTime): string {
  * Convert hrTime to nanoseconds.
  * @param hrTime
  */
-export function hrTimeToNanoseconds(hrTime: types.HrTime): number {
+export function hrTimeToNanoseconds(hrTime: api.HrTime): number {
   return hrTime[0] * SECOND_TO_NANOSECONDS + hrTime[1];
 }
 
@@ -137,7 +137,7 @@ export function hrTimeToNanoseconds(hrTime: types.HrTime): number {
  * Convert hrTime to milliseconds.
  * @param hrTime
  */
-export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
+export function hrTimeToMilliseconds(hrTime: api.HrTime): number {
   return Math.round(hrTime[0] * 1e3 + hrTime[1] / 1e6);
 }
 
@@ -145,7 +145,7 @@ export function hrTimeToMilliseconds(hrTime: types.HrTime): number {
  * Convert hrTime to microseconds.
  * @param hrTime
  */
-export function hrTimeToMicroseconds(hrTime: types.HrTime): number {
+export function hrTimeToMicroseconds(hrTime: api.HrTime): number {
   return Math.round(hrTime[0] * 1e6 + hrTime[1] / 1e3);
 }
 

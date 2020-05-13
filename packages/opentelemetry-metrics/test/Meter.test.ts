@@ -30,7 +30,7 @@ import {
   MetricObservable,
   MetricDescriptor,
 } from '../src';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
@@ -45,7 +45,7 @@ describe('Meter', () => {
   let meter: Meter;
   const keya = 'keya';
   const keyb = 'keyb';
-  const labels: types.Labels = { [keyb]: 'value2', [keya]: 'value1' };
+  const labels: api.Labels = { [keyb]: 'value2', [keya]: 'value1' };
 
   beforeEach(() => {
     meter = new MeterProvider({
@@ -200,7 +200,7 @@ describe('Meter', () => {
 
         // should skip below metric
         const counter2 = meter.createCounter('name1', {
-          valueType: types.ValueType.INT,
+          valueType: api.ValueType.INT,
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
@@ -233,19 +233,19 @@ describe('Meter', () => {
 
       it('should return no op metric if name is an empty string', () => {
         const counter = meter.createCounter('');
-        assert.ok(counter instanceof types.NoopMetric);
+        assert.ok(counter instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const counter1 = meter.createCounter('1name');
         const counter_ = meter.createCounter('_name');
-        assert.ok(counter1 instanceof types.NoopMetric);
-        assert.ok(counter_ instanceof types.NoopMetric);
+        assert.ok(counter1 instanceof api.NoopMetric);
+        assert.ok(counter_ instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const counter = meter.createCounter('name with invalid characters^&*(');
-        assert.ok(counter instanceof types.NoopMetric);
+        assert.ok(counter instanceof api.NoopMetric);
       });
     });
   });
@@ -292,19 +292,19 @@ describe('Meter', () => {
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const measure = meter.createMeasure('');
-        assert.ok(measure instanceof types.NoopMetric);
+        assert.ok(measure instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
         const measure1 = meter.createMeasure('1name');
         const measure_ = meter.createMeasure('_name');
-        assert.ok(measure1 instanceof types.NoopMetric);
-        assert.ok(measure_ instanceof types.NoopMetric);
+        assert.ok(measure1 instanceof api.NoopMetric);
+        assert.ok(measure_ instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
         const measure = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(measure instanceof types.NoopMetric);
+        assert.ok(measure instanceof api.NoopMetric);
       });
     });
 
@@ -455,7 +455,7 @@ describe('Meter', () => {
 
       const metricObservable = new MetricObservable();
 
-      measure.setCallback((observerResult: types.ObserverResult) => {
+      measure.setCallback((observerResult: api.ObserverResult) => {
         observerResult.observe(getCpuUsage, { pid: '123', core: '1' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '2' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '3' });
@@ -527,7 +527,7 @@ describe('Meter', () => {
       const counter = meter.createCounter('counter', {
         description: 'test',
         labelKeys: [key],
-        valueType: types.ValueType.INT,
+        valueType: api.ValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
