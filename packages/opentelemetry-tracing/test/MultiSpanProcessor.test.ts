@@ -31,33 +31,44 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
-  const tracer = new BasicTracerProvider().getTracer('default');
-  const span = tracer.startSpan('one');
-
   it('should handle empty span processor', () => {
     const multiSpanProcessor = new MultiSpanProcessor([]);
-    multiSpanProcessor.onStart(span);
-    multiSpanProcessor.onEnd(span);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    span.end();
     multiSpanProcessor.shutdown();
   });
 
   it('should handle one span processor', () => {
     const processor1 = new TestProcessor();
     const multiSpanProcessor = new MultiSpanProcessor([processor1]);
-    multiSpanProcessor.onStart(span);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
-    multiSpanProcessor.onEnd(span);
+    span.end();
     assert.strictEqual(processor1.spans.length, 1);
+    multiSpanProcessor.shutdown();
   });
 
   it('should handle two span processor', () => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
     const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-    multiSpanProcessor.onStart(span);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
-    multiSpanProcessor.onEnd(span);
+
+    span.end();
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
 

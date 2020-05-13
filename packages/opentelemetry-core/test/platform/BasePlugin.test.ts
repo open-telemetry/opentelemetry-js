@@ -18,15 +18,14 @@ import { NoopTracerProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin, NoopLogger } from '../../src';
-import * as types from './fixtures/test-package/foo/bar/internal';
+import * as types from '../trace/fixtures/test-package/foo/bar/internal';
 
 const provider = new NoopTracerProvider();
 const logger = new NoopLogger();
-
 describe('BasePlugin', () => {
   describe('internalFilesLoader', () => {
     it('should load internally exported files', () => {
-      const testPackage = require('./fixtures/test-package');
+      const testPackage = require('../trace/fixtures/test-package');
       const plugin = new TestPlugin();
       assert.doesNotThrow(() => {
         plugin.enable(testPackage, provider, logger);
@@ -81,4 +80,4 @@ class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
   protected unpatch(): void {}
 }
 
-const basedir = path.dirname(require.resolve('./fixtures/test-package'));
+const basedir = path.dirname(require.resolve('../trace/fixtures/test-package'));
