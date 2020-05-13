@@ -94,13 +94,13 @@
 						<section class="tsd-index-section tsd-is-private tsd-is-private-protected tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external"><a href="traceapi.html#_tracerprovider" class="tsd-kind-icon">_tracer<wbr>Provider</a></li>
 								<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external"><a href="traceapi.html#_instance" class="tsd-kind-icon">_instance</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#disable" class="tsd-kind-icon">disable</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#gettracerprovider" class="tsd-kind-icon">get<wbr>Tracer<wbr>Provider</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="traceapi.html#setglobaltracerprovider" class="tsd-kind-icon">set<wbr>Global<wbr>Tracer<wbr>Provider</a></li>
@@ -122,7 +122,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L26">src/api/trace.ts:26</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L31">src/api/trace.ts:31</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -137,29 +137,41 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-private tsd-is-private-protected tsd-is-external">
 				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-					<a name="_tracerprovider" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagPrivate">Private</span> _tracer<wbr>Provider</h3>
-					<div class="tsd-signature tsd-kind-icon">_tracer<wbr>Provider<span class="tsd-signature-symbol">:</span> <a href="../interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a><span class="tsd-signature-symbol"> =&nbsp;NOOP_TRACER_PROVIDER</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L26">src/api/trace.ts:26</a></li>
-						</ul>
-					</aside>
-				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external">
 					<a name="_instance" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagStatic">Static</span> <span class="tsd-flag ts-flagPrivate">Private</span> <span class="tsd-flag ts-flagOptional">Optional</span> _instance</h3>
 					<div class="tsd-signature tsd-kind-icon">_instance<span class="tsd-signature-symbol">:</span> <a href="traceapi.html" class="tsd-signature-type">TraceAPI</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L25">src/api/trace.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L31">src/api/trace.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="disable" class="tsd-anchor"></a>
+					<h3>disable</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">disable<span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L81">src/api/trace.ts:81</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Remove the global tracer provider</p>
+								</div>
+							</div>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a name="gettracer" class="tsd-anchor"></a>
 					<h3>get<wbr>Tracer</h3>
@@ -170,7 +182,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L58">src/api/trace.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L76">src/api/trace.ts:76</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -201,7 +213,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L51">src/api/trace.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L66">src/api/trace.ts:66</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -223,7 +235,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L43">src/api/trace.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L48">src/api/trace.ts:48</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -251,7 +263,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/c5ed47d/packages/opentelemetry-api/src/api/trace.ts#L32">src/api/trace.ts:32</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/6aa8ed4f/packages/opentelemetry-api/src/api/trace.ts#L37">src/api/trace.ts:37</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -283,11 +295,11 @@
 							<li class=" tsd-kind-constructor tsd-parent-kind-class tsd-is-private tsd-is-external">
 								<a href="traceapi.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-external">
-								<a href="traceapi.html#_tracerprovider" class="tsd-kind-icon">_tracer<wbr>Provider</a>
-							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-class tsd-is-private tsd-is-static tsd-is-external">
 								<a href="traceapi.html#_instance" class="tsd-kind-icon">_instance</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="traceapi.html#disable" class="tsd-kind-icon">disable</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="traceapi.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a>

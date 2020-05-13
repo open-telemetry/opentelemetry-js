@@ -150,6 +150,10 @@ tracerProvider.register();</code></pre>
  * and used by instrumentation libraries.
  */</span>
 api.metrics.setGlobalMeterProvider(meterProvider);</code></pre>
+				<a href="#version-compatibility" id="version-compatibility" style="color: inherit; text-decoration: none;">
+					<h2>Version Compatibility</h2>
+				</a>
+				<p>Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same <code>node_modules</code> structure, the OpenTelemetry API takes advantage of a variable on the <code>global</code> object to store the global API. When an API method in the API package is called, it checks if this <code>global</code> API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.</p>
 				<a href="#advanced-use" id="advanced-use" style="color: inherit; text-decoration: none;">
 					<h2>Advanced Use</h2>
 				</a>
@@ -165,7 +169,7 @@ tracerProvider.register({
 
   <span class="hljs-comment">// Skip registering a default context manager</span>
   <span class="hljs-attr">contextManager</span>: <span class="hljs-literal">null</span>,
-})</code></pre>
+});</code></pre>
 				<a href="#api-methods" id="api-methods" style="color: inherit; text-decoration: none;">
 					<h3>API Methods</h3>
 				</a>
@@ -176,7 +180,7 @@ tracerProvider.register({
 					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html">Propagation API Documentation</a></li>
 					<li><a href="https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html">Context API Documentation</a></li>
 				</ul>
-				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>)
+				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>);
 
 <span class="hljs-comment">/* Initialize TraceProvider */</span>
 api.trace.setGlobalTracerProvider(traceProvider);
@@ -193,7 +197,7 @@ api.metrics.getMeterProvider();
 api.metrics.getMeter(name, version);
 
 <span class="hljs-comment">/* Initialize Propagator */</span>
-api.propagation.setGlobalPropagator(httpTraceContextPropagator)
+api.propagation.setGlobalPropagator(httpTraceContextPropagator);
 
 <span class="hljs-comment">/* Initialize Context Manager */</span>
 api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
@@ -273,9 +277,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/noopboundmeasure.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Measure</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopboundobserver.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Observer</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -321,10 +322,10 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/boundobserver.html" class="tsd-kind-icon">Bound<wbr>Observer</a>
+						<a href="interfaces/correlationcontext.html" class="tsd-kind-icon">Correlation<wbr>Context</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/correlationcontext.html" class="tsd-kind-icon">Correlation<wbr>Context</a>
+						<a href="interfaces/counter.html" class="tsd-kind-icon">Counter</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a>
@@ -342,19 +343,25 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/measure.html" class="tsd-kind-icon">Measure</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/meterprovider.html" class="tsd-kind-icon">Meter<wbr>Provider</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/metric.html" class="tsd-kind-icon">Metric</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/metricobservable.html" class="tsd-kind-icon">Metric<wbr>Observable</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/metricoptions.html" class="tsd-kind-icon">Metric<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/metricutils.html" class="tsd-kind-icon">Metric<wbr>Utils</a>
+						<a href="interfaces/observer.html" class="tsd-kind-icon">Observer</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/observerresult.html" class="tsd-kind-icon">Observer<wbr>Result</a>
@@ -398,6 +405,12 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a>
 					</li>
+					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
+						<a href="interfaces/unboundmetric.html" class="tsd-kind-icon">Unbound<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#getterfunction" class="tsd-kind-icon">Getter<wbr>Function</a>
 					</li>
@@ -413,11 +426,29 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
 					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#myglobals" class="tsd-kind-icon">My<wbr>Globals</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#setterfunction" class="tsd-kind-icon">Setter<wbr>Function</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#api_backwards_compatibility_version" class="tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#global_context_manager_api_key" class="tsd-kind-icon">GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#global_metrics_api_key" class="tsd-kind-icon">GLOBAL_<wbr>METRICS_<wbr>API_<wbr>KEY</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#global_propagation_api_key" class="tsd-kind-icon">GLOBAL_<wbr>PROPAGATION_<wbr>API_<wbr>KEY</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#global_trace_api_key" class="tsd-kind-icon">GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#invalid_span_id" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID</a>
@@ -431,8 +462,8 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_bound_measure" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_bound_observer" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>OBSERVER</a>
+					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+						<a href="globals.html#noop_context_manager" class="tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a>
@@ -462,6 +493,15 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#_global" class="tsd-kind-icon">_global</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#api1" class="tsd-kind-icon">api1</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-not-exported">
+						<a href="globals.html#api2" class="tsd-kind-icon">api2</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#context" class="tsd-kind-icon">context</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
@@ -481,6 +521,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#defaultsetter" class="tsd-kind-icon">default<wbr>Setter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
+						<a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a>
 					</li>
 					<li class=" tsd-kind-object-literal tsd-is-external tsd-is-not-exported">
 						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
