@@ -92,7 +92,7 @@ describe('Meter', () => {
       );
     });
 
-    it('be able to call add with no labels', () => {
+    it('should be able to call add with no labels', () => {
       const counter = meter.createCounter('name', {
         description: 'desc',
         unit: '1',
