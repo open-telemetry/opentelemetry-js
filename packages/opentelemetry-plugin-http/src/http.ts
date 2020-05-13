@@ -203,6 +203,9 @@ export class HttpPlugin extends BasePlugin<Http> {
       hostname,
     });
     span.setAttributes(attributes);
+    if (this._config.requestHook) {
+      this._callRequestHook(span, request);
+    }
 
     request.on(
       'response',
@@ -212,6 +215,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           { hostname }
         );
         span.setAttributes(attributes);
+        if (this._config.responseHook) {
+          this._callResponseHook(span, response);
+        }
 
         this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
@@ -315,6 +321,13 @@ export class HttpPlugin extends BasePlugin<Http> {
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
           context.bind(response);
+
+          if (plugin._config.requestHook) {
+            plugin._callRequestHook(span, request);
+          }
+          if (plugin._config.responseHook) {
+            plugin._callResponseHook(span, response);
+          }
 
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
@@ -463,6 +476,28 @@ export class HttpPlugin extends BasePlugin<Http> {
 
     span.end();
     this._spanNotEnded.delete(span);
+  }
+
+  private _callResponseHook(
+    span: Span,
+    response: IncomingMessage | ServerResponse
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.responseHook!(span, response),
+      false
+    );
+  }
+
+  private _callRequestHook(
+    span: Span,
+    request: ClientRequest | IncomingMessage
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.requestHook!(span, request),
+      false
+    );
   }
 
   private _safeExecute<

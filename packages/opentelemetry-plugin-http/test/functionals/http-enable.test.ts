@@ -40,6 +40,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { ContextManager } from '@opentelemetry/context-base';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -74,6 +75,20 @@ function doNock(
 
 export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
+};
+
+export const requestHookFunction = (
+  span: ISpan,
+  request: ClientRequest | IncomingMessage
+): void => {
+  span.setAttribute('custom request hook attribute', 'request');
+};
+
+export const responseHookFunction = (
+  span: ISpan,
+  response: IncomingMessage | ServerResponse
+): void => {
+  span.setAttribute('custom response hook attribute', 'response');
 };
 
 describe('HttpPlugin', () => {
@@ -207,6 +222,8 @@ describe('HttpPlugin', () => {
             (url: string) => url.endsWith(`/ignored/function`),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
+          requestHook: requestHookFunction,
+          responseHook: responseHookFunction,
           serverName,
         };
         plugin.enable(http, provider, provider.logger, config);
@@ -702,6 +719,40 @@ describe('HttpPlugin', () => {
           });
         });
         req.end();
+      });
+
+      it('custom attributes should show up on client and server spans', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+
+        assert.strictEqual(
+          incomingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
+
+        assert.strictEqual(
+          outgoingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
       });
     });
 
