@@ -44,6 +44,7 @@
   "files": [
     "build/src/**/*.js",
     "build/src/**/*.d.ts",
+    "build/src/**/*.proto",
     "doc",
     "LICENSE",
     "README.md"
