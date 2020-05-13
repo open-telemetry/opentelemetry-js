@@ -92,9 +92,14 @@ describe('Meter', () => {
       );
     });
 
-    it('should return counter with resource', () => {
+    it('should pipe through resource', () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assert.ok(counter.resource instanceof Resource);
+
+      counter.add(1, { foo: 'bar' });
+
+      const [record] = counter.getMetricRecord();
+      assert.ok(record.resource instanceof Resource);
     });
 
     describe('.bind()', () => {
@@ -284,9 +289,14 @@ describe('Meter', () => {
       assert.strictEqual((measure as MeasureMetric)['_absolute'], false);
     });
 
-    it('should return a measure with resource', () => {
+    it('should pipe through resource', () => {
       const measure = meter.createMeasure('name') as MeasureMetric;
       assert.ok(measure.resource instanceof Resource);
+
+      measure.record(1, { foo: 'bar' });
+
+      const [record] = measure.getMetricRecord();
+      assert.ok(record.resource instanceof Resource);
     });
 
     describe('names', () => {
@@ -487,9 +497,16 @@ describe('Meter', () => {
       ensureMetric(metric5);
     });
 
-    it('should return an observer with resource', () => {
+    it('should pipe through resource', () => {
       const observer = meter.createObserver('name') as ObserverMetric;
       assert.ok(observer.resource instanceof Resource);
+
+      observer.setCallback(result => {
+        result.observe(() => 42, { foo: 'bar' });
+      });
+
+      const [record] = observer.getMetricRecord();
+      assert.ok(record.resource instanceof Resource);
     });
   });
 
