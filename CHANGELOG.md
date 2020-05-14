@@ -18,8 +18,6 @@ All notable changes to this project will be documented in this file.
 #### :bug: (Bug Fix)
 * `opentelemetry-exporter-collector`
   * [#1053](https://github.com/open-telemetry/opentelemetry-js/pull/1053) fix: include proto files in deployment package ([@dyladan](https://github.com/dyladan))
-* `opentelemetry-api`, `opentelemetry-metrics`
-  * [#1032](https://github.com/open-telemetry/opentelemetry-js/pull/1032) Make Labels Optional for CounterMetric::add ([@astorm](https://github.com/astorm))
 
 #### :books: (Refine Doc)
 * [#1051](https://github.com/open-telemetry/opentelemetry-js/pull/1051) chore: deploy docs using github action ([@dyladan](https://github.com/dyladan))
