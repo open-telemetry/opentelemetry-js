@@ -17,6 +17,7 @@
 import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
 import * as path from 'path';
+import * as fs from 'fs';
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
@@ -37,9 +38,13 @@ const traceServiceProtoPath =
   'opentelemetry/proto/collector/trace/v1/trace_service.proto';
 const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 
-const address = '127.0.0.1:1501';
+const address = 'localhost:1501';
 
-describe('CollectorExporter - node', () => {
+type TestParams = {
+  useTLS: boolean
+};
+
+const testCollectorExporter = (params: TestParams) => describe(`CollectorExporter - node ${params.useTLS ? 'with TLS' : ''}`, () => {
   let collectorExporter: CollectorExporter;
   let server: grpc.Server;
   let exportedData:
@@ -76,7 +81,13 @@ describe('CollectorExporter - node', () => {
             },
           }
         );
-        server.bind(address, grpc.ServerCredentials.createInsecure());
+        let credentials = params.useTLS ?
+          grpc.ServerCredentials.createSsl(fs.readFileSync('./certs/ca.crt'), [{
+            cert_chain: fs.readFileSync("./certs/server.crt"),
+            private_key: fs.readFileSync("./certs/server.key")
+          }]) :
+          grpc.ServerCredentials.createInsecure();
+        server.bind(address, credentials);
         server.start();
         done();
       });
@@ -87,9 +98,17 @@ describe('CollectorExporter - node', () => {
   });
 
   beforeEach(done => {
+    const credentials = params.useTLS ?
+      grpc.credentials.createSsl(
+        fs.readFileSync('./certs/ca.crt'),
+        fs.readFileSync('./certs/client.key'),
+        fs.readFileSync('./certs/client.crt')
+      ):
+      undefined;
     collectorExporter = new CollectorExporter({
       serviceName: 'basic-service',
       url: address,
+      credentials,
     });
 
     const provider = new BasicTracerProvider();
@@ -128,3 +147,6 @@ describe('CollectorExporter - node', () => {
     });
   });
 });
+
+testCollectorExporter({useTLS: true});
+testCollectorExporter({useTLS: false});

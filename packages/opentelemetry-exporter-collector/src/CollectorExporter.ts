@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
+import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { Attributes, Logger } from '@opentelemetry/api';
+import * as grpc from 'grpc';
 import { onInit, onShutdown, sendSpans } from './platform/index';
 import { opentelemetryProto } from './types';
 
@@ -29,6 +30,7 @@ export interface CollectorExporterConfig {
   serviceName?: string;
   attributes?: Attributes;
   url?: string;
+  credentials?: grpc.ChannelCredentials;
 }
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
@@ -43,6 +45,7 @@ export class CollectorExporter implements SpanExporter {
   readonly logger: Logger;
   readonly hostName: string | undefined;
   readonly attributes?: Attributes;
+  readonly credentials?: grpc.ChannelCredentials;
   private _isShutdown: boolean = false;
 
   /**
@@ -56,6 +59,7 @@ export class CollectorExporter implements SpanExporter {
     }
 
     this.attributes = config.attributes;
+    this.credentials = config.credentials;
 
     this.logger = config.logger || new NoopLogger();
 

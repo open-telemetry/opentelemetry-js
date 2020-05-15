@@ -18,12 +18,12 @@ import * as protoLoader from '@grpc/proto-loader';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as grpc from 'grpc';
 import * as path from 'path';
-
 import { CollectorExporter } from '../../CollectorExporter';
-import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
+import * as collectorTypes from '../../types';
 import { CollectorData, GRPCQueueItem } from './types';
 import { removeProtocol } from './util';
+
 
 const traceServiceClients: WeakMap<
   CollectorExporter,
@@ -40,7 +40,7 @@ export function onInit(collectorExporter: CollectorExporter) {
     grpcSpansQueue: [],
   });
   const serverAddress = removeProtocol(collectorExporter.url);
-  const credentials: grpc.ChannelCredentials = grpc.credentials.createInsecure();
+  const credentials: grpc.ChannelCredentials = collectorExporter.credentials || grpc.credentials.createInsecure();
 
   const traceServiceProtoPath =
     'opentelemetry/proto/collector/trace/v1/trace_service.proto';
