@@ -27,7 +27,7 @@ import {
   setCorrelationContext,
 } from '../correlation-context';
 
-export const CORRELATION_CONTEXT_HEADER = 'otcorrelationcontext';
+export const CORRELATION_CONTEXT_HEADER = 'otcorrelations';
 const KEY_PAIR_SEPARATOR = '=';
 const PROPERTIES_SEPARATOR = ';';
 const ITEMS_SEPARATOR = ',';
