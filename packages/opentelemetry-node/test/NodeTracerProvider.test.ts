@@ -289,21 +289,39 @@ describe('mergePlugins', () => {
       enabled: true,
       path: 'testpath2',
     },
+    module3: {
+      enabled: true,
+      path: 'testpath3',
+    },
   };
 
   const userPlugins = {
     module2: {
       path: 'userpath',
     },
+    module3: {
+      enabled: false,
+    },
+    nonDefaultModule: {
+      path: 'userpath2',
+    },
   };
 
   const mergedPlugins = mergePlugins(defaultPlugins, userPlugins);
 
-  describe('constructor', () => {
-    it('should construct an instance with required only options', () => {
-      assert.equal(mergedPlugins.module1.path, 'testpath');
-      assert.equal(mergedPlugins.module2.path, 'userpath');
-      assert.equal(mergedPlugins.module2.enabled, true);
-    });
+  it('should merge user and default configs', () => {
+    assert.equal(mergedPlugins.module1.enabled, true);
+    assert.equal(mergedPlugins.module1.path, 'testpath');
+    assert.equal(mergedPlugins.module2.enabled, true);
+    assert.equal(mergedPlugins.module2.path, 'userpath');
+    assert.equal(mergedPlugins.module3.enabled, false);
+    assert.equal(mergedPlugins.nonDefaultModule.enabled, true);
+    assert.equal(mergedPlugins.nonDefaultModule.path, 'userpath2');
+  });
+
+  it('should should not mangle default config', () => {
+    assert.equal(defaultPlugins.module2.path, 'testpath2');
+    assert.equal(defaultPlugins.module3.enabled, true);
+    assert.equal(defaultPlugins.module3.path, 'testpath3');
   });
 });
