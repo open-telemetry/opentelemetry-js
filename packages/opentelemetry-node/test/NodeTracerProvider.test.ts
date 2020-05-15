@@ -28,7 +28,7 @@ import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
 import { ContextManager } from '@opentelemetry/context-base';
-import { NodeTracerProvider } from '../src/NodeTracerProvider';
+import { NodeTracerProvider, mergePlugins } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
   new Promise(resolve => {
@@ -113,8 +113,6 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(plugins.length, 2);
       require('http');
       assert.strictEqual(plugins.length, 3);
-      require('grpc');
-      assert.strictEqual(plugins.length, 4);
     });
 
     it('should construct an instance with default attributes', () => {
@@ -277,6 +275,35 @@ describe('NodeTracerProvider', () => {
       };
       const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
       return patchedFn();
+    });
+  });
+});
+
+describe('mergePlugins', () => {
+  const defaultPlugins = {
+    module1: {
+      enabled: true,
+      path: 'testpath',
+    },
+    module2: {
+      enabled: true,
+      path: 'testpath2',
+    },
+  };
+
+  const userPlugins = {
+    module2: {
+      path: 'userpath',
+    },
+  };
+
+  const mergedPlugins = mergePlugins(defaultPlugins, userPlugins);
+
+  describe('constructor', () => {
+    it('should construct an instance with required only options', () => {
+      assert.equal(mergedPlugins.module1.path, 'testpath');
+      assert.equal(mergedPlugins.module2.path, 'userpath');
+      assert.equal(mergedPlugins.module2.enabled, true);
     });
   });
 });

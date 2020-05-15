@@ -40,33 +40,11 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
     this._pluginLoader = new PluginLoader(this, this.logger);
 
-    /**
-     * For user supplied config of plugin(s) that are loaded by default,
-     * merge the user supplied and default configs of said plugin(s)
-     */
-    let mergedUserSuppliedPlugins: Plugins = {};
-
-    for (const pluginName in config.plugins) {
-      if (DEFAULT_INSTRUMENTATION_PLUGINS.hasOwnProperty(pluginName)) {
-        mergedUserSuppliedPlugins[pluginName] = {
-          ...DEFAULT_INSTRUMENTATION_PLUGINS[pluginName],
-          ...config.plugins[pluginName],
-        };
-      } else {
-        mergedUserSuppliedPlugins[pluginName] = config.plugins[pluginName];
-        // enable user-supplied plugins unless explicitly disabled
-        if (mergedUserSuppliedPlugins[pluginName].enabled === undefined) {
-          mergedUserSuppliedPlugins[pluginName].enabled = true;
-        }
-      }
-    }
-
-    const mergedPlugins: Plugins = {
-      ...DEFAULT_INSTRUMENTATION_PLUGINS,
-      ...mergedUserSuppliedPlugins,
-    };
-
-    this._pluginLoader.load(mergedPlugins);
+    config.plugins
+      ? this._pluginLoader.load(
+          mergePlugins(DEFAULT_INSTRUMENTATION_PLUGINS, config.plugins)
+        )
+      : this._pluginLoader.load(DEFAULT_INSTRUMENTATION_PLUGINS);
   }
 
   stop() {
@@ -81,4 +59,40 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
     super.register(config);
   }
+}
+
+/**
+ * Two layer merge.
+ * First, for user supplied config of plugin(s) that are loaded by default,
+ * merge the user supplied and default configs of said plugin(s).
+ * Then merge the results with the default plugins.
+ * @returns 2-layer deep merge of default and user supplied plugins.
+ */
+export function mergePlugins(
+  defaultPlugins: Plugins,
+  userSuppliedPlugins: Plugins
+): Plugins {
+  let mergedUserSuppliedPlugins: Plugins = {};
+
+  for (const pluginName in userSuppliedPlugins) {
+    if (DEFAULT_INSTRUMENTATION_PLUGINS.hasOwnProperty(pluginName)) {
+      mergedUserSuppliedPlugins[pluginName] = {
+        ...DEFAULT_INSTRUMENTATION_PLUGINS[pluginName],
+        ...userSuppliedPlugins[pluginName],
+      };
+    } else {
+      mergedUserSuppliedPlugins[pluginName] = userSuppliedPlugins[pluginName];
+      // enable user-supplied plugins unless explicitly disabled
+      if (mergedUserSuppliedPlugins[pluginName].enabled === undefined) {
+        mergedUserSuppliedPlugins[pluginName].enabled = true;
+      }
+    }
+  }
+
+  const mergedPlugins: Plugins = {
+    ...defaultPlugins,
+    ...mergedUserSuppliedPlugins,
+  };
+
+  return mergedPlugins;
 }
