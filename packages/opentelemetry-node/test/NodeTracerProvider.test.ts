@@ -103,16 +103,18 @@ describe('NodeTracerProvider', () => {
           },
         },
       });
-      const pluginLoader = provider['_pluginLoader'];
-      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      const plugins = provider['_pluginLoader']['_plugins'];
+      assert.strictEqual(plugins.length, 0);
       require('simple-module');
-      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(plugins.length, 1);
       require('supported-module');
-      assert.strictEqual(pluginLoader['_plugins'].length, 2);
+      assert.strictEqual(plugins.length, 2);
       require('random-module');
-      assert.strictEqual(pluginLoader['_plugins'].length, 2);
+      assert.strictEqual(plugins.length, 2);
       require('http');
-      assert.strictEqual(pluginLoader['_plugins'].length, 3);
+      assert.strictEqual(plugins.length, 3);
+      require('grpc');
+      assert.strictEqual(plugins.length, 4);
     });
 
     it('should construct an instance with default attributes', () => {
