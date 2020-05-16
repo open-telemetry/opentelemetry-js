@@ -31,8 +31,6 @@ export namespace opentelemetryProto {
       export interface ExportTraceServiceRequest {
         resourceSpans: opentelemetryProto.trace.v1.ResourceSpans[];
       }
-      // eslint-disable-next-line @typescript-eslint/no-empty-interface
-      export interface ExportTraceServiceResponse {}
 
       export interface ExportTraceServiceError {
         code: number;
