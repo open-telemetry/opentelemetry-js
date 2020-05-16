@@ -1,4 +1,15 @@
 module.exports = {
+  plugins: [
+    "@typescript-eslint",
+    "header"
+  ],
+  extends: [
+      "./node_modules/gts",
+  ],
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+      "project": "./tsconfig.json"
+  },
   rules: {
     "@typescript-eslint/no-this-alias": "off",
     "eqeqeq": "off",
