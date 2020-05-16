@@ -108,8 +108,6 @@ export class AsyncHooksContextManager implements ContextManager {
     }
     try {
       return await fn();
-    } catch (err) {
-      throw err;
     } finally {
       if (oldContext === undefined) {
         this._destroy(uid);

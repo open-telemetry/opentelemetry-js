@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CanonicalCode, context, propagation, Span as ISpan, SpanKind } from '@opentelemetry/api';
+import {
+  CanonicalCode,
+  context,
+  propagation,
+  Span as ISpan,
+  SpanKind,
+} from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -216,17 +222,9 @@ describe('HttpPlugin', () => {
             (url: string) => url.endsWith('/ignored/function'),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
-<<<<<<< HEAD
-<<<<<<< HEAD
           requestHook: requestHookFunction,
           responseHook: responseHookFunction,
           serverName,
-=======
-          serverName
->>>>>>> fix(lint): move tslint to eslint
-=======
-          serverName,
->>>>>>> fix: update version script
         };
         plugin.enable(http, provider, provider.logger, config);
         server = http.createServer((request, response) => {
@@ -770,14 +768,14 @@ describe('HttpPlugin', () => {
         plugin.disable();
       });
 
-      it(`should not trace without parent with options enabled (both client & server)`, async () => {
+      it('should not trace without parent with options enabled (both client & server)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -785,13 +783,13 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      it(`should not trace without parent with options enabled (client only)`, async () => {
+      it('should not trace without parent with options enabled (client only)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -809,13 +807,13 @@ describe('HttpPlugin', () => {
         );
       });
 
-      it(`should not trace without parent with options enabled (server only)`, async () => {
+      it('should not trace without parent with options enabled (server only)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -833,14 +831,14 @@ describe('HttpPlugin', () => {
         );
       });
 
-      it(`should trace with parent with both requireParent options enabled`, done => {
+      it('should trace with parent with both requireParent options enabled', done => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const tracer = provider.getTracer('default');
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
