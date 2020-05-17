@@ -34,8 +34,8 @@ describe('Global Utils', () => {
   assert.notEqual(api1, api2);
   // that return separate noop instances to start
   assert.notStrictEqual(
-    api1.context['getContextManager'](),
-    api2.context['getContextManager']()
+    api1.context.getContextManager(),
+    api2.context.getContextManager()
   );
 
   beforeEach(() => {
@@ -46,33 +46,33 @@ describe('Global Utils', () => {
   });
 
   it('should change the global context manager', () => {
-    const original = api1.context['getContextManager']();
+    const original = api1.context.getContextManager();
     const newContextManager = new NoopContextManager();
     api1.context.setGlobalContextManager(newContextManager);
-    assert.notStrictEqual(api1.context['getContextManager'](), original);
-    assert.strictEqual(api1.context['getContextManager'](), newContextManager);
+    assert.notStrictEqual(api1.context.getContextManager(), original);
+    assert.strictEqual(api1.context.getContextManager(), newContextManager);
   });
 
   it('should load an instance from one which was set in the other', () => {
     api1.context.setGlobalContextManager(new NoopContextManager());
     assert.strictEqual(
-      api1.context['getContextManager'](),
-      api2.context['getContextManager']()
+      api1.context.getContextManager(),
+      api2.context.getContextManager()
     );
   });
 
   it('should disable both if one is disabled', () => {
-    const original = api1.context['getContextManager']();
+    const original = api1.context.getContextManager();
 
     api1.context.setGlobalContextManager(new NoopContextManager());
 
-    assert.notStrictEqual(original, api1.context['getContextManager']());
+    assert.notStrictEqual(original, api1.context.getContextManager());
     api2.context.disable();
-    assert.strictEqual(original, api1.context['getContextManager']());
+    assert.strictEqual(original, api1.context.getContextManager());
   });
 
   it('should return the module NoOp implementation if the version is a mismatch', () => {
-    const original = api1.context['getContextManager']();
+    const original = api1.context.getContextManager();
     api1.context.setGlobalContextManager(new NoopContextManager());
     const afterSet = _global[GLOBAL_CONTEXT_MANAGER_API_KEY]!(-1);
 
