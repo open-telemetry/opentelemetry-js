@@ -44,13 +44,17 @@ class AwsEc2Detector implements Detector {
       const {
         accountId,
         instanceId,
+        instanceType,
         region,
+        availabilityZone,
       } = await this._awsMetadataAccessor();
       return new Resource({
         [CLOUD_RESOURCE.PROVIDER]: 'aws',
         [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
         [CLOUD_RESOURCE.REGION]: region,
+        [CLOUD_RESOURCE.ZONE]: availabilityZone,
         [HOST_RESOURCE.ID]: instanceId,
+        [HOST_RESOURCE.TYPE]: instanceType,
       });
     } catch {
       return Resource.empty();

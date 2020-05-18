@@ -203,6 +203,9 @@ export class HttpPlugin extends BasePlugin<Http> {
       hostname,
     });
     span.setAttributes(attributes);
+    if (this._config.requestHook) {
+      this._callRequestHook(span, request);
+    }
 
     request.on(
       'response',
@@ -212,6 +215,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           { hostname }
         );
         span.setAttributes(attributes);
+        if (this._config.responseHook) {
+          this._callResponseHook(span, response);
+        }
 
         this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
@@ -316,6 +322,13 @@ export class HttpPlugin extends BasePlugin<Http> {
           context.bind(request);
           context.bind(response);
 
+          if (plugin._config.requestHook) {
+            plugin._callRequestHook(span, request);
+          }
+          if (plugin._config.responseHook) {
+            plugin._callResponseHook(span, response);
+          }
+
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
           const originalEnd = response.end;
@@ -393,6 +406,8 @@ export class HttpPlugin extends BasePlugin<Http> {
       );
 
       if (utils.isOpenTelemetryRequest(optionsParsed)) {
+        // clone the headers so delete will not modify the user's object
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
         delete optionsParsed.headers[utils.OT_REQUEST_HEADER];
         return original.apply(this, [optionsParsed, ...args]);
       }
@@ -463,6 +478,28 @@ export class HttpPlugin extends BasePlugin<Http> {
 
     span.end();
     this._spanNotEnded.delete(span);
+  }
+
+  private _callResponseHook(
+    span: Span,
+    response: IncomingMessage | ServerResponse
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.responseHook!(span, response),
+      false
+    );
+  }
+
+  private _callRequestHook(
+    span: Span,
+    request: ClientRequest | IncomingMessage
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.requestHook!(span, request),
+      false
+    );
   }
 
   private _safeExecute<

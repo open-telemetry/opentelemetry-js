@@ -48,8 +48,10 @@ const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
 
 const mockedAwsResponse = {
   instanceId: 'my-instance-id',
+  instanceType: 'my-instance-type',
   accountId: 'my-account-id',
   region: 'my-region',
+  availabilityZone: 'my-zone',
 };
 
 describe('detectResources', async () => {
@@ -132,8 +134,12 @@ describe('detectResources', async () => {
         provider: 'aws',
         accountId: 'my-account-id',
         region: 'my-region',
+        zone: 'my-zone',
       });
-      assertHostResource(resource, { id: 'my-instance-id' });
+      assertHostResource(resource, {
+        id: 'my-instance-id',
+        hostType: 'my-instance-type',
+      });
       assertServiceResource(resource, {
         instanceId: '627cc493',
         name: 'my-service',
