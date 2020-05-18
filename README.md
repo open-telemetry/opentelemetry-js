@@ -186,8 +186,8 @@ These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-c
 - [@opentelemetry/plugin-pg-pool][otel-contrib-plugin-pg-pool]
 - [@opentelemetry/plugin-redis][otel-contrib-plugin-redis]
 - [@opentelemetry/plugin-ioredis][otel-contrib-plugin-ioredis]
+- [@opentelemetry/plugin-express][otel-contrib-plugin-express]
 - [@opentelemetry/plugin-dns][otel-contrib-plugin-dns] - By default, this plugin is not loaded [#612](https://github.com/open-telemetry/opentelemetry-js/issues/612)
-- [@opentelemetry/plugin-express][otel-contrib-plugin-express] - By default, this plugin is not loaded
 
 #### Web Plugins
 ##### Core
