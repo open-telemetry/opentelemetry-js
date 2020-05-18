@@ -66,10 +66,10 @@ The `opentelemetry-js` project is written in TypeScript.
 ### Guidelines for Pull Requests
 
 - Typically we try to turn around reviews within one to two business days.
-- It is generally expected that a maintainer (@open-telemetry/javascript-maintainers) should review and merge every PR.
+- It is generally expected that a maintainer ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)) should review and merge every PR.
   - If a change has met the requirements listed below, an approver may also merge the pull request.
 - Most PRs should be merged in one to two weeks.
-- If a PR is taking longer than 30 days, please ping the approvers (@open-telemetry/javascript-approvers) as it may have been lost
+- If a PR is taking longer than 30 days, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)) as it may have been lost
 - Dependency upgrades and Security fixes: This PR is small and/or low-risk and can be merged with only maintainer reviews.
 - If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request, or you can ask for a review on Gitter channel.
 - API changes, breaking changes, or large changes will be subject to more scrutiny and may require more reviewers. These PRs should only be merged by maintainers.
