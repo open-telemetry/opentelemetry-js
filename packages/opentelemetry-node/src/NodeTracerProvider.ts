@@ -72,7 +72,7 @@ export function mergePlugins(
   defaultPlugins: Plugins,
   userSuppliedPlugins: Plugins
 ): Plugins {
-  let mergedUserSuppliedPlugins: Plugins = {};
+  const mergedUserSuppliedPlugins: Plugins = {};
 
   for (const pluginName in userSuppliedPlugins) {
     mergedUserSuppliedPlugins[pluginName] = {
