@@ -75,30 +75,26 @@ export class HttpCorrelationContext implements HttpTextPropagator {
     ) as string;
     if (!headerValue) return context;
     const correlationContext: CorrelationContext = {};
-    if (headerValue.length > 0) {
-      const pairs = headerValue.split(ITEMS_SEPARATOR);
-      if (pairs.length == 1) return context;
-      pairs.forEach(entry => {
-        const valueProps = entry.split(PROPERTIES_SEPARATOR);
-        if (valueProps.length > 0) {
-          const keyPairPart = valueProps.shift();
-          if (keyPairPart) {
-            const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
-            if (keyPair.length > 1) {
-              const key = decodeURIComponent(keyPair[0].trim());
-              let value = decodeURIComponent(keyPair[1].trim());
-              if (valueProps.length > 0) {
-                value =
-                  value +
-                  PROPERTIES_SEPARATOR +
-                  valueProps.join(PROPERTIES_SEPARATOR);
-              }
-              correlationContext[key] = { value };
-            }
-          }
-        }
-      });
+    if (headerValue.length == 0) {
+      return context;
     }
+    const pairs = headerValue.split(ITEMS_SEPARATOR);
+    if (pairs.length == 1) return context;
+    pairs.forEach(entry => {
+      const valueProps = entry.split(PROPERTIES_SEPARATOR);
+      if (valueProps.length <= 0) return;
+      const keyPairPart = valueProps.shift();
+      if (!keyPairPart) return;
+      const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
+      if (keyPair.length <= 1) return;
+      const key = decodeURIComponent(keyPair[0].trim());
+      let value = decodeURIComponent(keyPair[1].trim());
+      if (valueProps.length > 0) {
+        value =
+          value + PROPERTIES_SEPARATOR + valueProps.join(PROPERTIES_SEPARATOR);
+      }
+      correlationContext[key] = { value };
+    });
     return setCorrelationContext(context, correlationContext);
   }
 }
