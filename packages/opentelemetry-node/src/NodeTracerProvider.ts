@@ -75,18 +75,11 @@ export function mergePlugins(
   let mergedUserSuppliedPlugins: Plugins = {};
 
   for (const pluginName in userSuppliedPlugins) {
-    if (DEFAULT_INSTRUMENTATION_PLUGINS.hasOwnProperty(pluginName)) {
-      mergedUserSuppliedPlugins[pluginName] = {
-        ...DEFAULT_INSTRUMENTATION_PLUGINS[pluginName],
-        ...userSuppliedPlugins[pluginName],
-      };
-    } else {
-      mergedUserSuppliedPlugins[pluginName] = userSuppliedPlugins[pluginName];
-      // enable user-supplied plugins unless explicitly disabled
-      if (mergedUserSuppliedPlugins[pluginName].enabled === undefined) {
-        mergedUserSuppliedPlugins[pluginName].enabled = true;
-      }
-    }
+    mergedUserSuppliedPlugins[pluginName] = {
+      // Any user-supplied non-default plugin should be enabled by default
+      ...(DEFAULT_INSTRUMENTATION_PLUGINS[pluginName] || { enabled: true }),
+      ...userSuppliedPlugins[pluginName],
+    };
   }
 
   const mergedPlugins: Plugins = {
