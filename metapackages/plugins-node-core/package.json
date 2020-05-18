@@ -5,6 +5,9 @@
     "author": "OpenTelemetry Authors",
     "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
     "license": "Apache-2.0",
+    "publishConfig": {
+        "access": "public"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
