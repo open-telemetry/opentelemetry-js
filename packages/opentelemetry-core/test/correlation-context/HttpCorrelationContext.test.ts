@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,10 @@ import {
 } from '@opentelemetry/api';
 import { Context } from '@opentelemetry/context-base';
 import * as assert from 'assert';
-
 import {
   getCorrelationContext,
   setCorrelationContext,
 } from '../../src/correlation-context/correlation-context';
-
 import {
   HttpCorrelationContext,
   CORRELATION_CONTEXT_HEADER,
@@ -43,7 +41,7 @@ describe('HttpCorrelationContext', () => {
   });
 
   describe('.inject()', () => {
-    it('should set traceparent header', () => {
+    it('should set correlation context header', () => {
       const correlationContext: CorrelationContext = {
         key1: { value: 'd4cda95b652f4a1592b449d5929fda1b' },
         key3: { value: 'c88815a7-0fa9-4d95-a1f1-cdccce3c5c2a' },
@@ -116,7 +114,8 @@ describe('HttpCorrelationContext', () => {
 
   describe('.extract()', () => {
     it('should extract context of a sampled span from carrier', () => {
-      carrier[CORRELATION_CONTEXT_HEADER] = 'key1=d4cda95b,key3=c88815a7';
+      carrier[CORRELATION_CONTEXT_HEADER] =
+        'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
       const extractedCorrelationContext = getCorrelationContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
@@ -124,6 +123,8 @@ describe('HttpCorrelationContext', () => {
       const expected: CorrelationContext = {
         key1: { value: 'd4cda95b' },
         key3: { value: 'c88815a7' },
+        keyn: { value: 'valn' },
+        keym: { value: 'valm' },
       };
       assert.deepStrictEqual(extractedCorrelationContext, expected);
     });

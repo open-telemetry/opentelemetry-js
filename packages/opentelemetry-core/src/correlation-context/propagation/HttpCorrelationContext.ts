@@ -21,7 +21,6 @@ import {
   HttpTextPropagator,
   SetterFunction,
 } from '@opentelemetry/api';
-
 import {
   getCorrelationContext,
   setCorrelationContext,
@@ -46,29 +45,26 @@ export const MAX_TOTAL_LENGTH = 8192;
  */
 export class HttpCorrelationContext implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
-    const distContext = getCorrelationContext(context);
-    if (distContext) {
-      const all = Object.keys(distContext);
-      const values = all
-        .map(
-          (key: string) =>
-            `${encodeURIComponent(key)}=${encodeURIComponent(
-              distContext[key].value
-            )}`
-        )
-        .filter((pair: string) => {
-          return pair.length <= MAX_PER_NAME_VALUE_PAIRS;
-        })
-        .slice(0, MAX_NAME_VALUE_PAIRS);
-      const headerValue = values.reduce((hValue: String, current: String) => {
-        const value = `${hValue}${
-          hValue != '' ? ITEMS_SEPARATOR : ''
-        }${current}`;
-        return value.length > MAX_TOTAL_LENGTH ? hValue : value;
-      }, '');
-      if (headerValue.length > 0) {
-        setter(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
-      }
+    const correlationContext = getCorrelationContext(context);
+    if (!correlationContext) return;
+    const all = Object.keys(correlationContext);
+    const values = all
+      .map(
+        (key: string) =>
+          `${encodeURIComponent(key)}=${encodeURIComponent(
+            correlationContext[key].value
+          )}`
+      )
+      .filter((pair: string) => {
+        return pair.length <= MAX_PER_NAME_VALUE_PAIRS;
+      })
+      .slice(0, MAX_NAME_VALUE_PAIRS);
+    const headerValue = values.reduce((hValue: String, current: String) => {
+      const value = `${hValue}${hValue != '' ? ITEMS_SEPARATOR : ''}${current}`;
+      return value.length > MAX_TOTAL_LENGTH ? hValue : value;
+    }, '');
+    if (headerValue.length > 0) {
+      setter(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
     }
   }
 
@@ -78,7 +74,7 @@ export class HttpCorrelationContext implements HttpTextPropagator {
       CORRELATION_CONTEXT_HEADER
     ) as string;
     if (!headerValue) return context;
-    const distributedContext: CorrelationContext = {};
+    const correlationContext: CorrelationContext = {};
     if (headerValue.length > 0) {
       const pairs = headerValue.split(ITEMS_SEPARATOR);
       if (pairs.length == 1) return context;
@@ -97,12 +93,12 @@ export class HttpCorrelationContext implements HttpTextPropagator {
                   PROPERTIES_SEPARATOR +
                   valueProps.join(PROPERTIES_SEPARATOR);
               }
-              distributedContext[key] = { value };
+              correlationContext[key] = { value };
             }
           }
         }
       });
     }
-    return setCorrelationContext(context, distributedContext);
+    return setCorrelationContext(context, correlationContext);
   }
 }
