@@ -34,6 +34,10 @@ describe('BasicTracerProvider', () => {
     context.disable();
   });
 
+  afterEach(() => {
+    delete process.env.OTEL_SAMPLING_PROBABILITY;
+  });
+
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new BasicTracerProvider();
@@ -316,7 +320,6 @@ describe('BasicTracerProvider', () => {
       const context = span.context();
       assert.strictEqual(context.traceFlags, TraceFlags.NONE);
       span.end();
-      delete process.env.OTEL_SAMPLING_PROBABILITY;
     });
 
     it('should create real span when sampled', () => {
@@ -355,7 +358,7 @@ describe('BasicTracerProvider', () => {
       context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
-        disable: () => {},
+        disable: () => { },
       } as ContextManager);
 
       const tracer = new BasicTracerProvider().getTracer('default');
