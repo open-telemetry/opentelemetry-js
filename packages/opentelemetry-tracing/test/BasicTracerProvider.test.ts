@@ -358,7 +358,7 @@ describe('BasicTracerProvider', () => {
       context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
-        disable: () => { },
+        disable: () => {},
       } as ContextManager);
 
       const tracer = new BasicTracerProvider().getTracer('default');
