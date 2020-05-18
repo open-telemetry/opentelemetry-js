@@ -65,11 +65,8 @@ describe('HttpCorrelationContext', () => {
         key3: { value: 'c88815a7' },
       };
 
-      let value = '';
       // Generate long value 2*MAX_PER_NAME_VALUE_PAIRS
-      for (let i = 0; i < MAX_PER_NAME_VALUE_PAIRS; ++i) {
-        value += '1a';
-      }
+      const value = '1a'.repeat(MAX_PER_NAME_VALUE_PAIRS);
       correlationContext['longPair'] = { value };
 
       httpTraceContext.inject(
@@ -130,7 +127,7 @@ describe('HttpCorrelationContext', () => {
     });
   });
 
-  it('returns null if header is missing', () => {
+  it('returns undefined if header is missing', () => {
     assert.deepStrictEqual(
       getCorrelationContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)

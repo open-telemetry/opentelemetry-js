@@ -21,6 +21,10 @@ const CORRELATION_CONTEXT = Context.createKey(
   'OpenTelemetry Distributed Contexts Key'
 );
 
+/**
+ * @param {Context} Context that manage all context values
+ * @returns {CorrelationContext} Extracted correlation context from the context
+ */
 export function getCorrelationContext(
   context: Context
 ): CorrelationContext | undefined {
@@ -29,6 +33,10 @@ export function getCorrelationContext(
   );
 }
 
+/**
+ * @param {Context} Context that manage all context values
+ * @param {CorrelationContext} correlation context that will be set in the actual context
+ */
 export function setCorrelationContext(
   context: Context,
   correlationContext: CorrelationContext
