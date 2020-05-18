@@ -202,6 +202,7 @@ describe('HttpPlugin', () => {
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
+        assert.strictEqual(options.headers[OT_REQUEST_HEADER], 1);
       });
     });
     describe('with good plugin options', () => {

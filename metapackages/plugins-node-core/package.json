@@ -1,0 +1,20 @@
+{
+    "name": "@opentelemetry/plugins-node-core",
+    "version": "0.8.0",
+    "description": "Metapackage which bundles all opentelemetry node core plugins",
+    "author": "OpenTelemetry Authors",
+    "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+    "license": "Apache-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+    },
+    "dependencies": {
+        "@opentelemetry/plugin-grpc": "^0.8.0",
+        "@opentelemetry/plugin-http": "^0.8.0",
+        "@opentelemetry/plugin-https": "^0.8.0"
+    }
+}
