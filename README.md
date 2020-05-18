@@ -56,21 +56,23 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 
 ## Supported Runtimes
 
-Platform Version | Supported
----------------- | ---------
-Node.JS `v14`    | ✅
-Node.JS `v13`    | ✅
-Node.JS `v12`    | ✅
-Node.JS `v10`    | ✅
-Node.JS `v8`     | See [Node Support](#node-support) below
-Web Browsers     | ✅ See [Browser Support](#browser-support) below
+| Platform Version | Supported                                       |
+|------------------|-------------------------------------------------|
+| Node.JS `v14`    | ✅                                               |
+| Node.JS `v13`    | ✅                                               |
+| Node.JS `v12`    | ✅                                               |
+| Node.JS `v10`    | ✅                                               |
+| Node.JS `v8`     | See [Node Support](#node-support) below         |
+| Web Browsers     | ✅ See [Browser Support](#browser-support) below |
 
 ### Node Support
+
 Automated tests are run using the latest release of each currently active version of Node.JS.
 While Node.JS v8 is no longer supported by the Node.JS team, the latest version of Node.JS v8 is still included in our testing suite.
 Please note that versions of Node.JS v8 prior to `v8.5.0` will NOT work, because OpenTelemetry Node depends on the `perf_hooks` module introduced in `v8.5.0`
 
 ### Browser Support
+
 Automated browser tests are run in the latest version of Headless Chrome.
 There is currently no list of officially supported browsers, but OpenTelemetry is developed using standard web technologies with wide support and should work in currently supported versions of major browsers.
 
@@ -80,28 +82,28 @@ OpenTelemetry JS is under active development.
 This release isn't guaranteed to conform to a specific version of the specification, and future
 releases will not attempt to maintain backwards compatibility with the alpha release.
 
-| Component                   | Initial Version | Release Date     |
-| --------------------------- | --------------- | ---------------- |
-| Tracing API                 | Alpha v0.1.0    | October 14 2019  |
-| Tracing SDK (Node and Web)  | Alpha v0.1.0    | October 14 2019  |
-| Jaeger Trace Exporter       | Alpha v0.1.0    | October 14 2019  |
-| Trace Context Propagation   | Alpha v0.1.0    | October 14 2019  |
-| Zipkin Trace Exporter       | Alpha v0.1.0    | October 14 2019  |
-| OpenTracing Bridge          | Alpha v0.1.0    | October 14 2019  |
-| Metrics API                 | Alpha v0.2.0    | November 04 2019 |
-| Metrics SDK                 | Alpha v0.2.0    | November 04 2019 |
-| Prometheus Metric Exporter  | Alpha v0.3.0    | December 13 2019 |
-| Resources                   | Beta v0.5.0     | March 16 2020    |
-| Metrics SDK (Complete)      | Beta v0.5.0     | March 16 2020    |
-| OpenCensus Bridge           | Unknown         | Unknown          |
-| Support for Tags/Baggage    | Unknown         | Unknown          |
+| Component                  | Initial Version | Release Date     |
+|----------------------------|-----------------|------------------|
+| Tracing API                | Alpha v0.1.0    | October 14 2019  |
+| Tracing SDK (Node and Web) | Alpha v0.1.0    | October 14 2019  |
+| Jaeger Trace Exporter      | Alpha v0.1.0    | October 14 2019  |
+| Trace Context Propagation  | Alpha v0.1.0    | October 14 2019  |
+| Zipkin Trace Exporter      | Alpha v0.1.0    | October 14 2019  |
+| OpenTracing Bridge         | Alpha v0.1.0    | October 14 2019  |
+| Metrics API                | Alpha v0.2.0    | November 04 2019 |
+| Metrics SDK                | Alpha v0.2.0    | November 04 2019 |
+| Prometheus Metric Exporter | Alpha v0.3.0    | December 13 2019 |
+| Resources                  | Beta v0.5.0     | March 16 2020    |
+| Metrics SDK (Complete)     | Beta v0.5.0     | March 16 2020    |
+| OpenCensus Bridge          | Unknown         | Unknown          |
+| Support for Tags/Baggage   | Unknown         | Unknown          |
 
 ## Feature Status
 
 Last updated March 2020
 
 | Feature             | API Status | Specification Target | SDK Status  |
-| ------------------- | ---------- | -------------------- | ----------- |
+|---------------------|------------|----------------------|-------------|
 | Tracing             | Beta       | v0.3                 | Beta        |
 | Metrics             | Beta       | v0.3                 | Beta        |
 | Context             | Beta       | v0.3                 | Beta        |
@@ -116,6 +118,7 @@ for details on upcoming releases. The dates and features described here are
 estimates, and subject to change.
 
 ## Contributing
+
 We'd love your help!. Use tags [up-for-grabs][up-for-grabs-issues] and
 [good first issue][good-first-issues] to get started with the project. Follow
 [CONTRIBUTING](CONTRIBUTING.md) guide to report issues or submit a proposal.
@@ -141,6 +144,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
 ### Thanks to all the people who already contributed!
+
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
 </a>
@@ -149,19 +153,19 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 ### API
 
-| Package                 | Description |
-| ----------------------- | -----------------|
-| [@opentelemetry/api][otel-api] | This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It's intended for use both on the server and in the browser. |
+| Package                          | Description                                                                                                                                                                                    |
+|----------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [@opentelemetry/api][otel-api]   | This package provides TypeScript interfaces, enums and no-op implementations for the OpenTelemetry core trace and metrics model. It is intended for use both on the server and in the browser. |
+| [@opentelemetry/core][otel-core] | This package provides default and no-op implementations of the OpenTelemetry api for trace and metrics. It's intended for use both on the server and in the browser.                           |
 
 ### Implementation / SDKs
 
-| Package                 | Description |
-| ----------------------- | -----------------|
+| Package                                | Description                                                                                                                                                                                                                                                  |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | [@opentelemetry/tracing][otel-tracing] | This module provides a full control over instrumentation and span creation. It doesn't load [`async_hooks`](https://nodejs.org/api/async_hooks.html) or any instrumentation plugin by default. It is intended for use both on the server and in the browser. |
-| [@opentelemetry/metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data. |
-| [@opentelemetry/node][otel-node] | This module provides automatic tracing for Node.js applications. It is intended for use on the server only. |
-| [@opentelemetry/web][otel-web] | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only. |
+| [@opentelemetry/metrics][otel-metrics] | This module provides instruments and meters for reporting of time series data.                                                                                                                                                                               |
+| [@opentelemetry/node][otel-node]       | This module provides automatic tracing for Node.js applications. It is intended for use on the server only.                                                                                                                                                  |
+| [@opentelemetry/web][otel-web]         | This module provides automated instrumentation and tracing for Web applications. It is intended for use in the browser only.                                                                                                                                 |
 
 ### Compatible Exporters
 
@@ -174,12 +178,17 @@ See the [OpenTelemetry registry](https://opentelemetry.io/registry/?s=node.js) f
 OpenTelemetry can collect tracing data automatically using plugins. Vendors/Users can also create and use their own. Currently, OpenTelemetry supports automatic tracing for:
 
 #### Node Plugins
+
 ##### Core
+
 - [@opentelemetry/plugin-grpc][otel-plugin-grpc]
 - [@opentelemetry/plugin-http][otel-plugin-http]
 - [@opentelemetry/plugin-https][otel-plugin-https]
+
 ##### Contrib
+
 These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node
+
 - [@opentelemetry/plugin-mongodb][otel-contrib-plugin-mongodb]
 - [@opentelemetry/plugin-mysql][otel-contrib-plugin-mysql]
 - [@opentelemetry/plugin-pg][otel-contrib-plugin-pg]
@@ -190,10 +199,15 @@ These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-c
 - [@opentelemetry/plugin-dns][otel-contrib-plugin-dns] - By default, this plugin is not loaded [#612](https://github.com/open-telemetry/opentelemetry-js/issues/612)
 
 #### Web Plugins
+
 ##### Core
+
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+
 ##### Contrib
+
 These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web
+
 - [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
 - [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]
 
@@ -201,12 +215,12 @@ To request automatic tracing support for a module not on this list, please [file
 
 ### Shims
 
-| Package                 | Description |
-| ----------------------- | -----------------|
+| Package                                                  | Description                                                                             |
+|----------------------------------------------------------|-----------------------------------------------------------------------------------------|
 | [@opentelemetry/shim-opentracing][otel-shim-opentracing] | OpenTracing shim allows existing OpenTracing instrumentation to report to OpenTelemetry |
 
-
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For help or feedback on this project, join us on [gitter][node-gitter-url]
 
