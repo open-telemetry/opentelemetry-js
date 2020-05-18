@@ -1,3 +1,11 @@
+#! /bin/sh
+#
+# Usage: regenerate.sh
+#
+# regenerate.sh regenerates certificates that are used to test gRPC with TLS
+# Make sure you run it in test/certs directory.
+# It also serves as a documentation on how existing certificates were generated.
+
 rm ca.crt ca.key client.crt client.csr client.key server.crt server.csr server.key
 openssl genrsa -passout pass:1111 -des3 -out ca.key 4096
 openssl req -passin pass:1111 -new -x509 -days 365 -key ca.key -out ca.crt -subj  "/C=CL/ST=RM/L=OpenTelemetryTest/O=Root/OU=Test/CN=ca"
