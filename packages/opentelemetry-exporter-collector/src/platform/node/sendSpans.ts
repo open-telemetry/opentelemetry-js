@@ -24,7 +24,6 @@ import * as collectorTypes from '../../types';
 import { CollectorData, GRPCQueueItem } from './types';
 import { removeProtocol } from './util';
 
-
 const traceServiceClients: WeakMap<
   CollectorExporter,
   CollectorData
@@ -40,7 +39,8 @@ export function onInit(collectorExporter: CollectorExporter) {
     grpcSpansQueue: [],
   });
   const serverAddress = removeProtocol(collectorExporter.url);
-  const credentials: grpc.ChannelCredentials = collectorExporter.credentials || grpc.credentials.createInsecure();
+  const credentials: grpc.ChannelCredentials =
+    collectorExporter.credentials || grpc.credentials.createInsecure();
 
   const traceServiceProtoPath =
     'opentelemetry/proto/collector/trace/v1/trace_service.proto';
