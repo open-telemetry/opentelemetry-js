@@ -82,9 +82,9 @@ const testCollectorExporter = (params: TestParams) => describe(`CollectorExporte
           }
         );
         let credentials = params.useTLS ?
-          grpc.ServerCredentials.createSsl(fs.readFileSync('./certs/ca.crt'), [{
-            cert_chain: fs.readFileSync("./certs/server.crt"),
-            private_key: fs.readFileSync("./certs/server.key")
+          grpc.ServerCredentials.createSsl(fs.readFileSync('./test/certs/ca.crt'), [{
+            cert_chain: fs.readFileSync("./test/certs/server.crt"),
+            private_key: fs.readFileSync("./test/certs/server.key")
           }]) :
           grpc.ServerCredentials.createInsecure();
         server.bind(address, credentials);
@@ -100,9 +100,9 @@ const testCollectorExporter = (params: TestParams) => describe(`CollectorExporte
   beforeEach(done => {
     const credentials = params.useTLS ?
       grpc.credentials.createSsl(
-        fs.readFileSync('./certs/ca.crt'),
-        fs.readFileSync('./certs/client.key'),
-        fs.readFileSync('./certs/client.crt')
+        fs.readFileSync('./test/certs/ca.crt'),
+        fs.readFileSync('./test/certs/client.key'),
+        fs.readFileSync('./test/certs/client.crt')
       ):
       undefined;
     collectorExporter = new CollectorExporter({
