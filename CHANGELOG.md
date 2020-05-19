@@ -4,6 +4,46 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.8.1
+
+#### :rocket: (Enhancement)
+* Other
+  * [#1050](https://github.com/open-telemetry/opentelemetry-js/pull/1050) feat: add plugin metapackages ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-resources`
+  * [#1055](https://github.com/open-telemetry/opentelemetry-js/pull/1055) chore(opentelemetry-resources): add instance type and az to aws detector ([@justinwalz](https://github.com/justinwalz))
+* `opentelemetry-plugin-http`
+  * [#963](https://github.com/open-telemetry/opentelemetry-js/pull/963) feat(plugin-http): add plugin hooks before processing req and res ([@BlumAmir](https://github.com/BlumAmir))
+* `opentelemetry-metrics`
+  * [#1049](https://github.com/open-telemetry/opentelemetry-js/pull/1049) chore: pipe resource through to MetricRecord ([@mwear](https://github.com/mwear))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1032](https://github.com/open-telemetry/opentelemetry-js/pull/1032) Make Labels Optional for CounterMetric::add ([@astorm](https://github.com/astorm))
+
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-http`
+  * [#1060](https://github.com/open-telemetry/opentelemetry-js/pull/1060) fix(http-plugin): don't modify user's headers object in plugin ([@BlumAmir](https://github.com/BlumAmir))
+* `opentelemetry-exporter-collector`
+  * [#1053](https://github.com/open-telemetry/opentelemetry-js/pull/1053) fix: include proto files in deployment package ([@dyladan](https://github.com/dyladan))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1065](https://github.com/open-telemetry/opentelemetry-js/pull/1065) style: format README ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1064](https://github.com/open-telemetry/opentelemetry-js/pull/1064) chore: update README ([@mayurkale22](https://github.com/mayurkale22))
+  * [#1051](https://github.com/open-telemetry/opentelemetry-js/pull/1051) chore: deploy docs using github action ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-prometheus`
+  * [#1056](https://github.com/open-telemetry/opentelemetry-js/pull/1056) fix readme: setting labelKeys when creating the counter ([@luebken](https://github.com/luebken))
+
+#### Committers: 9
+- Alan Storm ([@astorm](https://github.com/astorm))
+- Amir Blum ([@BlumAmir](https://github.com/BlumAmir))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Justin Walz ([@justinwalz](https://github.com/justinwalz))
+- Matthew Wear ([@mwear](https://github.com/mwear))
+- Matthias Lübken ([@luebken](https://github.com/luebken))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Naseem ([@naseemkullah](https://github.com/naseemkullah))
+- [@shivkanya9146](https://github.com/shivkanya9146)
+
 ## 0.8.0
 
 Released 2020-05-12
