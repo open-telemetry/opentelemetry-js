@@ -26,13 +26,8 @@ import {
 } from '../../CollectorExporterBase';
 import { CollectorExporterError } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorData, GRPCQueueItem } from './types';
+import { GRPCQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
-
-const traceServiceClients: WeakMap<
-  CollectorExporter,
-  CollectorData
-> = new WeakMap<CollectorExporter, CollectorData>();
 
 /**
  * Collector Exporter Config for Node
@@ -47,6 +42,10 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
+  isShutDown: boolean = false;
+  traceServiceClient?: TraceServiceClient = undefined;
+  grpcSpansQueue: GRPCQueueItem[] = [];
+
   /**
    * @param config
    */
@@ -55,22 +54,15 @@ export class CollectorExporter extends CollectorExporterBase<
   }
 
   onShutdown(): void {
-    const exporter = traceServiceClients.get(this);
-    if (!exporter) {
-      return;
-    }
-    exporter.isShutDown = true;
-
-    if (exporter.traceServiceClient) {
-      exporter.traceServiceClient.close();
+    this.isShutDown = true;
+    if (this.traceServiceClient) {
+      this.traceServiceClient.close();
     }
   }
 
   onInit(config: CollectorExporterConfig): void {
-    traceServiceClients.set(this, {
-      isShutDown: false,
-      grpcSpansQueue: [],
-    });
+    this.isShutDown = false;
+    this.grpcSpansQueue = [];
     const serverAddress = removeProtocol(this.url);
     const credentials: grpc.ChannelCredentials =
       config.credentials || grpc.credentials.createInsecure();
@@ -92,16 +84,12 @@ export class CollectorExporter extends CollectorExporterBase<
         const packageObject: any = grpc.loadPackageDefinition(
           packageDefinition
         );
-        const exporter = traceServiceClients.get(this);
-        if (!exporter) {
-          return;
-        }
-        exporter.traceServiceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+        this.traceServiceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
           serverAddress,
           credentials
         );
-        if (exporter.grpcSpansQueue.length > 0) {
-          const queue = exporter.grpcSpansQueue.splice(0);
+        if (this.grpcSpansQueue.length > 0) {
+          const queue = this.grpcSpansQueue.splice(0);
           queue.forEach((item: GRPCQueueItem) => {
             this.sendSpans(item.spans, item.onSuccess, item.onError);
           });
@@ -114,17 +102,16 @@ export class CollectorExporter extends CollectorExporterBase<
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void {
-    const exporter = traceServiceClients.get(this);
-    if (!exporter || exporter.isShutDown) {
+    if (this.isShutDown) {
       return;
     }
-    if (exporter.traceServiceClient) {
+    if (this.traceServiceClient) {
       const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
         spans,
         this
       );
 
-      exporter.traceServiceClient.export(
+      this.traceServiceClient.export(
         exportTraceServiceRequest,
         (
           err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
@@ -141,7 +128,7 @@ export class CollectorExporter extends CollectorExporterBase<
         }
       );
     } else {
-      exporter.grpcSpansQueue.push({
+      this.grpcSpansQueue.push({
         spans,
         onSuccess,
         onError,
