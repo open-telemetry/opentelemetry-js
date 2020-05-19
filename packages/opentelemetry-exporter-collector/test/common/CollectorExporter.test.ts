@@ -27,9 +27,7 @@ import { mockedReadableSpan } from '../helper';
 
 interface CollectorExporterConfig extends CollectorExporterConfigBase {}
 class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
-  onInit() {
-    console.log('called');
-  }
+  onInit() {}
   onShutdown() {}
   sendSpans() {}
 }
