@@ -29,7 +29,7 @@ jobs:
         npm run lint:examples
 
     - name: Install API Dependencies
-      run: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
+      run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
 
     - name: Test Docs
       run: npm run docs-test
