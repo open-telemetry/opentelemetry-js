@@ -25,7 +25,7 @@ import * as collectorTypes from '../../types';
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {}
 
 /**
- * Collector Exporter
+ * Collector Exporter for Web
  */
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
@@ -83,8 +83,6 @@ export class CollectorExporter extends CollectorExporterBase<
    * @param body
    * @param onSuccess
    * @param onError
-   * @param logger
-   * @param collectorUrl
    */
   private _sendSpansWithXhr(
     body: string,

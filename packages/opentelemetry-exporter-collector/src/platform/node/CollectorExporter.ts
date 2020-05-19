@@ -35,14 +35,14 @@ const traceServiceClients: WeakMap<
 > = new WeakMap<CollectorExporter, CollectorData>();
 
 /**
- * Collector Exporter Config
+ * Collector Exporter Config for Node
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
 }
 
 /**
- * Collector Exporter
+ * Collector Exporter for Node
  */
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig

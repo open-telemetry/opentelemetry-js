@@ -20,7 +20,7 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { opentelemetryProto, CollectorExporterError } from './types';
 
 /**
- * Collector Exporter Config
+ * Collector Exporter base config
  */
 export interface CollectorExporterConfigBase {
   hostName?: string;
@@ -34,7 +34,7 @@ const DEFAULT_SERVICE_NAME = 'collector-exporter';
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
- * Collector Exporter
+ * Collector Exporter abstract base class
  */
 export abstract class CollectorExporterBase<
   T extends CollectorExporterConfigBase
