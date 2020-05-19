@@ -25,6 +25,8 @@ export * from './context/propagation/B3Propagator';
 export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
+export * from './correlation-context/correlation-context';
+export * from './correlation-context/propagation/HttpCorrelationContext';
 export * from './platform';
 export * from './trace/NoRecordingSpan';
 export * from './trace/sampler/ProbabilitySampler';
