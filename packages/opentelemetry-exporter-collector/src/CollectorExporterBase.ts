@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger } from "@opentelemetry/api";
-import { ExportResult, NoopLogger } from "@opentelemetry/core";
-import { ReadableSpan, SpanExporter } from "@opentelemetry/tracing";
-import { opentelemetryProto, CollectorExporterError } from "./types";
+import { Attributes, Logger } from '@opentelemetry/api';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
+import { opentelemetryProto, CollectorExporterError } from './types';
 
 /**
  * Collector Exporter Config
@@ -30,27 +30,29 @@ export interface CollectorExporterConfigBase {
   url?: string;
 }
 
-const DEFAULT_SERVICE_NAME = "collector-exporter";
-const DEFAULT_COLLECTOR_URL = "http://localhost:55678/v1/trace";
+const DEFAULT_SERVICE_NAME = 'collector-exporter';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
  * Collector Exporter
  */
-export abstract class CollectorExporterBase<T extends CollectorExporterConfigBase> implements SpanExporter {
-  protected readonly serviceName: string;
-  protected readonly url: string;
-  protected readonly logger: Logger;
-  protected readonly hostName: string | undefined;
-  protected readonly attributes?: Attributes;
+export abstract class CollectorExporterBase<
+  T extends CollectorExporterConfigBase
+> implements SpanExporter {
+  public readonly serviceName: string;
+  public readonly url: string;
+  public readonly logger: Logger;
+  public readonly hostName: string | undefined;
+  public readonly attributes?: Attributes;
   private _isShutdown: boolean = false;
 
   /**
    * @param config
    */
-  constructor(config: T = ({} as T)) {
+  constructor(config: T = {} as T) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = config.url || DEFAULT_COLLECTOR_URL;
-    if (typeof config.hostName === "string") {
+    if (typeof config.hostName === 'string') {
       this.hostName = config.hostName;
     }
 
@@ -101,7 +103,7 @@ export abstract class CollectorExporterBase<T extends CollectorExporterConfigBas
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        this.logger.debug("spans to be sent", spans);
+        this.logger.debug('spans to be sent', spans);
         // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
         // it will use the appropriate transport layer automatically depends on platform
         this.sendSpans(spans, resolve, reject);
@@ -116,11 +118,11 @@ export abstract class CollectorExporterBase<T extends CollectorExporterConfigBas
    */
   shutdown(): void {
     if (this._isShutdown) {
-      this.logger.debug("shutdown already started");
+      this.logger.debug('shutdown already started');
       return;
     }
     this._isShutdown = true;
-    this.logger.debug("shutdown started");
+    this.logger.debug('shutdown started');
 
     // platform dependent
     this.onShutdown();

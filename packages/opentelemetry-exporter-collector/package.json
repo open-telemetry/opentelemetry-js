@@ -2,8 +2,8 @@
   "name": "@opentelemetry/exporter-collector",
   "version": "0.8.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
-  "main": "build/src/index.js",
-  "types": "build/src/index.d.ts",
+  "main": "build/src/platform/node/index.js",
+  "types": "build/src/platform/node/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "browser": {
     "./src/platform/index.ts": "./src/platform/browser/index.ts",

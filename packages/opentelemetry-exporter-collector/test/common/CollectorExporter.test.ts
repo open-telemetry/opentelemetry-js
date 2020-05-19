@@ -14,41 +14,41 @@
  * limitations under the License.
  */
 
-import { ExportResult, NoopLogger } from "@opentelemetry/core";
-import { ReadableSpan } from "@opentelemetry/tracing";
-import * as assert from "assert";
-import * as sinon from "sinon";
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { ReadableSpan } from '@opentelemetry/tracing';
+import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   CollectorExporterBase,
-  CollectorExporterConfigBase
-} from "../../src/CollectorExporterBase";
+  CollectorExporterConfigBase,
+} from '../../src/CollectorExporterBase';
 
-import { mockedReadableSpan } from "../helper";
+import { mockedReadableSpan } from '../helper';
 
 interface CollectorExporterConfig extends CollectorExporterConfigBase {}
 class CollectorExporter extends CollectorExporterBase {
   onInit() {
-    console.log("called");
+    console.log('called');
   }
   onShutdown() {}
   sendSpans() {}
 }
 
-describe("CollectorExporter - common", () => {
+describe('CollectorExporter - common', () => {
   let collectorExporter: CollectorExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 
-  describe("constructor", () => {
+  describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
-      onInitSpy = sinon.stub(CollectorExporter.prototype, "onInit");
+      onInitSpy = sinon.stub(CollectorExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostName: "foo",
+        hostName: 'foo',
         logger: new NoopLogger(),
-        serviceName: "bar",
+        serviceName: 'bar',
         attributes: {},
-        url: "http://foo.bar.com"
+        url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
@@ -57,58 +57,58 @@ describe("CollectorExporter - common", () => {
       onInitSpy.restore();
     });
 
-    it("should create an instance", () => {
-      assert.ok(typeof collectorExporter !== "undefined");
+    it('should create an instance', () => {
+      assert.ok(typeof collectorExporter !== 'undefined');
     });
 
-    it("should call onInit", () => {
+    it('should call onInit', () => {
       assert.strictEqual(onInitSpy.callCount, 1);
     });
 
-    describe("when config contains certain params", () => {
-      it("should set hostName", () => {
-        assert.strictEqual(collectorExporter.hostName, "foo");
+    describe('when config contains certain params', () => {
+      it('should set hostName', () => {
+        assert.strictEqual(collectorExporter.hostName, 'foo');
       });
 
-      it("should set serviceName", () => {
-        assert.strictEqual(collectorExporter.serviceName, "bar");
+      it('should set serviceName', () => {
+        assert.strictEqual(collectorExporter.serviceName, 'bar');
       });
 
-      it("should set url", () => {
-        assert.strictEqual(collectorExporter.url, "http://foo.bar.com");
+      it('should set url', () => {
+        assert.strictEqual(collectorExporter.url, 'http://foo.bar.com');
       });
 
-      it("should set logger", () => {
+      it('should set logger', () => {
         assert.ok(collectorExporter.logger === collectorExporterConfig.logger);
       });
     });
 
-    describe("when config is missing certain params", () => {
+    describe('when config is missing certain params', () => {
       beforeEach(() => {
         collectorExporter = new CollectorExporter();
       });
 
-      it("should set default serviceName", () => {
-        assert.strictEqual(collectorExporter.serviceName, "collector-exporter");
+      it('should set default serviceName', () => {
+        assert.strictEqual(collectorExporter.serviceName, 'collector-exporter');
       });
 
-      it("should set default logger", () => {
+      it('should set default logger', () => {
         assert.ok(collectorExporter.logger instanceof NoopLogger);
       });
     });
   });
 
-  describe("export", () => {
+  describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorExporter.prototype, "sendSpans");
+      spySend = sinon.stub(CollectorExporter.prototype, 'sendSpans');
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
     afterEach(() => {
       spySend.restore();
     });
 
-    it("should export spans as collectorTypes.Spans", done => {
+    it('should export spans as collectorTypes.Spans', done => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
@@ -121,7 +121,7 @@ describe("CollectorExporter - common", () => {
       assert.strictEqual(spySend.callCount, 1);
     });
 
-    describe("when exporter is shutdown", () => {
+    describe('when exporter is shutdown', () => {
       it('should not export anything but return callback with code "FailedNotRetryable"', () => {
         const spans: ReadableSpan[] = [];
         spans.push(Object.assign({}, mockedReadableSpan));
@@ -135,23 +135,23 @@ describe("CollectorExporter - common", () => {
         assert.strictEqual(
           returnCode,
           ExportResult.FAILED_NOT_RETRYABLE,
-          "return value is wrong"
+          'return value is wrong'
         );
-        assert.strictEqual(spySend.callCount, 0, "should not call send");
+        assert.strictEqual(spySend.callCount, 0, 'should not call send');
       });
     });
   });
 
-  describe("shutdown", () => {
+  describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(CollectorExporter.prototype, "onShutdown");
+      onShutdownSpy = sinon.stub(CollectorExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
-        hostName: "foo",
+        hostName: 'foo',
         logger: new NoopLogger(),
-        serviceName: "bar",
+        serviceName: 'bar',
         attributes: {},
-        url: "http://foo.bar.com"
+        url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
@@ -159,7 +159,7 @@ describe("CollectorExporter - common", () => {
       onShutdownSpy.restore();
     });
 
-    it("should call onShutdown", done => {
+    it('should call onShutdown', done => {
       collectorExporter.shutdown();
       setTimeout(() => {
         assert.equal(onShutdownSpy.callCount, 1);

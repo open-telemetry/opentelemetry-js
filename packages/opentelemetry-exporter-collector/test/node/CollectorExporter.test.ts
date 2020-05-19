@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-import * as protoLoader from "@grpc/proto-loader";
-import * as grpc from "grpc";
-import * as path from "path";
-import * as fs from "fs";
+import * as protoLoader from '@grpc/proto-loader';
+import * as grpc from 'grpc';
+import * as path from 'path';
+import * as fs from 'fs';
 import {
   BasicTracerProvider,
-  SimpleSpanProcessor
-} from "@opentelemetry/tracing";
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 
-import * as assert from "assert";
-import * as sinon from "sinon";
-import { CollectorExporter } from "../../src/platform/node";
-import * as collectorTypes from "../../src/types";
+import * as assert from 'assert';
+import * as sinon from 'sinon';
+import { CollectorExporter } from '../../src/platform/node';
+import * as collectorTypes from '../../src/types';
 
 import {
   ensureResourceIsCorrect,
   ensureExportedSpanIsCorrect,
-  mockedReadableSpan
-} from "../helper";
+  mockedReadableSpan,
+} from '../helper';
 
 const traceServiceProtoPath =
-  "opentelemetry/proto/collector/trace/v1/trace_service.proto";
-const includeDirs = [path.resolve(__dirname, "../../src/platform/node/protos")];
+  'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 
-const address = "localhost:1501";
+const address = 'localhost:1501';
 
 type TestParams = {
   useTLS: boolean;
@@ -46,7 +46,7 @@ type TestParams = {
 
 const testCollectorExporter = (params: TestParams) =>
   describe(`CollectorExporter - node ${
-    params.useTLS ? "with TLS" : ""
+    params.useTLS ? 'with TLS' : ''
   }`, () => {
     let collectorExporter: CollectorExporter;
     let server: grpc.Server;
@@ -63,7 +63,7 @@ const testCollectorExporter = (params: TestParams) =>
           enums: String,
           defaults: true,
           oneofs: true,
-          includeDirs
+          includeDirs,
         })
         .then((packageDefinition: protoLoader.PackageDefinition) => {
           const packageObject: any = grpc.loadPackageDefinition(
@@ -81,17 +81,17 @@ const testCollectorExporter = (params: TestParams) =>
                 } catch (e) {
                   exportedData = undefined;
                 }
-              }
+              },
             }
           );
           let credentials = params.useTLS
             ? grpc.ServerCredentials.createSsl(
-                fs.readFileSync("./test/certs/ca.crt"),
+                fs.readFileSync('./test/certs/ca.crt'),
                 [
                   {
-                    cert_chain: fs.readFileSync("./test/certs/server.crt"),
-                    private_key: fs.readFileSync("./test/certs/server.key")
-                  }
+                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                    private_key: fs.readFileSync('./test/certs/server.key'),
+                  },
                 ]
               )
             : grpc.ServerCredentials.createInsecure();
@@ -108,15 +108,15 @@ const testCollectorExporter = (params: TestParams) =>
     beforeEach(done => {
       const credentials = params.useTLS
         ? grpc.credentials.createSsl(
-            fs.readFileSync("./test/certs/ca.crt"),
-            fs.readFileSync("./test/certs/client.key"),
-            fs.readFileSync("./test/certs/client.crt")
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
           )
         : undefined;
       collectorExporter = new CollectorExporter({
-        serviceName: "basic-service",
+        serviceName: 'basic-service',
         url: address,
-        credentials
+        credentials,
       });
 
       const provider = new BasicTracerProvider();
@@ -128,15 +128,15 @@ const testCollectorExporter = (params: TestParams) =>
       exportedData = undefined;
     });
 
-    describe("export", () => {
-      it("should export spans", done => {
+    describe('export', () => {
+      it('should export spans', done => {
         const responseSpy = sinon.spy();
         const spans = [Object.assign({}, mockedReadableSpan)];
         collectorExporter.export(spans, responseSpy);
         setTimeout(() => {
           assert.ok(
-            typeof exportedData !== "undefined",
-            "resource" + " doesn't exist"
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
           );
           let spans;
           let resource;
@@ -146,7 +146,7 @@ const testCollectorExporter = (params: TestParams) =>
             ensureExportedSpanIsCorrect(spans[0]);
 
             assert.ok(
-              typeof resource !== "undefined",
+              typeof resource !== 'undefined',
               "resource doesn't exist"
             );
             if (resource) {

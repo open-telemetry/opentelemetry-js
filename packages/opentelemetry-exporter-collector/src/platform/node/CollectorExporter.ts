@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import * as protoLoader from "@grpc/proto-loader";
-import * as grpc from "grpc";
-import * as path from "path";
-import * as collectorTypes from "../../types";
+import * as protoLoader from '@grpc/proto-loader';
+import * as grpc from 'grpc';
+import * as path from 'path';
+import * as collectorTypes from '../../types';
 
-import { ReadableSpan } from "@opentelemetry/tracing";
+import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   CollectorExporterBase,
-  CollectorExporterConfigBase
-} from "../../CollectorExporterBase";
-import { CollectorExporterError } from "../../types";
-import { toCollectorExportTraceServiceRequest } from "../../transform";
-import { CollectorData, GRPCQueueItem } from "./types";
-import { removeProtocol } from "./util";
+  CollectorExporterConfigBase,
+} from '../../CollectorExporterBase';
+import { CollectorExporterError } from '../../types';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorData, GRPCQueueItem } from './types';
+import { removeProtocol } from './util';
 
 const traceServiceClients: WeakMap<
   CollectorExporter,
@@ -44,7 +44,9 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 /**
  * Collector Exporter
  */
-export class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
+export class CollectorExporter extends CollectorExporterBase<
+  CollectorExporterConfig
+> {
   /**
    * @param config
    */
@@ -67,15 +69,15 @@ export class CollectorExporter extends CollectorExporterBase<CollectorExporterCo
   onInit(config: CollectorExporterConfig): void {
     traceServiceClients.set(this, {
       isShutDown: false,
-      grpcSpansQueue: []
+      grpcSpansQueue: [],
     });
     const serverAddress = removeProtocol(this.url);
     const credentials: grpc.ChannelCredentials =
       config.credentials || grpc.credentials.createInsecure();
 
     const traceServiceProtoPath =
-      "opentelemetry/proto/collector/trace/v1/trace_service.proto";
-    const includeDirs = [path.resolve(__dirname, "protos")];
+      'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+    const includeDirs = [path.resolve(__dirname, 'protos')];
 
     protoLoader
       .load(traceServiceProtoPath, {
@@ -84,7 +86,7 @@ export class CollectorExporter extends CollectorExporterBase<CollectorExporterCo
         enums: String,
         defaults: true,
         oneofs: true,
-        includeDirs
+        includeDirs,
       })
       .then(packageDefinition => {
         const packageObject: any = grpc.loadPackageDefinition(
@@ -129,7 +131,7 @@ export class CollectorExporter extends CollectorExporterBase<CollectorExporterCo
         ) => {
           if (err) {
             this.logger.error(
-              "exportTraceServiceRequest",
+              'exportTraceServiceRequest',
               exportTraceServiceRequest
             );
             onError(err);
@@ -142,7 +144,7 @@ export class CollectorExporter extends CollectorExporterBase<CollectorExporterCo
       exporter.grpcSpansQueue.push({
         spans,
         onSuccess,
-        onError
+        onError,
       });
     }
   }
