@@ -55,6 +55,17 @@ const { CompositePropagator } = require("@opentelemetry/core");
 api.propagation.setGlobalPropagator(new CompositePropagator());
 ```
 
+#### Correlation Context Propagator
+Provides a text-based approach to propagate [correlation context](https://w3c.github.io/correlation-context/) to remote services using the [OpenTelemetry CorrelationContext Propagation](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/correlationcontext/api.md#header-name) HTTP headers.
+
+```js
+const api = require("@opentelemetry/api");
+const { HttpCorrelationContext } = require("@opentelemetry/core");
+
+/* Set Global Propagator */
+api.propagation.setGlobalPropagator(new HttpCorrelationContext());
+```
+
 ### Built-in Sampler
 Sampler is used to make decisions on `Span` sampling.
 
