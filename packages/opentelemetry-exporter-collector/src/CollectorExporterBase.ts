@@ -14,59 +14,54 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger } from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import * as grpc from 'grpc';
-import { onInit, onShutdown, sendSpans } from './platform/index';
-import { opentelemetryProto } from './types';
+import { Attributes, Logger } from "@opentelemetry/api";
+import { ExportResult, NoopLogger } from "@opentelemetry/core";
+import { ReadableSpan, SpanExporter } from "@opentelemetry/tracing";
+import { opentelemetryProto, CollectorExporterError } from "./types";
 
 /**
  * Collector Exporter Config
  */
-export interface CollectorExporterConfig {
+export interface CollectorExporterConfigBase {
   hostName?: string;
   logger?: Logger;
   serviceName?: string;
   attributes?: Attributes;
   url?: string;
-  credentials?: grpc.ChannelCredentials;
 }
 
-const DEFAULT_SERVICE_NAME = 'collector-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
+const DEFAULT_SERVICE_NAME = "collector-exporter";
+const DEFAULT_COLLECTOR_URL = "http://localhost:55678/v1/trace";
 
 /**
  * Collector Exporter
  */
-export class CollectorExporter implements SpanExporter {
+export abstract class CollectorExporterBase implements SpanExporter {
   readonly serviceName: string;
   readonly url: string;
   readonly logger: Logger;
   readonly hostName: string | undefined;
   readonly attributes?: Attributes;
-  readonly credentials?: grpc.ChannelCredentials;
   private _isShutdown: boolean = false;
 
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigBase = {}) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = config.url || DEFAULT_COLLECTOR_URL;
-    if (typeof config.hostName === 'string') {
+    if (typeof config.hostName === "string") {
       this.hostName = config.hostName;
     }
 
     this.attributes = config.attributes;
-    this.credentials = config.credentials;
 
     this.logger = config.logger || new NoopLogger();
 
     this.shutdown = this.shutdown.bind(this);
 
     // platform dependent
-    onInit(this);
+    this.onInit();
   }
 
   /**
@@ -106,10 +101,10 @@ export class CollectorExporter implements SpanExporter {
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        this.logger.debug('spans to be sent', spans);
+        this.logger.debug("spans to be sent", spans);
         // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
         // it will use the appropriate transport layer automatically depends on platform
-        sendSpans(spans, resolve, reject, this);
+        this.sendSpans(spans, resolve, reject);
       } catch (e) {
         reject(e);
       }
@@ -121,13 +116,21 @@ export class CollectorExporter implements SpanExporter {
    */
   shutdown(): void {
     if (this._isShutdown) {
-      this.logger.debug('shutdown already started');
+      this.logger.debug("shutdown already started");
       return;
     }
     this._isShutdown = true;
-    this.logger.debug('shutdown started');
+    this.logger.debug("shutdown started");
 
     // platform dependent
-    onShutdown(this);
+    this.onShutdown();
   }
+
+  abstract onShutdown(): void;
+  abstract onInit(): void;
+  abstract sendSpans(
+    spans: ReadableSpan[],
+    onSuccess: () => void,
+    onError: (error: CollectorExporterError) => void
+  ): void;
 }
