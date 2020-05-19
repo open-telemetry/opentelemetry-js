@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: restore lerna
-      uses: actions/cache@master # must use master to cache multiple paths
+      uses: actions/cache@master # must use unreleased master to cache multiple paths
       with:
         path: |
           node_modules
