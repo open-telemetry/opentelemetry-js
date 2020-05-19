@@ -13,6 +13,7 @@ This package provides default implementations of the OpenTelemetry API for trace
   * [HttpTraceContext Propagator](#httptracecontext-propagator)
   * [B3 Propagator](#b3-propagator)
   * [Composite Propagator](#composite-propagator)
+  * [Correlation Context Propagator](#correlation-context-propagator)
 - [Built-in Sampler](#built-in-sampler)
   * [Always Sampler](#always-sampler)
   * [Never Sampler](#never-sampler)
