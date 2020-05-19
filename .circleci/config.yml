@@ -115,37 +115,6 @@ browsers_unit_tests: &browsers_unit_tests
         command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then npm run codecov:browser; fi
 
 jobs:
-  lint_&_docs:
-    docker:
-      - image: node:12
-        environment:
-          NPM_CONFIG_UNSAFE_PERM: true
-    steps:
-      - checkout
-      - run:
-          name: Install minimal doc and lint modules globally
-          command: npm i -g tslint lerna typedoc linkinator typescript tslint-consistent-codestyle tslint-microsoft-contrib
-      - run:
-          name: Install gts version 1.1.0 globally
-          command: npm i -g gts@1.1.0
-      - run:
-          name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
-      - run:
-          name: Check code style and linting
-          command: npm run lint
-      - run:
-          name: Install doc dependencies
-          command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
-      - run:
-          name: Docs tests
-          command: npm run docs-test
-      - run:
-          name: Install minimal modules to lint examples
-          command: npm i --no-save eslint eslint-plugin-import eslint-config-airbnb-base
-      - run:
-          name: Lint examples
-          command: npm run lint:examples
   node8:
     docker:
       - image: node:8
@@ -180,10 +149,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint_&_docs:
-          filters:
-            branches:
-              only: /.*/
       - node8
       - node10
       - node12
