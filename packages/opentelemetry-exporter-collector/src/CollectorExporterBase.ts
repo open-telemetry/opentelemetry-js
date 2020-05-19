@@ -36,18 +36,18 @@ const DEFAULT_COLLECTOR_URL = "http://localhost:55678/v1/trace";
 /**
  * Collector Exporter
  */
-export abstract class CollectorExporterBase implements SpanExporter {
-  readonly serviceName: string;
-  readonly url: string;
-  readonly logger: Logger;
-  readonly hostName: string | undefined;
-  readonly attributes?: Attributes;
+export abstract class CollectorExporterBase<T extends CollectorExporterConfigBase> implements SpanExporter {
+  protected readonly serviceName: string;
+  protected readonly url: string;
+  protected readonly logger: Logger;
+  protected readonly hostName: string | undefined;
+  protected readonly attributes?: Attributes;
   private _isShutdown: boolean = false;
 
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfigBase = {}) {
+  constructor(config: T = ({} as T)) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = config.url || DEFAULT_COLLECTOR_URL;
     if (typeof config.hostName === "string") {
@@ -61,7 +61,7 @@ export abstract class CollectorExporterBase implements SpanExporter {
     this.shutdown = this.shutdown.bind(this);
 
     // platform dependent
-    this.onInit();
+    this.onInit(config);
   }
 
   /**
@@ -127,7 +127,7 @@ export abstract class CollectorExporterBase implements SpanExporter {
   }
 
   abstract onShutdown(): void;
-  abstract onInit(): void;
+  abstract onInit(config: T): void;
   abstract sendSpans(
     spans: ReadableSpan[],
     onSuccess: () => void,

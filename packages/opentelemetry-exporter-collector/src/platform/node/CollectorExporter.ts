@@ -44,9 +44,7 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 /**
  * Collector Exporter
  */
-export class CollectorExporter extends CollectorExporterBase {
-  protected credentials?: grpc.ChannelCredentials;
-
+export class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
   /**
    * @param config
    */
@@ -66,14 +64,14 @@ export class CollectorExporter extends CollectorExporterBase {
     }
   }
 
-  onInit(): void {
+  onInit(config: CollectorExporterConfig): void {
     traceServiceClients.set(this, {
       isShutDown: false,
       grpcSpansQueue: []
     });
     const serverAddress = removeProtocol(this.url);
     const credentials: grpc.ChannelCredentials =
-      this.credentials || grpc.credentials.createInsecure();
+      config.credentials || grpc.credentials.createInsecure();
 
     const traceServiceProtoPath =
       "opentelemetry/proto/collector/trace/v1/trace_service.proto";

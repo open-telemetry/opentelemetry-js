@@ -11,7 +11,9 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {}
 /**
  * Collector Exporter
  */
-export class CollectorExporter extends CollectorExporterBase {
+export class CollectorExporter extends CollectorExporterBase<
+  CollectorExporterConfig
+> {
   onInit(): void {
     window.addEventListener("unload", this.shutdown);
   }
