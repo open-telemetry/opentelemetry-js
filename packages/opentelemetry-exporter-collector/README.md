@@ -49,7 +49,7 @@ provider.register();
 
 ```
 
-By default, plaintext connection is used. In order to use TLS, provide `credentials` option like so:
+By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
 ```js
 const fs = require('fs');
 const grpc = require('grpc');
