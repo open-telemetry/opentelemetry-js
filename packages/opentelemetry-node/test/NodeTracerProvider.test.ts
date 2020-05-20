@@ -28,7 +28,7 @@ import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import * as path from 'path';
 import { ContextManager } from '@opentelemetry/context-base';
-import { NodeTracerProvider, mergePlugins } from '../src/NodeTracerProvider';
+import { NodeTracerProvider } from '../src/NodeTracerProvider';
 
 const sleep = (time: number) =>
   new Promise(resolve => {
@@ -307,7 +307,9 @@ describe('mergePlugins', () => {
     },
   };
 
-  const mergedPlugins = mergePlugins(defaultPlugins, userPlugins);
+  const provider = new NodeTracerProvider();
+
+  const mergedPlugins = provider.mergePlugins(defaultPlugins, userPlugins);
 
   it('should merge user and default configs', () => {
     assert.equal(mergedPlugins.module1.enabled, true);
