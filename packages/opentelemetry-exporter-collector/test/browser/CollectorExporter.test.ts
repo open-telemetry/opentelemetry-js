@@ -21,7 +21,7 @@ import * as sinon from 'sinon';
 import {
   CollectorExporter,
   CollectorExporterConfig,
-} from '../../src/CollectorExporter';
+} from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
 
 import {
