@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.8.2
+
+#### :rocket: (Enhancement)
+* `opentelemetry-exporter-collector`
+  * [#1063](https://github.com/open-telemetry/opentelemetry-js/pull/1063) feat: exporter collector TLS option ([@mzahor](https://github.com/mzahor))
+* `opentelemetry-core`
+  * [#838](https://github.com/open-telemetry/opentelemetry-js/pull/838) feat: implement W3C Correlation Context propagator ([@rubenvp8510](https://github.com/rubenvp8510))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-api`
+  * [#1067](https://github.com/open-telemetry/opentelemetry-js/pull/1067) fix: missing `global` in browser environments ([@legendecas](https://github.com/legendecas))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1057](https://github.com/open-telemetry/opentelemetry-js/pull/1057) chore: add examples README.md ([@mayurkale22](https://github.com/mayurkale22))
+* `opentelemetry-core`
+  * [#1080](https://github.com/open-telemetry/opentelemetry-js/pull/1080) docs: document CorrelationContext propagator under Built-in Implement… ([@rubenvp8510](https://github.com/rubenvp8510))
+
+#### Committers: 5
+- Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Olivier Albertini ([@OlivierAlbertini](https://github.com/OlivierAlbertini))
+- Ruben Vargas Palma ([@rubenvp8510](https://github.com/rubenvp8510))
+- legendecas ([@legendecas](https://github.com/legendecas))
+
 ## 0.8.1
 
 #### :rocket: (Enhancement)
