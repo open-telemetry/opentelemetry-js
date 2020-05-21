@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
+import { Aggregator, Point, AggregatorType } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
 /** Basic aggregator which calculates a Sum from individual measurements. */
 export class CounterSumAggregator implements Aggregator {
+  public type = AggregatorType.COUNTERSUM;
   private _current: number = 0;
   private _lastUpdateTime: HrTime = [0, 0];
 

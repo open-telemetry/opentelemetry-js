@@ -20,13 +20,10 @@ import {
   hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
-  CounterSumAggregator,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
-  ObserverAggregator,
-  HistogramAggregator,
-  MeasureExactAggregator,
+  AggregatorType,
   Sum,
   Histogram,
   Distribution,
@@ -209,18 +206,18 @@ export class PrometheusExporter implements MetricExporter {
     };
 
     if (
-      record.aggregator instanceof CounterSumAggregator &&
+      record.aggregator.type === AggregatorType.COUNTERSUM &&
       record.descriptor.monotonic
     ) {
       return new prom.Counter(metricObject);
-    } else if (record.aggregator instanceof CounterSumAggregator) {
+    } else if (record.aggregator.type === AggregatorType.COUNTERSUM) {
       // there is no such thing as a non-monotonic counter in prometheus
       return new prom.Gauge(metricObject);
-    } else if (record.aggregator instanceof ObserverAggregator) {
+    } else if (record.aggregator.type === AggregatorType.OBSERVER) {
       return new prom.Gauge(metricObject);
-    } else if (record.aggregator instanceof MeasureExactAggregator) {
+    } else if (record.aggregator.type === AggregatorType.MEASUREEXACT) {
       return new MockSummary(Object.assign(metricObject, { percentiles: [] }));
-    } else if (record.aggregator instanceof HistogramAggregator) {
+    } else if (record.aggregator.type === AggregatorType.HISTOGRAM) {
       return new MockHistogram(metricObject);
     }
     // other aggregator are not implemented right now

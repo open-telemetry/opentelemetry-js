@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
+import { Aggregator, Point, AggregatorType } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
 /** Basic aggregator for Observer which keeps the last recorded value. */
 export class ObserverAggregator implements Aggregator {
+  public type = AggregatorType.OBSERVER;
   private _current: number = 0;
   private _lastUpdateTime: HrTime = [0, 0];
 

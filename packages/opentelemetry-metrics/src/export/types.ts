@@ -97,10 +97,26 @@ export interface MetricExporter {
 }
 
 /**
+ * Type of standard aggregator.
+ */
+export enum AggregatorType {
+  UNKNOWN = 'unknown',
+  COUNTERSUM = 'countersum',
+  HISTOGRAM = 'histogram',
+  MEASUREEXACT = 'measureexact',
+  OBSERVER = 'observer',
+}
+
+/**
  * Base interface for aggregators. Aggregators are responsible for holding
  * aggregated values and taking a snapshot of these values upon export.
  */
 export interface Aggregator {
+  /**
+   * The type of aggregator
+   */
+  type: AggregatorType;
+
   /** Updates the current with the new value. */
   update(value: number): void;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point, Histogram } from '../types';
+import { Aggregator, Point, Histogram, AggregatorType } from '../types';
 import { hrTime } from '@opentelemetry/core';
 import { HrTime } from '@opentelemetry/api';
 
@@ -23,6 +23,7 @@ import { HrTime } from '@opentelemetry/api';
  * and provides the total sum and count of all observations.
  */
 export class HistogramAggregator implements Aggregator {
+  public type = AggregatorType.HISTOGRAM;
   private _histogram: Histogram;
   private readonly _boundaries: number[];
   private _lastUpdate: HrTime = hrTime();

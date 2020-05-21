@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
+import { Aggregator, Point, AggregatorType } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import { Distribution } from '../types';
 
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
 export class MeasureExactAggregator implements Aggregator {
+  public type = AggregatorType.MEASUREEXACT;
   private _distribution: Distribution;
   private _lastUpdateTime: HrTime = [0, 0];
 
