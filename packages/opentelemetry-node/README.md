@@ -52,22 +52,16 @@ npm install --save @opentelemetry/plugin-https
 
 ## Usage
 
-The following code will configure the `NodeTracerProvider` to instrument `http` using `@opentelemetry/plugin-http`.
+The following code will configure the `NodeTracerProvider` to instrument `http`
+(and any other installed [supported
+modules](https://github.com/open-telemetry/opentelemetry-js#plugins))
+using `@opentelemetry/plugin-http`.
 
 ```js
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 // Create and configure NodeTracerProvider
-const provider = new NodeTracerProvider({
-  plugins: {
-    http: {
-      enabled: true,
-      // You may use a package name or absolute path to the file.
-      path: '@opentelemetry/plugin-http',
-      // http plugin options
-    }
-  }
-});
+const provider = new NodeTracerProvider();
 
 // Initialize the provider
 provider.register()
@@ -77,19 +71,35 @@ provider.register()
 const http = require('http');
 ```
 
-To enable instrumentation for all [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins), create an instance of `NodeTracerProvider` without providing any plugin configuration to the constructor.
+## Plugin configuration
+
+User supplied plugin configuration is merged with the default plugin
+configuration. Furthermore, custom plugins that are configured are implicitly
+enabled just as default plugins are.
+
+In the following example:
+
+- the default express plugin is disabled
+- the http plugin has a custom config for a `requestHook`
+- the customPlugin is loaded from the user supplied path
+- all default plugins are still loaded if installed.
 
 ```js
-const { NodeTracerProvider } = require('@opentelemetry/node');
-
-// Create and initialize NodeTracerProvider
-const provider = new NodeTracerProvider();
-
-// Initialize the provider
-provider.register()
-
-// Your application code
-// ...
+const provider = new NodeTracerProvider({
+  plugins: {
+    express: {
+      enabled: false,
+    },
+    http: {
+      requestHook: (span, request) => {
+        span.setAttribute("custom request hook attribute", "request");
+      },
+    },
+    customPlugin: {
+      path: "/path/to/custom/module",
+    },
+  },
+});
 ```
 
 ## Examples
