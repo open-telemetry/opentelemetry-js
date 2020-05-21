@@ -133,6 +133,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
+- [Matthew Wear](https://github.com/mwear), LightStep
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
