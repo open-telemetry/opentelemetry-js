@@ -140,9 +140,8 @@ export class TracerShim extends opentracing.Tracer {
     const opentelemSpanContext: api.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     if (!carrier || typeof carrier !== 'object') return;
     switch (format) {
-      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
-      case opentracing.FORMAT_TEXT_MAP:
+      case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
           defaultSetter,
@@ -152,21 +151,22 @@ export class TracerShim extends opentracing.Tracer {
           )
         );
         return;
-      case opentracing.FORMAT_BINARY:
+      }
+      case opentracing.FORMAT_BINARY: {
         this._logger.warn(
           'OpentracingShim.inject() does not support FORMAT_BINARY'
         );
         // @todo: Implement binary format
         return;
+      }
       default:
     }
   }
 
   _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     switch (format) {
-      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
-      case opentracing.FORMAT_TEXT_MAP:
+      case opentracing.FORMAT_TEXT_MAP: {
         const context = getExtractedSpanContext(
           api.propagation.extract(carrier)
         );
@@ -174,12 +174,14 @@ export class TracerShim extends opentracing.Tracer {
           return null;
         }
         return new SpanContextShim(context);
-      case opentracing.FORMAT_BINARY:
+      }
+      case opentracing.FORMAT_BINARY: {
         // @todo: Implement binary format
         this._logger.warn(
           'OpentracingShim.extract() does not support FORMAT_BINARY'
         );
         return null;
+      }
       default:
     }
     return null;

@@ -15,8 +15,9 @@
  */
 
 import * as childProcess from 'child_process';
-import { SpanKind, Attributes, Event, Span, Status } from '@opentelemetry/api';
 import * as assert from 'assert';
+/* eslint-disable node/no-unpublished-import */
+import { SpanKind, Attributes, Event, Span, Status } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,

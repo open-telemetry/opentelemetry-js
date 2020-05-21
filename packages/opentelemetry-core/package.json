@@ -18,8 +18,8 @@
     "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "clean": "rimraf build/*",
-    "lint": "gts check",
-    "lint:fix": "gts fix",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
     "prepare": "npm run compile",
@@ -38,7 +38,7 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "engines": {
-    "node": ">=8.0.0"
+    "node": ">=8.5.0"
   },
   "files": [
     "build/src/**/*.js",
@@ -57,7 +57,7 @@
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "codecov": "^3.6.1",
-    "gts": "^1.1.0",
+    "gts": "^2.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^5.0.5",
     "karma-chrome-launcher": "^3.1.0",
@@ -72,8 +72,6 @@
     "ts-loader": "^6.0.4",
     "ts-mocha": "^7.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.16.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.2",
     "webpack": "^4.35.2"
   },

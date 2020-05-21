@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,25 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Status, CanonicalCode, Span, Attributes } from '@opentelemetry/api';
+import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/api';
 import {
-  RequestOptions,
-  IncomingMessage,
   ClientRequest,
   IncomingHttpHeaders,
+  IncomingMessage,
   OutgoingHttpHeaders,
+  RequestOptions,
   ServerResponse,
 } from 'http';
+import { Socket } from 'net';
+import * as url from 'url';
+import { AttributeNames } from './enums/AttributeNames';
 import {
-  IgnoreMatcher,
   Err,
+  IgnoreMatcher,
   ParsedRequestOptions,
   SpecialHttpStatusCodeMapping,
 } from './types';
-import { AttributeNames } from './enums/AttributeNames';
-import * as url from 'url';
-import { Socket } from 'net';
 
 /**
  * Specific header used by exporters to "mark" outgoing request to avoid creating
@@ -266,8 +265,9 @@ export const getRequestInfo = (
     if (!pathname && optionsParsed.path) {
       pathname = url.parse(optionsParsed.path).pathname || '/';
     }
-    origin = `${optionsParsed.protocol || 'http:'}//${optionsParsed.host ||
-      `${optionsParsed.hostname}:${optionsParsed.port}`}`;
+    origin = `${optionsParsed.protocol || 'http:'}//${
+      optionsParsed.host || `${optionsParsed.hostname}:${optionsParsed.port}`
+    }`;
   }
 
   if (hasExpectHeader(optionsParsed)) {
@@ -327,13 +327,12 @@ export const getOutgoingRequestAttributes = (
   const host = requestOptions.host;
   const hostname =
     requestOptions.hostname ||
-    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
     'localhost';
   const requestMethod = requestOptions.method;
   const method = requestMethod ? requestMethod.toUpperCase() : 'GET';
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
-
   const attributes: Attributes = {
     [AttributeNames.HTTP_URL]: getAbsoluteUrl(
       requestOptions,
@@ -414,7 +413,7 @@ export const getIncomingRequestAttributes = (
   const host = requestUrl?.host || headers.host;
   const hostname =
     requestUrl?.hostname ||
-    host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+    host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
     'localhost';
   const serverName = options.serverName;
   const attributes: Attributes = {
@@ -437,8 +436,8 @@ export const getIncomingRequestAttributes = (
   }
 
   if (requestUrl) {
-    attributes[AttributeNames.HTTP_TARGET] = requestUrl.path || '/';
     attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
+    attributes[AttributeNames.HTTP_TARGET] = requestUrl.pathname || '/';
   }
 
   if (userAgent !== undefined) {
@@ -454,7 +453,7 @@ export const getIncomingRequestAttributes = (
  * @param {(ServerResponse & { socket: Socket; })} response the response object
  */
 export const getIncomingRequestAttributesOnResponse = (
-  request: IncomingMessage,
+  request: IncomingMessage & { __ot_middlewares?: string[] },
   response: ServerResponse & { socket: Socket }
 ): Attributes => {
   const { statusCode, statusMessage, socket } = response;

@@ -47,20 +47,14 @@ interface TestRequestResponse {
 }
 
 type TestGrpcClient = grpc.Client & {
-  // tslint:disable-next-line:no-any
   unaryMethod: any;
-  // tslint:disable-next-line:no-any
   UnaryMethod: any;
-  // tslint:disable-next-line:no-any
   clientStreamMethod: any;
-  // tslint:disable-next-line:no-any
   serverStreamMethod: any;
-  // tslint:disable-next-line:no-any
   bidiStreamMethod: any;
 };
 
 // Compare two arrays using an equal function f
-// tslint:disable-next-line:no-any
 const arrayIsEqual = (f: any) => ([x, ...xs]: any) => ([y, ...ys]: any): any =>
   x === undefined && y === undefined
     ? true
@@ -75,8 +69,7 @@ const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
   y: TestRequestResponse | TestRequestResponse[]
 ) =>
   x instanceof Array && y instanceof Array
-    ? // tslint:disable-next-line:no-any
-      arrayIsEqual(requestEqual)(x as any)(y as any)
+    ? arrayIsEqual(requestEqual)(x as any)(y as any)
     : !(x instanceof Array) && !(y instanceof Array)
     ? requestEqual(x)(y)
     : false;
@@ -201,7 +194,6 @@ const replicate = (request: TestRequestResponse) => {
   return result;
 };
 
-// tslint:disable-next-line:no-any
 function startServer(grpc: GrpcModule, proto: any) {
   const server = new grpc.Server();
 
@@ -220,7 +212,6 @@ function startServer(grpc: GrpcModule, proto: any) {
 
     // This method returns the request
     unaryMethod(
-      // tslint:disable-next-line:no-any
       call: grpc.ServerUnaryCall<any>,
       callback: SendUnaryDataCallback
     ) {
@@ -231,7 +222,6 @@ function startServer(grpc: GrpcModule, proto: any) {
 
     // This method sum the requests
     clientStreamMethod(
-      // tslint:disable-next-line:no-any
       call: grpc.ServerReadableStream<any>,
       callback: SendUnaryDataCallback
     ) {
@@ -254,7 +244,6 @@ function startServer(grpc: GrpcModule, proto: any) {
 
     // This method returns an array that replicates the request, request.num of
     // times
-    // tslint:disable-next-line:no-any
     serverStreamMethod: (call: grpc.ServerWriteableStream<any>) => {
       const result = replicate(call.request);
 
@@ -272,7 +261,6 @@ function startServer(grpc: GrpcModule, proto: any) {
     },
 
     // This method returns the request
-    // tslint:disable-next-line:no-any
     bidiStreamMethod: (call: grpc.ServerDuplexStream<any, any>) => {
       call.on('data', (data: TestRequestResponse) => {
         if (data.num <= MAX_ERROR_STATUS) {
@@ -291,7 +279,6 @@ function startServer(grpc: GrpcModule, proto: any) {
   return server;
 }
 
-// tslint:disable-next-line:no-any
 function createClient(grpc: GrpcModule, proto: any) {
   return new proto.GrpcTester(
     'localhost:' + grpcPort,
@@ -399,7 +386,6 @@ describe('GrpcPlugin', () => {
       method.description
     }`, async () => {
       const args = [client, method.request];
-      // tslint:disable-next-line:no-any
       await (method.method as any)
         .apply({}, args)
         .then((result: TestRequestResponse | TestRequestResponse[]) => {
@@ -441,7 +427,6 @@ describe('GrpcPlugin', () => {
         assert.deepStrictEqual(rootSpan, span);
 
         const args = [client, method.request];
-        // tslint:disable-next-line:no-any
         await (method.method as any)
           .apply({}, args)
           .then(() => {
@@ -498,7 +483,6 @@ describe('GrpcPlugin', () => {
           : method.request;
       const args = [client, insertError(errRequest)(errorCode)];
 
-      // tslint:disable-next-line:no-any
       await (method.method as any)
         .apply({}, args)
         .then(() => {
@@ -540,7 +524,6 @@ describe('GrpcPlugin', () => {
             : method.request;
         const args = [client, insertError(errRequest)(errorCode)];
 
-        // tslint:disable-next-line:no-any
         await (method.method as any)
           .apply({}, args)
           .then(() => {
@@ -608,7 +591,6 @@ describe('GrpcPlugin', () => {
     methodList.forEach(method => {
       describe(`Test error raising for grpc remote ${method.description}`, () => {
         Object.keys(grpc.status).forEach((statusKey: string) => {
-          // tslint:disable-next-line:no-any
           const errorCode = Number(grpc.status[statusKey as any]);
           if (errorCode > grpc.status.OK) {
             runErrorTest(method, statusKey, errorCode, provider);

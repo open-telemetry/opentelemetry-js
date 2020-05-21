@@ -5,8 +5,8 @@
   "description": "Test utilities.",
   "main": "build/testUtils.js",
   "scripts": {
-    "lint": "gts check",
-    "lint:fix": "gts fix",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "compile": "tsc -p .",
     "precompile": "tsc --version",
     "prepare": "npm run compile"
@@ -26,10 +26,8 @@
     "@opentelemetry/api": "^0.8.1",
     "@opentelemetry/core": "^0.8.1",
     "@opentelemetry/tracing": "^0.8.1",
-    "gts": "^1.1.2",
+    "gts": "^2.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.16.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "3.7.4"
   }
 }
