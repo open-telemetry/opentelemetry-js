@@ -21,6 +21,9 @@ import { isListenerObject } from './util';
 /* Key name to be used to save a context reference in Zone */
 const ZONE_CONTEXT_KEY = 'OT_ZONE_CONTEXT';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type UserFunction = Function;
+
 /**
  * ZoneContextManager
  * This module provides an easy functionality for tracing action between asynchronous operations in web.
@@ -55,7 +58,10 @@ export class ZoneContextManager implements ContextManager {
    * @param target Function to be executed within the context
    * @param context A context (span) to be executed within target function
    */
-  private _bindFunction<T extends Function>(target: T, context: Context): T {
+  private _bindFunction<T extends UserFunction>(
+    target: T,
+    context: Context
+  ): T {
     const manager = this;
     const contextWrapper = function (this: any, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
@@ -136,13 +142,13 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchAddEventListener(
     target: TargetWithEvents,
-    original: Function,
+    original: UserFunction,
     context: Context
   ) {
     const contextManager = this;
 
     return function (
-      this: {},
+      this: unknown,
       event: string,
       listener: Func<void>,
       opts?: any
@@ -169,9 +175,9 @@ export class ZoneContextManager implements ContextManager {
    */
   private _patchRemoveEventListener(
     target: TargetWithEvents,
-    original: Function
+    original: UserFunction
   ) {
-    return function (this: {}, event: string, listener: Func<void>) {
+    return function (this: unknown, event: string, listener: Func<void>) {
       if (
         target.__ot_listeners === undefined ||
         target.__ot_listeners[event] === undefined
