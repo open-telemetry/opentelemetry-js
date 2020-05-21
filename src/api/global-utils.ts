@@ -18,6 +18,7 @@ import { ContextManager } from '@opentelemetry/context-base';
 import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { TracerProvider } from '../trace/tracer_provider';
+import { _globalThis } from '../platform';
 
 export const GLOBAL_CONTEXT_MANAGER_API_KEY = Symbol.for(
   'io.opentelemetry.js.api.context'
@@ -31,14 +32,14 @@ export const GLOBAL_PROPAGATION_API_KEY = Symbol.for(
 export const GLOBAL_TRACE_API_KEY = Symbol.for('io.opentelemetry.js.api.trace');
 
 type Get<T> = (version: number) => T;
-type MyGlobals = Partial<{
+type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
   [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
   [GLOBAL_PROPAGATION_API_KEY]: Get<HttpTextPropagator>;
   [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
 }>;
 
-export const _global = global as typeof global & MyGlobals;
+export const _global = _globalThis as OtelGlobal;
 
 /**
  * Make a function which accepts a version integer and returns the instance of an API if the version

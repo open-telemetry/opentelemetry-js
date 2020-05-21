@@ -4,6 +4,10 @@
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
