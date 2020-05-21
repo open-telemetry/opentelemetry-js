@@ -32,6 +32,7 @@ function get(input: string | URL, options?: https.RequestOptions): GetResult;
 function get(input: https.RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line prefer-const
     let req: http.ClientRequest;
 
     function onGetResponseCb(resp: http.IncomingMessage): void {

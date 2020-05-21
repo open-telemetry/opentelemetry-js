@@ -22,7 +22,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
 
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {}
+export type CollectorExporterConfig = CollectorExporterConfigBase;
 
 /**
  * Collector Exporter for Web

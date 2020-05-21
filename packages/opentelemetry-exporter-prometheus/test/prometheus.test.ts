@@ -34,7 +34,7 @@ describe('PrometheusExporter', () => {
   let toPoint: () => Point;
   before(() => {
     toPoint = CounterSumAggregator.prototype.toPoint;
-    CounterSumAggregator.prototype.toPoint = function(): Point {
+    CounterSumAggregator.prototype.toPoint = function (): Point {
       const point = toPoint.apply(this);
       point.timestamp = mockedHrTime;
       return point;
@@ -59,7 +59,7 @@ describe('PrometheusExporter', () => {
         },
         () => {
           const url = `http://localhost:${port}${endpoint}`;
-          http.get(url, function(res: any) {
+          http.get(url, (res: any) => {
             assert.strictEqual(res.statusCode, 200);
             exporter.shutdown(() => {
               return done();
@@ -94,7 +94,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function(res: any) {
+        http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
@@ -114,7 +114,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, function(res: any) {
+        http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             return done();
@@ -134,7 +134,7 @@ describe('PrometheusExporter', () => {
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}/metric`;
-        http.get(url, function(res: any) {
+        http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
           exporter.shutdown(() => {
             const exporter2 = new PrometheusExporter({
@@ -144,7 +144,7 @@ describe('PrometheusExporter', () => {
 
             exporter2.startServer(() => {
               const url = `http://localhost:${port}/metric`;
-              http.get(url, function(res: any) {
+              http.get(url, (res: any) => {
                 assert.strictEqual(res.statusCode, 200);
                 exporter2.stopServer(() => {
                   return done();
@@ -166,7 +166,7 @@ describe('PrometheusExporter', () => {
       exporter.startServer(() => {
         const url = `http://localhost:${port}/invalid`;
 
-        http.get(url, function(res: any) {
+        http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 404);
           exporter.shutdown(() => {
             return done();

@@ -83,8 +83,6 @@ export class AsyncHooksContextManager implements ContextManager {
     }
     try {
       return fn();
-    } catch (err) {
-      throw err;
     } finally {
       if (oldContext === undefined) {
         this._destroy(uid);
@@ -110,8 +108,6 @@ export class AsyncHooksContextManager implements ContextManager {
     }
     try {
       return await fn();
-    } catch (err) {
-      throw err;
     } finally {
       if (oldContext === undefined) {
         this._destroy(uid);
@@ -147,7 +143,7 @@ export class AsyncHooksContextManager implements ContextManager {
 
   private _bindFunction<T extends Function>(target: T, context: Context): T {
     const manager = this;
-    const contextWrapper = function(this: {}, ...args: unknown[]) {
+    const contextWrapper = function (this: {}, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -160,7 +156,6 @@ export class AsyncHooksContextManager implements ContextManager {
      * It isn't possible to tell Typescript that contextWrapper is the same as T
      * so we forced to cast as any here.
      */
-    // tslint:disable-next-line:no-any
     return contextWrapper as any;
   }
 
@@ -208,7 +203,7 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param original reference to the patched method
    */
   private _patchRemoveListener(ee: PatchedEventEmitter, original: Function) {
-    return function(this: {}, event: string, listener: Func<void>) {
+    return function (this: {}, event: string, listener: Func<void>) {
       if (
         ee.__ot_listeners === undefined ||
         ee.__ot_listeners[event] === undefined
@@ -231,7 +226,7 @@ export class AsyncHooksContextManager implements ContextManager {
     ee: PatchedEventEmitter,
     original: Function
   ) {
-    return function(this: {}, event: string) {
+    return function (this: {}, event: string) {
       if (
         ee.__ot_listeners === undefined ||
         ee.__ot_listeners[event] === undefined
@@ -256,7 +251,7 @@ export class AsyncHooksContextManager implements ContextManager {
     context: Context
   ) {
     const contextManager = this;
-    return function(this: {}, event: string, listener: Func<void>) {
+    return function (this: {}, event: string, listener: Func<void>) {
       if (ee.__ot_listeners === undefined) ee.__ot_listeners = {};
       let listeners = ee.__ot_listeners[event];
       if (listeners === undefined) {

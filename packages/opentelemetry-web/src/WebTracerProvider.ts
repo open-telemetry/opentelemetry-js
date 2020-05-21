@@ -51,8 +51,10 @@ export class WebTracerProvider extends BasicTracerProvider {
     }
 
     if ((config as SDKRegistrationConfig).contextManager) {
-      throw 'contextManager should be defined in register method not in' +
-        ' constructor';
+      throw (
+        'contextManager should be defined in register method not in' +
+        ' constructor'
+      );
     }
     if ((config as SDKRegistrationConfig).propagator) {
       throw 'propagator should be defined in register method not in constructor';

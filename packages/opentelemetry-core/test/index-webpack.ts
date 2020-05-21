@@ -19,7 +19,7 @@
 const testsContextCommon = require.context('.', true, /test$/);
 testsContextCommon.keys().forEach(key => {
   if (key.indexOf('./platform/BasePlugin.test') >= 0) {
-    return function() {};
+    return function () {};
   }
   return testsContextCommon(key);
 });
