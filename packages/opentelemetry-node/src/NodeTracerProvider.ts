@@ -70,7 +70,8 @@ export class NodeTracerProvider extends BasicTracerProvider {
   private _mergePlugins(
     defaultPlugins: Plugins,
     userSuppliedPlugins: Plugins
-  ): Plugins {    const mergedUserSuppliedPlugins: Plugins = {};
+  ): Plugins {
+    const mergedUserSuppliedPlugins: Plugins = {};
 
     for (const pluginName in userSuppliedPlugins) {
       mergedUserSuppliedPlugins[pluginName] = {
