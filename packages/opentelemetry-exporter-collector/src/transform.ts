@@ -200,7 +200,7 @@ export function toCollectorExportTraceServiceRequest<
 >(
   spans: ReadableSpan[],
   collectorExporterBase: CollectorExporterBase<T>,
-  name: string = ''
+  name = ''
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const spansToBeSent: opentelemetryProto.trace.v1.Span[] = spans.map(span =>
     toCollectorSpan(span)

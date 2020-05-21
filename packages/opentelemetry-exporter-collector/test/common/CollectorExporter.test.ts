@@ -25,7 +25,7 @@ import {
 
 import { mockedReadableSpan } from '../helper';
 
-interface CollectorExporterConfig extends CollectorExporterConfigBase {}
+type CollectorExporterConfig = CollectorExporterConfigBase;
 class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
   onInit() {}
   onShutdown() {}
