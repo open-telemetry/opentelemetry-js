@@ -42,7 +42,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
     config.plugins
       ? this._pluginLoader.load(
-          this.mergePlugins(DEFAULT_INSTRUMENTATION_PLUGINS, config.plugins)
+          this._mergePlugins(DEFAULT_INSTRUMENTATION_PLUGINS, config.plugins)
         )
       : this._pluginLoader.load(DEFAULT_INSTRUMENTATION_PLUGINS);
   }
@@ -67,7 +67,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
    * Then merge the results with the default plugins.
    * @returns 2-layer deep merge of default and user supplied plugins.
    */
-  mergePlugins(defaultPlugins: Plugins, userSuppliedPlugins: Plugins): Plugins {
+  private _mergePlugins(defaultPlugins: Plugins, userSuppliedPlugins: Plugins): Plugins {
     const mergedUserSuppliedPlugins: Plugins = {};
 
     for (const pluginName in userSuppliedPlugins) {

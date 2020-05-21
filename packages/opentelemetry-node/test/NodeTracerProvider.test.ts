@@ -309,7 +309,7 @@ describe('mergePlugins', () => {
 
   const provider = new NodeTracerProvider();
 
-  const mergedPlugins = provider.mergePlugins(defaultPlugins, userPlugins);
+  const mergedPlugins = provider["_mergePlugins"](defaultPlugins, userPlugins);
 
   it('should merge user and default configs', () => {
     assert.equal(mergedPlugins.module1.enabled, true);
