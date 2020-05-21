@@ -17,15 +17,15 @@
 import { Tracer } from './tracer';
 
 /**
- * TracerProvider provides an interface for creating {@link Tracer}s
+ * A registry for creating named {@link Tracer}s.
  */
 export interface TracerProvider {
   /**
    * Returns a Tracer, creating one if one with the given name and version is
    * not already created.
    *
-   * If there is no Span associated with the current context, `null` is
-   * returned.
+   * This function may return different Tracer types (e.g.
+   * {@link NoopTracerProvider} vs. a functional tracer).
    *
    * @param name The name of the tracer or instrumentation library.
    * @param version The version of the tracer or instrumentation library.
