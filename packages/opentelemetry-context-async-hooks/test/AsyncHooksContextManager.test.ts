@@ -202,7 +202,7 @@ describe('AsyncHooksContextManager', () => {
     it('not awaited withAsync() inside with() should not restore context', done => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
-      let _done: boolean = false;
+      let _done = false;
 
       contextManager.with(scope1, () => {
         assert.strictEqual(contextManager.active(), scope1);

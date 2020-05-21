@@ -71,11 +71,9 @@ describe('awsEc2Detector', () => {
 
   describe('with failing request', () => {
     it('should return empty resource', async () => {
-      const scope = nock(AWS_HOST)
-        .get(AWS_PATH)
-        .replyWithError({
-          code: 'ENOTFOUND',
-        });
+      const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
+        code: 'ENOTFOUND',
+      });
       const resource: Resource = await awsEc2Detector.detect();
       scope.done();
 

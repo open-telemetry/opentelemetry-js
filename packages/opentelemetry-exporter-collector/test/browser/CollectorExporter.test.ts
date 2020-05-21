@@ -66,7 +66,7 @@ describe('CollectorExporter - web', () => {
   describe('export', () => {
     describe('when "sendBeacon" is available', () => {
       it('should successfully send the spans using sendBeacon', done => {
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const args = spyBeacon.args[0];
@@ -106,7 +106,7 @@ describe('CollectorExporter - web', () => {
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
 
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[1][0];
@@ -123,7 +123,7 @@ describe('CollectorExporter - web', () => {
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const response: any = spyLoggerError.args[0][0];
@@ -138,8 +138,7 @@ describe('CollectorExporter - web', () => {
     describe('when "sendBeacon" is NOT available', () => {
       let server: any;
       beforeEach(() => {
-        // @ts-ignore
-        window.navigator.sendBeacon = false;
+        (window.navigator as any).sendBeacon = false;
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
@@ -147,7 +146,7 @@ describe('CollectorExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -184,7 +183,7 @@ describe('CollectorExporter - web', () => {
         const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
         const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -202,7 +201,7 @@ describe('CollectorExporter - web', () => {
       it('should log the error message', done => {
         const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-        collectorExporter.export(spans, function() {});
+        collectorExporter.export(spans, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];

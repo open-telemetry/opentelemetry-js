@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
   context,
@@ -196,7 +195,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   ): ClientRequest {
     const hostname =
       options.hostname ||
-      options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+      options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
       'localhost';
     const attributes = utils.getOutgoingRequestAttributes(options, {
       component: this.component,
@@ -332,16 +331,14 @@ export class HttpPlugin extends BasePlugin<Http> {
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
           const originalEnd = response.end;
-          response.end = function(
+          response.end = function (
             this: ServerResponse,
             ...args: ResponseEndArgs
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
-            // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
             const returned = plugin._safeExecute(
               span,
-              // tslint:disable-next-line:no-any
               () => response.end.apply(this, arguments as any),
               true
             );
@@ -413,6 +410,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       }
 
       if (
+        utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,

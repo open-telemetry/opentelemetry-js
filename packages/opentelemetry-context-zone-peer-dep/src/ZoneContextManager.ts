@@ -57,7 +57,7 @@ export class ZoneContextManager implements ContextManager {
    */
   private _bindFunction<T extends Function>(target: T, context: Context): T {
     const manager = this;
-    const contextWrapper = function(this: any, ...args: unknown[]) {
+    const contextWrapper = function (this: any, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -141,7 +141,12 @@ export class ZoneContextManager implements ContextManager {
   ) {
     const contextManager = this;
 
-    return function(this: {}, event: string, listener: Func<void>, opts?: any) {
+    return function (
+      this: {},
+      event: string,
+      listener: Func<void>,
+      opts?: any
+    ) {
       if (target.__ot_listeners === undefined) {
         target.__ot_listeners = {};
       }
@@ -166,7 +171,7 @@ export class ZoneContextManager implements ContextManager {
     target: TargetWithEvents,
     original: Function
   ) {
-    return function(this: {}, event: string, listener: Func<void>) {
+    return function (this: {}, event: string, listener: Func<void>) {
       if (
         target.__ot_listeners === undefined ||
         target.__ot_listeners[event] === undefined
