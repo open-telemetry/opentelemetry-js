@@ -20,5 +20,5 @@
  * @param url
  */
 export function removeProtocol(url: string): string {
-  return url.replace(/^https?\:\/\//, '');
+  return url.replace(/^https?:\/\//, '');
 }

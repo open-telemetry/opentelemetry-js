@@ -84,7 +84,7 @@ const testCollectorExporter = (params: TestParams) =>
               },
             }
           );
-          let credentials = params.useTLS
+          const credentials = params.useTLS
             ? grpc.ServerCredentials.createSsl(
                 fs.readFileSync('./test/certs/ca.crt'),
                 [

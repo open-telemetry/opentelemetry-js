@@ -65,7 +65,7 @@ export class HttpCorrelationContext implements HttpTextPropagator {
   }
 
   private _serializeKeyPairs(keyPairs: string[]) {
-    return keyPairs.reduce((hValue: String, current: String) => {
+    return keyPairs.reduce((hValue: string, current: string) => {
       const value = `${hValue}${hValue != '' ? ITEMS_SEPARATOR : ''}${current}`;
       return value.length > MAX_TOTAL_LENGTH ? hValue : value;
     }, '');

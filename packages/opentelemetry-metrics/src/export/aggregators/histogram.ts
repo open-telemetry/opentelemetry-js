@@ -30,7 +30,7 @@ export class HistogramAggregator implements Aggregator {
 
   constructor(boundaries: number[]) {
     if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error(`HistogramAggregator should be created with boundaries.`);
+      throw new Error('HistogramAggregator should be created with boundaries.');
     }
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
