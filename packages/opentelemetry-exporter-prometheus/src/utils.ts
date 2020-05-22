@@ -24,8 +24,8 @@ import { Histogram, Distribution } from '@opentelemetry/metrics';
  * using the Opentelemetry data.
  */
 
-// Mock implementation of the prom Histogram that allows us to set its internal state
-export class MockHistogram extends prom.Histogram {
+// Custom implementation of the prom Histogram that allows us to set its internal state
+export class CustomHistogram extends prom.Histogram {
   // tslint:disable-next-line naming-convention / name used by prom internally
   protected upperBounds: number[] = [];
   // ref https://github.com/siimon/prom-client/blob/master/lib/histogram.js#L34
@@ -64,8 +64,8 @@ export class MockHistogram extends prom.Histogram {
   }
 }
 
-// Mock implementation of the prom Summary that allows us to set its internal state
-export class MockSummary extends prom.Summary {
+// Custom implementation of the prom Summary that allows us to set its internal state
+export class CustomSummary extends prom.Summary {
   // ref: https://github.com/siimon/prom-client/blob/master/lib/summary.js#L29
   // tslint:disable-next-line naming-convention / name used by prom internally
   protected hashMap: Record<

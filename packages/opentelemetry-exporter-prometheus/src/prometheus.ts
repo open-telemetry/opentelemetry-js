@@ -33,7 +33,7 @@ import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as prom from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
-import { MockHistogram, MockSummary } from './utils';
+import { CustomHistogram, CustomSummary } from './utils';
 
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
@@ -149,10 +149,10 @@ export class PrometheusExporter implements MetricExporter {
         point.value as number,
         hrTimeToMilliseconds(point.timestamp)
       );
-    } else if (metric instanceof MockSummary) {
+    } else if (metric instanceof CustomSummary) {
       const distribution = point.value as Distribution;
       metric.setValues(distribution, labelValues);
-    } else if (metric instanceof MockHistogram) {
+    } else if (metric instanceof CustomHistogram) {
       const histogram = point.value as Histogram;
       metric.setValues(histogram, labelValues);
     }
@@ -216,9 +216,11 @@ export class PrometheusExporter implements MetricExporter {
     } else if (record.aggregator.type === AggregatorType.OBSERVER) {
       return new prom.Gauge(metricObject);
     } else if (record.aggregator.type === AggregatorType.MEASUREEXACT) {
-      return new MockSummary(Object.assign(metricObject, { percentiles: [] }));
+      return new CustomSummary(
+        Object.assign(metricObject, { percentiles: [] })
+      );
     } else if (record.aggregator.type === AggregatorType.HISTOGRAM) {
-      return new MockHistogram(metricObject);
+      return new CustomHistogram(metricObject);
     }
     // other aggregator are not implemented right now
     return undefined;
