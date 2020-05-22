@@ -12,6 +12,12 @@ module.exports = {
   },
   rules: {
     "@typescript-eslint/no-this-alias": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_"
+      }
+    ],
     "eqeqeq": "off",
     "prefer-rest-params": "off",
     "@typescript-eslint/naming-convention": [

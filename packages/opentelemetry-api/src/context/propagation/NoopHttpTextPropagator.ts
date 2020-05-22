@@ -22,9 +22,9 @@ import { HttpTextPropagator } from './HttpTextPropagator';
  */
 export class NoopHttpTextPropagator implements HttpTextPropagator {
   /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown, setter: Function): void {}
+  inject(_context: Context, _carrier: unknown, _setter: unknown): void {}
   /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown, getter: Function): Context {
+  extract(context: Context, _carrier: unknown, _getter: unknown): Context {
     return context;
   }
 }
