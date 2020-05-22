@@ -17,6 +17,9 @@
 import { Context } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 
+// eslint-disable-next-line @typescript-eslint/ban-types
+type UserFunction = Function;
+
 /**
  * Stack Context Manager for managing the state in web
  * it doesn't fully support the async calls though
@@ -37,7 +40,7 @@ export class StackContextManager implements ContextManager {
    * @param target Function to be executed within the context
    * @param context
    */
-  private _bindFunction<T extends (...args: any[]) => unknown>(
+  private _bindFunction<T extends UserFunction>(
     target: T,
     context = Context.ROOT_CONTEXT
   ): T {

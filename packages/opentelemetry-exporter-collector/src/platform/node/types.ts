@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import * as grpc from 'grpc';
+import { CollectorExporterError, opentelemetryProto } from '../../types';
 
 /**
  * Queue item to be used to save temporary spans in case the GRPC service
@@ -32,5 +32,10 @@ export interface GRPCQueueItem {
  * Trace Service Client for sending spans
  */
 export interface TraceServiceClient extends grpc.Client {
-  export: (request: any, callback: () => unknown) => unknown;
+  export: (
+    request: any,
+    callback: (
+      err: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+    ) => void
+  ) => unknown;
 }

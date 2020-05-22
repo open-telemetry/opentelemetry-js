@@ -24,16 +24,16 @@ import {
  * Implementation of {@link TypeObserverResult}
  */
 export class ObserverResult implements TypeObserverResult {
-  callbackObservers: Map<Labels, () => unknown> = new Map<
+  callbackObservers: Map<Labels, () => number> = new Map<
     Labels,
-    () => unknown
+    () => number
   >();
   observers: Map<Labels, MetricObservable> = new Map<
     Labels,
     MetricObservable
   >();
 
-  observe(callback: () => unknown | MetricObservable, labels: Labels): void {
+  observe(callback: (() => number) | MetricObservable, labels: Labels): void {
     if (typeof callback === 'function') {
       this.callbackObservers.set(labels, callback);
     } else {
