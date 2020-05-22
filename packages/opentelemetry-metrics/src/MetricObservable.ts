@@ -30,13 +30,13 @@ export class MetricObservable implements api.MetricObservable {
     }
   }
 
-  subscribe(subscriber: Function) {
+  subscribe(subscriber: () => unknown) {
     if (typeof subscriber === 'function') {
       this._subscribers.push(subscriber as Subscriber);
     }
   }
 
-  unsubscribe(subscriber?: Function) {
+  unsubscribe(subscriber?: () => unknown) {
     if (typeof subscriber === 'function') {
       for (let i = 0, j = this._subscribers.length; i < j; i++) {
         if (this._subscribers[i] === subscriber) {

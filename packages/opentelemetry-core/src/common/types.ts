@@ -39,6 +39,6 @@ export interface TimeOriginLegacy {
  */
 export interface ShimWrapped {
   __wrapped: boolean;
-  __unwrap: Function;
-  __original: Function;
+  __unwrap: () => unknown;
+  __original: () => unknown;
 }

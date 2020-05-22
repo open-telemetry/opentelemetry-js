@@ -311,7 +311,7 @@ export const isValidOptionsType = (options: unknown): boolean => {
  */
 export const isOpenTelemetryRequest = (
   options: RequestOptions
-): options is { headers: {} } & RequestOptions => {
+): options is { headers: Record<string, string> } & RequestOptions => {
   return !!(options && options.headers && options.headers[OT_REQUEST_HEADER]);
 };
 

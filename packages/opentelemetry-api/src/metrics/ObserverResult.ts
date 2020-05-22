@@ -21,5 +21,5 @@ import { MetricObservable } from './MetricObservable';
  * Interface that is being used in function setCallback for Observer Metric
  */
 export interface ObserverResult {
-  observe(callback: Function | MetricObservable, labels: Labels): void;
+  observe(callback: () => unknown | MetricObservable, labels: Labels): void;
 }

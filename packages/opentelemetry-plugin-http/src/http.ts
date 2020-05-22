@@ -272,7 +272,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   ) {
     const plugin = this;
     return function incomingRequest(
-      this: {},
+      this: unknown,
       event: string,
       ...args: unknown[]
     ): boolean {
@@ -384,7 +384,7 @@ export class HttpPlugin extends BasePlugin<Http> {
   ): Func<ClientRequest> {
     const plugin = this;
     return function outgoingRequest(
-      this: {},
+      this: unknown,
       options: url.URL | RequestOptions | string,
       ...args: unknown[]
     ): ClientRequest {

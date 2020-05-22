@@ -20,7 +20,7 @@ import * as grpcTypes from 'grpc'; // For types only
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,
-  fn: Function
+  fn
 ) => {
   let index = -1;
   for (const arg of args) {

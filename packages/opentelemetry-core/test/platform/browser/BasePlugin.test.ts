@@ -36,11 +36,11 @@ describe('BasePlugin', () => {
   });
 });
 
-class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
+class TestPlugin extends BasePlugin<{ [key: string]: () => unknown }> {
   readonly moduleName = 'test-package';
   readonly version = '0.1.0';
 
-  patch(): { [key: string]: Function } {
+  patch(): { [key: string]: () => unknown } {
     return this._moduleExports;
   }
 

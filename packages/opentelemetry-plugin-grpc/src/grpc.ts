@@ -221,7 +221,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     original:
       | grpcTypes.handleCall<RequestType, ResponseType>
       | grpcTypes.ClientReadableStream<RequestType>,
-    self: {}
+    self: unknown
   ) {
     function patchedCallback(
       err: grpcTypes.ServiceError,
@@ -259,7 +259,11 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     }
 
     plugin._tracer.bind(call);
-    return (original as Function).call(self, call, patchedCallback);
+    return (original as (...args: any[]) => unknown).call(
+      self,
+      call,
+      patchedCallback
+    );
   }
 
   private _serverStreamAndBidiHandler<RequestType, ResponseType>(
@@ -267,7 +271,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     span: Span,
     call: ServerCallWithMeta,
     original: grpcTypes.handleCall<RequestType, ResponseType>,
-    self: {}
+    self: unknown
   ) {
     let spanEnded = false;
     const endSpan = () => {

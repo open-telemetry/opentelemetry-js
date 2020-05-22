@@ -46,7 +46,7 @@ describe('BasePlugin', () => {
         assert.strictEqual(
           (plugin['_moduleExports']![
             'externallyExportedFunction'
-          ] as Function)(),
+          ] as () => unknown)(),
           true
         );
       } else {
@@ -56,7 +56,7 @@ describe('BasePlugin', () => {
   });
 });
 
-class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
+class TestPlugin extends BasePlugin<{ [key: string]: () => unknown }> {
   readonly moduleName = 'test-package';
   readonly version = '0.1.0';
   readonly _basedir = basedir;
@@ -74,7 +74,7 @@ class TestPlugin extends BasePlugin<{ [key: string]: Function }> {
     },
   };
 
-  protected patch(): { [key: string]: Function } {
+  protected patch(): { [key: string]: () => unknown } {
     return this._moduleExports;
   }
   protected unpatch(): void {}

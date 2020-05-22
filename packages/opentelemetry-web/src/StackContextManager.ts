@@ -37,7 +37,7 @@ export class StackContextManager implements ContextManager {
    * @param target Function to be executed within the context
    * @param context
    */
-  private _bindFunction<T extends Function>(
+  private _bindFunction<T extends (...args: any[]) => unknown>(
     target: T,
     context = Context.ROOT_CONTEXT
   ): T {

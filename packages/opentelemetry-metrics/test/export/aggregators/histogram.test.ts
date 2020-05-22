@@ -33,6 +33,7 @@ describe('HistogramAggregator', () => {
     });
 
     it('should throw if no boundaries are defined', () => {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       assert.throws(() => new HistogramAggregator());
       assert.throws(() => new HistogramAggregator([]));

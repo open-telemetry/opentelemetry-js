@@ -40,7 +40,7 @@ class DummySpanExporter implements tracing.SpanExporter {
   shutdown() {}
 }
 
-const getData = (url: string, callbackAfterSend: Function) => {
+const getData = (url: string, callbackAfterSend: () => unknown) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     const req = new XMLHttpRequest();
