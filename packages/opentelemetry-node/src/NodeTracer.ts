@@ -19,31 +19,34 @@ import { setActiveSpan } from '@opentelemetry/core';
 import { Tracer } from '@opentelemetry/tracing';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 
+type UnPromisify<T> = T extends Promise<infer U> ? U : T;
+
 /**
  * This class represents a nodejs-specific tracer.
  */
 export class NodeTracer extends Tracer {
   /**
-   * Execute the provided function with the given span in the current context.
+   * Execute the provided function with the given span set in the current context.
    *
    * **NOTE**: This function is experimental, refer to to
    *  https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node#withspanasync
    */
-  async withSpanAsync<T extends any, U extends () => Promise<T>>(
-    span: api.Span,
-    fn: U
-  ): Promise<void> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async withSpanAsync<
+    T extends () => Promise<any>,
+    U = UnPromisify<ReturnType<T>>
+  >(span: api.Span, fn: T): Promise<U> {
     const contextManager = api.context.getContextManager();
     if (contextManager instanceof AsyncHooksContextManager) {
-      await contextManager.withAsync(
+      return await contextManager.withAsync(
         setActiveSpan(api.context.active(), span),
         fn
       );
     } else {
       this.logger.warn(
-        `Using withAsync without AsyncHookContextManager doesn't work, please refer to https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node#withspanasync`
+        "Using withAsync without AsyncHookContextManager doesn't work, please refer to https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node#withspanasync"
       );
-      await fn();
+      return await fn();
     }
   }
 }

@@ -232,25 +232,6 @@ describe('NodeTracerProvider', () => {
         undefined
       );
     });
-
-    it('should find correct context with promises', async () => {
-      provider = new NodeTracerProvider();
-      const span = provider.getTracer('default').startSpan('my-span');
-      await provider.getTracer('default').withSpan(span, async () => {
-        for (let i = 0; i < 3; i++) {
-          await sleep(5).then(() => {
-            assert.deepStrictEqual(
-              provider.getTracer('default').getCurrentSpan(),
-              span
-            );
-          });
-        }
-      });
-      assert.deepStrictEqual(
-        provider.getTracer('default').getCurrentSpan(),
-        undefined
-      );
-    });
   });
 
   describe('.bind()', () => {
@@ -288,7 +269,7 @@ describe('NodeTracerProvider', () => {
 
     it('should run context with AsyncHooksContextManager with multiple spans', async () => {
       provider = new NodeTracerProvider({});
-      let nestedHasBeenRun: boolean = false;
+      let nestedHasBeenRun = false;
       const span = provider.getTracer('default').startSpan('my-span');
       await provider.getTracer('default').withSpanAsync(span, async () => {
         assert.deepStrictEqual(

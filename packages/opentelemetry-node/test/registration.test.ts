@@ -38,7 +38,7 @@ describe('API registration', () => {
     tracerProvider.register();
 
     assert.ok(
-      context['_getContextManager']() instanceof AsyncHooksContextManager
+      context.getContextManager() instanceof AsyncHooksContextManager
     );
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof HttpTraceContext
@@ -57,7 +57,7 @@ describe('API registration', () => {
       propagator,
     });
 
-    assert.ok(context['_getContextManager']() === contextManager);
+    assert.ok(context.getContextManager() === contextManager);
     assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
     assert.ok(trace.getTracerProvider() === tracerProvider);
@@ -69,7 +69,7 @@ describe('API registration', () => {
       contextManager: null,
     });
 
-    assert.ok(context['_getContextManager']() instanceof NoopContextManager);
+    assert.ok(context.getContextManager() instanceof NoopContextManager);
 
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof HttpTraceContext
@@ -88,7 +88,7 @@ describe('API registration', () => {
     );
 
     assert.ok(
-      context['_getContextManager']() instanceof AsyncHooksContextManager
+      context.getContextManager() instanceof AsyncHooksContextManager
     );
     assert.ok(trace.getTracerProvider() === tracerProvider);
   });
