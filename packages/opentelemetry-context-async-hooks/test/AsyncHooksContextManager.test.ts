@@ -149,8 +149,8 @@ describe('AsyncHooksContextManager', () => {
     });
 
     it('should finally restore an old scope', async () => {
-      const scope1 = '1' as any;
-      const scope2 = '2' as any;
+      const scope1 = { '1': 1 } as any;
+      const scope2 = { '2': 2 } as any;
       let done = false;
 
       await contextManager.withAsync(scope1, async () => {
@@ -161,8 +161,23 @@ describe('AsyncHooksContextManager', () => {
         });
         assert.strictEqual(contextManager.active(), scope1);
       });
-
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
       assert.ok(done);
+    });
+
+    it('should keep scope across async operations', async () => {
+      const scope1 = { '1': 1 } as any;
+
+      await contextManager.withAsync(scope1, () => {
+        return new Promise(resolve => {
+          assert.strictEqual(contextManager.active(), scope1);
+          setTimeout(() => {
+            assert.strictEqual(contextManager.active(), scope1);
+            return resolve();
+          }, 5);
+        });
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
   });
 
@@ -180,93 +195,33 @@ describe('AsyncHooksContextManager', () => {
         });
         assert.strictEqual(contextManager.active(), scope1);
       });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
 
       assert.ok(done);
     });
 
-    it('withAsync() inside with() should correctly restore conxtext', done => {
+    it('with() inside a setTimeout inside withAsync() should correctly restore context', async () => {
       const scope1 = '1' as any;
       const scope2 = '2' as any;
 
-      contextManager.with(scope1, async () => {
-        assert.strictEqual(contextManager.active(), scope1);
-        await contextManager.withAsync(scope2, async () => {
-          assert.strictEqual(contextManager.active(), scope2);
-        });
-        assert.strictEqual(contextManager.active(), scope1);
-        return done();
-      });
-      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
-    });
-
-    it('not awaited withAsync() inside with() should not restore context', done => {
-      const scope1 = '1' as any;
-      const scope2 = '2' as any;
-      let _done = false;
-
-      contextManager.with(scope1, () => {
-        assert.strictEqual(contextManager.active(), scope1);
-        contextManager
-          .withAsync(scope2, async () => {
-            assert.strictEqual(contextManager.active(), scope2);
-          })
-          .then(() => {
+      await contextManager
+        .withAsync(scope1, () => {
+          return new Promise(resolve => {
             assert.strictEqual(contextManager.active(), scope1);
-            _done = true;
-          });
-        // in this case the current scope is 2 since we
-        // didnt waited the withAsync call
-        assert.strictEqual(contextManager.active(), scope2);
-        setTimeout(() => {
-          assert.strictEqual(contextManager.active(), scope1);
-          assert(_done);
-          return done();
-        }, 100);
-      });
-      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
-    });
-
-    it('withAsync() inside a setTimeout inside a with() should correctly restore context', done => {
-      const scope1 = '1' as any;
-      const scope2 = '2' as any;
-
-      contextManager.with(scope1, () => {
-        assert.strictEqual(contextManager.active(), scope1);
-        setTimeout(() => {
-          assert.strictEqual(contextManager.active(), scope1);
-          contextManager
-            .withAsync(scope2, async () => {
-              assert.strictEqual(contextManager.active(), scope2);
-            })
-            .then(() => {
+            setTimeout(() => {
               assert.strictEqual(contextManager.active(), scope1);
-              return done();
-            });
-        }, 5);
-        assert.strictEqual(contextManager.active(), scope1);
-      });
-      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
-    });
-
-    it('with() inside a setTimeout inside withAsync() should correctly restore context', done => {
-      const scope1 = '1' as any;
-      const scope2 = '2' as any;
-
-      contextManager
-        .withAsync(scope1, async () => {
-          assert.strictEqual(contextManager.active(), scope1);
-          setTimeout(() => {
+              contextManager.with(scope2, () => {
+                assert.strictEqual(contextManager.active(), scope2);
+                return resolve();
+              });
+            }, 5);
             assert.strictEqual(contextManager.active(), scope1);
-            contextManager.with(scope2, () => {
-              assert.strictEqual(contextManager.active(), scope2);
-              return done();
-            });
-          }, 5);
-          assert.strictEqual(contextManager.active(), scope1);
+          });
         })
         .then(() => {
-          assert.strictEqual(contextManager.active(), scope1);
+          assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
         });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
   });
 
@@ -320,31 +275,15 @@ describe('AsyncHooksContextManager', () => {
       fn();
     });
 
-    it('should fail to return current context (when disabled + async op)', done => {
-      contextManager.disable();
+    it('should fail to return current context with async op', done => {
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const fn = contextManager.bind(() => {
+        assert.strictEqual(contextManager.active(), context);
         setTimeout(() => {
           assert.strictEqual(
             contextManager.active(),
             Context.ROOT_CONTEXT,
             'should have no context'
-          );
-          return done();
-        }, 100);
-      }, context);
-      fn();
-    });
-
-    it('should return current context (when re-enabled + async op)', done => {
-      contextManager.enable();
-      const context = Context.ROOT_CONTEXT.setValue(key1, 1);
-      const fn = contextManager.bind(() => {
-        setTimeout(() => {
-          assert.strictEqual(
-            contextManager.active(),
-            context,
-            'should have context'
           );
           return done();
         }, 100);
@@ -363,7 +302,6 @@ describe('AsyncHooksContextManager', () => {
       const ee = new EventEmitter();
       contextManager.disable();
       assert.deepStrictEqual(contextManager.bind(ee, Context.ROOT_CONTEXT), ee);
-      contextManager.enable();
     });
 
     it('should return current context and removeListener (when enabled)', done => {
@@ -409,7 +347,6 @@ describe('AsyncHooksContextManager', () => {
         assert.deepStrictEqual(contextManager.active(), context);
         patchedEe.removeListener('test', handler);
         assert.strictEqual(patchedEe.listeners('test').length, 0);
-        contextManager.enable();
         return done();
       };
       patchedEe.on('test', handler);
@@ -417,32 +354,14 @@ describe('AsyncHooksContextManager', () => {
       patchedEe.emit('test');
     });
 
-    it('should not return current context (when disabled + async op)', done => {
-      contextManager.disable();
+    it('should not return current context with async op', done => {
       const ee = new EventEmitter();
       const context = Context.ROOT_CONTEXT.setValue(key1, 1);
       const patchedEe = contextManager.bind(ee, context);
       const handler = () => {
+        assert.deepStrictEqual(contextManager.active(), context);
         setImmediate(() => {
           assert.deepStrictEqual(contextManager.active(), Context.ROOT_CONTEXT);
-          patchedEe.removeAllListeners('test');
-          assert.strictEqual(patchedEe.listeners('test').length, 0);
-          return done();
-        });
-      };
-      patchedEe.on('test', handler);
-      assert.strictEqual(patchedEe.listeners('test').length, 1);
-      patchedEe.emit('test');
-    });
-
-    it('should return current context (when enabled + async op)', done => {
-      contextManager.enable();
-      const ee = new EventEmitter();
-      const context = Context.ROOT_CONTEXT.setValue(key1, 1);
-      const patchedEe = contextManager.bind(ee, context);
-      const handler = () => {
-        setImmediate(() => {
-          assert.deepStrictEqual(contextManager.active(), context);
           patchedEe.removeAllListeners('test');
           assert.strictEqual(patchedEe.listeners('test').length, 0);
           return done();
