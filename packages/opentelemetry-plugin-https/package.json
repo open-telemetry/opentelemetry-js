@@ -42,7 +42,6 @@
   },
   "devDependencies": {
     "@opentelemetry/context-async-hooks": "^0.8.2",
-    "@opentelemetry/context-base": "^0.8.2",
     "@opentelemetry/node": "^0.8.2",
     "@opentelemetry/tracing": "^0.8.2",
     "@types/got": "^9.6.7",

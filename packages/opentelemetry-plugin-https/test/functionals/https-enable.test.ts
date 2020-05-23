@@ -21,7 +21,7 @@ import {
   Span as ISpan,
   SpanKind,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, setActiveSpan } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   AttributeNames,
@@ -30,7 +30,6 @@ import {
   OT_REQUEST_HEADER,
 } from '@opentelemetry/plugin-http';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
-import { ContextManager } from '@opentelemetry/context-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -83,7 +82,7 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpsPlugin', () => {
-  let contextManager: ContextManager;
+  let contextManager: AsyncHooksContextManager;
 
   beforeEach(() => {
     contextManager = new AsyncHooksContextManager().enable();
@@ -453,21 +452,24 @@ describe('HttpsPlugin', () => {
         doNock(hostname, testPath, 200, 'Ok', num);
         const name = 'TestRootSpan';
         const span = tracer.startSpan(name);
-        await tracer.withSpan(span, async () => {
-          for (let i = 0; i < num; i++) {
-            await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
+        await contextManager.withAsync(
+          setActiveSpan(contextManager.active(), span),
+          async () => {
+            for (let i = 0; i < num; i++) {
+              await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
+              const spans = memoryExporter.getFinishedSpans();
+              assert.ok(spans[i].name.indexOf(testPath) >= 0);
+              assert.strictEqual(
+                span.context().traceId,
+                spans[i].spanContext.traceId
+              );
+            }
+            span.end();
             const spans = memoryExporter.getFinishedSpans();
-            assert.ok(spans[i].name.indexOf(testPath) >= 0);
-            assert.strictEqual(
-              span.context().traceId,
-              spans[i].spanContext.traceId
-            );
+            // 5 child spans ended + 1 span (root)
+            assert.strictEqual(spans.length, 6);
           }
-          span.end();
-          const spans = memoryExporter.getFinishedSpans();
-          // 5 child spans ended + 1 span (root)
-          assert.strictEqual(spans.length, 6);
-        });
+        );
       });
 
       for (const ignored of ['string', 'function', 'regexp']) {
