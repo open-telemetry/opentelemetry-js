@@ -1,20 +1,13 @@
-import { PushController } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/api';
-import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { metrics, Metric, BoundCounter } from '@opentelemetry/api';
+import { installExportPipeline } from '@opentelemetry/exporter-prometheus';
 
-const exporter = new PrometheusExporter(
-  {
-    startServer: true,
-  },
-  () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
-  },
-);
+installExportPipeline({
+  startServer: true,
+}, () => {
+  console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+});
 
-const meter = new PushController({
-  exporter,
-  interval: 1000,
-}).getMeter('example-ts');
+const meter = metrics.getMeter('example-ts');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
