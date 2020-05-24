@@ -23,7 +23,7 @@ const logger = new NoopLogger();
 describe('BasePlugin', () => {
   describe('enable', () => {
     it('should enable plugin', () => {
-      const moduleExports = { foo: function() {} };
+      const moduleExports = { foo: function () {} };
       const plugin = new TestPlugin('foo', '1');
       const patch = plugin.enable(moduleExports, provider, logger);
 

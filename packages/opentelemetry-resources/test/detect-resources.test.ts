@@ -112,11 +112,9 @@ describe('detectResources', async () => {
 
   describe('in AWS environment', () => {
     it('returns a merged resource', async () => {
-      const gcpScope = nock(HOST_ADDRESS)
-        .get(INSTANCE_PATH)
-        .replyWithError({
-          code: 'ENOTFOUND',
-        });
+      const gcpScope = nock(HOST_ADDRESS).get(INSTANCE_PATH).replyWithError({
+        code: 'ENOTFOUND',
+      });
       const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .replyWithError({

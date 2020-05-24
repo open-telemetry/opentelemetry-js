@@ -1,10 +1,13 @@
 {
     "name": "@opentelemetry/plugins-web-core",
-    "version": "0.8.1",
+    "version": "0.8.2",
     "description": "Metapackage which bundles all opentelemetry web core plugins",
     "author": "OpenTelemetry Authors",
     "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
     "license": "Apache-2.0",
+    "publishConfig": {
+        "access": "public"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
@@ -13,6 +16,6 @@
         "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
     },
     "dependencies": {
-        "@opentelemetry/plugin-xml-http-request": "^0.8.1"
+        "@opentelemetry/plugin-xml-http-request": "^0.8.2"
     }
 }

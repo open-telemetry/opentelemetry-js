@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Span, PluginConfig } from '@opentelemetry/api';
-import * as url from 'url';
+import { PluginConfig, Span } from '@opentelemetry/api';
+import * as http from 'http';
 import {
   ClientRequest,
-  IncomingMessage,
-  ServerResponse,
-  request,
   get,
+  IncomingMessage,
+  request,
+  ServerResponse,
 } from 'http';
-import * as http from 'http';
+import * as url from 'url';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
