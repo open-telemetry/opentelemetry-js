@@ -25,8 +25,14 @@ import { ExporterConfig } from './types';
  * @param callback Callback to be called after a server was started
  * @param controllerConfig Default meter configuration
  */
-export function installExportPipeline(exporterConfig?: ExporterConfig, callback?: () => void, controllerConfig?: ConstructorParameters<typeof PullController>[0]) {
+export function installExportPipeline(
+  exporterConfig?: ExporterConfig,
+  callback?: () => void,
+  controllerConfig?: ConstructorParameters<typeof PullController>[0]
+) {
   const exporter = new PrometheusExporter(exporterConfig, callback);
   const pullController = new PullController({ ...controllerConfig, exporter });
+  exporter.setPullCallback(() => pullController.collect());
   api.metrics.setGlobalMeterProvider(pullController);
+  return { exporter, controller: pullController };
 }

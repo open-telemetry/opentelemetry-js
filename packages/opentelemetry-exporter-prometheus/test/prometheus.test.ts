@@ -14,35 +14,19 @@
  * limitations under the License.
  */
 
-import { HrTime, ObserverResult } from '@opentelemetry/api';
+import { ObserverResult } from '@opentelemetry/api';
 import {
   CounterMetric,
-  CounterSumAggregator,
   Meter,
   PushController,
   ObserverMetric,
-  Point,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
-
-const mockedHrTime: HrTime = [1586347902211, 0];
-const mockedTimeMS = 1586347902211000;
+import { mockedTimeMS } from './sandbox';
 
 describe('PrometheusExporter', () => {
-  let toPoint: () => Point;
-  before(() => {
-    toPoint = CounterSumAggregator.prototype.toPoint;
-    CounterSumAggregator.prototype.toPoint = function (): Point {
-      const point = toPoint.apply(this);
-      point.timestamp = mockedHrTime;
-      return point;
-    };
-  });
-  after(() => {
-    CounterSumAggregator.prototype.toPoint = toPoint;
-  });
   describe('constructor', () => {
     it('should construct an exporter', () => {
       const exporter = new PrometheusExporter();

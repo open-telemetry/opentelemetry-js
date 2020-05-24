@@ -48,12 +48,17 @@ export class PullController extends Controller implements api.MeterProvider {
   getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
-      this._meters.set(key, new Meter({
-        logger: this.logger,
-        resource: this.resource,
-        ...this._config,
-        ...config
-      }));
+      this._meters.set(
+        key,
+        new Meter({
+          batcher: this._batcher,
+          exporter: this._exporter,
+          logger: this.logger,
+          resource: this.resource,
+          ...this._config,
+          ...config,
+        })
+      );
     }
 
     return this._meters.get(key)!;
