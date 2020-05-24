@@ -34,12 +34,3 @@ export interface GRPCQueueItem {
 export interface TraceServiceClient extends grpc.Client {
   export: (request: any, callback: Function) => {};
 }
-
-/**
- * Interface to store helper information
- */
-export interface CollectorData {
-  traceServiceClient?: TraceServiceClient;
-  isShutDown: boolean;
-  grpcSpansQueue: GRPCQueueItem[];
-}

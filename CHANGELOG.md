@@ -4,6 +4,125 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.8.2
+
+#### :rocket: (Enhancement)
+* `opentelemetry-exporter-collector`
+  * [#1063](https://github.com/open-telemetry/opentelemetry-js/pull/1063) feat: exporter collector TLS option ([@mzahor](https://github.com/mzahor))
+* `opentelemetry-core`
+  * [#838](https://github.com/open-telemetry/opentelemetry-js/pull/838) feat: implement W3C Correlation Context propagator ([@rubenvp8510](https://github.com/rubenvp8510))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-api`
+  * [#1067](https://github.com/open-telemetry/opentelemetry-js/pull/1067) fix: missing `global` in browser environments ([@legendecas](https://github.com/legendecas))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1057](https://github.com/open-telemetry/opentelemetry-js/pull/1057) chore: add examples README.md ([@mayurkale22](https://github.com/mayurkale22))
+* `opentelemetry-core`
+  * [#1080](https://github.com/open-telemetry/opentelemetry-js/pull/1080) docs: document CorrelationContext propagator under Built-in Implement… ([@rubenvp8510](https://github.com/rubenvp8510))
+
+#### Committers: 5
+- Marian Zagoruiko ([@mzahor](https://github.com/mzahor))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Olivier Albertini ([@OlivierAlbertini](https://github.com/OlivierAlbertini))
+- Ruben Vargas Palma ([@rubenvp8510](https://github.com/rubenvp8510))
+- legendecas ([@legendecas](https://github.com/legendecas))
+
+## 0.8.1
+
+#### :rocket: (Enhancement)
+* Other
+  * [#1050](https://github.com/open-telemetry/opentelemetry-js/pull/1050) feat: add plugin metapackages ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-resources`
+  * [#1055](https://github.com/open-telemetry/opentelemetry-js/pull/1055) chore(opentelemetry-resources): add instance type and az to aws detector ([@justinwalz](https://github.com/justinwalz))
+* `opentelemetry-plugin-http`
+  * [#963](https://github.com/open-telemetry/opentelemetry-js/pull/963) feat(plugin-http): add plugin hooks before processing req and res ([@BlumAmir](https://github.com/BlumAmir))
+* `opentelemetry-metrics`
+  * [#1049](https://github.com/open-telemetry/opentelemetry-js/pull/1049) chore: pipe resource through to MetricRecord ([@mwear](https://github.com/mwear))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1032](https://github.com/open-telemetry/opentelemetry-js/pull/1032) Make Labels Optional for CounterMetric::add ([@astorm](https://github.com/astorm))
+
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-http`
+  * [#1060](https://github.com/open-telemetry/opentelemetry-js/pull/1060) fix(http-plugin): don't modify user's headers object in plugin ([@BlumAmir](https://github.com/BlumAmir))
+* `opentelemetry-exporter-collector`
+  * [#1053](https://github.com/open-telemetry/opentelemetry-js/pull/1053) fix: include proto files in deployment package ([@dyladan](https://github.com/dyladan))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1065](https://github.com/open-telemetry/opentelemetry-js/pull/1065) style: format README ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1064](https://github.com/open-telemetry/opentelemetry-js/pull/1064) chore: update README ([@mayurkale22](https://github.com/mayurkale22))
+  * [#1051](https://github.com/open-telemetry/opentelemetry-js/pull/1051) chore: deploy docs using github action ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-exporter-prometheus`
+  * [#1056](https://github.com/open-telemetry/opentelemetry-js/pull/1056) fix readme: setting labelKeys when creating the counter ([@luebken](https://github.com/luebken))
+
+#### Committers: 9
+- Alan Storm ([@astorm](https://github.com/astorm))
+- Amir Blum ([@BlumAmir](https://github.com/BlumAmir))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Justin Walz ([@justinwalz](https://github.com/justinwalz))
+- Matthew Wear ([@mwear](https://github.com/mwear))
+- Matthias Lübken ([@luebken](https://github.com/luebken))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Naseem ([@naseemkullah](https://github.com/naseemkullah))
+- [@shivkanya9146](https://github.com/shivkanya9146)
+
+## 0.8.0
+
+Released 2020-05-12
+
+#### :boom: Breaking Change
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1001](https://github.com/open-telemetry/opentelemetry-js/pull/1001) fix: observers should not expose bind/unbind method ([@legendecas](https://github.com/legendecas))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-plugin-http`
+  * [#984](https://github.com/open-telemetry/opentelemetry-js/pull/984) fix(http-plugin): strip otel custom http header #983 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-core`
+  * [#1021](https://github.com/open-telemetry/opentelemetry-js/pull/1021) fix: left pad short b3 trace identifiers ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-plugin-xml-http-reques`
+  * [#1002](https://github.com/open-telemetry/opentelemetry-js/pull/1002) fix(opentelemetry-plugin-xml-http-request): define span kind as CLIENT for xmlhttprequests ([@ivansenic](https://github.com/ivansenic))
+* `opentelemetry-plugin-grpc`
+  * [#1005](https://github.com/open-telemetry/opentelemetry-js/pull/1005) fix: add missing error status handler ([@markwolff](https://github.com/markwolff))
+* `opentelemetry-exporter-collector`
+  * [#1008](https://github.com/open-telemetry/opentelemetry-js/pull/1008) fix: permission denied error when cloning submodules ([@sleighzy](https://github.com/sleighzy))
+
+#### :rocket: (Enhancement)
+* `opentelemetry-exporter-zipkin`, `opentelemetry-plugin-http`, `opentelemetry-tracing`
+  * [#1037](https://github.com/open-telemetry/opentelemetry-js/pull/1037) fix(tracing): span processor should receive a readable span as parameters ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-tracing`
+  * [#1024](https://github.com/open-telemetry/opentelemetry-js/pull/1024) fix: multi span processor should flush child span processors ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-metrics`, `opentelemetry-tracing`
+  * [#1015](https://github.com/open-telemetry/opentelemetry-js/pull/1015) fix: prevent duplicated resource creation ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-metrics`
+  * [#1014](https://github.com/open-telemetry/opentelemetry-js/pull/1014) feat(metrics): use MetricDescriptor to determine aggregator #989 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-plugin-http`
+  * [#948](https://github.com/open-telemetry/opentelemetry-js/pull/948) feat(http-plugin): add options to disable new spans if no parent ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-api`, `opentelemetry-node`, `opentelemetry-plugin-grpc`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-tracing`, `opentelemetry-web`
+  * [#943](https://github.com/open-telemetry/opentelemetry-js/pull/943) Use global API instances ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api`
+  * [#1016](https://github.com/open-telemetry/opentelemetry-js/pull/1016) refactor: normalize namespace import name for @opentelemetry/api ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-core`, `opentelemetry-base`
+  * [#991](https://github.com/open-telemetry/opentelemetry-js/pull/991) refactor: merge opentelemetry-base to opentelemetry-core ([@legendecas](https://github.com/legendecas))
+* `opentelemetry-core`
+  * [#981](https://github.com/open-telemetry/opentelemetry-js/pull/981) chore: splitting BasePlugin into browser and node ([@obecny](https://github.com/obecny))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1003](https://github.com/open-telemetry/opentelemetry-js/pull/1003) chore: test on node 14 ([@dyladan](https://github.com/dyladan))
+  * [#990](https://github.com/open-telemetry/opentelemetry-js/pull/990) fix(opentracing-shim): update opentracing shim example ([@sleighzy](https://github.com/sleighzy))
+
+#### Committers: 7
+- legendecas ([@legendecas](https://github.com/legendecas))
+- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Ivan Senic ([@ivansenic](https://github.com/ivansenic))
+- Mark Wolff ([@markwolff](https://github.com/markwolff))
+- Simon Leigh ([@sleighzy](https://github.com/sleighzy))
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+
 ## 0.7.0
 
 Released 2020-04-23

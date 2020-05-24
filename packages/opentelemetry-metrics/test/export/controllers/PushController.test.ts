@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { PushController, Meter } from '../../../src';
+import { PushController, Meter, CounterMetric } from '../../../src';
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('PushController', () => {
@@ -37,6 +37,14 @@ describe('PushController', () => {
     it('should return an instance of Meter', () => {
       const meter = new PushController().getMeter('test-push-controller');
       assert.ok(meter instanceof Meter);
+    });
+
+    it('should propagate resources', () => {
+      const controller = new PushController();
+      const meter = controller.getMeter('test-meter-provider');
+      const counter = meter.createCounter('test-counter') as CounterMetric;
+      assert.strictEqual((meter as any)._resource, controller.resource);
+      assert.strictEqual(counter.resource, controller.resource);
     });
 
     it('should return the meter with default version without a version option', () => {

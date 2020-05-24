@@ -50,10 +50,7 @@ export class Meter implements api.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(
-    name: string,
-    options?: api.MetricOptions
-  ): api.Metric<api.BoundMeasure> {
+  createMeasure(name: string, options?: api.MetricOptions): api.Measure {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -80,10 +77,7 @@ export class Meter implements api.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(
-    name: string,
-    options?: api.MetricOptions
-  ): api.Metric<api.BoundCounter> {
+  createCounter(name: string, options?: api.MetricOptions): api.Counter {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -107,10 +101,7 @@ export class Meter implements api.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObserver(
-    name: string,
-    options?: api.MetricOptions
-  ): api.Metric<api.BoundObserver> {
+  createObserver(name: string, options?: api.MetricOptions): api.Observer {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -185,6 +176,6 @@ export class Meter implements api.Meter {
    * @param name Name of metric to be created
    */
   private _isValidName(name: string): boolean {
-    return Boolean(name.match(/^[a-z][a-z0-9_.\-]*$/i));
+    return Boolean(name.match(/^[a-z][a-z0-9_.-]*$/i));
   }
 }

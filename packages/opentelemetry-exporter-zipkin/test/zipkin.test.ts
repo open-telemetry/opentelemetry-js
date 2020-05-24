@@ -253,7 +253,7 @@ describe('ZipkinExporter', () => {
     it(`should send '${OT_REQUEST_HEADER}' header`, () => {
       const scope = nock('https://localhost:9411')
         .post('/api/v2/spans')
-        .reply(function(uri, requestBody, cb) {
+        .reply(function (uri, requestBody, cb) {
           assert.ok(this.req.headers[OT_REQUEST_HEADER]);
           cb(null, [200, 'Ok']);
         });

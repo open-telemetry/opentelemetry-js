@@ -30,7 +30,7 @@ import { hashLabels } from './Utils';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
-  implements api.Metric<T> {
+  implements api.UnboundMetric<T> {
   protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
@@ -87,6 +87,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       descriptor: this._descriptor,
       labels: instrument.getLabels(),
       aggregator: instrument.getAggregator(),
+      resource: this.resource,
     }));
   }
 
@@ -106,8 +107,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
 }
 
 /** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<BoundCounter>
-  implements Pick<api.MetricUtils, 'add'> {
+export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   constructor(
     name: string,
     options: MetricOptions,
@@ -131,16 +131,15 @@ export class CounterMetric extends Metric<BoundCounter>
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param labels key-values pairs that are associated with a specific metric
+   * @param [labels = {}] key-values pairs that are associated with a specific metric
    *     that you want to record.
    */
-  add(value: number, labels: api.Labels) {
+  add(value: number, labels: api.Labels = {}) {
     this.bind(labels).add(value);
   }
 }
 
-export class MeasureMetric extends Metric<BoundMeasure>
-  implements Pick<api.MetricUtils, 'record'> {
+export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
   protected readonly _absolute: boolean;
 
   constructor(
@@ -165,14 +164,14 @@ export class MeasureMetric extends Metric<BoundMeasure>
     );
   }
 
-  record(value: number, labels: api.Labels) {
+  record(value: number, labels: api.Labels = {}) {
     this.bind(labels).record(value);
   }
 }
 
 /** This is a SDK implementation of Observer Metric. */
 export class ObserverMetric extends Metric<BoundObserver>
-  implements Pick<api.MetricUtils, 'setCallback'> {
+  implements api.Observer {
   private _observerResult = new ObserverResult();
 
   constructor(
