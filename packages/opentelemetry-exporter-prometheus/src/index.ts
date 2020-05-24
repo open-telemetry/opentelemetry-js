@@ -16,3 +16,4 @@
 
 export * from './prometheus';
 export * from './export/types';
+export * from './export/export-pipeline';

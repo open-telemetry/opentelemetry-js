@@ -10,19 +10,33 @@ OpenTelemetry metrics allow a user to collect data and export it to a metrics ba
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/metrics
+npm install --save @opentelemetry/metrics @opentelemetry/api
 ```
 
 ## Usage
+
+### Install Export Pipeline
+It is essential to install export pipeline first before all subsequent meter initialization to get exporters work properly. Here we'll take  `@opentelemetry/exporter-prometheus` for an example.
+
+```js
+import * as prometheus from '@opentelemetry/exporter-prometheus'
+import { metrics } from '@opentelemetry/api'
+
+// Install the export pipeline before all subsequent call to metrics.
+prometheus.installPipeline();
+
+const meter = metrics.getMeter('example-meter');
+const counter = meter.createCounter('foo');
+```
 
 ### Counter
 Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
 
 ```js
-const { PushController } = require('@opentelemetry/metrics');
+const { metrics } = require('@opentelemetry/api');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new PushController().getMeter('your-meter-name');
+const meter = metrics.getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
   labelKeys: ['pid'],
@@ -34,17 +48,17 @@ const labels = { pid: process.pid };
 // Create a BoundInstrument associated with specified label values.
 const boundCounter = counter.bind(labels);
 boundCounter.add(10);
-
 ```
 
 ### Observable
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
-const { PushController, MetricObservable } = require('@opentelemetry/metrics');
+const { metrics } = require('@opentelemetry/api');
+const { MetricObservable } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
-const meter = new PushController().getMeter('your-meter-name');
+const meter = metrics.getMeter('your-meter-name');
 
 const observer = meter.createObserver('metric_name', {
   labelKeys: ['pid', 'core'],
@@ -67,8 +81,7 @@ observer.setCallback((observerResult) => {
 // simulate asynchronous operation
 setInterval(()=> {
   metricObservable.next(getCpuUsage());
-}, 2000)
-
+}, 2000);
 ```
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.

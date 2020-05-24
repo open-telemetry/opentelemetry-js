@@ -14,60 +14,26 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger, ExportResult, unrefTimer } from '@opentelemetry/core';
-import * as api from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../../';
-import { DEFAULT_CONFIG, MeterConfig } from '../../types';
+import { unrefTimer } from '@opentelemetry/core';
+import { DEFAULT_CONFIG } from '../../types';
 import { PushControllerConfig } from './types';
-import { NoopExporter } from '../NoopExporter';
-import { UngroupedBatcher } from '../Batcher';
-import { Controller } from '../Controller';
+import { PullController } from './PullController';
 
 const DEFAULT_EXPORT_INTERVAL = 60_000;
 
 /**
- * This class represents a meter provider collecting metric instrument values periodically.
+ * This class represents a controller collecting metric instrument values
+ * periodically.
  */
-export class PushController extends Controller implements api.MeterProvider {
+export class PushController extends PullController {
   private _timer: NodeJS.Timeout;
 
-  readonly resource: Resource = Resource.createTelemetrySDKResource();
-  readonly logger: api.Logger;
-
-  constructor(private _config: PushControllerConfig = DEFAULT_CONFIG) {
-    super(
-      _config.batcher ?? new UngroupedBatcher(),
-      _config.exporter ?? new NoopExporter()
-    );
-    this.logger = _config.logger ?? new ConsoleLogger(_config.logLevel);
+  constructor(_config: PushControllerConfig = DEFAULT_CONFIG) {
+    super(_config);
 
     this._timer = setInterval(() => {
       this.collect();
     }, _config.interval ?? DEFAULT_EXPORT_INTERVAL);
     unrefTimer(this._timer);
-  }
-
-  /**
-   * Returns a Meter, creating one if one with the given name and version is not already created
-   *
-   * @returns Meter A Meter with the given name and version
-   */
-  getMeter(name: string, version = '*', config?: MeterConfig): Meter {
-    const key = `${name}@${version}`;
-    if (!this._meters.has(key)) {
-      this._meters.set(key, new Meter(config || this._config));
-    }
-
-    return this._meters.get(key)!;
-  }
-
-  /**
-   * @implements Controller.onExportResult
-   */
-  protected onExportResult(result: ExportResult): void {
-    if (result !== ExportResult.SUCCESS) {
-      // @todo: log error
-    }
   }
 }

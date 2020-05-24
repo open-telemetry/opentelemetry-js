@@ -20,6 +20,5 @@ export * from './Metric';
 export * from './MetricObservable';
 export * from './export/aggregators';
 export * from './export/controllers';
-export * from './export/Controller';
 export * from './export/ConsoleMetricExporter';
 export * from './export/types';

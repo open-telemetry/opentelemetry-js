@@ -12,8 +12,7 @@ The OpenTelemetry Prometheus Metrics Exporter allows the user to send collected 
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/metrics
-npm install --save @opentelemetry/exporter-prometheus
+npm install --save @opentelemetry/exporter-prometheus @opentelemetry/api
 ```
 
 ## Usage
@@ -21,18 +20,15 @@ npm install --save @opentelemetry/exporter-prometheus
 Create & register the exporter on your application.
 
 ```js
-const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
-const { MeterProvider }  = require('@opentelemetry/metrics');
+const prometheus = require('@opentelemetry/exporter-prometheus');
+const api  = require('@opentelemetry/api');
 
 // Add your port and startServer to the Prometheus options
-const options = {port: 9464, startServer: true};
-const exporter = new PrometheusExporter(options);
+const options = { port: 9464, startServer: true };
+prometheus.installExportPipeline(options);
 
 // Register the exporter
-const meter = new MeterProvider({
-  exporter,
-  interval: 1000,
-}).getMeter('example-prometheus');
+const meter = api.metrics.getMeter('example-prometheus');
 
 // Now, start recording data
 const counter = meter.createCounter('metric_name');

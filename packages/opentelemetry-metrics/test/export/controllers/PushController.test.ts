@@ -21,15 +21,15 @@ import { NoopLogger } from '@opentelemetry/core';
 describe('PushController', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
-      const provider = new PushController();
-      assert.ok(provider instanceof PushController);
+      const controller = new PushController();
+      assert.ok(controller instanceof PushController);
     });
 
     it('should construct an instance with logger', () => {
-      const provider = new PushController({
+      const controller = new PushController({
         logger: new NoopLogger(),
       });
-      assert.ok(provider instanceof PushController);
+      assert.ok(controller instanceof PushController);
     });
   });
 
@@ -40,28 +40,28 @@ describe('PushController', () => {
     });
 
     it('should return the meter with default version without a version option', () => {
-      const provider = new PushController();
-      const meter1 = provider.getMeter('default');
-      const meter2 = provider.getMeter('default', '*');
+      const controller = new PushController();
+      const meter1 = controller.getMeter('default');
+      const meter2 = controller.getMeter('default', '*');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return the same Meter instance with same name & version', () => {
-      const provider = new PushController();
-      const meter1 = provider.getMeter('meter1', 'ver1');
-      const meter2 = provider.getMeter('meter1', 'ver1');
+      const controller = new PushController();
+      const meter1 = controller.getMeter('meter1', 'ver1');
+      const meter2 = controller.getMeter('meter1', 'ver1');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return different Meter instance with different name or version', () => {
-      const provider = new PushController();
+      const controller = new PushController();
 
-      const meter1 = provider.getMeter('meter1', 'ver1');
-      const meter2 = provider.getMeter('meter1');
+      const meter1 = controller.getMeter('meter1', 'ver1');
+      const meter2 = controller.getMeter('meter1');
       assert.notEqual(meter1, meter2);
 
-      const meter3 = provider.getMeter('meter2', 'ver2');
-      const meter4 = provider.getMeter('meter3', 'ver2');
+      const meter3 = controller.getMeter('meter2', 'ver2');
+      const meter4 = controller.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
     });
   });

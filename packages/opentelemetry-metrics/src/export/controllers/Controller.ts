@@ -15,9 +15,9 @@
  */
 
 import { ExportResult } from '@opentelemetry/core';
-import { Meter } from '../Meter';
-import { MetricExporter } from './types';
-import { Batcher } from './Batcher';
+import { Meter } from '../../Meter';
+import { MetricExporter } from '../types';
+import { Batcher } from '../Batcher';
 
 export abstract class Controller {
   protected readonly _meters: Map<string, Meter> = new Map();
@@ -27,7 +27,7 @@ export abstract class Controller {
     protected readonly _exporter: MetricExporter
   ) {}
 
-  protected collect() {
+  collect() {
     for (const meter of this._meters.values()) {
       meter.collect();
     }
@@ -36,5 +36,9 @@ export abstract class Controller {
     });
   }
 
-  protected abstract onExportResult(result: ExportResult): void;
+  protected onExportResult(result: ExportResult): void {
+    if (result !== ExportResult.SUCCESS) {
+      // @todo: log error
+    }
+  }
 }

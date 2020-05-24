@@ -50,6 +50,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _server: Server;
   private readonly _prefix?: string;
   private readonly _invalidCharacterRegex = /[^a-z0-9_]/gi;
+  private _pullCallback: (() => void) | undefined;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a label named 'le'
@@ -115,6 +116,15 @@ export class PrometheusExporter implements MetricExporter {
   shutdown(cb?: () => void) {
     this._registry.clear();
     this.stopServer(cb);
+  }
+
+  /**
+   * Set the pulling callback will be called on request of metrics.
+   *
+   * @param cb The callback
+   */
+  setPullCallback(cb?: () => void) {
+    this._pullCallback = cb;
   }
 
   /**
@@ -295,6 +305,7 @@ export class PrometheusExporter implements MetricExporter {
     response: ServerResponse
   ) => {
     if (url.parse(request.url!).pathname === this._endpoint) {
+      this._pullCallback?.();
       this._exportMetrics(response);
     } else {
       this._notFound(response);
