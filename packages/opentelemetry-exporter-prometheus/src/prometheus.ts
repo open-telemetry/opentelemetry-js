@@ -252,14 +252,14 @@ export class PrometheusExporter implements MetricExporter {
   stopServer(callback?: () => void) {
     if (!this._server) {
       this._logger.debug(
-        `Prometheus stopServer() was called but server was never started.`
+        'Prometheus stopServer() was called but server was never started.'
       );
       if (callback) {
         callback();
       }
     } else {
       this._server.close(() => {
-        this._logger.debug(`Prometheus exporter was stopped`);
+        this._logger.debug('Prometheus exporter was stopped');
         if (callback) {
           callback();
         }

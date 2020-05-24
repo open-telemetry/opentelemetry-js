@@ -265,6 +265,7 @@ const assertHasOneLabel = (
   resource: Resource
 ): void => {
   const hasOne = Object.values(constants).reduce(
+    // eslint-disable-next-line no-prototype-builtins
     (found, key) => found || resource.labels.hasOwnProperty(key),
     false
   );

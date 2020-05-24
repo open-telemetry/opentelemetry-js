@@ -3,9 +3,10 @@
   "npmClient": "npm",
   "packages": [
     "benchmark/*",
+    "metapackages/*",
     "packages/*"
   ],
-  "version": "0.8.0",
+  "version": "0.8.2",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
