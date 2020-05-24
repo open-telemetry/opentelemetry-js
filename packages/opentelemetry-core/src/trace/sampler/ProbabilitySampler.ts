@@ -27,7 +27,7 @@ export class ProbabilitySampler implements Sampler {
     this._probability = this._normalize(_probability);
   }
 
-  shouldSample(parentContext: SpanContext | null = null) {
+  shouldSample(parentContext?: SpanContext) {
     // Respect the parent sampling decision if there is one
     if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
       return {
@@ -35,15 +35,6 @@ export class ProbabilitySampler implements Sampler {
           (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
             ? SamplingDecision.RECORD_AND_SAMPLED
             : SamplingDecision.NOT_RECORD,
-      };
-    }
-    if (this._probability >= 1.0) {
-      return {
-        decision: SamplingDecision.RECORD_AND_SAMPLED,
-      };
-    } else if (this._probability <= 0) {
-      return {
-        decision: SamplingDecision.NOT_RECORD,
       };
     }
     return {

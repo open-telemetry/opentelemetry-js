@@ -16,13 +16,41 @@
 
 import { Attributes } from './attributes';
 
+/**
+ * A sampling decision that determines how a {@link Span} will be recorded
+ * and collected.
+ */
 export enum SamplingDecision {
-  NOT_RECORD = 0,
-  RECORD = 0b01,
-  RECORD_AND_SAMPLED = 0b11,
+  /**
+   * `Span.isRecording() === false`, span will not be recorded and all events
+   * and attributes will be dropped.
+   */
+  NOT_RECORD,
+  /**
+   * `Span.isRecording() === true`, but `Sampled` flag in {@link TraceFlags}
+   * MUST NOT be set.
+   */
+  RECORD,
+  /**
+   * `Span.isRecording() === true` AND `Sampled` flag in {@link TraceFlags}
+   * MUST be set.
+   */
+  RECORD_AND_SAMPLED,
 }
 
+/**
+ * A sampling result contains a decision for a {@link Span} and additional
+ * attributes the sampler would like to added to the Span.
+ */
 export interface SamplingResult {
+  /**
+   * A sampling decision, refer to {@link SamplingDecision} for details.
+   */
   decision: SamplingDecision;
+  /**
+   * The list of attributes returned by SamplingResult MUST be immutable.
+   * Caller may call this method any number of times and can safely cache the
+   * returned value.
+   */
   attributes?: Readonly<Attributes>;
 }
