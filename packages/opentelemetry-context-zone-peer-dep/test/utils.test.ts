@@ -22,8 +22,8 @@ describe('ZoneContextManager utils', () => {
     describe('when object contains "addEventListener" and "removeEventListener"', () => {
       it('should return true', () => {
         const obj = {
-          addEventListener: function() {},
-          removeEventListener: function() {},
+          addEventListener: function () {},
+          removeEventListener: function () {},
         };
         assert.strictEqual(utils.isListenerObject(obj), true);
       });
@@ -37,7 +37,7 @@ describe('ZoneContextManager utils', () => {
     describe('when object contains "addEventListener" only', () => {
       it('should return false', () => {
         const obj = {
-          addEventListener: function() {},
+          addEventListener: function () {},
         };
         assert.strictEqual(utils.isListenerObject(obj), false);
       });
@@ -45,7 +45,7 @@ describe('ZoneContextManager utils', () => {
     describe('when object contains "removeEventListener" only', () => {
       it('should return false', () => {
         const obj = {
-          removeEventListener: function() {},
+          removeEventListener: function () {},
         };
         assert.strictEqual(utils.isListenerObject(obj), false);
       });

@@ -78,7 +78,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       shimmer.wrap(
         this._moduleExports.Server.prototype,
         'register',
-        // tslint:disable-next-line:no-any
         this._patchServer() as any
       );
     }
@@ -135,7 +134,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       plugin._logger.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
-        // tslint:disable-next-line:no-any
         this: grpcTypes.Server & { handlers: any },
         name: string,
         handler: grpcTypes.handleCall<RequestType, ResponseType>,
@@ -143,7 +141,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         deserialize: grpcTypes.deserialize<RequestType>,
         type: string
       ) {
-        // tslint:disable-next-line:no-any
         const originalResult = originalRegister.apply(this, arguments as any);
         const handlerSet = this.handlers[name];
 
@@ -228,7 +225,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   ) {
     function patchedCallback(
       err: grpcTypes.ServiceError,
-      // tslint:disable-next-line:no-any
       value: any,
       trailer: grpcTypes.Metadata,
       flags: grpcTypes.writeFlags
@@ -309,7 +305,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       endSpan();
     });
 
-    // tslint:disable-next-line:no-any
     return (original as any).call(self, call);
   }
 
@@ -323,12 +318,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         serviceName: string,
         options: grpcTypes.GenericClientOptions
       ) {
-        // tslint:disable-next-line:no-any
         const client = original.apply(this, arguments as any);
         shimmer.massWrap(
           client.prototype as never,
           plugin._getMethodsToWrap(client, methods) as never[],
-          // tslint:disable-next-line:no-any
           plugin._getPatchedClientMethods() as any
         );
         return client;
@@ -346,6 +339,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         .map(methodName => methods[methodName].originalName)
         .filter(
           originalName =>
+            // eslint-disable-next-line no-prototype-builtins
             !!originalName && client.prototype.hasOwnProperty(originalName)
         ) as string[]),
     ];
@@ -376,7 +370,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
    */
   private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
-    // tslint:disable-next-line:no-any
     args: any[],
     self: grpcTypes.Client,
     plugin: GrpcPlugin
@@ -390,7 +383,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       callback: SendUnaryDataCallback,
       metadata: grpcTypes.Metadata
     ) {
-      // tslint:disable-next-line:no-any
       const wrappedFn = (err: grpcTypes.ServiceError, res: any) => {
         if (err) {
           if (err.code) {
@@ -492,7 +484,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _getMetadata(
     original: GrpcClientFunc,
-    // tslint:disable-next-line:no-any
     args: any[]
   ): grpcTypes.Metadata {
     let metadata: grpcTypes.Metadata;
@@ -501,7 +492,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // A possible issue that could occur is if the 'options' parameter from
     // the user contains an '_internal_repr' as well as a 'getMap' function,
     // but this is an extremely rare case.
-    // tslint:disable-next-line:no-any
     let metadataIndex = findIndex(args, (arg: any) => {
       return (
         arg &&

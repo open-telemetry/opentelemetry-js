@@ -41,19 +41,20 @@ class DummySpanExporter implements tracing.SpanExporter {
 }
 
 const getData = (url: string, callbackAfterSend: Function) => {
+  // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     const req = new XMLHttpRequest();
     req.open('GET', url, true);
     req.send();
-    req.onload = function() {
+    req.onload = function () {
       resolve();
     };
 
-    req.onerror = function() {
+    req.onerror = function () {
       resolve();
     };
 
-    req.ontimeout = function() {
+    req.ontimeout = function () {
       resolve();
     };
 
@@ -135,7 +136,7 @@ describe('xhr', () => {
     ) => {
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function (xhr: any) {
         requests.push(xhr);
       };
       sandbox.useFakeTimers();
@@ -428,7 +429,7 @@ describe('xhr', () => {
     beforeEach(done => {
       sandbox = sinon.createSandbox();
       const fakeXhr = sandbox.useFakeXMLHttpRequest();
-      fakeXhr.onCreate = function(xhr: any) {
+      fakeXhr.onCreate = function (xhr: any) {
         requests.push(xhr);
       };
 

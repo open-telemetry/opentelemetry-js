@@ -21,12 +21,12 @@ export type grpc = typeof grpcModule;
 
 export type SendUnaryDataCallback = (
   error: grpcModule.ServiceError | null,
-  // tslint:disable-next-line:no-any
   value?: any,
   trailer?: grpcModule.Metadata,
   flags?: grpcModule.writeFlags
 ) => void;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GrpcPluginOptions {}
 
 interface GrpcStatus {

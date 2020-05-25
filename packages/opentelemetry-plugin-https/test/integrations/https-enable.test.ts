@@ -57,7 +57,7 @@ describe('HttpsPlugin Integration tests', () => {
   });
 
   describe('enable()', () => {
-    before(function(done) {
+    before(function (done) {
       // mandatory
       if (process.env.CI) {
         done();
@@ -85,7 +85,7 @@ describe('HttpsPlugin Integration tests', () => {
       const ignoreConfig = [
         `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith(`/ignored/function`),
+        (url: string) => url.endsWith('/ignored/function'),
       ];
       const config: HttpPluginConfig = {
         ignoreIncomingPaths: ignoreConfig,

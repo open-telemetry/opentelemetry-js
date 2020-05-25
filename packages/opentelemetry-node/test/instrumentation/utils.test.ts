@@ -88,8 +88,7 @@ describe('Instrumentation#utils', () => {
       }
     );
 
-    it(`should return false when version is equal to null and supportedVersions is equal to '*'`, () => {
-      // tslint:disable-next-line:no-any
+    it("should return false when version is equal to null and supportedVersions is equal to '*'", () => {
       assert.strictEqual(utils.isSupportedVersion(null as any, ['*']), false);
     });
   });

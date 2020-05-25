@@ -1,13 +1,13 @@
 {
   "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
-    "lint": "gts check",
-    "lint:fix": "gts fix",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "version:update": "node ../../scripts/version-update.js",
@@ -49,7 +49,7 @@
     "@types/zone.js": "^0.5.12",
     "babel-loader": "^8.0.6",
     "codecov": "^3.6.1",
-    "gts": "^1.1.0",
+    "gts": "^2.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",
     "karma": "^5.0.5",
     "karma-chrome-launcher": "^3.1.0",
@@ -64,15 +64,13 @@
     "ts-loader": "^6.0.4",
     "ts-mocha": "^7.0.0",
     "ts-node": "^8.6.2",
-    "tslint-consistent-codestyle": "^1.16.0",
-    "tslint-microsoft-contrib": "^6.2.0",
     "typescript": "^3.6.3",
     "webpack": "^4.35.2",
     "webpack-cli": "^3.3.9",
     "zone.js": "^0.10.2"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.8.1"
+    "@opentelemetry/context-base": "^0.8.2"
   },
   "peerDependencies": {
     "zone.js": "^0.10.2"
