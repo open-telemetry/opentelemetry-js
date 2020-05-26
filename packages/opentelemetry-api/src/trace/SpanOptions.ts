@@ -33,7 +33,7 @@ export interface SpanOptions {
   /** A span's attributes */
   attributes?: Attributes;
 
-  /** Links span to other spans */
+  /** {@link Link}s span to other spans */
   links?: Link[];
 
   /**
