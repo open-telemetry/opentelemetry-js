@@ -43,7 +43,7 @@
   "devDependencies": {
     "@babel/core": "^7.6.0",
     "@types/mocha": "^7.0.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "12.12.35",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "@types/zone.js": "^0.5.12",
