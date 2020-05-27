@@ -357,7 +357,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return function patchOpen(this: XMLHttpRequest, ...args): void {
         const method: string = args[0];
         const url: string = args[1];
-        const async: boolean = !!args[2];
+        const async = !!args[2];
         if (async) {
           plugin._createSpan(this, url, method);
         } else {

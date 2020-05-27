@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
   context,
@@ -196,13 +195,16 @@ export class HttpPlugin extends BasePlugin<Http> {
   ): ClientRequest {
     const hostname =
       options.hostname ||
-      options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+      options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
       'localhost';
     const attributes = utils.getOutgoingRequestAttributes(options, {
       component: this.component,
       hostname,
     });
     span.setAttributes(attributes);
+    if (this._config.requestHook) {
+      this._callRequestHook(span, request);
+    }
 
     request.on(
       'response',
@@ -212,6 +214,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           { hostname }
         );
         span.setAttributes(attributes);
+        if (this._config.responseHook) {
+          this._callResponseHook(span, response);
+        }
 
         this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
@@ -316,19 +321,24 @@ export class HttpPlugin extends BasePlugin<Http> {
           context.bind(request);
           context.bind(response);
 
+          if (plugin._config.requestHook) {
+            plugin._callRequestHook(span, request);
+          }
+          if (plugin._config.responseHook) {
+            plugin._callResponseHook(span, response);
+          }
+
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
           const originalEnd = response.end;
-          response.end = function(
+          response.end = function (
             this: ServerResponse,
             ...args: ResponseEndArgs
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
-            // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
             const returned = plugin._safeExecute(
               span,
-              // tslint:disable-next-line:no-any
               () => response.end.apply(this, arguments as any),
               true
             );
@@ -391,6 +401,13 @@ export class HttpPlugin extends BasePlugin<Http> {
         options,
         extraOptions
       );
+
+      if (utils.isOpenTelemetryRequest(optionsParsed)) {
+        // clone the headers so delete will not modify the user's object
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+        delete optionsParsed.headers[utils.OT_REQUEST_HEADER];
+        return original.apply(this, [optionsParsed, ...args]);
+      }
 
       if (
         utils.isOpenTelemetryRequest(optionsParsed) ||
@@ -459,6 +476,28 @@ export class HttpPlugin extends BasePlugin<Http> {
 
     span.end();
     this._spanNotEnded.delete(span);
+  }
+
+  private _callResponseHook(
+    span: Span,
+    response: IncomingMessage | ServerResponse
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.responseHook!(span, response),
+      false
+    );
+  }
+
+  private _callRequestHook(
+    span: Span,
+    request: ClientRequest | IncomingMessage
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.requestHook!(span, request),
+      false
+    );
   }
 
   private _safeExecute<

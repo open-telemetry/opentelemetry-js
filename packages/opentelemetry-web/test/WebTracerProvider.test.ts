@@ -59,7 +59,6 @@ describe('WebTracerProvider', () => {
     });
 
     it('should enable all plugins', () => {
-      let options: WebTracerConfig;
       const dummyPlugin1 = new DummyPlugin();
       const dummyPlugin2 = new DummyPlugin();
       const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
@@ -67,7 +66,7 @@ describe('WebTracerProvider', () => {
 
       const plugins = [dummyPlugin1, dummyPlugin2];
 
-      options = { plugins };
+      const options = { plugins };
       new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);

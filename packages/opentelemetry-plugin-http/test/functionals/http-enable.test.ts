@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
+  context,
+  propagation,
   Span as ISpan,
   SpanKind,
-  propagation,
-  context,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -40,6 +39,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { ContextManager } from '@opentelemetry/context-base';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -74,6 +74,20 @@ function doNock(
 
 export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
+};
+
+export const requestHookFunction = (
+  span: ISpan,
+  request: ClientRequest | IncomingMessage
+): void => {
+  span.setAttribute('custom request hook attribute', 'request');
+};
+
+export const responseHookFunction = (
+  span: ISpan,
+  response: IncomingMessage | ServerResponse
+): void => {
+  span.setAttribute('custom response hook attribute', 'response');
 };
 
 describe('HttpPlugin', () => {
@@ -180,9 +194,14 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
+        assert.strictEqual(options.headers[OT_REQUEST_HEADER], 1);
       });
     });
     describe('with good plugin options', () => {
@@ -193,16 +212,18 @@ describe('HttpPlugin', () => {
       before(() => {
         const config: HttpPluginConfig = {
           ignoreIncomingPaths: [
-            `/ignored/string`,
+            '/ignored/string',
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
+          requestHook: requestHookFunction,
+          responseHook: responseHookFunction,
           serverName,
         };
         plugin.enable(http, provider, provider.logger, config);
@@ -293,6 +314,10 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
@@ -486,8 +511,7 @@ describe('HttpPlugin', () => {
           arg
         )}`, async () => {
           try {
-            // @ts-ignore
-            await httpRequest.get(arg);
+            await httpRequest.get(arg as any);
           } catch (error) {
             // request has been made
             // nock throw
@@ -674,9 +698,7 @@ describe('HttpPlugin', () => {
 
       it("should have 1 ended span when response is listened by using req.on('response')", done => {
         const host = `${protocol}://${hostname}`;
-        nock(host)
-          .get('/')
-          .reply(404);
+        nock(host).get('/').reply(404);
         const req = http.request(`${host}/`);
         req.on('response', response => {
           response.on('data', () => {});
@@ -695,6 +717,40 @@ describe('HttpPlugin', () => {
         });
         req.end();
       });
+
+      it('custom attributes should show up on client and server spans', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+
+        assert.strictEqual(
+          incomingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
+
+        assert.strictEqual(
+          outgoingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
+      });
     });
 
     describe('with require parent span', () => {
@@ -712,14 +768,14 @@ describe('HttpPlugin', () => {
         plugin.disable();
       });
 
-      it(`should not trace without parent with options enabled (both client & server)`, async () => {
+      it('should not trace without parent with options enabled (both client & server)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -727,13 +783,13 @@ describe('HttpPlugin', () => {
         assert.strictEqual(spans.length, 0);
       });
 
-      it(`should not trace without parent with options enabled (client only)`, async () => {
+      it('should not trace without parent with options enabled (client only)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -751,13 +807,13 @@ describe('HttpPlugin', () => {
         );
       });
 
-      it(`should not trace without parent with options enabled (server only)`, async () => {
+      it('should not trace without parent with options enabled (server only)', async () => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const result = await httpRequest.get(
           `${protocol}://${hostname}:${serverPort}${testPath}`
         );
@@ -775,14 +831,14 @@ describe('HttpPlugin', () => {
         );
       });
 
-      it(`should trace with parent with both requireParent options enabled`, done => {
+      it('should trace with parent with both requireParent options enabled', done => {
         plugin.disable();
         const config: HttpPluginConfig = {
           requireParentforIncomingSpans: true,
           requireParentforOutgoingSpans: true,
         };
         plugin.enable(http, provider, provider.logger, config);
-        const testPath = `/test/test`;
+        const testPath = '/test/test';
         const tracer = provider.getTracer('default');
         const span = tracer.startSpan('parentSpan', {
           kind: SpanKind.INTERNAL,
