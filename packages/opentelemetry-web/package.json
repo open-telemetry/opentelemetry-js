@@ -47,7 +47,7 @@
     "@opentelemetry/resources": "^0.8.2",
     "@types/jquery": "^3.3.31",
     "@types/mocha": "^7.0.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "12.12.35",
     "@types/sinon": "^7.0.13",
     "@types/webpack-env": "1.13.9",
     "babel-loader": "^8.0.6",
