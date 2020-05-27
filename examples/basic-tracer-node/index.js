@@ -18,7 +18,7 @@ provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
  * tracer provider. This means when you call API methods like
  * `opentelemetry.trace.getTracer`, they will use this tracer provider. If you
  * do not register a global tracer provider, instrumentation which calls these
- * methods will recieve no-op implementations.
+ * methods will receive no-op implementations.
  */
 provider.register();
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');

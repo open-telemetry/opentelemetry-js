@@ -44,7 +44,7 @@
     "@opentelemetry/context-base": "^0.8.2",
     "@opentelemetry/resources": "^0.8.2",
     "@types/mocha": "^7.0.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "12.12.35",
     "@types/semver": "^6.0.1",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",

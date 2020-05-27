@@ -42,7 +42,7 @@
   },
   "devDependencies": {
     "@types/mocha": "^7.0.0",
-    "@types/node": "^12.6.8",
+    "@types/node": "12.12.35",
     "@types/shimmer": "^1.0.1",
     "codecov": "^3.6.1",
     "gts": "^2.0.0",
