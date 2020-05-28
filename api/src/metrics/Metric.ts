@@ -106,6 +106,21 @@ export interface UnboundMetric<T> extends Metric {
   unbind(labels: Labels): void;
 }
 
+/**
+ * Counter is the most common synchronous instrument. This instrument supports
+ * an `Add(increment)` function for reporting a sum, and is restricted to
+ * non-negative increments. The default aggregation is Sum, as for any additive
+ * instrument.
+ *
+ * Example uses for Counter:
+ * <ol>
+ *   <li> count the number of bytes received. </li>
+ *   <li> count the number of requests completed. </li>
+ *   <li> count the number of accounts created. </li>
+ *   <li> count the number of checkpoints run. </li>
+ *   <li> count the number of 5xx errors. </li>
+ * <ol>
+ */
 export interface Counter extends UnboundMetric<BoundCounter> {
   /**
    * Adds the given value to the current value. Values cannot be negative.
