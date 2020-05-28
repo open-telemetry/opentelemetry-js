@@ -235,6 +235,9 @@ describe('fetch', () => {
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
 
+      // investigating
+      console.log(JSON.stringify(attributes));
+
       assert.ok(
         attributes[keys[0]] !== '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
