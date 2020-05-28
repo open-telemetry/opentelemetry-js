@@ -1,12 +1,12 @@
 # Batcher API Guide
 
-The batcher has two responsabilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
+[The batcher](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-metrics/src/export/Batcher.ts?rgh-link-date=2020-05-25T18%3A43%3A57Z) has two responsibilities: choosing which aggregator to choose for a metric instrument and store the last record for each metric ready to be exported.
 
 ## Selecting a specific aggregator for metrics
 
-Sometimes you may want to use a specific aggregator for one of your metric, export a average of the last X values instead of just the last one.
+Sometimes you may want to use a specific aggregator for one of your metric, export an average of the last X values instead of just the last one.
 
-Here is what a aggregator that does that would looks like:
+Here is what an aggregator that does that would look like:
 ```ts
 import { Aggregator } from '@opentelemetry/metrics';
 import { hrTime } from '@opentelemetry/core';
