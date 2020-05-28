@@ -25,10 +25,16 @@ import { TimeInput } from '../common/Time';
  * in-process function calls to sub-components. A Trace has a single, top-level
  * "root" Span that in turn may have zero or more child Spans, which in turn
  * may have children.
+ *
+ * Spans are created by the {@link Tracer.startSpan} method.
  */
 export interface Span {
   /**
    * Returns the {@link SpanContext} object associated with this Span.
+   *
+   * Get an immutable, serializable identifier for this span that can be used
+   * to create new child spans. Returned SpanContext is usable even after the
+   * span ends.
    *
    * @returns the SpanContext object associated with this Span.
    */
@@ -36,6 +42,8 @@ export interface Span {
 
   /**
    * Sets an attribute to the span.
+   *
+   * Sets a single Attribute with the key and value passed as arguments.
    *
    * @param key the key for this attribute.
    * @param value the value for this attribute.
@@ -66,7 +74,8 @@ export interface Span {
 
   /**
    * Sets a status to the span. If used, this will override the default Span
-   * status. Default is {@link CanonicalCode.OK}.
+   * status. Default is {@link CanonicalCode.OK}. SetStatus overrides the value
+   * of previous calls to SetStatus on the Span.
    *
    * @param status the Status to set.
    */
@@ -74,6 +83,11 @@ export interface Span {
 
   /**
    * Updates the Span name.
+   *
+   * This will override the name provided via {@link Tracer.startSpan}.
+   *
+   * Upon this update, any sampling behavior based on Span name will depend on
+   * the implementation.
    *
    * @param name the Span name.
    */
@@ -97,7 +111,7 @@ export interface Span {
    * Returns the flag whether this span will be recorded.
    *
    * @returns true if this Span is active and recording information like events
-   * with the AddEvent operation and attributes using setAttributes.
+   *     with the `AddEvent` operation and attributes using `setAttributes`.
    */
   isRecording(): boolean;
 }
