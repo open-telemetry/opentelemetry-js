@@ -191,10 +191,9 @@ export class PrometheusExporter implements MetricExporter {
 
     switch (record.descriptor.metricKind) {
       case MetricKind.COUNTER:
-        // there is no such thing as a non-monotonic counter in prometheus
-        return record.descriptor.monotonic
-          ? new Counter(metricObject)
-          : new Gauge(metricObject);
+        return new Counter(metricObject);
+      case MetricKind.UP_DOWN_COUNTER:
+        return new Gauge(metricObject);
       case MetricKind.OBSERVER:
         return new Gauge(metricObject);
       default:

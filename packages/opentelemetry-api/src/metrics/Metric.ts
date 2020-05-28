@@ -48,12 +48,7 @@ export interface MetricOptions {
   disabled?: boolean;
 
   /**
-   * Asserts that this metric may only increase (e.g. time spent).
-   */
-  monotonic?: boolean;
-
-  /**
-   * (ValueRecorder only, default true) Asserts that this metric will only accept
+   * (Measure only, default true) Asserts that this metric will only accept
    * non-negative values (e.g. disk usage).
    */
   absolute?: boolean;
@@ -125,7 +120,18 @@ export interface Counter extends UnboundMetric<BoundCounter> {
   add(value: number, labels?: Labels): void;
 }
 
+<<<<<<< HEAD
 export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
+=======
+export interface UpDownCounter extends UnboundMetric<BoundCounter> {
+  /**
+   * Adds the given value to the current value. Values can be negative.
+   */
+  add(value: number, labels?: Labels): void;
+}
+
+export interface Measure extends UnboundMetric<BoundMeasure> {
+>>>>>>> a7dbd0b... feat: add the UpDownCounter instrument
   /**
    * Records the given value to this value recorder.
    */
