@@ -153,7 +153,7 @@ describe('fetch', () => {
       })
     );
 
-    const spyEntries = sandbox.stub(core.otperformance, 'getEntriesByType');
+    const spyEntries = sandbox.stub(performance, 'getEntriesByType');
     spyEntries.withArgs('resource').returns(resources);
     fetchPlugin = new FetchPlugin(config);
     webTracerProviderWithZone = new WebTracerProvider({
@@ -163,10 +163,7 @@ describe('fetch', () => {
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();
     exportSpy = sandbox.stub(dummySpanExporter, 'export');
-    clearResourceTimingsSpy = sandbox.stub(
-      (core.otperformance as unknown) as Performance,
-      'clearResourceTimings'
-    );
+    clearResourceTimingsSpy = sandbox.stub(performance, 'clearResourceTimings');
     webTracerProviderWithZone.addSpanProcessor(
       new tracing.SimpleSpanProcessor(dummySpanExporter)
     );

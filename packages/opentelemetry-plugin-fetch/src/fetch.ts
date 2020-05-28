@@ -120,7 +120,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
    */
   private _clearResources() {
     if (this._tasksCount === 0 && this._config.clearTimingResources) {
-      ((core.otperformance as unknown) as Performance).clearResourceTimings();
+      performance.clearResourceTimings();
       this._usedResources = new WeakSet<PerformanceResourceTiming>();
     }
   }
@@ -166,7 +166,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
       // fallback - either Observer is not available or it took longer
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
-      resources = core.otperformance.getEntriesByType(
+      resources = performance.getEntriesByType(
         'resource'
       ) as PerformanceResourceTiming[];
     }
