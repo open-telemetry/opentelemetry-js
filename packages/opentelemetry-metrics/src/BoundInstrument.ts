@@ -90,8 +90,8 @@ export class BoundCounter extends BaseBoundInstrument
 
 /**
  * BoundUpDownCounter allows the SDK to observe/record a single metric event.
- * The value of single instrument in the `Counter` associated with specified
- * Labels.
+ * The value of single instrument in the `UpDownCounter` associated with
+ * specified Labels.
  */
 export class BoundUpDownCounter extends BaseBoundInstrument
   implements api.BoundCounter {
