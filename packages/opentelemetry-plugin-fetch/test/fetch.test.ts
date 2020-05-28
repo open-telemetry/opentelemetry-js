@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -97,7 +97,8 @@ describe('fetch', () => {
   let fakeNow = 0;
   let fetchPlugin: FetchPlugin;
 
-  const url = 'https://httpbin.org/get';
+  const url = 'http://localhost:8090/get';
+  const badUrl = 'http://foo.bar.com/get';
 
   const clearData = () => {
     sandbox.restore();
@@ -115,6 +116,32 @@ describe('fetch', () => {
 
     sandbox.stub(core.otperformance, 'timeOrigin').value(0);
     sandbox.stub(core.otperformance, 'now').callsFake(() => fakeNow);
+
+    function fakeFetch(input: RequestInfo, init: RequestInit = {}) {
+      return new Promise((resolve, reject) => {
+        const response: any = {
+          args: {},
+          url: fileUrl,
+        };
+        response.headers = Object.assign({}, init.headers);
+
+        if (init.method === 'DELETE') {
+          response.status = 405;
+          response.statusText = 'OK';
+          resolve(new window.Response('foo', response));
+        } else if (input === url) {
+          response.status = 200;
+          response.statusText = 'OK';
+          resolve(new window.Response(JSON.stringify(response), response));
+        } else {
+          response.status = 404;
+          response.statusText = 'Bad request';
+          reject(new window.Response(JSON.stringify(response), response));
+        }
+      });
+    }
+
+    sandbox.stub(window, 'fetch').callsFake(fakeFetch as any);
 
     const resources: PerformanceResourceTiming[] = [];
     resources.push(
@@ -205,6 +232,12 @@ describe('fetch', () => {
       clearData();
     });
 
+    it('should wrap methods', () => {
+      assert.ok(core.isWrapped(window.fetch));
+      fetchPlugin.patch();
+      assert.ok(core.isWrapped(window.fetch));
+    });
+
     it('should unwrap methods', () => {
       assert.ok(core.isWrapped(window.fetch));
       fetchPlugin.unpatch();
@@ -235,9 +268,6 @@ describe('fetch', () => {
       const attributes = span.attributes;
       const keys = Object.keys(attributes);
 
-      // investigating
-      console.log(JSON.stringify(attributes));
-
       assert.ok(
         attributes[keys[0]] !== '',
         `attributes ${AttributeNames.COMPONENT} is not defined`
@@ -257,14 +287,12 @@ describe('fetch', () => {
         200,
         `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
       );
-      assert.strictEqual(
-        attributes[keys[4]],
-        'OK',
+      assert.ok(
+        attributes[keys[4]] === 'OK' || attributes[keys[4]] === '',
         `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
       );
-      assert.strictEqual(
-        attributes[keys[5]],
-        'httpbin.org',
+      assert.ok(
+        (attributes[keys[5]] as string).indexOf('localhost') === 0,
         `attributes ${AttributeNames.HTTP_HOST} is wrong`
       );
       assert.ok(
@@ -409,7 +437,6 @@ describe('fetch', () => {
 
     it('should set trace headers', () => {
       const span: api.Span = exportSpy.args[1][0][0];
-
       assert.strictEqual(
         lastResponse.headers[core.X_B3_TRACE_ID],
         span.context().traceId,
@@ -462,7 +489,6 @@ describe('fetch', () => {
 
   describe('when url is ignored', () => {
     beforeEach(done => {
-      const url = 'https://httpbin.org/get';
       const propagateTraceHeaderCorsUrls = url;
       prepareData(done, url, {
         propagateTraceHeaderCorsUrls,
@@ -479,7 +505,6 @@ describe('fetch', () => {
 
   describe('when clearTimingResources is TRUE', () => {
     beforeEach(done => {
-      const url = 'https://httpbin.org/get';
       const propagateTraceHeaderCorsUrls = url;
       prepareData(done, url, {
         propagateTraceHeaderCorsUrls,
@@ -500,7 +525,6 @@ describe('fetch', () => {
 
   describe('when request is NOT successful (wrong url)', () => {
     beforeEach(done => {
-      const badUrl = 'https://httpbin.orgbad/get';
       const propagateTraceHeaderCorsUrls = badUrl;
       prepareData(done, badUrl, { propagateTraceHeaderCorsUrls });
     });
@@ -519,9 +543,8 @@ describe('fetch', () => {
 
   describe('when request is NOT successful (405)', () => {
     beforeEach(done => {
-      const badUrl = 'https://httpbin.org/get';
-      const propagateTraceHeaderCorsUrls = badUrl;
-      prepareData(done, badUrl, { propagateTraceHeaderCorsUrls }, 'DELETE');
+      const propagateTraceHeaderCorsUrls = url;
+      prepareData(done, url, { propagateTraceHeaderCorsUrls }, 'DELETE');
     });
     afterEach(() => {
       clearData();
