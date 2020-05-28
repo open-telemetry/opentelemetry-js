@@ -63,15 +63,14 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     span: api.Span,
     corsPreFlightRequest: PerformanceResourceTiming
   ): void {
-    this._tracer.withSpan(span, () => {
-      const childSpan = this._tracer.startSpan('CORS Preflight', {
-        startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
-      });
-      web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
-      childSpan.end(
-        corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
-      );
+    const childSpan = this._tracer.startSpan('CORS Preflight', {
+      parent: span,
+      startTime: corsPreFlightRequest[web.PerformanceTimingNames.FETCH_START],
     });
+    web.addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+    childSpan.end(
+      corsPreFlightRequest[web.PerformanceTimingNames.RESPONSE_END]
+    );
   }
 
   /**
@@ -139,11 +138,13 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }
-    return this._tracer.startSpan(url, {
+    const method = (options.method || 'GET').toUpperCase();
+    const spanName = `HTTP ${method}`;
+    return this._tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.moduleName,
-        [AttributeNames.HTTP_METHOD]: options.method,
+        [AttributeNames.HTTP_METHOD]: method,
         [AttributeNames.HTTP_URL]: url,
       },
     });

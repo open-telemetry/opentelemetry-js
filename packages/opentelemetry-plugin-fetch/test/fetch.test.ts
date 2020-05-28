@@ -255,7 +255,7 @@ describe('fetch', () => {
 
     it('span should have correct name', () => {
       const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-      assert.strictEqual(span.name, url, 'span has wrong name');
+      assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
     });
 
     it('span should have correct kind', () => {
@@ -371,7 +371,11 @@ describe('fetch', () => {
 
     it('preflight request span should have correct name', () => {
       const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-      assert.strictEqual(span.name, 'CORS Preflight', 'span has wrong name');
+      assert.strictEqual(
+        span.name,
+        'CORS Preflight',
+        'preflight request span has wrong name'
+      );
     });
 
     it('preflight request span should have correct kind', () => {
