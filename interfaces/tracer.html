@@ -118,7 +118,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/tracer.ts#L66">src/trace/tracer.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/tracer.ts#L86">src/trace/tracer.ts:86</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -158,14 +158,17 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/tracer.ts#L36">src/trace/tracer.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/tracer.ts#L40">src/trace/tracer.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Returns the current Span from the current context if available.</p>
 								</div>
-								<p>If there is no Span associated with the current context, null is returned.</p>
+								<p>If there is no Span associated with the current context, <code>null</code> is
+								returned.</p>
+								<p>To install a <a href="span.html">Span</a> to the current Context use
+								<a href="tracer.html#withspan">Tracer.withSpan</a>.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="span.html" class="tsd-signature-type">Span</a>
 								<span class="tsd-signature-symbol"> | </span>
@@ -185,13 +188,21 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/tracer.ts#L45">src/trace/tracer.ts:45</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/tracer.ts#L58">src/trace/tracer.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Starts a new <a href="span.html">Span</a>.</p>
+									<p>Starts a new <a href="span.html">Span</a>. Start the span without setting it as the current
+									span in this tracer&#39;s context.</p>
 								</div>
+								<p>This method do NOT modify the current Context. To install a <a href="span.html">Span</a> to the current Context use <a href="tracer.html#withspan">Tracer.withSpan</a>.</p>
+								<dl class="tsd-comment-tags">
+									<dt>example</dt>
+									<dd><pre><code>const span = tracer.start<span class="hljs-constructor">Span('<span class="hljs-params">op</span>')</span>;
+span.set<span class="hljs-constructor">Attribute('<span class="hljs-params">key</span>', '<span class="hljs-params">value</span>')</span>;
+span.<span class="hljs-keyword">end</span><span class="hljs-literal">()</span>;</code></pre></dd>
+								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -223,17 +234,22 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/tracer.ts#L55">src/trace/tracer.ts:55</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/tracer.ts#L75">src/trace/tracer.ts:75</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Executes the function given by fn within the context provided by Span</p>
+									<p>Executes the function given by fn within the context provided by Span.</p>
 								</div>
+								<p>This is a convenience method for creating spans attached to the tracer&#39;s
+									context. Applications that need more control over the span lifetime should
+								use <a href="tracer.html#startspan">Tracer.startSpan</a> instead.</p>
 								<dl class="tsd-comment-tags">
 									<dt>example</dt>
-									<dd><p>tracer.withSpan(span, function() { ... });</p>
-									</dd>
+									<dd><pre><code>tracer.<span class="hljs-keyword">with</span><span class="hljs-constructor">Span(<span class="hljs-params">span</span>, ()</span> =&gt; {
+    tracer.get<span class="hljs-constructor">CurrentSpan()</span>.add<span class="hljs-constructor">Event(<span class="hljs-string">"parent's event"</span>)</span>;
+    <span class="hljs-keyword">do</span><span class="hljs-constructor">SomeOtherWork()</span>;  <span class="hljs-comment">// Here "span" is the current Span.</span>
+});</code></pre></dd>
 								</dl>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>

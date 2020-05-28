@@ -69,13 +69,15 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Injects {@link Context} into and extracts it from carriers that travel
+						<p>Injects <code>Context</code> into and extracts it from carriers that travel
 							in-band across process boundaries. Encoding is expected to conform to the
 							HTTP Header Field semantics. Values are often encoded as RPC/HTTP request
 						headers.</p>
 					</div>
 					<p>The carrier of propagated data on both the client (injector) and server
-					(extractor) side is usually an object such as http headers.</p>
+						(extractor) side is usually an object such as http headers. Propagation is
+						usually implemented via library-specific request interceptors, where the
+					client-side injects values and the server-side extracts them.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -118,12 +120,12 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/context/propagation/HttpTextPropagator.ts#L58">src/context/propagation/HttpTextPropagator.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/HttpTextPropagator.ts#L60">src/context/propagation/HttpTextPropagator.ts:60</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Given a {@link Context} and a carrier, extract context values from a
+									<p>Given a <code>Context</code> and a carrier, extract context values from a
 										carrier and return a new context, created from the old context, with the
 									extracted values.</p>
 								</div>
@@ -166,15 +168,15 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/context/propagation/HttpTextPropagator.ts#L44">src/context/propagation/HttpTextPropagator.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/HttpTextPropagator.ts#L46">src/context/propagation/HttpTextPropagator.ts:46</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Injects values from a given {@link Context} into a carrier.</p>
+									<p>Injects values from a given <code>Context</code> into a carrier.</p>
 								</div>
-								<p>OpenTelemetry defines a common set of format values (HttpTextPropagator), and
-								each has an expected <code>carrier</code> type.</p>
+								<p>OpenTelemetry defines a common set of format values (HttpTextPropagator),
+								and each has an expected <code>carrier</code> type.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">

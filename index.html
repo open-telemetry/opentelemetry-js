@@ -76,12 +76,13 @@
 				<a href="#quick-start" id="quick-start" style="color: inherit; text-decoration: none;">
 					<h2>Quick Start</h2>
 				</a>
-				<p>To get started tracing you need to install the SDK and plugins, create a TracerProvider, and register it with the API.</p>
+				<p>To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.</p>
 				<a href="#install-dependencies" id="install-dependencies" style="color: inherit; text-decoration: none;">
 					<h3>Install Dependencies</h3>
 				</a>
 				<pre><code class="language-sh">$ <span class="hljs-comment"># Install tracing dependencies</span>
 $ npm install \
+    @opentelemetry/api \
     @opentelemetry/core \
     @opentelemetry/node \
     @opentelemetry/tracing \
@@ -92,6 +93,9 @@ $ <span class="hljs-comment"># Install metrics dependencies</span>
 $ npm install \
     @opentelemetry/metrics \
     @opentelemetry/exporter-prometheus <span class="hljs-comment"># add exporters as needed</span></code></pre>
+				<blockquote>
+					<p>Note: this example is for node.js. See <a href="https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web">examples/tracer-web</a> for a browser example.</p>
+				</blockquote>
 				<a href="#initialize-the-sdk" id="initialize-the-sdk" style="color: inherit; text-decoration: none;">
 					<h3>Initialize the SDK</h3>
 				</a>
@@ -113,9 +117,9 @@ $ npm install \
  */</span>
 tracerProvider.addSpanProcessor(
   <span class="hljs-keyword">new</span> SimpleSpanProcessor(
-    <span class="hljs-keyword">new</span> JaegerExporter(
-      <span class="hljs-comment">/* export options */</span>
-    )
+    <span class="hljs-keyword">new</span> JaegerExporter({
+      <span class="hljs-attr">serviceName</span>: <span class="hljs-string">'my-service'</span>
+    })
   )
 );
 
@@ -182,18 +186,18 @@ tracerProvider.register({
 				</ul>
 				<pre><code class="language-javascript"><span class="hljs-keyword">const</span> api = <span class="hljs-built_in">require</span>(<span class="hljs-string">"@opentelemetry/api"</span>);
 
-<span class="hljs-comment">/* Initialize TraceProvider */</span>
-api.trace.setGlobalTracerProvider(traceProvider);
-<span class="hljs-comment">/* returns traceProvider (no-op if a working provider has not been initialized) */</span>
+<span class="hljs-comment">/* Initialize TracerProvider */</span>
+api.trace.setGlobalTracerProvider(tracerProvider);
+<span class="hljs-comment">/* returns tracerProvider (no-op if a working provider has not been initialized) */</span>
 api.trace.getTracerProvider();
-<span class="hljs-comment">/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */</span>
+<span class="hljs-comment">/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */</span>
 api.trace.getTracer(name, version);
 
 <span class="hljs-comment">/* Initialize MeterProvider */</span>
 api.metrics.setGlobalMeterProvider(meterProvider);
 <span class="hljs-comment">/* returns meterProvider (no-op if a working provider has not been initialized) */</span>
 api.metrics.getMeterProvider();
-<span class="hljs-comment">/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */</span>
+<span class="hljs-comment">/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */</span>
 api.metrics.getMeter(name, version);
 
 <span class="hljs-comment">/* Initialize Propagator */</span>

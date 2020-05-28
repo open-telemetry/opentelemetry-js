@@ -75,6 +75,7 @@
 							&quot;root&quot; Span that in turn may have zero or more child Spans, which in turn
 						may have children.</p>
 					</div>
+					<p>Spans are created by the <a href="tracer.html#startspan">Tracer.startSpan</a> method.</p>
 				</div>
 			</section>
 			<section class="tsd-panel tsd-hierarchy">
@@ -123,7 +124,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L61">src/trace/span.ts:61</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L69">src/trace/span.ts:69</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -160,13 +161,16 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L35">src/trace/span.ts:35</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L41">src/trace/span.ts:41</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Returns the <a href="spancontext.html">SpanContext</a> object associated with this Span.</p>
 								</div>
+								<p>Get an immutable, serializable identifier for this span that can be used
+									to create new child spans. Returned SpanContext is usable even after the
+								span ends.</p>
 							</div>
 							<h4 class="tsd-returns-title">Returns <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h4>
 							<p>the SpanContext object associated with this Span.</p>
@@ -183,7 +187,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L94">src/trace/span.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L108">src/trace/span.ts:108</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -215,7 +219,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L102">src/trace/span.ts:102</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L116">src/trace/span.ts:116</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -225,7 +229,7 @@
 							</div>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">boolean</span></h4>
 							<p>true if this Span is active and recording information like events
-							with the AddEvent operation and attributes using setAttributes.</p>
+							with the <code>AddEvent</code> operation and attributes using <code>setAttributes</code>.</p>
 						</li>
 					</ul>
 				</section>
@@ -239,13 +243,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L43">src/trace/span.ts:43</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L51">src/trace/span.ts:51</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets an attribute to the span.</p>
 								</div>
+								<p>Sets a single Attribute with the key and value passed as arguments.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
@@ -276,7 +281,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L50">src/trace/span.ts:50</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L58">src/trace/span.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -307,13 +312,14 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L73">src/trace/span.ts:73</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L82">src/trace/span.ts:82</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Sets a status to the span. If used, this will override the default Span
-									status. Default is <a href="../enums/canonicalcode.html#ok">CanonicalCode.OK</a>.</p>
+										status. Default is <a href="../enums/canonicalcode.html#ok">CanonicalCode.OK</a>. SetStatus overrides the value
+									of previous calls to SetStatus on the Span.</p>
 								</div>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -339,13 +345,16 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/span.ts#L80">src/trace/span.ts:80</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/span.ts#L94">src/trace/span.ts:94</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
 									<p>Updates the Span name.</p>
 								</div>
+								<p>This will override the name provided via <a href="tracer.html#startspan">Tracer.startSpan</a>.</p>
+								<p>Upon this update, any sampling behavior based on Span name will depend on
+								the implementation.</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">

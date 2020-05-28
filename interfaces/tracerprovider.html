@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>TracerProvider provides an interface for creating <a href="tracer.html">Tracer</a>s</p>
+						<p>A registry for creating named <a href="tracer.html">Tracer</a>s.</p>
 					</div>
 				</div>
 			</section>
@@ -112,7 +112,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/7233a03/packages/opentelemetry-api/src/trace/tracer_provider.ts#L34">src/trace/tracer_provider.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/tracer_provider.ts#L34">src/trace/tracer_provider.ts:34</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -120,8 +120,8 @@
 									<p>Returns a Tracer, creating one if one with the given name and version is
 									not already created.</p>
 								</div>
-								<p>If there is no Span associated with the current context, <code>null</code> is
-								returned.</p>
+								<p>This function may return different Tracer types (e.g.
+								<a href="../classes/nooptracerprovider.html">NoopTracerProvider</a> vs. a functional tracer).</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
