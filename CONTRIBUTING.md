@@ -63,6 +63,31 @@ The `opentelemetry-js` project is written in TypeScript.
 - `npm test` tests code the same way that our CI will test it.
 - `npm run lint:fix` lint (and maybe fix) any changes.
 
+### Guidelines for Pull Requests
+
+- Typically we try to turn around reviews within one to two business days.
+- It is generally expected that a maintainer ([@open-telemetry/javascript-maintainers](https://github.com/orgs/open-telemetry/teams/javascript-maintainers)) should review and merge every PR.
+  - If a change has met the requirements listed below, an approver may also merge the pull request.
+- Most PRs should be merged in one to two weeks.
+- If a PR is taking longer than 30 days, please ping the approvers ([@open-telemetry/javascript-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)) as it may have been lost
+- Dependency upgrades and Security fixes: This PR is small and/or low-risk and can be merged with only maintainer reviews.
+- If your patch is not getting reviewed or you need a specific person to review it, you can @username or @open-telemetry/javascript-approvers a reviewer asking for a review in the pull request, or you can ask for a review on Gitter channel.
+- API changes, breaking changes, or large changes will be subject to more scrutiny and may require more reviewers. These PRs should only be merged by maintainers.
+- Changes to existing plugins and exporters will typically require the approval of the original plugin/exporter author.
+
+### General Merge Requirements
+
+- All requirements are at the discretion of the maintainers.
+  - Maintainers may merge pull requests which have not strictly met these requirements.
+  - Maintainers may close, block, or put on hold pull requests even if they have strictly met these requirements.
+- No “changes requested” reviews.
+- No unresolved conversations.
+- 4 approvals, including the approvals of both maintainers
+  - A pull request opened by an approver may be merged with only 3 reviews.
+  - Small (simple typo, URL, update docs, or grammatical fix) or high-priority changes may be merged more quickly or with fewer reviewers at the discretion of the maintainers. This is typically indicated with the express label.
+- For plugins, exporters, and propagators approval of the original code module author is preferred but not required.
+- New or changed functionality is tested by unit tests.
+- New or changed functionality is documented.
 
 ### Generating API documentation
 - `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-api/docs/out`
