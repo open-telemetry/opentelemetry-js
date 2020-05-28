@@ -256,7 +256,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       resources = otperformance.getEntriesByType(
-        'resource'
+        // ts thinks this is the perf_hooks module, but it is the browser performance api
+        'resource' as any
       ) as PerformanceResourceTiming[];
     }
 

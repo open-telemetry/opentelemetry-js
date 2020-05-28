@@ -9,14 +9,7 @@ const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 const EXPORTER = process.env.EXPORTER || '';
 
 module.exports = (serviceName) => {
-  const provider = new NodeTracerProvider({
-    plugins: {
-      grpc: {
-        enabled: true,
-        path: '@opentelemetry/plugin-grpc',
-      },
-    },
-  });
+  const provider = new NodeTracerProvider();
 
   let exporter;
   if (EXPORTER.toLowerCase().startsWith('z')) {
