@@ -29,6 +29,8 @@ $ npm install \
     @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
+> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
+
 ### Initialize the SDK
 
 Before any other module in your application is loaded, you must initialize the global tracer and meter providers. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
