@@ -53,7 +53,7 @@ export class AsyncHooksContextManager implements ContextManager {
   }
 
   active(): Context {
-    return this._stack[0] ?? Context.ROOT_CONTEXT;
+    return this._stack[this._stack.length - 1] ?? Context.ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
@@ -62,12 +62,9 @@ export class AsyncHooksContextManager implements ContextManager {
   ): ReturnType<T> {
     this._enterContext(context);
     try {
-      const result = fn();
+      return fn();
+    } finally {
       this._exitContext();
-      return result;
-    } catch (err) {
-      this._exitContext();
-      throw err;
     }
   }
 
@@ -227,7 +224,7 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid id of the async context
    */
   private _init(uid: number) {
-    const context = this._stack[0];
+    const context = this._stack[this._stack.length - 1];
     if (context !== undefined) {
       this._contexts.set(uid, context);
     }
@@ -264,13 +261,13 @@ export class AsyncHooksContextManager implements ContextManager {
    * Set the given context as active
    */
   private _enterContext(context: Context) {
-    this._stack.unshift(context);
+    this._stack.push(context);
   }
 
   /**
    * Remove the context at the root of the stack
    */
   private _exitContext() {
-    this._stack.shift();
+    this._stack.pop();
   }
 }
