@@ -9,13 +9,14 @@ This package provides everything needed to interact with the OpenTelemetry API, 
 
 ## Quick Start
 
-To get started tracing you need to install the SDK and plugins, create a TracerProvider, and register it with the API.
+To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.
 
 ### Install Dependencies
 
 ```sh
 $ # Install tracing dependencies
 $ npm install \
+    @opentelemetry/api \
     @opentelemetry/core \
     @opentelemetry/node \
     @opentelemetry/tracing \
@@ -27,6 +28,8 @@ $ npm install \
     @opentelemetry/metrics \
     @opentelemetry/exporter-prometheus # add exporters as needed
 ```
+
+> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
 
 ### Initialize the SDK
 
@@ -50,9 +53,9 @@ const tracerProvider = new NodeTracerProvider();
  */
 tracerProvider.addSpanProcessor(
   new SimpleSpanProcessor(
-    new JaegerExporter(
-      /* export options */
-    )
+    new JaegerExporter({
+      serviceName: 'my-service'
+    })
   )
 );
 
@@ -124,18 +127,18 @@ If you are writing an instrumentation library, or prefer to call the API methods
 ```javascript
 const api = require("@opentelemetry/api");
 
-/* Initialize TraceProvider */
-api.trace.setGlobalTracerProvider(traceProvider);
-/* returns traceProvider (no-op if a working provider has not been initialized) */
+/* Initialize TracerProvider */
+api.trace.setGlobalTracerProvider(tracerProvider);
+/* returns tracerProvider (no-op if a working provider has not been initialized) */
 api.trace.getTracerProvider();
-/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */
+/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */
 api.trace.getTracer(name, version);
 
 /* Initialize MeterProvider */
 api.metrics.setGlobalMeterProvider(meterProvider);
 /* returns meterProvider (no-op if a working provider has not been initialized) */
 api.metrics.getMeterProvider();
-/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */
+/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
 api.metrics.getMeter(name, version);
 
 /* Initialize Propagator */
@@ -171,7 +174,6 @@ async function doSomething() {
   }
 }
 ```
-
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
