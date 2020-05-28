@@ -167,6 +167,40 @@ describe('AsyncHooksContextManager', () => {
       });
       assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
     });
+
+    it('should works with multiple concurrent operations', done => {
+      const scope1 = '1' as any;
+      const scope2 = '2' as any;
+      const scope3 = '3' as any;
+      const scope4 = '4' as any;
+      let scope4Called = false;
+
+      contextManager.with(scope1, async () => {
+        assert.strictEqual(contextManager.active(), scope1);
+        setTimeout(async () => {
+          await contextManager.with(scope3, async () => {
+            assert.strictEqual(contextManager.active(), scope3);
+          });
+          assert.strictEqual(contextManager.active(), scope1);
+          assert.strictEqual(scope4Called, true);
+          return done();
+        }, 100);
+        assert.strictEqual(contextManager.active(), scope1);
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
+      contextManager.with(scope2, async () => {
+        assert.strictEqual(contextManager.active(), scope2);
+        setTimeout(() => {
+          contextManager.with(scope4, async () => {
+            assert.strictEqual(contextManager.active(), scope4);
+            scope4Called = true;
+          });
+          assert.strictEqual(contextManager.active(), scope2);
+        }, 20);
+        assert.strictEqual(contextManager.active(), scope2);
+      });
+      assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
+    });
   });
 
   describe('.bind(function)', () => {
