@@ -42,7 +42,7 @@ export class StackContextManager implements ContextManager {
     context = Context.ROOT_CONTEXT
   ): T {
     const manager = this;
-    const contextWrapper = function (this: any, ...args: any[]) {
+    const contextWrapper = function (this: unknown, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
