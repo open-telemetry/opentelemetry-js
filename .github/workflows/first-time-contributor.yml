@@ -33,7 +33,7 @@ jobs:
             You can sign as a company or an individual.
             All pull requests run several checks, including checking if the user who created the pull request signed the CLA.
             If you have not signed the CLA, the failed check will have a link you can follow in order to sign.
-            Once you have signed, come back to this PR and comment "I signed it,"" and the check will be rerun.
+            Once you have signed, come back to this PR and comment "I signed it," and the check will be rerun.
 
             ## Contribution Guidelines
 
