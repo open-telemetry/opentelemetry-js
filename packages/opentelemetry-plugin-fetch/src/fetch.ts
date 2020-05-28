@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import shimmer = require('shimmer');
+import * as shimmer from 'shimmer'
 import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import * as web from '@opentelemetry/web';
