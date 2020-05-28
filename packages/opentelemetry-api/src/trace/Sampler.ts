@@ -34,7 +34,6 @@ export interface Sampler {
    * @param traceId of the span to be created. It can be different from the
    *     traceId in the {@link SpanContext}. Typically in situations when the
    *     span to be created starts a new trace.
-   * @param spanId of the span to be created.
    * @param spanName of the span to be created.
    * @param spanKind of the span to be created.
    * @param attributes Initial set of Attributes for the Span being constructed.
@@ -45,7 +44,6 @@ export interface Sampler {
   shouldSample(
     parentContext: SpanContext | undefined,
     traceId: string,
-    spanId: string,
     spanName: string,
     spanKind: SpanKind,
     attributes: Attributes,

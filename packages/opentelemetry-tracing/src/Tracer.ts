@@ -84,7 +84,6 @@ export class Tracer implements api.Tracer {
     const samplingResult = this._sampler.shouldSample(
       parentContext,
       traceId,
-      spanId,
       name,
       spanKind,
       attributes,
