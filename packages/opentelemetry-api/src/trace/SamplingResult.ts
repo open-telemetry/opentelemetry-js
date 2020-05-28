@@ -49,8 +49,8 @@ export interface SamplingResult {
   decision: SamplingDecision;
   /**
    * The list of attributes returned by SamplingResult MUST be immutable.
-   * Caller may call this method any number of times and can safely cache the
-   * returned value.
+   * Caller may call {@link Sampler}.shouldSample any number of times and
+   * can safely cache the returned value.
    */
   attributes?: Readonly<Attributes>;
 }
