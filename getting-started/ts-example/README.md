@@ -252,7 +252,6 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
-  labelKeys: ["route"],
   description: "Count all incoming requests"
 });
 
@@ -317,7 +316,6 @@ const meter = new MeterProvider({
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
-  labelKeys: ["route"],
   description: "Count all incoming requests"
 });
 
