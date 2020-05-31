@@ -66,8 +66,6 @@ export class Tracer implements api.Tracer {
     context = api.context.active()
   ): api.Span {
     const parentContext = getParent(options, context);
-    // make sampling decision
-    const samplingDecision = this._sampler.shouldSample(parentContext);
     const spanId = randomSpanId();
     let traceId;
     let traceState;
@@ -79,12 +77,26 @@ export class Tracer implements api.Tracer {
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
     }
-    const traceFlags = samplingDecision
-      ? api.TraceFlags.SAMPLED
-      : api.TraceFlags.NONE;
+    const spanKind = options.kind ?? api.SpanKind.INTERNAL;
+    const links = options.links ?? [];
+    const attributes = { ...this._defaultAttributes, ...options.attributes };
+    // make sampling decision
+    const samplingResult = this._sampler.shouldSample(
+      parentContext,
+      traceId,
+      name,
+      spanKind,
+      attributes,
+      links
+    );
+
+    const traceFlags =
+      samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
+        ? api.TraceFlags.SAMPLED
+        : api.TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
-    if (!samplingDecision) {
-      this.logger.debug('Sampling is off, starting no recording span');
+    if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
+      this.logger.debug('Recording is off, starting no recording span');
       return new NoRecordingSpan(spanContext);
     }
 
@@ -92,15 +104,13 @@ export class Tracer implements api.Tracer {
       this,
       name,
       spanContext,
-      options.kind || api.SpanKind.INTERNAL,
+      spanKind,
       parentContext ? parentContext.spanId : undefined,
-      options.links || [],
+      links,
       options.startTime
     );
     // Set default attributes
-    span.setAttributes(
-      Object.assign({}, this._defaultAttributes, options.attributes)
-    );
+    span.setAttributes(Object.assign(attributes, samplingResult.attributes));
     return span;
   }
 

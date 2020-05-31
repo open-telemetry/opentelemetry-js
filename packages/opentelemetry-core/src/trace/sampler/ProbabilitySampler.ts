@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Sampler, SpanContext, TraceFlags } from '@opentelemetry/api';
+import {
+  Sampler,
+  SpanContext,
+  TraceFlags,
+  SamplingDecision,
+} from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces. */
 export class ProbabilitySampler implements Sampler {
@@ -25,13 +30,19 @@ export class ProbabilitySampler implements Sampler {
   shouldSample(parentContext?: SpanContext) {
     // Respect the parent sampling decision if there is one
     if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
-      return (
-        (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
-      );
+      return {
+        decision:
+          (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
+            ? SamplingDecision.RECORD_AND_SAMPLED
+            : SamplingDecision.NOT_RECORD,
+      };
     }
-    if (this._probability >= 1.0) return true;
-    else if (this._probability <= 0) return false;
-    return Math.random() < this._probability;
+    return {
+      decision:
+        Math.random() < this._probability
+          ? SamplingDecision.RECORD_AND_SAMPLED
+          : SamplingDecision.NOT_RECORD,
+    };
   }
 
   toString(): string {
