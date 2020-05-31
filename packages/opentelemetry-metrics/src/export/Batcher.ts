@@ -64,9 +64,7 @@ export class UngroupedBatcher extends Batcher {
   }
 
   process(record: MetricRecord): void {
-    const labels = record.descriptor.labelKeys
-      .map(k => `${k}=${record.labels[k]}`)
-      .join(',');
+    const labels = record.labels;
     this._batchMap.set(record.descriptor.name + labels, record);
   }
 }

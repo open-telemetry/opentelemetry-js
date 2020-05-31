@@ -78,7 +78,6 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
-  readonly labelKeys: string[];
   readonly monotonic: boolean;
 }
 

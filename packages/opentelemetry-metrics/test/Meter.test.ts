@@ -228,7 +228,6 @@ describe('Meter', () => {
         assert.strictEqual(record.length, 1);
         assert.deepStrictEqual(record[0].descriptor, {
           description: '',
-          labelKeys: [],
           metricKind: MetricKind.COUNTER,
           monotonic: true,
           name: 'name1',
@@ -469,7 +468,6 @@ describe('Meter', () => {
     it('should set callback and observe value ', () => {
       const measure = meter.createObserver('name', {
         description: 'desc',
-        labelKeys: ['pid', 'core'],
       }) as ObserverMetric;
 
       function getCpuUsage() {
@@ -528,7 +526,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
@@ -545,7 +542,6 @@ describe('Meter', () => {
         monotonic: true,
         unit: '1',
         valueType: ValueType.DOUBLE,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -556,7 +552,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
         valueType: api.ValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
@@ -574,7 +569,6 @@ describe('Meter', () => {
         monotonic: true,
         unit: '1',
         valueType: ValueType.INT,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;

@@ -31,9 +31,6 @@ export interface MetricOptions {
   /** The unit of the Metric values. */
   unit: string;
 
-  /** The list of label keys for the Metric. */
-  labelKeys: string[];
-
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
 
@@ -84,6 +81,5 @@ export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
   description: '',
   unit: '1',
-  labelKeys: [],
   valueType: ValueType.DOUBLE,
 };
