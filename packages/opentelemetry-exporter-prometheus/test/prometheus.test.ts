@@ -302,7 +302,7 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(lines, [
                 '# HELP counter a test description',
                 '# TYPE counter counter',
-                // `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
                 `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
                 '',
               ]);

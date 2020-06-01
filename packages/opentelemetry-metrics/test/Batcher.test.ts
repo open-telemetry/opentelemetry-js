@@ -41,7 +41,7 @@ describe('Batcher', () => {
       barCounter.add(2);
       meter.collect();
       const checkPointSet = meter.getBatcher().checkPointSet();
-      // assert.strictEqual(checkPointSet.length, 2);
+      assert.strictEqual(checkPointSet.length, 2);
       for (const record of checkPointSet) {
         switch (record.labels.key) {
           case 'foo':
