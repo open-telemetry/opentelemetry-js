@@ -134,6 +134,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
+- [Naseem Kullah](https://github.com/naseemkullah), Transit
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
