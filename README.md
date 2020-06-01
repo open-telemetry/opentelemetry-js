@@ -134,6 +134,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Mark Wolff](https://github.com/markwolff), Microsoft
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
+- [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
@@ -261,4 +262,3 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-contrib-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
 [otel-contrib-plugin-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-user-interaction
 [otel-contrib-plugin-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-document-load
-
