@@ -17,7 +17,7 @@
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 import { ObserverResult } from './ObserverResult';
-import { BoundCounter, BoundMeasure } from './BoundInstrument';
+import { BoundCounter, BoundValueRecorder } from './BoundInstrument';
 
 /**
  * Options needed for metric creation
@@ -56,7 +56,7 @@ export interface MetricOptions {
   monotonic?: boolean;
 
   /**
-   * (Measure only, default true) Asserts that this metric will only accept
+   * (ValueRecorder only, default true) Asserts that this metric will only accept
    * non-negative values (e.g. disk usage).
    */
   absolute?: boolean;
@@ -128,9 +128,9 @@ export interface Counter extends UnboundMetric<BoundCounter> {
   add(value: number, labels?: Labels): void;
 }
 
-export interface Measure extends UnboundMetric<BoundMeasure> {
+export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
   /**
-   * Records the given value to this measure.
+   * Records the given value to this value recorder.
    */
   record(value: number, labels?: Labels): void;
 
