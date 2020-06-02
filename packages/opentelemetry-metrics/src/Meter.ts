@@ -18,7 +18,12 @@ import * as api from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, MeasureMetric, ObserverMetric } from './Metric';
+import {
+  Metric,
+  CounterMetric,
+  ValueRecorderMetric,
+  ObserverMetric,
+} from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -52,28 +57,36 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates and returns a new {@link Measure}.
+   * Creates and returns a new {@link ValueRecorder}.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: api.MetricOptions): api.Measure {
+  createValueRecorder(
+    name: string,
+    options?: api.MetricOptions
+  ): api.ValueRecorder {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_MEASURE_METRIC;
+      return api.NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: MetricOptions = {
-      absolute: true, // Measures are defined as absolute by default
-      monotonic: false, // not applicable to measure, set to false
+      absolute: true, // value recorders are defined as absolute by default
+      monotonic: false, // not applicable to value recorder, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
 
-    const measure = new MeasureMetric(name, opt, this._batcher, this._resource);
-    this._registerMetric(name, measure);
-    return measure;
+    const valueRecorder = new ValueRecorderMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource
+    );
+    this._registerMetric(name, valueRecorder);
+    return valueRecorder;
   }
 
   /**
