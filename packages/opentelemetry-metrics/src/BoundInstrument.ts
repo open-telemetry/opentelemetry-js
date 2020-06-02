@@ -93,10 +93,10 @@ export class BoundCounter extends BaseBoundInstrument
 }
 
 /**
- * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
+ * BoundValueRecorder is an implementation of the {@link BoundValueRecorder} interface.
  */
-export class BoundMeasure extends BaseBoundInstrument
-  implements api.BoundMeasure {
+export class BoundValueRecorder extends BaseBoundInstrument
+  implements api.BoundValueRecorder {
   private readonly _absolute: boolean;
 
   constructor(
@@ -119,7 +119,7 @@ export class BoundMeasure extends BaseBoundInstrument
   ): void {
     if (this._absolute && value < 0) {
       this._logger.error(
-        `Absolute measure cannot contain negative values for $${Object.values(
+        `Absolute ValueRecorder cannot contain negative values for $${Object.values(
           this._labels
         )}`
       );

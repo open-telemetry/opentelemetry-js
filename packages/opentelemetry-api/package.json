@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/api",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Public API for OpenTelemetry",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -51,12 +51,12 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.8.2"
+    "@opentelemetry/context-base": "^0.8.3"
   },
   "devDependencies": {
     "@types/mocha": "^7.0.0",
-    "@types/node": "^12.6.8",
-    "@types/webpack-env": "1.13.9",
+    "@types/node": "^14.0.5",
+    "@types/webpack-env": "1.15.2",
     "codecov": "^3.6.1",
     "gts": "^2.0.0",
     "istanbul-instrumenter-loader": "^3.0.1",

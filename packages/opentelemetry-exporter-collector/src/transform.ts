@@ -28,7 +28,7 @@ import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
 } from './CollectorExporterBase';
-import { COLLETOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
+import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
 /**
@@ -172,7 +172,7 @@ export function toCollectorResource(
 export function toCollectorKind(
   kind: SpanKind
 ): opentelemetryProto.trace.v1.Span.SpanKind {
-  const collectorKind = COLLETOR_SPAN_KIND_MAPPING[kind];
+  const collectorKind = COLLECTOR_SPAN_KIND_MAPPING[kind];
   return typeof collectorKind === 'number'
     ? collectorKind
     : opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
