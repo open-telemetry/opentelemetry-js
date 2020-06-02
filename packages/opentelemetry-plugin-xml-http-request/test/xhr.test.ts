@@ -596,4 +596,71 @@ describe('xhr', () => {
       assert.strictEqual(events.length, 12, 'number of events is wrong');
     });
   });
+
+  describe('should work when async=false', () => {
+    let webTracerWithZone: api.Tracer;
+    let webTracerProviderWithZone: WebTracerProvider;
+    let dummySpanExporter: DummySpanExporter;
+    let exportSpy: any;
+    let rootSpan: api.Span;
+    const url =
+      'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
+
+    beforeEach(done => {
+      const resources: PerformanceResourceTiming[] = [];
+      resources.push(
+        createResource({
+          name: url,
+        })
+      );
+      webTracerProviderWithZone = new WebTracerProvider({
+        logLevel: LogLevel.ERROR,
+        plugins: [new XMLHttpRequestPlugin({})],
+      });
+      webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
+      dummySpanExporter = new DummySpanExporter();
+      exportSpy = sinon.stub(dummySpanExporter, 'export');
+      webTracerProviderWithZone.addSpanProcessor(
+        new tracing.SimpleSpanProcessor(dummySpanExporter)
+      );
+
+      rootSpan = webTracerWithZone.startSpan('root');
+      webTracerWithZone.withSpan(rootSpan, () => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', url, false);
+        xhr.send();
+        // setTimeout due to the plugin's use of a timeout to gather data (currently set to 300 and not exported)
+        setTimeout(done, 500);
+      });
+    });
+
+    it('should create a span with correct root span', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(
+        span.parentSpanId,
+        rootSpan.context().spanId,
+        'parent span is not root span'
+      );
+    });
+    it('span should have correct kind', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      assert.strictEqual(span.kind, api.SpanKind.CLIENT, 'span has wrong kind');
+    });
+    it('span should have correct attributes', () => {
+      const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+      const attributes = span.attributes;
+      const keys = Object.keys(attributes);
+
+      assert.strictEqual(
+        attributes[keys[1]],
+        'GET',
+        `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+      );
+      assert.strictEqual(
+        attributes[keys[2]],
+        url,
+        `attributes ${AttributeNames.HTTP_URL} is wrong`
+      );
+    });
+  });
 });
