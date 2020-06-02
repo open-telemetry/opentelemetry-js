@@ -29,19 +29,6 @@ type PatchedEventEmitter = {
   __ot_listeners?: { [name: string]: WeakMap<Func<void>, Func<void>> };
 } & EventEmitter;
 
-class Reference<T> {
-  constructor(private _value: T) {}
-
-  set(value: T) {
-    this._value = value;
-    return this;
-  }
-
-  get() {
-    return this._value;
-  }
-}
-
 const ADD_LISTENER_METHODS = [
   'addListener' as 'addListener',
   'on' as 'on',
@@ -52,72 +39,36 @@ const ADD_LISTENER_METHODS = [
 
 export class AsyncHooksContextManager implements ContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
-  private _contextRefs: Map<number, Reference<Context> | undefined> = new Map();
+  private _contexts: Map<number, Context | undefined> = new Map();
+  private _stack: Array<Context | undefined> = [];
 
   constructor() {
     this._asyncHook = asyncHooks.createHook({
       init: this._init.bind(this),
+      before: this._before.bind(this),
+      after: this._after.bind(this),
       destroy: this._destroy.bind(this),
       promiseResolve: this._destroy.bind(this),
     });
   }
 
   active(): Context {
-    const ref = this._contextRefs.get(asyncHooks.executionAsyncId());
-    return ref === undefined ? Context.ROOT_CONTEXT : ref.get();
+    return this._stack[this._stack.length - 1] ?? Context.ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
     fn: T
   ): ReturnType<T> {
-    const uid = asyncHooks.executionAsyncId();
-    let ref = this._contextRefs.get(uid);
-    let oldContext: Context | undefined = undefined;
-    if (ref === undefined) {
-      ref = new Reference(context);
-      this._contextRefs.set(uid, ref);
-    } else {
-      oldContext = ref.get();
-      ref.set(context);
-    }
+    this._enterContext(context);
     try {
       return fn();
     } finally {
-      if (oldContext === undefined) {
-        this._destroy(uid);
-      } else {
-        ref.set(oldContext);
-      }
+      this._exitContext();
     }
   }
 
-  async withAsync<T extends Promise<any>, U extends (...args: unknown[]) => T>(
-    context: Context,
-    fn: U
-  ): Promise<T> {
-    const uid = asyncHooks.executionAsyncId();
-    let ref = this._contextRefs.get(uid);
-    let oldContext: Context | undefined = undefined;
-    if (ref === undefined) {
-      ref = new Reference(context);
-      this._contextRefs.set(uid, ref);
-    } else {
-      oldContext = ref.get();
-      ref.set(context);
-    }
-    try {
-      return await fn();
-    } finally {
-      if (oldContext === undefined) {
-        this._destroy(uid);
-      } else {
-        ref.set(oldContext);
-      }
-    }
-  }
-
-  bind<T>(target: T, context: Context): T {
+  bind<T>(target: T, context?: Context): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
       context = this.active();
@@ -137,7 +88,8 @@ export class AsyncHooksContextManager implements ContextManager {
 
   disable(): this {
     this._asyncHook.disable();
-    this._contextRefs.clear();
+    this._contexts.clear();
+    this._stack = [];
     return this;
   }
 
@@ -156,6 +108,7 @@ export class AsyncHooksContextManager implements ContextManager {
      * It isn't possible to tell Typescript that contextWrapper is the same as T
      * so we forced to cast as any here.
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return contextWrapper as any;
   }
 
@@ -271,9 +224,9 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid id of the async context
    */
   private _init(uid: number) {
-    const ref = this._contextRefs.get(asyncHooks.executionAsyncId());
-    if (ref !== undefined) {
-      this._contextRefs.set(uid, ref);
+    const context = this._stack[this._stack.length - 1];
+    if (context !== undefined) {
+      this._contexts.set(uid, context);
     }
   }
 
@@ -283,6 +236,38 @@ export class AsyncHooksContextManager implements ContextManager {
    * @param uid uid of the async context
    */
   private _destroy(uid: number) {
-    this._contextRefs.delete(uid);
+    this._contexts.delete(uid);
+  }
+
+  /**
+   * Before hook is called just beforing executing a async context.
+   * @param uid uid of the async context
+   */
+  private _before(uid: number) {
+    const context = this._contexts.get(uid);
+    if (context !== undefined) {
+      this._enterContext(context);
+    }
+  }
+
+  /**
+   * After hook is called just after completing the execution of a async context.
+   */
+  private _after() {
+    this._exitContext();
+  }
+
+  /**
+   * Set the given context as active
+   */
+  private _enterContext(context: Context) {
+    this._stack.push(context);
+  }
+
+  /**
+   * Remove the context at the root of the stack
+   */
+  private _exitContext() {
+    this._stack.pop();
   }
 }

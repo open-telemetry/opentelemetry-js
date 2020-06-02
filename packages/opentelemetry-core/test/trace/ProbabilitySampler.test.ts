@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import * as api from '@opentelemetry/api';
 import {
   ProbabilitySampler,
   ALWAYS_SAMPLER,
@@ -24,60 +25,82 @@ import {
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
     const sampler = new ProbabilitySampler(1);
-    assert.strictEqual(sampler.shouldSample(), true);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
   });
 
   it('should return a always sampler for >1', () => {
     const sampler = new ProbabilitySampler(100);
-    assert.strictEqual(sampler.shouldSample(), true);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
     assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
   });
 
   it('should return a never sampler for 0', () => {
     const sampler = new ProbabilitySampler(0);
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
   });
 
   it('should return a never sampler for <0', () => {
     const sampler = new ProbabilitySampler(-1);
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
   });
 
   it('should sample according to the probability', () => {
     Math.random = () => 1 / 10;
     const sampler = new ProbabilitySampler(0.2);
-    assert.strictEqual(sampler.shouldSample(), true);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
     assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0.2}');
 
     Math.random = () => 5 / 10;
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
   });
 
-  it('should return true for ALWAYS_SAMPLER', () => {
-    assert.strictEqual(ALWAYS_SAMPLER.shouldSample(), true);
+  it('should return api.SamplingDecision.RECORD_AND_SAMPLED for ALWAYS_SAMPLER', () => {
+    assert.deepStrictEqual(ALWAYS_SAMPLER.shouldSample(), {
+      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+    });
     assert.strictEqual(ALWAYS_SAMPLER.toString(), 'ProbabilitySampler{1}');
   });
 
-  it('should return false for NEVER_SAMPLER', () => {
-    assert.strictEqual(NEVER_SAMPLER.shouldSample(), false);
+  it('should return decision: api.SamplingDecision.NOT_RECORD for NEVER_SAMPLER', () => {
+    assert.deepStrictEqual(NEVER_SAMPLER.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
     assert.strictEqual(NEVER_SAMPLER.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle NaN', () => {
     const sampler = new ProbabilitySampler(NaN);
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
     assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle -NaN', () => {
     const sampler = new ProbabilitySampler(-NaN);
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
     assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle undefined', () => {
     const sampler = new ProbabilitySampler(undefined);
-    assert.strictEqual(sampler.shouldSample(), false);
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
     assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 });

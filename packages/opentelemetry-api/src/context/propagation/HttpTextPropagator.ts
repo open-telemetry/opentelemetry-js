@@ -19,20 +19,22 @@ import { SetterFunction } from './setter';
 import { GetterFunction } from './getter';
 
 /**
- * Injects {@link Context} into and extracts it from carriers that travel
+ * Injects `Context` into and extracts it from carriers that travel
  * in-band across process boundaries. Encoding is expected to conform to the
  * HTTP Header Field semantics. Values are often encoded as RPC/HTTP request
  * headers.
  *
  * The carrier of propagated data on both the client (injector) and server
- * (extractor) side is usually an object such as http headers.
+ * (extractor) side is usually an object such as http headers. Propagation is
+ * usually implemented via library-specific request interceptors, where the
+ * client-side injects values and the server-side extracts them.
  */
 export interface HttpTextPropagator {
   /**
-   * Injects values from a given {@link Context} into a carrier.
+   * Injects values from a given `Context` into a carrier.
    *
-   * OpenTelemetry defines a common set of format values (HttpTextPropagator), and
-   * each has an expected `carrier` type.
+   * OpenTelemetry defines a common set of format values (HttpTextPropagator),
+   * and each has an expected `carrier` type.
    *
    * @param context the Context from which to extract values to transmit over
    *     the wire.
@@ -44,7 +46,7 @@ export interface HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction): void;
 
   /**
-   * Given a {@link Context} and a carrier, extract context values from a
+   * Given a `Context` and a carrier, extract context values from a
    * carrier and return a new context, created from the old context, with the
    * extracted values.
    *
