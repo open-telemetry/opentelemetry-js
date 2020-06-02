@@ -59,7 +59,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 | Platform Version | Supported                                       |
 |------------------|-------------------------------------------------|
 | Node.JS `v14`    | ✅                                               |
-| Node.JS `v13`    | ✅                                               |
 | Node.JS `v12`    | ✅                                               |
 | Node.JS `v10`    | ✅                                               |
 | Node.JS `v8`     | See [Node Support](#node-support) below         |

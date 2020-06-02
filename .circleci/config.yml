@@ -161,11 +161,6 @@ jobs:
       - image: node:12
         environment: *node_test_env
     <<: *node_unit_tests
-  node13:
-    docker:
-      - image: node:13
-        environment: *node_test_env
-    <<: *node_unit_tests
   node14:
     docker:
       - image: node:14
@@ -187,7 +182,6 @@ workflows:
       - node8
       - node10
       - node12
-      - node13
       - node14
       - node12-browsers
 
