@@ -139,7 +139,8 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   }
 }
 
-export class ValueRecorderMetric extends Metric<BoundValueRecorder> implements api.ValueRecorder {
+export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+  implements api.ValueRecorder {
   protected readonly _absolute: boolean;
 
   constructor(

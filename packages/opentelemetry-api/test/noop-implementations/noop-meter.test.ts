@@ -50,7 +50,10 @@ describe('NoopMeter', () => {
       description: 'the testing package',
     };
 
-    const valueRecorderWithOptions = meter.createValueRecorder('some-name', options);
+    const valueRecorderWithOptions = meter.createValueRecorder(
+      'some-name',
+      options
+    );
     assert.strictEqual(valueRecorderWithOptions, NOOP_VALUE_RECORDER_METRIC);
     const counterWithOptions = meter.createCounter('some-name', options);
     assert.strictEqual(counterWithOptions, NOOP_COUNTER_METRIC);

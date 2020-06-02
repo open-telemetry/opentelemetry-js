@@ -289,7 +289,10 @@ describe('Meter', () => {
         unit: '1',
         disabled: false,
       });
-      assert.strictEqual((valueRecorder as ValueRecorderMetric)['_absolute'], true);
+      assert.strictEqual(
+        (valueRecorder as ValueRecorderMetric)['_absolute'],
+        true
+      );
     });
 
     it('should be able to set absolute to false', () => {
@@ -299,11 +302,16 @@ describe('Meter', () => {
         disabled: false,
         absolute: false,
       });
-      assert.strictEqual((valueRecorder as ValueRecorderMetric)['_absolute'], false);
+      assert.strictEqual(
+        (valueRecorder as ValueRecorderMetric)['_absolute'],
+        false
+      );
     });
 
     it('should pipe through resource', () => {
-      const valueRecorder = meter.createValueRecorder('name') as ValueRecorderMetric;
+      const valueRecorder = meter.createValueRecorder(
+        'name'
+      ) as ValueRecorderMetric;
       assert.ok(valueRecorder.resource instanceof Resource);
 
       valueRecorder.record(1, { foo: 'bar' });
@@ -326,7 +334,9 @@ describe('Meter', () => {
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
-        const valueRecorder = meter.createValueRecorder('name with invalid characters^&*(');
+        const valueRecorder = meter.createValueRecorder(
+          'name with invalid characters^&*('
+        );
         assert.ok(valueRecorder instanceof api.NoopMetric);
       });
     });
@@ -335,7 +345,9 @@ describe('Meter', () => {
       const performanceTimeOrigin = hrTime();
 
       it('should create a valueRecorder instrument', () => {
-        const valueRecorder = meter.createValueRecorder('name') as ValueRecorderMetric;
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
         const boundValueRecorder = valueRecorder.bind(labels);
         assert.doesNotThrow(() => boundValueRecorder.record(10));
       });
@@ -404,7 +416,9 @@ describe('Meter', () => {
       });
 
       it('should return same instrument on same label values', () => {
-        const valueRecorder = meter.createValueRecorder('name') as ValueRecorderMetric;
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
         const boundValueRecorder1 = valueRecorder.bind(labels);
         boundValueRecorder1.record(10);
         const boundValueRecorder2 = valueRecorder.bind(labels);
@@ -426,7 +440,9 @@ describe('Meter', () => {
 
     describe('.unbind()', () => {
       it('should remove the valueRecorder instrument', () => {
-        const valueRecorder = meter.createValueRecorder('name') as ValueRecorderMetric;
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
         const boundValueRecorder = valueRecorder.bind(labels);
         assert.strictEqual(valueRecorder['_instruments'].size, 1);
         valueRecorder.unbind(labels);
@@ -442,7 +458,9 @@ describe('Meter', () => {
       });
 
       it('should clear all instruments', () => {
-        const valueRecorder = meter.createValueRecorder('name') as ValueRecorderMetric;
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
         valueRecorder.bind(labels);
         assert.strictEqual(valueRecorder['_instruments'].size, 1);
         valueRecorder.clear();

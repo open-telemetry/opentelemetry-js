@@ -33,7 +33,7 @@ import { ObserverResult } from './ObserverResult';
  * constant NoopMetrics for all of its methods.
  */
 export class NoopMeter implements Meter {
-  constructor() { }
+  constructor() {}
 
   /**
    * Returns constant noop value recorder.
@@ -122,7 +122,7 @@ export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
 }
 
 export class NoopObserverMetric extends NoopMetric<void> implements Observer {
-  setCallback(callback: (observerResult: ObserverResult) => void): void { }
+  setCallback(callback: (observerResult: ObserverResult) => void): void {}
 }
 
 export class NoopBoundCounter implements BoundCounter {
@@ -146,6 +146,8 @@ export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
 export const NOOP_BOUND_VALUE_RECORDER = new NoopBoundValueRecorder();
-export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(NOOP_BOUND_VALUE_RECORDER);
+export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
+  NOOP_BOUND_VALUE_RECORDER
+);
 
 export const NOOP_OBSERVER_METRIC = new NoopObserverMetric();

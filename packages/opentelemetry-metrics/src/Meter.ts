@@ -18,7 +18,12 @@ import * as api from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, ValueRecorderMetric, ObserverMetric } from './Metric';
+import {
+  Metric,
+  CounterMetric,
+  ValueRecorderMetric,
+  ObserverMetric,
+} from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -56,7 +61,10 @@ export class Meter implements api.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createValueRecorder(name: string, options?: api.MetricOptions): api.ValueRecorder {
+  createValueRecorder(
+    name: string,
+    options?: api.MetricOptions
+  ): api.ValueRecorder {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
@@ -71,7 +79,12 @@ export class Meter implements api.Meter {
       ...options,
     };
 
-    const valueRecorder = new ValueRecorderMetric(name, opt, this._batcher, this._resource);
+    const valueRecorder = new ValueRecorderMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource
+    );
     this._registerMetric(name, valueRecorder);
     return valueRecorder;
   }
