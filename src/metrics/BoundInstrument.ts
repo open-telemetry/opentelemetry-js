@@ -26,15 +26,15 @@ export interface BoundCounter {
   add(value: number): void;
 }
 
-/** Measure to report instantaneous measurement of a value. */
-export interface BoundMeasure {
+/** ValueRecorder to report instantaneous measurement of a value. */
+export interface BoundValueRecorder {
   /**
-   * Records the given value to this measure.
-   * @param value the measurement to record.
+   * Records the given value to this value recorder.
+   * @param value to record.
    * @param correlationContext the correlationContext associated with the
-   *     measurements.
+   *     values.
    * @param spanContext the {@link SpanContext} that identifies the {@link Span}
-   *     for which the measurements are associated with.
+   *     which the values are associated with.
    */
   record(value: number): void;
   record(value: number, correlationContext: CorrelationContext): void;

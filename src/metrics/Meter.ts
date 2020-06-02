@@ -14,22 +14,22 @@
  * limitations under the License.
  */
 
-import { MetricOptions, Counter, Measure, Observer } from './Metric';
+import { MetricOptions, Counter, ValueRecorder, Observer } from './Metric';
 
 /**
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
- * or raw values (`Measure`) in which the aggregation and labels
+ * or raw values (`ValueRecorder`) in which the aggregation and labels
  * for the exported metric are deferred.
  */
 export interface Meter {
   /**
-   * Creates and returns a new `Measure`.
+   * Creates and returns a new `ValueRecorder`.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Measure;
+  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder;
 
   /**
    * Creates a new `Counter` metric. Generally, this kind of metric when the
