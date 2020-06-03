@@ -55,6 +55,6 @@
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
     "@opentelemetry/metrics": "^0.8.3",
-    "prom-client": "^11.5.3"
+    "prom-client": "^12.0.0"
   }
 }
