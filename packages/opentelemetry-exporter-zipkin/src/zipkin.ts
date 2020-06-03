@@ -37,7 +37,7 @@ export class ZipkinExporter implements SpanExporter {
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private readonly _reqOpts: http.RequestOptions;
-  private _serviceName: string;
+  private _serviceName?: string;
   private _isShutdown: boolean;
 
   constructor(config: zipkinTypes.ExporterConfig) {
