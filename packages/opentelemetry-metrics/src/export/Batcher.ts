@@ -16,7 +16,7 @@
 
 import {
   CounterSumAggregator,
-  MeasureExactAggregator,
+  ValueRecorderExactAggregator,
   ObserverAggregator,
 } from './aggregators';
 import {
@@ -59,7 +59,7 @@ export class UngroupedBatcher extends Batcher {
       case MetricKind.OBSERVER:
         return new ObserverAggregator();
       default:
-        return new MeasureExactAggregator();
+        return new ValueRecorderExactAggregator();
     }
   }
 

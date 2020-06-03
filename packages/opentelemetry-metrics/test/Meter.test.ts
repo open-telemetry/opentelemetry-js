@@ -22,7 +22,7 @@ import {
   MetricKind,
   Sum,
   MeterProvider,
-  MeasureMetric,
+  ValueRecorderMetric,
   Distribution,
   ObserverMetric,
   MetricRecord,
@@ -268,82 +268,94 @@ describe('Meter', () => {
     });
   });
 
-  describe('#measure', () => {
-    it('should create a measure', () => {
-      const measure = meter.createMeasure('name');
-      assert.ok(measure instanceof Metric);
+  describe('#ValueRecorder', () => {
+    it('should create a valueRecorder', () => {
+      const valueRecorder = meter.createValueRecorder('name');
+      assert.ok(valueRecorder instanceof Metric);
     });
 
-    it('should create a measure with options', () => {
-      const measure = meter.createMeasure('name', {
+    it('should create a valueRecorder with options', () => {
+      const valueRecorder = meter.createValueRecorder('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       });
-      assert.ok(measure instanceof Metric);
+      assert.ok(valueRecorder instanceof Metric);
     });
 
     it('should be absolute by default', () => {
-      const measure = meter.createMeasure('name', {
+      const valueRecorder = meter.createValueRecorder('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       });
-      assert.strictEqual((measure as MeasureMetric)['_absolute'], true);
+      assert.strictEqual(
+        (valueRecorder as ValueRecorderMetric)['_absolute'],
+        true
+      );
     });
 
     it('should be able to set absolute to false', () => {
-      const measure = meter.createMeasure('name', {
+      const valueRecorder = meter.createValueRecorder('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
         absolute: false,
       });
-      assert.strictEqual((measure as MeasureMetric)['_absolute'], false);
+      assert.strictEqual(
+        (valueRecorder as ValueRecorderMetric)['_absolute'],
+        false
+      );
     });
 
     it('should pipe through resource', () => {
-      const measure = meter.createMeasure('name') as MeasureMetric;
-      assert.ok(measure.resource instanceof Resource);
+      const valueRecorder = meter.createValueRecorder(
+        'name'
+      ) as ValueRecorderMetric;
+      assert.ok(valueRecorder.resource instanceof Resource);
 
-      measure.record(1, { foo: 'bar' });
+      valueRecorder.record(1, { foo: 'bar' });
 
-      const [record] = measure.getMetricRecord();
+      const [record] = valueRecorder.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
 
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
-        const measure = meter.createMeasure('');
-        assert.ok(measure instanceof api.NoopMetric);
+        const valueRecorder = meter.createValueRecorder('');
+        assert.ok(valueRecorder instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name does not start with a letter', () => {
-        const measure1 = meter.createMeasure('1name');
-        const measure_ = meter.createMeasure('_name');
-        assert.ok(measure1 instanceof api.NoopMetric);
-        assert.ok(measure_ instanceof api.NoopMetric);
+        const valueRecorder1 = meter.createValueRecorder('1name');
+        const valueRecorder_ = meter.createValueRecorder('_name');
+        assert.ok(valueRecorder1 instanceof api.NoopMetric);
+        assert.ok(valueRecorder_ instanceof api.NoopMetric);
       });
 
       it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
-        const measure = meter.createMeasure('name with invalid characters^&*(');
-        assert.ok(measure instanceof api.NoopMetric);
+        const valueRecorder = meter.createValueRecorder(
+          'name with invalid characters^&*('
+        );
+        assert.ok(valueRecorder instanceof api.NoopMetric);
       });
     });
 
     describe('.bind()', () => {
       const performanceTimeOrigin = hrTime();
 
-      it('should create a measure instrument', () => {
-        const measure = meter.createMeasure('name') as MeasureMetric;
-        const boundMeasure = measure.bind(labels);
-        assert.doesNotThrow(() => boundMeasure.record(10));
+      it('should create a valueRecorder instrument', () => {
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+        assert.doesNotThrow(() => boundValueRecorder.record(10));
       });
 
       it('should not accept negative values by default', () => {
-        const measure = meter.createMeasure('name');
-        const boundMeasure = measure.bind(labels);
-        boundMeasure.record(-10);
+        const valueRecorder = meter.createValueRecorder('name');
+        const boundValueRecorder = valueRecorder.bind(labels);
+        boundValueRecorder.record(-10);
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
@@ -359,11 +371,11 @@ describe('Meter', () => {
       });
 
       it('should not set the instrument data when disabled', () => {
-        const measure = meter.createMeasure('name', {
+        const valueRecorder = meter.createValueRecorder('name', {
           disabled: true,
-        }) as MeasureMetric;
-        const boundMeasure = measure.bind(labels);
-        boundMeasure.record(10);
+        }) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+        boundValueRecorder.record(10);
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
@@ -379,12 +391,12 @@ describe('Meter', () => {
       });
 
       it('should accept negative (and positive) values when absolute is set to false', () => {
-        const measure = meter.createMeasure('name', {
+        const valueRecorder = meter.createValueRecorder('name', {
           absolute: false,
         });
-        const boundMeasure = measure.bind(labels);
-        boundMeasure.record(-10);
-        boundMeasure.record(50);
+        const boundValueRecorder = valueRecorder.bind(labels);
+        boundValueRecorder.record(-10);
+        boundValueRecorder.record(50);
 
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
@@ -404,11 +416,13 @@ describe('Meter', () => {
       });
 
       it('should return same instrument on same label values', () => {
-        const measure = meter.createMeasure('name') as MeasureMetric;
-        const boundMeasure1 = measure.bind(labels);
-        boundMeasure1.record(10);
-        const boundMeasure2 = measure.bind(labels);
-        boundMeasure2.record(100);
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder1 = valueRecorder.bind(labels);
+        boundValueRecorder1.record(10);
+        const boundValueRecorder2 = valueRecorder.bind(labels);
+        boundValueRecorder2.record(100);
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
@@ -420,54 +434,58 @@ describe('Meter', () => {
             sum: 110,
           }
         );
-        assert.strictEqual(boundMeasure1, boundMeasure2);
+        assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
       });
     });
 
     describe('.unbind()', () => {
-      it('should remove the measure instrument', () => {
-        const measure = meter.createMeasure('name') as MeasureMetric;
-        const boundMeasure = measure.bind(labels);
-        assert.strictEqual(measure['_instruments'].size, 1);
-        measure.unbind(labels);
-        assert.strictEqual(measure['_instruments'].size, 0);
-        const boundMeasure2 = measure.bind(labels);
-        assert.strictEqual(measure['_instruments'].size, 1);
-        assert.notStrictEqual(boundMeasure, boundMeasure2);
+      it('should remove the valueRecorder instrument', () => {
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        valueRecorder.unbind(labels);
+        assert.strictEqual(valueRecorder['_instruments'].size, 0);
+        const boundValueRecorder2 = valueRecorder.bind(labels);
+        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        assert.notStrictEqual(boundValueRecorder, boundValueRecorder2);
       });
 
       it('should not fail when removing non existing instrument', () => {
-        const measure = meter.createMeasure('name');
-        measure.unbind({});
+        const valueRecorder = meter.createValueRecorder('name');
+        valueRecorder.unbind({});
       });
 
       it('should clear all instruments', () => {
-        const measure = meter.createMeasure('name') as MeasureMetric;
-        measure.bind(labels);
-        assert.strictEqual(measure['_instruments'].size, 1);
-        measure.clear();
-        assert.strictEqual(measure['_instruments'].size, 0);
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        valueRecorder.bind(labels);
+        assert.strictEqual(valueRecorder['_instruments'].size, 1);
+        valueRecorder.clear();
+        assert.strictEqual(valueRecorder['_instruments'].size, 0);
       });
     });
   });
 
   describe('#observer', () => {
     it('should create an observer', () => {
-      const measure = meter.createObserver('name') as ObserverMetric;
-      assert.ok(measure instanceof Metric);
+      const valueRecorder = meter.createObserver('name') as ObserverMetric;
+      assert.ok(valueRecorder instanceof Metric);
     });
 
     it('should create observer with options', () => {
-      const measure = meter.createObserver('name', {
+      const valueRecorder = meter.createObserver('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       }) as ObserverMetric;
-      assert.ok(measure instanceof Metric);
+      assert.ok(valueRecorder instanceof Metric);
     });
 
     it('should set callback and observe value ', () => {
-      const measure = meter.createObserver('name', {
+      const valueRecorder = meter.createObserver('name', {
         description: 'desc',
         labelKeys: ['pid', 'core'],
       }) as ObserverMetric;
@@ -478,7 +496,7 @@ describe('Meter', () => {
 
       const metricObservable = new MetricObservable();
 
-      measure.setCallback((observerResult: api.ObserverResult) => {
+      valueRecorder.setCallback((observerResult: api.ObserverResult) => {
         observerResult.observe(getCpuUsage, { pid: '123', core: '1' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '2' });
         observerResult.observe(getCpuUsage, { pid: '123', core: '3' });
@@ -488,7 +506,7 @@ describe('Meter', () => {
 
       metricObservable.next(0.123);
 
-      const metricRecords: MetricRecord[] = measure.getMetricRecord();
+      const metricRecords: MetricRecord[] = valueRecorder.getMetricRecord();
       assert.strictEqual(metricRecords.length, 5);
 
       const metric5 = metricRecords[0];
@@ -587,8 +605,8 @@ describe('Meter', () => {
       batcher: new CustomBatcher(),
     });
     assert.throws(() => {
-      const measure = customMeter.createMeasure('myMeasure');
-      measure.bind({}).record(1);
+      const valueRecorder = customMeter.createValueRecorder('myValueRecorder');
+      valueRecorder.bind({}).record(1);
     }, /aggregatorFor method not implemented/);
   });
 });
