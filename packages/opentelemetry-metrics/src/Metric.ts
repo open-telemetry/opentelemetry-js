@@ -19,7 +19,7 @@ import { Resource } from '@opentelemetry/resources';
 import {
   BoundCounter,
   BaseBoundInstrument,
-  BoundMeasure,
+  BoundValueRecorder,
   BoundObserver,
 } from './BoundInstrument';
 import { ObserverResult } from './ObserverResult';
@@ -139,7 +139,8 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   }
 }
 
-export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
+export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+  implements api.ValueRecorder {
   protected readonly _absolute: boolean;
 
   constructor(
@@ -148,12 +149,12 @@ export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
     private readonly _batcher: Batcher,
     resource: Resource
   ) {
-    super(name, options, MetricKind.MEASURE, resource);
+    super(name, options, MetricKind.VALUE_RECORDER, resource);
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
-  protected _makeInstrument(labels: api.Labels): BoundMeasure {
-    return new BoundMeasure(
+  protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
+    return new BoundValueRecorder(
       labels,
       this._disabled,
       this._monotonic,

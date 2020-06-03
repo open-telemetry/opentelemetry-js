@@ -173,7 +173,7 @@ export interface CollectorExporterError {
 /**
  * Mapping between api SpanKind and proto SpanKind
  */
-export const COLLETOR_SPAN_KIND_MAPPING = {
+export const COLLECTOR_SPAN_KIND_MAPPING = {
   [SpanKind.INTERNAL]: opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
   [SpanKind.SERVER]: opentelemetryProto.trace.v1.Span.SpanKind.SERVER,
   [SpanKind.CLIENT]: opentelemetryProto.trace.v1.Span.SpanKind.CLIENT,

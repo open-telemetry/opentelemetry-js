@@ -43,7 +43,7 @@ export interface MetricOptions {
   /** Monotonic metrics may only increase. */
   monotonic: boolean;
 
-  /** (Measure only) Asserts that this metric will only accept non-negative values. */
+  /** (ValueRecorder only) Asserts that this metric will only accept non-negative values. */
   absolute: boolean;
 
   /** User provided logger. */
