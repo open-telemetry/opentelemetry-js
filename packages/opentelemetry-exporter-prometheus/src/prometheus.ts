@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  ExportResult,
-  NoopLogger,
-  hrTimeToMilliseconds,
-} from '@opentelemetry/core';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import {
   CounterSumAggregator,
   LastValue,
