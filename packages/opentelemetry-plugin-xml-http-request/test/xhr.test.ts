@@ -100,7 +100,7 @@ describe('xhr', () => {
   const asyncTests = [{ async: true }, { async: false }];
   asyncTests.forEach(test => {
     const testAsync = test.async;
-    describe('when async=' + testAsync, () => {
+    describe(`when async='${testAsync}'`, () => {
       let sandbox: sinon.SinonSandbox;
       let requests: any[] = [];
       let prepareData: any;
