@@ -140,7 +140,6 @@ export class PrometheusExporter implements MetricExporter {
       metric.inc(
         labelValues,
         point.value as Sum,
-        hrTimeToMilliseconds(point.timestamp)
       );
     }
 
@@ -151,7 +150,6 @@ export class PrometheusExporter implements MetricExporter {
         metric.set(
           labelValues,
           point.value as LastValue,
-          hrTimeToMilliseconds(point.timestamp)
         );
       }
     }
