@@ -154,7 +154,7 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   private _getLabelValues(keys: string[], labels: api.Labels) {
-   const labelValues: LabelValues<string> = {};
+    const labelValues: LabelValues<string> = {};
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {
         labelValues[keys[i]] = labels[keys[i]];
