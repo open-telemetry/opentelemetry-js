@@ -31,7 +31,7 @@ import {
 } from '@opentelemetry/metrics';
 import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
+import { Counter, Gauge, LabelValues, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 
@@ -160,7 +160,7 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   private _getLabelValues(keys: string[], labels: api.Labels) {
-    const labelValues: labelValues = {};
+   const labelValues: LabelValues<string> = {};
     for (let i = 0; i < keys.length; i++) {
       if (labels[keys[i]] !== null) {
         labelValues[keys[i]] = labels[keys[i]];
