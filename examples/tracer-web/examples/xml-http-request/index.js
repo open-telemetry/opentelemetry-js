@@ -29,7 +29,7 @@ const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
 const getData = (url) => new Promise((resolve, reject) => {
   // eslint-disable-next-line no-undef
   const req = new XMLHttpRequest();
-  req.open('GET', url, false);
+  req.open('GET', url, true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.setRequestHeader('Accept', 'application/json');
   req.onload = () => {
@@ -43,7 +43,7 @@ const getData = (url) => new Promise((resolve, reject) => {
 
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
-  const url1 = 'https://httpbin.orga/get';
+  const url1 = 'https://httpbin.org/get';
 
   const element = document.getElementById('button1');
 
