@@ -80,7 +80,7 @@ export class ZipkinExporter implements SpanExporter {
       setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
       return;
     }
-    return this._sendSpans(spans, resultCallback);
+    return this._sendSpans(spans, this._serviceName, resultCallback);
   }
 
   /**
@@ -95,25 +95,21 @@ export class ZipkinExporter implements SpanExporter {
   }
 
   /**
-   * Transforms an OpenTelemetry span to a Zipkin span.
-   */
-  private _toZipkinSpan(span: ReadableSpan): zipkinTypes.Span {
-    return toZipkinSpan(
-      span,
-      String(this._serviceName),
-      this._statusCodeTagName,
-      this._statusDescriptionTagName
-    );
-  }
-
-  /**
    * Transform spans and sends to Zipkin service.
    */
   private _sendSpans(
     spans: ReadableSpan[],
+    serviceName: string,
     done?: (result: ExportResult) => void
   ) {
-    const zipkinSpans = spans.map(span => this._toZipkinSpan(span));
+    const zipkinSpans = spans.map(span =>
+      toZipkinSpan(
+        span,
+        serviceName,
+        this._statusCodeTagName,
+        this._statusDescriptionTagName
+      )
+    );
     return this._send(zipkinSpans, (result: ExportResult) => {
       if (done) {
         return done(result);
