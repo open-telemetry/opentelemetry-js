@@ -70,15 +70,10 @@ export class ZipkinExporter implements SpanExporter {
     resultCallback: (result: ExportResult) => void
   ) {
     if (typeof this._serviceName !== 'string') {
-      if (
-        typeof spans[0].resource.labels[SERVICE_RESOURCE.NAME] !== 'undefined'
-      ) {
-        this._serviceName = spans[0].resource.labels[
-          SERVICE_RESOURCE.NAME
-        ].toString();
-      } else {
-        this._serviceName = 'Unnamed Service';
-      }
+      this._serviceName = String(
+        spans[0].resource.labels[SERVICE_RESOURCE.NAME] ||
+          'OpenTelemetry Service'
+      );
     }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
@@ -105,7 +100,7 @@ export class ZipkinExporter implements SpanExporter {
   private _toZipkinSpan(span: ReadableSpan): zipkinTypes.Span {
     return toZipkinSpan(
       span,
-      this._serviceName,
+      String(this._serviceName),
       this._statusCodeTagName,
       this._statusDescriptionTagName
     );

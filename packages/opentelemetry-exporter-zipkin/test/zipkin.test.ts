@@ -333,7 +333,7 @@ describe('ZipkinExporter', () => {
       });
     });
 
-    it('should set serviceName to "Unnamed service" by default', () => {
+    it('should set serviceName to "Opentelemetry Service" by default', () => {
       const scope = nock('http://localhost:9411')
         .post('/api/v2/spans')
         .replyWithError(new Error('My Socket Error'));
@@ -393,15 +393,11 @@ describe('ZipkinExporter', () => {
         resource: Resource.empty(),
       };
 
-      const exporter = new ZipkinExporter({
-        serviceName: 'my-service',
-      });
-
-      delete exporter['_serviceName'];
+      const exporter = new ZipkinExporter({});
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
-        assert.equal(exporter['_serviceName'], 'Unnamed Service');
+        assert.equal(exporter['_serviceName'], 'OpenTelemetry Service');
       });
     });
 
@@ -469,11 +465,7 @@ describe('ZipkinExporter', () => {
         resource: Resource.empty(),
       };
 
-      const exporter = new ZipkinExporter({
-        serviceName: 'my-service',
-      });
-
-      delete exporter['_serviceName'];
+      const exporter = new ZipkinExporter({});
 
       exporter.export([span1, span2], (result: ExportResult) => {
         scope.done();
