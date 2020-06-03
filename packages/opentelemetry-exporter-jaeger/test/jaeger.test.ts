@@ -156,7 +156,7 @@ describe('JaegerExporter', () => {
       const mockedEndpoint = 'http://testendpoint';
       nock(mockedEndpoint)
         .post('/')
-        .reply(function() {
+        .reply(function () {
           assert.strictEqual(this.req.headers[OT_REQUEST_HEADER], 1);
           assert.strictEqual(
             this.req.headers['content-type'],

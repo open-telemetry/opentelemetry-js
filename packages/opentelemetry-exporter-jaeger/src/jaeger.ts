@@ -32,11 +32,13 @@ export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
-    const localConfig = Object.assign({}, config)
+    const localConfig = Object.assign({}, config);
     this._logger = localConfig.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = localConfig.tags || [];
     this._onShutdownFlushTimeout =
-      typeof localConfig.flushTimeout === 'number' ? localConfig.flushTimeout : 2000;
+      typeof localConfig.flushTimeout === 'number'
+        ? localConfig.flushTimeout
+        : 2000;
 
     // https://github.com/jaegertracing/jaeger-client-node#environment-variables
     // By default, the client sends traces via UDP to the agent at localhost:6832. Use JAEGER_AGENT_HOST and
@@ -44,14 +46,18 @@ export class JaegerExporter implements SpanExporter {
     // to the endpoint via HTTP, making the JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If JAEGER_ENDPOINT is secured,
     // HTTP basic authentication can be performed by setting the JAEGER_USER and JAEGER_PASSWORD environment variables.
     if (localConfig.endpoint) {
-      localConfig.endpoint = localConfig.endpoint || process.env.JAEGER_ENDPOINT;
+      localConfig.endpoint =
+        localConfig.endpoint || process.env.JAEGER_ENDPOINT;
       localConfig.username = localConfig.username || process.env.JAEGER_USER;
-      localConfig.password = localConfig.password || process.env.JAEGER_PASSWORD;
+      localConfig.password =
+        localConfig.password || process.env.JAEGER_PASSWORD;
       this._sender = new jaegerTypes.HTTPSender(localConfig);
       this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
     } else {
       localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
-      this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(localConfig);
+      this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
+        localConfig
+      );
     }
 
     if (this._sender._client instanceof Socket) {
