@@ -115,37 +115,6 @@ browsers_unit_tests: &browsers_unit_tests
         command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then npm run codecov:browser; fi
 
 jobs:
-  lint_&_docs:
-    docker:
-      - image: node:12
-        environment:
-          NPM_CONFIG_UNSAFE_PERM: true
-    steps:
-      - checkout
-      - run:
-          name: Install minimal doc and lint modules globally
-          command: npm i -g eslint@^6.8.0 eslint-plugin-node @typescript-eslint/eslint-plugin@^2.23.0 @typescript-eslint/parser@^2.23.0 eslint-plugin-header@^3.0.0 eslint-plugin-import@^2.19.1 eslint-plugin-prettier prettier lerna typedoc linkinator typescript@^3.7.2
-      - run:
-          name: Install gts version 2.0.0 globally
-          command: npm i -g gts@2.0.0
-      - run:
-          name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link eslint gts eslint-plugin-node @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-plugin-header eslint-plugin-import eslint-plugin-prettier prettier lerna typedoc linkinator typescript'
-      - run:
-          name: Check code style and linting
-          command: npm run lint
-      - run:
-          name: Install doc dependencies
-          command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
-      - run:
-          name: Docs tests
-          command: npm run docs-test
-      - run:
-          name: Install minimal modules to lint examples
-          command: npm i --no-save eslint eslint-plugin-import eslint-config-airbnb-base
-      - run:
-          name: Lint examples
-          command: npm run lint:examples
   node8:
     docker:
       - image: node:8
@@ -175,10 +144,6 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint_&_docs:
-          filters:
-            branches:
-              only: /.*/
       - node8
       - node10
       - node12
