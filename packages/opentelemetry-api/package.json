@@ -68,7 +68,7 @@
     "karma-webpack": "^4.0.2",
     "linkinator": "^2.0.3",
     "mocha": "^7.1.2",
-    "nyc": "^15.0.0",
+    "nyc": "^15.1.0",
     "ts-loader": "^6.0.4",
     "ts-mocha": "^7.0.0",
     "typedoc": "^0.15.0",
