@@ -27,16 +27,17 @@ import {
   statusDescriptionTagName,
 } from './transform';
 import { OT_REQUEST_HEADER } from './utils';
+import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 /**
  * Zipkin Exporter
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
   private readonly _logger: api.Logger;
-  private readonly _serviceName: string;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private readonly _reqOpts: http.RequestOptions;
+  private _serviceName: string;
   private _isShutdown: boolean;
 
   constructor(config: zipkinTypes.ExporterConfig) {
@@ -68,6 +69,17 @@ export class ZipkinExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ) {
+    if (typeof this._serviceName !== 'string') {
+      if (
+        typeof spans[0].resource.labels[SERVICE_RESOURCE.NAME] !== 'undefined'
+      ) {
+        this._serviceName = spans[0].resource.labels[
+          SERVICE_RESOURCE.NAME
+        ].toString();
+      } else {
+        this._serviceName = 'Unnamed Service';
+      }
+    }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
       setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
