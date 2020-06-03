@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 
-import { MetricOptions, Counter, ValueRecorder, Observer } from './Metric';
+import { BatchObserverResult } from './BatchObserverResult';
+import {
+  MetricOptions,
+  Counter,
+  ValueRecorder,
+  Observer,
+  BatchObserver,
+  BatchMetricOptions,
+} from './Metric';
+import { ObserverResult } from './ObserverResult';
 
 /**
  * An interface to allow the recording metrics.
@@ -44,6 +53,24 @@ export interface Meter {
    * Creates a new `Observer` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
+   * @param [callback] the observer callback
    */
-  createObserver(name: string, options?: MetricOptions): Observer;
+  createObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): Observer;
+
+  /**
+   * Creates a new `BatchObserver` metric, can be used to update many metrics
+   * at the same time and when operations needs to be async
+   * @param name the name of the metric.
+   * @param callback the batch observer callback
+   * @param [options] the metric batch options.
+   */
+  createBatchObserver(
+    name: string,
+    callback: (batchObserverResult: BatchObserverResult) => void,
+    options?: BatchMetricOptions
+  ): BatchObserver;
 }

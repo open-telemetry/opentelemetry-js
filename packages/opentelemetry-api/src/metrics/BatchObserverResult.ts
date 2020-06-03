@@ -1,5 +1,5 @@
 /*!
- * Copyright 2019, OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-import {
-  MetricObservable,
-  ObserverResult as TypeObserverResult,
-  Labels,
-} from '@opentelemetry/api';
+import { Labels } from './Metric';
+import { Observation } from './Observation';
 
 /**
- * Implementation of {@link TypeObserverResult}
+ * Interface that is being used in callback function for Observer Metric
+ *     for batch
  */
-export class ObserverResult implements TypeObserverResult {
-  values: Map<Labels, number> = new Map<Labels, number>();
-  callbackObservers: Map<Labels, Function> = new Map<Labels, Function>();
-  observers: Map<Labels, MetricObservable> = new Map<
-    Labels,
-    MetricObservable
-  >();
-
-  observe(value: number, labels: Labels): void {
-    this.values.set(labels, value);
-  }
+export interface BatchObserverResult {
+  /**
+   * Used to observe (update) observations for certain labels
+   * @param labels
+   * @param observations
+   */
+  observe(labels: Labels, observations: Observation[]): void;
 }

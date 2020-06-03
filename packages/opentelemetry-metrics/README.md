@@ -37,37 +37,81 @@ boundCounter.add(10);
 
 ```
 
-### Observable
+### Observer
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
-const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 
-// Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-const observer = meter.createObserver('metric_name', {
-  labelKeys: ['pid', 'core'],
-  description: 'Example of a observer'
+meter.createObserver('cpu_core_usage', {
+  monotonic: false,
+  labelKeys: ['core'],
+  description: 'Example of a sync observer with callback',
+}, (observerResult) => {
+  observerResult.observe(getRandomValue(), { core: '1' });
+  observerResult.observe(getRandomValue(), { core: '2' });
 });
 
 function getCpuUsage() {
   return Math.random();
 }
 
-const metricObservable = new MetricObservable();
+```
 
-observer.setCallback((observerResult) => {
-  // synchronous callback
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
-  // asynchronous callback
-  observerResult.observe(metricObservable, { pid: process.pid, core: '2' });
+### Batch Observer
+Choose this kind of metric when you need to have an async calculation that needs to be used to update Observer
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  },
+);
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 3000,
+}).getMeter('example-observer');
+
+const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
+  monotonic: false,
+  labelKeys: ['app'],
+  description: 'CPU',
 });
 
-// simulate asynchronous operation
-setInterval(()=> {
-  metricObservable.next(getCpuUsage());
-}, 2000)
+const MemUsageMetric = meter.createObserver('mem_usage_per_app', {
+  monotonic: false,
+  labelKeys: ['app'],
+  description: 'Memory',
+});
+
+meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+  getSomeAsyncMetrics().then(metrics => {
+    observerBatchResult.observe({ app: 'myApp' }, [
+      cpuUsageMetric.observation(metrics.value1),
+      MemUsageMetric.observation(metrics.value2)
+    ]);
+  });
+});
+
+function getSomeAsyncMetrics() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        value1: Math.random(),
+        value2: Math.random(),
+      });
+    }, 100)
+  });
+}
 
 ```
 

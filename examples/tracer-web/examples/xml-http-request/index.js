@@ -26,21 +26,24 @@ providerWithZone.register({
 
 const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
-const getData = (url) => new Promise((resolve, _reject) => {
+const getData = (url) => new Promise((resolve, reject) => {
   // eslint-disable-next-line no-undef
   const req = new XMLHttpRequest();
-  req.open('GET', url, true);
+  req.open('GET', url, false);
   req.setRequestHeader('Content-Type', 'application/json');
   req.setRequestHeader('Accept', 'application/json');
-  req.send();
   req.onload = () => {
     resolve();
   };
+  req.onerror = () => {
+    reject();
+  };
+  req.send();
 });
 
 // example of keeping track of context between async operations
 const prepareClickEvent = () => {
-  const url1 = 'https://httpbin.org/get';
+  const url1 = 'https://httpbin.orga/get';
 
   const element = document.getElementById('button1');
 
@@ -52,6 +55,9 @@ const prepareClickEvent = () => {
       webTracerWithZone.withSpan(span1, () => {
         getData(url1).then((_data) => {
           webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
+          span1.end();
+        }, ()=> {
+          webTracerWithZone.getCurrentSpan().addEvent('fetching-error');
           span1.end();
         });
       });

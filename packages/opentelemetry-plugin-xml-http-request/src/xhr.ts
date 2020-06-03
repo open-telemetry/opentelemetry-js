@@ -362,6 +362,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         if (async) {
           plugin._createSpan(this, url, method);
         } else {
+          plugin._createSpan(this, url, method);
           plugin._logger.debug(
             'tracing support for synchronous XMLHttpRequest calls is not' +
               ' supported'

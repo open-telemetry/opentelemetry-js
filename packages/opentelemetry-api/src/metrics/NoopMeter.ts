@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { BatchObserverResult } from './BatchObserverResult';
 import { Meter } from './Meter';
 import {
   MetricOptions,
@@ -22,10 +23,12 @@ import {
   Counter,
   ValueRecorder,
   Observer,
+  BatchObserver,
 } from './Metric';
 import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { Observation } from './Observation';
 import { ObserverResult } from './ObserverResult';
 
 /**
@@ -57,8 +60,25 @@ export class NoopMeter implements Meter {
    * Returns constant noop observer.
    * @param name the name of the metric.
    * @param [options] the metric options.
+   * @param [callback] the observer callback
    */
-  createObserver(name: string, options?: MetricOptions): Observer {
+  createObserver(
+    name: string,
+    options?: MetricOptions,
+    callback?: (observerResult: ObserverResult) => void
+  ): Observer {
+    return NOOP_OBSERVER_METRIC;
+  }
+
+  /**
+   * Returns constant noop observer.
+   * @param name the name of the metric.
+   * @param callback
+   */
+  createBatchObserver(
+    name: string,
+    callback: (batchObserverResult: BatchObserverResult) => void
+  ): Observer {
     return NOOP_OBSERVER_METRIC;
   }
 }
@@ -69,6 +89,7 @@ export class NoopMetric<T> implements UnboundMetric<T> {
   constructor(instrument: T) {
     this._instrument = instrument;
   }
+
   /**
    * Returns a Bound Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Bound Instrument instead of
@@ -122,8 +143,16 @@ export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
 }
 
 export class NoopObserverMetric extends NoopMetric<void> implements Observer {
-  setCallback(callback: (observerResult: ObserverResult) => void): void {}
+  observation(): Observation {
+    return {
+      observer: this,
+      value: 0,
+    };
+  }
 }
+
+export class NoopBatchObserverMetric extends NoopMetric<void>
+  implements BatchObserver {}
 
 export class NoopBoundCounter implements BoundCounter {
   add(value: number): void {
@@ -151,3 +180,4 @@ export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
 );
 
 export const NOOP_OBSERVER_METRIC = new NoopObserverMetric();
+export const NOOP_BATCH_OBSERVER_METRIC = new NoopBatchObserverMetric();
