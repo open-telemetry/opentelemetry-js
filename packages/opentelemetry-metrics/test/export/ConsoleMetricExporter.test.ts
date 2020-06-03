@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter, PushController, MetricKind } from '../../src';
-import { ValueType } from '@opentelemetry/api';
+import { ValueType, metrics } from '@opentelemetry/api';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -31,6 +31,58 @@ describe('ConsoleMetricExporter', () => {
 
   afterEach(() => {
     console.log = previousConsoleLog;
+  });
+
+  describe('.installPipeline()', () => {
+    let clock: sinon.SinonFakeTimers;
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
+    });
+    afterEach(() => {
+      clock.restore();
+    });
+
+    it('should install export pipeline to global metric provider', () => {
+      const spyConsole = sinon.spy(console, 'log');
+      const interval = 1000;
+
+      ConsoleMetricExporter.installPipeline({ interval });
+
+      const meter = metrics.getMeter('test-console-metric-exporter');
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+        labelKeys: ['key1', 'key2'],
+      });
+      const boundCounter = counter.bind({
+        key1: 'labelValue1',
+        key2: 'labelValue2',
+      });
+      boundCounter.add(10);
+
+      // tick push interval.
+      clock.tick(interval);
+
+      assert.strictEqual(spyConsole.args.length, 3);
+      const [descriptor, labels, value] = spyConsole.args;
+      assert.deepStrictEqual(descriptor, [
+        {
+          description: 'a test description',
+          labelKeys: ['key1', 'key2'],
+          metricKind: MetricKind.COUNTER,
+          monotonic: true,
+          name: 'counter',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        },
+      ]);
+      assert.deepStrictEqual(labels, [
+        {
+          key1: 'labelValue1',
+          key2: 'labelValue2',
+        },
+      ]);
+      assert.deepStrictEqual(value[0], 'value: 10');
+    });
   });
 
   describe('.export()', () => {

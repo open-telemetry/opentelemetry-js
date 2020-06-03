@@ -28,15 +28,14 @@ import { Controller } from './Controller';
  * than waiting incoming pull of metrics.
  */
 export class PullController extends Controller implements api.MeterProvider {
-  readonly logger: api.Logger;
   readonly resource: Resource;
 
   constructor(private readonly _config: MeterConfig = DEFAULT_CONFIG) {
     super(
       _config.batcher ?? new UngroupedBatcher(),
-      _config.exporter ?? new NoopExporter()
+      _config.exporter ?? new NoopExporter(),
+      _config.logger ?? new ConsoleLogger(_config.logLevel)
     );
-    this.logger = _config.logger ?? new ConsoleLogger(_config.logLevel);
     this.resource = _config.resource ?? Resource.createTelemetrySDKResource();
   }
 
@@ -53,7 +52,7 @@ export class PullController extends Controller implements api.MeterProvider {
         new Meter({
           batcher: this._batcher,
           exporter: this._exporter,
-          logger: this.logger,
+          logger: this._logger,
           resource: this.resource,
           ...this._config,
           ...config,

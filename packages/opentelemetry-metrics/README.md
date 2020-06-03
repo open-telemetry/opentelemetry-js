@@ -16,14 +16,14 @@ npm install --save @opentelemetry/metrics @opentelemetry/api
 ## Usage
 
 ### Install Export Pipeline
-It is essential to install export pipeline first before all subsequent meter initialization to get exporters work properly. Here we'll take  `@opentelemetry/exporter-prometheus` for an example.
+It is essential to install export pipeline first before all subsequent meter initialization to get exporters work properly. Here we'll take `ConsoleMetricExporter` for an example.
 
 ```js
-import * as prometheus from '@opentelemetry/exporter-prometheus'
+import { ConsoleMetricExporter } from '@opentelemetry/metrics'
 import { metrics } from '@opentelemetry/api'
 
 // Install the export pipeline before all subsequent call to metrics.
-prometheus.installPipeline();
+ConsoleMetricExporter.installPipeline();
 
 const meter = metrics.getMeter('example-meter');
 const counter = meter.createCounter('foo');

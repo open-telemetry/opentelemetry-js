@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Logger } from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 import { Meter } from '../../Meter';
 import { MetricExporter } from '../types';
@@ -24,7 +25,8 @@ export abstract class Controller {
 
   constructor(
     protected readonly _batcher: Batcher,
-    protected readonly _exporter: MetricExporter
+    protected readonly _exporter: MetricExporter,
+    protected readonly _logger: Logger
   ) {}
 
   collect() {
@@ -32,13 +34,13 @@ export abstract class Controller {
       meter.collect();
     }
     this._exporter.export(this._batcher.checkPointSet(), result => {
-      this.onExportResult(result);
+      // TODO: retry strategy
+      if (result !== ExportResult.SUCCESS) {
+        this._logger.error(
+          'Metric exporter reported non success result(%s).',
+          result
+        );
+      }
     });
-  }
-
-  protected onExportResult(result: ExportResult): void {
-    if (result !== ExportResult.SUCCESS) {
-      // @todo: log error
-    }
   }
 }
