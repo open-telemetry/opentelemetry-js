@@ -40,7 +40,7 @@ export class ZipkinExporter implements SpanExporter {
   private _serviceName?: string;
   private _isShutdown: boolean;
 
-  constructor(config: zipkinTypes.ExporterConfig) {
+  constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
     const urlOpts = url.parse(urlStr);
 
