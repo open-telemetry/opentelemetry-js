@@ -45,16 +45,14 @@ export class JaegerExporter implements SpanExporter {
     // JAEGER_AGENT_PORT to send UDP traces to a different host:port. If JAEGER_ENDPOINT is set, the client sends traces
     // to the endpoint via HTTP, making the JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If JAEGER_ENDPOINT is secured,
     // HTTP basic authentication can be performed by setting the JAEGER_USER and JAEGER_PASSWORD environment variables.
+    localConfig.endpoint = localConfig.endpoint || process.env.JAEGER_ENDPOINT;
+    localConfig.username = localConfig.username || process.env.JAEGER_USER;
+    localConfig.password = localConfig.password || process.env.JAEGER_PASSWORD;
+    localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
     if (localConfig.endpoint) {
-      localConfig.endpoint =
-        localConfig.endpoint || process.env.JAEGER_ENDPOINT;
-      localConfig.username = localConfig.username || process.env.JAEGER_USER;
-      localConfig.password =
-        localConfig.password || process.env.JAEGER_PASSWORD;
       this._sender = new jaegerTypes.HTTPSender(localConfig);
       this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
     } else {
-      localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
       this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
         localConfig
       );
