@@ -21,7 +21,7 @@ import { Resource } from '@opentelemetry/resources';
 /** The kind of metric. */
 export enum MetricKind {
   COUNTER,
-  MEASURE,
+  VALUE_RECORDER,
   OBSERVER,
 }
 
