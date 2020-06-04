@@ -22,17 +22,19 @@ meter.createObserver('cpu_core_usage', {
   monotonic: false,
   labelKeys: ['core'],
   description: 'Example of a sync observer with callback',
-}, (observerResult) => {
+}, (observerResult) => { // this callback is called once per each interval
   observerResult.observe(getRandomValue(), { core: '1' });
   observerResult.observe(getRandomValue(), { core: '2' });
 });
 
+// no callback as they will be updated in batch observer
 const tempMetric = meter.createObserver('cpu_temp_per_app', {
   monotonic: false,
   labelKeys: ['app', 'core'],
   description: 'Example of batch observer',
 });
 
+// no callback as they will be updated in batch observer
 const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
   monotonic: false,
   labelKeys: ['app', 'core'],
@@ -40,26 +42,6 @@ const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
 });
 
 meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
-    function someAsyncMetrics() {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          const stats = [
-            {
-              name: 'app1',
-              core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
-              core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
-            },
-            {
-              name: 'app2',
-              core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
-              core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
-            },
-          ];
-          resolve(stats);
-        }, 200);
-      });
-    }
-
     Promise.all([
       someAsyncMetrics(),
       // simulate waiting
@@ -83,6 +65,26 @@ meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
     logger: new ConsoleLogger(LogLevel.DEBUG)
   },
 );
+
+function someAsyncMetrics() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const stats = [
+        {
+          name: 'app1',
+          core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+          core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+        },
+        {
+          name: 'app2',
+          core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+          core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+        },
+      ];
+      resolve(stats);
+    }, 200);
+  });
+}
 
 function getRandomValue() {
   return Math.random();

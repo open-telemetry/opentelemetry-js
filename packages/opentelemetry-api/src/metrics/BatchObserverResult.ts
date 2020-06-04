@@ -19,7 +19,7 @@ import { Observation } from './Observation';
 
 /**
  * Interface that is being used in callback function for Observer Metric
- *     for batch
+ * for batch
  */
 export interface BatchObserverResult {
   /**
