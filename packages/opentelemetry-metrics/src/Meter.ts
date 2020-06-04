@@ -189,7 +189,7 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  collect(): Promise<undefined> {
+  collect(): Promise<unknown> {
     return new Promise((resolve, reject) => {
       const metrics: Promise<MetricRecord[]>[] = [];
       Array.from(this._metrics.values()).forEach(metric => {

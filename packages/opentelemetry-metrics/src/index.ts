@@ -24,4 +24,3 @@ export * from './ValueObserverMetric';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
 export * from './export/types';
-export { ValueObserverMetric } from './ValueObserverMetric';
