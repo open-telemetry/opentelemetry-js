@@ -20,7 +20,6 @@ import {
   CounterSumAggregator,
   Meter,
   MeterProvider,
-  ObserverMetric,
   Point,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
@@ -244,7 +243,7 @@ describe('PrometheusExporter', () => {
         return Math.random();
       }
 
-      meter.createObserver(
+      meter.createValueObserver(
         'metric_observer',
         {
           description: 'a test description',
@@ -256,7 +255,7 @@ describe('PrometheusExporter', () => {
             core: '1',
           });
         }
-      ) as ObserverMetric;
+      );
 
       meter.collect().then(() => {
         exporter.export(meter.getBatcher().checkPointSet(), () => {
