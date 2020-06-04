@@ -15,7 +15,6 @@
  */
 
 import {
-  MetricObservable,
   ObserverResult as TypeObserverResult,
   Labels,
 } from '@opentelemetry/api';
@@ -25,11 +24,6 @@ import {
  */
 export class ObserverResult implements TypeObserverResult {
   values: Map<Labels, number> = new Map<Labels, number>();
-  callbackObservers: Map<Labels, Function> = new Map<Labels, Function>();
-  observers: Map<Labels, MetricObservable> = new Map<
-    Labels,
-    MetricObservable
-  >();
 
   observe(value: number, labels: Labels): void {
     this.values.set(labels, value);

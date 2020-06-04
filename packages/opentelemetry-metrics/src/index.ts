@@ -20,7 +20,6 @@ export * from './ValueRecorderMetric';
 export * from './Meter';
 export * from './MeterProvider';
 export * from './Metric';
-export * from './MetricObservable';
 export * from './ValueObserverMetric';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
