@@ -162,7 +162,7 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
 }
 
 /** Base interface for the Observer metrics. */
-export interface Observer extends Metric {
+export interface ValueObserver extends Metric {
   observation: (value: number) => Observation;
 }
 

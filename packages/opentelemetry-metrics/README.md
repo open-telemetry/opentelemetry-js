@@ -37,7 +37,7 @@ boundCounter.add(10);
 
 ```
 
-### Observer
+### Value Observer
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
@@ -45,7 +45,7 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-meter.createObserver('cpu_core_usage', {
+meter.createValueObserver('cpu_core_usage', {
   monotonic: false,
   labelKeys: ['core'],
   description: 'Example of a sync observer with callback',
@@ -54,14 +54,14 @@ meter.createObserver('cpu_core_usage', {
   observerResult.observe(getRandomValue(), { core: '2' });
 });
 
-function getCpuUsage() {
+function getRandomValue() {
   return Math.random();
 }
 
 ```
 
 ### Batch Observer
-Choose this kind of metric when you need to have an async calculation that needs to be used to update Observer
+Choose this kind of metric when you need to have an async calculation that needs to be used to update Value Observer
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
@@ -81,13 +81,13 @@ const meter = new MeterProvider({
   interval: 3000,
 }).getMeter('example-observer');
 
-const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
+const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
   monotonic: false,
   labelKeys: ['app'],
   description: 'CPU',
 });
 
-const MemUsageMetric = meter.createObserver('mem_usage_per_app', {
+const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
   monotonic: false,
   labelKeys: ['app'],
   description: 'Memory',

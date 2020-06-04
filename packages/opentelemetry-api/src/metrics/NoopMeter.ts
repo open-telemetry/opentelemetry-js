@@ -22,7 +22,7 @@ import {
   Labels,
   Counter,
   ValueRecorder,
-  Observer,
+  ValueObserver,
   BatchObserver,
 } from './Metric';
 import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
@@ -57,29 +57,29 @@ export class NoopMeter implements Meter {
   }
 
   /**
-   * Returns constant noop observer.
+   * Returns constant noop value observer.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the observer callback
+   * @param [callback] the value observer callback
    */
-  createObserver(
+  createValueObserver(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): Observer {
-    return NOOP_OBSERVER_METRIC;
+  ): ValueObserver {
+    return NOOP_VALUE_OBSERVER_METRIC;
   }
 
   /**
-   * Returns constant noop observer.
+   * Returns constant noop batch observer.
    * @param name the name of the metric.
-   * @param callback
+   * @param callback the batch observer callback
    */
   createBatchObserver(
     name: string,
     callback: (batchObserverResult: BatchObserverResult) => void
-  ): Observer {
-    return NOOP_OBSERVER_METRIC;
+  ): BatchObserver {
+    return NOOP_BATCH_OBSERVER_METRIC;
   }
 }
 
@@ -142,10 +142,11 @@ export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
   }
 }
 
-export class NoopObserverMetric extends NoopMetric<void> implements Observer {
+export class NoopValueObserverMetric extends NoopMetric<void>
+  implements ValueObserver {
   observation(): Observation {
     return {
-      observer: this,
+      valueObserver: this,
       value: 0,
     };
   }
@@ -179,5 +180,5 @@ export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
   NOOP_BOUND_VALUE_RECORDER
 );
 
-export const NOOP_OBSERVER_METRIC = new NoopObserverMetric();
+export const NOOP_VALUE_OBSERVER_METRIC = new NoopValueObserverMetric();
 export const NOOP_BATCH_OBSERVER_METRIC = new NoopBatchObserverMetric();

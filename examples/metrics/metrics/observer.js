@@ -15,30 +15,30 @@ const exporter = new PrometheusExporter(
 
 const meter = new MeterProvider({
   exporter,
-  interval: 3000,
+  interval: 2000,
 }).getMeter('example-observer');
 
-meter.createObserver('cpu_core_usage', {
+meter.createValueObserver('cpu_core_usage', {
   monotonic: false,
   labelKeys: ['core'],
-  description: 'Example of a sync observer with callback',
+  description: 'Example of a sync value observer with callback',
 }, (observerResult) => { // this callback is called once per each interval
   observerResult.observe(getRandomValue(), { core: '1' });
   observerResult.observe(getRandomValue(), { core: '2' });
 });
 
 // no callback as they will be updated in batch observer
-const tempMetric = meter.createObserver('cpu_temp_per_app', {
+const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
   monotonic: false,
   labelKeys: ['app', 'core'],
-  description: 'Example of batch observer',
+  description: 'Example of sync value observer used with async batch observer',
 });
 
 // no callback as they will be updated in batch observer
-const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
+const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
   monotonic: false,
   labelKeys: ['app', 'core'],
-  description: 'Example of batch observer',
+  description: 'Example of sync value observer used with async batch observer',
 });
 
 meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {

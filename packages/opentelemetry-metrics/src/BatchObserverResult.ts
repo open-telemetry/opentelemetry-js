@@ -51,7 +51,7 @@ export class BatchObserverResult implements api.BatchObserverResult {
       return;
     }
     observations.forEach(observation => {
-      observation.observer.bind(labels).update(observation.value);
+      observation.valueObserver.bind(labels).update(observation.value);
     });
     this._immediate = setImmediate(() => {
       if (typeof this._callback === 'function') {

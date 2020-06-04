@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-import { Observer } from './Metric';
+import { ValueObserver } from './Metric';
 
 /**
- * Interface for updating value of certain observer
+ * Interface for updating value of certain value observer
  */
 export interface Observation {
-  observer: Observer;
+  valueObserver: ValueObserver;
   value: number;
 }

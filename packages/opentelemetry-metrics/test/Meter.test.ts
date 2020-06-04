@@ -24,7 +24,7 @@ import {
   MeterProvider,
   ValueRecorderMetric,
   Distribution,
-  ObserverMetric,
+  ValueObserverMetric,
   MetricRecord,
   Aggregator,
   MetricDescriptor,
@@ -471,23 +471,25 @@ describe('Meter', () => {
     });
   });
 
-  describe('#observer', () => {
-    it('should create an observer', () => {
-      const valueRecorder = meter.createObserver('name') as ObserverMetric;
-      assert.ok(valueRecorder instanceof Metric);
+  describe('#valueObserver', () => {
+    it('should create a value observer', () => {
+      const valueObserver = meter.createValueObserver(
+        'name'
+      ) as ValueObserverMetric;
+      assert.ok(valueObserver instanceof Metric);
     });
 
     it('should create observer with options', () => {
-      const valueRecorder = meter.createObserver('name', {
+      const valueObserver = meter.createValueObserver('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
-      }) as ObserverMetric;
-      assert.ok(valueRecorder instanceof Metric);
+      }) as ValueObserverMetric;
+      assert.ok(valueObserver instanceof Metric);
     });
 
     it('should set callback and observe value ', async () => {
-      const valueRecorder = meter.createObserver(
+      const valueRecorder = meter.createValueObserver(
         'name',
         {
           description: 'desc',
@@ -499,7 +501,7 @@ describe('Meter', () => {
           observerResult.observe(getCpuUsage(), { pid: '123', core: '3' });
           observerResult.observe(getCpuUsage(), { pid: '123', core: '4' });
         }
-      ) as ObserverMetric;
+      ) as ValueObserverMetric;
 
       function getCpuUsage() {
         return Math.random();
@@ -524,12 +526,12 @@ describe('Meter', () => {
     });
 
     it('should pipe through resource', async () => {
-      const observer = meter.createObserver('name', {}, result => {
+      const valueObserver = meter.createValueObserver('name', {}, result => {
         result.observe(42, { foo: 'bar' });
-      }) as ObserverMetric;
-      assert.ok(observer.resource instanceof Resource);
+      }) as ValueObserverMetric;
+      assert.ok(valueObserver.resource instanceof Resource);
 
-      const [record] = await observer.getMetricRecord();
+      const [record] = await valueObserver.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
   });
@@ -551,17 +553,17 @@ describe('Meter', () => {
     });
 
     it('should use callback to observe values ', async () => {
-      const tempMetric = meter.createObserver('cpu_temp_per_app', {
+      const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
         monotonic: false,
         labelKeys: ['app', 'core'],
         description: 'desc',
-      }) as ObserverMetric;
+      }) as ValueObserverMetric;
 
-      const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
+      const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
         monotonic: false,
         labelKeys: ['app', 'core'],
         description: 'desc',
-      }) as ObserverMetric;
+      }) as ValueObserverMetric;
 
       meter.createBatchObserver(
         'metric_batch_observer',
@@ -654,11 +656,11 @@ describe('Meter', () => {
     });
 
     it('should not observe values when timeout', async () => {
-      const cpuUsageMetric = meter.createObserver('cpu_usage_per_app', {
+      const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
         monotonic: false,
         labelKeys: ['app', 'core'],
         description: 'desc',
-      }) as ObserverMetric;
+      }) as ValueObserverMetric;
 
       meter.createBatchObserver(
         'metric_batch_observer',

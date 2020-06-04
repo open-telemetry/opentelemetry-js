@@ -15,11 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ObserverMetric } from './ObserverMetric';
+import { ValueObserverMetric } from './ValueObserverMetric';
 
 export class Observation implements api.Observation {
   constructor(
-    public readonly observer: ObserverMetric,
+    public readonly valueObserver: ValueObserverMetric,
     public readonly value: number
   ) {}
 }

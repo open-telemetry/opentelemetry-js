@@ -19,7 +19,7 @@ import {
   MetricOptions,
   Counter,
   ValueRecorder,
-  Observer,
+  ValueObserver,
   BatchObserver,
   BatchMetricOptions,
 } from './Metric';
@@ -50,16 +50,16 @@ export interface Meter {
   createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
-   * Creates a new `Observer` metric.
+   * Creates a new `ValueObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the observer callback
    */
-  createObserver(
+  createValueObserver(
     name: string,
     options?: MetricOptions,
     callback?: (observerResult: ObserverResult) => void
-  ): Observer;
+  ): ValueObserver;
 
   /**
    * Creates a new `BatchObserver` metric, can be used to update many metrics

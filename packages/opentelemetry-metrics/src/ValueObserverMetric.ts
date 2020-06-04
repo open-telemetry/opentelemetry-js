@@ -24,9 +24,9 @@ import { ObserverResult } from './ObserverResult';
 
 const NOOP_CALLBACK = () => {};
 
-/** This is a SDK implementation of Observer Metric. */
-export class ObserverMetric extends Metric<BoundObserver>
-  implements api.Observer {
+/** This is a SDK implementation of Value Observer Metric. */
+export class ValueObserverMetric extends Metric<BoundObserver>
+  implements api.ValueObserver {
   private _callback: (observerResult: api.ObserverResult) => void;
 
   constructor(

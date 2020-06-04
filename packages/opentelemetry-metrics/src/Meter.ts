@@ -23,7 +23,7 @@ import { CounterMetric } from './CounterMetric';
 import { MetricRecord } from './export/types';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
 import { Metric } from './Metric';
-import { ObserverMetric } from './ObserverMetric';
+import { ValueObserverMetric } from './ValueObserverMetric';
 import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
@@ -111,21 +111,21 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new observer metric.
+   * Creates a new value observer metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
-   * @param [callback] the batch observer callback
+   * @param [callback] the value observer callback
    */
-  createObserver(
+  createValueObserver(
     name: string,
     options: api.MetricOptions = {},
     callback?: (observerResult: api.ObserverResult) => void
-  ): api.Observer {
+  ): api.ValueObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_OBSERVER_METRIC;
+      return api.NOOP_VALUE_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
       monotonic: false, // Observers are defined as non-monotonic by default
@@ -134,15 +134,15 @@ export class Meter implements api.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const observer = new ObserverMetric(
+    const valueObserver = new ValueObserverMetric(
       name,
       opt,
       this._batcher,
       this._resource,
       callback
     );
-    this._registerMetric(name, observer);
-    return observer;
+    this._registerMetric(name, valueObserver);
+    return valueObserver;
   }
 
   /**
@@ -162,7 +162,7 @@ export class Meter implements api.Meter {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_OBSERVER_METRIC;
+      return api.NOOP_BATCH_OBSERVER_METRIC;
     }
     const opt: api.BatchMetricOptions = {
       monotonic: false, // Observers are defined as non-monotonic by default
@@ -171,15 +171,15 @@ export class Meter implements api.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const observer = new BatchObserverMetric(
+    const batchObserver = new BatchObserverMetric(
       name,
       opt,
       this._batcher,
       this._resource,
       callback
     );
-    this._registerMetric(name, observer);
-    return observer;
+    this._registerMetric(name, batchObserver);
+    return batchObserver;
   }
 
   /**
