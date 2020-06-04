@@ -303,12 +303,17 @@ Next, modify your `monitoring.js` file to look like this:
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
+const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port
+const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint
+
 const exporter = new PrometheusExporter(
   {
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${Prometheusendpoint}`,
+    );
   },
 );
 
