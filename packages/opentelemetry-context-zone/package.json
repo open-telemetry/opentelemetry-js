@@ -52,7 +52,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "mocha": "^7.1.2",
-    "nyc": "^15.0.0",
+    "nyc": "^15.1.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
     "ts-loader": "^6.0.4",
