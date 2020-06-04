@@ -33,6 +33,7 @@ import { SERVICE_RESOURCE } from '@opentelemetry/resources';
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
+  private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _logger: api.Logger;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
@@ -40,7 +41,7 @@ export class ZipkinExporter implements SpanExporter {
   private _serviceName?: string;
   private _isShutdown: boolean;
 
-  constructor(config: zipkinTypes.ExporterConfig) {
+  constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
     const urlOpts = url.parse(urlStr);
 
@@ -72,7 +73,7 @@ export class ZipkinExporter implements SpanExporter {
     if (typeof this._serviceName !== 'string') {
       this._serviceName = String(
         spans[0].resource.labels[SERVICE_RESOURCE.NAME] ||
-          'OpenTelemetry Service'
+          this.DEFAULT_SERVICE_NAME
       );
     }
     this._logger.debug('Zipkin exporter export');
