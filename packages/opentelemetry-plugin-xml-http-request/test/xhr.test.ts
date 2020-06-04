@@ -21,6 +21,8 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
+  isWrapped,
+  NoopLogger,
 } from '@opentelemetry/core';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
@@ -63,7 +65,6 @@ const getData = (url: string, callbackAfterSend: Function, async?: boolean) => {
       resolve();
     };
     req.send();
-
     callbackAfterSend();
   });
 };
@@ -132,6 +133,7 @@ describe('xhr', () => {
         let spyEntries: any;
         const url = `${window.location.origin}/xml-http-request.js`;
         let fakeNow = 0;
+        let xmlHttpRequestPlugin: XMLHttpRequestPlugin;
 
         clearData = () => {
           requests = [];
@@ -163,13 +165,13 @@ describe('xhr', () => {
 
           spyEntries = sandbox.stub(performance, 'getEntriesByType');
           spyEntries.withArgs('resource').returns(resources);
-
+          xmlHttpRequestPlugin = new XMLHttpRequestPlugin({
+            propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
+          });
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
             plugins: [
-              new XMLHttpRequestPlugin({
-                propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
-              }),
+              xmlHttpRequestPlugin,
             ],
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
@@ -209,6 +211,20 @@ describe('xhr', () => {
 
         afterEach(() => {
           clearData();
+        });
+
+        it('should patch to wrap XML HTTP Requests when enabled', () => {
+          let xhttp = new XMLHttpRequest();
+          assert.ok(isWrapped(xhttp.send));
+          xmlHttpRequestPlugin.enable(XMLHttpRequest.prototype, new api.NoopTracerProvider(), new NoopLogger());
+          assert.ok(isWrapped(xhttp.send));
+        });
+    
+        it('should unpatch to unwrap XML HTTP Requests when disabled', () => {
+          let xhttp = new XMLHttpRequest();
+          assert.ok(isWrapped(xhttp.send));
+          xmlHttpRequestPlugin.disable()
+          assert.ok(!isWrapped(xhttp.send));
         });
 
         it('should create a span with correct root span', () => {
@@ -346,6 +362,87 @@ describe('xhr', () => {
           );
 
           assert.strictEqual(events.length, 12, 'number of events is wrong');
+
+        //   it('should create a span for preflight request', () => {
+        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+        //     const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+        //     assert.strictEqual(
+        //       span.parentSpanId,
+        //       parentSpan.spanContext.spanId,
+        //       'parent span is not root span'
+        //     );
+        //   });
+      
+        //   it('preflight request span should have correct name', () => {
+        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+        //     assert.strictEqual(
+        //       span.name,
+        //       'CORS Preflight',
+        //       'preflight request span has wrong name'
+        //     );
+        //   });
+      
+        //   it('preflight request span should have correct kind', () => {
+        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+        //     assert.strictEqual(
+        //       span.kind,
+        //       api.SpanKind.INTERNAL,
+        //       'span has wrong kind'
+        //     );
+        //   });
+      
+        //   it('preflight request span should have correct events', () => {
+        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+        //     const events = span.events;
+        //     assert.strictEqual(events.length, 9, 'number of events is wrong');
+      
+        //     assert.strictEqual(
+        //       events[0].name,
+        //       PTN.FETCH_START,
+        //       `event ${PTN.FETCH_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[1].name,
+        //       PTN.DOMAIN_LOOKUP_START,
+        //       `event ${PTN.DOMAIN_LOOKUP_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[2].name,
+        //       PTN.DOMAIN_LOOKUP_END,
+        //       `event ${PTN.DOMAIN_LOOKUP_END} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[3].name,
+        //       PTN.CONNECT_START,
+        //       `event ${PTN.CONNECT_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[4].name,
+        //       PTN.SECURE_CONNECTION_START,
+        //       `event ${PTN.SECURE_CONNECTION_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[5].name,
+        //       PTN.CONNECT_END,
+        //       `event ${PTN.CONNECT_END} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[6].name,
+        //       PTN.REQUEST_START,
+        //       `event ${PTN.REQUEST_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[7].name,
+        //       PTN.RESPONSE_START,
+        //       `event ${PTN.RESPONSE_START} is not defined`
+        //     );
+        //     assert.strictEqual(
+        //       events[8].name,
+        //       PTN.RESPONSE_END,
+        //       `event ${PTN.RESPONSE_END} is not defined`
+        //     );
+        //   });
+      
         });
 
         describe('AND origin match with window.location', () => {
