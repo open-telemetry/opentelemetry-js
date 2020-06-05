@@ -29,6 +29,7 @@ import {
   hrTimeToMilliseconds,
   NoopLogger,
   hrTimeDuration,
+  InstrumentationLibrary,
 } from '@opentelemetry/core';
 
 const performanceTimeOrigin = hrTime();
@@ -230,6 +231,7 @@ describe('Span', () => {
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
     assert.deepStrictEqual(span.events, []);
+    assert.ok(span.instrumentationLibrary instanceof InstrumentationLibrary);
   });
 
   it('should return ReadableSpan with attributes', () => {
