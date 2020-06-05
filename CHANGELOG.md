@@ -4,6 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.8.3
+
+#### :rocket: (Enhancement)
+* `opentelemetry-node`
+  * [#980](https://github.com/open-telemetry/opentelemetry-js/pull/980) feat: merge user supplied and default plugin configs ([@naseemkullah](https://github.com/naseemkullah))
+
+#### :bug: (Bug Fix)
+* `opentelemetry-context-async-hooks`
+  * [#1099](https://github.com/open-telemetry/opentelemetry-js/pull/1099) fix(asynchooks-scope): fix context loss using .with() #1101 ([@vmarchaud](https://github.com/vmarchaud))
+
+#### :books: (Refine Doc)
+* Other
+  * [#1100](https://github.com/open-telemetry/opentelemetry-js/pull/1100) docs(batcher): document how to configure custom aggregators #989 ([@vmarchaud](https://github.com/vmarchaud))
+* `opentelemetry-api`
+  * [#1106](https://github.com/open-telemetry/opentelemetry-js/pull/1106) chore: improve API documentation ([@mayurkale22](https://github.com/mayurkale22))
+
+#### Committers: 7
+- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+- Daniel Dyla ([@dyladan](https://github.com/dyladan))
+- Kanika Shah ([@kanikashah90](https://github.com/kanikashah90))
+- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+- Naseem ([@naseemkullah](https://github.com/naseemkullah))
+- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+- [@shivkanya9146](https://github.com/shivkanya9146)
+
+
 ## 0.8.2
 
 #### :rocket: (Enhancement)

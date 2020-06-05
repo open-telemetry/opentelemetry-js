@@ -73,8 +73,11 @@ setInterval(()=> {
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
-### Measure
-***Work in progress***
+### Value Recorder
+
+`ValueRecorder` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
+Values captured by `ValueRecorder.record(value)` are treated as individual events belonging to a distribution that is being summarized.
+`ValueRecorder` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

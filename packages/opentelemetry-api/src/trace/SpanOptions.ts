@@ -30,10 +30,10 @@ export interface SpanOptions {
    */
   kind?: SpanKind;
 
-  /** A spans attributes */
+  /** A span's attributes */
   attributes?: Attributes;
 
-  /** A spans links */
+  /** {@link Link}s span to other spans */
   links?: Link[];
 
   /**
