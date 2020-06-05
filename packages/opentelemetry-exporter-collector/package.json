@@ -85,6 +85,7 @@
     "@grpc/proto-loader": "^0.5.3",
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/metrics": "^0.8.3",
     "@opentelemetry/resources": "^0.8.3",
     "@opentelemetry/tracing": "^0.8.3",
     "google-protobuf": "^3.11.4",

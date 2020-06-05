@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/api';
+import { SpanKind, Logger } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
 
 // header to prevent instrumentation on request
@@ -47,6 +47,101 @@ export namespace opentelemetryProto {
       attributes: opentelemetryProto.common.v1.AttributeKeyValue[];
       droppedAttributesCount: number;
     }
+  }
+
+  export namespace metrics.v1 {
+    export interface ExportMetricsServiceRequest {
+      resourceMetrics: opentelemetryProto.metrics.v1.ResourceMetrics[];
+    }
+    export interface Metric {
+      metricDescriptor: opentelemetryProto.metrics.v1.MetricDescriptor;
+      int64DataPoints?: opentelemetryProto.metrics.v1.Int64DataPoint[];
+      doubleDataPoints?: opentelemetryProto.metrics.v1.DoubleDataPoint[];
+      histogramDataPoints?: opentelemetryProto.metrics.v1.HistogramDataPoint[];
+      summaryDataPoints?: opentelemetryProto.metrics.v1.SummaryDataPoint[];
+    }
+
+    export interface Int64DataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+    }
+    
+    export interface DoubleDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+    }
+    
+    export interface HistogramDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+      count: number;
+      sum: number;
+      buckets: opentelemetryProto.metrics.v1.HistogramDataPoint_Bucket;
+      explicitBounds: number[];
+    }
+
+    export interface HistogramDataPoint_Bucket {
+      count: number;
+      exemplar: number; // CHANGE LATER
+    }
+    
+    export interface SummaryDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+      count: number;
+      sum: number;
+      percentileValues: opentelemetryProto.metrics.v1.SummaryDataPoint_ValueAtPercentile[];
+    }
+
+    export interface SummaryDataPoint_ValueAtPercentile {
+      percentile: number;
+      value: number;
+    }
+    
+    export interface MetricDescriptor {
+      name: string;
+      description: string;
+      unit: string;
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
+      // temporality: opentelemetryProto.metrics.v1.Temporality;
+    }
+
+    export interface InstrumentationLibraryMetrics {
+      instrumentationLibrary?: opentelemetryProto.common.v1.InstrumentationLibrary;
+      metrics: opentelemetryProto.metrics.v1.Metric[];
+    }
+    
+    export interface ResourceMetrics {
+      resource?: opentelemetryProto.resource.v1.Resource;
+      instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
+    }
+
+    export enum MetricDescriptor_Type {
+      UNSPECIFIED,
+      GAUGE_INT64,
+      GAUGE_DOUBLE,
+      GAUGE_HISTOGRAM,
+      COUNTER_INT64,
+      COUNTER_DOUBLE,
+      CUMULATIVE_HISTOGRAM,
+      SUMMARY
+    }
+
+    /*export enum Temporality {
+      INVALID_TEMPORALITY,
+      INSTANTANEOUS,
+      DELTA,
+      CUMULATIVE,
+    }*/
   }
 
   export namespace trace.v1 {
@@ -159,6 +254,20 @@ export namespace opentelemetryProto {
       BOOL,
     }
   }
+}
+
+export interface ExporterOptions {
+  /**
+   * App prefix for metrics, if needed
+   */
+  prefix?: string;
+
+  /**
+   * Object implementing the logger interface
+   */
+  logger?: Logger;
+
+  url?: string;
 }
 
 /**
