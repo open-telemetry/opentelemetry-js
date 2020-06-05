@@ -301,12 +301,17 @@ import { MeterProvider } from '@opentelemetry/metrics';
 import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
+const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port
+const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint
+
 const exporter = new PrometheusExporter(
   {
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${Prometheusendpoint}`,
+    );
   },
 );
 
