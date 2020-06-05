@@ -52,6 +52,13 @@ export interface Meter {
    * supports negative increments. It is generally useful for capturing changes
    * in an amount of resources used, or any quantity that rises and falls
    * during a request.
+   * Example uses for UpDownCounter:
+   * <ol>
+   *   <li> count the number of active requests. </li>
+   *   <li> count memory in use by instrumenting new and delete. </li>
+   *   <li> count queue size by instrumenting enqueue and dequeue. </li>
+   *   <li> count semaphore up and down operations. </li>
+   * </ol>
    *
    * @param name the name of the metric.
    * @param [options] the metric options.
