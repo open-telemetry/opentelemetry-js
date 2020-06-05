@@ -18,7 +18,6 @@ import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import {
   BoundCounter,
-  BoundUpDownCounter,
   BaseBoundInstrument,
   BoundValueRecorder,
   BoundObserver,
@@ -135,40 +134,7 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   }
 }
 
-/** This is a SDK implementation of UpDownCounter Metric. */
-export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
-  implements api.UpDownCounter {
-  constructor(
-    name: string,
-    options: MetricOptions,
-    private readonly _batcher: Batcher,
-    resource: Resource
-  ) {
-    super(name, options, MetricKind.UP_DOWN_COUNTER, resource);
-  }
-  protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
-    return new BoundUpDownCounter(
-      labels,
-      this._disabled,
-      this._valueType,
-      this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
-    );
-  }
-
-  /**
-   * Adds the given value to the current value. Values cannot be negative.
-   * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific
-   *     metric that you want to record.
-   */
-  add(value: number, labels: api.Labels = {}) {
-    this.bind(labels).add(value);
-  }
-}
-
-export class ValueRecorderMetric extends Metric<BoundValueRecorder>
-  implements api.ValueRecorder {
+export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
   protected readonly _absolute: boolean;
 
   constructor(

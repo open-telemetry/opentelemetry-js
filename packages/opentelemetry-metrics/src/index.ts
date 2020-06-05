@@ -22,3 +22,4 @@ export * from './MetricObservable';
 export * from './export/aggregators';
 export * from './export/ConsoleMetricExporter';
 export * from './export/types';
+export * from './UpDownCounterMetric';

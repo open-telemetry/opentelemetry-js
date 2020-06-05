@@ -18,13 +18,8 @@ import * as api from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import {
-  Metric,
-  CounterMetric,
-  ValueRecorderMetric,
-  UpDownCounterMetric,
-  ObserverMetric,
-} from './Metric';
+import { UpDownCounterMetric } from './UpDownCounterMetric';
+import { Metric, CounterMetric, ValueRecorderMetric, ObserverMetric } from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -230,4 +225,3 @@ export class Meter implements api.Meter {
     return Boolean(name.match(/^[a-z][a-z0-9_.-]*$/i));
   }
 }
-s
