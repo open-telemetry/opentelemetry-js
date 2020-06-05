@@ -98,15 +98,15 @@ export const K8S_RESOURCE = {
 };
 
 /** Attributes describing the telemetry library. */
-export const LIBRARY_RESOURCE = {
+export const TELEMETRY_SDK_RESOURCE = {
   /** The name of the telemetry library. */
-  NAME: 'library.name',
+  NAME: 'telemetry.sdk.name',
 
   /** The language of telemetry library and of the code instrumented with it. */
-  LANGUAGE: 'library.language',
+  LANGUAGE: 'telemetry.sdk.language',
 
-  /** The version string of the library. */
-  VERSION: 'library.version',
+  /** The version string of the telemetry library */
+  VERSION: 'telemetry.sdk.version',
 };
 
 /** Attributes describing a service instance. */

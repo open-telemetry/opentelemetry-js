@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
+import { context, Span, SpanKind } from '@opentelemetry/api';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/api';
-import * as assert from 'assert';
-import * as https from 'https';
-import * as http from 'http';
-import * as nock from 'nock';
-import { plugin } from '../../src/https';
-import { assertSpan } from '../utils/assertSpan';
-import { DummyPropagation } from '../utils/DummyPropagation';
-import * as url from 'url';
-import axios, { AxiosResponse } from 'axios';
-import * as superagent from 'superagent';
-import * as got from 'got';
-import * as request from 'request-promise-native';
-import * as path from 'path';
+import { NodeTracerProvider } from '@opentelemetry/node';
+import { Http } from '@opentelemetry/plugin-http';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
-import { Http } from '@opentelemetry/plugin-http';
-import { NodeTracerProvider } from '@opentelemetry/node';
+import * as assert from 'assert';
+import axios, { AxiosResponse } from 'axios';
+import * as got from 'got';
+import * as http from 'http';
+import * as https from 'https';
+import * as nock from 'nock';
+import * as path from 'path';
+import * as request from 'request-promise-native';
+import * as superagent from 'superagent';
+import * as url from 'url';
+import { plugin } from '../../src/https';
+import { assertSpan } from '../utils/assertSpan';
+import { DummyPropagation } from '../utils/DummyPropagation';
 
 const memoryExporter = new InMemorySpanExporter();
 
@@ -43,6 +44,14 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('Packages', () => {
+  beforeEach(() => {
+    memoryExporter.reset();
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+  });
+
+  afterEach(() => {
+    context.disable();
+  });
   describe('get', () => {
     const logger = new NoopLogger();
 
@@ -92,7 +101,7 @@ describe('Packages', () => {
               // https://github.com/sindresorhus/got/commit/bf1aa5492ae2bc78cbbec6b7d764906fb156e6c2#diff-707a4781d57c42085155dcb27edb9ccbR258
               // TODO: check if this is still the case when new version
               'https://www.google.com'
-            : `https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8`
+            : 'https://www.google.com/search?q=axios&oq=axios&aqs=chrome.0.69i59l2j0l3j69i60.811j0j7&sourceid=chrome&ie=UTF-8'
         );
         const result = await httpPackage.get(urlparsed.href!);
         if (!resHeaders) {

@@ -73,14 +73,14 @@ Create a file named `tracing.js` and add the following code:
 ```javascript
 'use strict';
 
-const opentelemetry = require("@opentelemetry/api");
+const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 
 const provider = new NodeTracerProvider({
-  logLevel: opentelemetry.LogLevel.ERROR
+  logLevel: LogLevel.ERROR
 });
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+provider.register();
 ```
 
 If you run your application now with `node -r ./tracing.js app.js`, your application will create and propagate traces over HTTP. If an already instrumented service that supports [Trace Context](https://www.w3.org/TR/trace-context/) headers calls your application using HTTP, and you call another application using HTTP, the Trace Context headers will be correctly propagated.
@@ -109,7 +109,6 @@ After these dependencies are installed, we will need to initialize and register 
 ```javascript
 'use strict';
 
-const opentelemetry = require("@opentelemetry/api");
 const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
@@ -119,7 +118,7 @@ const provider = new NodeTracerProvider({
   logLevel: LogLevel.ERROR
 });
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+provider.register();
 
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
@@ -263,8 +262,8 @@ const boundInstruments = new Map();
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
     if (!boundInstruments.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const boundCounter = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const boundCounter = requestCount.bind(labels);
       boundInstruments.set(req.path, boundCounter);
     }
 
@@ -304,16 +303,24 @@ Next, modify your `monitoring.js` file to look like this:
 const { MeterProvider } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
-const meter = new MeterProvider().getMeter('your-meter-name');
+const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port
+const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint
 
-meter.addExporter(
-  new PrometheusExporter(
-    { startServer: true },
-    () => {
-      console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-    }
-  )
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${Prometheusendpoint}`,
+    );
+  },
 );
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('your-meter-name');
 
 const requestCount = meter.createCounter("requests", {
   monotonic: true,
@@ -326,8 +333,8 @@ const boundInstruments = new Map();
 module.exports.countAllRequests = () => {
   return (req, res, next) => {
     if (!boundInstruments.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const boundCounter = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const boundCounter = requestCount.bind(labels);
       boundInstruments.set(req.path, boundCounter);
     }
 

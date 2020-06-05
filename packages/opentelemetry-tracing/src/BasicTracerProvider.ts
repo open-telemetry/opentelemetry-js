@@ -14,26 +14,34 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
+import { ConsoleLogger, HttpTraceContext } from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
 import { NoopSpanProcessor } from './NoopSpanProcessor';
-import { TracerConfig } from './types';
+import { SDKRegistrationConfig, TracerConfig } from './types';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * This class represents a basic tracer provider which platform libraries can extend
  */
-export class BasicTracerProvider implements types.TracerProvider {
+export class BasicTracerProvider implements api.TracerProvider {
+  private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   activeSpanProcessor = new NoopSpanProcessor();
-  readonly logger: types.Logger;
+  readonly logger: api.Logger;
+  readonly resource: Resource;
 
-  constructor(private _config: TracerConfig = DEFAULT_CONFIG) {
-    this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
+  constructor(config: TracerConfig = DEFAULT_CONFIG) {
+    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
+    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this._config = Object.assign({}, config, {
+      logger: this.logger,
+      resource: this.resource,
+    });
   }
 
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
@@ -58,5 +66,27 @@ export class BasicTracerProvider implements types.TracerProvider {
 
   getActiveSpanProcessor(): SpanProcessor {
     return this.activeSpanProcessor;
+  }
+
+  /**
+   * Register this TracerProvider for use with the OpenTelemetry API.
+   * Undefined values may be replaced with defaults, and
+   * null values will be skipped.
+   *
+   * @param config Configuration object for SDK registration
+   */
+  register(config: SDKRegistrationConfig = {}) {
+    api.trace.setGlobalTracerProvider(this);
+    if (config.propagator === undefined) {
+      config.propagator = new HttpTraceContext();
+    }
+
+    if (config.contextManager) {
+      api.context.setGlobalContextManager(config.contextManager);
+    }
+
+    if (config.propagator) {
+      api.propagation.setGlobalPropagator(config.propagator);
+    }
   }
 }

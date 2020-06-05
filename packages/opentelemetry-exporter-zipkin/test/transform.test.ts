@@ -15,12 +15,13 @@
  */
 
 import * as assert from 'assert';
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { Span, BasicTracerProvider } from '@opentelemetry/tracing';
 import {
   NoopLogger,
   hrTimeToMicroseconds,
   hrTimeDuration,
+  VERSION,
 } from '@opentelemetry/core';
 import {
   toZipkinSpan,
@@ -30,17 +31,24 @@ import {
   statusDescriptionTagName,
 } from '../src/transform';
 import * as zipkinTypes from '../src/types';
+import { Resource } from '@opentelemetry/resources';
 
 const logger = new NoopLogger();
 const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');
 const parentId = '5c1c63257de34c67';
-const spanContext: types.SpanContext = {
+const spanContext: api.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
-  traceFlags: types.TraceFlags.SAMPLED,
+  traceFlags: api.TraceFlags.SAMPLED,
 };
+
+const DUMMY_RESOUCE = new Resource({
+  service: 'ui',
+  version: 1,
+  cost: 112.12,
+});
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
@@ -49,7 +57,7 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER,
+        api.SpanKind.SERVER,
         parentId
       );
       span.setAttributes({
@@ -60,7 +68,7 @@ describe('transform', () => {
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span.toReadableSpan(),
+        span,
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -86,6 +94,9 @@ describe('transform', () => {
           key1: 'value1',
           key2: 'value2',
           [statusCodeTagName]: 'OK',
+          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.name': 'opentelemetry',
+          'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
@@ -96,12 +107,12 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER
+        api.SpanKind.SERVER
       );
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span.toReadableSpan(),
+        span,
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -120,6 +131,9 @@ describe('transform', () => {
         parentId: undefined,
         tags: {
           [statusCodeTagName]: 'OK',
+          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.name': 'opentelemetry',
+          'telemetry.sdk.version': VERSION,
         },
         timestamp: hrTimeToMicroseconds(span.startTime),
         traceId: span.spanContext.traceId,
@@ -127,20 +141,20 @@ describe('transform', () => {
     });
     // SpanKind mapping tests
     [
-      { ot: types.SpanKind.CLIENT, zipkin: 'CLIENT' },
-      { ot: types.SpanKind.SERVER, zipkin: 'SERVER' },
-      { ot: types.SpanKind.CONSUMER, zipkin: 'CONSUMER' },
-      { ot: types.SpanKind.PRODUCER, zipkin: 'PRODUCER' },
-      { ot: types.SpanKind.INTERNAL, zipkin: undefined },
+      { ot: api.SpanKind.CLIENT, zipkin: 'CLIENT' },
+      { ot: api.SpanKind.SERVER, zipkin: 'SERVER' },
+      { ot: api.SpanKind.CONSUMER, zipkin: 'CONSUMER' },
+      { ot: api.SpanKind.PRODUCER, zipkin: 'PRODUCER' },
+      { ot: api.SpanKind.INTERNAL, zipkin: undefined },
     ].forEach(item =>
       it(`should map OpenTelemetry SpanKind ${
-        types.SpanKind[item.ot]
+        api.SpanKind[item.ot]
       } to Zipkin ${item.zipkin}`, () => {
         const span = new Span(tracer, 'my-span', spanContext, item.ot);
         span.end();
 
         const zipkinSpan = toZipkinSpan(
-          span.toReadableSpan(),
+          span,
           'my-service',
           statusCodeTagName,
           statusDescriptionTagName
@@ -159,6 +173,9 @@ describe('transform', () => {
           parentId: undefined,
           tags: {
             [statusCodeTagName]: 'OK',
+            'telemetry.sdk.language': 'nodejs',
+            'telemetry.sdk.name': 'opentelemetry',
+            'telemetry.sdk.version': VERSION,
           },
           timestamp: hrTimeToMicroseconds(span.startTime),
           traceId: span.spanContext.traceId,
@@ -173,7 +190,7 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER,
+        api.SpanKind.SERVER,
         parentId
       );
       span.setAttributes({
@@ -184,13 +201,17 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        DUMMY_RESOUCE
       );
 
       assert.deepStrictEqual(tags, {
         key1: 'value1',
         key2: 'value2',
         [statusCodeTagName]: 'OK',
+        cost: 112.12,
+        service: 'ui',
+        version: 1,
       });
     });
     it('should map OpenTelemetry Status.code to a Zipkin tag', () => {
@@ -198,11 +219,11 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER,
+        api.SpanKind.SERVER,
         parentId
       );
-      const status: types.Status = {
-        code: types.CanonicalCode.ABORTED,
+      const status: api.Status = {
+        code: api.CanonicalCode.ABORTED,
       };
       span.setStatus(status);
       span.setAttributes({
@@ -213,7 +234,8 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        Resource.empty()
       );
 
       assert.deepStrictEqual(tags, {
@@ -227,11 +249,11 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER,
+        api.SpanKind.SERVER,
         parentId
       );
-      const status: types.Status = {
-        code: types.CanonicalCode.ABORTED,
+      const status: api.Status = {
+        code: api.CanonicalCode.ABORTED,
         message: 'my-message',
       };
       span.setStatus(status);
@@ -243,7 +265,8 @@ describe('transform', () => {
         span.attributes,
         span.status,
         statusCodeTagName,
-        statusDescriptionTagName
+        statusDescriptionTagName,
+        Resource.empty()
       );
 
       assert.deepStrictEqual(tags, {
@@ -261,7 +284,7 @@ describe('transform', () => {
         tracer,
         'my-span',
         spanContext,
-        types.SpanKind.SERVER,
+        api.SpanKind.SERVER,
         parentId
       );
       span.addEvent('my-event1');

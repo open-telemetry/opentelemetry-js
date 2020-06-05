@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
  */
 
 import { NoopLogger } from '@opentelemetry/core';
-import { SpanKind, Span } from '@opentelemetry/api';
+import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
+import * as url from 'url';
 import { plugin } from '../../src/http';
 import { assertSpan } from '../utils/assertSpan';
 import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
-import * as url from 'url';
 import * as utils from '../utils/utils';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -31,6 +31,7 @@ import {
 } from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
 import { AttributeNames } from '../../src/enums/AttributeNames';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 const protocol = 'http';
 const serverPort = 32345;
 const hostname = 'localhost';
@@ -41,8 +42,16 @@ export const customAttributeFunction = (span: Span): void => {
 };
 
 describe('HttpPlugin Integration tests', () => {
+  beforeEach(() => {
+    memoryExporter.reset();
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+  });
+
+  afterEach(() => {
+    context.disable();
+  });
   describe('enable()', () => {
-    before(function(done) {
+    before(function (done) {
       // mandatory
       if (process.env.CI) {
         done();
@@ -71,7 +80,7 @@ describe('HttpPlugin Integration tests', () => {
       const ignoreConfig = [
         `${protocol}://${hostname}:${serverPort}/ignored/string`,
         /\/ignored\/regexp$/i,
-        (url: string) => url.endsWith(`/ignored/function`),
+        (url: string) => url.endsWith('/ignored/function'),
       ];
       const config: HttpPluginConfig = {
         ignoreIncomingPaths: ignoreConfig,
@@ -146,7 +155,9 @@ describe('HttpPlugin Integration tests', () => {
 
       const result = await httpRequest.get(
         new url.URL(`${protocol}://google.fr/?query=test`),
-        { headers: { 'x-foo': 'foo' } }
+        {
+          headers: { 'x-foo': 'foo' },
+        }
       );
 
       spans = memoryExporter.getFinishedSpans();

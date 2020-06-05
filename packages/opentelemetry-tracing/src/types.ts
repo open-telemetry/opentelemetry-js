@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-import { Attributes, Logger, Sampler } from '@opentelemetry/api';
+import {
+  Attributes,
+  HttpTextPropagator,
+  Logger,
+  Sampler,
+} from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
+import { ContextManager } from '@opentelemetry/context-base';
+import { Resource } from '@opentelemetry/resources';
 
 /**
  * TracerConfig provides an interface for configuring a Basic Tracer.
  */
 export interface TracerConfig {
   /**
-   * Attributed that will be applied on every span created by Tracer.
+   * Attributes that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.
    */
   defaultAttributes?: Attributes;
@@ -42,6 +49,22 @@ export interface TracerConfig {
 
   /** Trace Parameters */
   traceParams?: TraceParams;
+
+  /** Resource associated with trace telemetry  */
+  resource?: Resource;
+}
+
+/**
+ * Configuration options for registering the API with the SDK.
+ * Undefined values may be substituted for defaults, and null
+ * values will not be registered.
+ */
+export interface SDKRegistrationConfig {
+  /** Propagator to register as the global propagator */
+  propagator?: HttpTextPropagator | null;
+
+  /** Context manager to register as the global context manager */
+  contextManager?: ContextManager | null;
 }
 
 /** Global configuration of trace service */

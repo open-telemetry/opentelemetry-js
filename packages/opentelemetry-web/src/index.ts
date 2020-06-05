@@ -15,7 +15,7 @@
  */
 
 export * from './WebTracerProvider';
-export * from './StackScopeManager';
+export * from './StackContextManager';
 export * from './enums/PerformanceTimingNames';
 export * from './types';
 export * from './utils';

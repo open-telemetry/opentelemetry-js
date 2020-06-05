@@ -15,10 +15,11 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
-import { ScopeManager } from '@opentelemetry/scope-base';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
-import { Tracer } from '@opentelemetry/tracing';
+import { ContextManager } from '@opentelemetry/context-base';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
+import { B3Propagator, BasePlugin, NoopLogger } from '@opentelemetry/core';
+import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
+import { Span, Tracer } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { WebTracerConfig } from '../src';
@@ -37,16 +38,17 @@ class DummyPlugin extends BasePlugin<unknown> {
 describe('WebTracerProvider', () => {
   describe('constructor', () => {
     let defaultOptions: WebTracerConfig;
-    let scopeManager: ScopeManager;
+    let contextManager: ContextManager;
 
     beforeEach(() => {
       defaultOptions = {};
-      scopeManager = new ZoneScopeManager().enable();
-      context.initGlobalContextManager(scopeManager);
+      contextManager = new ZoneContextManager().enable();
+      context.setGlobalContextManager(contextManager);
     });
 
     afterEach(() => {
-      scopeManager.disable();
+      contextManager.disable();
+      context.disable();
     });
 
     it('should construct an instance with required only options', () => {
@@ -57,7 +59,6 @@ describe('WebTracerProvider', () => {
     });
 
     it('should enable all plugins', () => {
-      let options: WebTracerConfig;
       const dummyPlugin1 = new DummyPlugin();
       const dummyPlugin2 = new DummyPlugin();
       const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
@@ -65,21 +66,53 @@ describe('WebTracerProvider', () => {
 
       const plugins = [dummyPlugin1, dummyPlugin2];
 
-      options = { plugins };
+      const options = { plugins };
       new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);
       assert.ok(spyEnable2.calledOnce === true);
     });
 
-    it('should work without default scope manager', () => {
+    it('should work without default context manager', () => {
       assert.doesNotThrow(() => {
         new WebTracerProvider({});
       });
     });
 
-    describe('when scopeManager is "ZoneScopeManager"', () => {
-      it('should correctly return the scopes for 2 parallel actions', () => {
+    it('should throw error when context manager is passed in constructor', () => {
+      let error = '';
+      try {
+        new WebTracerProvider({
+          contextManager: new ZoneContextManager(),
+        } as any);
+      } catch (e) {
+        error = e;
+      }
+      assert.strictEqual(
+        error,
+        'contextManager should be defined in' +
+          ' register method not in constructor'
+      );
+    });
+
+    it('should throw error when propagator is passed in constructor', () => {
+      let error = '';
+      try {
+        new WebTracerProvider({
+          propagator: new B3Propagator(),
+        } as any);
+      } catch (e) {
+        error = e;
+      }
+      assert.strictEqual(
+        error,
+        'propagator should be defined in register' +
+          ' method not in constructor'
+      );
+    });
+
+    describe('when contextManager is "ZoneContextManager"', () => {
+      it('should correctly return the contexts for 2 parallel actions', done => {
         const webTracerWithZone = new WebTracerProvider().getTracer('default');
 
         const rootSpan = webTracerWithZone.startSpan('rootSpan');
@@ -111,9 +144,25 @@ describe('WebTracerProvider', () => {
                 webTracerWithZone.getCurrentSpan() === concurrentSpan2,
                 'Current span is concurrentSpan2'
               );
+              done();
             }, 20);
           });
         });
+      });
+    });
+
+    describe('.startSpan()', () => {
+      it('should assign resource to span', () => {
+        const provider = new WebTracerProvider({
+          logger: new NoopLogger(),
+        });
+        const span = provider.getTracer('default').startSpan('my-span') as Span;
+        assert.ok(span);
+        assert.ok(span.resource instanceof Resource);
+        assert.equal(
+          span.resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+          'webjs'
+        );
       });
     });
   });

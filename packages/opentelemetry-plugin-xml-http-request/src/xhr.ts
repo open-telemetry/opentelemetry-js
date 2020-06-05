@@ -94,7 +94,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
   }
 
   /**
-   * checks if trace headers shoudl be propagated
+   * checks if trace headers should be propagated
    * @param spanUrl
    * @private
    */
@@ -256,7 +256,8 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       // then OBSERVER_WAIT_TIME_MS and observer didn't collect enough
       // information
       resources = otperformance.getEntriesByType(
-        'resource'
+        // ts thinks this is the perf_hooks module, but it is the browser performance api
+        'resource' as any
       ) as PerformanceResourceTiming[];
     }
 
@@ -316,6 +317,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     }
 
     const currentSpan = this._tracer.startSpan(url, {
+      kind: api.SpanKind.CLIENT,
       attributes: {
         [AttributeNames.COMPONENT]: this.component,
         [AttributeNames.HTTP_METHOD]: method,
@@ -356,15 +358,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return function patchOpen(this: XMLHttpRequest, ...args): void {
         const method: string = args[0];
         const url: string = args[1];
-        const async: boolean = !!args[2];
-        if (async) {
-          plugin._createSpan(this, url, method);
-        } else {
-          plugin._logger.debug(
-            'tracing support for synchronous XMLHttpRequest calls is not' +
-              ' supported'
-          );
-        }
+        plugin._createSpan(this, url, method);
 
         return original.apply(this, args);
       };

@@ -7,63 +7,145 @@
 
 This package provides everything needed to interact with the OpenTelemetry API, including all TypeScript interfaces, enums, and no-op implementations. It is intended for use both on the server and in the browser.
 
-## Basic Use
+## Quick Start
 
-### API Entry Point
+To get started you need to install the SDK and plugins, create a TracerProvider and/or MeterProvider, and register it with the API.
 
-API entry points are defined as global singleton objects `trace` and `metrics` which contain methods used to initialize SDK implementations and acquire resources from the API.
+### Install Dependencies
 
-- [Trace API Documentation][trace-api-docs]
-- [Metrics API Documentation][metrics-api-docs]
+```sh
+$ # Install tracing dependencies
+$ npm install \
+    @opentelemetry/api \
+    @opentelemetry/core \
+    @opentelemetry/node \
+    @opentelemetry/tracing \
+    @opentelemetry/exporter-jaeger \ # add exporters as needed
+    @opentelemetry/plugin-http # add plugins as needed
 
-```javascript
-const api = require("@opentelemetry/api")
-
-/* Initialize TraceProvider */
-api.trace.initGlobalTracerProvider(traceProvider);
-/* returns traceProvider (no-op if a working provider has not been initialized) */
-api.trace.getTracerProvider();
-/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized); */
-api.trace.getTracer(name, version);
-
-/* Initialize MeterProvider */
-api.metrics.initGlobalMeterProvider(meterProvider);
-/* returns meterProvider (no-op if a working provider has not been initialized) */
-api.metrics.getMeterProvider();
-/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized); */
-api.metrics.getMeter(name, version);
+$ # Install metrics dependencies
+$ npm install \
+    @opentelemetry/metrics \
+    @opentelemetry/exporter-prometheus # add exporters as needed
 ```
 
-### Application Owners
+> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
 
-Application owners will also need a working OpenTelemetry SDK implementation. OpenTelemetry provides working SDK implementations for [web] and [node] for both [tracing] and [metrics].
+### Initialize the SDK
 
-#### Simple NodeJS Example
+Before any other module in your application is loaded, you must initialize the global tracer and meter providers. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
 
-Before any other module in your application is loaded, you must initialize the global tracer and meter registries. If you fail to initialize a provider, no-op implementations will be provided to any library which acquires them from the API.
+To collect traces and metrics, you will have to tell the SDK where to export telemetry data to. This example uses Jaeger and Prometheus, but exporters exist for [other tracing backends][other-tracing-backends]. If you're not sure if there is an exporter for your tracing backend, contact your tracing provider.
+
+#### Tracing
+
+```javascript
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
+const { JaegerExporter } = require("@opentelemetry/exporter-jaeger");
+
+const tracerProvider = new NodeTracerProvider();
+
+/**
+ * The SimpleSpanProcessor does no batching and exports spans
+ * immediately when they end. For most production use cases,
+ * OpenTelemetry recommends use of the BatchSpanProcessor.
+ */
+tracerProvider.addSpanProcessor(
+  new SimpleSpanProcessor(
+    new JaegerExporter({
+      serviceName: 'my-service'
+    })
+  )
+);
+
+/**
+ * Registering the provider with the API allows it to be discovered
+ * and used by instrumentation libraries. The OpenTelemetry API provides
+ * methods to set global SDK implementations, but the default SDK provides
+ * a convenience method named `register` which registers same defaults
+ * for you.
+ *
+ * By default the NodeTracerProvider uses Trace Context for propagation
+ * and AsyncHooksScopeManager for context management. To learn about
+ * customizing this behavior, see API Registration Options below.
+ */
+tracerProvider.register();
+```
+
+#### Metrics
 
 ```javascript
 const api = require("@opentelemetry/api");
-const sdk = require("@opentelemetry/node");
+const { MeterProvider } = require("@opentelemetry/metrics");
+const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 
-const { SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
-
-// Initialize an exporter
-const exporter = new JaegerExporter({
-  serviceName: 'basic-service'
+const meterProvider = new MeterProvider({
+  // The Prometheus exporter runs an HTTP server which
+  // the Prometheus backend scrapes to collect metrics.
+  exporter: new PrometheusExporter({ startServer: true }),
+  interval: 1000,
 });
 
-// Create a provider which we will configure as the global tracer provider
-const provider = new sdk.NodeTracerProvider();
+/**
+ * Registering the provider with the API allows it to be discovered
+ * and used by instrumentation libraries.
+ */
+api.metrics.setGlobalMeterProvider(meterProvider);
+```
 
-// Configure span processor to send spans to the exporter
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+## Version Compatibility
 
-// Initialize the OpenTelemetry APIs to use the NodeTracerProvider bindings
-api.trace.initGlobalTracerProvider(provider);
+Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
 
-// your application code below this line
+## Advanced Use
+### API Registration Options
+
+If you prefer to choose your own propagator or context manager, you may pass an options object into the `tracerProvider.register()` method. Omitted or `undefined` options will be replaced by a default value and `null` values will be skipped.
+
+```javascript
+const { B3Propagator } = require("@opentelemetry/core");
+
+tracerProvider.register({
+  // Use B3 Propagation
+  propagator: new B3Propagator(),
+
+  // Skip registering a default context manager
+  contextManager: null,
+});
+```
+
+### API Methods
+
+If you are writing an instrumentation library, or prefer to call the API methods directly rather than using the `register` method on the Tracer/Meter Provider, OpenTelemetry provides direct access to the underlying API methods through the `@opentelemetry/api` package. API entry points are defined as global singleton objects `trace`, `metrics`, `propagation`, and `context` which contain methods used to initialize SDK implementations and acquire resources from the API.
+
+- [Trace API Documentation][trace-api-docs]
+- [Metrics API Documentation][metrics-api-docs]
+- [Propagation API Documentation][propagation-api-docs]
+- [Context API Documentation][context-api-docs]
+
+```javascript
+const api = require("@opentelemetry/api");
+
+/* Initialize TracerProvider */
+api.trace.setGlobalTracerProvider(tracerProvider);
+/* returns tracerProvider (no-op if a working provider has not been initialized) */
+api.trace.getTracerProvider();
+/* returns a tracer from the registered global tracer provider (no-op if a working provider has not been initialized) */
+api.trace.getTracer(name, version);
+
+/* Initialize MeterProvider */
+api.metrics.setGlobalMeterProvider(meterProvider);
+/* returns meterProvider (no-op if a working provider has not been initialized) */
+api.metrics.getMeterProvider();
+/* returns a meter from the registered global meter provider (no-op if a working provider has not been initialized) */
+api.metrics.getMeter(name, version);
+
+/* Initialize Propagator */
+api.propagation.setGlobalPropagator(httpTraceContextPropagator);
+
+/* Initialize Context Manager */
+api.context.setGlobalContextManager(asyncHooksContextManager);
 ```
 
 ### Library Authors
@@ -93,7 +175,6 @@ async function doSomething() {
 }
 ```
 
-
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
@@ -116,8 +197,12 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [trace-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/traceapi.html
 [metrics-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/metricsapi.html
+[propagation-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/propagationapi.html
+[context-api-docs]: https://open-telemetry.github.io/opentelemetry-js/classes/contextapi.html
 
 [web]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-web
 [tracing]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing
 [node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 [metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
+
+[other-tracing-backends]: https://github.com/open-telemetry/opentelemetry-js#trace-exporters

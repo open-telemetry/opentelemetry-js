@@ -1,11 +1,11 @@
-# OpenTelemetry Tracing
+# OpenTelemetry Tracing SDK
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-`tracing` contains the foundation for all tracing SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
+The `tracing` module contains the foundation for all tracing SDKs of [opentelemetry-js](https://github.com/open-telemetry/opentelemetry-js).
 
 Used standalone, this module provides methods for manual instrumentation of code, offering full control over span creation for client-side JavaScript (browser) and Node.js.
 
@@ -17,7 +17,7 @@ For automated instrumentation for Node.js, please see
 ## Installation
 
 ```bash
-npm install --save @opentelemetry/core
+npm install --save @opentelemetry/api
 npm install --save @opentelemetry/tracing
 ```
 
@@ -28,8 +28,9 @@ const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider } = require('@opentelemetry/tracing');
 
 // To start a trace, you first need to initialize the Tracer provider.
-// NOTE: the default OpenTelemetry tracer provider does not record any tracing information.
-opentelemetry.trace.initGlobalTracerProvider(new BasicTracerProvider());
+// NOTE: The default OpenTelemetry tracer provider does not record any tracing information.
+//       Registering a working tracer provider allows the API methods to record traces.
+new BasicTracerProvider().register();
 
 // To create a span in a trace, we used the global singleton tracer to start a new span.
 const span = opentelemetry.trace.getTracer('default').startSpan('foo');

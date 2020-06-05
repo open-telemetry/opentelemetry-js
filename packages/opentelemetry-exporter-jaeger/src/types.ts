@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 
 /**
  * Options for Jaeger configuration
  */
 export interface ExporterConfig {
-  logger?: types.Logger;
+  logger?: api.Logger;
   serviceName: string;
   tags?: Tag[];
   host?: string; // default: 'localhost'
   port?: number; // default: 6832
   maxPacketSize?: number; // default: 65000
-  /** Force a flush on shutdown */
-  forceFlush?: boolean; // default: true
   /** Time to wait for an onShutdown flush to finish before closing the sender */
   flushTimeout?: number; // default: 2000
 }
@@ -35,12 +33,9 @@ export interface ExporterConfig {
 // Below require is needed as jaeger-client types does not expose the thrift,
 // udp_sender, util etc. modules.
 
-// tslint:disable-next-line:variable-name
 export const UDPSender = require('jaeger-client/dist/src/reporters/udp_sender')
   .default;
-// tslint:disable-next-line:variable-name
 export const Utils = require('jaeger-client/dist/src/util').default;
-// tslint:disable-next-line:variable-name
 export const ThriftUtils = require('jaeger-client/dist/src/thrift').default;
 
 export type TagValue = string | number | boolean;

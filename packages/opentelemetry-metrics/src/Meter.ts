@@ -14,36 +14,42 @@
  * limitations under the License.
  */
 
-import * as types from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import { ConsoleLogger } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
-import { Metric, CounterMetric, MeasureMetric } from './Metric';
+import {
+  Metric,
+  CounterMetric,
+  ValueRecorderMetric,
+  ObserverMetric,
+} from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
   DEFAULT_CONFIG,
   MeterConfig,
 } from './types';
-import { LabelSet } from './LabelSet';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
-import { NoopExporter } from '../test/mocks/Exporter';
+import { NoopExporter } from './export/NoopExporter';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
  */
-export class Meter implements types.Meter {
-  private readonly _logger: types.Logger;
+export class Meter implements api.Meter {
+  private readonly _logger: api.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
-  readonly labels = Meter.labels;
+  private readonly _resource: Resource;
 
   /**
    * Constructs a new Meter instance.
    */
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
-    this._batcher = new UngroupedBatcher();
+    this._batcher = config.batcher ?? new UngroupedBatcher();
+    this._resource = config.resource || Resource.createTelemetrySDKResource();
     // start the push controller
     const exporter = config.exporter || new NoopExporter();
     const interval = config.interval;
@@ -51,31 +57,36 @@ export class Meter implements types.Meter {
   }
 
   /**
-   * Creates and returns a new {@link Measure}.
+   * Creates and returns a new {@link ValueRecorder}.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(
+  createValueRecorder(
     name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundMeasure> {
+    options?: api.MetricOptions
+  ): api.ValueRecorder {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return types.NOOP_MEASURE_METRIC;
+      return api.NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: MetricOptions = {
-      absolute: true, // Measures are defined as absolute by default
-      monotonic: false, // not applicable to measure, set to false
+      absolute: true, // value recorders are defined as absolute by default
+      monotonic: false, // not applicable to value recorder, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
 
-    const measure = new MeasureMetric(name, opt, this._batcher);
-    this._registerMetric(name, measure);
-    return measure;
+    const valueRecorder = new ValueRecorderMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource
+    );
+    this._registerMetric(name, valueRecorder);
+    return valueRecorder;
   }
 
   /**
@@ -85,15 +96,12 @@ export class Meter implements types.Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(
-    name: string,
-    options?: types.MetricOptions
-  ): types.Metric<types.BoundCounter> {
+  createCounter(name: string, options?: api.MetricOptions): api.Counter {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return types.NOOP_COUNTER_METRIC;
+      return api.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
       monotonic: true, // Counters are defined as monotonic by default
@@ -102,9 +110,38 @@ export class Meter implements types.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, this._batcher);
+    const counter = new CounterMetric(name, opt, this._batcher, this._resource);
     this._registerMetric(name, counter);
     return counter;
+  }
+
+  /**
+   * Creates a new observer metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createObserver(name: string, options?: api.MetricOptions): api.Observer {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_OBSERVER_METRIC;
+    }
+    const opt: MetricOptions = {
+      monotonic: false, // Observers are defined as non-monotonic by default
+      absolute: false, // not applicable to observer, set to false
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const observer = new ObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource
+    );
+    this._registerMetric(name, observer);
+    return observer;
   }
 
   /**
@@ -124,27 +161,6 @@ export class Meter implements types.Meter {
 
   getBatcher(): Batcher {
     return this._batcher;
-  }
-
-  /**
-   * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered labels into a canonicalized
-   * set of labels with an unique identifier, useful for pre-aggregation.
-   * @param labels user provided unordered Labels.
-   */
-  static labels(labels: types.Labels): types.LabelSet {
-    const keys = Object.keys(labels).sort();
-    const identifier = keys.reduce((result, key) => {
-      if (result.length > 2) {
-        result += ',';
-      }
-      return (result += key + ':' + labels[key]);
-    }, '|#');
-    const sortedLabels: types.Labels = {};
-    keys.forEach(key => {
-      sortedLabels[key] = labels[key];
-    });
-    return new LabelSet(identifier, sortedLabels);
   }
 
   /**
@@ -179,6 +195,6 @@ export class Meter implements types.Meter {
    * @param name Name of metric to be created
    */
   private _isValidName(name: string): boolean {
-    return Boolean(name.match(/^[a-z][a-z0-9_.\-]*$/i));
+    return Boolean(name.match(/^[a-z][a-z0-9_.-]*$/i));
   }
 }

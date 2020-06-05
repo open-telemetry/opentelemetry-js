@@ -30,16 +30,10 @@ export interface SpanOptions {
    */
   kind?: SpanKind;
 
-  /** A spans attributes */
+  /** A span's attributes */
   attributes?: Attributes;
 
-  /**
-   * Indicates that if this Span is active and recording information like
-   * events with the `AddEvent` operation and attributes using `setAttributes`.
-   */
-  isRecording?: boolean;
-
-  /** A spans links */
+  /** {@link Link}s span to other spans */
   links?: Link[];
 
   /**
@@ -50,6 +44,9 @@ export interface SpanOptions {
    * A parent `SpanContext` (or `Span`, for convenience) that the newly-started
    * span will be the child of. This overrides the parent span extracted from
    * the currently active context.
+   *
+   * A null value here should prevent the SDK from extracting a parent from
+   * the current context, forcing the new span to be a root span.
    */
   parent?: Span | SpanContext | null;
 

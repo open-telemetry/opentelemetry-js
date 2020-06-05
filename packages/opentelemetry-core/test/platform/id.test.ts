@@ -18,15 +18,31 @@ import * as assert from 'assert';
 import { randomSpanId, randomTraceId } from '../../src/platform';
 
 describe('randomTraceId', () => {
-  it('returns different 32-char hex strings', () => {
+  it('returns 32 character hex strings', () => {
     const traceId = randomTraceId();
     assert.ok(traceId.match(/[a-f0-9]{32}/));
+    assert.ok(!traceId.match(/^0+$/));
+  });
+
+  it('returns different ids on each call', () => {
+    const traceId1 = randomTraceId();
+    const traceId2 = randomTraceId();
+
+    assert.notDeepStrictEqual(traceId1, traceId2);
   });
 });
 
 describe('randomSpanId', () => {
-  it('returns different 16-char hex string', () => {
+  it('returns 16 character hex strings', () => {
     const spanId = randomSpanId();
     assert.ok(spanId.match(/[a-f0-9]{16}/));
+    assert.ok(!spanId.match(/^0+$/));
+  });
+
+  it('returns different ids on each call', () => {
+    const spanId1 = randomSpanId();
+    const spanId2 = randomSpanId();
+
+    assert.notDeepStrictEqual(spanId1, spanId2);
   });
 });

@@ -14,38 +14,36 @@
  * limitations under the License.
  */
 
-import { Metric, MetricOptions, Labels, LabelSet } from './Metric';
-import { BoundCounter, BoundMeasure } from './BoundInstrument';
+import { MetricOptions, Counter, ValueRecorder, Observer } from './Metric';
 
 /**
  * An interface to allow the recording metrics.
  *
  * {@link Metric}s are used for recording pre-defined aggregation (`Counter`),
- * or raw values (`Measure`) in which the aggregation and labels
+ * or raw values (`ValueRecorder`) in which the aggregation and labels
  * for the exported metric are deferred.
  */
 export interface Meter {
   /**
-   * Creates and returns a new `Measure`.
+   * Creates and returns a new `ValueRecorder`.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure>;
+  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder;
 
   /**
-   * Creates a new `counter` metric. Generally, this kind of metric when the
+   * Creates a new `Counter` metric. Generally, this kind of metric when the
    * value is a quantity, the sum is of primary interest, and the event count
    * and value distribution are not of primary interest.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter>;
+  createCounter(name: string, options?: MetricOptions): Counter;
 
   /**
-   * Provide a pre-computed re-useable LabelSet by
-   * converting the unordered labels into a canonicalized
-   * set of labels with an unique identifier, useful for pre-aggregation.
-   * @param labels user provided unordered Labels.
+   * Creates a new `Observer` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
    */
-  labels(labels: Labels): LabelSet;
+  createObserver(name: string, options?: MetricOptions): Observer;
 }

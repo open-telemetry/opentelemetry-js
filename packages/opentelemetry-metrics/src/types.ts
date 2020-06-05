@@ -17,6 +17,8 @@
 import { LogLevel } from '@opentelemetry/core';
 import { Logger, ValueType } from '@opentelemetry/api';
 import { MetricExporter } from './export/types';
+import { Resource } from '@opentelemetry/resources';
+import { Batcher } from './export/Batcher';
 
 /** Options needed for SDK metric creation. */
 export interface MetricOptions {
@@ -41,7 +43,7 @@ export interface MetricOptions {
   /** Monotonic metrics may only increase. */
   monotonic: boolean;
 
-  /** (Measure only) Asserts that this metric will only accept non-negative values. */
+  /** (ValueRecorder only) Asserts that this metric will only accept non-negative values. */
   absolute: boolean;
 
   /** User provided logger. */
@@ -64,11 +66,17 @@ export interface MeterConfig {
 
   /** Metric collect interval */
   interval?: number;
+
+  /** Resource associated with metric telemetry */
+  resource?: Resource;
+
+  /** Metric batcher. */
+  batcher?: Batcher;
 }
 
 /** Default Meter configuration. */
 export const DEFAULT_CONFIG = {
-  logLevel: LogLevel.DEBUG,
+  logLevel: LogLevel.INFO,
 };
 
 /** The default metric creation options value. */

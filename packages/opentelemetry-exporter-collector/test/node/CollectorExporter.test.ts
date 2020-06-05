@@ -14,136 +14,150 @@
  * limitations under the License.
  */
 
-import * as core from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import * as http from 'http';
+import * as protoLoader from '@grpc/proto-loader';
+import * as grpc from 'grpc';
+import * as path from 'path';
+import * as fs from 'fs';
+import {
+  BasicTracerProvider,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
+
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  CollectorExporter,
-  CollectorExporterConfig,
-} from '../../src/CollectorExporter';
+import { CollectorExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
-  ensureExportTraceServiceRequestIsSet,
-  ensureSpanIsCorrect,
+  ensureResourceIsCorrect,
+  ensureExportedSpanIsCorrect,
   mockedReadableSpan,
 } from '../helper';
 
-const fakeRequest = {
-  end: function() {},
-  on: function() {},
-  write: function() {},
+const traceServiceProtoPath =
+  'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
+
+const address = 'localhost:1501';
+
+type TestParams = {
+  useTLS: boolean;
 };
 
-const mockRes = {
-  statusCode: 200,
-};
+const testCollectorExporter = (params: TestParams) =>
+  describe(`CollectorExporter - node ${
+    params.useTLS ? 'with TLS' : ''
+  }`, () => {
+    let collectorExporter: CollectorExporter;
+    let server: grpc.Server;
+    let exportedData:
+      | collectorTypes.opentelemetryProto.trace.v1.ResourceSpans
+      | undefined;
 
-const mockResError = {
-  statusCode: 400,
-};
-
-describe('CollectorExporter - node', () => {
-  let collectorExporter: CollectorExporter;
-  let collectorExporterConfig: CollectorExporterConfig;
-  let spyRequest: any;
-  let spyWrite: any;
-  let spans: ReadableSpan[];
-  describe('export', () => {
-    beforeEach(() => {
-      spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
-      spyWrite = sinon.stub(fakeRequest, 'write');
-      collectorExporterConfig = {
-        hostName: 'foo',
-        logger: new core.NoopLogger(),
-        serviceName: 'bar',
-        attributes: {},
-        url: 'http://foo.bar.com',
-      };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
-      spans = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
+    before(done => {
+      server = new grpc.Server();
+      protoLoader
+        .load(traceServiceProtoPath, {
+          keepCase: false,
+          longs: String,
+          enums: String,
+          defaults: true,
+          oneofs: true,
+          includeDirs,
+        })
+        .then((packageDefinition: protoLoader.PackageDefinition) => {
+          const packageObject: any = grpc.loadPackageDefinition(
+            packageDefinition
+          );
+          server.addService(
+            packageObject.opentelemetry.proto.collector.trace.v1.TraceService
+              .service,
+            {
+              Export: (data: {
+                request: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+              }) => {
+                try {
+                  exportedData = data.request.resourceSpans[0];
+                } catch (e) {
+                  exportedData = undefined;
+                }
+              },
+            }
+          );
+          const credentials = params.useTLS
+            ? grpc.ServerCredentials.createSsl(
+                fs.readFileSync('./test/certs/ca.crt'),
+                [
+                  {
+                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
+                    private_key: fs.readFileSync('./test/certs/server.key'),
+                  },
+                ]
+              )
+            : grpc.ServerCredentials.createInsecure();
+          server.bind(address, credentials);
+          server.start();
+          done();
+        });
     });
+
+    after(() => {
+      server.forceShutdown();
+    });
+
+    beforeEach(done => {
+      const credentials = params.useTLS
+        ? grpc.credentials.createSsl(
+            fs.readFileSync('./test/certs/ca.crt'),
+            fs.readFileSync('./test/certs/client.key'),
+            fs.readFileSync('./test/certs/client.crt')
+          )
+        : undefined;
+      collectorExporter = new CollectorExporter({
+        serviceName: 'basic-service',
+        url: address,
+        credentials,
+      });
+
+      const provider = new BasicTracerProvider();
+      provider.addSpanProcessor(new SimpleSpanProcessor(collectorExporter));
+      done();
+    });
+
     afterEach(() => {
-      spyRequest.restore();
-      spyWrite.restore();
+      exportedData = undefined;
     });
 
-    it('should open the connection', done => {
-      collectorExporter.export(spans, function() {});
-
-      setTimeout(() => {
-        const args = spyRequest.args[0];
-        const options = args[0];
-
-        assert.strictEqual(options.hostname, 'foo.bar.com');
-        assert.strictEqual(options.method, 'POST');
-        assert.strictEqual(options.path, '/');
-        done();
-      });
-    });
-
-    it('should successfully send the spans', done => {
-      collectorExporter.export(spans, function() {});
-
-      setTimeout(() => {
-        const writeArgs = spyWrite.args[0];
-        const json = JSON.parse(
-          writeArgs[0]
-        ) as collectorTypes.ExportTraceServiceRequest;
-        const span1 = json.spans && json.spans[0];
-        assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
-        if (span1) {
-          ensureSpanIsCorrect(span1);
-        }
-
-        ensureExportTraceServiceRequestIsSet(json, 6);
-
-        done();
-      });
-    });
-
-    it('should log the successful message', done => {
-      const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
-
-      const responseSpy = sinon.spy();
-      collectorExporter.export(spans, responseSpy);
-
-      setTimeout(() => {
-        const args = spyRequest.args[0];
-        const callback = args[1];
-        callback(mockRes);
+    describe('export', () => {
+      it('should export spans', done => {
+        const responseSpy = sinon.spy();
+        const spans = [Object.assign({}, mockedReadableSpan)];
+        collectorExporter.export(spans, responseSpy);
         setTimeout(() => {
-          const response: any = spyLoggerDebug.args[1][0];
-          assert.strictEqual(response, 'statusCode: 200');
-          assert.strictEqual(spyLoggerError.args.length, 0);
-          assert.strictEqual(responseSpy.args[0][0], 0);
+          assert.ok(
+            typeof exportedData !== 'undefined',
+            'resource' + " doesn't exist"
+          );
+          let spans;
+          let resource;
+          if (exportedData) {
+            spans = exportedData.instrumentationLibrarySpans[0].spans;
+            resource = exportedData.resource;
+            ensureExportedSpanIsCorrect(spans[0]);
+
+            assert.ok(
+              typeof resource !== 'undefined',
+              "resource doesn't exist"
+            );
+            if (resource) {
+              ensureResourceIsCorrect(resource);
+            }
+          }
           done();
-        });
-      });
-    });
-
-    it('should log the error message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
-
-      const responseSpy = sinon.spy();
-      collectorExporter.export(spans, responseSpy);
-
-      setTimeout(() => {
-        const args = spyRequest.args[0];
-        const callback = args[1];
-        callback(mockResError);
-        setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'statusCode: 400');
-
-          assert.strictEqual(responseSpy.args[0][0], 1);
-          done();
-        });
+        }, 200);
       });
     });
   });
-});
+
+testCollectorExporter({ useTLS: true });
+testCollectorExporter({ useTLS: false });

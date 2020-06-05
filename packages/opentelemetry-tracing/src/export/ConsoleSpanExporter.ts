@@ -16,8 +16,7 @@
 
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
-import { ExportResult } from '@opentelemetry/base';
-import { hrTimeToMicroseconds } from '@opentelemetry/core';
+import { ExportResult, hrTimeToMicroseconds } from '@opentelemetry/core';
 
 /**
  * This is implementation of {@link SpanExporter} that prints spans to the

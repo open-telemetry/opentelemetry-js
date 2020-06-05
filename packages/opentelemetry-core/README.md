@@ -5,7 +5,108 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package provides default and no-op implementations of the OpenTelemetry API for trace and metrics. It's intended for use both on the server and in the browser.
+This package provides default implementations of the OpenTelemetry API for trace and metrics. It's intended for use both on the server and in the browser.
+
+## Built-in Implementations
+
+- [Built-in Propagators](#built-in-propagators)
+  * [HttpTraceContext Propagator](#httptracecontext-propagator)
+  * [B3 Propagator](#b3-propagator)
+  * [Composite Propagator](#composite-propagator)
+  * [Correlation Context Propagator](#correlation-context-propagator)
+- [Built-in Sampler](#built-in-sampler)
+  * [Always Sampler](#always-sampler)
+  * [Never Sampler](#never-sampler)
+  * [Probability Sampler](#probability-sampler)
+
+### Built-in Propagators
+
+#### HttpTraceContext Propagator
+OpenTelemetry provides a text-based approach to propagate context to remote services using the [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP headers.
+
+> This is used as a default Propagator
+
+```js
+const api = require("@opentelemetry/api");
+const { HttpTraceContext } = require("@opentelemetry/core");
+
+/* Set Global Propagator */
+api.propagation.setGlobalPropagator(new HttpTraceContext());
+```
+
+#### B3 Propagator
+This is propagator for the B3 HTTP header format, which sends a `SpanContext` on the wire in an HTTP request, allowing other services to create spans with the right context. Based on: https://github.com/openzipkin/b3-propagation
+
+```js
+const api = require("@opentelemetry/api");
+const { B3Propagator } = require("@opentelemetry/core");
+
+/* Set Global Propagator */
+api.propagation.setGlobalPropagator(new B3Propagator());
+```
+
+#### Composite Propagator
+Combines multiple propagators into a single propagator.
+
+```js
+const api = require("@opentelemetry/api");
+const { CompositePropagator } = require("@opentelemetry/core");
+
+/* Set Global Propagator */
+api.propagation.setGlobalPropagator(new CompositePropagator());
+```
+
+#### Correlation Context Propagator
+Provides a text-based approach to propagate [correlation context](https://w3c.github.io/correlation-context/) to remote services using the [OpenTelemetry CorrelationContext Propagation](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/correlationcontext/api.md#header-name) HTTP headers.
+
+```js
+const api = require("@opentelemetry/api");
+const { HttpCorrelationContext } = require("@opentelemetry/core");
+
+/* Set Global Propagator */
+api.propagation.setGlobalPropagator(new HttpCorrelationContext());
+```
+
+### Built-in Sampler
+Sampler is used to make decisions on `Span` sampling.
+
+#### Always Sampler
+Samples every trace regardless of upstream sampling decisions.
+
+> This is used as a default Sampler
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { ALWAYS_SAMPLER } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: ALWAYS_SAMPLER
+});
+```
+
+#### Never Sampler
+Doesn't sample any trace, regardless of upstream sampling decisions.
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { NEVER_SAMPLER } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: NEVER_SAMPLER
+});
+```
+
+#### Probability Sampler
+Samples a configurable percentage of traces, and additionally samples any trace that was sampled upstream.
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { ProbabilitySampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: new ProbabilitySampler(0.5)
+});
+```
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>

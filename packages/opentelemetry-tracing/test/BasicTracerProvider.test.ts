@@ -15,6 +15,7 @@
  */
 
 import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
+import { ContextManager } from '@opentelemetry/context-base';
 import {
   ALWAYS_SAMPLER,
   NEVER_SAMPLER,
@@ -24,13 +25,13 @@ import {
   setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
-import { NoopScopeManager, ScopeManager } from '@opentelemetry/scope-base';
+import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
-    context.initGlobalContextManager(new NoopScopeManager());
+    context.disable();
   });
 
   describe('constructor', () => {
@@ -120,6 +121,14 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
     });
 
+    it('should propagate resources', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const tracer = tracerProvider.getTracer('default');
+      const span = tracer.startSpan('my-span') as Span;
+      assert.strictEqual(tracer.resource, tracerProvider.resource);
+      assert.strictEqual(span.resource, tracerProvider.resource);
+    });
+
     it('should start a span with name and options', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {});
@@ -172,6 +181,7 @@ describe('BasicTracerProvider', () => {
         setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
           traceState: state,
         })
       );
@@ -234,6 +244,21 @@ describe('BasicTracerProvider', () => {
       childSpan.end();
     });
 
+    it('should create a root span when parent is null', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span');
+      const overrideParent = tracer.startSpan('my-parent-override-span');
+      const rootSpan = tracer.startSpan(
+        'root-span',
+        { parent: null },
+        setActiveSpan(Context.ROOT_CONTEXT, span)
+      );
+      const context = rootSpan.context();
+      assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
+      span.end();
+      rootSpan.end();
+    });
+
     it('should start a span with name and with invalid parent span', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan(
@@ -256,6 +281,7 @@ describe('BasicTracerProvider', () => {
         setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: '0',
           spanId: '0',
+          traceFlags: TraceFlags.SAMPLED,
         })
       );
       assert.ok(span instanceof Span);
@@ -276,48 +302,16 @@ describe('BasicTracerProvider', () => {
       const context = span.context();
       assert.ok(context.traceId.match(/[a-f0-9]{32}/));
       assert.ok(context.spanId.match(/[a-f0-9]{16}/));
-      assert.strictEqual(context.traceFlags, TraceFlags.UNSAMPLED);
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
       assert.deepStrictEqual(context.traceState, undefined);
       span.end();
     });
 
-    it('should create real span when not sampled but recording events true', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: true });
-      assert.ok(span instanceof Span);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should not create real span when not sampled and recording events false', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-        logger: new NoopLogger(),
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: false });
-      assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), false);
-    });
-
-    it('should not create real span when not sampled and no recording events configured', () => {
-      const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
-        logger: new NoopLogger(),
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span');
-      assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.UNSAMPLED);
-      assert.strictEqual(span.isRecording(), false);
-    });
-
-    it('should create real span when sampled and recording events true', () => {
+    it('should create real span when sampled', () => {
       const tracer = new BasicTracerProvider({
         sampler: ALWAYS_SAMPLER,
       }).getTracer('default');
-      const span = tracer.startSpan('my-span', { isRecording: true });
+      const span = tracer.startSpan('my-span');
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
@@ -335,14 +329,22 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
       assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
+
+    it('should assign a resource', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
+      const span = tracer.startSpan('my-span') as Span;
+      assert.ok(span);
+      assert.ok(span.resource instanceof Resource);
+    });
   });
 
   describe('.getCurrentSpan()', () => {
     it('should return current span when it exists', () => {
-      context.initGlobalContextManager({
+      context.setGlobalContextManager({
         active: () =>
           setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
-      } as ScopeManager);
+        disable: () => {},
+      } as ContextManager);
 
       const tracer = new BasicTracerProvider().getTracer('default');
       assert.deepStrictEqual(tracer.getCurrentSpan(), 'foo');
@@ -350,7 +352,7 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.withSpan()', () => {
-    it('should run scope with NoopScopeManager scope manager', done => {
+    it('should run context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       tracer.withSpan(span, () => {
@@ -361,7 +363,7 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.bind()', () => {
-    it('should bind scope with NoopScopeManager scope manager', done => {
+    it('should bind context with NoopContextManager context manager', done => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span');
       const fn = () => {
@@ -370,6 +372,13 @@ describe('BasicTracerProvider', () => {
       };
       const patchedFn = tracer.bind(fn, span);
       return patchedFn();
+    });
+  });
+
+  describe('.resource', () => {
+    it('should return a Resource', () => {
+      const tracerProvider = new BasicTracerProvider();
+      assert.ok(tracerProvider.resource instanceof Resource);
     });
   });
 });

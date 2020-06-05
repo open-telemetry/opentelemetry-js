@@ -15,7 +15,6 @@ npm install --save @opentelemetry/exporter-collector
 
 ## Usage in Web
 ```js
-import * as opentelemetry from '@opentelemetry/api';
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorExporter } from '@opentelemetry/exporter-collector'
@@ -28,17 +27,17 @@ const provider = new WebTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+provider.register();
 
 ```
 
 ## Usage in Node
 ```js
-const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
+  serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
 };
 
@@ -46,9 +45,37 @@ const provider = new BasicTracerProvider();
 const exporter = new CollectorExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
-opentelemetry.trace.initGlobalTracerProvider(provider);
+provider.register();
 
 ```
+
+By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
+```js
+const fs = require('fs');
+const grpc = require('grpc');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+
+const collectorOptions = {
+  serviceName: 'basic-service',
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  credentials: grpc.credentials.createSsl(
+    fs.readFileSync('./ca.crt'),
+    fs.readFileSync('./client.key'),
+    fs.readFileSync('./client.crt')
+  )
+};
+
+const provider = new BasicTracerProvider();
+const exporter = new CollectorExporter(collectorOptions);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+
+provider.register();
+```
+
+To see how to generate credentials, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+
+Note, that this will only work if TLS is also configured on the server.
 
 ## Running opentelemetry-collector locally to see the traces
 1. Go to examples/basic-tracer-node

@@ -8,7 +8,9 @@ const exporter = new PrometheusExporter(
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+    );
   },
 );
 
@@ -31,9 +33,9 @@ const nonMonotonicCounter = meter.createCounter('non_monotonic_counter', {
   description: 'Example of a non-monotonic counter',
 });
 
-setInterval(() => {
-  const labels = meter.labels({ pid: process.pid });
+const labels = { pid: process.pid };
 
+setInterval(() => {
   monotonicCounter.bind(labels).add(1);
   nonMonotonicCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
 }, 1000);

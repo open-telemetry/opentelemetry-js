@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { SpanKind } from '@opentelemetry/api';
+import { context, SpanKind } from '@opentelemetry/api';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
@@ -40,6 +41,13 @@ const memoryExporter = new InMemorySpanExporter();
 const protocol = 'http';
 
 describe('Packages', () => {
+  beforeEach(() => {
+    context.setGlobalContextManager(new AsyncHooksContextManager().enable());
+  });
+
+  afterEach(() => {
+    context.disable();
+  });
   describe('get', () => {
     const logger = new NoopLogger();
     const provider = new NodeTracerProvider({

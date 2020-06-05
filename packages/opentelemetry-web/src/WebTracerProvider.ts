@@ -15,7 +15,12 @@
  */
 
 import { BasePlugin } from '@opentelemetry/core';
-import { BasicTracerProvider, TracerConfig } from '@opentelemetry/tracing';
+import {
+  BasicTracerProvider,
+  SDKRegistrationConfig,
+  TracerConfig,
+} from '@opentelemetry/tracing';
+import { StackContextManager } from './StackContextManager';
 
 /**
  * WebTracerConfig provides an interface for configuring a Web Tracer.
@@ -28,7 +33,7 @@ export interface WebTracerConfig extends TracerConfig {
 }
 
 /**
- * This class represents a web tracer with {@link StackScopeManager}
+ * This class represents a web tracer with {@link StackContextManager}
  */
 export class WebTracerProvider extends BasicTracerProvider {
   /**
@@ -44,5 +49,33 @@ export class WebTracerProvider extends BasicTracerProvider {
     for (const plugin of config.plugins) {
       plugin.enable([], this, this.logger);
     }
+
+    if ((config as SDKRegistrationConfig).contextManager) {
+      throw (
+        'contextManager should be defined in register method not in' +
+        ' constructor'
+      );
+    }
+    if ((config as SDKRegistrationConfig).propagator) {
+      throw 'propagator should be defined in register method not in constructor';
+    }
+  }
+
+  /**
+   * Register this TracerProvider for use with the OpenTelemetry API.
+   * Undefined values may be replaced with defaults, and
+   * null values will be skipped.
+   *
+   * @param config Configuration object for SDK registration
+   */
+  register(config: SDKRegistrationConfig = {}) {
+    if (config.contextManager === undefined) {
+      config.contextManager = new StackContextManager();
+    }
+    if (config.contextManager) {
+      config.contextManager.enable();
+    }
+
+    super.register(config);
   }
 }

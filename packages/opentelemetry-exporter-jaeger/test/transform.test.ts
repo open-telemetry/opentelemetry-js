@@ -17,26 +17,30 @@
 import * as assert from 'assert';
 import { spanToThrift } from '../src/transform';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import * as types from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
+import * as api from '@opentelemetry/api';
 import { ThriftUtils, Utils, ThriftReferenceType } from '../src/types';
 import { hrTimeToMicroseconds } from '@opentelemetry/core';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
   const spanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
+    traceFlags: TraceFlags.NONE,
   };
 
   describe('spanToThrift', () => {
     it('should convert an OpenTelemetry span to a Thrift', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {
           testBool: true,
@@ -45,7 +49,7 @@ describe('transform', () => {
         },
         links: [
           {
-            spanContext: {
+            context: {
               traceId: 'a4cda95b652f4a1592b449d5929fda1b',
               spanId: '3e0c63257de34c92',
             },
@@ -66,6 +70,11 @@ describe('transform', () => {
           },
         ],
         duration: [32, 800000000],
+        resource: new Resource({
+          service: 'ui',
+          version: 1,
+          cost: 112.12,
+        }),
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -90,8 +99,18 @@ describe('transform', () => {
         thriftSpan.startTime,
         Utils.encodeInt64(hrTimeToMicroseconds(readableSpan.startTime))
       );
-      assert.strictEqual(thriftSpan.tags.length, 6);
-      const [tag1, tag2, tag3, tag4, tag5, tag6] = thriftSpan.tags;
+      assert.strictEqual(thriftSpan.tags.length, 9);
+      const [
+        tag1,
+        tag2,
+        tag3,
+        tag4,
+        tag5,
+        tag6,
+        tag7,
+        tag8,
+        tag9,
+      ] = thriftSpan.tags;
       assert.strictEqual(tag1.key, 'testBool');
       assert.strictEqual(tag1.vType, 'BOOL');
       assert.strictEqual(tag1.vBool, true);
@@ -110,6 +129,15 @@ describe('transform', () => {
       assert.strictEqual(tag6.key, 'span.kind');
       assert.strictEqual(tag6.vType, 'STRING');
       assert.strictEqual(tag6.vStr, 'INTERNAL');
+      assert.strictEqual(tag7.key, 'service');
+      assert.strictEqual(tag7.vType, 'STRING');
+      assert.strictEqual(tag7.vStr, 'ui');
+      assert.strictEqual(tag8.key, 'version');
+      assert.strictEqual(tag8.vType, 'DOUBLE');
+      assert.strictEqual(tag8.vDouble, 1);
+      assert.strictEqual(tag9.key, 'cost');
+      assert.strictEqual(tag9.vType, 'DOUBLE');
+      assert.strictEqual(tag9.vDouble, 112.12);
       assert.strictEqual(thriftSpan.references.length, 0);
 
       assert.strictEqual(thriftSpan.logs.length, 1);
@@ -127,18 +155,20 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Thrift when links, events and attributes are empty', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
-        kind: types.SpanKind.CLIENT,
+        kind: api.SpanKind.CLIENT,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
-          code: types.CanonicalCode.DATA_LOSS,
+          code: api.CanonicalCode.DATA_LOSS,
           message: 'data loss',
         },
         attributes: {},
         links: [],
         events: [],
         duration: [32, 800000000],
+        resource: Resource.empty(),
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -183,18 +213,19 @@ describe('transform', () => {
     it('should convert an OpenTelemetry span to a Thrift with ThriftReference', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         spanContext,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {},
         parentSpanId: '3e0c63257de34c92',
         links: [
           {
-            spanContext: {
+            context: {
               traceId: 'a4cda95b652f4a1592b449d5929fda1b',
               spanId: '3e0c63257de34c92',
             },
@@ -202,6 +233,7 @@ describe('transform', () => {
         ],
         events: [],
         duration: [32, 800000000],
+        resource: Resource.empty(),
       };
 
       const thriftSpan = spanToThrift(readableSpan);
@@ -223,21 +255,24 @@ describe('transform', () => {
     it('should left pad trace ids', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
-        kind: types.SpanKind.CLIENT,
+        kind: api.SpanKind.CLIENT,
         spanContext: {
           traceId: '92b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
+        ended: true,
         status: {
-          code: types.CanonicalCode.DATA_LOSS,
+          code: api.CanonicalCode.DATA_LOSS,
           message: 'data loss',
         },
         attributes: {},
         links: [],
         events: [],
         duration: [32, 800000000],
+        resource: Resource.empty(),
       };
 
       const thriftSpan = spanToThrift(readableSpan);

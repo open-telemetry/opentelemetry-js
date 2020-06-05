@@ -22,15 +22,14 @@ import api, {
   NoopTracer,
   SpanOptions,
   Span,
+  context,
+  trace,
+  propagation,
+  metrics,
 } from '../../src';
 
 describe('API', () => {
-  const functions = [
-    'getCurrentSpan',
-    'startSpan',
-    'withSpan',
-    'getHttpTextFormat',
-  ];
+  const functions = ['getCurrentSpan', 'startSpan', 'withSpan'];
 
   it('should expose a tracer provider via getTracerProvider', () => {
     const tracer = api.trace.getTracerProvider();
@@ -42,12 +41,15 @@ describe('API', () => {
     const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
-      traceFlags: TraceFlags.UNSAMPLED,
+      traceFlags: TraceFlags.NONE,
     };
     const dummySpan = new NoopSpan(spanContext);
 
-    afterEach(() => {
-      api.trace.initGlobalTracerProvider(new NoopTracerProvider());
+    beforeEach(() => {
+      context.disable();
+      trace.disable();
+      propagation.disable();
+      metrics.disable();
     });
 
     it('should not crash', () => {
@@ -65,7 +67,7 @@ describe('API', () => {
     });
 
     it('should use the global tracer provider', () => {
-      api.trace.initGlobalTracerProvider(new TestTracerProvider());
+      api.trace.setGlobalTracerProvider(new TestTracerProvider());
       const tracer = api.trace.getTracerProvider().getTracer('name');
       const span = tracer.startSpan('test');
       assert.deepStrictEqual(span, dummySpan);

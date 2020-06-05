@@ -22,6 +22,7 @@ import {
   setActiveSpan,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
+import { defaultSetter } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -29,7 +30,7 @@ function translateReferences(references: opentracing.Reference[]): api.Link[] {
     const context = reference.referencedContext();
     if (context instanceof SpanContextShim) {
       links.push({
-        spanContext: (context as SpanContextShim).getSpanContext(),
+        context: (context as SpanContextShim).getSpanContext(),
         attributes: { 'span.kind': reference.type },
       });
     }
@@ -134,40 +135,38 @@ export class TracerShim extends opentracing.Tracer {
   _inject(
     spanContext: opentracing.SpanContext,
     format: string,
-    carrier: api.Carrier
+    carrier: unknown
   ): void {
     const opentelemSpanContext: api.SpanContext = (spanContext as SpanContextShim).getSpanContext();
     if (!carrier || typeof carrier !== 'object') return;
     switch (format) {
-      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
-      case opentracing.FORMAT_TEXT_MAP:
+      case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
+          defaultSetter,
           setExtractedSpanContext(
             api.Context.ROOT_CONTEXT,
             opentelemSpanContext
           )
         );
         return;
-      case opentracing.FORMAT_BINARY:
+      }
+      case opentracing.FORMAT_BINARY: {
         this._logger.warn(
           'OpentracingShim.inject() does not support FORMAT_BINARY'
         );
         // @todo: Implement binary format
         return;
+      }
       default:
     }
   }
 
-  _extract(
-    format: string,
-    carrier: api.Carrier
-  ): opentracing.SpanContext | null {
+  _extract(format: string, carrier: unknown): opentracing.SpanContext | null {
     switch (format) {
-      // tslint:disable-next-line:no-switch-case-fall-through
       case opentracing.FORMAT_HTTP_HEADERS:
-      case opentracing.FORMAT_TEXT_MAP:
+      case opentracing.FORMAT_TEXT_MAP: {
         const context = getExtractedSpanContext(
           api.propagation.extract(carrier)
         );
@@ -175,12 +174,14 @@ export class TracerShim extends opentracing.Tracer {
           return null;
         }
         return new SpanContextShim(context);
-      case opentracing.FORMAT_BINARY:
+      }
+      case opentracing.FORMAT_BINARY: {
         // @todo: Implement binary format
         this._logger.warn(
           'OpentracingShim.extract() does not support FORMAT_BINARY'
         );
         return null;
+      }
       default:
     }
     return null;

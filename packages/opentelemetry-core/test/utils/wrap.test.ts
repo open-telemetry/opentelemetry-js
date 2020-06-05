@@ -23,7 +23,7 @@ function makeWrapped(
   unwrap: any,
   original: any
 ): ShimWrapped {
-  const wrapper = function() {};
+  const wrapper = function () {};
   defineProperty(wrapper, '__wrapped', wrapped);
   defineProperty(wrapper, '__unwrap', unwrap);
   defineProperty(wrapper, '__original', original);
@@ -31,7 +31,8 @@ function makeWrapped(
 }
 
 function defineProperty(obj: any, name: string, value: unknown) {
-  var enumerable = !!obj[name] && obj.propertyIsEnumerable(name);
+  // eslint-disable-next-line no-prototype-builtins
+  const enumerable = !!obj[name] && obj.propertyIsEnumerable(name);
   Object.defineProperty(obj, name, {
     configurable: true,
     enumerable: enumerable,
@@ -44,16 +45,16 @@ const notWrappedFunctions: any[] = [];
 notWrappedFunctions.push(
   makeWrapped(
     false,
-    function() {},
-    function() {}
+    () => {},
+    () => {}
   )
 );
-notWrappedFunctions.push(makeWrapped(false, 'foo', function() {}));
-notWrappedFunctions.push(makeWrapped(false, function() {}, 'foo'));
+notWrappedFunctions.push(makeWrapped(false, 'foo', () => {}));
+notWrappedFunctions.push(makeWrapped(false, () => {}, 'foo'));
 notWrappedFunctions.push({
   __wrapped: true,
-  __unwrap: function() {},
-  __original: function() {},
+  __unwrap: function () {},
+  __original: function () {},
 });
 
 describe('utils-wrap', () => {
@@ -61,8 +62,8 @@ describe('utils-wrap', () => {
     it('should return true when function was wrapped', () => {
       const wrapped: ShimWrapped = makeWrapped(
         true,
-        function() {},
-        function() {}
+        () => {},
+        () => {}
       );
       assert.strictEqual(isWrapped(wrapped), true, 'function is not wrapped');
     });

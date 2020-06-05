@@ -1,81 +1,37 @@
 version: 2
 
 node_test_env: &node_test_env
-  RUN_POSTGRES_TESTS: 1
-  RUN_MYSQL_TESTS: 1
-  RUN_MONGODB_TESTS: 1
-  RUN_REDIS_TESTS: 1
-  POSTGRES_USER: postgres
-  POSTGRES_DB: circle_database
-  POSTGRES_HOST: localhost
-  POSTGRES_PORT: 5432
-  OPENTELEMETRY_REDIS_HOST: 'localhost'
-  OPENTELEMETRY_REDIS_PORT: 6379
-  MONGODB_HOST: localhost
-  MONGODB_DB: opentelemetry-tests
-  MONGODB_PORT: 27017
-  MYSQL_USER: otel
-  MYSQL_PASSWORD: secret
-  MYSQL_DATABASE: circle_database
-  MYSQL_PORT: 3306
   NPM_CONFIG_UNSAFE_PERM: true
 
-postgres_service: &postgres_service
-  image: circleci/postgres:9.6-alpine
-  environment: # env to pass to CircleCI, specified values must match node_test_env
-    POSTGRES_USER: postgres
-    POSTGRES_DB: circle_database
-redis_service: &redis_service
-  image: redis
-
-mongo_service: &mongo_service
-  image: mongo
-
-mysql_service: &mysql_service
-  image: circleci/mysql:5.7
-  environment:
-    MYSQL_USER: otel
-    MYSQL_PASSWORD: secret
-    MYSQL_DATABASE: circle_database
-    MYSQL_ROOT_PASSWORD: rootpw
 
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
   paths:
     - ./node_modules
     - ./package-lock.json
-    - packages/opentelemetry-base/node_modules
-    - packages/opentelemetry-scope-base/node_modules
     - packages/opentelemetry-api/node_modules
-    - packages/opentelemetry-scope-async-hooks/node_modules
+    - packages/opentelemetry-context-async-hooks/node_modules
+    - packages/opentelemetry-context-base/node_modules
+    - packages/opentelemetry-context-zone/node_modules
+    - packages/opentelemetry-context-zone-peer-dep/node_modules
     - packages/opentelemetry-core/node_modules
-    - packages/opentelemetry-exporter-prometheus/node_modules
-    - packages/opentelemetry-metrics/node_modules
-    - packages/opentelemetry-tracing/node_modules
     - packages/opentelemetry-exporter-jaeger/node_modules
+    - packages/opentelemetry-exporter-prometheus/node_modules
     - packages/opentelemetry-exporter-zipkin/node_modules
+    - packages/opentelemetry-metrics/node_modules
     - packages/opentelemetry-node/node_modules
     - packages/opentelemetry-shim-opentracing/node_modules
+    - packages/opentelemetry-tracing/node_modules
     - packages/opentelemetry-web/node_modules
-    - packages/opentelemetry-plugin-dns/node_modules
 
 cache_2: &cache_2
   key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
   paths:
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
-    - packages/opentelemetry-plugin-ioredis/node_modules
-    - packages/opentelemetry-plugin-mongodb/node_modules
-    - packages/opentelemetry-plugin-redis/node_modules
-    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg/node_modules
-    - packages/opentelemetry-plugin-document-load/node_modules
     - packages/opentelemetry-plugin-https/node_modules
-    - packages/opentelemetry-plugin-postgres/opentelemetry-plugin-pg-pool/node_modules
-    - packages/opentelemetry-plugin-mysql/node_modules
     - packages/opentelemetry-exporter-collector/node_modules
     - packages/opentelemetry-plugin-xml-http-request/node_modules
-    - packages/opentelemetry-exporter-stackdriver-trace/node_modules
-    - packages/opentelemetry-plugin-express/node_modules
     - packages/opentelemetry-resources/node_modules
 
 node_unit_tests: &node_unit_tests
@@ -159,92 +115,25 @@ browsers_unit_tests: &browsers_unit_tests
         command: if [ "$CIRCLE_NODE_VERSION" = "v12" ]; then npm run codecov:browser; fi
 
 jobs:
-  lint_&_docs:
-    docker:
-      - image: node:12
-        environment:
-          NPM_CONFIG_UNSAFE_PERM: true
-    steps:
-      - checkout
-      - run:
-          name: Install minimal doc and lint modules globally
-          command: npm i -g tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib
-      - run:
-          name: Symlink global modules into all lerna packages
-          command: lerna exec 'npm link tslint lerna typedoc linkinator typescript gts tslint-consistent-codestyle tslint-microsoft-contrib'
-      - run:
-          name: Check code style and linting
-          command: npm run lint
-      - run:
-          name: Install doc dependencies
-          command: lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies -- --only dev
-      - run:
-          name: Docs tests
-          command: npm run docs-test
-      - persist_to_workspace:
-          root: packages/opentelemetry-api/docs
-          paths:
-            - out
-      - run:
-          name: Install minimal modules to lint examples
-          command: npm i --no-save eslint eslint-plugin-import eslint-config-airbnb-base
-      - run:
-          name: Lint examples
-          command: npm run lint:examples
-  docs-deploy:
-    docker:
-      - image: node:12
-    steps:
-      - checkout
-      - attach_workspace:
-          at: packages/opentelemetry-api/docs
-      - run:
-          name: Install and configure dependencies
-          command: |
-            npm install --silent --no-save gh-pages
-            git config user.email noreply@opentelemetry.io
-            git config user.name "ci-build"
-      - add_ssh_keys:
-          fingerprints:
-            - "1d:a3:60:b5:b4:8d:e7:8a:96:ce:6a:0a:e9:58:4c:54"
-      - run:
-          name: Deploy docs to gh-pages branch
-          command: gh-pages --dist packages/opentelemetry-api/docs/out
   node8:
     docker:
       - image: node:8
         environment: *node_test_env
-      - *postgres_service
-      - *mysql_service
-      - *redis_service
-      - *mongo_service
     <<: *node_unit_tests
   node10:
     docker:
       - image: node:10
         environment: *node_test_env
-      - *postgres_service
-      - *mysql_service
-      - *redis_service
-      - *mongo_service
     <<: *node_unit_tests
   node12:
     docker:
       - image: node:12
         environment: *node_test_env
-      - *postgres_service
-      - *mysql_service
-      - *redis_service
-      - *mongo_service
     <<: *node_unit_tests
-  node13:
+  node14:
     docker:
-      - image: node:13
+      - image: node:14
         environment: *node_test_env
-      - *postgres_service
-      - *mysql_service
-      - *redis_service
-      - *mongo_service
     <<: *node_unit_tests
   node12-browsers:
     docker:
@@ -255,20 +144,9 @@ workflows:
   version: 2
   build:
     jobs:
-      - lint_&_docs:
-          filters:
-            branches:
-              only: /.*/
-      - docs-deploy:
-          requires:
-            - lint_&_docs
-          filters:
-            tags:
-              only: /^v\d+\.\d+\.\d$/
-            branches:
-              ignore: /.*/
       - node8
       - node10
       - node12
-      - node13
+      - node14
       - node12-browsers
+

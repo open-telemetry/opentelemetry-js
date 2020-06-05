@@ -15,9 +15,10 @@
  */
 
 import {
-  Carrier,
   Context,
-  HttpTextFormat,
+  GetterFunction,
+  HttpTextPropagator,
+  SetterFunction,
   SpanContext,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -62,40 +63,43 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class HttpTraceContext implements HttpTextFormat {
-  inject(context: Context, carrier: Carrier) {
+export class HttpTraceContext implements HttpTextPropagator {
+  inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
     const traceParent = `${VERSION}-${spanContext.traceId}-${
       spanContext.spanId
-    }-0${Number(spanContext.traceFlags || TraceFlags.UNSAMPLED).toString(16)}`;
+    }-0${Number(spanContext.traceFlags || TraceFlags.NONE).toString(16)}`;
 
-    carrier[TRACE_PARENT_HEADER] = traceParent;
+    setter(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
-      carrier[TRACE_STATE_HEADER] = spanContext.traceState.serialize();
+      setter(carrier, TRACE_STATE_HEADER, spanContext.traceState.serialize());
     }
   }
 
-  extract(context: Context, carrier: Carrier): Context {
-    const traceParentHeader = carrier[TRACE_PARENT_HEADER];
+  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
+    const traceParentHeader = getter(carrier, TRACE_PARENT_HEADER);
     if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
       : traceParentHeader;
+    if (typeof traceParent !== 'string') return context;
     const spanContext = parseTraceParent(traceParent);
     if (!spanContext) return context;
 
     spanContext.isRemote = true;
 
-    const traceStateHeader = carrier[TRACE_STATE_HEADER];
+    const traceStateHeader = getter(carrier, TRACE_STATE_HEADER);
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a
       // single header.
       const state = Array.isArray(traceStateHeader)
         ? traceStateHeader.join(',')
         : traceStateHeader;
-      spanContext.traceState = new TraceState(state as string);
+      spanContext.traceState = new TraceState(
+        typeof state === 'string' ? state : undefined
+      );
     }
     return setExtractedSpanContext(context, spanContext);
   }

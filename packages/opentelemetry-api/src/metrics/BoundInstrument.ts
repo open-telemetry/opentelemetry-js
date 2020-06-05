@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 
 /** An Instrument for Counter Metric. */
@@ -26,20 +26,21 @@ export interface BoundCounter {
   add(value: number): void;
 }
 
-/** Measure to report instantaneous measurement of a value. */
-export interface BoundMeasure {
+/** ValueRecorder to report instantaneous measurement of a value. */
+export interface BoundValueRecorder {
   /**
-   * Records the given value to this measure.
-   * @param value the measurement to record.
-   * @param distContext the distContext associated with the measurements.
+   * Records the given value to this value recorder.
+   * @param value to record.
+   * @param correlationContext the correlationContext associated with the
+   *     values.
    * @param spanContext the {@link SpanContext} that identifies the {@link Span}
-   *     for which the measurements are associated with.
+   *     which the values are associated with.
    */
   record(value: number): void;
-  record(value: number, distContext: DistributedContext): void;
+  record(value: number, correlationContext: CorrelationContext): void;
   record(
     value: number,
-    distContext: DistributedContext,
+    correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
 }

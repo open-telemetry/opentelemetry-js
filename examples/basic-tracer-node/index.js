@@ -1,34 +1,26 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
-const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
-const { CollectorExporter } = require('@opentelemetry/exporter-collector');
-
-const options = {
-  serviceName: 'basic-service',
-};
-
-// Initialize an exporter depending on how we were started
-let exporter;
-
-const EXPORTER = process.env.EXPORTER || '';
-if (EXPORTER.toLowerCase().startsWith('z')) {
-  exporter = new ZipkinExporter(options);
-} else if (EXPORTER.toLowerCase().startsWith('j')) {
-  exporter = new JaegerExporter(options);
-} else {
-  exporter = new CollectorExporter(options);
-}
 
 const provider = new BasicTracerProvider();
 
-// Configure span processor to send spans to the provided exporter
+// Configure span processor to send spans to the exporter
+const exporter = new JaegerExporter({ serviceName: 'basic-service' });
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
-// Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings
-opentelemetry.trace.initGlobalTracerProvider(provider);
+/**
+ * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.
+ *
+ * This registers the tracer provider with the OpenTelemetry API as the global
+ * tracer provider. This means when you call API methods like
+ * `opentelemetry.trace.getTracer`, they will use this tracer provider. If you
+ * do not register a global tracer provider, instrumentation which calls these
+ * methods will receive no-op implementations.
+ */
+provider.register();
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
 // Create a span. A span must be closed.
@@ -58,5 +50,7 @@ function doWork(parent) {
   span.setAttribute('key', 'value');
 
   // Annotate our span to capture metadata about our operation
-  span.addEvent('invoking doWork').end();
+  span.addEvent('invoking doWork');
+
+  span.end();
 }

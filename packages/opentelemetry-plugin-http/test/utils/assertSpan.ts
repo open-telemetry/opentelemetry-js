@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import { SpanKind, Status } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as http from 'http';
 import { AttributeNames } from '../../src/enums/AttributeNames';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
-import { ReadableSpan } from '@opentelemetry/tracing';
 
 export const assertSpan = (
   span: ReadableSpan,

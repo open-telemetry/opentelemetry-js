@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
   context,
@@ -22,8 +21,14 @@ import {
   SpanKind,
   SpanOptions,
   Status,
+  SpanContext,
+  TraceFlags,
 } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  NoRecordingSpan,
+  getExtractedSpanContext,
+} from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingMessage,
@@ -56,6 +61,12 @@ export class HttpPlugin extends BasePlugin<Http> {
   protected _config!: HttpPluginConfig;
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
+
+  private readonly _emptySpanContext: SpanContext = {
+    traceId: '',
+    spanId: '',
+    traceFlags: TraceFlags.NONE,
+  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);
@@ -145,7 +156,7 @@ export class HttpPlugin extends BasePlugin<Http> {
 
   protected _getPatchOutgoingGetFunction(
     clientRequest: (
-      options: RequestOptions | string | URL,
+      options: RequestOptions | string | url.URL,
       ...args: HttpRequestArgs
     ) => ClientRequest
   ) {
@@ -161,7 +172,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       // https://nodejs.org/dist/latest/docs/api/http.html#http_http_get_options_callback
       // https://github.com/googleapis/cloud-trace-nodejs/blob/master/src/plugins/plugin-http.ts#L198
       return function outgoingGetRequest<
-        T extends RequestOptions | string | URL
+        T extends RequestOptions | string | url.URL
       >(options: T, ...args: HttpRequestArgs): ClientRequest {
         const req = clientRequest(options, ...args);
         req.end();
@@ -184,13 +195,16 @@ export class HttpPlugin extends BasePlugin<Http> {
   ): ClientRequest {
     const hostname =
       options.hostname ||
-      options.host?.replace(/^(.*)(\:[0-9]{1,5})/, '$1') ||
+      options.host?.replace(/^(.*)(:[0-9]{1,5})/, '$1') ||
       'localhost';
     const attributes = utils.getOutgoingRequestAttributes(options, {
       component: this.component,
       hostname,
     });
     span.setAttributes(attributes);
+    if (this._config.requestHook) {
+      this._callRequestHook(span, request);
+    }
 
     request.on(
       'response',
@@ -200,6 +214,9 @@ export class HttpPlugin extends BasePlugin<Http> {
           { hostname }
         );
         span.setAttributes(attributes);
+        if (this._config.responseHook) {
+          this._callResponseHook(span, response);
+        }
 
         this._tracer.bind(response);
         this._logger.debug('outgoingRequest on response()');
@@ -304,19 +321,24 @@ export class HttpPlugin extends BasePlugin<Http> {
           context.bind(request);
           context.bind(response);
 
+          if (plugin._config.requestHook) {
+            plugin._callRequestHook(span, request);
+          }
+          if (plugin._config.responseHook) {
+            plugin._callResponseHook(span, response);
+          }
+
           // Wraps end (inspired by:
           // https://github.com/GoogleCloudPlatform/cloud-trace-nodejs/blob/master/src/plugins/plugin-connect.ts#L75)
           const originalEnd = response.end;
-          response.end = function(
+          response.end = function (
             this: ServerResponse,
             ...args: ResponseEndArgs
           ) {
             response.end = originalEnd;
             // Cannot pass args of type ResponseEndArgs,
-            // tslint complains "Expected 1-2 arguments, but got 1 or more.", it does not make sense to me
             const returned = plugin._safeExecute(
               span,
-              // tslint:disable-next-line:no-any
               () => response.end.apply(this, arguments as any),
               true
             );
@@ -380,6 +402,13 @@ export class HttpPlugin extends BasePlugin<Http> {
         extraOptions
       );
 
+      if (utils.isOpenTelemetryRequest(optionsParsed)) {
+        // clone the headers so delete will not modify the user's object
+        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
+        delete optionsParsed.headers[utils.OT_REQUEST_HEADER];
+        return original.apply(this, [optionsParsed, ...args]);
+      }
+
       if (
         utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
@@ -396,7 +425,6 @@ export class HttpPlugin extends BasePlugin<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-
       const span = plugin._startHttpSpan(operationName, spanOptions);
 
       return plugin._tracer.withSpan(span, () => {
@@ -417,9 +445,26 @@ export class HttpPlugin extends BasePlugin<Http> {
   }
 
   private _startHttpSpan(name: string, options: SpanOptions) {
-    const span = this._tracer
-      .startSpan(name, options)
-      .setAttribute(AttributeNames.COMPONENT, this.component);
+    /*
+     * If a parent is required but not present, we use a `NoRecordingSpan` to still
+     * propagate context without recording it.
+     */
+    const requireParent =
+      options.kind === SpanKind.CLIENT
+        ? this._config.requireParentforOutgoingSpans
+        : this._config.requireParentforIncomingSpans;
+    let span: Span;
+    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
+      const spanContext =
+        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+      // TODO: Refactor this when a solution is found in
+      // https://github.com/open-telemetry/opentelemetry-specification/issues/530
+      span = new NoRecordingSpan(spanContext);
+    } else {
+      span = this._tracer
+        .startSpan(name, options)
+        .setAttribute(AttributeNames.COMPONENT, this.component);
+    }
     this._spanNotEnded.add(span);
     return span;
   }
@@ -431,6 +476,28 @@ export class HttpPlugin extends BasePlugin<Http> {
 
     span.end();
     this._spanNotEnded.delete(span);
+  }
+
+  private _callResponseHook(
+    span: Span,
+    response: IncomingMessage | ServerResponse
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.responseHook!(span, response),
+      false
+    );
+  }
+
+  private _callRequestHook(
+    span: Span,
+    request: ClientRequest | IncomingMessage
+  ) {
+    this._safeExecute(
+      span,
+      () => this._config.requestHook!(span, request),
+      false
+    );
   }
 
   private _safeExecute<

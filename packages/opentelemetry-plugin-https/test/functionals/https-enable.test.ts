@@ -29,8 +29,8 @@ import {
   HttpPluginConfig,
   OT_REQUEST_HEADER,
 } from '@opentelemetry/plugin-http';
-import { AsyncHooksScopeManager } from '@opentelemetry/scope-async-hooks';
-import { ScopeManager } from '@opentelemetry/scope-base';
+import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ContextManager } from '@opentelemetry/context-base';
 import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
@@ -62,7 +62,7 @@ const provider = new NodeTracerProvider({
 });
 const tracer = provider.getTracer('test-https');
 provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
-propagation.initGlobalPropagator(new DummyPropagation());
+propagation.setGlobalPropagator(new DummyPropagation());
 
 function doNock(
   hostname: string,
@@ -83,15 +83,16 @@ export const customAttributeFunction = (span: ISpan): void => {
 };
 
 describe('HttpsPlugin', () => {
-  let scopeManger: ScopeManager;
+  let contextManager: ContextManager;
 
   beforeEach(() => {
-    scopeManger = new AsyncHooksScopeManager().enable();
-    context.initGlobalContextManager(scopeManger);
+    contextManager = new AsyncHooksContextManager().enable();
+    context.setGlobalContextManager(contextManager);
   });
 
   afterEach(() => {
-    scopeManger.disable();
+    contextManager.disable();
+    context.disable();
   });
 
   it('should return a plugin', () => {
@@ -207,14 +208,14 @@ describe('HttpsPlugin', () => {
       before(() => {
         const config: HttpPluginConfig = {
           ignoreIncomingPaths: [
-            `/ignored/string`,
+            '/ignored/string',
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
           serverName,
@@ -502,8 +503,7 @@ describe('HttpsPlugin', () => {
           arg
         )}`, async () => {
           try {
-            // @ts-ignore
-            await httpsRequest.get(arg);
+            await httpsRequest.get(arg as any);
           } catch (error) {
             // request has been made
             // nock throw
@@ -676,9 +676,7 @@ describe('HttpsPlugin', () => {
 
       it("should have 1 ended span when response is listened by using req.on('response')", done => {
         const host = `${protocol}://${hostname}`;
-        nock(host)
-          .get('/')
-          .reply(404);
+        nock(host).get('/').reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
           response.on('data', () => {});

@@ -16,24 +16,30 @@
 
 export * from './common/Logger';
 export * from './common/Time';
-export * from './context/propagation/carrier';
-export * from './context/propagation/HttpTextFormat';
-export * from './distributed_context/DistributedContext';
-export * from './distributed_context/EntryValue';
+export * from './context/propagation/getter';
+export * from './context/propagation/HttpTextPropagator';
+export * from './context/propagation/NoopHttpTextPropagator';
+export * from './context/propagation/setter';
+export * from './correlation_context/CorrelationContext';
+export * from './correlation_context/EntryValue';
 export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
+export * from './metrics/MetricObservable';
 export * from './metrics/NoopMeter';
 export * from './metrics/NoopMeterProvider';
+export * from './metrics/ObserverResult';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
+export * from './trace/link_context';
 export * from './trace/link';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
 export * from './trace/Sampler';
+export * from './trace/SamplingResult';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/span';
@@ -45,7 +51,7 @@ export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
-export { Context } from '@opentelemetry/scope-base';
+export { Context } from '@opentelemetry/context-base';
 
 import { ContextAPI } from './api/context';
 /** Entrypoint for context API */

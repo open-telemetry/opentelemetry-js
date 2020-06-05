@@ -1,0 +1,37 @@
+name: Lint
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: restore lerna
+      uses: actions/cache@master # must use unreleased master to cache multiple paths
+      id: cache
+      with:
+        path: |
+          node_modules
+          packages/*/node_modules
+          metapackages/*/node_modules
+        key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+    - name: Bootstrap
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        npm install --only=dev --ignore-scripts
+        npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+
+    - name: Lint
+      run: |
+        npm run lint
+        npm run lint:examples
+
+    - name: Install and Build API Dependencies
+      run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
+
+    - name: Test Docs
+      run: npm run docs-test

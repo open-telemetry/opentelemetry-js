@@ -19,10 +19,10 @@ npm install --save @opentelemetry/plugin-xml-http-request
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracer } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
-import { ZoneScopeManager } from '@opentelemetry/scope-zone';
+import { ZoneContextManager } from '@opentelemetry/context-zone';
 
 const webTracerWithZone = new WebTracer({
-  scopeManager: new ZoneScopeManager(),
+  contextManager: new ZoneContextManager(),
   plugins: [
     new XMLHttpRequestPlugin({
       propagateTraceHeaderCorsUrls: ['http://localhost:8090']

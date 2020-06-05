@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
+import { BoundCounter, BoundValueRecorder } from './BoundInstrument';
 
 /**
  * Options needed for metric creation
@@ -54,7 +56,7 @@ export interface MetricOptions {
   monotonic?: boolean;
 
   /**
-   * (Measure only, default true) Asserts that this metric will only accept
+   * (ValueRecorder only, default true) Asserts that this metric will only accept
    * non-negative values (e.g. disk usage).
    */
   absolute?: boolean;
@@ -76,68 +78,88 @@ export enum ValueType {
  * Metric represents a base class for different types of metric
  * pre aggregations.
  */
-export interface Metric<T> {
+export interface Metric {
   /**
-   * Returns a Instrument associated with specified LabelSet.
-   * It is recommended to keep a reference to the Instrument instead of always
-   * calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
-   */
-  bind(labels: LabelSet): T;
-
-  /**
-   * Removes the Instrument from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
-   */
-  unbind(labels: LabelSet): void;
-
-  /**
-   * Clears all timeseries from the Metric.
+   * Clears all bound instruments from the Metric.
    */
   clear(): void;
 }
 
-export interface MetricUtils {
+/**
+ * UnboundMetric represents a base class for different types of metric
+ * pre aggregations without label value bound yet.
+ */
+export interface UnboundMetric<T> extends Metric {
   /**
-   * Adds the given value to the current value. Values cannot be negative.
+   * Returns a Instrument associated with specified Labels.
+   * It is recommended to keep a reference to the Instrument instead of always
+   * calling this method for every operations.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  add(value: number, labelSet: LabelSet): void;
+  bind(labels: Labels): T;
 
   /**
-   * Sets the given value. Values can be negative.
+   * Removes the Instrument from the metric, if it is present.
+   * @param labels key-values pairs that are associated with a specific metric.
    */
-  set(value: number, labelSet: LabelSet): void;
+  unbind(labels: Labels): void;
+}
 
+/**
+ * Counter is the most common synchronous instrument. This instrument supports
+ * an `Add(increment)` function for reporting a sum, and is restricted to
+ * non-negative increments. The default aggregation is Sum, as for any additive
+ * instrument.
+ *
+ * Example uses for Counter:
+ * <ol>
+ *   <li> count the number of bytes received. </li>
+ *   <li> count the number of requests completed. </li>
+ *   <li> count the number of accounts created. </li>
+ *   <li> count the number of checkpoints run. </li>
+ *   <li> count the number of 5xx errors. </li>
+ * <ol>
+ */
+export interface Counter extends UnboundMetric<BoundCounter> {
   /**
-   * Records the given value to this measure.
+   * Adds the given value to the current value. Values cannot be negative.
    */
-  record(value: number, labelSet: LabelSet): void;
+  add(value: number, labels?: Labels): void;
+}
+
+export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
+  /**
+   * Records the given value to this value recorder.
+   */
+  record(value: number, labels?: Labels): void;
 
   record(
     value: number,
-    labelSet: LabelSet,
-    distContext: DistributedContext
+    labels: Labels,
+    correlationContext: CorrelationContext
   ): void;
 
   record(
     value: number,
-    labelSet: LabelSet,
-    distContext: DistributedContext,
+    labels: Labels,
+    correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
+}
+
+/** Base interface for the Observer metrics. */
+export interface Observer extends Metric {
+  /**
+   * Sets a callback where user can observe value for certain labels. The
+   * observers are called periodically to retrieve the value.
+   * @param callback a function that will be called once to set observers
+   *     for values
+   */
+  setCallback(callback: (observerResult: ObserverResult) => void): void;
 }
 
 /**
  * key-value pairs passed by the user.
  */
-export type Labels = Record<string, string>;
-
-/**
- * Canonicalized labels with an unique string identifier.
- */
-export interface LabelSet {
-  identifier: string;
-  labels: Labels;
-}
+export type Labels = { [key: string]: string };

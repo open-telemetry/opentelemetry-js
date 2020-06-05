@@ -15,8 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/base';
-import { NoopLogger } from '@opentelemetry/core';
+import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
@@ -29,16 +28,15 @@ export class JaegerExporter implements SpanExporter {
   private readonly _logger: api.Logger;
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
-  private readonly _forceFlushOnShutdown: boolean = true;
   private readonly _onShutdownFlushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
     this._logger = config.logger || new NoopLogger();
     const tags: jaegerTypes.Tag[] = config.tags || [];
-    this._forceFlushOnShutdown =
-      typeof config.forceFlush === 'boolean' ? config.forceFlush : true;
     this._onShutdownFlushTimeout =
       typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
+
+    config.host = config.host || process.env.JAEGER_AGENT_HOST;
 
     this._sender = new jaegerTypes.UDPSender(config);
     if (this._sender._client instanceof Socket) {
@@ -69,7 +67,6 @@ export class JaegerExporter implements SpanExporter {
 
   /** Shutdown exporter. */
   shutdown(): void {
-    if (!this._forceFlushOnShutdown) return;
     // Make an optimistic flush.
     this._flush();
     // Sleeping x seconds before closing the sender's connection to ensure

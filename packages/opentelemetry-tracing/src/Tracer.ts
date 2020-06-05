@@ -25,8 +25,8 @@ import {
   randomTraceId,
   setActiveSpan,
 } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
-import { DEFAULT_CONFIG } from './config';
 import { Span } from './Span';
 import { TraceParams, TracerConfig } from './types';
 import { mergeConfig } from './utility';
@@ -38,19 +38,21 @@ export class Tracer implements api.Tracer {
   private readonly _defaultAttributes: api.Attributes;
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
+  readonly resource: Resource;
   readonly logger: api.Logger;
 
   /**
    * Constructs a new Tracer instance.
    */
   constructor(
-    config: TracerConfig = DEFAULT_CONFIG,
+    config: TracerConfig,
     private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
     this._defaultAttributes = localConfig.defaultAttributes;
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
+    this.resource = _tracerProvider.resource;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
@@ -63,11 +65,7 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    const parentContext = options.parent
-      ? getContext(options.parent)
-      : getParentSpanContext(context);
-    // make sampling decision
-    const samplingDecision = this._sampler.shouldSample(parentContext);
+    const parentContext = getParent(options, context);
     const spanId = randomSpanId();
     let traceId;
     let traceState;
@@ -79,13 +77,26 @@ export class Tracer implements api.Tracer {
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
     }
-    const traceFlags = samplingDecision
-      ? api.TraceFlags.SAMPLED
-      : api.TraceFlags.UNSAMPLED;
+    const spanKind = options.kind ?? api.SpanKind.INTERNAL;
+    const links = options.links ?? [];
+    const attributes = { ...this._defaultAttributes, ...options.attributes };
+    // make sampling decision
+    const samplingResult = this._sampler.shouldSample(
+      parentContext,
+      traceId,
+      name,
+      spanKind,
+      attributes,
+      links
+    );
+
+    const traceFlags =
+      samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
+        ? api.TraceFlags.SAMPLED
+        : api.TraceFlags.NONE;
     const spanContext = { traceId, spanId, traceFlags, traceState };
-    const recordEvents = options.isRecording || false;
-    if (!recordEvents && !samplingDecision) {
-      this.logger.debug('Sampling is off, starting no recording span');
+    if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
+      this.logger.debug('Recording is off, starting no recording span');
       return new NoRecordingSpan(spanContext);
     }
 
@@ -93,15 +104,13 @@ export class Tracer implements api.Tracer {
       this,
       name,
       spanContext,
-      options.kind || api.SpanKind.INTERNAL,
+      spanKind,
       parentContext ? parentContext.spanId : undefined,
-      options.links || [],
+      links,
       options.startTime
     );
     // Set default attributes
-    span.setAttributes(
-      Object.assign({}, this._defaultAttributes, options.attributes)
-    );
+    span.setAttributes(Object.assign(attributes, samplingResult.attributes));
     return span;
   }
 
@@ -117,7 +126,7 @@ export class Tracer implements api.Tracer {
   }
 
   /**
-   * Enters the scope of code where the given Span is in the current context.
+   * Enters the context of code where the given Span is in the current context.
    */
   withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
     span: api.Span,
@@ -128,7 +137,7 @@ export class Tracer implements api.Tracer {
   }
 
   /**
-   * Bind a span (or the current one) to the target's scope
+   * Bind a span (or the current one) to the target's context
    */
   bind<T>(target: T, span?: api.Span): T {
     return api.context.bind(
@@ -147,7 +156,23 @@ export class Tracer implements api.Tracer {
   }
 }
 
-function getContext(span: api.Span | api.SpanContext) {
+/**
+ * Get the parent to assign to a started span. If options.parent is null,
+ * do not assign a parent.
+ *
+ * @param options span options
+ * @param context context to check for parent
+ */
+function getParent(
+  options: api.SpanOptions,
+  context: api.Context
+): api.SpanContext | undefined {
+  if (options.parent === null) return undefined;
+  if (options.parent) return getContext(options.parent);
+  return getParentSpanContext(context);
+}
+
+function getContext(span: api.Span | api.SpanContext): api.SpanContext {
   return isSpan(span) ? span.context() : span;
 }
 

@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-/** Defines a attributes interface. */
+/**
+ * Defines a attributes interface.
+ * These attributes provides additional data about the {@link Span}.
+ */
 export interface Attributes {
   [attributeKey: string]: unknown;
 }

@@ -19,7 +19,7 @@ import { TraceState } from './trace_state';
 
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
- * serialized and propagated along side of a {@link DistributedContext}.
+ * serialized and propagated along side of a {@link CorrelationContext}.
  */
 export interface SpanContext {
   /**
@@ -47,9 +47,9 @@ export interface SpanContext {
    * caller may have recorded trace data. A caller who does not record trace
    * data out-of-band leaves this flag unset.
    *
-   * SAMPLED = 0x1 and UNSAMPLED = 0x0;
+   * SAMPLED = 0x1 and NONE = 0x0;
    */
-  traceFlags?: TraceFlags;
+  traceFlags: TraceFlags;
   /**
    * Tracing-system-specific info to propagate.
    *

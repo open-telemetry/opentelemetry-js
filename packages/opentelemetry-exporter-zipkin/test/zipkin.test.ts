@@ -17,12 +17,17 @@
 import * as assert from 'assert';
 import * as nock from 'nock';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { ExportResult } from '@opentelemetry/base';
-import { NoopLogger, hrTimeToMicroseconds } from '@opentelemetry/core';
-import * as types from '@opentelemetry/api';
+import {
+  ExportResult,
+  NoopLogger,
+  hrTimeToMicroseconds,
+} from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
+import { Resource } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 import { OT_REQUEST_HEADER } from '../src/utils';
+import { TraceFlags } from '@opentelemetry/api';
 
 const MICROS_PER_SECS = 1e6;
 
@@ -31,20 +36,23 @@ function getReadableSpan() {
   const duration = 2000;
   const readableSpan: ReadableSpan = {
     name: 'my-span',
-    kind: types.SpanKind.INTERNAL,
+    kind: api.SpanKind.INTERNAL,
     spanContext: {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
     },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
+    ended: true,
     duration: [duration, 0],
     status: {
-      code: types.CanonicalCode.OK,
+      code: api.CanonicalCode.OK,
     },
     attributes: {},
     links: [],
     events: [],
+    resource: Resource.empty(),
   };
   return readableSpan;
 }
@@ -125,17 +133,19 @@ describe('ZipkinExporter', () => {
 
       const span1: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.INTERNAL,
+        kind: api.SpanKind.INTERNAL,
         parentSpanId,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
+        ended: true,
         duration: [duration, 0],
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {
           key1: 'value1',
@@ -149,23 +159,27 @@ describe('ZipkinExporter', () => {
             attributes: { key3: 'value3' },
           },
         ],
+        resource: Resource.empty(),
       };
       const span2: ReadableSpan = {
         name: 'my-span',
-        kind: types.SpanKind.SERVER,
+        kind: api.SpanKind.SERVER,
         spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
         },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
+        ended: true,
         duration: [duration, 0],
         status: {
-          code: types.CanonicalCode.OK,
+          code: api.CanonicalCode.OK,
         },
         attributes: {},
         links: [],
         events: [],
+        resource: Resource.empty(),
       };
 
       const exporter = new ZipkinExporter({
@@ -239,7 +253,7 @@ describe('ZipkinExporter', () => {
     it(`should send '${OT_REQUEST_HEADER}' header`, () => {
       const scope = nock('https://localhost:9411')
         .post('/api/v2/spans')
-        .reply(function(uri, requestBody, cb) {
+        .reply(function (uri, requestBody, cb) {
           assert.ok(this.req.headers[OT_REQUEST_HEADER]);
           cb(null, [200, 'Ok']);
         });

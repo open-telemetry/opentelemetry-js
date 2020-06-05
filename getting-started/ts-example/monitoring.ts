@@ -2,13 +2,21 @@ import { MeterProvider } from '@opentelemetry/metrics';
 import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-const meter = new MeterProvider().getMeter('example-ts');
-
-meter.addExporter(
-  new PrometheusExporter({ startServer: true }, () => {
-    console.log("prometheus scrape endpoint: http://localhost:9464/metrics");
-  })
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+    );
+  },
 );
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 1000,
+}).getMeter('example-ts');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
@@ -21,8 +29,8 @@ const handles = new Map();
 export const countAllRequests = () => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
-      const labelSet = meter.labels({ route: req.path });
-      const handle = requestCount.bind(labelSet);
+      const labels = { route: req.path };
+      const handle = requestCount.bind(labels);
       handles.set(req.path, handle);
     }
 

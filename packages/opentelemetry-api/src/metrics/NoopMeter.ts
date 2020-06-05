@@ -15,10 +15,18 @@
  */
 
 import { Meter } from './Meter';
-import { MetricOptions, Metric, Labels, LabelSet, MetricUtils } from './Metric';
-import { BoundMeasure, BoundCounter } from './BoundInstrument';
-import { DistributedContext } from '../distributed_context/DistributedContext';
+import {
+  MetricOptions,
+  UnboundMetric,
+  Labels,
+  Counter,
+  ValueRecorder,
+  Observer,
+} from './Metric';
+import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
+import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
+import { ObserverResult } from './ObserverResult';
 
 /**
  * NoopMeter is a noop implementation of the {@link Meter} interface. It reuses
@@ -28,12 +36,12 @@ export class NoopMeter implements Meter {
   constructor() {}
 
   /**
-   * Returns constant noop measure.
+   * Returns constant noop value recorder.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure> {
-    return NOOP_MEASURE_METRIC;
+  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder {
+    return NOOP_VALUE_RECORDER_METRIC;
   }
 
   /**
@@ -41,45 +49,42 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter> {
+  createCounter(name: string, options?: MetricOptions): Counter {
     return NOOP_COUNTER_METRIC;
   }
 
-  labels(labels: Labels): LabelSet {
-    return NOOP_LABEL_SET;
+  /**
+   * Returns constant noop observer.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createObserver(name: string, options?: MetricOptions): Observer {
+    return NOOP_OBSERVER_METRIC;
   }
 }
 
-export class NoopMetric<T> implements Metric<T> {
+export class NoopMetric<T> implements UnboundMetric<T> {
   private readonly _instrument: T;
 
   constructor(instrument: T) {
     this._instrument = instrument;
   }
   /**
-   * Returns a Bound Instrument associated with specified LabelSet.
+   * Returns a Bound Instrument associated with specified Labels.
    * It is recommended to keep a reference to the Bound Instrument instead of
    * always calling this method for every operations.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric
+   *     that you want to record.
    */
-  bind(labels: LabelSet): T {
-    return this._instrument;
-  }
-
-  /**
-   * Returns a Bound Instrument for a metric with all labels not set.
-   */
-  getDefaultBound(): T {
+  bind(labels: Labels): T {
     return this._instrument;
   }
 
   /**
    * Removes the Binding from the metric, if it is present.
-   * @param labels the canonicalized LabelSet used to associate with this
-   *     metric instrument.
+   * @param labels key-values pairs that are associated with a specific metric.
    */
-  unbind(labels: LabelSet): void {
+  unbind(labels: Labels): void {
     return;
   }
 
@@ -89,35 +94,35 @@ export class NoopMetric<T> implements Metric<T> {
   clear(): void {
     return;
   }
-
-  setCallback(fn: () => void): void {
-    return;
-  }
 }
 
 export class NoopCounterMetric extends NoopMetric<BoundCounter>
-  implements Pick<MetricUtils, 'add'> {
-  add(value: number, labelSet: LabelSet) {
-    this.bind(labelSet).add(value);
+  implements Counter {
+  add(value: number, labels: Labels) {
+    this.bind(labels).add(value);
   }
 }
 
-export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
-  implements Pick<MetricUtils, 'record'> {
+export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
+  implements ValueRecorder {
   record(
     value: number,
-    labelSet: LabelSet,
-    distContext?: DistributedContext,
+    labels: Labels,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ) {
-    if (typeof distContext === 'undefined') {
-      this.bind(labelSet).record(value);
+    if (typeof correlationContext === 'undefined') {
+      this.bind(labels).record(value);
     } else if (typeof spanContext === 'undefined') {
-      this.bind(labelSet).record(value, distContext);
+      this.bind(labels).record(value, correlationContext);
     } else {
-      this.bind(labelSet).record(value, distContext, spanContext);
+      this.bind(labels).record(value, correlationContext, spanContext);
     }
   }
+}
+
+export class NoopObserverMetric extends NoopMetric<void> implements Observer {
+  setCallback(callback: (observerResult: ObserverResult) => void): void {}
 }
 
 export class NoopBoundCounter implements BoundCounter {
@@ -126,10 +131,10 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
-export class NoopBoundMeasure implements BoundMeasure {
+export class NoopBoundValueRecorder implements BoundValueRecorder {
   record(
     value: number,
-    distContext?: DistributedContext,
+    correlationContext?: CorrelationContext,
     spanContext?: SpanContext
   ): void {
     return;
@@ -140,7 +145,9 @@ export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_BOUND_MEASURE = new NoopBoundMeasure();
-export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
+export const NOOP_BOUND_VALUE_RECORDER = new NoopBoundValueRecorder();
+export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
+  NOOP_BOUND_VALUE_RECORDER
+);
 
-export const NOOP_LABEL_SET = {} as LabelSet;
+export const NOOP_OBSERVER_METRIC = new NoopObserverMetric();

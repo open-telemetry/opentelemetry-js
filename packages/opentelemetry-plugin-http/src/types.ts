@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import { Span, PluginConfig } from '@opentelemetry/api';
-import * as url from 'url';
+import { PluginConfig, Span } from '@opentelemetry/api';
+import * as http from 'http';
 import {
   ClientRequest,
-  IncomingMessage,
-  ServerResponse,
-  request,
   get,
+  IncomingMessage,
+  request,
+  ServerResponse,
 } from 'http';
-import * as http from 'http';
+import * as url from 'url';
 
 export type IgnoreMatcher = string | RegExp | ((url: string) => boolean);
 export type HttpCallback = (res: IncomingMessage) => void;
@@ -57,6 +56,14 @@ export interface HttpCustomAttributeFunction {
   ): void;
 }
 
+export interface HttpRequestCustomAttributeFunction {
+  (span: Span, request: ClientRequest | IncomingMessage): void;
+}
+
+export interface HttpResponseCustomAttributeFunction {
+  (span: Span, response: IncomingMessage | ServerResponse): void;
+}
+
 /**
  * Options available for the HTTP Plugin (see [documentation](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http#http-plugin-options))
  */
@@ -65,10 +72,18 @@ export interface HttpPluginConfig extends PluginConfig {
   ignoreIncomingPaths?: IgnoreMatcher[];
   /** Not trace all outgoing requests that match urls */
   ignoreOutgoingUrls?: IgnoreMatcher[];
-  /** Function for adding custom attributes */
+  /** Function for adding custom attributes after response is handled */
   applyCustomAttributesOnSpan?: HttpCustomAttributeFunction;
+  /** Function for adding custom attributes before request is handled */
+  requestHook?: HttpRequestCustomAttributeFunction;
+  /** Function for adding custom attributes before response is handled */
+  responseHook?: HttpResponseCustomAttributeFunction;
   /** The primary server name of the matched virtual host. */
   serverName?: string;
+  /** Require parent to create span for outgoing requests */
+  requireParentforOutgoingSpans?: boolean;
+  /** Require parent to create span for incoming requests */
+  requireParentforIncomingSpans?: boolean;
 }
 
 export interface Err extends Error {

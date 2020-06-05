@@ -14,11 +14,18 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/scope-base';
-import { Carrier } from '../context/propagation/carrier';
-import { HttpTextFormat } from '../context/propagation/HttpTextFormat';
-import { NOOP_HTTP_TEXT_FORMAT } from '../context/propagation/NoopHttpTextFormat';
+import { Context } from '@opentelemetry/context-base';
+import { defaultGetter, GetterFunction } from '../context/propagation/getter';
+import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
+import { NOOP_HTTP_TEXT_PROPAGATOR } from '../context/propagation/NoopHttpTextPropagator';
+import { defaultSetter, SetterFunction } from '../context/propagation/setter';
 import { ContextAPI } from './context';
+import {
+  API_BACKWARDS_COMPATIBILITY_VERSION,
+  GLOBAL_PROPAGATION_API_KEY,
+  makeGetter,
+  _global,
+} from './global-utils';
 
 const contextApi = ContextAPI.getInstance();
 
@@ -27,7 +34,6 @@ const contextApi = ContextAPI.getInstance();
  */
 export class PropagationAPI {
   private static _instance?: PropagationAPI;
-  private _propagator: HttpTextFormat = NOOP_HTTP_TEXT_FORMAT;
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -44,8 +50,20 @@ export class PropagationAPI {
   /**
    * Set the current propagator. Returns the initialized propagator
    */
-  public initGlobalPropagator(propagator: HttpTextFormat): HttpTextFormat {
-    this._propagator = propagator;
+  public setGlobalPropagator(
+    propagator: HttpTextPropagator
+  ): HttpTextPropagator {
+    if (_global[GLOBAL_PROPAGATION_API_KEY]) {
+      // global propagator has already been set
+      return this._getGlobalPropagator();
+    }
+
+    _global[GLOBAL_PROPAGATION_API_KEY] = makeGetter(
+      API_BACKWARDS_COMPATIBILITY_VERSION,
+      propagator,
+      NOOP_HTTP_TEXT_PROPAGATOR
+    );
+
     return propagator;
   }
 
@@ -53,19 +71,42 @@ export class PropagationAPI {
    * Inject context into a carrier to be propagated inter-process
    *
    * @param carrier carrier to inject context into
+   * @param setter Function used to set values on the carrier
    * @param context Context carrying tracing data to inject. Defaults to the currently active context.
    */
-  public inject(carrier: Carrier, context = contextApi.active()): void {
-    return this._propagator.inject(context, carrier);
+  public inject<Carrier>(
+    carrier: Carrier,
+    setter: SetterFunction<Carrier> = defaultSetter,
+    context = contextApi.active()
+  ): void {
+    return this._getGlobalPropagator().inject(context, carrier, setter);
   }
 
   /**
    * Extract context from a carrier
    *
    * @param carrier Carrier to extract context from
+   * @param getter Function used to extract keys from a carrier
    * @param context Context which the newly created context will inherit from. Defaults to the currently active context.
    */
-  public extract(carrier: Carrier, context = contextApi.active()): Context {
-    return this._propagator.extract(context, carrier);
+  public extract<Carrier>(
+    carrier: Carrier,
+    getter: GetterFunction<Carrier> = defaultGetter,
+    context = contextApi.active()
+  ): Context {
+    return this._getGlobalPropagator().extract(context, carrier, getter);
+  }
+
+  /** Remove the global propagator */
+  public disable() {
+    delete _global[GLOBAL_PROPAGATION_API_KEY];
+  }
+
+  private _getGlobalPropagator(): HttpTextPropagator {
+    return (
+      _global[GLOBAL_PROPAGATION_API_KEY]?.(
+        API_BACKWARDS_COMPATIBILITY_VERSION
+      ) ?? NOOP_HTTP_TEXT_PROPAGATOR
+    );
   }
 }
