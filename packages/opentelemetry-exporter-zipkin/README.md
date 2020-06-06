@@ -17,7 +17,7 @@ npm install --save @opentelemetry/exporter-zipkin
 
 ## Usage
 
-Install the exporter on your application and pass the options, it must contain a service name.
+Install the exporter on your application and pass the options. `serviceName` is an optional string. If omitted, the exporter will first try to get the service name from the Resource. If no service name can be detected on the Resource, a fallback name of "OpenTelemetry Service" will be used.
 
 ```js
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');

@@ -28,6 +28,7 @@ import { ZipkinExporter } from '../src';
 import * as zipkinTypes from '../src/types';
 import { OT_REQUEST_HEADER } from '../src/utils';
 import { TraceFlags } from '@opentelemetry/api';
+import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 
 const MICROS_PER_SECS = 1e6;
 
@@ -329,6 +330,152 @@ describe('ZipkinExporter', () => {
       exporter.export([getReadableSpan()], (result: ExportResult) => {
         assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
         done();
+      });
+    });
+
+    it('should set serviceName to "Opentelemetry Service" by default', () => {
+      const scope = nock('http://localhost:9411')
+        .post('/api/v2/spans')
+        .replyWithError(new Error('My Socket Error'));
+
+      const parentSpanId = '5c1c63257de34c67';
+      const startTime = 1566156729709;
+      const duration = 2000;
+
+      const span1: ReadableSpan = {
+        name: 'my-span',
+        kind: api.SpanKind.INTERNAL,
+        parentSpanId,
+        spanContext: {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        },
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        ended: true,
+        duration: [duration, 0],
+        status: {
+          code: api.CanonicalCode.OK,
+        },
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
+        },
+        links: [],
+        events: [
+          {
+            name: 'my-event',
+            time: [startTime + 10, 0],
+            attributes: { key3: 'value3' },
+          },
+        ],
+        resource: Resource.empty(),
+      };
+      const span2: ReadableSpan = {
+        name: 'my-span',
+        kind: api.SpanKind.SERVER,
+        spanContext: {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        },
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        ended: true,
+        duration: [duration, 0],
+        status: {
+          code: api.CanonicalCode.OK,
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        resource: Resource.empty(),
+      };
+
+      const exporter = new ZipkinExporter({});
+
+      exporter.export([span1, span2], (result: ExportResult) => {
+        scope.done();
+        assert.equal(exporter['_serviceName'], 'OpenTelemetry Service');
+      });
+    });
+
+    it('should set serviceName if resource has one', () => {
+      const resource_service_name = 'resource_service_name';
+
+      const scope = nock('http://localhost:9411')
+        .post('/api/v2/spans')
+        .replyWithError(new Error('My Socket Error'));
+
+      const parentSpanId = '5c1c63257de34c67';
+      const startTime = 1566156729709;
+      const duration = 2000;
+
+      const span1: ReadableSpan = {
+        name: 'my-span',
+        kind: api.SpanKind.INTERNAL,
+        parentSpanId,
+        spanContext: {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        },
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        ended: true,
+        duration: [duration, 0],
+        status: {
+          code: api.CanonicalCode.OK,
+        },
+        attributes: {
+          key1: 'value1',
+          key2: 'value2',
+        },
+        links: [],
+        events: [
+          {
+            name: 'my-event',
+            time: [startTime + 10, 0],
+            attributes: { key3: 'value3' },
+          },
+        ],
+        resource: new Resource({
+          [SERVICE_RESOURCE.NAME]: resource_service_name,
+        }),
+      };
+      const span2: ReadableSpan = {
+        name: 'my-span',
+        kind: api.SpanKind.SERVER,
+        spanContext: {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.NONE,
+        },
+        startTime: [startTime, 0],
+        endTime: [startTime + duration, 0],
+        ended: true,
+        duration: [duration, 0],
+        status: {
+          code: api.CanonicalCode.OK,
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        resource: Resource.empty(),
+      };
+
+      const exporter = new ZipkinExporter({});
+
+      exporter.export([span1, span2], (result: ExportResult) => {
+        scope.done();
+        assert.equal(exporter['_serviceName'], resource_service_name);
+
+        // checking if service name remains consistent in further exports
+        exporter.export([span2], (result: ExportResult) => {
+          scope.done();
+          assert.equal(exporter['_serviceName'], resource_service_name);
+        });
       });
     });
   });
