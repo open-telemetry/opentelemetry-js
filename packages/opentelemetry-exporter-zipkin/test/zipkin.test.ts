@@ -21,6 +21,7 @@ import {
   ExportResult,
   NoopLogger,
   hrTimeToMicroseconds,
+  InstrumentationLibrary,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
@@ -54,6 +55,7 @@ function getReadableSpan() {
     links: [],
     events: [],
     resource: Resource.empty(),
+    instrumentationLibrary: new InstrumentationLibrary('default', '0.0.1'),
   };
   return readableSpan;
 }
@@ -161,6 +163,7 @@ describe('ZipkinExporter', () => {
           },
         ],
         resource: Resource.empty(),
+        instrumentationLibrary: new InstrumentationLibrary('default', '0.0.1'),
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -181,6 +184,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: new InstrumentationLibrary('default', '0.0.1'),
       };
 
       const exporter = new ZipkinExporter({
