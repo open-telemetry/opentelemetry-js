@@ -15,6 +15,7 @@
  */
 
 import { TraceFlags } from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -105,6 +106,7 @@ export const mockedReadableSpan: ReadableSpan = {
     version: 1,
     cost: 112.12,
   }),
+  instrumentationLibrary: new InstrumentationLibrary('default', '0.0.1'),
 };
 
 export function ensureExportedEventsAreCorrect(

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
-import { Attributes, TimedEvent } from '@opentelemetry/api';
+import { Attributes, TimedEvent, TraceFlags } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
 import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
 import { Resource } from '@opentelemetry/resources';
+import { InstrumentationLibrary } from '@opentelemetry/core';
+import { ReadableSpan } from '@opentelemetry/tracing';
 
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
@@ -117,6 +119,178 @@ describe('transform', () => {
         ],
         droppedAttributesCount: 0,
       });
+    });
+  });
+
+  describe('groupSpans', () => {
+    it('should group by resource', () => {
+      const resource1: Resource = new Resource({ name: 'resource 1' });
+      const resource2: Resource = new Resource({ name: 'resource 2' });
+      const instrumentationLibrary: InstrumentationLibrary = new InstrumentationLibrary(
+        'lib1',
+        '0.0.1'
+      );
+
+      const span1: ReadableSpan = {
+        name: 'span1',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: '5e107261f64fa53e',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: '78a8915098864388',
+        startTime: [1574120165, 429803070],
+        endTime: [1574120165, 438688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8885000],
+        resource: resource1,
+        instrumentationLibrary,
+      };
+
+      const span2: ReadableSpan = {
+        name: 'span2',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: 'f64fa53e5e107261',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: '86438878a8915098',
+        startTime: [1575120165, 439803070],
+        endTime: [1575120165, 448688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8775000],
+        resource: resource2,
+        instrumentationLibrary,
+      };
+
+      const span3: ReadableSpan = {
+        name: 'span3',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: '07261f64fa53e5e1',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: 'a891578098864388',
+        startTime: [1575120165, 439803070],
+        endTime: [1575120165, 448688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8775000],
+        resource: resource2,
+        instrumentationLibrary,
+      };
+
+      const expected = new Map([
+        [resource1, new Map([[instrumentationLibrary, [span1]]])],
+        [resource2, new Map([[instrumentationLibrary, [span2, span3]]])],
+      ]);
+
+      const result = transform.groupSpans([span1, span2, span3]);
+
+      assert.deepStrictEqual(result, expected);
+    });
+
+    it('should group by instrumentation library', () => {
+      const resource: Resource = new Resource({ name: 'resource 1' });
+      const instrumentationLibrary1: InstrumentationLibrary = new InstrumentationLibrary(
+        'lib1',
+        '0.0.1'
+      );
+      const instrumentationLibrary2: InstrumentationLibrary = new InstrumentationLibrary(
+        'lib2',
+        '0.0.2'
+      );
+
+      const span1: ReadableSpan = {
+        name: 'span1',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: '5e107261f64fa53e',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: '78a8915098864388',
+        startTime: [1574120165, 429803070],
+        endTime: [1574120165, 438688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8885000],
+        resource,
+        instrumentationLibrary: instrumentationLibrary1,
+      };
+
+      const span2: ReadableSpan = {
+        name: 'span2',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: 'f64fa53e5e107261',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: '78a8915098864388',
+        startTime: [1575120165, 439803070],
+        endTime: [1575120165, 448688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8775000],
+        resource,
+        instrumentationLibrary: instrumentationLibrary1,
+      };
+
+      const span3: ReadableSpan = {
+        name: 'span3',
+        kind: 0,
+        spanContext: {
+          traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+          spanId: '07261f64fa53e5e1',
+          traceFlags: TraceFlags.SAMPLED,
+        },
+        parentSpanId: 'a891578098864388',
+        startTime: [1575120165, 439803070],
+        endTime: [1575120165, 448688070],
+        ended: true,
+        status: { code: 0 },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [0, 8775000],
+        resource: resource,
+        instrumentationLibrary: instrumentationLibrary2,
+      };
+
+      const expected = new Map([
+        [
+          resource,
+          new Map([
+            [instrumentationLibrary1, [span1, span2]],
+            [instrumentationLibrary2, [span3]],
+          ]),
+        ],
+      ]);
+
+      const result = transform.groupSpans([span1, span2, span3]);
+
+      assert.deepStrictEqual(result, expected);
     });
   });
 });
