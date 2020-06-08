@@ -1,4 +1,5 @@
 # OpenTelemetry Zipkin Trace Exporter
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -44,12 +45,13 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 ## Viewing your traces
 
-Please visit the Zipkin UI endpoint http://localhost:9411
+Please visit the Zipkin UI endpoint <http://localhost:9411>
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For Zipkin project at https://zipkin.io/
+- For Zipkin project at <https://zipkin.io/>
 - For help or feedback on this project, join us on [gitter][gitter-url]
 
 ## License

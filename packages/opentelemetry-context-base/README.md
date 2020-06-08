@@ -1,4 +1,5 @@
 # OpenTelemetry Base Context Manager
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -7,7 +8,7 @@
 
 This package provides the ContextManager interface (which is used by concrete implementations) and a no-op implementation (which is used internally when no context propagation is defined). It's intended for use both on the server and in the browser.
 
-## What is a Context Manager ?
+## What is a Context Manager
 
 To understand why they exists, we'll need to understand how Javascript works: when you make native function call (networks, setInterval etc) you generally call C++ code that will later callback your own code.
 
@@ -18,6 +19,7 @@ ContextManager's aim to offer exactly that, it's API offer to store an object in
 This package only include the interface and a Noop implementation, for more information please see the [async-hooks based ContextManager][ah-context-manager] for NodeJS.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

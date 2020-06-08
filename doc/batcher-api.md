@@ -7,6 +7,7 @@
 Sometimes you may want to use a specific aggregator for one of your metric, export an average of the last X values instead of just the last one.
 
 Here is what an aggregator that does that would look like:
+
 ```ts
 import { Aggregator } from '@opentelemetry/metrics';
 import { hrTime } from '@opentelemetry/core';
@@ -43,6 +44,7 @@ export class AverageAggregator implements Aggregator {
 Now we will need to implement our own batcher to configure the sdk to use our new aggregator. To simplify even more, we will just extend the `UngroupedBatcher` (which is the default) to avoid re-implementing the whole `Aggregator` interface.
 
 Here the result:
+
 ```ts
 import {
   UngroupedBatcher,
