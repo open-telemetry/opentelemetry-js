@@ -42,3 +42,8 @@ export interface ShimWrapped {
   __unwrap: Function;
   __original: Function;
 }
+
+export interface InstrumentationLibrary {
+  readonly name: string;
+  readonly version: string;
+}

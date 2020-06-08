@@ -126,10 +126,10 @@ describe('transform', () => {
     it('should group by resource', () => {
       const resource1: Resource = new Resource({ name: 'resource 1' });
       const resource2: Resource = new Resource({ name: 'resource 2' });
-      const instrumentationLibrary: InstrumentationLibrary = new InstrumentationLibrary(
-        'lib1',
-        '0.0.1'
-      );
+      const instrumentationLibrary: InstrumentationLibrary = {
+        name: 'lib1',
+        version: '0.0.1',
+      };
 
       const span1: ReadableSpan = {
         name: 'span1',
@@ -206,14 +206,14 @@ describe('transform', () => {
 
     it('should group by instrumentation library', () => {
       const resource: Resource = new Resource({ name: 'resource 1' });
-      const instrumentationLibrary1: InstrumentationLibrary = new InstrumentationLibrary(
-        'lib1',
-        '0.0.1'
-      );
-      const instrumentationLibrary2: InstrumentationLibrary = new InstrumentationLibrary(
-        'lib2',
-        '0.0.2'
-      );
+      const instrumentationLibrary1: InstrumentationLibrary = {
+        name: 'lib1',
+        version: '0.0.1',
+      };
+      const instrumentationLibrary2: InstrumentationLibrary = {
+        name: 'lib2',
+        version: '0.0.2',
+      };
 
       const span1: ReadableSpan = {
         name: 'span1',

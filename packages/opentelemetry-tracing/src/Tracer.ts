@@ -47,8 +47,7 @@ export class Tracer implements api.Tracer {
    * Constructs a new Tracer instance.
    */
   constructor(
-    name: string,
-    version: string,
+    instrumentationLibrary: InstrumentationLibrary,
     config: TracerConfig,
     private _tracerProvider: BasicTracerProvider
   ) {
@@ -57,7 +56,7 @@ export class Tracer implements api.Tracer {
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
     this.resource = _tracerProvider.resource;
-    this.instrumentationLibrary = new InstrumentationLibrary(name, version);
+    this.instrumentationLibrary = instrumentationLibrary;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 

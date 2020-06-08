@@ -41,14 +41,17 @@ describe('Tracer', () => {
   }
 
   it('should create a Tracer instance', () => {
-    const tracer = new Tracer('default', '0.0.1', {}, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
     assert.ok(tracer instanceof Tracer);
   });
 
   it('should respect NO_RECORD sampling result', () => {
     const tracer = new Tracer(
-      'default',
-      '0.0.1',
+      { name: 'default', version: '0.0.1' },
       { sampler: NEVER_SAMPLER },
       tracerProvider
     );
@@ -59,8 +62,7 @@ describe('Tracer', () => {
 
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
     const tracer = new Tracer(
-      'default',
-      '0.0.1',
+      { name: 'default', version: '0.0.1' },
       { sampler: ALWAYS_SAMPLER },
       tracerProvider
     );
@@ -71,8 +73,7 @@ describe('Tracer', () => {
 
   it('should start a span with attributes in sampling result', () => {
     const tracer = new Tracer(
-      'default',
-      '0.0.1',
+      { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider
     );
@@ -82,7 +83,11 @@ describe('Tracer', () => {
   });
 
   it('should have an instrumentationLibrary', () => {
-    const tracer = new Tracer('default', '0.0.1', {}, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
 
     const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
 

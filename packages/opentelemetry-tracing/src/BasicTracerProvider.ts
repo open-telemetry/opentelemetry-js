@@ -49,7 +49,7 @@ export class BasicTracerProvider implements api.TracerProvider {
     if (!this._tracers.has(key)) {
       this._tracers.set(
         key,
-        new Tracer(name, version, config || this._config, this)
+        new Tracer({ name, version }, config || this._config, this)
       );
     }
 
