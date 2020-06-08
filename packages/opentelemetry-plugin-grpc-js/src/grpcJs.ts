@@ -20,6 +20,11 @@ import * as path from 'path';
 
 import * as grpcJs from '@grpc/grpc-js';
 
+
+/**
+ * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
+ * https://www.npmjs.com/package/@grpc/grpc-js
+ */
 export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   static readonly component = '@grpc/grpc-js';
   readonly supportedVersions = ['1.*'];
@@ -29,10 +34,10 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   }
 
   protected patch(): typeof grpcJs {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   protected unpatch(): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }
 
