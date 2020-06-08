@@ -160,7 +160,7 @@ export class PrometheusExporter implements MetricExporter {
           );
           break;
 
-        case MetricKind.OBSERVER: // deprecated
+        case MetricKind.OBSERVER: // @TODO remove later #1146
         case MetricKind.VALUE_OBSERVER:
           metric.set(
             labelValues,

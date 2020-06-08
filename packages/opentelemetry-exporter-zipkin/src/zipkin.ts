@@ -27,19 +27,21 @@ import {
   statusDescriptionTagName,
 } from './transform';
 import { OT_REQUEST_HEADER } from './utils';
+import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 /**
  * Zipkin Exporter
  */
 export class ZipkinExporter implements SpanExporter {
   static readonly DEFAULT_URL = 'http://localhost:9411/api/v2/spans';
+  private readonly DEFAULT_SERVICE_NAME = 'OpenTelemetry Service';
   private readonly _logger: api.Logger;
-  private readonly _serviceName: string;
   private readonly _statusCodeTagName: string;
   private readonly _statusDescriptionTagName: string;
   private readonly _reqOpts: http.RequestOptions;
+  private _serviceName?: string;
   private _isShutdown: boolean;
 
-  constructor(config: zipkinTypes.ExporterConfig) {
+  constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
     const urlOpts = url.parse(urlStr);
 
@@ -68,12 +70,18 @@ export class ZipkinExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ) {
+    if (typeof this._serviceName !== 'string') {
+      this._serviceName = String(
+        spans[0].resource.labels[SERVICE_RESOURCE.NAME] ||
+          this.DEFAULT_SERVICE_NAME
+      );
+    }
     this._logger.debug('Zipkin exporter export');
     if (this._isShutdown) {
       setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
       return;
     }
-    return this._sendSpans(spans, resultCallback);
+    return this._sendSpans(spans, this._serviceName, resultCallback);
   }
 
   /**
@@ -88,25 +96,21 @@ export class ZipkinExporter implements SpanExporter {
   }
 
   /**
-   * Transforms an OpenTelemetry span to a Zipkin span.
-   */
-  private _toZipkinSpan(span: ReadableSpan): zipkinTypes.Span {
-    return toZipkinSpan(
-      span,
-      this._serviceName,
-      this._statusCodeTagName,
-      this._statusDescriptionTagName
-    );
-  }
-
-  /**
    * Transform spans and sends to Zipkin service.
    */
   private _sendSpans(
     spans: ReadableSpan[],
+    serviceName: string,
     done?: (result: ExportResult) => void
   ) {
-    const zipkinSpans = spans.map(span => this._toZipkinSpan(span));
+    const zipkinSpans = spans.map(span =>
+      toZipkinSpan(
+        span,
+        serviceName,
+        this._statusCodeTagName,
+        this._statusDescriptionTagName
+      )
+    );
     return this._send(zipkinSpans, (result: ExportResult) => {
       if (done) {
         return done(result);
