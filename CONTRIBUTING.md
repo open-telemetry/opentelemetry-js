@@ -25,9 +25,11 @@ The Conventional Commits specification is a lightweight convention on top of com
 We use [commitlint](https://github.com/conventional-changelog/commitlint) and [husky](https://github.com/typicode/husky) to prevent bad commit message.
 For example, you want to submit the following commit message `git commit -s -am "my bad commit"`.
 You will receive the following error :
-```
+
+```text
 ✖   type must be one of [ci, feat, fix, docs, style, refactor, perf, test, revert, chore] [type-enum]
 ```
+
 Here an exemple that will pass the verification: `git commit -s -am "chore(opentelemetry-core): update deps"`
 
 ### Fork
@@ -35,7 +37,8 @@ Here an exemple that will pass the verification: `git commit -s -am "chore(opent
 In the interest of keeping this repository clean and manageable, you should work from a fork. To create a fork, click the 'Fork' button at the top of the repository, then clone the fork locally using `git clone git@github.com:USERNAME/opentelemetry-js.git`.
 
 You should also add this repository as an "upstream" repo to your local copy, in order to keep it up to date. You can add this as a remote like so:
-```
+
+```sh
 git remote add upstream https://github.com/open-telemetry/opentelemetry-js.git
 
 #verify that the upstream exists
@@ -43,7 +46,8 @@ git remote -v
 ```
 
 To update your fork, fetch the upstream repo's branches and commits, then merge your master with upstream's master:
-```
+
+```sh
 git fetch upstream
 git checkout master
 git merge upstream/master
@@ -90,12 +94,15 @@ The `opentelemetry-js` project is written in TypeScript.
 - New or changed functionality is documented.
 
 ### Generating API documentation
+
 - `npm run docs` to generate API documentation. Generates the documentation in `packages/opentelemetry-api/docs/out`
 
 ### Generating CHANGELOG documentation
+
 - `npm run changelog` to generate CHANGELOG documentation in your terminal (see [RELEASING.md](RELEASING.md) for more details).
 
 ### Benchmarks
+
 When two or more approaches must be compared, please write a benchmark in the benchmark/index.js module so that we can keep track of the most efficient algorithm.
 
 - `npm run bench` to run your benchmark.

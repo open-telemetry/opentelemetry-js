@@ -1,4 +1,5 @@
 # OpenTelemetry Tracing SDK
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -43,9 +44,11 @@ span.end();
 ```
 
 ## Example
+
 See [examples/basic-tracer-node](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/basic-tracer-node) for an end-to-end example, including exporting created spans.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
