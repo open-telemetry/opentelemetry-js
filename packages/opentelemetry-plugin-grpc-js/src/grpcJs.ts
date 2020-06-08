@@ -20,7 +20,6 @@ import * as path from 'path';
 
 import * as grpcJs from '@grpc/grpc-js';
 
-
 /**
  * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
  * https://www.npmjs.com/package/@grpc/grpc-js
