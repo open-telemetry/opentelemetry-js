@@ -15,53 +15,27 @@
  */
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { BoundObserver } from './BoundInstrument';
+import { BaseObserverMetric } from './BaseObserverMetric';
 import { Batcher } from './export/Batcher';
-import { MetricKind, MetricRecord } from './export/types';
-import { Metric } from './Metric';
-import { Observation } from './Observation';
-import { ObserverResult } from './ObserverResult';
-
-const NOOP_CALLBACK = () => {};
+import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of Value Observer Metric. */
-export class ValueObserverMetric extends Metric<BoundObserver>
+export class ValueObserverMetric extends BaseObserverMetric
   implements api.ValueObserver {
-  private _callback: (observerResult: api.ObserverResult) => void;
-
   constructor(
     name: string,
     options: api.MetricOptions,
-    private readonly _batcher: Batcher,
+    batcher: Batcher,
     resource: Resource,
     callback?: (observerResult: api.ObserverResult) => void
   ) {
-    super(name, options, MetricKind.VALUE_OBSERVER, resource);
-    this._callback = callback || NOOP_CALLBACK;
-  }
-
-  protected _makeInstrument(labels: api.Labels): BoundObserver {
-    return new BoundObserver(
-      labels,
-      this._disabled,
-      this._monotonic,
-      this._valueType,
-      this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
+    super(
+      name,
+      options,
+      batcher,
+      resource,
+      MetricKind.VALUE_OBSERVER,
+      callback
     );
-  }
-
-  getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = new ObserverResult();
-    this._callback(observerResult);
-    observerResult.values.forEach((value, labels) => {
-      const instrument = this.bind(labels);
-      instrument.update(value);
-    });
-    return super.getMetricRecord();
-  }
-
-  observation(value: number) {
-    return new Observation(this, value);
   }
 }

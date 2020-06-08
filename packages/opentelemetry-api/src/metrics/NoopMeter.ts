@@ -142,7 +142,7 @@ export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
   }
 }
 
-export class NoopValueObserverMetric extends NoopMetric<void>
+export class NoopBaseObserverMetric extends NoopMetric<void>
   implements ValueObserver {
   observation(): Observation {
     return {
@@ -180,5 +180,5 @@ export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
   NOOP_BOUND_VALUE_RECORDER
 );
 
-export const NOOP_VALUE_OBSERVER_METRIC = new NoopValueObserverMetric();
+export const NOOP_VALUE_OBSERVER_METRIC = new NoopBaseObserverMetric();
 export const NOOP_BATCH_OBSERVER_METRIC = new NoopBatchObserverMetric();

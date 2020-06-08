@@ -128,7 +128,7 @@ export class Meter implements api.Meter {
       return api.NOOP_VALUE_OBSERVER_METRIC;
     }
     const opt: api.MetricOptions = {
-      monotonic: false, // Observers are defined as non-monotonic by default
+      monotonic: false,
       absolute: false, // not applicable to observer, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,

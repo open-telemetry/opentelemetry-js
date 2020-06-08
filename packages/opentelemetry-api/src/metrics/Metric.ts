@@ -161,10 +161,13 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
   ): void;
 }
 
-/** Base interface for the Value Observer metrics. */
-export interface ValueObserver extends Metric {
+/** Base interface for the Observer metrics. */
+export interface BaseObserver extends Metric {
   observation: (value: number) => Observation;
 }
+
+/** Base interface for the Value Observer metrics. */
+export type ValueObserver = BaseObserver;
 
 /** Base interface for the Batch Observer metrics. */
 export type BatchObserver = Metric;
