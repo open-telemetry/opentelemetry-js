@@ -36,7 +36,7 @@ export class ValueObserverMetric extends Metric<BoundObserver>
     resource: Resource,
     callback?: (observerResult: api.ObserverResult) => void
   ) {
-    super(name, options, MetricKind.OBSERVER, resource);
+    super(name, options, MetricKind.VALUE_OBSERVER, resource);
     this._callback = callback || NOOP_CALLBACK;
   }
 

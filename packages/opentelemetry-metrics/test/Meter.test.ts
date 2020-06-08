@@ -31,10 +31,7 @@ import {
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  CounterSumAggregator,
-  ObserverAggregator,
-} from '../src/export/aggregators';
+import { SumAggregator, LastValueAggregator } from '../src/export/aggregators';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
@@ -130,7 +127,7 @@ describe('Meter', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof CounterSumAggregator);
+        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
@@ -768,20 +765,18 @@ class CustomBatcher extends Batcher {
 }
 
 function ensureMetric(metric: MetricRecord, name?: string, value?: number) {
-  assert.ok(metric.aggregator instanceof ObserverAggregator);
+  assert.ok(metric.aggregator instanceof LastValueAggregator);
+  const lastValue = metric.aggregator.toPoint().value;
   if (typeof value === 'number') {
-    assert.strictEqual(metric.aggregator.toPoint().value, value);
+    assert.strictEqual(lastValue, value);
   } else {
-    assert.ok(
-      metric.aggregator.toPoint().value >= 0 &&
-        metric.aggregator.toPoint().value <= 1
-    );
+    assert.ok(lastValue >= 0 && lastValue <= 1);
   }
   const descriptor = metric.descriptor;
   assert.strictEqual(descriptor.name, name || 'name');
   assert.strictEqual(descriptor.description, 'desc');
   assert.strictEqual(descriptor.unit, '1');
-  assert.strictEqual(descriptor.metricKind, MetricKind.OBSERVER);
+  assert.strictEqual(descriptor.metricKind, MetricKind.VALUE_OBSERVER);
   assert.strictEqual(descriptor.valueType, api.ValueType.DOUBLE);
   assert.strictEqual(descriptor.monotonic, false);
 }

@@ -20,14 +20,13 @@ import {
   hrTimeToMilliseconds,
 } from '@opentelemetry/core';
 import {
-  CounterSumAggregator,
-  LastValue,
   MetricExporter,
   MetricRecord,
   MetricDescriptor,
   MetricKind,
-  ObserverAggregator,
   Sum,
+  Distribution,
+  LastValue,
 } from '@opentelemetry/metrics';
 import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
@@ -145,14 +144,30 @@ export class PrometheusExporter implements MetricExporter {
     }
 
     if (metric instanceof Gauge) {
-      if (record.aggregator instanceof CounterSumAggregator) {
-        metric.set(labelValues, point.value as Sum);
-      } else if (record.aggregator instanceof ObserverAggregator) {
-        metric.set(
-          labelValues,
-          point.value as LastValue,
-          hrTimeToMilliseconds(point.timestamp)
-        );
+      switch (record.descriptor.metricKind) {
+        case MetricKind.COUNTER:
+        case MetricKind.UP_DOWN_COUNTER:
+          // case MetricKind.SUM_OBSERVER:
+          // case MetricKind.UP_DOWN_SUM_OBSERVER:
+          metric.set(labelValues, point.value as Sum);
+          break;
+        case MetricKind.VALUE_RECORDER:
+          // case MetricKind.VALUE_OBSERVER:
+          metric.set(
+            labelValues,
+            (point.value as Distribution).sum,
+            hrTimeToMilliseconds(point.timestamp)
+          );
+          break;
+
+        case MetricKind.OBSERVER: // deprecated
+        case MetricKind.VALUE_OBSERVER:
+          metric.set(
+            labelValues,
+            point.value as LastValue,
+            hrTimeToMilliseconds(point.timestamp)
+          );
+          break;
       }
     }
 
@@ -205,11 +220,16 @@ export class PrometheusExporter implements MetricExporter {
 
     switch (record.descriptor.metricKind) {
       case MetricKind.COUNTER:
+      case MetricKind.UP_DOWN_COUNTER:
         // there is no such thing as a non-monotonic counter in prometheus
         return record.descriptor.monotonic
           ? new Counter(metricObject)
           : new Gauge(metricObject);
-      case MetricKind.OBSERVER:
+      // case MetricKind.VALUE_RECORDER:
+      // case MetricKind.SUM_OBSERVER:
+      // case MetricKind.UP_DOWN_SUM_OBSERVER:
+      case MetricKind.OBSERVER: // deprecated
+      case MetricKind.VALUE_OBSERVER:
         return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented

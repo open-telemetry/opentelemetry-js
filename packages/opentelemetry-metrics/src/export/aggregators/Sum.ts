@@ -18,13 +18,13 @@ import { Aggregator, Point } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
-/** Basic aggregator for Observer which keeps the last recorded value. */
-export class ObserverAggregator implements Aggregator {
+/** Basic aggregator which calculates a Sum from individual measurements. */
+export class SumAggregator implements Aggregator {
   private _current: number = 0;
   private _lastUpdateTime: HrTime = [0, 0];
 
   update(value: number): void {
-    this._current = value;
+    this._current += value;
     this._lastUpdateTime = hrTime();
   }
 

@@ -20,7 +20,7 @@ import { hrTime } from '@opentelemetry/core';
 import { Distribution } from '../types';
 
 /** Basic aggregator keeping all raw values (events, sum, max and min). */
-export class ValueRecorderExactAggregator implements Aggregator {
+export class MinMaxSumCountAggregator implements Aggregator {
   private _distribution: Distribution;
   private _lastUpdateTime: HrTime = [0, 0];
 

@@ -17,7 +17,7 @@
 import { HrTime, ObserverResult } from '@opentelemetry/api';
 import {
   CounterMetric,
-  CounterSumAggregator,
+  SumAggregator,
   Meter,
   MeterProvider,
   Point,
@@ -32,15 +32,15 @@ const mockedTimeMS = 1586347902211000;
 describe('PrometheusExporter', () => {
   let toPoint: () => Point;
   before(() => {
-    toPoint = CounterSumAggregator.prototype.toPoint;
-    CounterSumAggregator.prototype.toPoint = function (): Point {
+    toPoint = SumAggregator.prototype.toPoint;
+    SumAggregator.prototype.toPoint = function (): Point {
       const point = toPoint.apply(this);
       point.timestamp = mockedHrTime;
       return point;
     };
   });
   after(() => {
-    CounterSumAggregator.prototype.toPoint = toPoint;
+    SumAggregator.prototype.toPoint = toPoint;
   });
   describe('constructor', () => {
     it('should construct an exporter', () => {
@@ -270,7 +270,6 @@ describe('PrometheusExporter', () => {
                     lines[0],
                     '# HELP metric_observer a test description'
                   );
-
                   assert.strictEqual(lines[1], '# TYPE metric_observer gauge');
 
                   const line3 = lines[2].split(' ');
