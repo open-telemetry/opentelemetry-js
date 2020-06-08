@@ -3,7 +3,7 @@
 This directory contains a number of examples of how to run real applications
 with OpenTelemetry JavaScript.
 
-### Maintained Examples
+## Maintained Examples
 
 Maintained Examples are expected to be updated with every OpenTelemetry JavaScript release, to
 use the latest and greatest features, and best practices.
@@ -20,7 +20,7 @@ use the latest and greatest features, and best practices.
 |[collector-exporter-node](collector-exporter-node/) | This example shows how to use `@opentelemetry/exporter-collector` to instrument a simple Node.js application | Intermediate |
 |[opentracing-shim](opentracing-shim/) | This is a simple example that demonstrates how existing OpenTracing instrumentation can be integrated with OpenTelemetry | Intermediate |
 
-### Contributing
+## Contributing
 
 Please see [CONTRIBUTING.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CONTRIBUTING.md) for instructions on how to contribute.
 

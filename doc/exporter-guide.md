@@ -6,7 +6,7 @@ We provide support for several open source backends and vendors out-of-the-box l
 
 A typical package layout:
 
-```
+```text
 opentelemetry-exporter-myexporter
    ├── src
    │   └── index.ts

@@ -1,4 +1,5 @@
 # OpenTelemetry Plugins Web Core
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -11,6 +12,7 @@ This package depends on all core web plugins maintained by OpenTelemetry authors
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

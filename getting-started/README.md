@@ -2,18 +2,19 @@
 
 This guide will walk you through the setup and configuration process for a tracing backend (in this case [Zipkin](https://zipkin.io), but [Jaeger](https://www.jaegertracing.io) would be simple to use as well), a metrics backend like [Prometheus](https://prometheus.io), and auto-instrumentation of NodeJS. [You can find the guide for TypeScript here](ts-example/README.md#getting-started-with-opentelemetry-js-typescript).
 
-1. [Tracing Your Application with OpenTelemetry](#tracing-your-application-with-opentelemetry)
-    1. [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
-    2. [Trace Your NodeJS Application](#trace-your-nodejs-application)
-        1. [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
-        2. [Initialize a global tracer](#initialize-a-global-tracer)
-        3. [Initialize and register a trace exporter](#initialize-and-register-a-trace-exporter)
-2. [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
-    1. [Set up a Metrics Backend](#set-up-a-metrics-backend)
-    2. [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
-        1. [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
-        2. [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
-        3. [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
+- [Getting Started with OpenTelemetry JS](#getting-started-with-opentelemetry-js)
+  - [Tracing Your Application with OpenTelemetry](#tracing-your-application-with-opentelemetry)
+    - [Setting up a Tracing Backend](#setting-up-a-tracing-backend)
+    - [Trace Your NodeJS Application](#trace-your-nodejs-application)
+      - [Install the required OpenTelemetry libraries](#install-the-required-opentelemetry-libraries)
+      - [Initialize a global tracer](#initialize-a-global-tracer)
+      - [Initialize and Register a Trace Exporter](#initialize-and-register-a-trace-exporter)
+  - [Collect Metrics Using OpenTelemetry](#collect-metrics-using-opentelemetry)
+    - [Set up a Metrics Backend](#set-up-a-metrics-backend)
+    - [Monitor Your NodeJS Application](#monitor-your-nodejs-application)
+      - [Install the required OpenTelemetry metrics libraries](#install-the-required-opentelemetry-metrics-libraries)
+      - [Initialize a meter and collect metrics](#initialize-a-meter-and-collect-metrics)
+      - [Initialize and register a metrics exporter](#initialize-and-register-a-metrics-exporter)
 
 ## Tracing Your Application with OpenTelemetry
 
@@ -32,7 +33,7 @@ The first thing we will need before we can start collecting traces is a tracing 
 In order to set up Zipkin as quickly as possible, run the latest [Docker Zipkin](https://github.com/openzipkin/docker-zipkin) container, exposing port `9411`. If you can’t run Docker containers, you will need to download and run Zipkin by following the Zipkin [quickstart guide](https://zipkin.io/pages/quickstart.html).
 
 ```sh
-$ docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin
+docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin
 ```
 
 Browse to <http://localhost:9411> to ensure that you can see the Zipkin UI.
@@ -134,10 +135,10 @@ provider.addSpanProcessor(
 console.log("tracing initialized");
 ```
 
-Now if you run your application with the `tracing.js` file loaded, and you send requests to your application over HTTP (in the sample application just browse to http://localhost:8080), you will see traces exported to your tracing backend that look like this:
+Now if you run your application with the `tracing.js` file loaded, and you send requests to your application over HTTP (in the sample application just browse to <http://localhost:8080),> you will see traces exported to your tracing backend that look like this:
 
 ```sh
-$ node -r ./tracing.js app.js
+node -r ./tracing.js app.js
 ```
 
 <p align="center"><img src="./images/zipkin-trace.png?raw=true"/></p>
@@ -292,7 +293,7 @@ Now, when we make requests to our service our meter will count all requests.
 Counting metrics is only useful if we can export them somewhere that we can see them. For this, we're going to use prometheus. Creating and registering a metrics exporter is much like the tracing exporter above. First we will need to install the prometheus exporter.
 
 ```sh
-$ npm install @opentelemetry/exporter-prometheus
+npm install @opentelemetry/exporter-prometheus
 ```
 
 Next, modify your `monitoring.js` file to look like this:
@@ -358,7 +359,7 @@ Listening for requests on http://localhost:8080
 
 Now, each time you browse to <http://localhost:8080> you should see "Hello from the backend" in your browser and your metrics in prometheus should update. You can verify the current metrics by browsing to <http://localhost:9464/metrics>, which should look like this:
 
-```
+```sh
 # HELP requests Count all incoming requests
 # TYPE requests counter
 requests{route="/"} 1

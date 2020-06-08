@@ -7,21 +7,20 @@ Our example will export spans data simultaneously on `Console` and [Jaeger](http
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 (Optional) Setup [Jaeger Tracing](https://www.jaegertracing.io/docs/latest/getting-started/#all-in-one): needs to be running on `localhost` port `16686`.
 
-
 ## Run the Application
 
 ```sh
-$ # from this directory
-$ npm start
+# from this directory
+npm start
 ```
 
-#### Jaeger UI
+### Jaeger UI
 
 Open the Jaeger UI in your browser [http://localhost:16686](http://localhost:16686)
 
@@ -34,6 +33,7 @@ Click on the trace to view its details.
 <p align="center"><img src="./images/jaeger-ui-detail.png?raw=true"/></p>
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on tracing, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing>
 

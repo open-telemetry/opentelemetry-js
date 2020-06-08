@@ -1,4 +1,5 @@
 # OpenTelemetry API for JavaScript
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -99,6 +100,7 @@ api.metrics.setGlobalMeterProvider(meterProvider);
 Because the npm installer and node module resolution algorithm could potentially allow two or more copies of any given package to exist within the same `node_modules` structure, the OpenTelemetry API takes advantage of a variable on the `global` object to store the global API. When an API method in the API package is called, it checks if this `global` API exists and proxies calls to it if and only if it is a compatible API version. This means if a package has a dependency on an OpenTelemetry API version which is not compatible with the API used by the end user, the package will receive a no-op implementation of the API.
 
 ## Advanced Use
+
 ### API Registration Options
 
 If you prefer to choose your own propagator or context manager, you may pass an options object into the `tracerProvider.register()` method. Omitted or `undefined` options will be replaced by a default value and `null` values will be skipped.
@@ -176,6 +178,7 @@ async function doSomething() {
 ```
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
