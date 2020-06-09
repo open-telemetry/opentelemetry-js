@@ -53,7 +53,7 @@
   "devDependencies": {
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.12",
-    "@types/semver": "6.2.1",
+    "@types/semver": "7.2.0",
     "@types/sinon": "7.5.2",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.0",
