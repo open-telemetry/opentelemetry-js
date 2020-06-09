@@ -52,8 +52,11 @@ function filterPlugins(plugins: Plugins): Plugins {
   }, {});
 }
 
-function getIgnoreList(): string[] {
+function getIgnoreList(): string[] | '*' {
   const envIgnoreList: string = process.env[envPluginDisabledList] || '';
+  if (envIgnoreList === '*') {
+    return envIgnoreList;
+  }
   return envIgnoreList.split(',').map(v => v.trim());
 }
 
@@ -131,9 +134,17 @@ export class PluginLoader {
           version = utils.getPackageVersion(this.logger, baseDir);
         }
 
+        // Skip loading of all modules if '*' is provided
+        if (modulesToIgnore === '*') {
+          this.logger.info(
+            `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${envPluginDisabledList})`
+          );
+          return exports;
+        }
+
         if (modulesToIgnore.includes(name)) {
           this.logger.info(
-            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list`
+            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${envPluginDisabledList})`
           );
           return exports;
         }
