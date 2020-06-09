@@ -18,10 +18,14 @@
   * Common attribute names defined by the Opetelemetry Semantic Conventions specification
   * https://github.com/open-telemetry/opentelemetry-specification/tree/master/specification/trace/semantic_conventions
   */
-export enum AttributeNames {
+export const enum AttributeNames {
   COMPONENT = 'component',
 
-  // grpc
+  // RPC
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/rpc.md
+  RPC_SERVICE = 'rpc.service',
+
+  // GRPC (no spec)
   GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
   GRPC_METHOD = 'grpc.method',
   GRPC_STATUS_CODE = 'grpc.status_code',
@@ -29,6 +33,7 @@ export enum AttributeNames {
   GRPC_ERROR_MESSAGE = 'grpc.error_message',
 
   // http
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
   HTTP_HOST = 'http.host',
   HTTP_METHOD = 'http.method',
   HTTP_TARGET = 'http.target',
@@ -47,6 +52,7 @@ export enum AttributeNames {
   HTTP_USER_AGENT = 'http.user_agent',
 
   // General network connection attributes
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/span-general.md
   NET_PEER_IP = 'net.peer.ip',
   NET_PEER_PORT = 'net.peer.port',
   NET_PEER_NAME = 'net.peer.name',
@@ -57,13 +63,11 @@ export enum AttributeNames {
   NET_HOST_PORT = 'net.host.port',
   NET_HOST_NAME = 'net.host.name',
   NET_TRANSPORT = 'net.transport',
-
-  // IP
   IP_TCP = 'IP.TCP',
   IP_UDP = 'IP.UDP',
 
-  // db
-  // required: https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/database.md
+  // db (required)
+  // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/database.md
   DB_TYPE = 'db.type',
   DB_INSTANCE = 'db.instance',
   DB_STATEMENT = 'db.statement',
