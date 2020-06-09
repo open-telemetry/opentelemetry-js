@@ -67,14 +67,14 @@ export namespace opentelemetryProto {
       timeUnixNano: number;
       value: number;
     }
-    
+
     export interface DoubleDataPoint {
       labels: opentelemetryProto.common.v1.StringKeyValue[];
       startTimeUnixNano: number;
       timeUnixNano: number;
       value: number;
     }
-    
+
     export interface HistogramDataPoint {
       labels: opentelemetryProto.common.v1.StringKeyValue[];
       startTimeUnixNano: number;
@@ -90,7 +90,7 @@ export namespace opentelemetryProto {
       count: number;
       exemplar: number; // CHANGE LATER
     }
-    
+
     export interface SummaryDataPoint {
       labels: opentelemetryProto.common.v1.StringKeyValue[];
       startTimeUnixNano: number;
@@ -105,21 +105,21 @@ export namespace opentelemetryProto {
       percentile: number;
       value: number;
     }
-    
+
     export interface MetricDescriptor {
       name: string;
       description: string;
       unit: string;
       labels: opentelemetryProto.common.v1.StringKeyValue[];
       type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
-      // temporality: opentelemetryProto.metrics.v1.Temporality;
+      temporality: opentelemetryProto.metrics.v1.MetricDescriptor_Temporality;
     }
 
     export interface InstrumentationLibraryMetrics {
       instrumentationLibrary?: opentelemetryProto.common.v1.InstrumentationLibrary;
       metrics: opentelemetryProto.metrics.v1.Metric[];
     }
-    
+
     export interface ResourceMetrics {
       resource?: opentelemetryProto.resource.v1.Resource;
       instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
@@ -133,15 +133,15 @@ export namespace opentelemetryProto {
       COUNTER_INT64,
       COUNTER_DOUBLE,
       CUMULATIVE_HISTOGRAM,
-      SUMMARY
+      SUMMARY,
     }
 
-    /*export enum Temporality {
+    export enum MetricDescriptor_Temporality {
       INVALID_TEMPORALITY,
       INSTANTANEOUS,
       DELTA,
       CUMULATIVE,
-    }*/
+    }
   }
 
   export namespace trace.v1 {

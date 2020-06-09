@@ -14,6 +14,26 @@
  * limitations under the License.
  */
 
-export * from './CollectorExporter';
+import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
+import { ExportResult } from '@opentelemetry/core';
+/**
+ * Collector Exporter for Node
+ */
+export class CollectorMetricExporter implements MetricExporter {
+  isShutDown: boolean = false;
 
-export * from './CollectorMetricExporter';
+  /**
+   * @param config
+   */
+  constructor() {}
+
+  export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {}
+
+
+  /**
+   * Prometheus Exporter: No shutdown
+   * GCM exporter: No shutdown
+   */
+  shutdown(): void {}
+
+}

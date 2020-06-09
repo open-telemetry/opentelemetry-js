@@ -31,7 +31,7 @@ import {
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
-import { MetricRecord } from '@opentelemetry/metrics';
+import { MetricRecord, MetricKind} from '@opentelemetry/metrics';
 // import { CollectorMetricExporter } from './CollectorMetricExporter';
 
 /**
@@ -239,35 +239,61 @@ export function toCollectorExportTraceServiceRequest<
   };
 }
 
-export function toCollectorMetric(metric: MetricRecord): opentelemetryProto.metrics.v1.Metric {
-  console.log("metric");
-  console.log(metric);
-  console.log(metric.aggregator.toPoint())
+export function toStringKeyValue(labels: {
+  [key: string]: string;
+}): opentelemetryProto.common.v1.StringKeyValue[] {
+  const collectorLabels: opentelemetryProto.common.v1.StringKeyValue[] = [];
+  for (const [key, value] of Object.entries(labels)) {
+    collectorLabels.push({ key: key, value: value });
+  }
+  return [];
+}
+
+export function getCollectorPoints(metric: MetricRecord) {
+  const metricKind = metric.descriptor.metricKind;
+  const valueType = metric.descriptor.valueType;
+  console.log(valueType, metricKind);
+}
+
+export function toCollectorMetric(
+  metric: MetricRecord,
+  startTime: string,
+): opentelemetryProto.metrics.v1.Metric {
+  console.log('metric');
+  console.log(metric.descriptor.metricKind == MetricKind.COUNTER);
+  console.log(metric.labels);
   return {
-    metricDescriptor: 
-      {
-        name: metric.descriptor.name,
-        description: metric.descriptor.description,
-        unit: metric.descriptor.unit,
-        labels: [{key: "hello", value: "world"}],
-        type: opentelemetryProto.metrics.v1.MetricDescriptor_Type.GAUGE_INT64,
-        // temporality: opentelemetryProto.metrics.v1.Temporality.INSTANTANEOUS,
-      },
+    metricDescriptor: {
+      name: metric.descriptor.name + ".",
+      description: metric.descriptor.description,
+      unit: metric.descriptor.unit,
+      labels: [{ key: 'hello', value: 'world' }],
+      type: opentelemetryProto.metrics.v1.MetricDescriptor_Type.COUNTER_INT64,
+      temporality: opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE,
+    },
     doubleDataPoints: [],
     histogramDataPoints: [],
     summaryDataPoints: [],
-    int64DataPoints: [{
-      labels: [{key: "hello", value: "world"}], 
-      value: 3,
-      startTimeUnixNano: core.hrTimeToNanoseconds(metric.aggregator.toPoint().timestamp),
-      timeUnixNano: core.hrTimeToNanoseconds(metric.aggregator.toPoint().timestamp),
-    }],
-  }
+    int64DataPoints: [
+      {
+        labels: [{ key: 'hello', value: 'world' }],
+        value: metric.aggregator.toPoint().value as number,
+        startTimeUnixNano: parseInt(startTime),
+        timeUnixNano: core.hrTimeToNanoseconds(
+          metric.aggregator.toPoint().timestamp
+        ),
+      },
+    ],
+  };
 }
 
-export function toCollectorExportMetricServiceRequest(metrics: MetricRecord[]): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
-   
-  const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(metric => toCollectorMetric(metric));
+export function toCollectorExportMetricServiceRequest(
+  metrics: MetricRecord[], 
+  startTime: string,
+): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
+  const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
+    metric => toCollectorMetric(metric, startTime)
+  );
   console.log(metricsToBeSent);
   const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
     metrics: metricsToBeSent,
@@ -277,12 +303,13 @@ export function toCollectorExportMetricServiceRequest(metrics: MetricRecord[]): 
     },
   };
 
-  const resource: Resource =  metrics.length > 0 ? metrics[0].resource : Resource.empty();
+  const resource: Resource =
+    metrics.length > 0 ? metrics[0].resource : Resource.empty();
   const additionalAttributes = Object.assign(
     {},
     {},
     {
-      'service.name': "TEST"
+      'service.name': 'TEST',
     }
   );
   const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
@@ -292,9 +319,9 @@ export function toCollectorExportMetricServiceRequest(metrics: MetricRecord[]): 
 
   const resourceMetric: opentelemetryProto.metrics.v1.ResourceMetrics = {
     resource: protoResource,
-    instrumentationLibraryMetrics: [instrumentationLibraryMetrics], 
-  }
+    instrumentationLibraryMetrics: [instrumentationLibraryMetrics],
+  };
   return {
-    resourceMetrics: [resourceMetric], 
+    resourceMetrics: [resourceMetric],
   };
 }
