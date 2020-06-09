@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 import { SpanKind, Status } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { AttributeNames, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as http from 'http';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import * as utils from '../../src/utils';
 import { DummyPropagation } from './DummyPropagation';
 

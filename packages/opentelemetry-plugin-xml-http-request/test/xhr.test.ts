@@ -15,6 +15,7 @@
  */
 import * as api from '@opentelemetry/api';
 import {
+  AttributeNames,
   B3Propagator,
   LogLevel,
   otperformance as performance,
@@ -30,7 +31,6 @@ import {
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
 

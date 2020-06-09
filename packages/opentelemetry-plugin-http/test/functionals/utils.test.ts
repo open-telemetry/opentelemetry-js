@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { AttributeNames, NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -22,7 +22,6 @@ import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { AttributeNames } from '../../src';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 

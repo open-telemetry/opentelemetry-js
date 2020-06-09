@@ -15,15 +15,12 @@
  */
 
 import { SpanKind } from '@opentelemetry/api';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { AttributeNames, hrTimeToNanoseconds } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as http from 'http';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import {
-  AttributeNames,
-  parseResponseStatus,
-} from '@opentelemetry/plugin-http';
+import { parseResponseStatus } from '@opentelemetry/plugin-http';
 
 export const assertSpan = (
   span: ReadableSpan,

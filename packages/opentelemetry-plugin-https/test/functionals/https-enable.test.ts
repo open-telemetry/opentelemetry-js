@@ -21,10 +21,9 @@ import {
   Span as ISpan,
   SpanKind,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { AttributeNames, NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
-  AttributeNames,
   Http,
   HttpPluginConfig,
   OT_REQUEST_HEADER,

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/api';
+import { AttributeNames } from '@opentelemetry/core';
 import {
   ClientRequest,
   IncomingHttpHeaders,
@@ -24,7 +25,6 @@ import {
 } from 'http';
 import { Socket } from 'net';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   IgnoreMatcher,

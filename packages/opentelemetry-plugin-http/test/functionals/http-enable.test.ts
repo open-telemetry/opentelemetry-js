@@ -20,7 +20,7 @@ import {
   Span as ISpan,
   SpanKind,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { AttributeNames, NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -30,7 +30,6 @@ import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
 import * as path from 'path';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin, plugin } from '../../src/http';
 import { Http, HttpPluginConfig } from '../../src/types';
 import { OT_REQUEST_HEADER } from '../../src/utils';

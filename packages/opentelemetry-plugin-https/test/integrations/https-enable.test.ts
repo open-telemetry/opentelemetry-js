@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
-import {
-  HttpPluginConfig,
-  Http,
-  AttributeNames,
-} from '@opentelemetry/plugin-http';
+import { AttributeNames, NoopLogger } from '@opentelemetry/core';
+import { HttpPluginConfig, Http } from '@opentelemetry/plugin-http';
 import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import { AttributeNames, NoopLogger } from '@opentelemetry/core';
 import { SpanKind, Span, context } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -30,7 +30,6 @@ import {
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import { HttpPluginConfig } from '../../src/types';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 const protocol = 'http';
 const serverPort = 32345;
