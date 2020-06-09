@@ -65,7 +65,7 @@
     "request-promise-native": "1.0.8",
     "rimraf": "3.0.2",
     "sinon": "7.5.0",
-    "superagent": "5.1.0",
+    "superagent": "5.2.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.7.2"
