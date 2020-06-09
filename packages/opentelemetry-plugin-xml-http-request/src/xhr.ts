@@ -358,15 +358,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       return function patchOpen(this: XMLHttpRequest, ...args): void {
         const method: string = args[0];
         const url: string = args[1];
-        const async = !!args[2];
-        if (async) {
-          plugin._createSpan(this, url, method);
-        } else {
-          plugin._logger.debug(
-            'tracing support for synchronous XMLHttpRequest calls is not' +
-              ' supported'
-          );
-        }
+        plugin._createSpan(this, url, method);
 
         return original.apply(this, args);
       };

@@ -1,4 +1,5 @@
 # OpenTelemetry Context Zone Peer Dependency
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -9,7 +10,6 @@ This module provides *Zone Context Manager with a peer dependency for [zone-js]*
 If you use Angular you already have the [zone-js] and you should use this package.
 If you don't have your own [zone-js] please use [@opentelemetry/context-zone]
 
-
 ## Installation
 
 ```bash
@@ -17,6 +17,7 @@ npm install --save @opentelemetry/context-zone-peer-dep
 ```
 
 ## Usage
+
 ```js
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracer } from '@opentelemetry/web';
@@ -49,6 +50,7 @@ webTracerWithZone.withSpan(span1, () => {
 ```
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

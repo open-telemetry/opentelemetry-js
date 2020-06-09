@@ -42,6 +42,7 @@
 ---
 
 ## About this project
+
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
 
 ## Quick start
@@ -144,7 +145,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
-### Thanks to all the people who already contributed!
+### Thanks to all the people who already contributed
 
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
@@ -188,7 +189,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 
 ##### Contrib
 
-These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node
+These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node>
 
 - [@opentelemetry/plugin-mongodb][otel-contrib-plugin-mongodb]
 - [@opentelemetry/plugin-mysql][otel-contrib-plugin-mysql]
@@ -207,7 +208,7 @@ These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-c
 
 ##### Contrib
 
-These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web
+These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
 - [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
 - [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]

@@ -21,8 +21,12 @@ import { Resource } from '@opentelemetry/resources';
 /** The kind of metric. */
 export enum MetricKind {
   COUNTER,
+  UP_DOWN_COUNTER,
   VALUE_RECORDER,
-  OBSERVER,
+  OBSERVER, // @TODO remove later #1146
+  SUM_OBSERVER,
+  UP_DOWN_SUM_OBSERVER,
+  VALUE_OBSERVER,
 }
 
 /** Sum returns an aggregated sum. */
@@ -78,7 +82,6 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
-  readonly labelKeys: string[];
   readonly monotonic: boolean;
 }
 
