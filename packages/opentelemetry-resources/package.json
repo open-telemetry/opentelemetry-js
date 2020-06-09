@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.12",
+    "@types/node": "14.0.13",
     "@types/sinon": "7.5.2",
     "codecov": "3.7.0",
     "gts": "2.0.2",
