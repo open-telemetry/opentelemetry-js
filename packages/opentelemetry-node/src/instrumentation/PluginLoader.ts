@@ -36,8 +36,6 @@ export enum HookState {
  */
 export const envPluginDisabledList = 'OPENTELEMETRY_NO_PATCH_MODULES';
 
-// @todo: env var to disable patching altogether
-
 export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
