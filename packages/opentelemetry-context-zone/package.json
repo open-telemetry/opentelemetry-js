@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "OpenTelemetry Context Zone",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -52,7 +52,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "mocha": "^7.1.2",
-    "nyc": "^15.0.0",
+    "nyc": "^15.1.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
     "ts-loader": "^6.0.4",
@@ -64,7 +64,7 @@
     "webpack-merge": "^4.2.2"
   },
   "dependencies": {
-    "@opentelemetry/context-zone-peer-dep": "^0.8.2",
+    "@opentelemetry/context-zone-peer-dep": "^0.8.3",
     "zone.js": "^0.10.2"
   },
   "sideEffects": true

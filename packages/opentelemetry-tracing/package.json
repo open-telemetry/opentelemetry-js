@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -63,7 +63,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "mocha": "^7.1.2",
-    "nyc": "^15.0.0",
+    "nyc": "^15.1.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
     "ts-loader": "^6.0.4",
@@ -73,9 +73,9 @@
     "webpack": "^4.35.2"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.8.2",
-    "@opentelemetry/context-base": "^0.8.2",
-    "@opentelemetry/core": "^0.8.2",
-    "@opentelemetry/resources": "^0.8.2"
+    "@opentelemetry/api": "^0.8.3",
+    "@opentelemetry/context-base": "^0.8.3",
+    "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/resources": "^0.8.3"
   }
 }

@@ -16,7 +16,7 @@
 
 import {
   CounterSumAggregator,
-  MeasureExactAggregator,
+  ValueRecorderExactAggregator,
   ObserverAggregator,
 } from './aggregators';
 import {
@@ -59,12 +59,12 @@ export class UngroupedBatcher extends Batcher {
       case MetricKind.OBSERVER:
         return new ObserverAggregator();
       default:
-        return new MeasureExactAggregator();
+        return new ValueRecorderExactAggregator();
     }
   }
 
   process(record: MetricRecord): void {
-    const labels = record.descriptor.labelKeys
+    const labels = Object.keys(record.labels)
       .map(k => `${k}=${record.labels[k]}`)
       .join(',');
     this._batchMap.set(record.descriptor.name + labels, record);

@@ -5,15 +5,15 @@ This example shows how to use [@opentelemetry/web](https://github.com/open-telem
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 ## Run the Application
 
 ```sh
-$ # from this directory
-$ npm start
+# from this directory
+npm start
 ```
 
 By default, the application will run on port `8090`.

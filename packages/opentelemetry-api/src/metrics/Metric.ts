@@ -17,7 +17,7 @@
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 import { ObserverResult } from './ObserverResult';
-import { BoundCounter, BoundMeasure } from './BoundInstrument';
+import { BoundCounter, BoundValueRecorder } from './BoundInstrument';
 
 /**
  * Options needed for metric creation
@@ -38,9 +38,6 @@ export interface MetricOptions {
    */
   unit?: string;
 
-  /** The list of label keys for the Metric. */
-  labelKeys?: string[];
-
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
 
@@ -56,7 +53,7 @@ export interface MetricOptions {
   monotonic?: boolean;
 
   /**
-   * (Measure only, default true) Asserts that this metric will only accept
+   * (ValueRecorder only, default true) Asserts that this metric will only accept
    * non-negative values (e.g. disk usage).
    */
   absolute?: boolean;
@@ -106,6 +103,21 @@ export interface UnboundMetric<T> extends Metric {
   unbind(labels: Labels): void;
 }
 
+/**
+ * Counter is the most common synchronous instrument. This instrument supports
+ * an `Add(increment)` function for reporting a sum, and is restricted to
+ * non-negative increments. The default aggregation is Sum, as for any additive
+ * instrument.
+ *
+ * Example uses for Counter:
+ * <ol>
+ *   <li> count the number of bytes received. </li>
+ *   <li> count the number of requests completed. </li>
+ *   <li> count the number of accounts created. </li>
+ *   <li> count the number of checkpoints run. </li>
+ *   <li> count the number of 5xx errors. </li>
+ * <ol>
+ */
 export interface Counter extends UnboundMetric<BoundCounter> {
   /**
    * Adds the given value to the current value. Values cannot be negative.
@@ -113,9 +125,9 @@ export interface Counter extends UnboundMetric<BoundCounter> {
   add(value: number, labels?: Labels): void;
 }
 
-export interface Measure extends UnboundMetric<BoundMeasure> {
+export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
   /**
-   * Records the given value to this measure.
+   * Records the given value to this value recorder.
    */
   record(value: number, labels?: Labels): void;
 

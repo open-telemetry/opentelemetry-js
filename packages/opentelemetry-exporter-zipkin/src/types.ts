@@ -21,7 +21,7 @@ import * as api from '@opentelemetry/api';
  */
 export interface ExporterConfig {
   logger?: api.Logger;
-  serviceName: string;
+  serviceName?: string;
   url?: string;
   // Optional mapping overrides for OpenTelemetry status code and description.
   statusCodeTagName?: string;

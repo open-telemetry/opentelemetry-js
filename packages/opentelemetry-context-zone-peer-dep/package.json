@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -58,7 +58,7 @@
     "karma-spec-reporter": "^0.0.32",
     "karma-webpack": "^4.0.2",
     "mocha": "^7.1.2",
-    "nyc": "^15.0.0",
+    "nyc": "^15.1.0",
     "rimraf": "^3.0.0",
     "sinon": "^7.5.0",
     "ts-loader": "^6.0.4",
@@ -70,7 +70,7 @@
     "zone.js": "^0.10.2"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.8.2"
+    "@opentelemetry/context-base": "^0.8.3"
   },
   "peerDependencies": {
     "zone.js": "^0.10.2"
