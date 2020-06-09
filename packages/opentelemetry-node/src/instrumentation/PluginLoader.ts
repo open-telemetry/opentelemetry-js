@@ -40,6 +40,12 @@ export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
 
+
+/**
+ * Wildcard symbol. If ignore list is set to this, disable all plugins
+ */
+const DISABLE_ALL_PLUGINS = '*';
+
 /**
  * Returns the Plugins object that meet the below conditions.
  * Valid criteria: 1. It should be enabled. 2. Should have non-empty path.
@@ -52,9 +58,9 @@ function filterPlugins(plugins: Plugins): Plugins {
   }, {});
 }
 
-function getIgnoreList(): string[] | '*' {
+function getIgnoreList(): string[] | typeof DISABLE_ALL_PLUGINS {
   const envIgnoreList: string = process.env[envPluginDisabledList] || '';
-  if (envIgnoreList === '*') {
+  if (envIgnoreList === DISABLE_ALL_PLUGINS) {
     return envIgnoreList;
   }
   return envIgnoreList.split(',').map(v => v.trim());
@@ -135,7 +141,7 @@ export class PluginLoader {
         }
 
         // Skip loading of all modules if '*' is provided
-        if (modulesToIgnore === '*') {
+        if (modulesToIgnore === DISABLE_ALL_PLUGINS) {
           this.logger.info(
             `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${envPluginDisabledList})`
           );
