@@ -27,7 +27,6 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
-  labelKeys: ['pid'],
   description: 'Example of a counter'
 });
 
@@ -50,7 +49,6 @@ const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const observer = meter.createObserver('metric_name', {
-  labelKeys: ['pid', 'core'],
   description: 'Example of a observer'
 });
 
