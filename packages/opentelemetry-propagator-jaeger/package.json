@@ -47,7 +47,7 @@
     "@types/mocha": "7.0.2",
     "@types/node": "12.12.46",
     "@types/sinon": "7.5.2",
-    "@types/webpack-env": "1.13.9",
+    "@types/webpack-env": "1.15.2",
     "codecov": "3.7.0",
     "gts": "1.1.2",
     "istanbul-instrumenter-loader": "3.0.1",
