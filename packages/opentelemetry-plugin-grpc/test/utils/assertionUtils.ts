@@ -16,11 +16,11 @@
 
 import { SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
+  AttributeNames,
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';

@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  AttributeNames,
   BasePlugin,
   hrTime,
   isUrlIgnored,
@@ -30,7 +31,6 @@ import {
   PerformanceTimingNames as PTN,
 } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
-import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,

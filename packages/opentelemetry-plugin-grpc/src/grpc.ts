@@ -23,12 +23,11 @@ import {
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
-import { BasePlugin } from '@opentelemetry/core';
+import { BasePlugin,  AttributeNames } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';
 import * as shimmer from 'shimmer';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
   GrpcClientFunc,

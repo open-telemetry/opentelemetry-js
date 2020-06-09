@@ -25,6 +25,7 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import {
+  AttributeNames,
   BasePlugin,
   NoRecordingSpan,
   getExtractedSpanContext,
@@ -40,7 +41,6 @@ import { Socket } from 'net';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   Func,
