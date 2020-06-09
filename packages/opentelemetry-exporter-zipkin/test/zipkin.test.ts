@@ -374,6 +374,7 @@ describe('ZipkinExporter', () => {
           },
         ],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -394,6 +395,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
       const exporter = new ZipkinExporter({});
@@ -446,6 +448,7 @@ describe('ZipkinExporter', () => {
         resource: new Resource({
           [SERVICE_RESOURCE.NAME]: resource_service_name,
         }),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -466,6 +469,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
       const exporter = new ZipkinExporter({});
