@@ -223,7 +223,11 @@ describe('PluginLoader', () => {
       const httpModule = require('http');
       const supportedModule = require('supported-module');
 
-      assert.strictEqual(pluginLoader['_plugins'].length, 0, 'No plugins were loaded');
+      assert.strictEqual(
+        pluginLoader['_plugins'].length,
+        0,
+        'No plugins were loaded'
+      );
       assert.strictEqual(simpleModule.value(), 0);
       assert.strictEqual(simpleModule.name(), 'simple-module');
       assert.ok(httpModule);
