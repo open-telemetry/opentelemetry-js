@@ -178,6 +178,35 @@ describe('PluginLoader', () => {
       pluginLoader.unload();
     });
 
+    it('should not load plugins on the ignore list environment variable', () => {
+      // Set ignore list env var
+      process.env[envPluginDisabledList] = 'simple-module,http';
+      const pluginLoader = new PluginLoader(provider, logger);
+      pluginLoader.load({
+        ...simplePlugins,
+        ...supportedVersionPlugins,
+        ...httpPlugins,
+      });
+
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+
+      const httpModule = require('http');
+      assert.ok(httpModule);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const supportedModule = require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(supportedModule.value(), 1);
+      assert.strictEqual(supportedModule.name(), 'patched-supported-module');
+
+      pluginLoader.unload();
+    });
+
     it('should load a plugin and patch the target modules', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
