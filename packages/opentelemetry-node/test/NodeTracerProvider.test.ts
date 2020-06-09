@@ -154,8 +154,16 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), false);
     });
 
-    // @todo: implement
-    it('should start a Span with always sampling');
+    it('should start a Span with always sampling', () => {
+      provider = new NodeTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+        logger: new NoopLogger(),
+      });
+      const span = provider.getTracer('default').startSpan('my-span');
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.isRecording(), true);
+    });
 
     it('should set default attributes on span', () => {
       const defaultAttributes = {
