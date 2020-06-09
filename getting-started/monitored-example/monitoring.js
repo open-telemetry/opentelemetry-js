@@ -21,7 +21,6 @@ const meter = new MeterProvider({
 
 const requestCount = meter.createCounter("requests", {
   monotonic: true,
-  labelKeys: ["route"],
   description: "Count all incoming requests"
 });
 

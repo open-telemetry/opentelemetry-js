@@ -21,7 +21,6 @@ const meter = new MeterProvider({
 
 const otelCpuUsage = meter.createObserver('metric_observer', {
   monotonic: false,
-  labelKeys: ['pid', 'core'],
   description: 'Example of a observer',
 });
 
