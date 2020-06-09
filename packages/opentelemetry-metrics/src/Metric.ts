@@ -27,6 +27,7 @@ import { MetricOptions } from './types';
 import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
 import { hashLabels } from './Utils';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
@@ -42,7 +43,8 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: MetricOptions,
     private readonly _kind: MetricKind,
-    readonly resource: Resource
+    readonly resource: Resource,
+    readonly instrumentationLibrary: InstrumentationLibrary
   ) {
     this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
@@ -88,6 +90,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       labels: instrument.getLabels(),
       aggregator: instrument.getAggregator(),
       resource: this.resource,
+      instrumentationLibrary: this.instrumentationLibrary,
     }));
   }
 
@@ -111,9 +114,10 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.COUNTER, resource);
+    super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
   }
   protected _makeInstrument(labels: api.Labels): BoundCounter {
     return new BoundCounter(
@@ -146,9 +150,16 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.VALUE_RECORDER, resource);
+    super(
+      name,
+      options,
+      MetricKind.VALUE_RECORDER,
+      resource,
+      instrumentationLibrary
+    );
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
@@ -178,9 +189,10 @@ export class ObserverMetric extends Metric<BoundObserver>
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.OBSERVER, resource);
+    super(name, options, MetricKind.OBSERVER, resource, instrumentationLibrary);
   }
 
   protected _makeInstrument(labels: api.Labels): BoundObserver {
