@@ -369,11 +369,8 @@ export function shouldPropagateTraceHeaders(
   if (parsedSpanUrl.origin === window.location.origin) {
     return true;
   } else {
-    for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-      if (urlMatches(spanUrl, propagateTraceHeaderUrl)) {
-        return true;
-      }
-    }
-    return false;
+    return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>
+      urlMatches(spanUrl, propagateTraceHeaderUrl)
+    );
   }
 }
