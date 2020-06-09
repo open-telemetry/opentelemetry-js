@@ -30,6 +30,14 @@ export enum HookState {
   DISABLED,
 }
 
+/**
+ * Environment variable which will contain list of modules to not load corresponding plugins for
+ * e.g.OPENTELEMETRY_NO_PATCH_MODULES=pg,https,mongodb
+ */
+export const envPluginDisabledList = 'OPENTELEMETRY_NO_PATCH_MODULES';
+
+// @todo: env var to disable patching altogether
+
 export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
@@ -44,6 +52,11 @@ function filterPlugins(plugins: Plugins): Plugins {
     if (plugins[key].enabled && plugins[key].path) acc[key] = plugins[key];
     return acc;
   }, {});
+}
+
+function getIgnoreList(): string[] {
+  const envIgnoreList: string = process.env[envPluginDisabledList] || '';
+  return envIgnoreList.split(',').map(v => v.trim());
 }
 
 /**
@@ -74,6 +87,7 @@ export class PluginLoader {
     if (this._hookState === HookState.UNINITIALIZED) {
       const pluginsToLoad = filterPlugins(plugins);
       const modulesToHook = Object.keys(pluginsToLoad);
+      const modulesToIgnore = getIgnoreList();
       // Do not hook require when no module is provided. In this case it is
       // not necessary. With skipping this step we lower our footprint in
       // customer applications and require-in-the-middle won't show up in CPU
@@ -117,6 +131,13 @@ export class PluginLoader {
         } else {
           // Get the module version.
           version = utils.getPackageVersion(this.logger, baseDir);
+        }
+
+        if (modulesToIgnore.includes(name)) {
+          this.logger.info(
+            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list`
+          );
+          return exports;
         }
 
         this.logger.info(

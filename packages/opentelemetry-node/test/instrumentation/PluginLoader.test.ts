@@ -23,6 +23,7 @@ import {
   PluginLoader,
   Plugins,
   searchPathForTest,
+  envPluginDisabledList,
 } from '../../src/instrumentation/PluginLoader';
 
 const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
@@ -135,6 +136,10 @@ describe('PluginLoader', () => {
   });
 
   describe('.load()', () => {
+    afterEach(() => {
+      delete process.env[envPluginDisabledList];
+    });
+
     it('sanity check', () => {
       // Ensure that module fixtures contain values that we expect.
       const simpleModule = require('simple-module');
@@ -150,6 +155,27 @@ describe('PluginLoader', () => {
       assert.strictEqual(simpleModule100.value(), 0);
 
       assert.throws(() => require('nonexistent-module'));
+    });
+
+    it('should not load a plugin on the ignore list environment variable', () => {
+      // Set ignore list env var
+      process.env[envPluginDisabledList] = 'simple-module';
+      const pluginLoader = new PluginLoader(provider, logger);
+      pluginLoader.load({ ...simplePlugins, ...supportedVersionPlugins });
+
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+
+      const supportedModule = require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(supportedModule.value(), 1);
+      assert.strictEqual(supportedModule.name(), 'patched-supported-module');
+
+      pluginLoader.unload();
     });
 
     it('should load a plugin and patch the target modules', () => {
