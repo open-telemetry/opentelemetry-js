@@ -51,7 +51,7 @@
     "rimraf": "3.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.7.2"
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "@opentelemetry/context-base": "^0.8.3"

@@ -68,7 +68,7 @@
     "ts-loader": "6.2.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.6.4",
+    "typescript": "3.9.5",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.11",
     "webpack-merge": "4.2.2"
