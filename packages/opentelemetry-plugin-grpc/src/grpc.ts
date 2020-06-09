@@ -23,7 +23,7 @@ import {
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
-import { BasePlugin,  AttributeNames } from '@opentelemetry/core';
+import { BasePlugin, AttributeNames } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';
