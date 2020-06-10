@@ -229,31 +229,22 @@ export function toCollectorExportTraceServiceRequest<
 export function groupSpans(
   spans: ReadableSpan[]
 ): Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>> {
-  const spanMap: Map<
-    Resource,
-    Map<core.InstrumentationLibrary, ReadableSpan[]>
-  > = new Map();
-  let resourceSpans:
-    | Map<core.InstrumentationLibrary, ReadableSpan[]>
-    | undefined;
-  let libSpans: ReadableSpan[] | undefined;
-
-  spans.forEach(span => {
+  return spans.reduce((spanMap, span) => {
     //group by resource
-    resourceSpans = spanMap.get(span.resource);
+    let resourceSpans = spanMap.get(span.resource);
     if (!resourceSpans) {
       resourceSpans = new Map<core.InstrumentationLibrary, ReadableSpan[]>();
       spanMap.set(span.resource, resourceSpans);
     }
     //group by instrumentation library
-    libSpans = resourceSpans.get(span.instrumentationLibrary);
+    let libSpans = resourceSpans.get(span.instrumentationLibrary);
     if (!libSpans) {
       libSpans = new Array<ReadableSpan>();
       resourceSpans.set(span.instrumentationLibrary, libSpans);
     }
     libSpans.push(span);
-  });
-  return spanMap;
+    return spanMap;
+  }, new Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>());
 }
 
 function toCollectorInstrumentationLibrarySpans(
@@ -270,27 +261,14 @@ function toCollectorResourceSpans(
   groupedSpans: Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>,
   baseAttributes: Attributes
 ): opentelemetryProto.trace.v1.ResourceSpans[] {
-  const collectorResourceSpans: opentelemetryProto.trace.v1.ResourceSpans[] = [];
-
-  groupedSpans.forEach((libSpans, resource) => {
-    const collectorResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
-      resource,
-      baseAttributes
-    );
-
-    const collectorLibSpans: opentelemetryProto.trace.v1.InstrumentationLibrarySpans[] = [];
-
-    libSpans.forEach((spans, instrumentationLibrary) => {
-      collectorLibSpans.push(
-        toCollectorInstrumentationLibrarySpans(instrumentationLibrary, spans)
-      );
-    });
-
-    collectorResourceSpans.push({
-      resource: collectorResource,
-      instrumentationLibrarySpans: collectorLibSpans,
-    });
+  return Array.from(groupedSpans, ([resource, libSpans]) => {
+    return {
+      resource: toCollectorResource(resource, baseAttributes),
+      instrumentationLibrarySpans: Array.from(
+        libSpans,
+        ([instrumentationLibrary, spans]) =>
+          toCollectorInstrumentationLibrarySpans(instrumentationLibrary, spans)
+      ),
+    };
   });
-
-  return collectorResourceSpans;
 }
