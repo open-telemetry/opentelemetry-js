@@ -39,6 +39,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugins-node-core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugins-node-core.svg
 
+[otel-plugins-node-core]: https://www.npmjs.com/package/@opentelemetry/plugins-node-core
+
 [otel-plugin-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-dns
 [otel-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
 [otel-plugin-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-ioredis
