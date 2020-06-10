@@ -61,7 +61,7 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "sinon": "9.0.2",
-    "ts-loader": "6.2.2",
+    "ts-loader": "7.0.5",
     "ts-mocha": "6.0.0",
     "ts-node": "8.10.2",
     "tslint-consistent-codestyle": "1.16.0",
