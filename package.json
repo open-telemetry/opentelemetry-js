@@ -50,7 +50,7 @@
     "@typescript-eslint/parser": "2.34.0",
     "gh-pages": "3.0.0",
     "gts": "2.0.2",
-    "husky": "3.1.0",
+    "husky": "4.2.5",
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
     "typescript": "3.9.5"
