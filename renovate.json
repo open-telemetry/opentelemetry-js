@@ -5,5 +5,6 @@
   "rebaseWhen": "behind-base-branch",
   "schedule": [
     "after 9am and before 3pm"
-  ]
+  ],
+  "labels": ["dependencies"]
 }
