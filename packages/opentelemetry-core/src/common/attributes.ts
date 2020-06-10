@@ -18,7 +18,7 @@
  * Common attribute names defined by the Opetelemetry Semantic Conventions specification
  * https://github.com/open-telemetry/opentelemetry-specification/tree/master/specification/trace/semantic_conventions
  */
-export const enum AttributeNames {
+export enum AttributeNames {
   COMPONENT = 'component',
 
   // RPC
