@@ -37,7 +37,6 @@ const meter = new MeterProvider({
 
 // Now, start recording data
 const counter = meter.createCounter('metric_name', {
-  labelKeys: ['pid'],
   description: 'Example of a counter'
 });
 counter.add(10, { pid: process.pid });

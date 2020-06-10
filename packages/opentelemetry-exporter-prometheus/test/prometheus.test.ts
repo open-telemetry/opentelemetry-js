@@ -200,7 +200,6 @@ describe('PrometheusExporter', () => {
     it('should export a count aggregation', done => {
       const counter = meter.createCounter('counter', {
         description: 'a test description',
-        labelKeys: ['key1'],
       });
 
       const boundCounter = counter.bind({ key1: 'labelValue1' });
@@ -245,7 +244,6 @@ describe('PrometheusExporter', () => {
 
       const observer = meter.createObserver('metric_observer', {
         description: 'a test description',
-        labelKeys: ['pid'],
       }) as ObserverMetric;
 
       observer.setCallback((observerResult: ObserverResult) => {
@@ -269,7 +267,10 @@ describe('PrometheusExporter', () => {
                 assert.strictEqual(lines[1], '# TYPE metric_observer gauge');
 
                 const line3 = lines[2].split(' ');
-                assert.strictEqual(line3[0], 'metric_observer{pid="123"}');
+                assert.strictEqual(
+                  line3[0],
+                  'metric_observer{pid="123",core="1"}'
+                );
                 assert.ok(
                   parseFloat(line3[1]) >= 0 && parseFloat(line3[1]) <= 1
                 );
@@ -286,7 +287,6 @@ describe('PrometheusExporter', () => {
     it('should export multiple labels', done => {
       const counter = meter.createCounter('counter', {
         description: 'a test description',
-        labelKeys: ['counterKey1'],
       }) as CounterMetric;
 
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
@@ -347,7 +347,7 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(lines, [
                 '# HELP counter description missing',
                 '# TYPE counter counter',
-                `counter 10 ${mockedTimeMS}`,
+                `counter{key1="labelValue1"} 10 ${mockedTimeMS}`,
                 '',
               ]);
 
@@ -373,7 +373,7 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(lines, [
                 '# HELP counter_bad_name description missing',
                 '# TYPE counter_bad_name counter',
-                `counter_bad_name 10 ${mockedTimeMS}`,
+                `counter_bad_name{key1="labelValue1"} 10 ${mockedTimeMS}`,
                 '',
               ]);
 
@@ -388,7 +388,6 @@ describe('PrometheusExporter', () => {
       const counter = meter.createCounter('counter', {
         description: 'a test description',
         monotonic: false,
-        labelKeys: ['key1'],
       });
 
       counter.bind({ key1: 'labelValue1' }).add(20);
@@ -449,7 +448,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP test_prefix_counter description missing',
                   '# TYPE test_prefix_counter counter',
-                  `test_prefix_counter 10 ${mockedTimeMS}`,
+                  `test_prefix_counter{key1="labelValue1"} 10 ${mockedTimeMS}`,
                   '',
                 ]);
 
@@ -478,7 +477,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP counter description missing',
                   '# TYPE counter counter',
-                  `counter 10 ${mockedTimeMS}`,
+                  `counter{key1="labelValue1"} 10 ${mockedTimeMS}`,
                   '',
                 ]);
 
@@ -507,7 +506,7 @@ describe('PrometheusExporter', () => {
                 assert.deepStrictEqual(lines, [
                   '# HELP counter description missing',
                   '# TYPE counter counter',
-                  `counter 10 ${mockedTimeMS}`,
+                  `counter{key1="labelValue1"} 10 ${mockedTimeMS}`,
                   '',
                 ]);
 
