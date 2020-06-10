@@ -43,7 +43,7 @@
   "devDependencies": {
     "@opentelemetry/resources": "^0.8.3",
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.12",
+    "@types/node": "14.0.13",
     "codecov": "3.7.0",
     "gts": "2.0.2",
     "mocha": "7.2.0",
@@ -51,7 +51,7 @@
     "rimraf": "3.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.7.2"
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",
