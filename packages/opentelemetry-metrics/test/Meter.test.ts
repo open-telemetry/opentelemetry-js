@@ -32,6 +32,7 @@ import {
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
+import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
@@ -649,7 +650,7 @@ describe('Meter', () => {
       ensureMetric(metric8, 'cpu_usage_per_app', 4.5);
     });
 
-    it('should not observe values when timeout', async () => {
+    it('should not observe values when timeout', done => {
       const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
         monotonic: false,
         description: 'desc',
@@ -663,10 +664,25 @@ describe('Meter', () => {
             new Promise((resolve, reject) => {
               setTimeout(resolve, 11);
             }),
-          ]).then(() => {
+          ]).then(async () => {
+            // try to hack to be able to update
+            (observerBatchResult as BatchObserverResult).cancelled = false;
             observerBatchResult.observe({ foo: 'bar' }, [
               cpuUsageMetric.observation(123),
             ]);
+
+            // simulate some waiting
+            await setTimeout(() => {}, 1);
+
+            const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
+            const value = cpuUsageMetric
+              .bind({ foo: 'bar' })
+              .getAggregator()
+              .toPoint().value as Distribution;
+
+            assert.strictEqual(value.count, 0);
+            assert.strictEqual(cpuUsageMetricRecords.length, 0);
+            done();
           });
         },
         {
@@ -674,10 +690,7 @@ describe('Meter', () => {
         }
       );
 
-      await meter.collect();
-
-      const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
-      assert.strictEqual(cpuUsageMetricRecords.length, 0);
+      meter.collect();
     });
   });
 

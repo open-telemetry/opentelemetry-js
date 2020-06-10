@@ -63,6 +63,9 @@ export class BatchObserverMetric extends Metric<BoundObserver>
       // cancels after MAX_TIMEOUT_MS - no more waiting for results
       const timer = setTimeout(() => {
         observerResult.cancelled = true;
+        // remove callback to prevent user from updating the values later if
+        // for any reason the observerBatchResult will be referenced
+        observerResult.onObserveCalled();
         super.getMetricRecord().then(resolve, reject);
         this._logger.debug('getMetricRecord - timeout');
       }, this._maxTimeoutUpdateMS);

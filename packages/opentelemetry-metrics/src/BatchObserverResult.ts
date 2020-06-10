@@ -34,17 +34,14 @@ export class BatchObserverResult implements api.BatchObserverResult {
   /**
    * used to save a callback that will be called after the observations are
    *     updated
-   * @param callback
+   * @param [callback]
    */
-  onObserveCalled(callback: () => void) {
-    if (this.cancelled) {
-      return;
-    }
+  onObserveCalled(callback?: () => void) {
     this._callback = callback;
   }
 
   observe(labels: api.Labels, observations: Observation[]): void {
-    if (this.cancelled) {
+    if (this.cancelled || !this._callback) {
       return;
     }
     observations.forEach(observation => {
@@ -54,6 +51,9 @@ export class BatchObserverResult implements api.BatchObserverResult {
       this._immediate = setImmediate(() => {
         if (typeof this._callback === 'function') {
           this._callback();
+          // prevent user from updating the values later if for any reason
+          // the observerBatchResult will be referenced and then try to use
+          this._callback = undefined;
         }
       });
     }
