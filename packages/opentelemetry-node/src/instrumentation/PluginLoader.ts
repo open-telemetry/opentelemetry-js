@@ -34,7 +34,7 @@ export enum HookState {
  * Environment variable which will contain list of modules to not load corresponding plugins for
  * e.g.OPENTELEMETRY_NO_PATCH_MODULES=pg,https,mongodb
  */
-export const envPluginDisabledList = 'OPENTELEMETRY_NO_PATCH_MODULES';
+export const ENV_PLUGIN_DISABLED_LIST = 'OPENTELEMETRY_NO_PATCH_MODULES';
 
 /**
  * Wildcard symbol. If ignore list is set to this, disable all plugins
@@ -44,8 +44,6 @@ const DISABLE_ALL_PLUGINS = '*';
 export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
-
-
 
 /**
  * Returns the Plugins object that meet the below conditions.
@@ -60,7 +58,7 @@ function filterPlugins(plugins: Plugins): Plugins {
 }
 
 function getIgnoreList(): string[] | typeof DISABLE_ALL_PLUGINS {
-  const envIgnoreList: string = process.env[envPluginDisabledList] || '';
+  const envIgnoreList: string = process.env[ENV_PLUGIN_DISABLED_LIST] || '';
   if (envIgnoreList === DISABLE_ALL_PLUGINS) {
     return envIgnoreList;
   }
@@ -144,14 +142,14 @@ export class PluginLoader {
         // Skip loading of all modules if '*' is provided
         if (modulesToIgnore === DISABLE_ALL_PLUGINS) {
           this.logger.info(
-            `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${envPluginDisabledList})`
+            `PluginLoader#load: skipped patching module ${name} because all plugins are disabled (${ENV_PLUGIN_DISABLED_LIST})`
           );
           return exports;
         }
 
         if (modulesToIgnore.includes(name)) {
           this.logger.info(
-            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${envPluginDisabledList})`
+            `PluginLoader#load: skipped patching module ${name} because it was on the ignore list (${ENV_PLUGIN_DISABLED_LIST})`
           );
           return exports;
         }
