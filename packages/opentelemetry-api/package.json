@@ -69,7 +69,7 @@
     "linkinator": "2.1.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
-    "ts-loader": "6.2.2",
+    "ts-loader": "7.0.5",
     "ts-mocha": "7.0.0",
     "typedoc": "0.15.8",
     "typescript": "3.7.2",
