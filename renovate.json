@@ -4,7 +4,7 @@
   ],
   "rebaseWhen": "behind-base-branch",
   "schedule": [
-    "after 9am and before 3pm"
+    "after 9pm and before 5am"
   ],
   "labels": ["dependencies"]
 }
