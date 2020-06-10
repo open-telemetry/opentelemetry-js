@@ -44,19 +44,22 @@ export class BatchObserverResult implements api.BatchObserverResult {
   }
 
   observe(labels: api.Labels, observations: Observation[]): void {
-    if (this._immediate) {
-      clearImmediate(this._immediate);
-    }
     if (this.cancelled) {
+      if (this._immediate) {
+        clearImmediate(this._immediate);
+        this._immediate = undefined;
+      }
       return;
     }
     observations.forEach(observation => {
       observation.valueObserver.bind(labels).update(observation.value);
     });
-    this._immediate = setImmediate(() => {
-      if (typeof this._callback === 'function') {
-        this._callback();
-      }
-    });
+    if (!this._immediate) {
+      this._immediate = setImmediate(() => {
+        if (typeof this._callback === 'function') {
+          this._callback();
+        }
+      });
+    }
   }
 }
