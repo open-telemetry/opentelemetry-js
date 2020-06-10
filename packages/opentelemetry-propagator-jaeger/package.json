@@ -46,7 +46,7 @@
   "devDependencies": {
     "@types/mocha": "7.0.2",
     "@types/node": "12.12.47",
-    "@types/sinon": "7.5.2",
+    "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.0",
     "gts": "2.0.2",
@@ -60,7 +60,7 @@
     "mocha": "6.2.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "7.5.0",
+    "sinon": "9.0.2",
     "ts-loader": "6.2.2",
     "ts-mocha": "6.0.0",
     "ts-node": "8.10.2",
