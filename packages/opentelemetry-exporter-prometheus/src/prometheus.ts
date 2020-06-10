@@ -26,7 +26,7 @@ import {
   MetricKind,
   Sum,
   Distribution,
-  LastValue,
+  Histogram,
 } from '@opentelemetry/metrics';
 import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
@@ -144,34 +144,22 @@ export class PrometheusExporter implements MetricExporter {
     }
 
     if (metric instanceof Gauge) {
-      switch (record.descriptor.metricKind) {
-        case MetricKind.COUNTER:
-        case MetricKind.UP_DOWN_COUNTER:
-          // case MetricKind.SUM_OBSERVER:
-          // case MetricKind.UP_DOWN_SUM_OBSERVER:
-          metric.set(labelValues, point.value as Sum);
-          break;
-        case MetricKind.VALUE_RECORDER:
-          // case MetricKind.VALUE_OBSERVER:
-          metric.set(
-            labelValues,
-            (point.value as Distribution).sum,
-            hrTimeToMilliseconds(point.timestamp)
-          );
-          break;
-
-        case MetricKind.OBSERVER: // @TODO remove later #1146
-        case MetricKind.VALUE_OBSERVER:
-          metric.set(
-            labelValues,
-            point.value as LastValue,
-            hrTimeToMilliseconds(point.timestamp)
-          );
-          break;
+      if (typeof point.value === 'number') {
+        metric.set(labelValues, point.value);
+      } else if ((point.value as Histogram).buckets) {
+        metric.set(
+          labelValues,
+          (point.value as Histogram).sum,
+          hrTimeToMilliseconds(point.timestamp)
+        );
+      } else if (typeof (point.value as Distribution).max === 'number') {
+        metric.set(
+          labelValues,
+          (point.value as Distribution).sum,
+          hrTimeToMilliseconds(point.timestamp)
+        );
       }
     }
-
-    // TODO: only counter and gauge are implemented in metrics so far
   }
 
   private _getLabelValues(keys: string[], labels: api.Labels) {

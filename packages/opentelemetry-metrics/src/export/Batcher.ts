@@ -56,11 +56,8 @@ export class UngroupedBatcher extends Batcher {
       case MetricKind.UP_DOWN_SUM_OBSERVER:
         return new aggregators.SumAggregator();
       case MetricKind.VALUE_RECORDER:
-        // case MetricKind.VALUE_OBSERVER: @TODO change it once sum observer
-        //  is implemented
-        return new aggregators.MinMaxSumCountAggregator();
       case MetricKind.VALUE_OBSERVER:
-        return new aggregators.LastValueAggregator();
+        return new aggregators.MinMaxSumCountAggregator();
       default:
         return new aggregators.MinMaxSumCountAggregator();
     }

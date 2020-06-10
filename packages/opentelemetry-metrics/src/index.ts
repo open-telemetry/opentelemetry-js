@@ -22,5 +22,6 @@ export * from './MeterProvider';
 export * from './Metric';
 export * from './ValueObserverMetric';
 export * from './export/aggregators';
+export * from './export/Batcher';
 export * from './export/ConsoleMetricExporter';
 export * from './export/types';

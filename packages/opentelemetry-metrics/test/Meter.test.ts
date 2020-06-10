@@ -28,10 +28,11 @@ import {
   MetricRecord,
   Aggregator,
   MetricDescriptor,
+  MinMaxSumCountAggregator,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import { SumAggregator, LastValueAggregator } from '../src/export/aggregators';
+import { SumAggregator } from '../src/export/aggregators';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
@@ -765,8 +766,9 @@ class CustomBatcher extends Batcher {
 }
 
 function ensureMetric(metric: MetricRecord, name?: string, value?: number) {
-  assert.ok(metric.aggregator instanceof LastValueAggregator);
-  const lastValue = metric.aggregator.toPoint().value;
+  assert.ok(metric.aggregator instanceof MinMaxSumCountAggregator);
+  const pValue = metric.aggregator.toPoint().value;
+  const lastValue = (pValue as Distribution).max;
   if (typeof value === 'number') {
     assert.strictEqual(lastValue, value);
   } else {
