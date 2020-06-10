@@ -4,11 +4,12 @@
 [![dependencies][dependencies-image]][dependencies-url]
 [![Apache License][license-image]][license-image]
 
-This package depends on all core node plugins maintained by OpenTelemetry authors. Installing it installs all core plugins
+This package depends on all node plugins maintained by OpenTelemetry authors.
+Installing it will also install all plugins.
 
 ## Plugins
 
-In addition to all [node core plugins][otel-plugins-node-core], the following plugins will be installed by this package
+In addition to all [node core plugins][otel-plugins-node-core], the following plugins will be installed by this package:
 
 - [@opentelemetry/plugin-express][otel-plugin-express]
 - [@opentelemetry/plugin-ioredis][otel-plugin-ioredis]
@@ -18,7 +19,7 @@ In addition to all [node core plugins][otel-plugins-node-core], the following pl
 - [@opentelemetry/plugin-pg][otel-plugin-pg]
 - [@opentelemetry/plugin-redis][otel-plugin-redis]
 
-note: dns is excluded by default because it requires some manual configuration to prevent infinite loops with exporters.
+Note: [@opentelemetry/plugin-dns][otel-plugin-dns] is excluded by default because it requires some manual configuration to prevent infinite loops with exporters.
 
 ## Useful links
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
@@ -38,6 +39,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [npm-url]: https://www.npmjs.com/package/@opentelemetry/plugins-node-core
 [npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugins-node-core.svg
 
+[otel-plugin-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-dns
 [otel-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
 [otel-plugin-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-ioredis
 [otel-plugin-mongodb]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-mongodb
