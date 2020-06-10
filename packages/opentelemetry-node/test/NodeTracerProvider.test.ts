@@ -143,7 +143,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
     });
 
-    it('should return a default span with no sampling', () => {
+    it('should return a default span with no sampling (NEVER_SAMPLER)', () => {
       provider = new NodeTracerProvider({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
@@ -154,8 +154,46 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), false);
     });
 
-    // @todo: implement
-    it('should start a Span with always sampling');
+    it('should start a recording span with always sampling (ALWAYS_SAMPLER)', () => {
+      provider = new NodeTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+        logger: new NoopLogger(),
+      });
+      const span = provider.getTracer('default').startSpan('my-span');
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.isRecording(), true);
+    });
+
+    it('should not sample with ALWAYS_SAMPLER if parent was not sampled', () => {
+      provider = new NodeTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+        logger: new NoopLogger(),
+      });
+
+      const notSampledParent = provider
+        .getTracer('default')
+        .startSpan('not-sampled-span', {
+          parent: {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          },
+        });
+      assert.ok(notSampledParent instanceof NoRecordingSpan);
+      assert.strictEqual(
+        notSampledParent.context().traceFlags,
+        TraceFlags.NONE
+      );
+      assert.strictEqual(notSampledParent.isRecording(), false);
+
+      const span = provider.getTracer('default').startSpan('child-span', {
+        parent: notSampledParent,
+      });
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
+      assert.strictEqual(span.isRecording(), false);
+    });
 
     it('should set default attributes on span', () => {
       const defaultAttributes = {

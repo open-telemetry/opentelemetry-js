@@ -42,7 +42,6 @@ describe('ConsoleMetricExporter', () => {
       );
       const counter = meter.createCounter('counter', {
         description: 'a test description',
-        labelKeys: ['key1', 'key2'],
       });
       const boundCounter = counter.bind({
         key1: 'labelValue1',
@@ -57,7 +56,6 @@ describe('ConsoleMetricExporter', () => {
       assert.deepStrictEqual(descriptor, [
         {
           description: 'a test description',
-          labelKeys: ['key1', 'key2'],
           metricKind: MetricKind.COUNTER,
           monotonic: true,
           name: 'counter',

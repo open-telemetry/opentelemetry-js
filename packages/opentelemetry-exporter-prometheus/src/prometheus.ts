@@ -30,7 +30,7 @@ import {
 } from '@opentelemetry/metrics';
 import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
+import { Counter, Gauge, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 
@@ -125,11 +125,9 @@ export class PrometheusExporter implements MetricExporter {
     const metric = this._registerMetric(record);
     if (!metric) return;
 
-    const labelValues = this._getLabelValues(
-      record.descriptor.labelKeys,
-      record.labels
-    );
     const point = record.aggregator.toPoint();
+
+    const labels = record.labels;
 
     if (metric instanceof Counter) {
       // Prometheus counter saves internal state and increments by given value.
@@ -137,7 +135,7 @@ export class PrometheusExporter implements MetricExporter {
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
       metric.inc(
-        labelValues,
+        labels,
         point.value as Sum,
         hrTimeToMilliseconds(point.timestamp)
       );
@@ -145,31 +143,21 @@ export class PrometheusExporter implements MetricExporter {
 
     if (metric instanceof Gauge) {
       if (typeof point.value === 'number') {
-        metric.set(labelValues, point.value);
+        metric.set(labels, point.value);
       } else if ((point.value as Histogram).buckets) {
         metric.set(
-          labelValues,
+          labels,
           (point.value as Histogram).sum,
           hrTimeToMilliseconds(point.timestamp)
         );
       } else if (typeof (point.value as Distribution).max === 'number') {
         metric.set(
-          labelValues,
+          labels,
           (point.value as Distribution).sum,
           hrTimeToMilliseconds(point.timestamp)
         );
       }
     }
-  }
-
-  private _getLabelValues(keys: string[], labels: api.Labels) {
-    const labelValues: labelValues = {};
-    for (let i = 0; i < keys.length; i++) {
-      if (labels[keys[i]] !== null) {
-        labelValues[keys[i]] = labels[keys[i]];
-      }
-    }
-    return labelValues;
   }
 
   private _registerMetric(record: MetricRecord): Metric | undefined {
@@ -186,9 +174,7 @@ export class PrometheusExporter implements MetricExporter {
      * https://prometheus.io/docs/instrumenting/exposition_formats/
      */
     if (metric instanceof Counter) {
-      metric.remove(
-        ...record.descriptor.labelKeys.map(k => record.labels[k].toString())
-      );
+      metric.remove(...Object.values(record.labels));
     }
 
     if (metric) return metric;
@@ -201,7 +187,7 @@ export class PrometheusExporter implements MetricExporter {
       name,
       // prom-client throws with empty description which is our default
       help: record.descriptor.description || 'description missing',
-      labelNames: record.descriptor.labelKeys,
+      labelNames: Object.keys(record.labels),
       // list of registries to register the newly created metric
       registers: [this._registry],
     };

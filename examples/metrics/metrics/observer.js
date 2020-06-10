@@ -32,14 +32,12 @@ meter.createValueObserver('cpu_core_usage', {
 // no callback as they will be updated in batch observer
 const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
   monotonic: false,
-  labelKeys: ['app', 'core'],
   description: 'Example of sync value observer used with async batch observer',
 });
 
 // no callback as they will be updated in batch observer
 const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
   monotonic: false,
-  labelKeys: ['app', 'core'],
   description: 'Example of sync value observer used with async batch observer',
 });
 

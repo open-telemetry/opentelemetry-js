@@ -224,7 +224,6 @@ describe('Meter', () => {
         assert.strictEqual(record.length, 1);
         assert.deepStrictEqual(record[0].descriptor, {
           description: '',
-          labelKeys: [],
           metricKind: MetricKind.COUNTER,
           monotonic: true,
           name: 'name1',
@@ -491,7 +490,6 @@ describe('Meter', () => {
         'name',
         {
           description: 'desc',
-          labelKeys: ['pid', 'core'],
         },
         (observerResult: api.ObserverResult) => {
           observerResult.observe(getCpuUsage(), { pid: '123', core: '1' });
@@ -553,13 +551,11 @@ describe('Meter', () => {
     it('should use callback to observe values ', async () => {
       const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
         monotonic: false,
-        labelKeys: ['app', 'core'],
         description: 'desc',
       }) as ValueObserverMetric;
 
       const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
         monotonic: false,
-        labelKeys: ['app', 'core'],
         description: 'desc',
       }) as ValueObserverMetric;
 
@@ -656,7 +652,6 @@ describe('Meter', () => {
     it('should not observe values when timeout', async () => {
       const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
         monotonic: false,
-        labelKeys: ['app', 'core'],
         description: 'desc',
       }) as ValueObserverMetric;
 
@@ -691,7 +686,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
@@ -708,7 +702,6 @@ describe('Meter', () => {
         monotonic: true,
         unit: '1',
         valueType: api.ValueType.DOUBLE,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -719,7 +712,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
         valueType: api.ValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
@@ -737,7 +729,6 @@ describe('Meter', () => {
         monotonic: true,
         unit: '1',
         valueType: api.ValueType.INT,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;

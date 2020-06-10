@@ -30,9 +30,7 @@ describe('Batcher', () => {
         logger: new NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');
-      counter = meter.createCounter('ungrouped-batcher-test', {
-        labelKeys: ['key'],
-      });
+      counter = meter.createCounter('ungrouped-batcher-test');
       fooCounter = counter.bind({ key: 'foo' });
       barCounter = counter.bind({ key: 'bar' });
     });

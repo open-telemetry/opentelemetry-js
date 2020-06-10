@@ -97,7 +97,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
       unit: this._options.unit || '1',
       metricKind: this._kind,
       valueType: this._valueType,
-      labelKeys: this._options.labelKeys || [],
       monotonic: this._monotonic,
     };
   }
