@@ -36,15 +36,16 @@ export enum HookState {
  */
 export const envPluginDisabledList = 'OPENTELEMETRY_NO_PATCH_MODULES';
 
+/**
+ * Wildcard symbol. If ignore list is set to this, disable all plugins
+ */
+const DISABLE_ALL_PLUGINS = '*';
+
 export interface Plugins {
   [pluginName: string]: PluginConfig;
 }
 
 
-/**
- * Wildcard symbol. If ignore list is set to this, disable all plugins
- */
-const DISABLE_ALL_PLUGINS = '*';
 
 /**
  * Returns the Plugins object that meet the below conditions.
