@@ -45,10 +45,6 @@ export class BatchObserverResult implements api.BatchObserverResult {
 
   observe(labels: api.Labels, observations: Observation[]): void {
     if (this.cancelled) {
-      if (this._immediate) {
-        clearImmediate(this._immediate);
-        this._immediate = undefined;
-      }
       return;
     }
     observations.forEach(observation => {
