@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { AttributeNames, NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/core';
 import { SpanKind, Span, context } from '@opentelemetry/api';
+import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as url from 'url';
@@ -175,10 +179,10 @@ describe('HttpPlugin Integration tests', () => {
       assert.strictEqual(spans.length, 1);
       assert.ok(span.name.indexOf('GET /') >= 0);
       assert.strictEqual(result.reqHeaders['x-foo'], 'foo');
-      assert.strictEqual(span.attributes[AttributeNames.HTTP_FLAVOR], '1.1');
+      assert.strictEqual(span.attributes[HttpAttribute.HTTP_FLAVOR], '1.1');
       assert.strictEqual(
-        span.attributes[AttributeNames.NET_TRANSPORT],
-        AttributeNames.IP_TCP
+        span.attributes[GeneralAttribute.NET_TRANSPORT],
+        GeneralAttribute.IP_TCP
       );
       assertSpan(span, SpanKind.CLIENT, validations);
     });

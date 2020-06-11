@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
-import { AttributeNames, NoopLogger } from '@opentelemetry/core';
+import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
@@ -263,10 +264,10 @@ describe('Utility', () => {
         utils.setSpanWithError(span, new Error(errorMessage), obj as any);
         const attributes = span.attributes;
         assert.strictEqual(
-          attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+          attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
           errorMessage
         );
-        assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+        assert.ok(attributes[HttpAttribute.HTTP_ERROR_NAME]);
       }
     });
   });
@@ -324,7 +325,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
-      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], '/test/toto');
+      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], '/test/toto');
     });
 
     it('should succesfully process without middleware stack', () => {
@@ -332,7 +333,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
-      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], undefined);
+      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], undefined);
     });
   });
 });

@@ -20,10 +20,10 @@ import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
-  AttributeNames,
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
+import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -35,7 +35,7 @@ export const assertSpan = (
   assert.strictEqual(span.kind, kind);
 
   assert.strictEqual(
-    span.attributes[AttributeNames.COMPONENT],
+    span.attributes[GeneralAttribute.COMPONENT],
     GrpcPlugin.component
   );
   assert.ok(span.endTime);

@@ -25,11 +25,11 @@ import {
   TraceFlags,
 } from '@opentelemetry/api';
 import {
-  AttributeNames,
   BasePlugin,
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
+import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 import {
   ClientRequest,
   IncomingMessage,
@@ -463,7 +463,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     } else {
       span = this._tracer
         .startSpan(name, options)
-        .setAttribute(AttributeNames.COMPONENT, this.component);
+        .setAttribute(GeneralAttribute.COMPONENT, this.component);
     }
     this._spanNotEnded.add(span);
     return span;
