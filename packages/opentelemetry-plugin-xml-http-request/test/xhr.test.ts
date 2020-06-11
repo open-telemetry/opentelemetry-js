@@ -179,12 +179,12 @@ describe('xhr', () => {
 
           spyEntries = sandbox.stub(performance, 'getEntriesByType');
           spyEntries.withArgs('resource').returns(resources);
-          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(propagateTraceHeaderCorsUrls);
+          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(
+            propagateTraceHeaderCorsUrls
+          );
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
-            plugins: [
-              xmlHttpRequestPlugin,
-            ],
+            plugins: [xmlHttpRequestPlugin],
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
@@ -226,16 +226,20 @@ describe('xhr', () => {
         });
 
         it('should patch to wrap XML HTTP Requests when enabled', () => {
-          let xhttp = new XMLHttpRequest();
+          const xhttp = new XMLHttpRequest();
           assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestPlugin.enable(XMLHttpRequest.prototype, new api.NoopTracerProvider(), new NoopLogger());
+          xmlHttpRequestPlugin.enable(
+            XMLHttpRequest.prototype,
+            new api.NoopTracerProvider(),
+            new NoopLogger()
+          );
           assert.ok(isWrapped(xhttp.send));
         });
-    
+
         it('should unpatch to unwrap XML HTTP Requests when disabled', () => {
-          let xhttp = new XMLHttpRequest();
+          const xhttp = new XMLHttpRequest();
           assert.ok(isWrapped(xhttp.send));
-          xmlHttpRequestPlugin.disable()
+          xmlHttpRequestPlugin.disable();
           assert.ok(!isWrapped(xhttp.send));
         });
 
@@ -374,7 +378,6 @@ describe('xhr', () => {
           );
 
           assert.strictEqual(events.length, 12, 'number of events is wrong');
-      
         });
 
         it('should create a span for preflight request', () => {
@@ -386,7 +389,7 @@ describe('xhr', () => {
             'parent span is not root span'
           );
         });
-    
+
         it('preflight request span should have correct name', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           assert.strictEqual(
@@ -395,7 +398,7 @@ describe('xhr', () => {
             'preflight request span has wrong name'
           );
         });
-    
+
         it('preflight request span should have correct kind', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           assert.strictEqual(
@@ -404,12 +407,12 @@ describe('xhr', () => {
             'span has wrong kind'
           );
         });
-    
+
         it('preflight request span should have correct events', () => {
           const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
           const events = span.events;
           assert.strictEqual(events.length, 9, 'number of events is wrong');
-    
+
           assert.strictEqual(
             events[0].name,
             PTN.FETCH_START,
@@ -463,7 +466,7 @@ describe('xhr', () => {
             const propagateTraceHeaderCorsUrls = [url];
             prepareData(done, url, { propagateTraceHeaderCorsUrls });
           });
-          
+
           it('should set trace headers', () => {
             const span: api.Span = exportSpy.args[1][0][0];
             assert.strictEqual(
