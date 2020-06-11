@@ -33,6 +33,7 @@ import {
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
+  parseUrl
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -83,7 +84,7 @@ function createResource(resource = {}): PerformanceResourceTiming {
     redirectEnd: 0,
     redirectStart: 0,
     requestStart: 16,
-    responseEnd: 80.5,
+    responseEnd: 20.5,
     responseStart: 17,
     secureConnectionStart: 14,
     transferSize: 0,
@@ -98,6 +99,16 @@ function createResource(resource = {}): PerformanceResourceTiming {
     defaultResource,
     resource
   ) as PerformanceResourceTiming;
+}
+
+function createMasterResource(resource = {}): PerformanceResourceTiming {
+  const masterResource: any = createResource(resource);
+  Object.keys(masterResource).forEach((key: string) => {
+    if (typeof masterResource[key] === 'number') {
+      masterResource[key] = masterResource[key] + 30;
+    }
+  });
+  return masterResource;
 }
 
 describe('xhr', () => {
@@ -131,7 +142,7 @@ describe('xhr', () => {
         let exportSpy: any;
         let rootSpan: api.Span;
         let spyEntries: any;
-        const url = `${window.location.origin}/xml-http-request.js`;
+        const url = 'http://localhost:8090/xml-http-request.js';
         let fakeNow = 0;
         let xmlHttpRequestPlugin: XMLHttpRequestPlugin;
 
@@ -159,15 +170,16 @@ describe('xhr', () => {
           const resources: PerformanceResourceTiming[] = [];
           resources.push(
             createResource({
-              name: url,
+              name: fileUrl,
+            }),
+            createMasterResource({
+              name: fileUrl,
             })
           );
 
           spyEntries = sandbox.stub(performance, 'getEntriesByType');
           spyEntries.withArgs('resource').returns(resources);
-          xmlHttpRequestPlugin = new XMLHttpRequestPlugin({
-            propagateTraceHeaderCorsUrls: propagateTraceHeaderCorsUrls,
-          });
+          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(propagateTraceHeaderCorsUrls);
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
             plugins: [
@@ -206,7 +218,7 @@ describe('xhr', () => {
 
         beforeEach(done => {
           const propagateTraceHeaderCorsUrls = [window.location.origin];
-          prepareData(done, url, propagateTraceHeaderCorsUrls);
+          prepareData(done, url, { propagateTraceHeaderCorsUrls });
         });
 
         afterEach(() => {
@@ -228,7 +240,7 @@ describe('xhr', () => {
         });
 
         it('should create a span with correct root span', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
             span.parentSpanId,
             rootSpan.context().spanId,
@@ -237,12 +249,12 @@ describe('xhr', () => {
         });
 
         it('span should have correct name', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(span.name, url, 'span has wrong name');
         });
 
         it('span should have correct kind', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           assert.strictEqual(
             span.kind,
             api.SpanKind.CLIENT,
@@ -251,7 +263,7 @@ describe('xhr', () => {
         });
 
         it('span should have correct attributes', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
 
@@ -281,7 +293,7 @@ describe('xhr', () => {
           );
           assert.strictEqual(
             attributes[keys[5]],
-            window.location.host,
+            parseUrl(url).host,
             `attributes ${HttpAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
@@ -297,7 +309,7 @@ describe('xhr', () => {
         });
 
         it('span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
           const events = span.events;
 
           assert.strictEqual(
@@ -362,92 +374,98 @@ describe('xhr', () => {
           );
 
           assert.strictEqual(events.length, 12, 'number of events is wrong');
-
-        //   it('should create a span for preflight request', () => {
-        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-        //     const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
-        //     assert.strictEqual(
-        //       span.parentSpanId,
-        //       parentSpan.spanContext.spanId,
-        //       'parent span is not root span'
-        //     );
-        //   });
-      
-        //   it('preflight request span should have correct name', () => {
-        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-        //     assert.strictEqual(
-        //       span.name,
-        //       'CORS Preflight',
-        //       'preflight request span has wrong name'
-        //     );
-        //   });
-      
-        //   it('preflight request span should have correct kind', () => {
-        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-        //     assert.strictEqual(
-        //       span.kind,
-        //       api.SpanKind.INTERNAL,
-        //       'span has wrong kind'
-        //     );
-        //   });
-      
-        //   it('preflight request span should have correct events', () => {
-        //     const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-        //     const events = span.events;
-        //     assert.strictEqual(events.length, 9, 'number of events is wrong');
-      
-        //     assert.strictEqual(
-        //       events[0].name,
-        //       PTN.FETCH_START,
-        //       `event ${PTN.FETCH_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[1].name,
-        //       PTN.DOMAIN_LOOKUP_START,
-        //       `event ${PTN.DOMAIN_LOOKUP_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[2].name,
-        //       PTN.DOMAIN_LOOKUP_END,
-        //       `event ${PTN.DOMAIN_LOOKUP_END} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[3].name,
-        //       PTN.CONNECT_START,
-        //       `event ${PTN.CONNECT_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[4].name,
-        //       PTN.SECURE_CONNECTION_START,
-        //       `event ${PTN.SECURE_CONNECTION_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[5].name,
-        //       PTN.CONNECT_END,
-        //       `event ${PTN.CONNECT_END} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[6].name,
-        //       PTN.REQUEST_START,
-        //       `event ${PTN.REQUEST_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[7].name,
-        //       PTN.RESPONSE_START,
-        //       `event ${PTN.RESPONSE_START} is not defined`
-        //     );
-        //     assert.strictEqual(
-        //       events[8].name,
-        //       PTN.RESPONSE_END,
-        //       `event ${PTN.RESPONSE_END} is not defined`
-        //     );
-        //   });
       
         });
 
+        it('should create a span for preflight request', () => {
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const parentSpan: tracing.ReadableSpan = exportSpy.args[1][0][0];
+          assert.strictEqual(
+            span.parentSpanId,
+            parentSpan.spanContext.spanId,
+            'parent span is not root span'
+          );
+        });
+    
+        it('preflight request span should have correct name', () => {
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          assert.strictEqual(
+            span.name,
+            'CORS Preflight',
+            'preflight request span has wrong name'
+          );
+        });
+    
+        it('preflight request span should have correct kind', () => {
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          assert.strictEqual(
+            span.kind,
+            api.SpanKind.INTERNAL,
+            'span has wrong kind'
+          );
+        });
+    
+        it('preflight request span should have correct events', () => {
+          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+          const events = span.events;
+          assert.strictEqual(events.length, 9, 'number of events is wrong');
+    
+          assert.strictEqual(
+            events[0].name,
+            PTN.FETCH_START,
+            `event ${PTN.FETCH_START} is not defined`
+          );
+          assert.strictEqual(
+            events[1].name,
+            PTN.DOMAIN_LOOKUP_START,
+            `event ${PTN.DOMAIN_LOOKUP_START} is not defined`
+          );
+          assert.strictEqual(
+            events[2].name,
+            PTN.DOMAIN_LOOKUP_END,
+            `event ${PTN.DOMAIN_LOOKUP_END} is not defined`
+          );
+          assert.strictEqual(
+            events[3].name,
+            PTN.CONNECT_START,
+            `event ${PTN.CONNECT_START} is not defined`
+          );
+          assert.strictEqual(
+            events[4].name,
+            PTN.SECURE_CONNECTION_START,
+            `event ${PTN.SECURE_CONNECTION_START} is not defined`
+          );
+          assert.strictEqual(
+            events[5].name,
+            PTN.CONNECT_END,
+            `event ${PTN.CONNECT_END} is not defined`
+          );
+          assert.strictEqual(
+            events[6].name,
+            PTN.REQUEST_START,
+            `event ${PTN.REQUEST_START} is not defined`
+          );
+          assert.strictEqual(
+            events[7].name,
+            PTN.RESPONSE_START,
+            `event ${PTN.RESPONSE_START} is not defined`
+          );
+          assert.strictEqual(
+            events[8].name,
+            PTN.RESPONSE_END,
+            `event ${PTN.RESPONSE_END} is not defined`
+          );
+        });
+
         describe('AND origin match with window.location', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = [url];
+            prepareData(done, url, { propagateTraceHeaderCorsUrls });
+          });
+          
           it('should set trace headers', () => {
-            const span: api.Span = exportSpy.args[0][0][0];
+            const span: api.Span = exportSpy.args[1][0][0];
             assert.strictEqual(
               requests[0].requestHeaders[X_B3_TRACE_ID],
               span.context().traceId,
@@ -475,11 +493,11 @@ describe('xhr', () => {
               prepareData(
                 done,
                 'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
-                /raw\.githubusercontent\.com/
+                { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
               );
             });
             it('should set trace headers', () => {
-              const span: api.Span = exportSpy.args[0][0][0];
+              const span: api.Span = exportSpy.args[1][0][0];
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.context().traceId,
