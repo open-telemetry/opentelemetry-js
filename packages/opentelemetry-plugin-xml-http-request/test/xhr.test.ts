@@ -152,11 +152,7 @@ describe('xhr', () => {
           spyEntries.restore();
         };
 
-        prepareData = (
-          done: any,
-          fileUrl: string,
-          propagateTraceHeaderCorsUrls?: any
-        ) => {
+        prepareData = (done: any, fileUrl: string, config?: any) => {
           sandbox = sinon.createSandbox();
           const fakeXhr = sandbox.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
@@ -179,9 +175,7 @@ describe('xhr', () => {
 
           spyEntries = sandbox.stub(performance, 'getEntriesByType');
           spyEntries.withArgs('resource').returns(resources);
-          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(
-            propagateTraceHeaderCorsUrls
-          );
+          xmlHttpRequestPlugin = new XMLHttpRequestPlugin(config);
           webTracerProviderWithZone = new WebTracerProvider({
             logLevel: LogLevel.ERROR,
             plugins: [xmlHttpRequestPlugin],
@@ -458,6 +452,25 @@ describe('xhr', () => {
             PTN.RESPONSE_END,
             `event ${PTN.RESPONSE_END} is not defined`
           );
+        });
+
+        describe('when url is ignored', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = url;
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              ignoreUrls: [propagateTraceHeaderCorsUrls],
+            });
+          });
+
+          it('should NOT create any span', () => {
+            assert.strictEqual(
+              exportSpy.args.length,
+              0,
+              "span shouldn't be exported"
+            );
+          });
         });
 
         describe('AND origin match with window.location', () => {
