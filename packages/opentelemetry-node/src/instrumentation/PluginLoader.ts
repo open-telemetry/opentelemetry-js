@@ -57,6 +57,10 @@ function filterPlugins(plugins: Plugins): Plugins {
   }, {});
 }
 
+/**
+ * Parse process.env[ENV_PLUGIN_DISABLED_LIST] for a list of modules
+ * not to load corresponding plugins for.
+ */
 function getIgnoreList(): string[] | typeof DISABLE_ALL_PLUGINS {
   const envIgnoreList: string = process.env[ENV_PLUGIN_DISABLED_LIST] || '';
   if (envIgnoreList === DISABLE_ALL_PLUGINS) {
