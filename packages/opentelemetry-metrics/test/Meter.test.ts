@@ -23,12 +23,11 @@ import {
   Sum,
   MeterProvider,
   ValueRecorderMetric,
-  Distribution,
   ValueObserverMetric,
   MetricRecord,
   Aggregator,
   MetricDescriptor,
-  MinMaxSumCountAggregator,
+  LastValueAggregator,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -355,15 +354,7 @@ describe('Meter', () => {
 
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value as number, 0);
       });
 
       it('should not set the instrument data when disabled', async () => {
@@ -375,15 +366,7 @@ describe('Meter', () => {
 
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value as number, 0);
       });
 
       it(
@@ -400,13 +383,8 @@ describe('Meter', () => {
           await meter.collect();
           const [record1] = meter.getBatcher().checkPointSet();
           assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 2,
-              max: 50,
-              min: -10,
-              sum: 40,
-            }
+            record1.aggregator.toPoint().value as number,
+            50
           );
           assert.ok(
             hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
@@ -426,13 +404,8 @@ describe('Meter', () => {
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 2,
-            max: 100,
-            min: 10,
-            sum: 110,
-          }
+          record1.aggregator.toPoint().value as number,
+          100
         );
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
       });
@@ -672,15 +645,15 @@ describe('Meter', () => {
             ]);
 
             // simulate some waiting
-            await setTimeout(() => {}, 1);
+            await setTimeout(() => {}, 5);
 
             const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
             const value = cpuUsageMetric
               .bind({ foo: 'bar' })
               .getAggregator()
-              .toPoint().value as Distribution;
+              .toPoint().value as number;
 
-            assert.strictEqual(value.count, 0);
+            assert.strictEqual(value, 0);
             assert.strictEqual(cpuUsageMetricRecords.length, 0);
             done();
           });
@@ -770,9 +743,8 @@ class CustomBatcher extends Batcher {
 }
 
 function ensureMetric(metric: MetricRecord, name?: string, value?: number) {
-  assert.ok(metric.aggregator instanceof MinMaxSumCountAggregator);
-  const pValue = metric.aggregator.toPoint().value;
-  const lastValue = (pValue as Distribution).max;
+  assert.ok(metric.aggregator instanceof LastValueAggregator);
+  const lastValue = metric.aggregator.toPoint().value;
   if (typeof value === 'number') {
     assert.strictEqual(lastValue, value);
   } else {

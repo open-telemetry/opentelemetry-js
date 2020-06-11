@@ -57,7 +57,7 @@ export class UngroupedBatcher extends Batcher {
         return new aggregators.SumAggregator();
       case MetricKind.VALUE_RECORDER:
       case MetricKind.VALUE_OBSERVER:
-        return new aggregators.MinMaxSumCountAggregator();
+        return new aggregators.LastValueAggregator();
       default:
         return new aggregators.MinMaxSumCountAggregator();
     }
