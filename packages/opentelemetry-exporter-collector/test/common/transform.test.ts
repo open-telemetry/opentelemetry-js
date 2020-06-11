@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Attributes, TimedEvent, TraceFlags } from '@opentelemetry/api';
+import { Attributes, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
 import {
