@@ -476,12 +476,15 @@ describe('xhr', () => {
         describe('AND origin match with window.location', () => {
           beforeEach(done => {
             clearData();
+            // this won't generate a preflight span
             const propagateTraceHeaderCorsUrls = [url];
-            prepareData(done, url, { propagateTraceHeaderCorsUrls });
+            prepareData(done, window.location.origin + '/xml-http-request.js', {
+              propagateTraceHeaderCorsUrls,
+            });
           });
 
           it('should set trace headers', () => {
-            const span: api.Span = exportSpy.args[1][0][0];
+            const span: api.Span = exportSpy.args[0][0][0];
             assert.strictEqual(
               requests[0].requestHeaders[X_B3_TRACE_ID],
               span.context().traceId,
@@ -513,7 +516,8 @@ describe('xhr', () => {
               );
             });
             it('should set trace headers', () => {
-              const span: api.Span = exportSpy.args[1][0][0];
+              // span at exportSpy.args[0][0][0] is the preflight span
+              const span: api.Span = exportSpy.args[1][0][0]; 
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.context().traceId,
