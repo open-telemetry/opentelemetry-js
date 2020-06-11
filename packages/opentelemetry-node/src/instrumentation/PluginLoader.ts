@@ -32,9 +32,9 @@ export enum HookState {
 
 /**
  * Environment variable which will contain list of modules to not load corresponding plugins for
- * e.g.OPENTELEMETRY_NO_PATCH_MODULES=pg,https,mongodb
+ * e.g.OTEL_NO_PATCH_MODULES=pg,https,mongodb
  */
-export const ENV_PLUGIN_DISABLED_LIST = 'OPENTELEMETRY_NO_PATCH_MODULES';
+export const ENV_PLUGIN_DISABLED_LIST = 'OTEL_NO_PATCH_MODULES';
 
 /**
  * Wildcard symbol. If ignore list is set to this, disable all plugins
