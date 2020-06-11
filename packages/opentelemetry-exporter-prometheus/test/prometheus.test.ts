@@ -278,7 +278,6 @@ describe('PrometheusExporter', () => {
                   assert.ok(
                     parseFloat(line3[1]) >= 0 && parseFloat(line3[1]) <= 1
                   );
-                  assert.ok(parseInt(line3[2], 10) <= new Date().getTime());
 
                   done();
                 });

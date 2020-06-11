@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import {
   ExportResult,
-  NoopLogger,
   hrTimeToMilliseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
 import {
-  MetricExporter,
-  MetricRecord,
-  MetricDescriptor,
-  MetricKind,
-  Sum,
   Distribution,
   Histogram,
+  MetricDescriptor,
+  MetricExporter,
+  MetricKind,
+  MetricRecord,
+  Sum,
 } from '@opentelemetry/metrics';
-import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, Metric, Registry } from 'prom-client';
 import * as url from 'url';
@@ -143,7 +143,18 @@ export class PrometheusExporter implements MetricExporter {
 
     if (metric instanceof Gauge) {
       if (typeof point.value === 'number') {
-        metric.set(labels, point.value);
+        if (
+          record.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
+          record.descriptor.metricKind === MetricKind.VALUE_RECORDER
+        ) {
+          metric.set(
+            labels,
+            point.value,
+            hrTimeToMilliseconds(point.timestamp)
+          );
+        } else {
+          metric.set(labels, point.value);
+        }
       } else if ((point.value as Histogram).buckets) {
         metric.set(
           labels,
