@@ -71,7 +71,7 @@
     "nyc": "15.1.0",
     "ts-loader": "7.0.5",
     "ts-mocha": "7.0.0",
-    "typedoc": "0.15.8",
+    "typedoc": "0.17.7",
     "typescript": "3.9.5",
     "webpack": "4.43.0"
   }
