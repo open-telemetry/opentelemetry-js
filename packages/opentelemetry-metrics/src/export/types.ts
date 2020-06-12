@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,6 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
-  readonly labelKeys: string[];
-  readonly monotonic: boolean;
 }
 
 /**

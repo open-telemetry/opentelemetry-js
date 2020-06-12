@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,6 @@ describe('ConsoleMetricExporter', () => {
       );
       const counter = meter.createCounter('counter', {
         description: 'a test description',
-        labelKeys: ['key1', 'key2'],
       });
       const boundCounter = counter.bind({
         key1: 'labelValue1',
@@ -57,9 +56,7 @@ describe('ConsoleMetricExporter', () => {
       assert.deepStrictEqual(descriptor, [
         {
           description: 'a test description',
-          labelKeys: ['key1', 'key2'],
           metricKind: MetricKind.COUNTER,
-          monotonic: true,
           name: 'counter',
           unit: '1',
           valueType: ValueType.DOUBLE,

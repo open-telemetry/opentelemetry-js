@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,7 @@ import {
   Aggregator,
   MetricObservable,
   MetricDescriptor,
+  UpDownCounterMetric,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -66,7 +67,6 @@ describe('Meter', () => {
         description: 'desc',
         unit: '1',
         disabled: false,
-        monotonic: false,
       });
       assert.ok(counter instanceof Metric);
     });
@@ -97,7 +97,6 @@ describe('Meter', () => {
         description: 'desc',
         unit: '1',
         disabled: false,
-        monotonic: true,
       });
       counter.add(1);
       meter.collect();
@@ -136,7 +135,7 @@ describe('Meter', () => {
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
-      it('should add positive values by default', () => {
+      it('should add positive values only', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
@@ -158,17 +157,6 @@ describe('Meter', () => {
         meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
-      });
-
-      it('should add negative value when monotonic is set to false', () => {
-        const counter = meter.createCounter('name', {
-          monotonic: false,
-        }) as CounterMetric;
-        const boundCounter = counter.bind(labels);
-        boundCounter.add(-10);
-        meter.collect();
-        const [record1] = meter.getBatcher().checkPointSet();
-        assert.strictEqual(record1.aggregator.toPoint().value, -10);
       });
 
       it('should return same instrument on same label values', () => {
@@ -228,9 +216,202 @@ describe('Meter', () => {
         assert.strictEqual(record.length, 1);
         assert.deepStrictEqual(record[0].descriptor, {
           description: '',
-          labelKeys: [],
           metricKind: MetricKind.COUNTER,
-          monotonic: true,
+          name: 'name1',
+          unit: '1',
+          valueType: ValueType.DOUBLE,
+        });
+        assert.strictEqual(record[0].aggregator.toPoint().value, 10);
+      });
+    });
+
+    describe('names', () => {
+      it('should create counter with valid names', () => {
+        const counter1 = meter.createCounter('name1');
+        const counter2 = meter.createCounter(
+          'Name_with-all.valid_CharacterClasses'
+        );
+        assert.ok(counter1 instanceof CounterMetric);
+        assert.ok(counter2 instanceof CounterMetric);
+      });
+
+      it('should return no op metric if name is an empty string', () => {
+        const counter = meter.createCounter('');
+        assert.ok(counter instanceof api.NoopMetric);
+      });
+
+      it('should return no op metric if name does not start with a letter', () => {
+        const counter1 = meter.createCounter('1name');
+        const counter_ = meter.createCounter('_name');
+        assert.ok(counter1 instanceof api.NoopMetric);
+        assert.ok(counter_ instanceof api.NoopMetric);
+      });
+
+      it('should return no op metric if name is an empty string contain only letters, numbers, ".", "_", and "-"', () => {
+        const counter = meter.createCounter('name with invalid characters^&*(');
+        assert.ok(counter instanceof api.NoopMetric);
+      });
+    });
+  });
+
+  describe('#UpDownCounter', () => {
+    const performanceTimeOrigin = hrTime();
+
+    it('should create a UpDownCounter', () => {
+      const upDownCounter = meter.createUpDownCounter('name');
+      assert.ok(upDownCounter instanceof Metric);
+    });
+
+    it('should create a UpDownCounter with options', () => {
+      const upDownCounter = meter.createUpDownCounter('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      assert.ok(upDownCounter instanceof Metric);
+    });
+
+    it('should be able to call add() directly on UpDownCounter', () => {
+      const upDownCounter = meter.createUpDownCounter('name');
+      upDownCounter.add(10, labels);
+      meter.collect();
+      const [record1] = meter.getBatcher().checkPointSet();
+
+      assert.strictEqual(record1.aggregator.toPoint().value, 10);
+      const lastTimestamp = record1.aggregator.toPoint().timestamp;
+      assert.ok(
+        hrTimeToNanoseconds(lastTimestamp) >
+          hrTimeToNanoseconds(performanceTimeOrigin)
+      );
+      upDownCounter.add(10, labels);
+      assert.strictEqual(record1.aggregator.toPoint().value, 20);
+
+      assert.ok(
+        hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+          hrTimeToNanoseconds(lastTimestamp)
+      );
+    });
+
+    it('should be able to call add with no labels', () => {
+      const upDownCounter = meter.createUpDownCounter('name', {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+      });
+      upDownCounter.add(1);
+      meter.collect();
+      const [record1] = meter.getBatcher().checkPointSet();
+      assert.strictEqual(record1.aggregator.toPoint().value, 1);
+    });
+
+    it('should pipe through resource', () => {
+      const upDownCounter = meter.createUpDownCounter(
+        'name'
+      ) as UpDownCounterMetric;
+      assert.ok(upDownCounter.resource instanceof Resource);
+
+      upDownCounter.add(1, { foo: 'bar' });
+
+      const [record] = upDownCounter.getMetricRecord();
+      assert.ok(record.resource instanceof Resource);
+    });
+
+    describe('.bind()', () => {
+      it('should create a UpDownCounter instrument', () => {
+        const upDownCounter = meter.createUpDownCounter('name');
+        const boundCounter = upDownCounter.bind(labels);
+        boundCounter.add(10);
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+
+        assert.strictEqual(record1.aggregator.toPoint().value, 10);
+        boundCounter.add(-200);
+        assert.strictEqual(record1.aggregator.toPoint().value, -190);
+      });
+
+      it('should return the aggregator', () => {
+        const upDownCounter = meter.createUpDownCounter(
+          'name'
+        ) as UpDownCounterMetric;
+        const boundCounter = upDownCounter.bind(labels);
+        boundCounter.add(20);
+        assert.ok(boundCounter.getAggregator() instanceof CounterSumAggregator);
+        assert.strictEqual(boundCounter.getLabels(), labels);
+      });
+
+      it('should not add the instrument data when disabled', () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          disabled: true,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+        boundCounter.add(10);
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 0);
+      });
+
+      it('should return same instrument on same label values', () => {
+        const upDownCounter = meter.createUpDownCounter('name');
+        const boundCounter = upDownCounter.bind(labels);
+        boundCounter.add(10);
+        const boundCounter1 = upDownCounter.bind(labels);
+        boundCounter1.add(10);
+        meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+
+        assert.strictEqual(record1.aggregator.toPoint().value, 20);
+        assert.strictEqual(boundCounter, boundCounter1);
+      });
+    });
+
+    describe('.unbind()', () => {
+      it('should remove a UpDownCounter instrument', () => {
+        const upDownCounter = meter.createUpDownCounter(
+          'name'
+        ) as UpDownCounterMetric;
+        const boundCounter = upDownCounter.bind(labels);
+        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        upDownCounter.unbind(labels);
+        assert.strictEqual(upDownCounter['_instruments'].size, 0);
+        const boundCounter1 = upDownCounter.bind(labels);
+        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        assert.notStrictEqual(boundCounter, boundCounter1);
+      });
+
+      it('should not fail when removing non existing instrument', () => {
+        const upDownCounter = meter.createUpDownCounter('name');
+        upDownCounter.unbind({});
+      });
+
+      it('should clear all instruments', () => {
+        const upDownCounter = meter.createUpDownCounter(
+          'name'
+        ) as CounterMetric;
+        upDownCounter.bind(labels);
+        assert.strictEqual(upDownCounter['_instruments'].size, 1);
+        upDownCounter.clear();
+        assert.strictEqual(upDownCounter['_instruments'].size, 0);
+      });
+    });
+
+    describe('.registerMetric()', () => {
+      it('skip already registered Metric', () => {
+        const counter1 = meter.createCounter('name1') as CounterMetric;
+        counter1.bind(labels).add(10);
+
+        // should skip below metric
+        const counter2 = meter.createCounter('name1', {
+          valueType: api.ValueType.INT,
+        }) as CounterMetric;
+        counter2.bind(labels).add(500);
+
+        meter.collect();
+        const record = meter.getBatcher().checkPointSet();
+
+        assert.strictEqual(record.length, 1);
+        assert.deepStrictEqual(record[0].descriptor, {
+          description: '',
+          metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
           valueType: ValueType.DOUBLE,
@@ -487,7 +668,6 @@ describe('Meter', () => {
     it('should set callback and observe value ', () => {
       const valueRecorder = meter.createObserver('name', {
         description: 'desc',
-        labelKeys: ['pid', 'core'],
       }) as ObserverMetric;
 
       function getCpuUsage() {
@@ -546,7 +726,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
       });
       const labels = { [key]: 'counter-value' };
       const boundCounter = counter.bind(labels);
@@ -560,10 +739,8 @@ describe('Meter', () => {
         name: 'counter',
         description: 'test',
         metricKind: MetricKind.COUNTER,
-        monotonic: true,
         unit: '1',
         valueType: ValueType.DOUBLE,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -574,7 +751,6 @@ describe('Meter', () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
-        labelKeys: [key],
         valueType: api.ValueType.INT,
       });
       const labels = { [key]: 'counter-value' };
@@ -589,10 +765,8 @@ describe('Meter', () => {
         name: 'counter',
         description: 'test',
         metricKind: MetricKind.COUNTER,
-        monotonic: true,
         unit: '1',
         valueType: ValueType.INT,
-        labelKeys: ['key'],
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -636,5 +810,4 @@ function ensureMetric(metric: MetricRecord) {
   assert.strictEqual(descriptor.unit, '1');
   assert.strictEqual(descriptor.metricKind, MetricKind.OBSERVER);
   assert.strictEqual(descriptor.valueType, ValueType.DOUBLE);
-  assert.strictEqual(descriptor.monotonic, false);
 }
