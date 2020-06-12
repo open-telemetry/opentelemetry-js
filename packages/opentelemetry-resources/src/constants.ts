@@ -1,5 +1,5 @@
-/**
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * Semantic conventions for Resources
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-resource-semantic-conventions.md
- */
-
-/** Attributes defining a running environment (e.g. Cloud, Data Center). */
 export const CLOUD_RESOURCE = {
   /** Name of the cloud provider. Example values are aws, azure, gcp. */
   PROVIDER: 'cloud.provider',
