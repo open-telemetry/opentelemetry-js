@@ -120,9 +120,6 @@ export interface Counter extends UnboundMetric<BoundCounter> {
   add(value: number, labels?: Labels): void;
 }
 
-<<<<<<< HEAD
-export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
-=======
 export interface UpDownCounter extends UnboundMetric<BoundCounter> {
   /**
    * Adds the given value to the current value. Values can be negative.
@@ -130,8 +127,7 @@ export interface UpDownCounter extends UnboundMetric<BoundCounter> {
   add(value: number, labels?: Labels): void;
 }
 
-export interface Measure extends UnboundMetric<BoundMeasure> {
->>>>>>> a7dbd0b... feat: add the UpDownCounter instrument
+export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
   /**
    * Records the given value to this value recorder.
    */

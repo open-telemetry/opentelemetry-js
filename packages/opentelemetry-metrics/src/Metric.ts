@@ -95,7 +95,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       description: this._options.description,
       unit: this._options.unit,
       metricKind: this._kind,
-      valueType: this._valueType
+      valueType: this._valueType,
     };
   }
 
@@ -134,7 +134,8 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   }
 }
 
-export class MeasureMetric extends Metric<BoundMeasure> implements api.Measure {
+export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+  implements api.ValueRecorder {
   protected readonly _absolute: boolean;
 
   constructor(

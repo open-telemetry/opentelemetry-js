@@ -82,11 +82,6 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
-<<<<<<< HEAD
-  readonly monotonic: boolean;
-=======
-  readonly labelKeys: string[];
->>>>>>> a7dbd0b... feat: add the UpDownCounter instrument
 }
 
 /**

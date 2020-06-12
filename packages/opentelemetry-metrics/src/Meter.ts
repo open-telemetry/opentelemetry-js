@@ -19,7 +19,12 @@ import { ConsoleLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
-import { Metric, CounterMetric, ValueRecorderMetric, ObserverMetric } from './Metric';
+import {
+  Metric,
+  CounterMetric,
+  ValueRecorderMetric,
+  ObserverMetric,
+} from './Metric';
 import {
   MetricOptions,
   DEFAULT_METRIC_OPTIONS,
@@ -68,9 +73,9 @@ export class Meter implements api.Meter {
       return api.NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: MetricOptions = {
-      absolute: true, // value recorders are defined as absolute by default
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
+      absolute: true, // value recorders are defined as absolute by default
       ...options,
     };
 

@@ -411,7 +411,6 @@ describe('Meter', () => {
         assert.strictEqual(record.length, 1);
         assert.deepStrictEqual(record[0].descriptor, {
           description: '',
-          labelKeys: [],
           metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
