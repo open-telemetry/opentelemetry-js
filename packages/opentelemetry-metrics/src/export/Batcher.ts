@@ -55,6 +55,7 @@ export class UngroupedBatcher extends Batcher {
   aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
+      case MetricKind.UP_DOWN_COUNTER:
         return new CounterSumAggregator();
       case MetricKind.OBSERVER:
         return new ObserverAggregator();

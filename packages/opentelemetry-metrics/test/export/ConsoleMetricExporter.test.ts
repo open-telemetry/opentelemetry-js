@@ -57,7 +57,6 @@ describe('ConsoleMetricExporter', () => {
         {
           description: 'a test description',
           metricKind: MetricKind.COUNTER,
-          monotonic: true,
           name: 'counter',
           unit: '1',
           valueType: ValueType.DOUBLE,

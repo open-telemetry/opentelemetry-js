@@ -37,10 +37,7 @@ export interface MetricOptions {
   /** Indicates the metric is a verbose metric that is disabled by default. */
   disabled: boolean;
 
-  /** Monotonic metrics may only increase. */
-  monotonic: boolean;
-
-  /** (ValueRecorder only) Asserts that this metric will only accept non-negative values. */
+  /** (Measure only) Asserts that this metric will only accept non-negative values. */
   absolute: boolean;
 
   /** User provided logger. */
@@ -79,6 +76,7 @@ export const DEFAULT_CONFIG = {
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
+  absolute: false,
   description: '',
   unit: '1',
   valueType: ValueType.DOUBLE,

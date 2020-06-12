@@ -46,10 +46,10 @@
     "@opentelemetry/node": "^0.8.3",
     "@opentelemetry/tracing": "^0.8.3",
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.12",
+    "@types/node": "14.0.13",
     "@types/semver": "7.2.0",
     "@types/shimmer": "1.0.1",
-    "@types/sinon": "7.5.2",
+    "@types/sinon": "9.0.4",
     "codecov": "3.7.0",
     "grpc": "1.24.3",
     "gts": "2.0.2",
@@ -58,10 +58,10 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "semver": "7.3.2",
-    "sinon": "7.5.0",
+    "sinon": "9.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.7.2"
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",

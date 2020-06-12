@@ -22,6 +22,8 @@ import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { OT_REQUEST_HEADER } from '../src/utils';
+import * as nock from 'nock';
 
 describe('JaegerExporter', () => {
   describe('constructor', () => {
@@ -148,6 +150,52 @@ describe('JaegerExporter', () => {
       exporter.export([readableSpan], (result: ExportResult) => {
         assert.strictEqual(result, ExportResult.SUCCESS);
       });
+    });
+
+    it('should use httpSender if config.endpoint is setten and set x-opentelemetry-outgoing-request header', done => {
+      const mockedEndpoint = 'http://testendpoint';
+      nock(mockedEndpoint)
+        .post('/')
+        .reply(function () {
+          assert.strictEqual(this.req.headers[OT_REQUEST_HEADER], 1);
+          assert.strictEqual(
+            this.req.headers['content-type'],
+            'application/x-thrift'
+          );
+          assert.strictEqual(this.req.headers.host, 'testendpoint');
+          done();
+        });
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+        endpoint: mockedEndpoint,
+      });
+      assert.strictEqual(exporter['_sender'].constructor.name, 'HTTPSender');
+      assert.strictEqual(
+        exporter['_sender']._httpOptions.headers[OT_REQUEST_HEADER],
+        1
+      );
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      };
+      const readableSpan: ReadableSpan = {
+        name: 'my-span1',
+        kind: api.SpanKind.CLIENT,
+        spanContext,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
+        ended: true,
+        status: {
+          code: api.CanonicalCode.DATA_LOSS,
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [32, 800000000],
+        resource: Resource.empty(),
+      };
+      exporter.export([readableSpan], () => {});
     });
   });
 });

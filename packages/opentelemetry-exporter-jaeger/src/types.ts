@@ -28,6 +28,13 @@ export interface ExporterConfig {
   maxPacketSize?: number; // default: 65000
   /** Time to wait for an onShutdown flush to finish before closing the sender */
   flushTimeout?: number; // default: 2000
+  //The HTTP endpoint for sending spans directly to a collector, i.e. http://jaeger-collector:14268/api/traces
+  //If setten will override host and port
+  endpoint?: string;
+  //Username to send as part of "Basic" authentication to the collector endpoint
+  username?: string;
+  //Password to send as part of "Basic" authentication to the collector endpoint
+  password?: string;
 }
 
 // Below require is needed as jaeger-client types does not expose the thrift,
@@ -37,6 +44,9 @@ export const UDPSender = require('jaeger-client/dist/src/reporters/udp_sender')
   .default;
 export const Utils = require('jaeger-client/dist/src/util').default;
 export const ThriftUtils = require('jaeger-client/dist/src/thrift').default;
+
+export const HTTPSender = require('jaeger-client/dist/src/reporters/http_sender')
+  .default;
 
 export type TagValue = string | number | boolean;
 

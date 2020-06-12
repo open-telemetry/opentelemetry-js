@@ -20,6 +20,7 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
+import { OT_REQUEST_HEADER } from './utils';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -31,21 +32,39 @@ export class JaegerExporter implements SpanExporter {
   private readonly _onShutdownFlushTimeout: number;
 
   constructor(config: jaegerTypes.ExporterConfig) {
-    this._logger = config.logger || new NoopLogger();
-    const tags: jaegerTypes.Tag[] = config.tags || [];
+    const localConfig = Object.assign({}, config);
+    this._logger = localConfig.logger || new NoopLogger();
+    const tags: jaegerTypes.Tag[] = localConfig.tags || [];
     this._onShutdownFlushTimeout =
-      typeof config.flushTimeout === 'number' ? config.flushTimeout : 2000;
+      typeof localConfig.flushTimeout === 'number'
+        ? localConfig.flushTimeout
+        : 2000;
 
-    config.host = config.host || process.env.JAEGER_AGENT_HOST;
+    // https://github.com/jaegertracing/jaeger-client-node#environment-variables
+    // By default, the client sends traces via UDP to the agent at localhost:6832. Use JAEGER_AGENT_HOST and
+    // JAEGER_AGENT_PORT to send UDP traces to a different host:port. If JAEGER_ENDPOINT is set, the client sends traces
+    // to the endpoint via HTTP, making the JAEGER_AGENT_HOST and JAEGER_AGENT_PORT unused. If JAEGER_ENDPOINT is secured,
+    // HTTP basic authentication can be performed by setting the JAEGER_USER and JAEGER_PASSWORD environment variables.
+    localConfig.endpoint = localConfig.endpoint || process.env.JAEGER_ENDPOINT;
+    localConfig.username = localConfig.username || process.env.JAEGER_USER;
+    localConfig.password = localConfig.password || process.env.JAEGER_PASSWORD;
+    localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
+    if (localConfig.endpoint) {
+      this._sender = new jaegerTypes.HTTPSender(localConfig);
+      this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
+    } else {
+      this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
+        localConfig
+      );
+    }
 
-    this._sender = new jaegerTypes.UDPSender(config);
     if (this._sender._client instanceof Socket) {
       // unref socket to prevent it from keeping the process running
       this._sender._client.unref();
     }
 
     this._process = {
-      serviceName: config.serviceName,
+      serviceName: localConfig.serviceName,
       tags: jaegerTypes.ThriftUtils.getThriftTags(tags),
     };
     this._sender.setProcess(this._process);
