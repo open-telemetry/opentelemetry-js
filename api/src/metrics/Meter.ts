@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { MetricOptions, Counter, ValueRecorder, Observer } from './Metric';
+import {
+  MetricOptions,
+  Counter,
+  ValueRecorder,
+  Observer,
+  UpDownCounter,
+} from './Metric';
 
 /**
  * An interface to allow the recording metrics.
@@ -39,6 +45,25 @@ export interface Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Counter;
+
+  /**
+   * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
+   * instrument and very similar to Counter except that Add(increment)
+   * supports negative increments. It is generally useful for capturing changes
+   * in an amount of resources used, or any quantity that rises and falls
+   * during a request.
+   * Example uses for UpDownCounter:
+   * <ol>
+   *   <li> count the number of active requests. </li>
+   *   <li> count memory in use by instrumenting new and delete. </li>
+   *   <li> count queue size by instrumenting enqueue and dequeue. </li>
+   *   <li> count semaphore up and down operations. </li>
+   * </ol>
+   *
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter;
 
   /**
    * Creates a new `Observer` metric.
