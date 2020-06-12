@@ -129,8 +129,8 @@ export class Meter implements api.Meter {
       return api.NOOP_COUNTER_METRIC;
     }
     const opt: api.MetricOptions = {
-      logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
+      logger: this._logger,
       ...options,
     };
     const upDownCounter = new UpDownCounterMetric(
