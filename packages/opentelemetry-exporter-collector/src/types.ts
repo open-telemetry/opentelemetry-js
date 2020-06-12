@@ -16,6 +16,7 @@
 
 import { SpanKind, Logger } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
+import * as grpc from 'grpc';
 
 // header to prevent instrumentation on request
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
@@ -23,6 +24,15 @@ export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
   export namespace collector {
+    export namespace metrics.v1 {
+      export interface ExportMetricsServiceError {
+        code: number;
+        details: string;
+        metadata: { [key: string]: unknown };
+        message: string;
+        stack: string;
+      }
+    }
     export namespace trace.v1 {
       export interface TraceService {
         service: opentelemetryProto.collector.trace.v1.TraceService;
@@ -268,6 +278,8 @@ export interface ExporterOptions {
   logger?: Logger;
 
   url?: string;
+  
+  credentials?:  grpc.ChannelCredentials;
 }
 
 /**

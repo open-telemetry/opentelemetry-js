@@ -22,7 +22,7 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 export class CollectorMetricExporter implements MetricExporter {
   public readonly logger: Logger;
   public readonly url: string;
-  private readonly _startTime = new Date().toISOString();
+  private readonly _startTime = new Date().getTime() * 1000000;
 
   constructor(options: ExporterOptions = {}) {
     this.logger = options.logger || new NoopLogger();

@@ -17,7 +17,7 @@
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporterError } from '../../types';
-
+import { MetricRecord} from '@opentelemetry/metrics';
 /**
  * Queue item to be used to save temporary spans in case the GRPC service
  * hasn't been fully initialised yet
@@ -33,4 +33,17 @@ export interface GRPCQueueItem {
  */
 export interface TraceServiceClient extends grpc.Client {
   export: (request: any, callback: Function) => {};
+}
+
+/**
+ * Metric Service Client for sending metrics
+ */
+export interface MetricsServiceClient extends grpc.Client {
+  export: (request: any, callback: Function) => {};
+}
+
+export interface GRPCMetricQueueItem {
+  metrics: MetricRecord[];
+  onSuccess: () => void;
+  onError: (error: CollectorExporterError) => void;
 }

@@ -257,14 +257,15 @@ export function getCollectorPoints(metric: MetricRecord) {
 
 export function toCollectorMetric(
   metric: MetricRecord,
-  startTime: string,
+  startTime: number,
 ): opentelemetryProto.metrics.v1.Metric {
   console.log('metric');
   console.log(metric.descriptor.metricKind == MetricKind.COUNTER);
   console.log(metric.labels);
+  console.log(startTime);
   return {
     metricDescriptor: {
-      name: metric.descriptor.name + ".",
+      name: metric.descriptor.name,
       description: metric.descriptor.description,
       unit: metric.descriptor.unit,
       labels: [{ key: 'hello', value: 'world' }],
@@ -278,7 +279,7 @@ export function toCollectorMetric(
       {
         labels: [{ key: 'hello', value: 'world' }],
         value: metric.aggregator.toPoint().value as number,
-        startTimeUnixNano: parseInt(startTime),
+        startTimeUnixNano: startTime,
         timeUnixNano: core.hrTimeToNanoseconds(
           metric.aggregator.toPoint().timestamp
         ),
@@ -289,7 +290,7 @@ export function toCollectorMetric(
 
 export function toCollectorExportMetricServiceRequest(
   metrics: MetricRecord[], 
-  startTime: string,
+  startTime: number,
 ): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
   const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
     metric => toCollectorMetric(metric, startTime)
@@ -298,7 +299,7 @@ export function toCollectorExportMetricServiceRequest(
   const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
     metrics: metricsToBeSent,
     instrumentationLibrary: {
-      name: name || `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
+      name: `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
       version: core.SDK_INFO.VERSION,
     },
   };
