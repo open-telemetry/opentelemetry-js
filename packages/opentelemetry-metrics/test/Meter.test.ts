@@ -155,15 +155,6 @@ describe('Meter', () => {
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
       });
 
-      it('should add negative value when monotonic is set to false', async () => {
-        const counter = meter.createCounter('name') as CounterMetric;
-        const boundCounter = counter.bind(labels);
-        boundCounter.add(-10);
-        await meter.collect();
-        const [record1] = meter.getBatcher().checkPointSet();
-        assert.strictEqual(record1.aggregator.toPoint().value, -10);
-      });
-
       it('should return same instrument on same label values', async () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
@@ -276,10 +267,10 @@ describe('Meter', () => {
       assert.ok(upDownCounter instanceof Metric);
     });
 
-    it('should be able to call add() directly on UpDownCounter', () => {
+    it('should be able to call add() directly on UpDownCounter', async () => {
       const upDownCounter = meter.createUpDownCounter('name');
       upDownCounter.add(10, labels);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -297,14 +288,14 @@ describe('Meter', () => {
       );
     });
 
-    it('should be able to call add with no labels', () => {
+    it('should be able to call add with no labels', async () => {
       const upDownCounter = meter.createUpDownCounter('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       });
       upDownCounter.add(1);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
       assert.strictEqual(record1.aggregator.toPoint().value, 1);
     });
@@ -322,11 +313,11 @@ describe('Meter', () => {
     });
 
     describe('.bind()', () => {
-      it('should create a UpDownCounter instrument', () => {
+      it('should create a UpDownCounter instrument', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -344,24 +335,24 @@ describe('Meter', () => {
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
-      it('should not add the instrument data when disabled', () => {
+      it('should not add the instrument data when disabled', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           disabled: true,
         });
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
       });
 
-      it('should return same instrument on same label values', () => {
+      it('should return same instrument on same label values', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = upDownCounter.bind(labels);
         boundCounter1.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
@@ -400,7 +391,7 @@ describe('Meter', () => {
     });
 
     describe('.registerMetric()', () => {
-      it('skip already registered Metric', () => {
+      it('skip already registered Metric', async () => {
         const counter1 = meter.createCounter('name1') as CounterMetric;
         counter1.bind(labels).add(10);
 
@@ -410,7 +401,7 @@ describe('Meter', () => {
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
-        meter.collect();
+        await meter.collect();
         const record = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record.length, 1);
