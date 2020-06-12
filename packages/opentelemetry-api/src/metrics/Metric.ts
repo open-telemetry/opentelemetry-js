@@ -16,8 +16,11 @@
 
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
-import { BoundCounter, BoundValueRecorder } from './BoundInstrument';
-import { Observation } from './Observation';
+import {
+  BoundBaseObserver,
+  BoundCounter,
+  BoundValueRecorder,
+} from './BoundInstrument';
 import { Logger } from '../common/Logger';
 
 /**
@@ -161,8 +164,13 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
 }
 
 /** Base interface for the Observer metrics. */
-export interface BaseObserver extends Metric {
-  observation: (value: number) => Observation;
+export interface BaseObserver extends UnboundMetric<BoundBaseObserver> {
+  observation: (
+    value: number
+  ) => {
+    value: number;
+    observer: BaseObserver;
+  };
 }
 
 /** Base interface for the Value Observer metrics. */

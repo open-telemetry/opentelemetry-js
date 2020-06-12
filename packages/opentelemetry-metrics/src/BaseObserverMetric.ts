@@ -19,7 +19,6 @@ import { BoundObserver } from './BoundInstrument';
 import { Batcher } from './export/Batcher';
 import { MetricKind, MetricRecord } from './export/types';
 import { Metric } from './Metric';
-import { Observation } from './Observation';
 import { ObserverResult } from './ObserverResult';
 
 const NOOP_CALLBACK = () => {};
@@ -65,6 +64,9 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
   }
 
   observation(value: number) {
-    return new Observation(this, value);
+    return {
+      value,
+      observer: this as BaseObserverMetric,
+    };
   }
 }

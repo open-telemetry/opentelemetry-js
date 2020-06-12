@@ -25,11 +25,15 @@ import {
   ValueObserver,
   BatchObserver,
   UpDownCounter,
+  BaseObserver,
 } from './Metric';
-import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
+import {
+  BoundValueRecorder,
+  BoundCounter,
+  BoundBaseObserver,
+} from './BoundInstrument';
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
-import { Observation } from './Observation';
 import { ObserverResult } from './ObserverResult';
 
 /**
@@ -152,11 +156,11 @@ export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
   }
 }
 
-export class NoopBaseObserverMetric extends NoopMetric<void>
-  implements ValueObserver {
-  observation(): Observation {
+export class NoopBaseObserverMetric extends NoopMetric<BoundBaseObserver>
+  implements BaseObserver {
+  observation() {
     return {
-      valueObserver: this,
+      observer: this as BaseObserver,
       value: 0,
     };
   }
@@ -181,6 +185,10 @@ export class NoopBoundValueRecorder implements BoundValueRecorder {
   }
 }
 
+export class NoopBoundBaseObserver implements BoundBaseObserver {
+  update(value: number) {}
+}
+
 export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
@@ -190,5 +198,8 @@ export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
   NOOP_BOUND_VALUE_RECORDER
 );
 
-export const NOOP_VALUE_OBSERVER_METRIC = new NoopBaseObserverMetric();
+export const NOOP_BOUND_BASE_OBSERVER = new NoopBoundBaseObserver();
+export const NOOP_VALUE_OBSERVER_METRIC = new NoopBaseObserverMetric(
+  NOOP_BOUND_BASE_OBSERVER
+);
 export const NOOP_BATCH_OBSERVER_METRIC = new NoopBatchObserverMetric();
