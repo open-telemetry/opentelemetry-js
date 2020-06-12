@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,7 +48,6 @@ export class BatchObserverMetric extends Metric<BoundObserver>
     return new BoundObserver(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)

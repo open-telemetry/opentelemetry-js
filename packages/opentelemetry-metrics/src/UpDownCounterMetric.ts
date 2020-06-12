@@ -16,38 +16,39 @@
 
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { BoundValueRecorder } from './BoundInstrument';
-import { Batcher } from './export/Batcher';
+import { BoundUpDownCounter } from './BoundInstrument';
 import { MetricKind } from './export/types';
+import { Batcher } from './export/Batcher';
 import { Metric } from './Metric';
 
-/** This is a SDK implementation of Value Recorder Metric. */
-export class ValueRecorderMetric extends Metric<BoundValueRecorder>
-  implements api.ValueRecorder {
-  protected readonly _absolute: boolean;
-
+/** This is a SDK implementation of UpDownCounter Metric. */
+export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
+  implements api.UpDownCounter {
   constructor(
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
     resource: Resource
   ) {
-    super(name, options, MetricKind.VALUE_RECORDER, resource);
-
-    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
+    super(name, options, MetricKind.UP_DOWN_COUNTER, resource);
   }
-  protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
-    return new BoundValueRecorder(
+  protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
+    return new BoundUpDownCounter(
       labels,
       this._disabled,
-      this._absolute,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)
     );
   }
 
-  record(value: number, labels: api.Labels = {}) {
-    this.bind(labels).record(value);
+  /**
+   * Adds the given value to the current value. Values cannot be negative.
+   * @param value the value to add.
+   * @param [labels = {}] key-values pairs that are associated with a specific
+   *     metric that you want to record.
+   */
+  add(value: number, labels: api.Labels = {}) {
+    this.bind(labels).add(value);
   }
 }

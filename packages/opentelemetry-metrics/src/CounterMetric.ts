@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     return new BoundCounter(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       // @todo: consider to set to CounterSumAggregator always.
