@@ -14,10 +14,20 @@
  * limitations under the License.
  */
 
-export * from './BasePlugin';
-export * from './environment';
-export * from './hex-to-base64';
-export * from './id';
-export * from './performance';
-export * from './sdk-info';
-export * from './timer-util';
+import {
+  DEFAULT_ENVIRONMENT,
+  ENVIRONMENT,
+  ENVIRONMENT_MAP,
+  parseEnvironment,
+} from '../../utils/environment';
+import * as api from '@opentelemetry/api';
+
+/**
+ * Gets the environment variables
+ */
+export function getEnv(): ENVIRONMENT {
+  const globalEnv = parseEnvironment(
+    (api._globalThis as unknown) as ENVIRONMENT_MAP
+  );
+  return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
+}
