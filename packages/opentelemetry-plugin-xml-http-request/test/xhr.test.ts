@@ -140,6 +140,7 @@ describe('xhr', () => {
         let webTracerProviderWithZone: WebTracerProvider;
         let dummySpanExporter: DummySpanExporter;
         let exportSpy: any;
+        let clearResourceTimingsSpy: any;
         let rootSpan: api.Span;
         let spyEntries: any;
         const url = 'http://localhost:8090/xml-http-request.js';
@@ -183,6 +184,10 @@ describe('xhr', () => {
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
+          clearResourceTimingsSpy = sandbox.stub(
+            (performance as unknown) as Performance,
+            'clearResourceTimings'
+          );
           webTracerProviderWithZone.addSpanProcessor(
             new tracing.SimpleSpanProcessor(dummySpanExporter)
           );
@@ -454,23 +459,12 @@ describe('xhr', () => {
           );
         });
 
-        describe('when url is ignored', () => {
-          beforeEach(done => {
-            clearData();
-            const propagateTraceHeaderCorsUrls = url;
-            prepareData(done, url, {
-              propagateTraceHeaderCorsUrls,
-              ignoreUrls: [propagateTraceHeaderCorsUrls],
-            });
-          });
-
-          it('should NOT create any span', () => {
-            assert.strictEqual(
-              exportSpy.args.length,
-              0,
-              "span shouldn't be exported"
-            );
-          });
+        it('should NOT clear the resources', () => {
+          assert.strictEqual(
+            clearResourceTimingsSpy.args.length,
+            0,
+            'resources have been cleared'
+          );
         });
 
         describe('AND origin match with window.location', () => {
@@ -517,7 +511,7 @@ describe('xhr', () => {
             });
             it('should set trace headers', () => {
               // span at exportSpy.args[0][0][0] is the preflight span
-              const span: api.Span = exportSpy.args[1][0][0]; 
+              const span: api.Span = exportSpy.args[1][0][0];
               assert.strictEqual(
                 requests[0].requestHeaders[X_B3_TRACE_ID],
                 span.context().traceId,
@@ -566,6 +560,44 @@ describe('xhr', () => {
             });
           }
         );
+
+        describe('when url is ignored', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = url;
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              ignoreUrls: [propagateTraceHeaderCorsUrls],
+            });
+          });
+
+          it('should NOT create any span', () => {
+            assert.strictEqual(
+              exportSpy.args.length,
+              0,
+              "span shouldn't be exported"
+            );
+          });
+        });
+
+        describe('when clearTimingResources is set', () => {
+          beforeEach(done => {
+            clearData();
+            const propagateTraceHeaderCorsUrls = url;
+            prepareData(done, url, {
+              propagateTraceHeaderCorsUrls,
+              clearTimingResources: true,
+            });
+          });
+
+          it('should clear the resources', () => {
+            assert.strictEqual(
+              clearResourceTimingsSpy.args.length,
+              1,
+              "resources haven't been cleared"
+            );
+          });
+        });
       });
 
       describe('when request is NOT successful', () => {
