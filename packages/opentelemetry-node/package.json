@@ -44,7 +44,7 @@
     "@opentelemetry/context-base": "^0.8.3",
     "@opentelemetry/resources": "^0.8.3",
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.12",
+    "@types/node": "14.0.13",
     "@types/semver": "7.2.0",
     "@types/shimmer": "1.0.1",
     "codecov": "3.7.0",
@@ -55,7 +55,7 @@
     "shimmer": "1.2.1",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.7.2"
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",

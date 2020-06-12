@@ -24,19 +24,16 @@ import { Aggregator } from './export/types';
 export class BaseBoundInstrument {
   protected _labels: api.Labels;
   protected _logger: api.Logger;
-  protected _monotonic: boolean;
 
   constructor(
     labels: api.Labels,
     logger: api.Logger,
-    monotonic: boolean,
     private readonly _disabled: boolean,
     private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
   ) {
     this._labels = labels;
     this._logger = logger;
-    this._monotonic = monotonic;
   }
 
   update(value: number): void {
@@ -72,18 +69,17 @@ export class BoundCounter extends BaseBoundInstrument
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
-    if (this._monotonic && value < 0) {
+    if (value < 0) {
       this._logger.error(
-        `Monotonic counter cannot descend for ${Object.values(this._labels)}`
+        `Counter cannot descend for ${Object.values(this._labels)}`
       );
       return;
     }
@@ -93,7 +89,29 @@ export class BoundCounter extends BaseBoundInstrument
 }
 
 /**
- * BoundValueRecorder is an implementation of the {@link BoundValueRecorder} interface.
+ * BoundUpDownCounter allows the SDK to observe/record a single metric event.
+ * The value of single instrument in the `UpDownCounter` associated with
+ * specified Labels.
+ */
+export class BoundUpDownCounter extends BaseBoundInstrument
+  implements api.BoundCounter {
+  constructor(
+    labels: api.Labels,
+    disabled: boolean,
+    valueType: api.ValueType,
+    logger: api.Logger,
+    aggregator: Aggregator
+  ) {
+    super(labels, logger, disabled, valueType, aggregator);
+  }
+
+  add(value: number): void {
+    this.update(value);
+  }
+}
+
+/**
+ * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
 export class BoundValueRecorder extends BaseBoundInstrument
   implements api.BoundValueRecorder {
@@ -102,13 +120,12 @@ export class BoundValueRecorder extends BaseBoundInstrument
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     absolute: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, disabled, valueType, aggregator);
     this._absolute = absolute;
   }
 
@@ -137,11 +154,10 @@ export class BoundObserver extends BaseBoundInstrument {
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, disabled, valueType, aggregator);
   }
 }
