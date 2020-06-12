@@ -61,7 +61,7 @@ function getRandomValue() {
 ```
 
 ### Batch Observer
-Choose this kind of metric when you need to have an async calculation that needs to be used to update Value Observer
+Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');

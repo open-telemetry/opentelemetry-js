@@ -181,8 +181,6 @@ export class Meter implements api.Meter {
    * @param name the name of the metric.
    * @param callback the batch observer callback
    * @param [options] the metric batch options.
-   * @param [maxTimeoutUpdateMS] indicates how long should the batch metric
-   *     wait to update
    */
   createBatchObserver(
     name: string,
