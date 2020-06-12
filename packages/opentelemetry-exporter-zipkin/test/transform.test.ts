@@ -44,7 +44,7 @@ const spanContext: api.SpanContext = {
   traceFlags: api.TraceFlags.SAMPLED,
 };
 
-const DUMMY_RESOUCE = new Resource({
+const DUMMY_RESOURCE = new Resource({
   service: 'ui',
   version: 1,
   cost: 112.12,
@@ -202,7 +202,7 @@ describe('transform', () => {
         span.status,
         statusCodeTagName,
         statusDescriptionTagName,
-        DUMMY_RESOUCE
+        DUMMY_RESOURCE
       );
 
       assert.deepStrictEqual(tags, {
