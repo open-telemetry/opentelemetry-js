@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -191,10 +191,9 @@ export class PrometheusExporter implements MetricExporter {
 
     switch (record.descriptor.metricKind) {
       case MetricKind.COUNTER:
-        // there is no such thing as a non-monotonic counter in prometheus
-        return record.descriptor.monotonic
-          ? new Counter(metricObject)
-          : new Gauge(metricObject);
+        return new Counter(metricObject);
+      case MetricKind.UP_DOWN_COUNTER:
+        return new Gauge(metricObject);
       case MetricKind.OBSERVER:
         return new Gauge(metricObject);
       default:

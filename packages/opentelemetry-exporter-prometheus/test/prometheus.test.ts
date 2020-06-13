@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -384,10 +384,9 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a non-monotonic counter as a gauge', done => {
-      const counter = meter.createCounter('counter', {
+    it('should export a UpDownCounter as a gauge', done => {
+      const counter = meter.createUpDownCounter('counter', {
         description: 'a test description',
-        monotonic: false,
       });
 
       counter.bind({ key1: 'labelValue1' }).add(20);
