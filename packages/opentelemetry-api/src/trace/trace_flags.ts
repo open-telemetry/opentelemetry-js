@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,12 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-/**
- * An enumeration that represents global trace flags. These flags are
- * propagated to all child {@link Span}. These determine features such as
- * whether a Span should be traced. It is implemented as a bitmask.
  */
 export enum TraceFlags {
   /** Represents no flag set. */
