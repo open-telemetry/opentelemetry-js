@@ -20,6 +20,7 @@ import {
   SpanKind,
   TimedEvent,
   TraceState,
+  Labels,
 } from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -31,7 +32,7 @@ import {
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
-import { MetricRecord, MetricKind} from '@opentelemetry/metrics';
+import { MetricRecord, MetricKind } from '@opentelemetry/metrics';
 // import { CollectorMetricExporter } from './CollectorMetricExporter';
 
 /**
@@ -44,6 +45,12 @@ export function toCollectorAttributes(
   return Object.keys(attributes).map(key => {
     return toCollectorAttributeKeyValue(key, attributes[key]);
   });
+}
+
+export function toCollectorLabels(
+  labels: Labels
+): opentelemetryProto.common.v1.StringKeyValue[] {
+  return Object.keys(labels).map(key => {return {key: key, value: labels[key]}});
 }
 
 /**
@@ -262,13 +269,14 @@ export function toCollectorMetric(
   console.log('metric');
   console.log(metric.descriptor.metricKind == MetricKind.COUNTER);
   console.log(metric.labels);
+  console.log(toCollectorLabels(metric.labels));
   console.log(startTime);
   return {
     metricDescriptor: {
       name: metric.descriptor.name,
       description: metric.descriptor.description,
       unit: metric.descriptor.unit,
-      labels: [{ key: 'hello', value: 'world' }],
+      labels: toCollectorLabels(metric.labels),
       type: opentelemetryProto.metrics.v1.MetricDescriptor_Type.COUNTER_INT64,
       temporality: opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE,
     },
@@ -277,7 +285,7 @@ export function toCollectorMetric(
     summaryDataPoints: [],
     int64DataPoints: [
       {
-        labels: [{ key: 'hello', value: 'world' }],
+        labels: toCollectorLabels(metric.labels),
         value: metric.aggregator.toPoint().value as number,
         startTimeUnixNano: startTime,
         timeUnixNano: core.hrTimeToNanoseconds(
