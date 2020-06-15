@@ -8,7 +8,9 @@ const exporter = new PrometheusExporter(
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+    );
   },
 );
 
@@ -20,14 +22,12 @@ const meter = new MeterProvider({
 // Monotonic counters can only be increased.
 const monotonicCounter = meter.createCounter('monotonic_counter', {
   monotonic: true,
-  labelKeys: ['pid'],
   description: 'Example of a monotonic counter',
 });
 
 // Non-monotonic counters can be increased or decreased.
 const nonMonotonicCounter = meter.createCounter('non_monotonic_counter', {
   monotonic: false,
-  labelKeys: ['pid'],
   description: 'Example of a non-monotonic counter',
 });
 

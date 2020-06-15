@@ -7,31 +7,46 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-    - name: restore lerna
-      uses: actions/cache@master # must use unreleased master to cache multiple paths
-      id: cache
-      with:
-        path: |
-          node_modules
-          packages/*/node_modules
-          metapackages/*/node_modules
-        key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+      - name: Lint changelog file
+        uses: avto-dev/markdown-lint@v1
+        with:
+          # Commenting due to
+          # https://github.com/avto-dev/markdown-lint/blob/aab9be9823fcd706f6da3e6ad6c64874c23fbd4c/lint/rules/changelog.js#L51-L71
+          # TODO: adhere to, or overwrite above rule and uncomment rules
+          # rules: "/lint/rules/changelog.js"
+          config: "/lint/config/changelog.yml"
+          args: "./CHANGELOG.md"
 
-    - name: Bootstrap
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        npm install --only=dev --ignore-scripts
-        npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
+      - name: Lint markdown files
+        uses: avto-dev/markdown-lint@v1
+        with:
+          args: "./**/*.md -i ./CHANGELOG.md"
 
-    - name: Lint
-      run: |
-        npm run lint
-        npm run lint:examples
+      - name: restore lerna
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            metapackages/*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
 
-    - name: Install and Build API Dependencies
-      run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
+      - name: Bootstrap
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npm install --only=dev --ignore-scripts
+          npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
 
-    - name: Test Docs
-      run: npm run docs-test
+      - name: Lint
+        run: |
+          npm run lint
+          npm run lint:examples
+
+      - name: Install and Build API Dependencies
+        run: npx lerna bootstrap --no-ci --scope @opentelemetry/api --include-filtered-dependencies
+
+      - name: Test Docs
+        run: npm run docs-test

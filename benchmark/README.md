@@ -3,8 +3,9 @@
 ## How to run
 
 To run your benchmark, just:
+
 ```sh
-$ npm run bench
+npm run bench
 ```
 
 The minimum sample size is set to 10 to perform statistical analysis on benchmark, you can re-configure that in `benchmark.js`.
@@ -15,7 +16,7 @@ The minimum sample size is set to 10 to perform statistical analysis on benchmar
 
 ### `v0.5.0` release
 
-```
+```text
 Beginning NoopTracerProvider Benchmark...
   5 tests completed.
 
@@ -67,7 +68,7 @@ Beginning HttpTraceContext Benchmark...
 
 ### `v0.3.3` release
 
-```
+```text
 Beginning NoopTracerProvider Benchmark...
   5 tests completed.
 

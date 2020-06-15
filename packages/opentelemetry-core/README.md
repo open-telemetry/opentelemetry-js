@@ -1,4 +1,5 @@
 # OpenTelemetry Core
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -9,19 +10,24 @@ This package provides default implementations of the OpenTelemetry API for trace
 
 ## Built-in Implementations
 
-- [Built-in Propagators](#built-in-propagators)
-  * [HttpTraceContext Propagator](#httptracecontext-propagator)
-  * [B3 Propagator](#b3-propagator)
-  * [Composite Propagator](#composite-propagator)
-  * [Correlation Context Propagator](#correlation-context-propagator)
-- [Built-in Sampler](#built-in-sampler)
-  * [Always Sampler](#always-sampler)
-  * [Never Sampler](#never-sampler)
-  * [Probability Sampler](#probability-sampler)
+- [OpenTelemetry Core](#opentelemetry-core)
+  - [Built-in Implementations](#built-in-implementations)
+    - [Built-in Propagators](#built-in-propagators)
+      - [HttpTraceContext Propagator](#httptracecontext-propagator)
+      - [B3 Propagator](#b3-propagator)
+      - [Composite Propagator](#composite-propagator)
+      - [Correlation Context Propagator](#correlation-context-propagator)
+    - [Built-in Sampler](#built-in-sampler)
+      - [Always Sampler](#always-sampler)
+      - [Never Sampler](#never-sampler)
+      - [Probability Sampler](#probability-sampler)
+  - [Useful links](#useful-links)
+  - [License](#license)
 
 ### Built-in Propagators
 
 #### HttpTraceContext Propagator
+
 OpenTelemetry provides a text-based approach to propagate context to remote services using the [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP headers.
 
 > This is used as a default Propagator
@@ -35,7 +41,8 @@ api.propagation.setGlobalPropagator(new HttpTraceContext());
 ```
 
 #### B3 Propagator
-This is propagator for the B3 HTTP header format, which sends a `SpanContext` on the wire in an HTTP request, allowing other services to create spans with the right context. Based on: https://github.com/openzipkin/b3-propagation
+
+This is propagator for the B3 HTTP header format, which sends a `SpanContext` on the wire in an HTTP request, allowing other services to create spans with the right context. Based on: <https://github.com/openzipkin/b3-propagation>
 
 ```js
 const api = require("@opentelemetry/api");
@@ -46,6 +53,7 @@ api.propagation.setGlobalPropagator(new B3Propagator());
 ```
 
 #### Composite Propagator
+
 Combines multiple propagators into a single propagator.
 
 ```js
@@ -57,6 +65,7 @@ api.propagation.setGlobalPropagator(new CompositePropagator());
 ```
 
 #### Correlation Context Propagator
+
 Provides a text-based approach to propagate [correlation context](https://w3c.github.io/correlation-context/) to remote services using the [OpenTelemetry CorrelationContext Propagation](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/correlationcontext/api.md#header-name) HTTP headers.
 
 ```js
@@ -68,9 +77,11 @@ api.propagation.setGlobalPropagator(new HttpCorrelationContext());
 ```
 
 ### Built-in Sampler
+
 Sampler is used to make decisions on `Span` sampling.
 
 #### Always Sampler
+
 Samples every trace regardless of upstream sampling decisions.
 
 > This is used as a default Sampler
@@ -85,6 +96,7 @@ const tracerProvider = new NodeTracerProvider({
 ```
 
 #### Never Sampler
+
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
 ```js
@@ -97,6 +109,7 @@ const tracerProvider = new NodeTracerProvider({
 ```
 
 #### Probability Sampler
+
 Samples a configurable percentage of traces, and additionally samples any trace that was sampled upstream.
 
 ```js
@@ -109,6 +122,7 @@ const tracerProvider = new NodeTracerProvider({
 ```
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

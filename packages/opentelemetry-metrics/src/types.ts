@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,19 +31,13 @@ export interface MetricOptions {
   /** The unit of the Metric values. */
   unit: string;
 
-  /** The list of label keys for the Metric. */
-  labelKeys: string[];
-
   /** The map of constant labels for the Metric. */
   constantLabels?: Map<string, string>;
 
   /** Indicates the metric is a verbose metric that is disabled by default. */
   disabled: boolean;
 
-  /** Monotonic metrics may only increase. */
-  monotonic: boolean;
-
-  /** (ValueRecorder only) Asserts that this metric will only accept non-negative values. */
+  /** (Measure only) Asserts that this metric will only accept non-negative values. */
   absolute: boolean;
 
   /** User provided logger. */
@@ -82,8 +76,8 @@ export const DEFAULT_CONFIG = {
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
+  absolute: false,
   description: '',
   unit: '1',
-  labelKeys: [],
   valueType: ValueType.DOUBLE,
 };

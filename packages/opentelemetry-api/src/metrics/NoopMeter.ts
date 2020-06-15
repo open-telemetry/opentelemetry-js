@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ import {
   Counter,
   ValueRecorder,
   Observer,
+  UpDownCounter,
 } from './Metric';
 import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
@@ -50,6 +51,15 @@ export class NoopMeter implements Meter {
    * @param [options] the metric options.
    */
   createCounter(name: string, options?: MetricOptions): Counter {
+    return NOOP_COUNTER_METRIC;
+  }
+
+  /**
+   * Returns a constant noop UpDownCounter.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
     return NOOP_COUNTER_METRIC;
   }
 

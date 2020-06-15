@@ -5,15 +5,15 @@ This example shows how to use [@opentelemetry/web](https://github.com/open-telem
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 ## Run the Application
 
 ```sh
-$ # from this directory
-$ npm start
+# from this directory
+npm start
 ```
 
 By default, the application will run on port `8090`.
@@ -34,7 +34,6 @@ To see the results, open the browser at <http://localhost:8090/xml-http-request/
 The screen will look as follows:
 
 ![Screenshot of the running example](images/xml-http-request.png)
-
 
 ## Useful links
 

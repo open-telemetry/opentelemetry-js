@@ -1,4 +1,5 @@
 # OpenTelemetry AsyncHooks-based Context Manager
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -7,7 +8,7 @@
 
 This package provides [async-hooks][async-hooks-doc] based context manager which is used internally by OpenTelemetry plugins to propagate specific context between function calls and async operations. It only targets NodeJS since async-hooks is only available there.
 
-## What is a ContextManager ?
+## What is a ContextManager
 
 The definition and why they exist is available on [the readme of the context-base package][def-context-manager].
 
@@ -25,13 +26,14 @@ There are known modules that break context propagation ([some of them are listed
 ### Prior arts
 
 Context propagation is a big subject when talking about tracing in NodeJS, if you want more information about that here are some resources:
-- https://www.npmjs.com/package/continuation-local-storage (which was the old way of doing context propagation)
+
+- <https://www.npmjs.com/package/continuation-local-storage> (which was the old way of doing context propagation)
 - Datadog's own implementation for their Javascript tracer: [here][dd-js-tracer-scope]
 - OpenTracing implementation: [here][opentracing-scope]
 - Discussion about context propagation by the NodeJS diagnostics working group: [here][diag-team-scope-discussion]
 
-
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
