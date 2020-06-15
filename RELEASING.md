@@ -4,15 +4,20 @@ This document explains how to publish all OT modules at version x.y.z. Ensure th
 
 Release Process:
 
-* [Update to latest locally](#update-to-latest-locally)
-* [Create a new branch](#create-a-new-branch)
-* [Prepare each package for release](#prepare-each-package-for-release)
-* [Use the Changelog to create a GitHub Release](#use-the-changelog-to-create-a-github-release)
-* [Create a new PR](#create-a-new-pr)
-* [Merge and pull](#merge-and-pull)
-* [Publish all packages](#publish-all-packages)
-* [Publish the GitHub Release](#publish-the-github-release)
-* [Update CHANGELOG](#update-changelog)
+- [Releasing OpenTelemetry Packages (for Maintainers Only)](#releasing-opentelemetry-packages-for-maintainers-only)
+  - [Update to latest locally](#update-to-latest-locally)
+  - [Create a new branch](#create-a-new-branch)
+  - [Prepare each package for release](#prepare-each-package-for-release)
+  - [Use the Changelog to create a GitHub Release](#use-the-changelog-to-create-a-github-release)
+    - [Generate the changelog with lerna](#generate-the-changelog-with-lerna)
+      - [How to use](#how-to-use)
+      - [Update Changelog file](#update-changelog-file)
+  - [Create a new PR](#create-a-new-pr)
+  - [Merge and pull](#merge-and-pull)
+  - [Publish all packages](#publish-all-packages)
+  - [Publish the GitHub Release](#publish-the-github-release)
+  - [Update CHANGELOG](#update-changelog)
+  - [Known Issues](#known-issues)
 
 ## Update to latest locally
 
@@ -26,9 +31,9 @@ Create a new branch called `x.y.z-proposal` from the current commit.
 
 Decide on the next `major.minor.patch` release number based on [semver](http://semver.org/) guidelines.
 
-* Use `npm install` command to initialize all package directories
-* Use `lerna publish --skip-npm --no-git-tag-version --no-push` to bump the version in all `package.json`
-* Use `npm run bootstrap` to generate latest `version.ts` files
+- Use `npm install` command to initialize all package directories
+- Use `lerna publish --skip-npm --no-git-tag-version --no-push` to bump the version in all `package.json`
+- Use `npm run bootstrap` to generate latest `version.ts` files
 
 ## Use the Changelog to create a GitHub Release
 
@@ -37,13 +42,16 @@ Decide on the next `major.minor.patch` release number based on [semver](http://s
 Since we use `lerna`, we can use [lerna-changelog](https://github.com/lerna/lerna-changelog#lerna-changelog)
 
 #### How to use
+
 Pass your [github token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) to generate the changelog automatically.
 For security reasons, when you create a Github token, select the permissions: under **repo**, select **Access public repositories**, **commit status**.
 
 In your terminal, execute the following command:
+
 ```bash
 GITHUB_AUTH=<your token> lerna-changelog
 ```
+
 It will print something like:
 
 ```md
@@ -59,10 +67,12 @@ It will print something like:
 - Helpful Hacker ([@helpful-hacker](https://github.com/helpful-hacker))
 - [@careful-coder](https://github.com/careful-coder)
 ```
+
 By default lerna-changelog will show all pull requests that have been merged since the latest tagged commit in the repository. That is however only true for pull requests **with certain labels applied** (see [lerna.json](lerna.json) for authorized labels).
 
 You can also use the `--from` and `--to` options to view a different range of pull requests:
-```
+
+```sh
 GITHUB_AUTH=xxxxx lerna-changelog --from=v1.0.0 --to=v2.0.0
 ```
 
@@ -97,15 +107,15 @@ done
 Check your e-mail and make sure the number of “you’ve published this module” emails matches the number you expect.
 
 ## Publish the GitHub Release
+
 Publish the GitHub release, ensuring that the tag points to the newly landed commit corresponding to release proposal `x.y.z`.
 
 ## Update CHANGELOG
 
-* After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
-* Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
-* Go through PR review and merge it to GitHub master branch.
-
+- After releasing is done, update the [CHANGELOG.md](https://github.com/open-telemetry/opentelemetry-js/blob/master/CHANGELOG.md) and start new Unreleased label.
+- Create a new commit with the exact title: `Post Release: update CHANGELOG.md`.
+- Go through PR review and merge it to GitHub master branch.
 
 ## Known Issues
 
-* The `examples/` and `getting-started/` folders are not part of lerna packages, we need to manually bump the version in `package.json`.
+- The `examples/` and `getting-started/` folders are not part of lerna packages, we need to manually bump the version in `package.json`.

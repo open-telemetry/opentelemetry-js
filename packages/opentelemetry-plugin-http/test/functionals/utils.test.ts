@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, OpenTelemetry Authors
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import { IncomingMessage, ServerResponse } from 'http';
 import { Socket } from 'net';
 import * as sinon from 'sinon';
 import * as url from 'url';
-import { AttributeNames } from '../../src';
 import { IgnoreMatcher } from '../../src/types';
 import * as utils from '../../src/utils';
 
@@ -264,10 +264,10 @@ describe('Utility', () => {
         utils.setSpanWithError(span, new Error(errorMessage), obj as any);
         const attributes = span.attributes;
         assert.strictEqual(
-          attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+          attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
           errorMessage
         );
-        assert.ok(attributes[AttributeNames.HTTP_ERROR_NAME]);
+        assert.ok(attributes[HttpAttribute.HTTP_ERROR_NAME]);
       }
     });
   });
@@ -325,7 +325,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
-      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], '/test/toto');
+      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], '/test/toto');
     });
 
     it('should succesfully process without middleware stack', () => {
@@ -333,7 +333,7 @@ describe('Utility', () => {
       const attributes = utils.getIncomingRequestAttributesOnResponse(request, {
         socket: {},
       } as ServerResponse & { socket: Socket });
-      assert.deepEqual(attributes[AttributeNames.HTTP_ROUTE], undefined);
+      assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], undefined);
     });
   });
 });

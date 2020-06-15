@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import * as api from '@opentelemetry/api';
  */
 export interface ExporterConfig {
   logger?: api.Logger;
-  serviceName: string;
+  serviceName?: string;
   url?: string;
   // Optional mapping overrides for OpenTelemetry status code and description.
   statusCodeTagName?: string;

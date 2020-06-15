@@ -1,4 +1,5 @@
 # OpenTelemetry Collector Exporter for web and node
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -15,6 +16,7 @@ npm install --save @opentelemetry/exporter-collector
 
 ## Usage in Web
 The CollectorExporter in Web expects the endpoint to end in `/v1/trace`. 
+
 ```js
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
@@ -33,7 +35,8 @@ provider.register();
 ```
 
 ## Usage in Node
-The CollectorExporter in Node expects the URL to only be the endpoint. It will not work with `/v1/trace`.
+The CollectorExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
+
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
@@ -52,6 +55,7 @@ provider.register();
 ```
 
 By default, plaintext connection is used. In order to use TLS in Node.js, provide `credentials` option like so:
+
 ```js
 const fs = require('fs');
 const grpc = require('grpc');
@@ -80,11 +84,13 @@ To see how to generate credentials, you can refer to the script used to generate
 Note, that this will only work if TLS is also configured on the server.
 
 ## Running opentelemetry-collector locally to see the traces
+
 1. Go to examples/basic-tracer-node
 2. run `npm run collector:docker:ot`
 3. Open page at `http://localhost:9411/zipkin/` to observe the traces
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

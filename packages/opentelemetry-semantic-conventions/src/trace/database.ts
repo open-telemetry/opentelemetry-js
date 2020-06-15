@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,17 +15,16 @@
  */
 
 /**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes
+ * Database attribute names defined by the Opetelemetry Semantic Conventions specification
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/database.md
  */
-export enum AttributeNames {
-  COMPONENT = 'component',
-  HTTP_HOST = 'http.host',
-  HTTP_FLAVOR = 'http.flavor',
-  HTTP_METHOD = 'http.method',
-  HTTP_SCHEME = 'http.scheme',
-  HTTP_STATUS_CODE = 'http.status_code',
-  HTTP_STATUS_TEXT = 'http.status_text',
-  HTTP_URL = 'http.url',
-  // NOT ON OFFICIAL SPEC
-  HTTP_USER_AGENT = 'http.user_agent',
-}
+export const DatabaseAttribute = {
+  // db (required)
+  DB_TYPE: 'db.type',
+  DB_INSTANCE: 'db.instance',
+  DB_STATEMENT: 'db.statement',
+  DB_URL: 'db.url',
+
+  // db (optional)
+  DB_USER: 'db.user',
+};

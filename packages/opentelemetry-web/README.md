@@ -1,4 +1,5 @@
 # OpenTelemetry Web SDK
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -10,7 +11,8 @@ This module provides *automated instrumentation and tracing* for Web application
 For manual instrumentation see the
 [@opentelemetry/tracing](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-tracing) package.
 
-## How does automatic tracing work?
+## How does automatic tracing work
+
 This package exposes a class `WebTracerProvider` that will be able to automatically trace things in Browser only.
 
 See the example how to use it.
@@ -62,6 +64,7 @@ providerWithZone.register({
 ```
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
