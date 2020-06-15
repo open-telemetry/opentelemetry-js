@@ -102,6 +102,14 @@ const provider = new NodeTracerProvider({
 });
 ```
 
+### Disable Plugins with Environment Variables
+
+Plugins can be disabled without modifying and redeploying code.
+`OTEL_NO_PATCH_MODULES` accepts a
+comma separated list of module names to disabled specific plugins.
+The names should match what you use to `require` the module into your application.
+For example, `OTEL_NO_PATCH_MODULES=pg,https` will disable the postgres plugin and the https plugin. To disable **all** plugins, set the environment variable to `*`.
+
 ## Examples
 
 See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) using node-sdk.

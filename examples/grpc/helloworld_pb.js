@@ -69,7 +69,6 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
   proto.helloworld.HelloRequest.toObject = function (includeInstance, msg) {
     let f;
 
-
     const obj = {
       name: msg.getName(),
     };
@@ -227,7 +226,6 @@ if (jspb.Message.GENERATE_TO_OBJECT) {
    */
   proto.helloworld.HelloReply.toObject = function (includeInstance, msg) {
     let f;
-
 
     const obj = {
       message: msg.getMessage(),
