@@ -46,6 +46,8 @@ class DummySpanExporter implements tracing.SpanExporter {
   shutdown() {}
 }
 
+const XHR_TIMEOUT = 2000;
+
 const getData = (url: string, callbackAfterSend: Function, async?: boolean) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
@@ -53,12 +55,18 @@ const getData = (url: string, callbackAfterSend: Function, async?: boolean) => {
       async = true;
     }
     const req = new XMLHttpRequest();
+    req.timeout = XHR_TIMEOUT;
+
     req.open('GET', url, async);
     req.onload = function () {
       resolve();
     };
 
     req.onerror = function () {
+      resolve();
+    };
+
+    req.onabort = function () {
       resolve();
     };
 
@@ -690,7 +698,7 @@ describe('xhr', () => {
             assert.strictEqual(
               attributes[keys[2]],
               secondUrl,
-              `attribute ${AttributeNames.HTTP_URL} is wrong`
+              `attribute ${HttpAttribute.HTTP_URL} is wrong`
             );
           });
         });
@@ -707,7 +715,7 @@ describe('xhr', () => {
           'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
         let fakeNow = 0;
 
-        beforeEach(done => {
+        beforeEach(() => {
           sandbox = sinon.createSandbox();
           const fakeXhr = sandbox.useFakeXMLHttpRequest();
           fakeXhr.onCreate = function (xhr: any) {
@@ -741,144 +749,416 @@ describe('xhr', () => {
           webTracerWithZone = webTracerWithZoneProvider.getTracer('xhr-test');
 
           rootSpan = webTracerWithZone.startSpan('root');
-
-          webTracerWithZone.withSpan(rootSpan, () => {
-            getData(
-              url,
-              () => {
-                fakeNow = 100;
-              },
-              testAsync
-            ).then(() => {
-              fakeNow = 0;
-              sandbox.clock.tick(1000);
-              done();
-            });
-            assert.strictEqual(requests.length, 1, 'request not called');
-            requests[0].respond(
-              400,
-              { 'Content-Type': 'text/plain' },
-              'Bad Request'
-            );
-          });
         });
 
         afterEach(() => {
           clearData();
         });
 
-        it('span should have correct attributes', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const attributes = span.attributes;
-          const keys = Object.keys(attributes);
+        describe('when request loads and receives an error code', () => {
+          beforeEach(done => {
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getData(
+                url,
+                () => {
+                  fakeNow = 100;
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+                done();
+              });
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].respond(
+                400,
+                { 'Content-Type': 'text/plain' },
+                'Bad Request'
+              );
+            });
+          });
+          it('span should have correct attributes', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const attributes = span.attributes;
+            const keys = Object.keys(attributes);
 
-          assert.ok(
-            attributes[keys[0]] !== '',
-            `attributes ${GeneralAttribute.COMPONENT} is not defined`
-          );
-          assert.strictEqual(
-            attributes[keys[1]],
-            'GET',
-            `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
-          );
-          assert.strictEqual(
-            attributes[keys[2]],
-            url,
-            `attributes ${HttpAttribute.HTTP_URL} is wrong`
-          );
-          assert.strictEqual(
-            attributes[keys[3]],
-            400,
-            `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
-          );
-          assert.strictEqual(
-            attributes[keys[4]],
-            'Bad Request',
-            `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
-          );
-          assert.strictEqual(
-            attributes[keys[5]],
-            'raw.githubusercontent.com',
-            `attributes ${HttpAttribute.HTTP_HOST} is wrong`
-          );
-          assert.ok(
-            attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-            `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
-          );
-          assert.ok(
-            attributes[keys[7]] !== '',
-            `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
-          );
+            assert.ok(
+              attributes[keys[0]] !== '',
+              `attributes ${GeneralAttribute.COMPONENT} is not defined`
+            );
+            assert.strictEqual(
+              attributes[keys[1]],
+              'GET',
+              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[2]],
+              url,
+              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[3]],
+              400,
+              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[4]],
+              'Bad Request',
+              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[5]],
+              'raw.githubusercontent.com',
+              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            );
+            assert.ok(
+              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            );
+            assert.ok(
+              attributes[keys[7]] !== '',
+              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            );
 
-          assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+
+            assert.strictEqual(
+              events[0].name,
+              EventNames.METHOD_OPEN,
+              `event ${EventNames.METHOD_OPEN} is not defined`
+            );
+            assert.strictEqual(
+              events[1].name,
+              EventNames.METHOD_SEND,
+              `event ${EventNames.METHOD_SEND} is not defined`
+            );
+            assert.strictEqual(
+              events[2].name,
+              PTN.FETCH_START,
+              `event ${PTN.FETCH_START} is not defined`
+            );
+            assert.strictEqual(
+              events[3].name,
+              PTN.DOMAIN_LOOKUP_START,
+              `event ${PTN.DOMAIN_LOOKUP_START} is not defined`
+            );
+            assert.strictEqual(
+              events[4].name,
+              PTN.DOMAIN_LOOKUP_END,
+              `event ${PTN.DOMAIN_LOOKUP_END} is not defined`
+            );
+            assert.strictEqual(
+              events[5].name,
+              PTN.CONNECT_START,
+              `event ${PTN.CONNECT_START} is not defined`
+            );
+            assert.strictEqual(
+              events[6].name,
+              PTN.SECURE_CONNECTION_START,
+              `event ${PTN.SECURE_CONNECTION_START} is not defined`
+            );
+            assert.strictEqual(
+              events[7].name,
+              PTN.CONNECT_END,
+              `event ${PTN.CONNECT_END} is not defined`
+            );
+            assert.strictEqual(
+              events[8].name,
+              PTN.REQUEST_START,
+              `event ${PTN.REQUEST_START} is not defined`
+            );
+            assert.strictEqual(
+              events[9].name,
+              PTN.RESPONSE_START,
+              `event ${PTN.RESPONSE_START} is not defined`
+            );
+            assert.strictEqual(
+              events[10].name,
+              PTN.RESPONSE_END,
+              `event ${PTN.RESPONSE_END} is not defined`
+            );
+            assert.strictEqual(
+              events[11].name,
+              EventNames.EVENT_ERROR,
+              `event ${EventNames.EVENT_ERROR} is not defined`
+            );
+
+            assert.strictEqual(events.length, 12, 'number of events is wrong');
+          });
         });
 
-        it('span should have correct events', () => {
-          const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
-          const events = span.events;
+        describe('when request encounters a network error', () => {
+          beforeEach(done => {
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getData(url, () => {}, testAsync).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+                done();
+              });
 
-          assert.strictEqual(
-            events[0].name,
-            EventNames.METHOD_OPEN,
-            `event ${EventNames.METHOD_OPEN} is not defined`
-          );
-          assert.strictEqual(
-            events[1].name,
-            EventNames.METHOD_SEND,
-            `event ${EventNames.METHOD_SEND} is not defined`
-          );
-          assert.strictEqual(
-            events[2].name,
-            PTN.FETCH_START,
-            `event ${PTN.FETCH_START} is not defined`
-          );
-          assert.strictEqual(
-            events[3].name,
-            PTN.DOMAIN_LOOKUP_START,
-            `event ${PTN.DOMAIN_LOOKUP_START} is not defined`
-          );
-          assert.strictEqual(
-            events[4].name,
-            PTN.DOMAIN_LOOKUP_END,
-            `event ${PTN.DOMAIN_LOOKUP_END} is not defined`
-          );
-          assert.strictEqual(
-            events[5].name,
-            PTN.CONNECT_START,
-            `event ${PTN.CONNECT_START} is not defined`
-          );
-          assert.strictEqual(
-            events[6].name,
-            PTN.SECURE_CONNECTION_START,
-            `event ${PTN.SECURE_CONNECTION_START} is not defined`
-          );
-          assert.strictEqual(
-            events[7].name,
-            PTN.CONNECT_END,
-            `event ${PTN.CONNECT_END} is not defined`
-          );
-          assert.strictEqual(
-            events[8].name,
-            PTN.REQUEST_START,
-            `event ${PTN.REQUEST_START} is not defined`
-          );
-          assert.strictEqual(
-            events[9].name,
-            PTN.RESPONSE_START,
-            `event ${PTN.RESPONSE_START} is not defined`
-          );
-          assert.strictEqual(
-            events[10].name,
-            PTN.RESPONSE_END,
-            `event ${PTN.RESPONSE_END} is not defined`
-          );
-          assert.strictEqual(
-            events[11].name,
-            EventNames.EVENT_ERROR,
-            `event ${EventNames.EVENT_ERROR} is not defined`
-          );
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].error();
+            });
+          });
 
-          assert.strictEqual(events.length, 12, 'number of events is wrong');
+          it('span should have correct attributes', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const attributes = span.attributes;
+            const keys = Object.keys(attributes);
+
+            assert.ok(
+              attributes[keys[0]] !== '',
+              `attributes ${GeneralAttribute.COMPONENT} is not defined`
+            );
+            assert.strictEqual(
+              attributes[keys[1]],
+              'GET',
+              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[2]],
+              url,
+              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[3]],
+              0,
+              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[4]],
+              '',
+              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[5]],
+              'raw.githubusercontent.com',
+              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            );
+            assert.ok(
+              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            );
+            assert.ok(
+              attributes[keys[7]] !== '',
+              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            );
+
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+
+            assert.strictEqual(
+              events[0].name,
+              EventNames.METHOD_OPEN,
+              `event ${EventNames.METHOD_OPEN} is not defined`
+            );
+            assert.strictEqual(
+              events[1].name,
+              EventNames.METHOD_SEND,
+              `event ${EventNames.METHOD_SEND} is not defined`
+            );
+            assert.strictEqual(
+              events[2].name,
+              EventNames.EVENT_ERROR,
+              `event ${EventNames.EVENT_ERROR} is not defined`
+            );
+
+            assert.strictEqual(events.length, 3, 'number of events is wrong');
+          });
+        });
+
+        describe('when request is aborted', () => {
+          before(function () {
+            // Can only abort Async requests
+            if (!testAsync) {
+              this.skip();
+            }
+          });
+
+          beforeEach(done => {
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getData(url, () => {}, testAsync).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+                done();
+              });
+
+              assert.strictEqual(requests.length, 1, 'request not called');
+              requests[0].abort();
+            });
+          });
+
+          it('span should have correct attributes', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const attributes = span.attributes;
+            const keys = Object.keys(attributes);
+
+            assert.ok(
+              attributes[keys[0]] !== '',
+              `attributes ${GeneralAttribute.COMPONENT} is not defined`
+            );
+            assert.strictEqual(
+              attributes[keys[1]],
+              'GET',
+              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[2]],
+              url,
+              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[3]],
+              0,
+              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[4]],
+              '',
+              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[5]],
+              'raw.githubusercontent.com',
+              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            );
+            assert.ok(
+              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            );
+            assert.ok(
+              attributes[keys[7]] !== '',
+              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            );
+
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+
+            assert.strictEqual(
+              events[0].name,
+              EventNames.METHOD_OPEN,
+              `event ${EventNames.METHOD_OPEN} is not defined`
+            );
+            assert.strictEqual(
+              events[1].name,
+              EventNames.METHOD_SEND,
+              `event ${EventNames.METHOD_SEND} is not defined`
+            );
+            assert.strictEqual(
+              events[2].name,
+              EventNames.EVENT_ABORT,
+              `event ${EventNames.EVENT_ABORT} is not defined`
+            );
+
+            assert.strictEqual(events.length, 3, 'number of events is wrong');
+          });
+        });
+
+        describe('when request times out', () => {
+          before(function () {
+            // Can only set timeout for Async requests
+            if (!testAsync) {
+              this.skip();
+            }
+          });
+
+          beforeEach(done => {
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getData(
+                url,
+                () => {
+                  sandbox.clock.tick(XHR_TIMEOUT);
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+                done();
+              });
+            });
+          });
+
+          it('span should have correct attributes', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const attributes = span.attributes;
+            const keys = Object.keys(attributes);
+
+            assert.ok(
+              attributes[keys[0]] !== '',
+              `attributes ${GeneralAttribute.COMPONENT} is not defined`
+            );
+            assert.strictEqual(
+              attributes[keys[1]],
+              'GET',
+              `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[2]],
+              url,
+              `attributes ${HttpAttribute.HTTP_URL} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[3]],
+              0,
+              `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[4]],
+              '',
+              `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
+            );
+            assert.strictEqual(
+              attributes[keys[5]],
+              'raw.githubusercontent.com',
+              `attributes ${HttpAttribute.HTTP_HOST} is wrong`
+            );
+            assert.ok(
+              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
+            );
+            assert.ok(
+              attributes[keys[7]] !== '',
+              `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
+            );
+
+            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+          });
+
+          it('span should have correct events', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[0][0][0];
+            const events = span.events;
+
+            assert.strictEqual(
+              events[0].name,
+              EventNames.METHOD_OPEN,
+              `event ${EventNames.METHOD_OPEN} is not defined`
+            );
+            assert.strictEqual(
+              events[1].name,
+              EventNames.METHOD_SEND,
+              `event ${EventNames.METHOD_SEND} is not defined`
+            );
+            assert.strictEqual(
+              events[2].name,
+              EventNames.EVENT_TIMEOUT,
+              `event ${EventNames.EVENT_TIMEOUT} is not defined`
+            );
+
+            assert.strictEqual(events.length, 3, 'number of events is wrong');
+          });
         });
       });
     });
