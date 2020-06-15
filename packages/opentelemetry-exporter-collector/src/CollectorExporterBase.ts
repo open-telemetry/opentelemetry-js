@@ -50,7 +50,7 @@ export abstract class CollectorExporterBase<
    */
   constructor(config: T = {} as T) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = this.defaultURL(config.url);
+    this.url = this.setDefaultUrl(config.url);
     if (typeof config.hostName === 'string') {
       this.hostName = config.hostName;
     }
@@ -134,5 +134,5 @@ export abstract class CollectorExporterBase<
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void;
-  abstract defaultURL(url: string | undefined): string;
+  abstract setDefaultUrl(url: string | undefined): string;
 }

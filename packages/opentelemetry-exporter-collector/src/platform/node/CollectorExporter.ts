@@ -29,7 +29,7 @@ import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { GRPCQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55678';
+const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
  * Collector Exporter Config for Node
@@ -138,7 +138,7 @@ export class CollectorExporter extends CollectorExporterBase<
     }
   }
 
-  defaultURL(url: string | undefined): string {
+  setDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }
 }

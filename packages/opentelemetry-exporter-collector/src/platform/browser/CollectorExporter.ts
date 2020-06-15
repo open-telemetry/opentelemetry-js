@@ -40,7 +40,7 @@ export class CollectorExporter extends CollectorExporterBase<
     window.removeEventListener('unload', this.shutdown);
   }
 
-  defaultURL(url: string | undefined) {
+  setDefaultUrl(url: string | undefined) {
     return url || DEFAULT_COLLECTOR_URL;
   }
 
