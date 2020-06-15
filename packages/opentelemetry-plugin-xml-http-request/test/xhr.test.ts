@@ -598,6 +598,102 @@ describe('xhr', () => {
             );
           });
         });
+
+        describe('when reusing the same XML Http request', () => {
+          let reusableReq: XMLHttpRequest; //= new XMLHttpRequest();
+          const firstUrl = 'http://localhost:8090/get';
+          const secondUrl = 'http://localhost:8099/get';
+          const getDataReuseXHR = (
+            url: string,
+            callbackAfterSend: Function,
+            async?: boolean
+          ) => {
+            // eslint-disable-next-line no-async-promise-executor
+            return new Promise(async (resolve, reject) => {
+              if (async === undefined) {
+                async = true;
+              }
+              reusableReq.open('GET', url, async);
+              reusableReq.onload = function () {
+                resolve();
+              };
+
+              reusableReq.onerror = function () {
+                resolve();
+              };
+
+              reusableReq.ontimeout = function () {
+                resolve();
+              };
+              reusableReq.send();
+              callbackAfterSend();
+            });
+          };
+
+          beforeEach(done => {
+            requests = [];
+            const resources: PerformanceResourceTiming[] = [];
+            resources.push(
+              createResource({
+                name: firstUrl,
+              }),
+              createResource({
+                name: secondUrl,
+              })
+            );
+            reusableReq = new XMLHttpRequest();
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getDataReuseXHR(
+                firstUrl,
+                () => {
+                  fakeNow = 100;
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+              });
+            });
+
+            webTracerWithZone.withSpan(rootSpan, () => {
+              getDataReuseXHR(
+                secondUrl,
+                () => {
+                  fakeNow = 100;
+                },
+                testAsync
+              ).then(() => {
+                fakeNow = 0;
+                sandbox.clock.tick(1000);
+                done();
+              });
+
+              assert.strictEqual(
+                requests.length,
+                1,
+                'first request not called'
+              );
+
+              requests[0].respond(
+                200,
+                { 'Content-Type': 'application/json' },
+                '{"foo":"bar"}'
+              );
+            });
+          });
+
+          it('should clear previous span information', () => {
+            const span: tracing.ReadableSpan = exportSpy.args[2][0][0];
+            const attributes = span.attributes;
+            const keys = Object.keys(attributes);
+
+            assert.strictEqual(
+              attributes[keys[2]],
+              secondUrl,
+              `attribute ${AttributeNames.HTTP_URL} is wrong`
+            );
+          });
+        });
       });
 
       describe('when request is NOT successful', () => {
