@@ -138,7 +138,7 @@ export class CollectorExporter extends CollectorExporterBase<
     }
   }
 
-  setDefaultUrl(url: string | undefined): string {
+  getDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }
 }

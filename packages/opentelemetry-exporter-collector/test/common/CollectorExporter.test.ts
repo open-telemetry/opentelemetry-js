@@ -30,7 +30,7 @@ class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
   onInit() {}
   onShutdown() {}
   sendSpans() {}
-  setDefaultUrl(url: string | undefined) {
+  getDefaultUrl(url: string | undefined) {
     return url || '';
   }
 }
