@@ -38,7 +38,7 @@ const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678
 };
 
 const provider = new BasicTracerProvider();
