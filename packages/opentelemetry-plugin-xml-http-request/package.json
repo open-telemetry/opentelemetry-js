@@ -76,6 +76,7 @@
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/semantic-conventions": "^0.8.3",
     "@opentelemetry/web": "^0.8.3",
     "shimmer": "^1.2.1"
   }
