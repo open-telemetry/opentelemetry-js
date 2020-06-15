@@ -13,7 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export const HttpAttribute = {
+  HTTP_HOST: 'http.host',
+  HTTP_METHOD: 'http.method',
+  HTTP_TARGET: 'http.target',
+  HTTP_ROUTE: 'http.route',
+  HTTP_URL: 'http.url',
+  HTTP_STATUS_CODE: 'http.status_code',
+  HTTP_STATUS_TEXT: 'http.status_text',
+  HTTP_FLAVOR: 'http.flavor',
+  HTTP_SERVER_NAME: 'http.server_name',
+  HTTP_CLIENT_IP: 'http.client_ip',
+  HTTP_SCHEME: 'http.scheme',
 
-export * from './http';
-export * from './types';
-export * from './utils';
+  // NOT ON OFFICIAL SPEC
+  HTTP_ERROR_NAME: 'http.error_name',
+  HTTP_ERROR_MESSAGE: 'http.error_message',
+  HTTP_USER_AGENT: 'http.user_agent',
+};

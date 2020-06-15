@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export const RpcAttribute = {
+  RPC_SERVICE: 'rpc.service',
 
-export * from './http';
-export * from './types';
-export * from './utils';
+  // GRPC (no spec)
+  GRPC_KIND: 'grpc.kind', // SERVER or CLIENT
+  GRPC_METHOD: 'grpc.method',
+  GRPC_STATUS_CODE: 'grpc.status_code',
+  GRPC_ERROR_NAME: 'grpc.error_name',
+  GRPC_ERROR_MESSAGE: 'grpc.error_message',
+};

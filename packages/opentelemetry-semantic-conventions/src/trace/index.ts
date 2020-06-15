@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './general';
+export * from './rpc';
 export * from './http';
-export * from './types';
-export * from './utils';
+export * from './database';
