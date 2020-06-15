@@ -1,7 +1,8 @@
 {
-  "name": "@opentelemetry/plugin-grpc",
+  "name": "@opentelemetry/grpc-utils",
   "version": "0.8.3",
-  "description": "OpenTelemetry grpc automatic instrumentation package.",
+  "private": true,
+  "description": "OpenTelemetry grpc plugin utility functions.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
@@ -41,9 +42,9 @@
     "access": "public"
   },
   "devDependencies": {
+    "@grpc/grpc-js": "1.0.5",
     "@opentelemetry/context-async-hooks": "^0.8.3",
     "@opentelemetry/context-base": "^0.8.3",
-    "@opentelemetry/grpc-utils": "^0.8.3",
     "@opentelemetry/node": "^0.8.3",
     "@opentelemetry/tracing": "^0.8.3",
     "@types/mocha": "7.0.2",
