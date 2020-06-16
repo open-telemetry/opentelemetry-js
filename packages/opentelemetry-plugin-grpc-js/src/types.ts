@@ -15,7 +15,8 @@
  */
 
 import type * as grpcJs from '@grpc/grpc-js';
-import * as events from 'events';
+import type { EventEmitter } from 'events';
+import { CALL_SPAN_ENDED } from './utils';
 
 export type grpc = typeof grpcJs;
 
@@ -24,25 +25,17 @@ export type SendUnaryDataCallback<T> = grpcJs.requestCallback<T>;
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GrpcPluginOptions {}
 
-interface GrpcStatus {
-  code: number;
-  details: string;
-  metadata: grpcJs.Metadata;
-}
-
 export type ServerCall<T, U> =
   | grpcJs.ServerUnaryCall<T, U>
   | grpcJs.ServerReadableStream<T, U>
   | grpcJs.ServerWritableStream<T, U>
   | grpcJs.ServerDuplexStream<T, U>;
 
-export type ServerCallWithMeta<T, U> = ServerCall<T, U> & {
-  metadata: grpcJs.Metadata;
-  status: GrpcStatus;
-  request?: unknown;
-} & events.EventEmitter;
+export type ServerCallWithMeta<T, U> = ServerCall<T, U>;
 
-export type GrpcClientFunc = typeof Function & {
+export type GrpcEmitter = EventEmitter & { [CALL_SPAN_ENDED]?: boolean };
+
+export type GrpcClientFunc = ((...args: unknown[]) => GrpcEmitter) & {
   path: string;
   requestStream: boolean;
   responseStream: boolean;
@@ -50,6 +43,7 @@ export type GrpcClientFunc = typeof Function & {
 
 export type GrpcInternalClientTypes = {
   makeClientConstructor: typeof grpcJs.makeGenericClientConstructor;
+  loadPackageDefinition: typeof grpcJs.loadPackageDefinition;
 };
 
 // TODO: Delete if moving internal file loaders to BasePlugin

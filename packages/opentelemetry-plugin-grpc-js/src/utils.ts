@@ -17,11 +17,18 @@
 import { CanonicalCode, Status } from '@opentelemetry/api';
 import type * as grpcTypes from '@grpc/grpc-js'; // For types only
 
+/**
+ * Symbol to include on grpc call if it has already emitted an error event.
+ * grpc events that emit 'error' will also emit 'finish' and so only the
+ * error event should be processed.
+ */
+export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
+
 // Equivalent to lodash _.findIndex
-export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
-  args,
-  fn: Function
-) => {
+export const findIndex: <T>(
+  args: unknown[],
+  fn: (arg: T) => boolean
+) => number = (args, fn: Function) => {
   let index = -1;
   for (const arg of args) {
     index++;
@@ -36,7 +43,7 @@ export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
  * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
  * @param status
  */
-export const _grpcStatusCodeToCanonicalCode = (
+export const grpcStatusCodeToCanonicalCode = (
   status?: grpcTypes.status
 ): CanonicalCode => {
   if (status !== 0 && !status) {
@@ -45,6 +52,6 @@ export const _grpcStatusCodeToCanonicalCode = (
   return status as number;
 };
 
-export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
+export const grpcStatusCodeToSpanStatus = (status: number): Status => {
   return { code: status };
 };

@@ -1,6 +1,5 @@
 {
   "name": "@opentelemetry/plugin-grpc-js",
-  "private": true,
   "version": "0.8.3",
   "description": "OpenTelemetry @grpc/grpc-js automatic instrumentation package.",
   "main": "build/src/index.js",
@@ -8,6 +7,7 @@
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
+    "test:deubg": "ts-mocha --inspect-brk -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "lint": "eslint . --ext .ts",
@@ -68,6 +68,7 @@
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/semantic-conventions": "^0.8.3",
     "shimmer": "1.2.1"
   }
 }

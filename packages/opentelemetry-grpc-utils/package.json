@@ -43,6 +43,7 @@
   },
   "devDependencies": {
     "@grpc/grpc-js": "1.0.5",
+    "@grpc/proto-loader": "0.5.4",
     "@opentelemetry/context-async-hooks": "^0.8.3",
     "@opentelemetry/context-base": "^0.8.3",
     "@opentelemetry/node": "^0.8.3",
@@ -68,6 +69,7 @@
   "dependencies": {
     "@opentelemetry/api": "^0.8.3",
     "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/semantic-conventions": "^0.8.3",
     "shimmer": "^1.2.1"
   }
 }
