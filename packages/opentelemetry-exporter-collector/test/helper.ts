@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
+import * as grpc from 'grpc';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -508,4 +509,14 @@ export function ensureExportTraceServiceRequestIsSet(
 
   const spans = instrumentationLibrarySpans[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
+}
+
+export function ensureMetadataIsCorrect(
+  actual: grpc.Metadata,
+  expected: grpc.Metadata
+) {
+  //ignore user agent
+  expected.remove('user-agent');
+  actual.remove('user-agent');
+  assert.deepStrictEqual(actual.getMap(), expected.getMap());
 }

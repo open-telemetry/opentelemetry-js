@@ -36,6 +36,7 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55678';
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
+  metadata?: grpc.Metadata;
 }
 
 /**
@@ -47,12 +48,14 @@ export class CollectorExporter extends CollectorExporterBase<
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
   grpcSpansQueue: GRPCQueueItem[] = [];
+  metadata?: grpc.Metadata;
 
   /**
    * @param config
    */
   constructor(config: CollectorExporterConfig = {}) {
     super(config);
+    this.metadata = config.metadata;
   }
 
   onShutdown(): void {
@@ -115,6 +118,7 @@ export class CollectorExporter extends CollectorExporterBase<
 
       this.traceServiceClient.export(
         exportTraceServiceRequest,
+        this.metadata,
         (
           err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
         ) => {
