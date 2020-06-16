@@ -19,5 +19,5 @@ import { plugin, GrpcJsPlugin } from '../src/grpcJs';
 import * as grpc from '@grpc/grpc-js';
 
 describe(`#${GrpcJsPlugin.component}`, () => {
-  runTests(plugin, GrpcJsPlugin.component, grpc);
+  runTests(plugin, GrpcJsPlugin.component, grpc, 12346);
 });

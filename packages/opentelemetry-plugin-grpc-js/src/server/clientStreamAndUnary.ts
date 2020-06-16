@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import { Span, CanonicalCode } from '@opentelemetry/api';
 import type { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
-import type { HandleCall } from '@grpc/grpc-js/build/src/server-call';
 import { grpcStatusCodeToCanonicalCode } from '../utils';
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type { GrpcJsPlugin } from '../grpcJs';
 import type * as grpcJs from '@grpc/grpc-js';
 
+/**
+ * Handle patching for clientStream and unary type server handlers
+ */
 export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
   plugin: GrpcJsPlugin,
   span: Span,
   call: ServerCallWithMeta<RequestType, ResponseType>,
   callback: SendUnaryDataCallback<ResponseType>,
   original:
-    | HandleCall<RequestType, ResponseType>
-    | grpcJs.ClientReadableStream<RequestType>,
-  self: {}
-) {
+    | grpcJs.handleUnaryCall<RequestType, ResponseType>
+    | grpcJs.ClientReadableStream<RequestType>
+): void {
   const patchedCallback: SendUnaryDataCallback<ResponseType> = (
     err: grpcJs.ServiceError | null,
     value?: ResponseType
@@ -54,13 +56,11 @@ export function clientStreamAndUnaryHandler<RequestType, ResponseType>(
         CanonicalCode.OK.toString()
       );
     }
-    span.addEvent('received');
 
-    // end the span
     span.end();
     return callback(err, value);
   };
 
   plugin.tracer.bind(call);
-  return (original as Function).call(self, call, patchedCallback);
+  return (original as Function).call({}, call, patchedCallback);
 }

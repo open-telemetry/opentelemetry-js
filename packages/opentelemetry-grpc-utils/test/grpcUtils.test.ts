@@ -20,11 +20,7 @@ import {
   SpanKind,
   propagation,
 } from '@opentelemetry/api';
-import {
-  ConsoleLogger,
-  HttpTraceContext,
-  BasePlugin,
-} from '@opentelemetry/core';
+import { NoopLogger, HttpTraceContext, BasePlugin } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
@@ -104,7 +100,8 @@ const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
 export const runTests = (
   plugin: BasePlugin<typeof grpcJs | typeof grpcNapi>,
   moduleName: string,
-  grpc: typeof grpcNapi | typeof grpcJs
+  grpc: typeof grpcNapi | typeof grpcJs,
+  grpcPort: number
 ) => {
   const MAX_ERROR_STATUS = grpc.status.UNAUTHENTICATED;
 
@@ -218,7 +215,6 @@ export const runTests = (
 
   let server: Server;
   let client: Client;
-  const grpcPort = 12345;
 
   const replicate = (request: TestRequestResponse) => {
     const result: TestRequestResponse[] = [];
@@ -357,7 +353,7 @@ export const runTests = (
       });
 
       it('should patch client constructor makeClientConstructor() and makeGenericClientConstructor()', () => {
-        plugin.enable(grpc, new NoopTracerProvider(), new ConsoleLogger());
+        plugin.enable(grpc, new NoopTracerProvider(), new NoopLogger());
         (plugin['_moduleExports'] as any).makeGenericClientConstructor({});
         assert.ok(
           plugin['_moduleExports'].makeGenericClientConstructor.__wrapped
@@ -611,7 +607,7 @@ export const runTests = (
     };
 
     describe('enable()', () => {
-      const logger = new ConsoleLogger();
+      const logger = new NoopLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {
@@ -659,7 +655,7 @@ export const runTests = (
     });
 
     describe('disable()', () => {
-      const logger = new ConsoleLogger();
+      const logger = new NoopLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
       beforeEach(() => {

@@ -20,21 +20,10 @@ import type { PackageDefinition } from '@grpc/grpc-js/build/src/make-client';
 import * as shimmer from 'shimmer';
 import { getMethodsToWrap, getPatchedClientMethods } from './utils';
 
-function _patchLoadedPackage(this: GrpcJsPlugin, result: grpcJs.GrpcObject) {
-  Object.values(result).forEach(service => {
-    if (typeof service === 'function') {
-      shimmer.massWrap<typeof service.prototype, string>(
-        service.prototype,
-        getMethodsToWrap(service, service.service),
-        getPatchedClientMethods.call(this)
-      );
-    } else if (typeof service.format !== 'string') {
-      // GrpcObject
-      _patchLoadedPackage.call(this, service as grpcJs.GrpcObject);
-    }
-  });
-}
-
+/**
+ * Entry point for client patching for grpc.loadPackageDefinition(...)
+ * @param this - GrpcJsPlugin
+ */
 export function patchLoadPackageDefinition(this: GrpcJsPlugin) {
   return (original: typeof grpcJs.loadPackageDefinition) => {
     const plugin = this;
@@ -53,4 +42,28 @@ export function patchLoadPackageDefinition(this: GrpcJsPlugin) {
       return result;
     } as typeof grpcJs.loadPackageDefinition;
   };
+}
+
+/**
+ * Utility function to patch *all* functions loaded through a proto file.
+ * Recursively searches for Client classes and patches all methods, reversing the
+ * parsing done by grpc.loadPackageDefinition
+ * https://github.com/grpc/grpc-node/blob/1d14203c382509c3f36132bd0244c99792cb6601/packages/grpc-js/src/make-client.ts#L200-L217
+ */
+function _patchLoadedPackage(
+  this: GrpcJsPlugin,
+  result: grpcJs.GrpcObject
+): void {
+  Object.values(result).forEach(service => {
+    if (typeof service === 'function') {
+      shimmer.massWrap<typeof service.prototype, string>(
+        service.prototype,
+        getMethodsToWrap(service, service.service),
+        getPatchedClientMethods.call(this)
+      );
+    } else if (typeof service.format !== 'string') {
+      // GrpcObject
+      _patchLoadedPackage.call(this, service as grpcJs.GrpcObject);
+    }
+  });
 }

@@ -34,7 +34,12 @@ import {
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
 } from '../utils';
+import { EventEmitter } from 'events';
 
+/**
+ * Parse a package method list and return a list of methods to patch
+ * with both possible casings e.g. "TestMethod" & "testMethod"
+ */
 export function getMethodsToWrap(
   client: typeof grpcJs.Client,
   methods: { [key: string]: { originalName?: string } }
@@ -52,6 +57,9 @@ export function getMethodsToWrap(
   return methodsToWrap;
 }
 
+/**
+ * Parse initial client call properties and start a span to trace its execution
+ */
 export function getPatchedClientMethods(this: GrpcJsPlugin) {
   const plugin = this;
   return (original: GrpcClientFunc) => {
@@ -72,12 +80,16 @@ export function getPatchedClientMethods(this: GrpcJsPlugin) {
   };
 }
 
+/**
+ * Execute grpc client call. Apply completitionspan properties and end the
+ * span on callback or receiving an emitted event.
+ */
 export function makeGrpcClientRemoteCall(
   original: GrpcClientFunc,
   args: unknown[],
   self: grpcJs.Client,
   plugin: GrpcJsPlugin
-) {
+): (span: Span) => EventEmitter {
   /**
    * Patches a callback so that the current span for this trace is also ended
    * when the callback is invoked.
@@ -128,7 +140,6 @@ export function makeGrpcClientRemoteCall(
       }
     }
 
-    span.addEvent('sent');
     span.setAttributes({
       [RpcAttribute.GRPC_METHOD]: original.path,
       [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
@@ -153,7 +164,6 @@ export function makeGrpcClientRemoteCall(
         if (call[CALL_SPAN_ENDED]) {
           return;
         }
-
         call[CALL_SPAN_ENDED] = true;
 
         span.setStatus({
@@ -164,6 +174,7 @@ export function makeGrpcClientRemoteCall(
           [RpcAttribute.GRPC_ERROR_NAME]: err.name,
           [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
+
         endSpan();
       });
 
@@ -171,8 +182,8 @@ export function makeGrpcClientRemoteCall(
         if (call[CALL_SPAN_ENDED]) {
           return;
         }
-
         call[CALL_SPAN_ENDED] = true;
+
         span.setStatus(grpcStatusCodeToSpanStatus(status.code));
 
         endSpan();
@@ -182,7 +193,10 @@ export function makeGrpcClientRemoteCall(
   };
 }
 
-export function getMetadata(
+/**
+ * Returns the metadata argument from user provided arguments (`args`)
+ */
+function getMetadata(
   this: GrpcJsPlugin,
   original: GrpcClientFunc,
   args: unknown[]
@@ -217,6 +231,11 @@ export function getMetadata(
   return metadata;
 }
 
+/**
+ * Inject opentelemetry trace context into `metadata` for use by another
+ * grpc receiver
+ * @param metadata
+ */
 export function setSpanContext(metadata: grpcJs.Metadata): void {
   propagation.inject(metadata, (metadata, k, v) =>
     metadata.set(k, v as grpcJs.MetadataValue)

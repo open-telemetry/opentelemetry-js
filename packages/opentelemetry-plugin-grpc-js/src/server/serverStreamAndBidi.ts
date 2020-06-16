@@ -21,15 +21,17 @@ import type { GrpcJsPlugin } from '../grpcJs';
 import { GrpcEmitter } from '../types';
 import { CALL_SPAN_ENDED, grpcStatusCodeToCanonicalCode } from '../utils';
 
+/**
+ * Handle patching for serverStream and Bidi type server handlers
+ */
 export function serverStreamAndBidiHandler<RequestType, ResponseType>(
   plugin: GrpcJsPlugin,
   span: Span,
   call: GrpcEmitter,
   original:
+    | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
     | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
-    | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>,
-  self: {}
-) {
+): void {
   let spanEnded = false;
   const endSpan = () => {
     if (!spanEnded) {
@@ -46,7 +48,8 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
       return;
     }
 
-    // No need to set here CALL_SPAN_ENDED here since no events should be emitted after this
+    // Set the "grpc call had an error" flag
+    call[CALL_SPAN_ENDED] = true;
 
     span.setStatus({
       code: CanonicalCode.OK,
@@ -79,5 +82,5 @@ export function serverStreamAndBidiHandler<RequestType, ResponseType>(
   });
 
   // Types of parameters 'call' and 'call' are incompatible.
-  return (original as Function).call(self, call);
+  return (original as Function).call({}, call);
 }

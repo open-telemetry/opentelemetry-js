@@ -45,19 +45,3 @@ export type GrpcInternalClientTypes = {
   makeClientConstructor: typeof grpcJs.makeGenericClientConstructor;
   loadPackageDefinition: typeof grpcJs.loadPackageDefinition;
 };
-
-// TODO: Delete if moving internal file loaders to BasePlugin
-/**
- * Maps a name (key) representing a internal file module and its exports
- */
-export interface ModuleNameToFilePath {
-  client: string; // path/to/file
-  [wildcard: string]: string; // string indexer
-}
-
-/**
- * Maps a semver to a module:filepath Map
- */
-export interface ModuleExportsMapping {
-  [semver: string]: ModuleNameToFilePath;
-}

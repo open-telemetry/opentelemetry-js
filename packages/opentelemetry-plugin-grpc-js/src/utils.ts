@@ -52,6 +52,10 @@ export const grpcStatusCodeToCanonicalCode = (
   return status as number;
 };
 
+/**
+ * Convert grpc status code to an opentelemetry Status object.
+ * @param status
+ */
 export const grpcStatusCodeToSpanStatus = (status: number): Status => {
   return { code: status };
 };

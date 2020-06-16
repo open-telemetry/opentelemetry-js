@@ -24,6 +24,7 @@ import {
   SpanOptions,
   SpanKind,
   propagation,
+  Span,
 } from '@opentelemetry/api';
 import {
   RpcAttribute,
@@ -32,6 +33,10 @@ import {
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
 
+/**
+ * Patch for grpc.Server.prototype.register(...) function. Provides auto-instrumentation for
+ * client_stream, server_stream, bidi, unary server handler calls.
+ */
 export function patchServer(this: GrpcJsPlugin) {
   return (originalRegister: typeof grpcJs.Server.prototype.register) => {
     const plugin = this;
@@ -45,7 +50,7 @@ export function patchServer(this: GrpcJsPlugin) {
       deserialize: grpcJs.deserialize<unknown>,
       type: string
     ): boolean {
-      const originalResult = originalRegister.call(
+      const originalRegisterResult = originalRegister.call(
         this,
         name,
         handler,
@@ -58,11 +63,11 @@ export function patchServer(this: GrpcJsPlugin) {
       shimmer.wrap(
         handlerSet,
         'func',
-        (originalFunc: HandleCall<RequestType, ResponseType>) => {
+        (originalFunc: HandleCall<unknown, unknown>) => {
           return function func(
             this: typeof handlerSet,
             call: ServerCallWithMeta<RequestType, ResponseType>,
-            callback: SendUnaryDataCallback<ResponseType>
+            callback: SendUnaryDataCallback<unknown>
           ) {
             const self = this;
 
@@ -87,54 +92,64 @@ export function patchServer(this: GrpcJsPlugin) {
                   });
 
                 plugin.tracer.withSpan(span, () => {
-                  switch (type) {
-                    case 'unary':
-                    case 'clientStream':
-                    case 'client_stream':
-                      return clientStreamAndUnaryHandler(
-                        plugin,
-                        span,
-                        call,
-                        callback,
-                        originalFunc,
-                        self
-                      );
-                    case 'serverStream':
-                    case 'server_stream':
-                    case 'bidi':
-                      return serverStreamAndBidiHandler(
-                        plugin,
-                        span,
-                        call as
-                          | grpcJs.ServerWritableStream<
-                              RequestType,
-                              ResponseType
-                            >
-                          | grpcJs.ServerDuplexStream<
-                              RequestType,
-                              ResponseType
-                            >,
-                        originalFunc as
-                          | grpcJs.handleServerStreamingCall<
-                              RequestType,
-                              ResponseType
-                            >
-                          | grpcJs.handleBidiStreamingCall<
-                              RequestType,
-                              ResponseType
-                            >,
-                        self
-                      );
-                    default:
-                      break;
-                  }
+                  handleServerFunction.call(
+                    self,
+                    plugin,
+                    span,
+                    type,
+                    originalFunc,
+                    call,
+                    callback
+                  );
                 });
               }
             );
           };
         }
       );
-      return originalResult;
+      return originalRegisterResult;
     } as typeof grpcJs.Server.prototype.register;
   };
+}
+
+/**
+ * Patch callback or EventEmitter provided by `originalFunc` and set appropriate `span`
+ * properties based on its result.
+ */
+function handleServerFunction<RequestType, ResponseType>(
+  this: unknown,
+  plugin: GrpcJsPlugin,
+  span: Span,
+  type: string,
+  originalFunc: HandleCall<RequestType, ResponseType>,
+  call: ServerCallWithMeta<RequestType, ResponseType>,
+  callback: SendUnaryDataCallback<unknown>
+) {
+  switch (type) {
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
+      return clientStreamAndUnaryHandler(
+        plugin,
+        span,
+        call,
+        callback,
+        originalFunc as
+          | grpcJs.handleUnaryCall<RequestType, ResponseType>
+          | grpcJs.ClientReadableStream<RequestType>
+      );
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
+      return serverStreamAndBidiHandler(
+        plugin,
+        span,
+        call,
+        originalFunc as
+          | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
+          | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
+      );
+    default:
+      break;
+  }
 }
