@@ -29,6 +29,7 @@ import {
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
+import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 import {
   ClientRequest,
   IncomingMessage,
@@ -40,7 +41,6 @@ import { Socket } from 'net';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   Func,
@@ -463,7 +463,7 @@ export class HttpPlugin extends BasePlugin<Http> {
     } else {
       span = this._tracer
         .startSpan(name, options)
-        .setAttribute(AttributeNames.COMPONENT, this.component);
+        .setAttribute(GeneralAttribute.COMPONENT, this.component);
     }
     this._spanNotEnded.add(span);
     return span;

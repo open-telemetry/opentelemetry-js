@@ -23,6 +23,10 @@ import {
   otperformance,
 } from '@opentelemetry/core';
 import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
+import {
   addSpanNetworkEvents,
   getResource,
   parseUrl,
@@ -30,7 +34,6 @@ import {
   shouldPropagateTraceHeaders,
 } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
-import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,
@@ -128,17 +131,17 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
 
-      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhrMem.status);
-      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
-      span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        AttributeNames.HTTP_SCHEME,
+        HttpAttribute.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(AttributeNames.HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
     }
   }
 
@@ -276,9 +279,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const currentSpan = this._tracer.startSpan(url, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [AttributeNames.COMPONENT]: this.component,
-        [AttributeNames.HTTP_METHOD]: method,
-        [AttributeNames.HTTP_URL]: url,
+        [GeneralAttribute.COMPONENT]: this.component,
+        [HttpAttribute.HTTP_METHOD]: method,
+        [HttpAttribute.HTTP_URL]: url,
       },
     });
 

@@ -25,12 +25,15 @@ import {
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
 import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
+import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { AttributeNames } from '../src/enums/AttributeNames';
 import { EventNames } from '../src/enums/EventNames';
 import { XMLHttpRequestPlugin } from '../src/xhr';
 
@@ -238,40 +241,40 @@ describe('xhr', () => {
 
           assert.ok(
             attributes[keys[0]] !== '',
-            `attributes ${AttributeNames.COMPONENT} is not defined`
+            `attributes ${GeneralAttribute.COMPONENT} is not defined`
           );
           assert.strictEqual(
             attributes[keys[1]],
             'GET',
-            `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+            `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
             attributes[keys[2]],
             url,
-            `attributes ${AttributeNames.HTTP_URL} is wrong`
+            `attributes ${HttpAttribute.HTTP_URL} is wrong`
           );
           assert.strictEqual(
             attributes[keys[3]],
             200,
-            `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
+            `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[keys[4]],
             'OK',
-            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+            `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
             attributes[keys[5]],
             window.location.host,
-            `attributes ${AttributeNames.HTTP_HOST} is wrong`
+            `attributes ${HttpAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
             attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-            `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
+            `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
           );
           assert.ok(
             attributes[keys[7]] !== '',
-            `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
+            `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
@@ -508,40 +511,40 @@ describe('xhr', () => {
 
           assert.ok(
             attributes[keys[0]] !== '',
-            `attributes ${AttributeNames.COMPONENT} is not defined`
+            `attributes ${GeneralAttribute.COMPONENT} is not defined`
           );
           assert.strictEqual(
             attributes[keys[1]],
             'GET',
-            `attributes ${AttributeNames.HTTP_METHOD} is wrong`
+            `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
             attributes[keys[2]],
             url,
-            `attributes ${AttributeNames.HTTP_URL} is wrong`
+            `attributes ${HttpAttribute.HTTP_URL} is wrong`
           );
           assert.strictEqual(
             attributes[keys[3]],
             400,
-            `attributes ${AttributeNames.HTTP_STATUS_CODE} is wrong`
+            `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
             attributes[keys[4]],
             'Bad Request',
-            `attributes ${AttributeNames.HTTP_STATUS_TEXT} is wrong`
+            `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
             attributes[keys[5]],
             'raw.githubusercontent.com',
-            `attributes ${AttributeNames.HTTP_HOST} is wrong`
+            `attributes ${HttpAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
             attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
-            `attributes ${AttributeNames.HTTP_SCHEME} is wrong`
+            `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
           );
           assert.ok(
             attributes[keys[7]] !== '',
-            `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
+            `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
           );
 
           assert.strictEqual(keys.length, 8, 'number of attributes is wrong');

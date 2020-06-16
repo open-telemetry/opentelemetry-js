@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-export * from './http';
-export * from './types';
-export * from './utils';
+export * from './trace';
