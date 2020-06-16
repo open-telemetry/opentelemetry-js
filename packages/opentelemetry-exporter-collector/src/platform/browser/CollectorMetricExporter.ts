@@ -13,39 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
-
-import { Logger } from '@opentelemetry/api';
+import { MetricRecord } from '@opentelemetry/metrics';
+import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
 import { toCollectorExportMetricServiceRequest } from '../../transform';
-import { CollectorExporterError, ExporterOptions } from '../../types';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
-export class CollectorMetricExporter implements MetricExporter {
-  public readonly logger: Logger;
-  public readonly url: string;
-  private readonly _startTime = new Date().getTime() * 1000000;
+import { CollectorExporterError } from '../../types';
 
-  constructor(options: ExporterOptions = {}) {
-    this.logger = options.logger || new NoopLogger();
-    this.url = options.url || 'http://localhost:55678/v1/metrics';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
+
+export class CollectorMetricExporter extends CollectorMetricExporterBase {
+
+  getDefaultUrl(url: string | undefined): string {
+    return url || DEFAULT_COLLECTOR_URL;
   }
 
-  export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {
-    this._exportMetrics(metrics);
+  onInit(): void {
+    window.addEventListener('unload', this.shutdown);
   }
 
-  private _exportMetrics(metrics: MetricRecord[]) {
-    return new Promise((resolve, reject) => {
-      try {
-        this.logger.debug('metrics to be sent', metrics);
-        // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
-        // it will use the appropriate transport layer automatically depends on platform
-        this.sendMetrics(metrics, resolve, reject);
-      } catch (e) {
-        console.log('Error');
-        console.log(e);
-        reject(e);
-      }
-    });
+  onShutdown(): void {
+    window.removeEventListener('unload', this.shutdown);
   }
 
   sendMetrics(
@@ -60,7 +46,6 @@ export class CollectorMetricExporter implements MetricExporter {
     const body = JSON.stringify(exportMetricServiceRequest);
     console.log(body);
     if (typeof navigator.sendBeacon === 'function') {
-      // Fix this later
       this._sendMetricsWithBeacon(body, onSuccess, onError);
     } else {
       this._sendMetricsWithXhr(body, onSuccess, onError);
@@ -131,11 +116,4 @@ export class CollectorMetricExporter implements MetricExporter {
     };
   }
 
-  // ExportMetricsServiceRequest <-----
-
-  /**
-   * Prometheus Exporter: No shutdown
-   * GCM exporter: No shutdown
-   */
-  shutdown(): void {}
 }

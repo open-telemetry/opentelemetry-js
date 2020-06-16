@@ -14,41 +14,44 @@
  * limitations under the License.
  */
 
-import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import { MetricRecord } from '@opentelemetry/metrics';
 import  * as collectorTypes  from '../../types';
 import { GRPCMetricQueueItem, MetricsServiceClient } from './types';
 import { removeProtocol } from './util';
-import { Logger } from '@opentelemetry/api';
 import * as path from 'path';
 import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
 import { toCollectorExportMetricServiceRequest } from '../../transform';
+import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
+
+const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
  * Collector Exporter for Node
  */
-export class CollectorMetricExporter implements MetricExporter {
-  isShutDown: boolean = false;
+export class CollectorMetricExporter extends CollectorMetricExporterBase {
   grpcMetricsQueue: GRPCMetricQueueItem[] = [];
-  public readonly url: string;
-  public readonly logger: Logger;
+
   metricServiceClient?: MetricsServiceClient = undefined;
-  private readonly _startTime = new Date().getTime() * 1000000;
+  credentials: grpc.ChannelCredentials;
+
+  constructor(options: collectorTypes.ExporterOptions = {}) {
+    super(options);
+    this.grpcMetricsQueue = [];
+    this.credentials = options.credentials || grpc.credentials.createInsecure();   
+  }
+
+  getDefaultUrl(url: string | undefined): string {
+    return url || DEFAULT_COLLECTOR_URL;
+  }
 
   /**
    * @param config
    */
-  constructor(options: collectorTypes.ExporterOptions = {}) {
-    this.logger = options.logger || new NoopLogger();
-    this.url = options.url || 'http://localhost:55678/v1/metrics';
-    this.grpcMetricsQueue = [];
+  onInit(): void {
     const serverAddress = removeProtocol(this.url);
-    console.log(serverAddress);
     const metricServiceProtoPath = 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
     const includeDirs = [path.resolve(__dirname, 'protos')];
-    const credentials: grpc.ChannelCredentials = grpc.credentials.createInsecure(); // options.credentials ||  
-    console.log(credentials);
     protoLoader
       .load(metricServiceProtoPath, {
         keepCase: false,
@@ -62,14 +65,10 @@ export class CollectorMetricExporter implements MetricExporter {
         const packageObject: any = grpc.loadPackageDefinition(
           packageDefinition
         );
-        console.log("metric constructor");
         this.metricServiceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
           serverAddress,
-          credentials
+          this.credentials
         );
-        console.log(this.metricServiceClient);
-        console.log("SETUP");
-        console.log(serverAddress);
         if (this.grpcMetricsQueue.length > 0) {
           const queue = this.grpcMetricsQueue.splice(0);
           queue.forEach((item: GRPCMetricQueueItem) => {
@@ -78,20 +77,6 @@ export class CollectorMetricExporter implements MetricExporter {
         }
       });
   }
-
-  export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {
-    return new Promise((resolve, reject) => {
-      try {
-        this.logger.debug('metrics to be sent', metrics);
-        this.sendMetrics(metrics, resolve, reject);
-      } catch (e) {
-        console.log('Error');
-        console.log(e);
-        reject(e);
-      }
-    });
-  }
-
 
   sendMetrics(
     metrics: MetricRecord[],
@@ -125,11 +110,7 @@ export class CollectorMetricExporter implements MetricExporter {
     }
   }
 
-  /**
-   * Prometheus Exporter: No shutdown
-   * GCM exporter: No shutdown
-   */
-  shutdown(): void {
+  onShutdown(): void {
     if (this.metricServiceClient) {
       this.metricServiceClient.close();
     }
