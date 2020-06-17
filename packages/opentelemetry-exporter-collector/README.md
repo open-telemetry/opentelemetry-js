@@ -80,6 +80,8 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.register();
 ```
 
+To see how to generate credentials, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
+
 The exporter can be configured to send custom metadata with each request as in the example below:
 
 ```js
@@ -102,8 +104,6 @@ provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
 ```
-
-To see how to generate credentials, you can refer to the script used to generate certificates for tests [here](./test/certs/regenerate.sh)
 
 Note, that this will only work if TLS is also configured on the server.
 
