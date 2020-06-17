@@ -70,12 +70,9 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
         onSuccess();
       } else {
         this.logger.error('sendBeacon - cannot send', body);
-        console.log(':(');
         onError({});
       }
     } catch (e) {
-      console.log('huh');
-      console.log(e);
       onError({});
     }
   }

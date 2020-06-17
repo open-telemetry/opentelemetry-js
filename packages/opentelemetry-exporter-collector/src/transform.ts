@@ -32,7 +32,7 @@ import {
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
-import { MetricRecord, MetricKind } from '@opentelemetry/metrics';
+import { MetricRecord } from '@opentelemetry/metrics';
 
 /**
  * Converts attributes
