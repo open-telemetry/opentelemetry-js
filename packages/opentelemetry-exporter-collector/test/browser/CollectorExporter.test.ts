@@ -219,3 +219,24 @@ describe('CollectorExporter - web', () => {
     });
   });
 });
+
+describe('CollectorExporter - browser (getDefaultUrl)', () => {
+  it('should default to v1/trace', done => {
+    const collectorExporter = new CollectorExporter({});
+    setTimeout(() => {
+      assert.strictEqual(
+        collectorExporter['url'],
+        'http://localhost:55678/v1/trace'
+      );
+      done();
+    });
+  });
+  it('should keep the URL if included', done => {
+    const url = 'http://foo.bar.com';
+    const collectorExporter = new CollectorExporter({ url });
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], url);
+      done();
+    });
+  });
+});
