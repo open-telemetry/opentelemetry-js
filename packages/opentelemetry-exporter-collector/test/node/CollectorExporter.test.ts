@@ -85,7 +85,7 @@ const testCollectorExporter = (params: TestParams) =>
               }) => {
                 try {
                   exportedData = data.request.resourceSpans[0];
-                  //reqMetadata = data.metadata;
+                  reqMetadata = data.metadata;
                 } catch (e) {
                   exportedData = undefined;
                 }
@@ -121,12 +121,11 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.crt')
           )
         : undefined;
-
       collectorExporter = new CollectorExporter({
         serviceName: 'basic-service',
         url: address,
         credentials,
-        metadata,
+        metadata: params.metadata,
       });
 
       const provider = new BasicTracerProvider();
