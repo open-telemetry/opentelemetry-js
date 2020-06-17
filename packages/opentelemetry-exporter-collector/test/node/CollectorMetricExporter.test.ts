@@ -29,7 +29,7 @@ import { Labels } from '@opentelemetry/api';
 const metricsServiceProtoPath = 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
 const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 
-const address = 'localhost:1502';
+const address = 'localhost:1501';
 
 type TestParams = {
   useTLS: boolean;
@@ -46,8 +46,8 @@ const testCollectorMetricExporter = (params: TestParams) =>
       | undefined;
 
     before(done => {
-      server = new grpc.Server();
-      protoLoader
+        server = new grpc.Server();
+        protoLoader
         .load(metricsServiceProtoPath, {
           keepCase: false,
           longs: String,
@@ -68,9 +68,9 @@ const testCollectorMetricExporter = (params: TestParams) =>
                 request: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
               }) => {
                 try {
-                  exportedData = data.request.resourceMetrics[0];
+                    exportedData = data.request.resourceMetrics[0];
                 } catch (e) {
-                  exportedData = undefined;
+                    exportedData = undefined;
                 }
               },
             }

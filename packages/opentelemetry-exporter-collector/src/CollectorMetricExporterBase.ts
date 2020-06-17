@@ -13,37 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {MetricExporter, MetricRecord} from '@opentelemetry/metrics';
+import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { Logger } from '@opentelemetry/api';
 import { ExporterOptions } from './types';
 import { NoopLogger, ExportResult } from '@opentelemetry/core';
-import  * as collectorTypes  from './types';
+import * as collectorTypes from './types';
 
 export abstract class CollectorMetricExporterBase implements MetricExporter {
-    public readonly logger: Logger;
-    public readonly url: string;
-    protected readonly _startTime = new Date().getTime() * 1000000;
-    private _isShutdown: boolean = false;
+  public readonly logger: Logger;
+  public readonly url: string;
+  protected readonly _startTime = new Date().getTime() * 1000000;
+  private _isShutdown: boolean = false;
 
-    constructor(options: ExporterOptions = {}) {
-        this.logger = options.logger || new NoopLogger();
-        this.url = this.getDefaultUrl(options.url);
+  constructor(options: ExporterOptions = {}) {
+    this.logger = options.logger || new NoopLogger();
+    this.url = this.getDefaultUrl(options.url);
+    this.onInit();
+  }
 
-        this.onInit();
+  export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {
+    if (this._isShutdown) {
+      cb(ExportResult.FAILED_NOT_RETRYABLE);
+      return;
     }
 
-    export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {
-        return new Promise((resolve, reject) => {
-            try {
-              this.logger.debug('metrics to be sent', metrics);
-              // Send metrics to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
-              // it will use the appropriate transport layer automatically depends on platform
-              this.sendMetrics(metrics, resolve, reject);
-            } catch (e) {
-              reject(e);
-            }
-          });
-    }
+    this._exportMetrics(metrics)
+      .then(() => {
+        cb(ExportResult.SUCCESS);
+      })
+      .catch(
+        (
+          error: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+        ) => {
+          if (error.message) {
+            this.logger.error(error.message);
+          }
+          if (error.code && error.code < 500) {
+            cb(ExportResult.FAILED_NOT_RETRYABLE);
+          } else {
+            cb(ExportResult.FAILED_RETRYABLE);
+          }
+        }
+      );
+  }
+
+  private _exportMetrics(metrics: MetricRecord[]): Promise<unknown> {
+    return new Promise((resolve, reject) => {
+      try {
+        this.logger.debug('metrics to be sent', metrics);
+        // Send metrics to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
+        // it will use the appropriate transport layer automatically depends on platform
+        this.sendMetrics(metrics, resolve, reject);
+      } catch (e) {
+        reject(e);
+      }
+    });
+  }
 
   /**
    * Shutdown the exporter.
@@ -60,8 +85,8 @@ export abstract class CollectorMetricExporterBase implements MetricExporter {
     this.onShutdown();
   }
 
-    abstract getDefaultUrl(url: string | undefined): string;
-    abstract onInit(): void;
-    abstract onShutdown(): void;
-    abstract sendMetrics(metrics: MetricRecord[], onSuccess: () => void, onError:  (error: collectorTypes.CollectorExporterError) => void): void;
+  abstract getDefaultUrl(url: string | undefined): string;
+  abstract onInit(): void;
+  abstract onShutdown(): void;
+  abstract sendMetrics(metrics: MetricRecord[], onSuccess: () => void, onError: (error: collectorTypes.CollectorExporterError) => void): void;
 }

@@ -34,6 +34,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
 
   metricServiceClient?: MetricsServiceClient = undefined;
   credentials: grpc.ChannelCredentials;
+  isShutDown: boolean = false;
 
   constructor(options: collectorTypes.ExporterOptions = {}) {
     super(options);
@@ -49,6 +50,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
    * @param config
    */
   onInit(): void {
+    this.isShutDown = false;
     const serverAddress = removeProtocol(this.url);
     const metricServiceProtoPath = 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
     const includeDirs = [path.resolve(__dirname, 'protos')];
@@ -83,9 +85,11 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
+    if (this.isShutDown) {
+      return;
+    }
     if (this.metricServiceClient) {
       const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(metrics, this._startTime);
-      console.log(exportMetricServiceRequest);
       this.metricServiceClient.export(exportMetricServiceRequest,  (
         err: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceError
       ) => {
@@ -97,7 +101,6 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
           onError(err);
         } else {
           onSuccess();
-          console.log(exportMetricServiceRequest);
         }
       }
     );
@@ -111,6 +114,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
   }
 
   onShutdown(): void {
+    this.isShutDown = true;
     if (this.metricServiceClient) {
       this.metricServiceClient.close();
     }

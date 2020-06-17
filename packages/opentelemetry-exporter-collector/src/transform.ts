@@ -265,11 +265,6 @@ export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number,
 ): opentelemetryProto.metrics.v1.Metric {
-  console.log('metric');
-  console.log(metric.descriptor.metricKind == MetricKind.COUNTER);
-  console.log(metric.labels);
-  console.log(toCollectorLabels(metric.labels));
-  console.log(startTime);
   return {
     metricDescriptor: {
       name: metric.descriptor.name,
@@ -302,7 +297,6 @@ export function toCollectorExportMetricServiceRequest(
   const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
     metric => toCollectorMetric(metric, startTime)
   );
-  console.log(metricsToBeSent);
   const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
     metrics: metricsToBeSent,
     instrumentationLibrary: {
@@ -317,7 +311,7 @@ export function toCollectorExportMetricServiceRequest(
     {},
     {},
     {
-      'service.name': 'TEST',
+      'service.name': 'test',
     }
   );
   const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
