@@ -33,7 +33,7 @@ import {
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-  parseUrl
+  parseUrl,
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -468,9 +468,8 @@ describe('xhr', () => {
         });
 
         it('should NOT clear the resources', () => {
-          assert.strictEqual(
-            clearResourceTimingsSpy.args.length,
-            0,
+          assert.ok(
+            clearResourceTimingsSpy.notCalled,
             'resources have been cleared'
           );
         });
@@ -580,11 +579,7 @@ describe('xhr', () => {
           });
 
           it('should NOT create any span', () => {
-            assert.strictEqual(
-              exportSpy.args.length,
-              0,
-              "span shouldn't be exported"
-            );
+            assert.ok(exportSpy.notCalled, "span shouldn't be exported");
           });
         });
 
@@ -599,16 +594,15 @@ describe('xhr', () => {
           });
 
           it('should clear the resources', () => {
-            assert.strictEqual(
-              clearResourceTimingsSpy.args.length,
-              1,
+            assert.ok(
+              clearResourceTimingsSpy.calledOnce,
               "resources haven't been cleared"
             );
           });
         });
 
         describe('when reusing the same XML Http request', () => {
-          let reusableReq: XMLHttpRequest; //= new XMLHttpRequest();
+          let reusableReq: XMLHttpRequest;
           const firstUrl = 'http://localhost:8090/get';
           const secondUrl = 'http://localhost:8099/get';
           const getDataReuseXHR = (
