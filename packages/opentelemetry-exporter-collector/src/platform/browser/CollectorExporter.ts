@@ -24,6 +24,8 @@ import * as collectorTypes from '../../types';
 
 export type CollectorExporterConfig = CollectorExporterConfigBase;
 
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
+
 /**
  * Collector Exporter for Web
  */
@@ -36,6 +38,10 @@ export class CollectorExporter extends CollectorExporterBase<
 
   onShutdown(): void {
     window.removeEventListener('unload', this.shutdown);
+  }
+
+  getDefaultUrl(url: string | undefined) {
+    return url || DEFAULT_COLLECTOR_URL;
   }
 
   sendSpans(
