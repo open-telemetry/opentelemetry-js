@@ -15,15 +15,16 @@ npm install --save @opentelemetry/exporter-collector
 ```
 
 ## Usage in Web
-The CollectorExporter in Web expects the endpoint to end in `/v1/trace`. 
+The CollectorExporter in Web expects the endpoint to end in `/v1/trace`.
 
 ```js
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { CollectorExporter } from '@opentelemetry/exporter-collector'
+import { CollectorExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  headers: {}, //an optional object containing custom headers to be sent with each request
 };
 
 const provider = new WebTracerProvider();
@@ -44,6 +45,7 @@ const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 const collectorOptions = {
   serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55678
+  metadata, // an optional grpc.Metadata object to be sent with each request
 };
 
 const provider = new BasicTracerProvider();
