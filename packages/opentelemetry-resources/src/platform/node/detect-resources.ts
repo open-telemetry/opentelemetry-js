@@ -17,14 +17,20 @@
 import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
 import { Detector } from '../../types';
+import { ResourceDetectionConfig } from './config';
+import * as util from 'util';
 
 const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
 /**
  * Runs all resource detectors and returns the results merged into a single
  * Resource.
+ *
+ * @param config Configuration object for resource detection
  */
-export const detectResources = async (): Promise<Resource> => {
+export const detectResources = async (
+  config: ResourceDetectionConfig = {}
+): Promise<Resource> => {
   const resources: Array<Resource> = await Promise.all(
     DETECTORS.map(d => {
       try {
@@ -34,6 +40,24 @@ export const detectResources = async (): Promise<Resource> => {
       }
     })
   );
+  if (config.logger) {
+    resources.forEach((resource, index) => {
+      // Only print populated resources
+      if (Object.keys(resource.labels).length > 0) {
+        const resourceDebugString = util.inspect(resource.labels, {
+          depth: 2,
+          breakLength: Infinity,
+          sorted: true,
+          compact: false,
+        });
+        const detectorName = DETECTORS[index].constructor
+          ? DETECTORS[index].constructor.name
+          : 'Unknown detector';
+        config.logger!(`${detectorName} found resource.`);
+        config.logger!(resourceDebugString);
+      }
+    });
+  }
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.createTelemetrySDKResource()
