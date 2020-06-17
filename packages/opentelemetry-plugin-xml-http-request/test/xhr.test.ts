@@ -48,13 +48,17 @@ class DummySpanExporter implements tracing.SpanExporter {
 
 const XHR_TIMEOUT = 2000;
 
-const getData = (url: string, callbackAfterSend: Function, async?: boolean) => {
+const getData = (
+  req: XMLHttpRequest,
+  url: string,
+  callbackAfterSend: Function,
+  async?: boolean
+) => {
   // eslint-disable-next-line no-async-promise-executor
   return new Promise(async (resolve, reject) => {
     if (async === undefined) {
       async = true;
     }
-    const req = new XMLHttpRequest();
     req.timeout = XHR_TIMEOUT;
 
     req.open('GET', url, async);
@@ -203,6 +207,7 @@ describe('xhr', () => {
           rootSpan = webTracerWithZone.startSpan('root');
           webTracerWithZone.withSpan(rootSpan, () => {
             getData(
+              new XMLHttpRequest(),
               fileUrl,
               () => {
                 fakeNow = 100;
@@ -602,35 +607,8 @@ describe('xhr', () => {
         });
 
         describe('when reusing the same XML Http request', () => {
-          let reusableReq: XMLHttpRequest;
           const firstUrl = 'http://localhost:8090/get';
           const secondUrl = 'http://localhost:8099/get';
-          const getDataReuseXHR = (
-            url: string,
-            callbackAfterSend: Function,
-            async?: boolean
-          ) => {
-            // eslint-disable-next-line no-async-promise-executor
-            return new Promise(async (resolve, reject) => {
-              if (async === undefined) {
-                async = true;
-              }
-              reusableReq.open('GET', url, async);
-              reusableReq.onload = function () {
-                resolve();
-              };
-
-              reusableReq.onerror = function () {
-                resolve();
-              };
-
-              reusableReq.ontimeout = function () {
-                resolve();
-              };
-              reusableReq.send();
-              callbackAfterSend();
-            });
-          };
 
           beforeEach(done => {
             requests = [];
@@ -643,9 +621,10 @@ describe('xhr', () => {
                 name: secondUrl,
               })
             );
-            reusableReq = new XMLHttpRequest();
+            const reusableReq = new XMLHttpRequest();
             webTracerWithZone.withSpan(rootSpan, () => {
-              getDataReuseXHR(
+              getData(
+                reusableReq,
                 firstUrl,
                 () => {
                   fakeNow = 100;
@@ -658,7 +637,8 @@ describe('xhr', () => {
             });
 
             webTracerWithZone.withSpan(rootSpan, () => {
-              getDataReuseXHR(
+              getData(
+                reusableReq,
                 secondUrl,
                 () => {
                   fakeNow = 100;
@@ -753,6 +733,7 @@ describe('xhr', () => {
           beforeEach(done => {
             webTracerWithZone.withSpan(rootSpan, () => {
               getData(
+                new XMLHttpRequest(),
                 url,
                 () => {
                   fakeNow = 100;
@@ -889,11 +870,13 @@ describe('xhr', () => {
         describe('when request encounters a network error', () => {
           beforeEach(done => {
             webTracerWithZone.withSpan(rootSpan, () => {
-              getData(url, () => {}, testAsync).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
+              getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                () => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                  done();
+                }
+              );
 
               assert.strictEqual(requests.length, 1, 'request not called');
               requests[0].error();
@@ -980,11 +963,13 @@ describe('xhr', () => {
 
           beforeEach(done => {
             webTracerWithZone.withSpan(rootSpan, () => {
-              getData(url, () => {}, testAsync).then(() => {
-                fakeNow = 0;
-                sandbox.clock.tick(1000);
-                done();
-              });
+              getData(new XMLHttpRequest(), url, () => {}, testAsync).then(
+                () => {
+                  fakeNow = 0;
+                  sandbox.clock.tick(1000);
+                  done();
+                }
+              );
 
               assert.strictEqual(requests.length, 1, 'request not called');
               requests[0].abort();
@@ -1072,6 +1057,7 @@ describe('xhr', () => {
           beforeEach(done => {
             webTracerWithZone.withSpan(rootSpan, () => {
               getData(
+                new XMLHttpRequest(),
                 url,
                 () => {
                   sandbox.clock.tick(XHR_TIMEOUT);
