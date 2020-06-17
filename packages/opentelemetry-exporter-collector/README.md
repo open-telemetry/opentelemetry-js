@@ -45,7 +45,6 @@ const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
 const collectorOptions = {
   serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55678
-  metadata, // an optional grpc.Metadata object to be sent with each request
 };
 
 const provider = new BasicTracerProvider();
@@ -72,6 +71,29 @@ const collectorOptions = {
     fs.readFileSync('./client.key'),
     fs.readFileSync('./client.crt')
   )
+};
+
+const provider = new BasicTracerProvider();
+const exporter = new CollectorExporter(collectorOptions);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+
+provider.register();
+```
+
+The exporter can be configured to send custom metadata with each request as in the example below:
+
+```js
+const grpc = require('grpc');
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+
+const metadata = new grpc.Metadata();
+metadata.set('k', 'v');
+
+const collectorOptions = {
+  serviceName: 'basic-service',
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55678
+  metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
 const provider = new BasicTracerProvider();
