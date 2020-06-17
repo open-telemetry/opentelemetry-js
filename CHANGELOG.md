@@ -18,6 +18,8 @@ All notable changes to this project will be documented in this file.
 
 ### :rocket: (Enhancement)
 
+* Other
+  * [#1181](https://github.com/open-telemetry/opentelemetry-js/pull/1181) feat: add node-plugins-all package ([@dyladan](https://github.com/dyladan))
 * `opentelemetry-plugin-fetch`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-web`
   * [#1121](https://github.com/open-telemetry/opentelemetry-js/pull/1121) chore: adding plugin-fetch and example ([@obecny](https://github.com/obecny))
 * `opentelemetry-node`
