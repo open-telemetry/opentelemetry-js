@@ -53,18 +53,18 @@ All notable changes to this project will be documented in this file.
 
 #### Committers: 12
 
-- David W. ([@davidwitten](https://github.com/davidwitten))
-- Bartlomiej Obecny ([@obecny](https://github.com/obecny))
-- Daniel Dyla ([@dyladan](https://github.com/dyladan))
-- Mark Wolff ([@markwolff](https://github.com/markwolff))
-- Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
-- Naseem ([@naseemkullah](https://github.com/naseemkullah))
-- Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
-- legendecas ([@legendecas](https://github.com/legendecas))
-- Shivkanya Andhare ([@shivkanya9146](https://github.com/shivkanya9146))
-- Leonardo Dalcin ([@leonardodalcin](https://github.com/leonardodalcin))
-- [@rezakrimi](https://github.com/rezakrimi)
-- John Bley ([@johnbley](https://github.com/johnbley))
+* David W. ([@davidwitten](https://github.com/davidwitten))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Mark Wolff ([@markwolff](https://github.com/markwolff))
+* Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+* legendecas ([@legendecas](https://github.com/legendecas))
+* Shivkanya Andhare ([@shivkanya9146](https://github.com/shivkanya9146))
+* Leonardo Dalcin ([@leonardodalcin](https://github.com/leonardodalcin))
+* [@rezakrimi](https://github.com/rezakrimi)
+* John Bley ([@johnbley](https://github.com/johnbley))
 
 ## 0.8.3
 
