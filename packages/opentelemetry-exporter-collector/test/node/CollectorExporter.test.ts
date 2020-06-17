@@ -159,5 +159,23 @@ const testCollectorExporter = (params: TestParams) =>
     });
   });
 
+describe('CollectorExporter - node (getDefaultUrl)', () => {
+  it('should default to localhost', done => {
+    const collectorExporter = new CollectorExporter({});
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], 'localhost:55678');
+      done();
+    });
+  });
+  it('should keep the URL if included', done => {
+    const url = 'http://foo.bar.com';
+    const collectorExporter = new CollectorExporter({ url });
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], url);
+      done();
+    });
+  });
+});
+
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });

@@ -38,6 +38,7 @@
     "@opentelemetry/core": "^0.8.3",
     "@opentelemetry/exporter-collector": "^0.8.3",
     "@opentelemetry/plugin-document-load": "^0.6.1",
+    "@opentelemetry/plugin-fetch": "^0.8.3",
     "@opentelemetry/plugin-user-interaction": "^0.6.1",
     "@opentelemetry/plugin-xml-http-request": "^0.8.3",
     "@opentelemetry/tracing": "^0.8.3",

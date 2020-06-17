@@ -1,5 +1,5 @@
 /*!
- * Copyright The OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-module.exports = {
-  listenAddress: 'localhost',
-  hostname: 'localhost',
-  browsers: ['ChromeHeadless'],
-  frameworks: ['mocha'],
-  coverageIstanbulReporter: {
-    reports: ['html', 'json'],
-    dir: '.nyc_output',
-    fixWebpackSourcePaths: true
-  },
-  reporters: ['spec', 'coverage-istanbul'],
-  files: ['test/index-webpack.ts'],
-  preprocessors: { 'test/index-webpack.ts': ['webpack'] },
-  webpackMiddleware: { noInfo: true }
+const karmaWebpackConfig = require('../../karma.webpack');
+const karmaBaseConfig = require('../../karma.base');
+
+module.exports = (config) => {
+  config.set(Object.assign({}, karmaBaseConfig, {
+    webpack: karmaWebpackConfig
+  }))
 };
