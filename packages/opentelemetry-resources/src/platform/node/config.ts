@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
+import { Logger } from '@opentelemetry/api';
+
 /**
  * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
  */
 export interface ResourceDetectionConfig {
   /** Optional Logger. */
-  logger?: (message: string) => void;
+  logger?: Logger;
 }

@@ -167,13 +167,20 @@ describe('detectResources', async () => {
   describe('with a debug logger', () => {
     it('prints detected resources to the logger', async () => {
       // This test depends on the env detector to be functioning as intended
-      const mockedLogger = sinon.fake();
-      await detectResources({ logger: mockedLogger });
+      const mockedLoggerMethod = sinon.fake();
+      await detectResources({
+        logger: {
+          debug: mockedLoggerMethod,
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: sinon.fake(),
+        },
+      });
 
-      assert.deepStrictEqual(mockedLogger.getCall(0).args, [
+      assert.deepStrictEqual(mockedLoggerMethod.getCall(0).args, [
         'EnvDetector found resource.',
       ]);
-      assert.deepStrictEqual(mockedLogger.getCall(1).args, [
+      assert.deepStrictEqual(mockedLoggerMethod.getCall(1).args, [
         "{\n  'service.instance.id': '627cc493',\n  'service.name': 'my-service',\n  'service.namespace': 'default',\n  'service.version': '0.0.1'\n}",
       ]);
     });

@@ -53,8 +53,8 @@ export const detectResources = async (
         const detectorName = DETECTORS[index].constructor
           ? DETECTORS[index].constructor.name
           : 'Unknown detector';
-        config.logger!(`${detectorName} found resource.`);
-        config.logger!(resourceDebugString);
+        config.logger!.debug(`${detectorName} found resource.`);
+        config.logger!.debug(resourceDebugString);
       }
     });
   }
