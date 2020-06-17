@@ -46,7 +46,7 @@
     "babel-loader": "8.1.0",
     "codecov": "3.7.0",
     "gts": "2.0.2",
-    "karma": "5.0.9",
+    "karma": "5.1.0",
     "karma-chrome-launcher": "3.1.0",
     "karma-mocha": "2.0.1",
     "karma-spec-reporter": "0.0.32",

@@ -21,16 +21,19 @@ import {
   isUrlIgnored,
   isWrapped,
   otperformance,
-  urlMatches,
 } from '@opentelemetry/core';
 import {
-  addSpanNetworkEvent,
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
+import {
+  addSpanNetworkEvents,
   getResource,
   parseUrl,
   PerformanceTimingNames as PTN,
+  shouldPropagateTraceHeaders,
 } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
-import { AttributeNames } from './enums/AttributeNames';
 import { EventNames } from './enums/EventNames';
 import {
   OpenFunction,
@@ -83,7 +86,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
-    if (!this._shouldPropagateTraceHeaders(spanUrl)) {
+    if (
+      !shouldPropagateTraceHeaders(
+        spanUrl,
+        this._config.propagateTraceHeaderCorsUrls
+      )
+    ) {
       return;
     }
     const headers: { [key: string]: unknown } = {};
@@ -91,34 +99,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
-  }
-
-  /**
-   * checks if trace headers should be propagated
-   * @param spanUrl
-   * @private
-   */
-  _shouldPropagateTraceHeaders(spanUrl: string) {
-    let propagateTraceHeaderUrls =
-      this._config.propagateTraceHeaderCorsUrls || [];
-    if (
-      typeof propagateTraceHeaderUrls === 'string' ||
-      propagateTraceHeaderUrls instanceof RegExp
-    ) {
-      propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
-    }
-    const parsedSpanUrl = parseUrl(spanUrl);
-
-    if (parsedSpanUrl.origin === window.location.origin) {
-      return true;
-    } else {
-      for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (urlMatches(spanUrl, propagateTraceHeaderUrl)) {
-          return true;
-        }
-      }
-      return false;
-    }
   }
 
   /**
@@ -135,7 +115,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       const childSpan = this._tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -151,39 +131,18 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     if (typeof spanUrl === 'string') {
       const parsedUrl = parseUrl(spanUrl);
 
-      span.setAttribute(AttributeNames.HTTP_STATUS_CODE, xhrMem.status);
-      span.setAttribute(AttributeNames.HTTP_STATUS_TEXT, xhrMem.statusText);
-      span.setAttribute(AttributeNames.HTTP_HOST, parsedUrl.host);
+      span.setAttribute(HttpAttribute.HTTP_STATUS_CODE, xhrMem.status);
+      span.setAttribute(HttpAttribute.HTTP_STATUS_TEXT, xhrMem.statusText);
+      span.setAttribute(HttpAttribute.HTTP_HOST, parsedUrl.host);
       span.setAttribute(
-        AttributeNames.HTTP_SCHEME,
+        HttpAttribute.HTTP_SCHEME,
         parsedUrl.protocol.replace(':', '')
       );
 
       // @TODO do we want to collect this or it will be collected earlier once only or
       //    maybe when parent span is not available ?
-      span.setAttribute(AttributeNames.HTTP_USER_AGENT, navigator.userAgent);
+      span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
     }
-  }
-
-  /**
-   * Adds Network events to the span
-   * @param span
-   * @param resource
-   * @private
-   */
-  private _addSpanNetworkEvents(
-    span: api.Span,
-    resource: PerformanceResourceTiming
-  ) {
-    addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-    addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
-    addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-    addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   }
 
   /**
@@ -257,6 +216,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       // information
       resources = otperformance.getEntriesByType(
         // ts thinks this is the perf_hooks module, but it is the browser performance api
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         'resource' as any
       ) as PerformanceResourceTiming[];
     }
@@ -278,7 +238,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      this._addSpanNetworkEvents(span, mainRequest);
+      addSpanNetworkEvents(span, mainRequest);
     }
   }
 
@@ -319,9 +279,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const currentSpan = this._tracer.startSpan(url, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [AttributeNames.COMPONENT]: this.component,
-        [AttributeNames.HTTP_METHOD]: method,
-        [AttributeNames.HTTP_URL]: url,
+        [GeneralAttribute.COMPONENT]: this.component,
+        [HttpAttribute.HTTP_METHOD]: method,
+        [HttpAttribute.HTTP_URL]: url,
       },
     });
 

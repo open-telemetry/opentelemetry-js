@@ -15,6 +15,10 @@
  */
 import { Attributes, CanonicalCode, Span, Status } from '@opentelemetry/api';
 import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
+import {
   ClientRequest,
   IncomingHttpHeaders,
   IncomingMessage,
@@ -24,7 +28,6 @@ import {
 } from 'http';
 import { Socket } from 'net';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   IgnoreMatcher,
@@ -196,8 +199,8 @@ export const setSpanWithError = (
   const message = error.message;
 
   span.setAttributes({
-    [AttributeNames.HTTP_ERROR_NAME]: error.name,
-    [AttributeNames.HTTP_ERROR_MESSAGE]: message,
+    [HttpAttribute.HTTP_ERROR_NAME]: error.name,
+    [HttpAttribute.HTTP_ERROR_MESSAGE]: message,
   });
 
   if (!obj) {
@@ -334,18 +337,18 @@ export const getOutgoingRequestAttributes = (
   const headers = requestOptions.headers || {};
   const userAgent = headers['user-agent'];
   const attributes: Attributes = {
-    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
+    [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
       requestOptions,
       headers,
       `${options.component}:`
     ),
-    [AttributeNames.HTTP_METHOD]: method,
-    [AttributeNames.HTTP_TARGET]: requestOptions.path || '/',
-    [AttributeNames.NET_PEER_NAME]: hostname,
+    [HttpAttribute.HTTP_METHOD]: method,
+    [HttpAttribute.HTTP_TARGET]: requestOptions.path || '/',
+    [GeneralAttribute.NET_PEER_NAME]: hostname,
   };
 
   if (userAgent !== undefined) {
-    attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
+    attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
   return attributes;
 };
@@ -357,11 +360,11 @@ export const getOutgoingRequestAttributes = (
 export const getAttributesFromHttpKind = (kind?: string): Attributes => {
   const attributes: Attributes = {};
   if (kind) {
-    attributes[AttributeNames.HTTP_FLAVOR] = kind;
+    attributes[HttpAttribute.HTTP_FLAVOR] = kind;
     if (kind.toUpperCase() !== 'QUIC') {
-      attributes[AttributeNames.NET_TRANSPORT] = AttributeNames.IP_TCP;
+      attributes[GeneralAttribute.NET_TRANSPORT] = GeneralAttribute.IP_TCP;
     } else {
-      attributes[AttributeNames.NET_TRANSPORT] = AttributeNames.IP_UDP;
+      attributes[GeneralAttribute.NET_TRANSPORT] = GeneralAttribute.IP_UDP;
     }
   }
   return attributes;
@@ -379,14 +382,14 @@ export const getOutgoingRequestAttributesOnResponse = (
   const { statusCode, statusMessage, httpVersion, socket } = response;
   const { remoteAddress, remotePort } = socket;
   const attributes: Attributes = {
-    [AttributeNames.NET_PEER_IP]: remoteAddress,
-    [AttributeNames.NET_PEER_PORT]: remotePort,
-    [AttributeNames.HTTP_HOST]: `${options.hostname}:${remotePort}`,
+    [GeneralAttribute.NET_PEER_IP]: remoteAddress,
+    [GeneralAttribute.NET_PEER_PORT]: remotePort,
+    [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
 
   if (statusCode) {
-    attributes[AttributeNames.HTTP_STATUS_CODE] = statusCode;
-    attributes[AttributeNames.HTTP_STATUS_TEXT] = (
+    attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
+    attributes[HttpAttribute.HTTP_STATUS_TEXT] = (
       statusMessage || ''
     ).toUpperCase();
   }
@@ -417,31 +420,31 @@ export const getIncomingRequestAttributes = (
     'localhost';
   const serverName = options.serverName;
   const attributes: Attributes = {
-    [AttributeNames.HTTP_URL]: getAbsoluteUrl(
+    [HttpAttribute.HTTP_URL]: getAbsoluteUrl(
       requestUrl,
       headers,
       `${options.component}:`
     ),
-    [AttributeNames.HTTP_HOST]: host,
-    [AttributeNames.NET_HOST_NAME]: hostname,
-    [AttributeNames.HTTP_METHOD]: method,
+    [HttpAttribute.HTTP_HOST]: host,
+    [GeneralAttribute.NET_HOST_NAME]: hostname,
+    [HttpAttribute.HTTP_METHOD]: method,
   };
 
   if (typeof ips === 'string') {
-    attributes[AttributeNames.HTTP_CLIENT_IP] = ips.split(',')[0];
+    attributes[HttpAttribute.HTTP_CLIENT_IP] = ips.split(',')[0];
   }
 
   if (typeof serverName === 'string') {
-    attributes[AttributeNames.HTTP_SERVER_NAME] = serverName;
+    attributes[HttpAttribute.HTTP_SERVER_NAME] = serverName;
   }
 
   if (requestUrl) {
-    attributes[AttributeNames.HTTP_ROUTE] = requestUrl.pathname || '/';
-    attributes[AttributeNames.HTTP_TARGET] = requestUrl.pathname || '/';
+    attributes[HttpAttribute.HTTP_ROUTE] = requestUrl.pathname || '/';
+    attributes[HttpAttribute.HTTP_TARGET] = requestUrl.pathname || '/';
   }
 
   if (userAgent !== undefined) {
-    attributes[AttributeNames.HTTP_USER_AGENT] = userAgent;
+    attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
@@ -471,16 +474,16 @@ export const getIncomingRequestAttributesOnResponse = (
     : undefined;
 
   const attributes: Attributes = {
-    [AttributeNames.NET_HOST_IP]: localAddress,
-    [AttributeNames.NET_HOST_PORT]: localPort,
-    [AttributeNames.NET_PEER_IP]: remoteAddress,
-    [AttributeNames.NET_PEER_PORT]: remotePort,
-    [AttributeNames.HTTP_STATUS_CODE]: statusCode,
-    [AttributeNames.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
+    [GeneralAttribute.NET_HOST_IP]: localAddress,
+    [GeneralAttribute.NET_HOST_PORT]: localPort,
+    [GeneralAttribute.NET_PEER_IP]: remoteAddress,
+    [GeneralAttribute.NET_PEER_PORT]: remotePort,
+    [HttpAttribute.HTTP_STATUS_CODE]: statusCode,
+    [HttpAttribute.HTTP_STATUS_TEXT]: (statusMessage || '').toUpperCase(),
   };
 
   if (route !== undefined) {
-    attributes[AttributeNames.HTTP_ROUTE] = route;
+    attributes[HttpAttribute.HTTP_ROUTE] = route;
   }
   return attributes;
 };
