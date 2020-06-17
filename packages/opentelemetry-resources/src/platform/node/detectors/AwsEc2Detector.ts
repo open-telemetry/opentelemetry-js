@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,13 +44,17 @@ class AwsEc2Detector implements Detector {
       const {
         accountId,
         instanceId,
+        instanceType,
         region,
+        availabilityZone,
       } = await this._awsMetadataAccessor();
       return new Resource({
         [CLOUD_RESOURCE.PROVIDER]: 'aws',
         [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
         [CLOUD_RESOURCE.REGION]: region,
+        [CLOUD_RESOURCE.ZONE]: availabilityZone,
         [HOST_RESOURCE.ID]: instanceId,
+        [HOST_RESOURCE.TYPE]: instanceType,
       });
     } catch {
       return Resource.empty();

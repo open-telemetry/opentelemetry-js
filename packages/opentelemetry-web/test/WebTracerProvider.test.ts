@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,6 @@ describe('WebTracerProvider', () => {
     });
 
     it('should enable all plugins', () => {
-      let options: WebTracerConfig;
       const dummyPlugin1 = new DummyPlugin();
       const dummyPlugin2 = new DummyPlugin();
       const spyEnable1 = sinon.spy(dummyPlugin1, 'enable');
@@ -67,7 +66,7 @@ describe('WebTracerProvider', () => {
 
       const plugins = [dummyPlugin1, dummyPlugin2];
 
-      options = { plugins };
+      const options = { plugins };
       new WebTracerProvider(options);
 
       assert.ok(spyEnable1.calledOnce === true);

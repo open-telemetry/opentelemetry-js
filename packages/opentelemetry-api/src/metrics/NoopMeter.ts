@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,16 @@
  */
 
 import { Meter } from './Meter';
-import { MetricOptions, Metric, Labels, MetricUtils } from './Metric';
-import { BoundMeasure, BoundCounter, BoundObserver } from './BoundInstrument';
+import {
+  MetricOptions,
+  UnboundMetric,
+  Labels,
+  Counter,
+  ValueRecorder,
+  Observer,
+  UpDownCounter,
+} from './Metric';
+import { BoundValueRecorder, BoundCounter } from './BoundInstrument';
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
 import { ObserverResult } from './ObserverResult';
@@ -29,12 +37,12 @@ export class NoopMeter implements Meter {
   constructor() {}
 
   /**
-   * Returns constant noop measure.
+   * Returns constant noop value recorder.
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createMeasure(name: string, options?: MetricOptions): Metric<BoundMeasure> {
-    return NOOP_MEASURE_METRIC;
+  createValueRecorder(name: string, options?: MetricOptions): ValueRecorder {
+    return NOOP_VALUE_RECORDER_METRIC;
   }
 
   /**
@@ -42,7 +50,16 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createCounter(name: string, options?: MetricOptions): Metric<BoundCounter> {
+  createCounter(name: string, options?: MetricOptions): Counter {
+    return NOOP_COUNTER_METRIC;
+  }
+
+  /**
+   * Returns a constant noop UpDownCounter.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createUpDownCounter(name: string, options?: MetricOptions): UpDownCounter {
     return NOOP_COUNTER_METRIC;
   }
 
@@ -51,12 +68,12 @@ export class NoopMeter implements Meter {
    * @param name the name of the metric.
    * @param [options] the metric options.
    */
-  createObserver(name: string, options?: MetricOptions): Metric<BoundObserver> {
+  createObserver(name: string, options?: MetricOptions): Observer {
     return NOOP_OBSERVER_METRIC;
   }
 }
 
-export class NoopMetric<T> implements Metric<T> {
+export class NoopMetric<T> implements UnboundMetric<T> {
   private readonly _instrument: T;
 
   constructor(instrument: T) {
@@ -90,14 +107,14 @@ export class NoopMetric<T> implements Metric<T> {
 }
 
 export class NoopCounterMetric extends NoopMetric<BoundCounter>
-  implements Pick<MetricUtils, 'add'> {
+  implements Counter {
   add(value: number, labels: Labels) {
     this.bind(labels).add(value);
   }
 }
 
-export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
-  implements Pick<MetricUtils, 'record'> {
+export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
+  implements ValueRecorder {
   record(
     value: number,
     labels: Labels,
@@ -114,8 +131,7 @@ export class NoopMeasureMetric extends NoopMetric<BoundMeasure>
   }
 }
 
-export class NoopObserverMetric extends NoopMetric<BoundObserver>
-  implements Pick<MetricUtils, 'setCallback'> {
+export class NoopObserverMetric extends NoopMetric<void> implements Observer {
   setCallback(callback: (observerResult: ObserverResult) => void): void {}
 }
 
@@ -125,7 +141,7 @@ export class NoopBoundCounter implements BoundCounter {
   }
 }
 
-export class NoopBoundMeasure implements BoundMeasure {
+export class NoopBoundValueRecorder implements BoundValueRecorder {
   record(
     value: number,
     correlationContext?: CorrelationContext,
@@ -135,16 +151,13 @@ export class NoopBoundMeasure implements BoundMeasure {
   }
 }
 
-export class NoopBoundObserver implements BoundObserver {
-  setCallback(callback: (observerResult: ObserverResult) => void): void {}
-}
-
 export const NOOP_METER = new NoopMeter();
 export const NOOP_BOUND_COUNTER = new NoopBoundCounter();
 export const NOOP_COUNTER_METRIC = new NoopCounterMetric(NOOP_BOUND_COUNTER);
 
-export const NOOP_BOUND_MEASURE = new NoopBoundMeasure();
-export const NOOP_MEASURE_METRIC = new NoopMeasureMetric(NOOP_BOUND_MEASURE);
+export const NOOP_BOUND_VALUE_RECORDER = new NoopBoundValueRecorder();
+export const NOOP_VALUE_RECORDER_METRIC = new NoopValueRecorderMetric(
+  NOOP_BOUND_VALUE_RECORDER
+);
 
-export const NOOP_BOUND_OBSERVER = new NoopBoundObserver();
-export const NOOP_OBSERVER_METRIC = new NoopObserverMetric(NOOP_BOUND_OBSERVER);
+export const NOOP_OBSERVER_METRIC = new NoopObserverMetric();

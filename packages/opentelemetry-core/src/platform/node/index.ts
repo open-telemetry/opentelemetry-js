@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-export * from './sdk-info';
+export * from './BasePlugin';
 export * from './id';
 export * from './performance';
+export * from './sdk-info';
 export * from './timer-util';
 export * from './hex-to-base64';

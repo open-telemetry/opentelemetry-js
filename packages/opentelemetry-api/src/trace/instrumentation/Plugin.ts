@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import { Logger } from '../../common/Logger';
 import { TracerProvider } from '../tracer_provider';
 
 /** Interface Plugin to apply patch. */
-// tslint:disable-next-line:no-any
 export interface Plugin<T = any> {
   /**
    * Contains all supported versions.

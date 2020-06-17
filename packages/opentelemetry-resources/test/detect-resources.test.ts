@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,8 +48,10 @@ const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
 
 const mockedAwsResponse = {
   instanceId: 'my-instance-id',
+  instanceType: 'my-instance-type',
   accountId: 'my-account-id',
   region: 'my-region',
+  availabilityZone: 'my-zone',
 };
 
 describe('detectResources', async () => {
@@ -110,11 +112,9 @@ describe('detectResources', async () => {
 
   describe('in AWS environment', () => {
     it('returns a merged resource', async () => {
-      const gcpScope = nock(HOST_ADDRESS)
-        .get(INSTANCE_PATH)
-        .replyWithError({
-          code: 'ENOTFOUND',
-        });
+      const gcpScope = nock(HOST_ADDRESS).get(INSTANCE_PATH).replyWithError({
+        code: 'ENOTFOUND',
+      });
       const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .replyWithError({
@@ -132,8 +132,12 @@ describe('detectResources', async () => {
         provider: 'aws',
         accountId: 'my-account-id',
         region: 'my-region',
+        zone: 'my-zone',
       });
-      assertHostResource(resource, { id: 'my-instance-id' });
+      assertHostResource(resource, {
+        id: 'my-instance-id',
+        hostType: 'my-instance-type',
+      });
       assertServiceResource(resource, {
         instanceId: '627cc493',
         name: 'my-service',

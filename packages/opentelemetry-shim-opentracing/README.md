@@ -1,4 +1,5 @@
 # OpenTracing shim
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -35,7 +36,6 @@ opentracing.initGlobalTracer(new TracerShim(tracer));
 ```
 
 See [examples/opentracing-shim](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/opentracing-shim) for a short example.
-
 
 ## License
 

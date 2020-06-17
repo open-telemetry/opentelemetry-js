@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,29 +81,38 @@ describe('NodeTracerProvider', () => {
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should load user configured plugins', () => {
+    it('should load a merge of user configured and default plugins and implictly enable non-default plugins', () => {
       provider = new NodeTracerProvider({
         logger: new NoopLogger(),
         plugins: {
           'simple-module': {
-            enabled: true,
             path: '@opentelemetry/plugin-simple-module',
           },
           'supported-module': {
-            enabled: true,
             path: '@opentelemetry/plugin-supported-module',
             enhancedDatabaseReporting: false,
             ignoreMethods: [],
             ignoreUrls: [],
           },
+          'random-module': {
+            enabled: false,
+            path: '@opentelemetry/random-module',
+          },
+          http: {
+            path: '@opentelemetry/plugin-http-module',
+          },
         },
       });
-      const pluginLoader = provider['_pluginLoader'];
-      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      const plugins = provider['_pluginLoader']['_plugins'];
+      assert.strictEqual(plugins.length, 0);
       require('simple-module');
-      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(plugins.length, 1);
       require('supported-module');
-      assert.strictEqual(pluginLoader['_plugins'].length, 2);
+      assert.strictEqual(plugins.length, 2);
+      require('random-module');
+      assert.strictEqual(plugins.length, 2);
+      require('http');
+      assert.strictEqual(plugins.length, 3);
     });
 
     it('should construct an instance with default attributes', () => {
@@ -134,7 +143,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
     });
 
-    it('should return a default span with no sampling', () => {
+    it('should return a default span with no sampling (NEVER_SAMPLER)', () => {
       provider = new NodeTracerProvider({
         sampler: NEVER_SAMPLER,
         logger: new NoopLogger(),
@@ -145,8 +154,46 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), false);
     });
 
-    // @todo: implement
-    it('should start a Span with always sampling');
+    it('should start a recording span with always sampling (ALWAYS_SAMPLER)', () => {
+      provider = new NodeTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+        logger: new NoopLogger(),
+      });
+      const span = provider.getTracer('default').startSpan('my-span');
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.isRecording(), true);
+    });
+
+    it('should not sample with ALWAYS_SAMPLER if parent was not sampled', () => {
+      provider = new NodeTracerProvider({
+        sampler: ALWAYS_SAMPLER,
+        logger: new NoopLogger(),
+      });
+
+      const notSampledParent = provider
+        .getTracer('default')
+        .startSpan('not-sampled-span', {
+          parent: {
+            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+            spanId: '6e0c63257de34c92',
+            traceFlags: TraceFlags.NONE,
+          },
+        });
+      assert.ok(notSampledParent instanceof NoRecordingSpan);
+      assert.strictEqual(
+        notSampledParent.context().traceFlags,
+        TraceFlags.NONE
+      );
+      assert.strictEqual(notSampledParent.isRecording(), false);
+
+      const span = provider.getTracer('default').startSpan('child-span', {
+        parent: notSampledParent,
+      });
+      assert.ok(span instanceof NoRecordingSpan);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
+      assert.strictEqual(span.isRecording(), false);
+    });
 
     it('should set default attributes on span', () => {
       const defaultAttributes = {
@@ -267,5 +314,54 @@ describe('NodeTracerProvider', () => {
       const patchedFn = context.bind(fn, setActiveSpan(context.active(), span));
       return patchedFn();
     });
+  });
+});
+
+describe('mergePlugins', () => {
+  const defaultPlugins = {
+    module1: {
+      enabled: true,
+      path: 'testpath',
+    },
+    module2: {
+      enabled: true,
+      path: 'testpath2',
+    },
+    module3: {
+      enabled: true,
+      path: 'testpath3',
+    },
+  };
+
+  const userPlugins = {
+    module2: {
+      path: 'userpath',
+    },
+    module3: {
+      enabled: false,
+    },
+    nonDefaultModule: {
+      path: 'userpath2',
+    },
+  };
+
+  const provider = new NodeTracerProvider();
+
+  const mergedPlugins = provider['_mergePlugins'](defaultPlugins, userPlugins);
+
+  it('should merge user and default configs', () => {
+    assert.equal(mergedPlugins.module1.enabled, true);
+    assert.equal(mergedPlugins.module1.path, 'testpath');
+    assert.equal(mergedPlugins.module2.enabled, true);
+    assert.equal(mergedPlugins.module2.path, 'userpath');
+    assert.equal(mergedPlugins.module3.enabled, false);
+    assert.equal(mergedPlugins.nonDefaultModule.enabled, true);
+    assert.equal(mergedPlugins.nonDefaultModule.path, 'userpath2');
+  });
+
+  it('should should not mangle default config', () => {
+    assert.equal(defaultPlugins.module2.path, 'testpath2');
+    assert.equal(defaultPlugins.module3.enabled, true);
+    assert.equal(defaultPlugins.module3.path, 'testpath3');
   });
 });

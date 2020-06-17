@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,12 +23,15 @@ import {
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
+import {
+  GeneralAttribute,
+  RpcAttribute,
+} from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
 import * as path from 'path';
 import * as shimmer from 'shimmer';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   grpc,
   GrpcClientFunc,
@@ -78,7 +81,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       shimmer.wrap(
         this._moduleExports.Server.prototype,
         'register',
-        // tslint:disable-next-line:no-any
         this._patchServer() as any
       );
     }
@@ -135,7 +137,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       plugin._logger.debug('patched gRPC server');
 
       return function register<RequestType, ResponseType>(
-        // tslint:disable-next-line:no-any
         this: grpcTypes.Server & { handlers: any },
         name: string,
         handler: grpcTypes.handleCall<RequestType, ResponseType>,
@@ -143,7 +144,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         deserialize: grpcTypes.deserialize<RequestType>,
         type: string
       ) {
-        // tslint:disable-next-line:no-any
         const originalResult = originalRegister.apply(this, arguments as any);
         const handlerSet = this.handlers[name];
 
@@ -176,8 +176,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                   const span = plugin._tracer
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
-                      [AttributeNames.GRPC_KIND]: spanOptions.kind,
-                      [AttributeNames.COMPONENT]: GrpcPlugin.component,
+                      [RpcAttribute.GRPC_KIND]: spanOptions.kind,
+                      [GeneralAttribute.COMPONENT]: GrpcPlugin.component,
                     });
 
                   plugin._tracer.withSpan(span, () => {
@@ -228,7 +228,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   ) {
     function patchedCallback(
       err: grpcTypes.ServiceError,
-      // tslint:disable-next-line:no-any
       value: any,
       trailer: grpcTypes.Metadata,
       flags: grpcTypes.writeFlags
@@ -239,19 +238,16 @@ export class GrpcPlugin extends BasePlugin<grpc> {
             code: _grpcStatusCodeToCanonicalCode(err.code),
             message: err.message,
           });
-          span.setAttribute(
-            AttributeNames.GRPC_STATUS_CODE,
-            err.code.toString()
-          );
+          span.setAttribute(RpcAttribute.GRPC_STATUS_CODE, err.code.toString());
         }
         span.setAttributes({
-          [AttributeNames.GRPC_ERROR_NAME]: err.name,
-          [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+          [RpcAttribute.GRPC_ERROR_NAME]: err.name,
+          [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
         });
       } else {
         span.setStatus({ code: CanonicalCode.OK });
         span.setAttribute(
-          AttributeNames.GRPC_STATUS_CODE,
+          RpcAttribute.GRPC_STATUS_CODE,
           plugin._moduleExports.status.OK.toString()
         );
       }
@@ -285,7 +281,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call.on('finish', () => {
       span.setStatus(_grpcStatusCodeToSpanStatus(call.status.code));
       span.setAttribute(
-        AttributeNames.GRPC_STATUS_CODE,
+        RpcAttribute.GRPC_STATUS_CODE,
         call.status.code.toString()
       );
 
@@ -303,13 +299,12 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       });
       span.addEvent('finished with error');
       span.setAttributes({
-        [AttributeNames.GRPC_ERROR_NAME]: err.name,
-        [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+        [RpcAttribute.GRPC_ERROR_NAME]: err.name,
+        [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
       });
       endSpan();
     });
 
-    // tslint:disable-next-line:no-any
     return (original as any).call(self, call);
   }
 
@@ -323,12 +318,10 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         serviceName: string,
         options: grpcTypes.GenericClientOptions
       ) {
-        // tslint:disable-next-line:no-any
         const client = original.apply(this, arguments as any);
         shimmer.massWrap(
           client.prototype as never,
           plugin._getMethodsToWrap(client, methods) as never[],
-          // tslint:disable-next-line:no-any
           plugin._getPatchedClientMethods() as any
         );
         return client;
@@ -346,6 +339,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         .map(methodName => methods[methodName].originalName)
         .filter(
           originalName =>
+            // eslint-disable-next-line no-prototype-builtins
             !!originalName && client.prototype.hasOwnProperty(originalName)
         ) as string[]),
     ];
@@ -363,7 +357,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           .startSpan(name, {
             kind: SpanKind.CLIENT,
           })
-          .setAttribute(AttributeNames.COMPONENT, GrpcPlugin.component);
+          .setAttribute(GeneralAttribute.COMPONENT, GrpcPlugin.component);
         return plugin._tracer.withSpan(span, () =>
           plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(span)
         );
@@ -376,7 +370,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
    */
   private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
-    // tslint:disable-next-line:no-any
     args: any[],
     self: grpcTypes.Client,
     plugin: GrpcPlugin
@@ -390,24 +383,23 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       callback: SendUnaryDataCallback,
       metadata: grpcTypes.Metadata
     ) {
-      // tslint:disable-next-line:no-any
       const wrappedFn = (err: grpcTypes.ServiceError, res: any) => {
         if (err) {
           if (err.code) {
             span.setStatus(_grpcStatusCodeToSpanStatus(err.code));
             span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
+              RpcAttribute.GRPC_STATUS_CODE,
               err.code.toString()
             );
           }
           span.setAttributes({
-            [AttributeNames.GRPC_ERROR_NAME]: err.name,
-            [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+            [RpcAttribute.GRPC_ERROR_NAME]: err.name,
+            [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
           });
         } else {
           span.setStatus({ code: CanonicalCode.OK });
           span.setAttribute(
-            AttributeNames.GRPC_STATUS_CODE,
+            RpcAttribute.GRPC_STATUS_CODE,
             plugin._moduleExports.status.OK.toString()
           );
         }
@@ -440,8 +432,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
       span.addEvent('sent');
       span.setAttributes({
-        [AttributeNames.GRPC_METHOD]: original.path,
-        [AttributeNames.GRPC_KIND]: SpanKind.CLIENT,
+        [RpcAttribute.GRPC_METHOD]: original.path,
+        [RpcAttribute.GRPC_KIND]: SpanKind.CLIENT,
       });
 
       this._setSpanContext(metadata);
@@ -467,8 +459,8 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               message: err.message,
             });
             span.setAttributes({
-              [AttributeNames.GRPC_ERROR_NAME]: err.name,
-              [AttributeNames.GRPC_ERROR_MESSAGE]: err.message,
+              [RpcAttribute.GRPC_ERROR_NAME]: err.name,
+              [RpcAttribute.GRPC_ERROR_MESSAGE]: err.message,
             });
             endSpan();
           }
@@ -479,7 +471,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
           (status: Status) => {
             span.setStatus({ code: CanonicalCode.OK });
             span.setAttribute(
-              AttributeNames.GRPC_STATUS_CODE,
+              RpcAttribute.GRPC_STATUS_CODE,
               status.code.toString()
             );
             endSpan();
@@ -492,7 +484,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _getMetadata(
     original: GrpcClientFunc,
-    // tslint:disable-next-line:no-any
     args: any[]
   ): grpcTypes.Metadata {
     let metadata: grpcTypes.Metadata;
@@ -501,7 +492,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // A possible issue that could occur is if the 'options' parameter from
     // the user contains an '_internal_repr' as well as a 'getMap' function,
     // but this is an extremely rare case.
-    // tslint:disable-next-line:no-any
     let metadataIndex = findIndex(args, (arg: any) => {
       return (
         arg &&

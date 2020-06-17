@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,8 +88,7 @@ describe('Instrumentation#utils', () => {
       }
     );
 
-    it(`should return false when version is equal to null and supportedVersions is equal to '*'`, () => {
-      // tslint:disable-next-line:no-any
+    it("should return false when version is equal to null and supportedVersions is equal to '*'", () => {
       assert.strictEqual(utils.isSupportedVersion(null as any, ['*']), false);
     });
   });

@@ -1,4 +1,5 @@
 # OpenTelemetry Metrics SDK
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -16,6 +17,7 @@ npm install --save @opentelemetry/metrics
 ## Usage
 
 ### Counter
+
 Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
 
 ```js
@@ -25,7 +27,6 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
-  labelKeys: ['pid'],
   description: 'Example of a counter'
 });
 
@@ -38,6 +39,7 @@ boundCounter.add(10);
 ```
 
 ### Observable
+
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
@@ -47,7 +49,6 @@ const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const observer = meter.createObserver('metric_name', {
-  labelKeys: ['pid', 'core'],
   description: 'Example of a observer'
 });
 
@@ -73,10 +74,14 @@ setInterval(()=> {
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
-### Measure
-***Work in progress***
+### Value Recorder
+
+`ValueRecorder` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
+Values captured by `ValueRecorder.record(value)` are treated as individual events belonging to a distribution that is being summarized.
+`ValueRecorder` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

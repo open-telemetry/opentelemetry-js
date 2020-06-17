@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
+import { ReadableSpan } from './ReadableSpan';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -33,13 +33,13 @@ export class SimpleSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: Span): void {}
+  onStart(span: ReadableSpan): void {}
 
-  onEnd(span: Span): void {
+  onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
       return;
     }
-    this._exporter.export([span.toReadableSpan()], () => {});
+    this._exporter.export([span], () => {});
   }
 
   shutdown(): void {

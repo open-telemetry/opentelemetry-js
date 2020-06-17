@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,18 @@
  */
 
 declare module 'require-in-the-middle' {
-    namespace hook {
-      type Options = {
-        internals?: boolean;
-      };
-      type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
-    }
-    function hook(modules: string[]|null, options: hook.Options|null, onRequire: hook.OnRequireFn): void;
-    function hook(modules: string[]|null, onRequire: hook.OnRequireFn): void;
-    function hook(onRequire: hook.OnRequireFn): void;
-    export = hook;
+  namespace hook {
+    type Options = {
+      internals?: boolean;
+    };
+    type OnRequireFn = <T>(exports: T, name: string, basedir?: string) => T;
   }
+  function hook(
+    modules: string[] | null,
+    options: hook.Options | null,
+    onRequire: hook.OnRequireFn
+  ): void;
+  function hook(modules: string[] | null, onRequire: hook.OnRequireFn): void;
+  function hook(onRequire: hook.OnRequireFn): void;
+  export = hook;
+}

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -119,6 +119,14 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan('my-span');
       assert.ok(span);
       assert.ok(span instanceof Span);
+    });
+
+    it('should propagate resources', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const tracer = tracerProvider.getTracer('default');
+      const span = tracer.startSpan('my-span') as Span;
+      assert.strictEqual(tracer.resource, tracerProvider.resource);
+      assert.strictEqual(span.resource, tracerProvider.resource);
     });
 
     it('should start a span with name and options', () => {

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import {
   CanonicalCode,
+  context,
+  propagation,
   Span as ISpan,
   SpanKind,
-  propagation,
-  context,
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -27,11 +26,14 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
+import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import * as nock from 'nock';
 import * as path from 'path';
-import { AttributeNames } from '../../src/enums/AttributeNames';
 import { HttpPlugin, plugin } from '../../src/http';
 import { Http, HttpPluginConfig } from '../../src/types';
 import { OT_REQUEST_HEADER } from '../../src/utils';
@@ -40,6 +42,7 @@ import { DummyPropagation } from '../utils/DummyPropagation';
 import { httpRequest } from '../utils/httpRequest';
 import { ContextManager } from '@opentelemetry/context-base';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import { ClientRequest, IncomingMessage, ServerResponse } from 'http';
 
 const applyCustomAttributesOnSpanErrorMessage =
   'bad applyCustomAttributesOnSpan function';
@@ -74,6 +77,20 @@ function doNock(
 
 export const customAttributeFunction = (span: ISpan): void => {
   span.setAttribute('span kind', SpanKind.CLIENT);
+};
+
+export const requestHookFunction = (
+  span: ISpan,
+  request: ClientRequest | IncomingMessage
+): void => {
+  span.setAttribute('custom request hook attribute', 'request');
+};
+
+export const responseHookFunction = (
+  span: ISpan,
+  response: IncomingMessage | ServerResponse
+): void => {
+  span.setAttribute('custom response hook attribute', 'response');
 };
 
 describe('HttpPlugin', () => {
@@ -160,11 +177,11 @@ describe('HttpPlugin', () => {
         assertSpan(incomingSpan, SpanKind.SERVER, validations);
         assertSpan(outgoingSpan, SpanKind.CLIENT, validations);
         assert.strictEqual(
-          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          incomingSpan.attributes[GeneralAttribute.NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          outgoingSpan.attributes[GeneralAttribute.NET_PEER_PORT],
           serverPort
         );
       });
@@ -180,9 +197,14 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
+        assert.strictEqual(options.headers[OT_REQUEST_HEADER], 1);
       });
     });
     describe('with good plugin options', () => {
@@ -193,16 +215,18 @@ describe('HttpPlugin', () => {
       before(() => {
         const config: HttpPluginConfig = {
           ignoreIncomingPaths: [
-            `/ignored/string`,
+            '/ignored/string',
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           ignoreOutgoingUrls: [
             `${protocol}://${hostname}:${serverPort}/ignored/string`,
             /\/ignored\/regexp$/i,
-            (url: string) => url.endsWith(`/ignored/function`),
+            (url: string) => url.endsWith('/ignored/function'),
           ],
           applyCustomAttributesOnSpan: customAttributeFunction,
+          requestHook: requestHookFunction,
+          responseHook: responseHookFunction,
           serverName,
         };
         plugin.enable(http, provider, provider.logger, config);
@@ -255,28 +279,25 @@ describe('HttpPlugin', () => {
 
         assert.strictEqual(spans.length, 2);
         assert.strictEqual(
-          incomingSpan.attributes[AttributeNames.HTTP_CLIENT_IP],
+          incomingSpan.attributes[HttpAttribute.HTTP_CLIENT_IP],
           '<client>'
         );
         assert.strictEqual(
-          incomingSpan.attributes[AttributeNames.NET_HOST_PORT],
+          incomingSpan.attributes[GeneralAttribute.NET_HOST_PORT],
           serverPort
         );
         assert.strictEqual(
-          outgoingSpan.attributes[AttributeNames.NET_PEER_PORT],
+          outgoingSpan.attributes[GeneralAttribute.NET_PEER_PORT],
           serverPort
         );
         [
           { span: incomingSpan, kind: SpanKind.SERVER },
           { span: outgoingSpan, kind: SpanKind.CLIENT },
         ].forEach(({ span, kind }) => {
+          assert.strictEqual(span.attributes[HttpAttribute.HTTP_FLAVOR], '1.1');
           assert.strictEqual(
-            span.attributes[AttributeNames.HTTP_FLAVOR],
-            '1.1'
-          );
-          assert.strictEqual(
-            span.attributes[AttributeNames.NET_TRANSPORT],
-            AttributeNames.IP_TCP
+            span.attributes[GeneralAttribute.NET_TRANSPORT],
+            GeneralAttribute.IP_TCP
           );
           assertSpan(span, kind, validations);
         });
@@ -293,6 +314,10 @@ describe('HttpPlugin', () => {
         };
 
         const result = await httpRequest.get(options);
+        assert(
+          result.reqHeaders[OT_REQUEST_HEADER] === undefined,
+          'custom header should be stripped'
+        );
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
@@ -486,8 +511,7 @@ describe('HttpPlugin', () => {
           arg
         )}`, async () => {
           try {
-            // @ts-ignore
-            await httpRequest.get(arg);
+            await httpRequest.get(arg as any);
           } catch (error) {
             // request has been made
             // nock throw
@@ -674,9 +698,7 @@ describe('HttpPlugin', () => {
 
       it("should have 1 ended span when response is listened by using req.on('response')", done => {
         const host = `${protocol}://${hostname}`;
-        nock(host)
-          .get('/')
-          .reply(404);
+        nock(host).get('/').reply(404);
         const req = http.request(`${host}/`);
         req.on('response', response => {
           response.on('data', () => {});
@@ -686,7 +708,7 @@ describe('HttpPlugin', () => {
             assert.strictEqual(spans.length, 1);
             assert.ok(Object.keys(span.attributes).length > 6);
             assert.strictEqual(
-              span.attributes[AttributeNames.HTTP_STATUS_CODE],
+              span.attributes[HttpAttribute.HTTP_STATUS_CODE],
               404
             );
             assert.strictEqual(span.status.code, CanonicalCode.NOT_FOUND);
@@ -694,6 +716,160 @@ describe('HttpPlugin', () => {
           });
         });
         req.end();
+      });
+
+      it('custom attributes should show up on client and server spans', async () => {
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${pathname}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        const [incomingSpan, outgoingSpan] = spans;
+
+        assert.strictEqual(
+          incomingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          incomingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
+
+        assert.strictEqual(
+          outgoingSpan.attributes['custom request hook attribute'],
+          'request'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['custom response hook attribute'],
+          'response'
+        );
+        assert.strictEqual(
+          outgoingSpan.attributes['span kind'],
+          SpanKind.CLIENT
+        );
+      });
+    });
+
+    describe('with require parent span', () => {
+      beforeEach(done => {
+        memoryExporter.reset();
+        plugin.enable(http, provider, provider.logger, {});
+        server = http.createServer((request, response) => {
+          response.end('Test Server Response');
+        });
+        server.listen(serverPort, done);
+      });
+
+      afterEach(() => {
+        server.close();
+        plugin.disable();
+      });
+
+      it('should not trace without parent with options enabled (both client & server)', async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = '/test/test';
+        await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 0);
+      });
+
+      it('should not trace without parent with options enabled (client only)', async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = '/test/test';
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(
+          spans.every(span => span.kind === SpanKind.SERVER),
+          true
+        );
+      });
+
+      it('should not trace without parent with options enabled (server only)', async () => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = '/test/test';
+        const result = await httpRequest.get(
+          `${protocol}://${hostname}:${serverPort}${testPath}`
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !== undefined
+        );
+        assert(
+          result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !== undefined
+        );
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 1);
+        assert.strictEqual(
+          spans.every(span => span.kind === SpanKind.CLIENT),
+          true
+        );
+      });
+
+      it('should trace with parent with both requireParent options enabled', done => {
+        plugin.disable();
+        const config: HttpPluginConfig = {
+          requireParentforIncomingSpans: true,
+          requireParentforOutgoingSpans: true,
+        };
+        plugin.enable(http, provider, provider.logger, config);
+        const testPath = '/test/test';
+        const tracer = provider.getTracer('default');
+        const span = tracer.startSpan('parentSpan', {
+          kind: SpanKind.INTERNAL,
+        });
+        tracer.withSpan(span, () => {
+          httpRequest
+            .get(`${protocol}://${hostname}:${serverPort}${testPath}`)
+            .then(result => {
+              span.end();
+              assert(
+                result.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY] !==
+                  undefined
+              );
+              assert(
+                result.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY] !==
+                  undefined
+              );
+              const spans = memoryExporter.getFinishedSpans();
+              assert.strictEqual(spans.length, 2);
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.CLIENT).length,
+                1
+              );
+              assert.strictEqual(
+                spans.filter(span => span.kind === SpanKind.INTERNAL).length,
+                1
+              );
+              return done();
+            })
+            .catch(done);
+        });
       });
     });
   });

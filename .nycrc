@@ -4,11 +4,14 @@
   ],
   "exclude": [
     "**/*.d.ts",
-    "build/**/**/*.js",
+    "build/**/*.*",
     "src/index.ts",
-    "karma.conf.js",
+    "src/platform/**/index.ts",
     "src/platform/browser/*.ts",
-    "test/index-webpack.ts",
+    "src/version.ts",
+    "test/**/*.*",
+    ".eslintrc.js",
+    "karma.conf.js",
     "webpack/*.js"
   ],
   "all": true

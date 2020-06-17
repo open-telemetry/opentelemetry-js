@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
  */
 
 import { unrefTimer } from '@opentelemetry/core';
-import { Span } from '../Span';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -53,13 +52,13 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   // does nothing.
-  onStart(span: Span): void {}
+  onStart(span: ReadableSpan): void {}
 
-  onEnd(span: Span): void {
+  onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
       return;
     }
-    this._addToBuffer(span.toReadableSpan());
+    this._addToBuffer(span);
   }
 
   shutdown(): void {

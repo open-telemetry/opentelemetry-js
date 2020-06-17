@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
-import { ObserverResult } from './ObserverResult';
 
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
@@ -27,15 +26,15 @@ export interface BoundCounter {
   add(value: number): void;
 }
 
-/** Measure to report instantaneous measurement of a value. */
-export interface BoundMeasure {
+/** ValueRecorder to report instantaneous measurement of a value. */
+export interface BoundValueRecorder {
   /**
-   * Records the given value to this measure.
-   * @param value the measurement to record.
+   * Records the given value to this value recorder.
+   * @param value to record.
    * @param correlationContext the correlationContext associated with the
-   *     measurements.
+   *     values.
    * @param spanContext the {@link SpanContext} that identifies the {@link Span}
-   *     for which the measurements are associated with.
+   *     which the values are associated with.
    */
   record(value: number): void;
   record(value: number, correlationContext: CorrelationContext): void;
@@ -44,15 +43,4 @@ export interface BoundMeasure {
     correlationContext: CorrelationContext,
     spanContext: SpanContext
   ): void;
-}
-
-/** Base interface for the Observer metrics. */
-export interface BoundObserver {
-  /**
-   * Sets callback for the observer. The callback is called once and then it
-   * sets observers for values. The observers are called periodically to
-   * retrieve the value.
-   * @param callback
-   */
-  setCallback(callback: (observerResult: ObserverResult) => void): void;
 }

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 import * as api from '@opentelemetry/api';
 import { Aggregator } from './export/types';
-import { ObserverResult } from './ObserverResult';
 
 /**
  * This class represent the base to BoundInstrument, which is responsible for generating
@@ -25,19 +24,16 @@ import { ObserverResult } from './ObserverResult';
 export class BaseBoundInstrument {
   protected _labels: api.Labels;
   protected _logger: api.Logger;
-  protected _monotonic: boolean;
 
   constructor(
     labels: api.Labels,
     logger: api.Logger,
-    monotonic: boolean,
     private readonly _disabled: boolean,
     private readonly _valueType: api.ValueType,
     private readonly _aggregator: Aggregator
   ) {
     this._labels = labels;
     this._logger = logger;
-    this._monotonic = monotonic;
   }
 
   update(value: number): void {
@@ -73,18 +69,17 @@ export class BoundCounter extends BaseBoundInstrument
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, disabled, valueType, aggregator);
   }
 
   add(value: number): void {
-    if (this._monotonic && value < 0) {
+    if (value < 0) {
       this._logger.error(
-        `Monotonic counter cannot descend for ${Object.values(this._labels)}`
+        `Counter cannot descend for ${Object.values(this._labels)}`
       );
       return;
     }
@@ -94,22 +89,43 @@ export class BoundCounter extends BaseBoundInstrument
 }
 
 /**
+ * BoundUpDownCounter allows the SDK to observe/record a single metric event.
+ * The value of single instrument in the `UpDownCounter` associated with
+ * specified Labels.
+ */
+export class BoundUpDownCounter extends BaseBoundInstrument
+  implements api.BoundCounter {
+  constructor(
+    labels: api.Labels,
+    disabled: boolean,
+    valueType: api.ValueType,
+    logger: api.Logger,
+    aggregator: Aggregator
+  ) {
+    super(labels, logger, disabled, valueType, aggregator);
+  }
+
+  add(value: number): void {
+    this.update(value);
+  }
+}
+
+/**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class BoundMeasure extends BaseBoundInstrument
-  implements api.BoundMeasure {
+export class BoundValueRecorder extends BaseBoundInstrument
+  implements api.BoundValueRecorder {
   private readonly _absolute: boolean;
 
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     absolute: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
+    super(labels, logger, disabled, valueType, aggregator);
     this._absolute = absolute;
   }
 
@@ -120,7 +136,7 @@ export class BoundMeasure extends BaseBoundInstrument
   ): void {
     if (this._absolute && value < 0) {
       this._logger.error(
-        `Absolute measure cannot contain negative values for $${Object.values(
+        `Absolute ValueRecorder cannot contain negative values for $${Object.values(
           this._labels
         )}`
       );
@@ -134,21 +150,14 @@ export class BoundMeasure extends BaseBoundInstrument
 /**
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
-export class BoundObserver extends BaseBoundInstrument
-  implements api.BoundObserver {
+export class BoundObserver extends BaseBoundInstrument {
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    monotonic: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
-    super(labels, logger, monotonic, disabled, valueType, aggregator);
-  }
-
-  setCallback(callback: (observerResult: api.ObserverResult) => void): void {
-    const observerResult = new ObserverResult();
-    callback(observerResult);
+    super(labels, logger, disabled, valueType, aggregator);
   }
 }

@@ -1,4 +1,5 @@
 # OpenTelemetry HTTP Instrumentation for Node.js
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -21,6 +22,7 @@ npm install --save @opentelemetry/plugin-http
 OpenTelemetry HTTP Instrumentation allows the user to automatically collect trace data and export them to their backend of choice, to give observability to distributed systems.
 
 To load a specific plugin (HTTP in this case), specify it in the Node Tracer's configuration.
+
 ```js
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
@@ -37,6 +39,7 @@ const provider = new NodeTracerProvider({
 ```
 
 To load all of the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
+
 ```js
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
@@ -52,11 +55,16 @@ Http plugin has few options available to choose from. You can set the following:
 | Options | Type | Description |
 | ------- | ---- | ----------- |
 | [`applyCustomAttributesOnSpan`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L52) | `HttpCustomAttributeFunction` | Function for adding custom attributes |
+| [`requestHook`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L60) | `HttpRequestCustomAttributeFunction` | Function for adding custom attributes before request is handled |
+| [`responseHook`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L67) | `HttpResponseCustomAttributeFunction` | Function for adding custom attributes before response is handled |
 | [`ignoreIncomingPaths`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all incoming requests that match paths |
 | [`ignoreOutgoingUrls`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `IgnoreMatcher[]` | Http plugin will not trace all outgoing requests that match urls |
 | [`serverName`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/types.ts#L28) | `string` | The primary server name of the matched virtual host. |
+| `requireParentforOutgoingSpans` | Boolean | Require that is a parent span to create new span for outgoing requests. |
+| `requireParentforIncomingSpans` | Boolean | Require that is a parent span to create new span for incoming requests. |
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

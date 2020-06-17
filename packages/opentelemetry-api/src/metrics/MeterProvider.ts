@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import { Meter } from './Meter';
 
 /**
- * MeterProvider provides an interface for creating {@link Meter}s
+ * A registry for creating named {@link Meter}s.
  */
 export interface MeterProvider {
   /**

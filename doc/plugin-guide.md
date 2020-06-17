@@ -11,14 +11,16 @@ Each plugin must extend the abstract class [BasePlugin][base-plugin] implementin
 - `unpatch`: A function describing how the module exports for a given file should be unpatched. This should generally mirror the logic in `patch`; for example, if `patch` wraps a method, `unpatch` should unwrap it.
 
 The core `PluginLoader` class is responsible for loading the instrumented plugins that use a patch mechanism to enable automatic tracing for specific target modules. In order to load new plugin, it should export `plugin` identifier.
+
 ```typescript
 export const plugin = new HttpPlugin(...);
 ```
 
 > Example of simple module plugin created and used in the tests.
-https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-node/test/instrumentation/node_modules/%40opentelemetry/plugin-simple-module/simple-module.js
+<https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-node/test/instrumentation/node_modules/%40opentelemetry/plugin-simple-module/simple-module.js>
 
 After the plugin is created, it must be added in the [list of default supported plugins][DEFAULT_INSTRUMENTATION_PLUGINS].
+
 ```typescript
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   http: {
@@ -41,7 +43,6 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
 We recommend using [`shimmer`][shimmer] to modify function properties on objects.
 
 Please refer to the [HTTP instrumentation][http-plugin] or [gRPC instrumentation][grpc-plugin] for more comprehensive examples.
-
 
 [shimmer]: https://github.com/othiym23/shimmer
 [builtin-plugins]: https://github.com/open-telemetry/opentelemetry-js#plugins

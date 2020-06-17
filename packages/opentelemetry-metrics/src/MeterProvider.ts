@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,12 +24,18 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
  * This class represents a meter provider which platform libraries can extend
  */
 export class MeterProvider implements api.MeterProvider {
+  private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
-  readonly resource: Resource = Resource.createTelemetrySDKResource();
+  readonly resource: Resource;
   readonly logger: api.Logger;
 
-  constructor(private _config: MeterConfig = DEFAULT_CONFIG) {
-    this.logger = _config.logger || new ConsoleLogger(_config.logLevel);
+  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
+    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this._config = Object.assign({}, config, {
+      logger: this.logger,
+      resource: this.resource,
+    });
   }
 
   /**

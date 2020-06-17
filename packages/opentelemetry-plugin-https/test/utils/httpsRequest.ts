@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ function get(input: string | URL, options?: https.RequestOptions): GetResult;
 function get(input: https.RequestOptions): GetResult;
 function get(input: any, options?: any): GetResult {
   return new Promise((resolve, reject) => {
+    // eslint-disable-next-line prefer-const
     let req: http.ClientRequest;
 
     function onGetResponseCb(resp: http.IncomingMessage): void {

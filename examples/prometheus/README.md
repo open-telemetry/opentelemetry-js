@@ -7,18 +7,19 @@ This is a simple example that demonstrates basic metrics collection and exports 
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 Setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/)
 
 ## Run the Application
+
 - Run the server
 
 ```sh
-$ # from this directory
-$ npm run start
+# from this directory
+npm run start
 ```
 
 - Replace the `prometheus.yml` provided by the Prometheus installation with the following:
@@ -39,8 +40,8 @@ scrape_configs:
 - Start Prometheus
 
 ```sh
-$ # from the directory you downloaded prometheus
-$ prometheus --config.file=prometheus.yml
+# from the directory you downloaded prometheus
+prometheus --config.file=prometheus.yml
 ```
 
 ### Prometheus UI
@@ -50,6 +51,7 @@ If you are using the default configurations, the prometheus client will be avail
 <p align="center"><img src="images/prom-ui.png?raw=true"/></p>
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on OpenTelemetry metrics, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics>
 - For more information on OpenTelemetry for Node.js, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node>

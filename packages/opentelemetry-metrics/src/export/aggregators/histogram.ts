@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ export class HistogramAggregator implements Aggregator {
 
   constructor(boundaries: number[]) {
     if (boundaries === undefined || boundaries.length === 0) {
-      throw new Error(`HistogramAggregator should be created with boundaries.`);
+      throw new Error('HistogramAggregator should be created with boundaries.');
     }
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.

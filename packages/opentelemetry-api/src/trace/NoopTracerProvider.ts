@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,10 @@ import { Tracer } from './tracer';
 import { TracerProvider } from './tracer_provider';
 
 /**
- * An implementation of the {@link TracerProvider} which returns an impotent Tracer
- * for all calls to `getTracer`
+ * An implementation of the {@link TracerProvider} which returns an impotent
+ * Tracer for all calls to `getTracer`.
+ *
+ * All operations are no-op.
  */
 export class NoopTracerProvider implements TracerProvider {
   getTracer(_name?: string, _version?: string): Tracer {

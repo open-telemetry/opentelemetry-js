@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ export type grpc = typeof grpcModule;
 
 export type SendUnaryDataCallback = (
   error: grpcModule.ServiceError | null,
-  // tslint:disable-next-line:no-any
   value?: any,
   trailer?: grpcModule.Metadata,
   flags?: grpcModule.writeFlags
 ) => void;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface GrpcPluginOptions {}
 
 interface GrpcStatus {

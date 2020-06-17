@@ -5,15 +5,15 @@ This example shows how to use [@opentelemetry/web](https://github.com/open-telem
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 ## Run the Application
 
 ```sh
-$ # from this directory
-$ npm start
+# from this directory
+npm start
 ```
 
 By default, the application will run on port `8090`.
@@ -35,6 +35,10 @@ The screen will look as follows:
 
 ![Screenshot of the running example](images/xml-http-request.png)
 
+
+### Fetch
+
+To see the results, open the browser at <http://localhost:8090/fetch/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
 
 ## Useful links
 

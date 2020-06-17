@@ -1,5 +1,5 @@
-/**
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -265,6 +265,7 @@ const assertHasOneLabel = (
   resource: Resource
 ): void => {
   const hasOne = Object.values(constants).reduce(
+    // eslint-disable-next-line no-prototype-builtins
     (found, key) => found || resource.labels.hasOwnProperty(key),
     false
   );

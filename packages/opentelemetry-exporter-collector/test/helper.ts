@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
 
 if (typeof Buffer === 'undefined') {
-  // @ts-ignore
-  window.Buffer = {
-    from: function(arr: []) {
+  (window as any).Buffer = {
+    from: function (arr: []) {
       return new Uint8Array(arr);
     },
   };

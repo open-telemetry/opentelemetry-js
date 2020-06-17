@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -288,6 +288,22 @@ describe('B3Propagator', () => {
       assert.ok(ctx1 === Context.ROOT_CONTEXT);
       assert.ok(ctx2 === Context.ROOT_CONTEXT);
       assert.ok(ctx3 === Context.ROOT_CONTEXT);
+    });
+
+    it('should left-pad 64 bit trace ids with 0', () => {
+      carrier[X_B3_TRACE_ID] = '8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_SAMPLED] = '1';
+      const extractedSpanContext = getExtractedSpanContext(
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      );
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '00000000000000008448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
     });
   });
 });

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ export class StackContextManager implements ContextManager {
     context = Context.ROOT_CONTEXT
   ): T {
     const manager = this;
-    const contextWrapper = function(this: any, ...args: any[]) {
+    const contextWrapper = function (this: unknown, ...args: unknown[]) {
       return manager.with(context, () => target.apply(this, args));
     };
     Object.defineProperty(contextWrapper, 'length', {
@@ -113,8 +113,6 @@ export class StackContextManager implements ContextManager {
 
     try {
       return fn();
-    } catch (err) {
-      throw err;
     } finally {
       this._currentContext = previousContext;
     }

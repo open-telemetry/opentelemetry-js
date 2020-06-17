@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Span } from '@opentelemetry/api';
 import { SpanProcessor } from './SpanProcessor';
+import { ReadableSpan } from './export/ReadableSpan';
 
 /** No-op implementation of SpanProcessor */
 export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: Span): void {}
-  onEnd(span: Span): void {}
+  onStart(span: ReadableSpan): void {}
+  onEnd(span: ReadableSpan): void {}
   shutdown(): void {}
   forceFlush(): void {}
 }

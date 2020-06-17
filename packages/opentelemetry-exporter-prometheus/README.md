@@ -1,4 +1,5 @@
 # OpenTelemetry Prometheus Metric Exporter
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -35,12 +36,14 @@ const meter = new MeterProvider({
 }).getMeter('example-prometheus');
 
 // Now, start recording data
-const counter = meter.createCounter('metric_name');
-counter.add(10, { [key]: 'value' });
+const counter = meter.createCounter('metric_name', {
+  description: 'Example of a counter'
+});
+counter.add(10, { pid: process.pid });
 
 // Record data using Instrument: It is recommended to keep a reference to the Bound Instrument instead of
 // always calling `bind()` method for every operations.
-const boundCounter = counter.bind({ [key]: 'value' });
+const boundCounter = counter.bind({ pid: process.pid });
 boundCounter.add(10);
 
 // .. some other work
@@ -48,11 +51,12 @@ boundCounter.add(10);
 
 ## Viewing your metrics
 
-With the above you should now be able to navigate to the Prometheus UI at: http://localhost:9464/metrics
+With the above you should now be able to navigate to the Prometheus UI at: <http://localhost:9464/metrics>
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
-- To learn more about Prometheus, visit: https://prometheus.io/
+- To learn more about Prometheus, visit: <https://prometheus.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
 

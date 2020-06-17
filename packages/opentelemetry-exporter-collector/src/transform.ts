@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,11 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporter } from './CollectorExporter';
-import { COLLETOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
+import {
+  CollectorExporterBase,
+  CollectorExporterConfigBase,
+} from './CollectorExporterBase';
+import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
 /**
@@ -169,7 +172,7 @@ export function toCollectorResource(
 export function toCollectorKind(
   kind: SpanKind
 ): opentelemetryProto.trace.v1.Span.SpanKind {
-  const collectorKind = COLLETOR_SPAN_KIND_MAPPING[kind];
+  const collectorKind = COLLECTOR_SPAN_KIND_MAPPING[kind];
   return typeof collectorKind === 'number'
     ? collectorKind
     : opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_UNSPECIFIED;
@@ -189,13 +192,15 @@ export function toCollectorTraceState(
 /**
  * Prepares trace service request to be sent to collector
  * @param spans spans
- * @param collectorExporter
+ * @param collectorExporterBase
  * @param [name] Instrumentation Library Name
  */
-export function toCollectorExportTraceServiceRequest(
+export function toCollectorExportTraceServiceRequest<
+  T extends CollectorExporterConfigBase
+>(
   spans: ReadableSpan[],
-  collectorExporter: CollectorExporter,
-  name: string = ''
+  collectorExporterBase: CollectorExporterBase<T>,
+  name = ''
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const spansToBeSent: opentelemetryProto.trace.v1.Span[] = spans.map(span =>
     toCollectorSpan(span)
@@ -205,9 +210,9 @@ export function toCollectorExportTraceServiceRequest(
 
   const additionalAttributes = Object.assign(
     {},
-    collectorExporter.attributes || {},
+    collectorExporterBase.attributes || {},
     {
-      'service.name': collectorExporter.serviceName,
+      'service.name': collectorExporterBase.serviceName,
     }
   );
   const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(

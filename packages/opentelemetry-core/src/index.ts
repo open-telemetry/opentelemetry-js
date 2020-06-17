@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,9 @@ export * from './context/propagation/B3Propagator';
 export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
+export * from './correlation-context/correlation-context';
+export * from './correlation-context/propagation/HttpCorrelationContext';
 export * from './platform';
-export * from './trace/instrumentation/BasePlugin';
 export * from './trace/NoRecordingSpan';
 export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/spancontext-utils';

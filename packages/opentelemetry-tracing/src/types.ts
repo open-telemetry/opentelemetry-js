@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import { Resource } from '@opentelemetry/resources';
  */
 export interface TracerConfig {
   /**
-   * Attributed that will be applied on every span created by Tracer.
+   * Attributes that will be applied on every span created by Tracer.
    * Useful to add infrastructure and environment information to your spans.
    */
   defaultAttributes?: Attributes;

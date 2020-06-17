@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,11 @@ import {
   PluginLoader,
   Plugins,
   searchPathForTest,
+  ENV_PLUGIN_DISABLED_LIST,
 } from '../../src/instrumentation/PluginLoader';
 
 const INSTALLED_PLUGINS_PATH = path.join(__dirname, 'node_modules');
-
+/* eslint-disable node/no-extraneous-require */
 const simplePlugins: Plugins = {
   'simple-module': {
     enabled: true,
@@ -135,6 +136,10 @@ describe('PluginLoader', () => {
   });
 
   describe('.load()', () => {
+    afterEach(() => {
+      delete process.env[ENV_PLUGIN_DISABLED_LIST];
+    });
+
     it('sanity check', () => {
       // Ensure that module fixtures contain values that we expect.
       const simpleModule = require('simple-module');
@@ -150,6 +155,86 @@ describe('PluginLoader', () => {
       assert.strictEqual(simpleModule100.value(), 0);
 
       assert.throws(() => require('nonexistent-module'));
+    });
+
+    it('should not load a plugin on the ignore list environment variable', () => {
+      // Set ignore list env var
+      process.env[ENV_PLUGIN_DISABLED_LIST] = 'simple-module';
+      const pluginLoader = new PluginLoader(provider, logger);
+      pluginLoader.load({ ...simplePlugins, ...supportedVersionPlugins });
+
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+
+      const supportedModule = require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(supportedModule.value(), 1);
+      assert.strictEqual(supportedModule.name(), 'patched-supported-module');
+
+      pluginLoader.unload();
+    });
+
+    it('should not load plugins on the ignore list environment variable', () => {
+      // Set ignore list env var
+      process.env[ENV_PLUGIN_DISABLED_LIST] = 'simple-module,http';
+      const pluginLoader = new PluginLoader(provider, logger);
+      pluginLoader.load({
+        ...simplePlugins,
+        ...supportedVersionPlugins,
+        ...httpPlugins,
+      });
+
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const simpleModule = require('simple-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+
+      const httpModule = require('http');
+      assert.ok(httpModule);
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const supportedModule = require('supported-module');
+      assert.strictEqual(pluginLoader['_plugins'].length, 1);
+      assert.strictEqual(supportedModule.value(), 1);
+      assert.strictEqual(supportedModule.name(), 'patched-supported-module');
+
+      pluginLoader.unload();
+    });
+
+    it('should not load any plugins if ignore list environment variable is set to "*"', () => {
+      // Set ignore list env var
+      process.env[ENV_PLUGIN_DISABLED_LIST] = '*';
+      const pluginLoader = new PluginLoader(provider, logger);
+      pluginLoader.load({
+        ...simplePlugins,
+        ...supportedVersionPlugins,
+        ...httpPlugins,
+      });
+
+      assert.strictEqual(pluginLoader['_plugins'].length, 0);
+
+      const simpleModule = require('simple-module');
+      const httpModule = require('http');
+      const supportedModule = require('supported-module');
+
+      assert.strictEqual(
+        pluginLoader['_plugins'].length,
+        0,
+        'No plugins were loaded'
+      );
+      assert.strictEqual(simpleModule.value(), 0);
+      assert.strictEqual(simpleModule.name(), 'simple-module');
+      assert.ok(httpModule);
+      assert.strictEqual(supportedModule.value(), 0);
+      assert.strictEqual(supportedModule.name(), 'supported-module');
+
+      pluginLoader.unload();
     });
 
     it('should load a plugin and patch the target modules', () => {
@@ -227,14 +312,14 @@ describe('PluginLoader', () => {
       pluginLoader.unload();
     });
 
-    it(`doesn't patch modules for which plugins aren't specified`, () => {
+    it("doesn't patch modules for which plugins aren't specified", () => {
       const pluginLoader = new PluginLoader(provider, logger);
       pluginLoader.load({});
       assert.strictEqual(require('simple-module').value(), 0);
       pluginLoader.unload();
     });
 
-    it(`should warn when module was already loaded`, callback => {
+    it('should warn when module was already loaded', callback => {
       const verifyWarnLogger = {
         error: logger.error,
         info: logger.info,
@@ -255,8 +340,7 @@ describe('PluginLoader', () => {
       const pluginLoader = new PluginLoader(provider, logger);
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.load(differentNamePlugins);
-      // @ts-ignore only to trigger the loading of the plugin
-      const randomModule = require('random-module');
+      require('random-module');
       assert.strictEqual(pluginLoader['_plugins'].length, 0);
       pluginLoader.unload();
     });

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,21 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
-  CollectorExporter,
-  CollectorExporterConfig,
-} from '../../src/CollectorExporter';
-import * as platform from '../../src/platform/index';
+  CollectorExporterBase,
+  CollectorExporterConfigBase,
+} from '../../src/CollectorExporterBase';
 
 import { mockedReadableSpan } from '../helper';
+
+type CollectorExporterConfig = CollectorExporterConfigBase;
+class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
+  onInit() {}
+  onShutdown() {}
+  sendSpans() {}
+  getDefaultUrl(url: string | undefined) {
+    return url || '';
+  }
+}
 
 describe('CollectorExporter - common', () => {
   let collectorExporter: CollectorExporter;
@@ -32,8 +41,9 @@ describe('CollectorExporter - common', () => {
 
   describe('constructor', () => {
     let onInitSpy: any;
+
     beforeEach(() => {
-      onInitSpy = sinon.stub(platform, 'onInit');
+      onInitSpy = sinon.stub(CollectorExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),
@@ -43,6 +53,7 @@ describe('CollectorExporter - common', () => {
       };
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
+
     afterEach(() => {
       onInitSpy.restore();
     });
@@ -53,7 +64,6 @@ describe('CollectorExporter - common', () => {
 
     it('should call onInit', () => {
       assert.strictEqual(onInitSpy.callCount, 1);
-      assert.ok(onInitSpy.args[0][0] === collectorExporter);
     });
 
     describe('when config contains certain params', () => {
@@ -92,7 +102,7 @@ describe('CollectorExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(platform, 'sendSpans');
+      spySend = sinon.stub(CollectorExporter.prototype, 'sendSpans');
       collectorExporter = new CollectorExporter(collectorExporterConfig);
     });
     afterEach(() => {
@@ -103,7 +113,7 @@ describe('CollectorExporter - common', () => {
       const spans: ReadableSpan[] = [];
       spans.push(Object.assign({}, mockedReadableSpan));
 
-      collectorExporter.export(spans, function() {});
+      collectorExporter.export(spans, () => {});
       setTimeout(() => {
         const span1 = spySend.args[0][0][0] as ReadableSpan;
         assert.deepStrictEqual(spans[0], span1);
@@ -136,7 +146,7 @@ describe('CollectorExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(platform, 'onShutdown');
+      onShutdownSpy = sinon.stub(CollectorExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),
@@ -153,7 +163,7 @@ describe('CollectorExporter - common', () => {
     it('should call onShutdown', done => {
       collectorExporter.shutdown();
       setTimeout(() => {
-        assert.ok(onShutdownSpy.args[0][0] === collectorExporter);
+        assert.equal(onShutdownSpy.callCount, 1);
         done();
       });
     });
