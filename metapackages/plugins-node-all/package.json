@@ -1,0 +1,28 @@
+{
+    "name": "@opentelemetry/plugins-node-all",
+    "version": "0.8.3",
+    "description": "Metapackage which bundles opentelemetry node core and contrib plugins",
+    "author": "OpenTelemetry Authors",
+    "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+    "license": "Apache-2.0",
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+    },
+    "dependencies": {
+        "@opentelemetry/plugins-node-core": "^0.8.3",
+        "@opentelemetry/plugin-express": "^0.8.0",
+        "@opentelemetry/plugin-ioredis": "^0.8.0",
+        "@opentelemetry/plugin-mongodb": "^0.8.0",
+        "@opentelemetry/plugin-mysql": "^0.8.0",
+        "@opentelemetry/plugin-pg-pool": "^0.8.0",
+        "@opentelemetry/plugin-pg": "^0.8.0",
+        "@opentelemetry/plugin-redis": "^0.8.0"
+    }
+}
