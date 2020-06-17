@@ -21,17 +21,17 @@ import {
   isUrlIgnored,
   isWrapped,
   otperformance,
-  urlMatches,
 } from '@opentelemetry/core';
 import {
   HttpAttribute,
   GeneralAttribute,
 } from '@opentelemetry/semantic-conventions';
 import {
-  addSpanNetworkEvent,
+  addSpanNetworkEvents,
   getResource,
   parseUrl,
   PerformanceTimingNames as PTN,
+  shouldPropagateTraceHeaders,
 } from '@opentelemetry/web';
 import * as shimmer from 'shimmer';
 import { EventNames } from './enums/EventNames';
@@ -86,7 +86,12 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
    * @private
    */
   private _addHeaders(xhr: XMLHttpRequest, spanUrl: string) {
-    if (!this._shouldPropagateTraceHeaders(spanUrl)) {
+    if (
+      !shouldPropagateTraceHeaders(
+        spanUrl,
+        this._config.propagateTraceHeaderCorsUrls
+      )
+    ) {
       return;
     }
     const headers: { [key: string]: unknown } = {};
@@ -94,34 +99,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     Object.keys(headers).forEach(key => {
       xhr.setRequestHeader(key, String(headers[key]));
     });
-  }
-
-  /**
-   * checks if trace headers should be propagated
-   * @param spanUrl
-   * @private
-   */
-  _shouldPropagateTraceHeaders(spanUrl: string) {
-    let propagateTraceHeaderUrls =
-      this._config.propagateTraceHeaderCorsUrls || [];
-    if (
-      typeof propagateTraceHeaderUrls === 'string' ||
-      propagateTraceHeaderUrls instanceof RegExp
-    ) {
-      propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
-    }
-    const parsedSpanUrl = parseUrl(spanUrl);
-
-    if (parsedSpanUrl.origin === window.location.origin) {
-      return true;
-    } else {
-      for (const propagateTraceHeaderUrl of propagateTraceHeaderUrls) {
-        if (urlMatches(spanUrl, propagateTraceHeaderUrl)) {
-          return true;
-        }
-      }
-      return false;
-    }
   }
 
   /**
@@ -138,7 +115,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       const childSpan = this._tracer.startSpan('CORS Preflight', {
         startTime: corsPreFlightRequest[PTN.FETCH_START],
       });
-      this._addSpanNetworkEvents(childSpan, corsPreFlightRequest);
+      addSpanNetworkEvents(childSpan, corsPreFlightRequest);
       childSpan.end(corsPreFlightRequest[PTN.RESPONSE_END]);
     });
   }
@@ -166,27 +143,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       //    maybe when parent span is not available ?
       span.setAttribute(HttpAttribute.HTTP_USER_AGENT, navigator.userAgent);
     }
-  }
-
-  /**
-   * Adds Network events to the span
-   * @param span
-   * @param resource
-   * @private
-   */
-  private _addSpanNetworkEvents(
-    span: api.Span,
-    resource: PerformanceResourceTiming
-  ) {
-    addSpanNetworkEvent(span, PTN.FETCH_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
-    addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
-    addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
-    addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
-    addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
-    addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
-    addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
   }
 
   /**
@@ -260,6 +216,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       // information
       resources = otperformance.getEntriesByType(
         // ts thinks this is the perf_hooks module, but it is the browser performance api
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         'resource' as any
       ) as PerformanceResourceTiming[];
     }
@@ -281,7 +238,7 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
         this._addChildSpan(span, corsPreFlightRequest);
         this._markResourceAsUsed(corsPreFlightRequest);
       }
-      this._addSpanNetworkEvents(span, mainRequest);
+      addSpanNetworkEvents(span, mainRequest);
     }
   }
 

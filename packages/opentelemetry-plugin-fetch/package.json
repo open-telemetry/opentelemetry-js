@@ -1,0 +1,82 @@
+{
+  "name": "@opentelemetry/plugin-fetch",
+  "version": "0.8.3",
+  "description": "OpenTelemetry fetch automatic instrumentation package.",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "clean": "rimraf build/*",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "precompile": "tsc --version",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "prepare": "npm run compile",
+    "tdd": "karma start",
+    "test:browser": "nyc karma start --single-run",
+    "watch": "tsc -w"
+  },
+  "keywords": [
+    "fetch",
+    "opentelemetry",
+    "browser",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.6.0",
+    "@opentelemetry/context-zone": "^0.8.2",
+    "@opentelemetry/tracing": "^0.8.2",
+    "@types/mocha": "^7.0.0",
+    "@types/node": "^14.0.5",
+    "@types/shimmer": "^1.0.1",
+    "@types/sinon": "^7.0.13",
+    "@types/webpack-env": "1.15.2",
+    "babel-loader": "^8.0.6",
+    "codecov": "^3.1.0",
+    "gts": "^2.0.0",
+    "istanbul-instrumenter-loader": "^3.0.1",
+    "karma": "^5.0.5",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-coverage-istanbul-reporter": "^3.0.2",
+    "karma-mocha": "^2.0.1",
+    "karma-spec-reporter": "^0.0.32",
+    "karma-webpack": "^4.0.2",
+    "mocha": "^7.1.2",
+    "nyc": "^15.0.0",
+    "rimraf": "^3.0.0",
+    "sinon": "^7.5.0",
+    "ts-loader": "^6.0.4",
+    "ts-mocha": "^7.0.0",
+    "ts-node": "^8.6.2",
+    "typescript": "3.6.4",
+    "webpack": "^4.35.2",
+    "webpack-cli": "^3.3.9",
+    "webpack-merge": "^4.2.2"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.8.3",
+    "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/web": "^0.8.3",
+    "shimmer": "^1.2.1"
+  }
+}
