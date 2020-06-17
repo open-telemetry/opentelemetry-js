@@ -520,3 +520,16 @@ export function ensureMetadataIsCorrect(
   actual.remove('user-agent');
   assert.deepStrictEqual(actual.getMap(), expected.getMap());
 }
+
+export function ensureHeadersContain(
+  actual: { [key: string]: string },
+  expected: { [key: string]: string }
+) {
+  Object.entries(expected).forEach(([k, v]) => {
+    assert.strictEqual(
+      v,
+      actual[k],
+      `Expected ${actual} to contain ${k}: ${v}`
+    );
+  });
+}
