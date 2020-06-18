@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<title>OpenTelemetry API for JavaScript</title>
-	<meta name="description" content="">
+	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="assets/css/main.css">
 </head>
@@ -13,7 +13,7 @@
 	<div class="tsd-page-toolbar">
 		<div class="container">
 			<div class="table-wrap">
-				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.json" data-base=".">
 					<div class="field">
 						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
 						<input id="tsd-search-field" type="text" />
@@ -56,7 +56,7 @@
 					<a href="globals.html">Globals</a>
 				</li>
 			</ul>
-			<h1> OpenTelemetry API for JavaScript</h1>
+			<h1>OpenTelemetry API for JavaScript</h1>
 		</div>
 	</div>
 </header>
@@ -72,6 +72,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-enum tsd-is-external"><a href="enums/canonicalcode.html" class="tsd-kind-icon">Canonical<wbr>Code</a></li>
 								<li class="tsd-kind-enum tsd-is-external"><a href="enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a></li>
+								<li class="tsd-kind-enum tsd-is-external"><a href="enums/samplingdecision.html" class="tsd-kind-icon">Sampling<wbr>Decision</a></li>
 								<li class="tsd-kind-enum tsd-is-external"><a href="enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a></li>
 								<li class="tsd-kind-enum tsd-is-external"><a href="enums/traceflags.html" class="tsd-kind-icon">Trace<wbr>Flags</a></li>
 								<li class="tsd-kind-enum tsd-is-external"><a href="enums/valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a></li>
@@ -83,10 +84,9 @@
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/contextapi.html" class="tsd-kind-icon">ContextAPI</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/metricsapi.html" class="tsd-kind-icon">MetricsAPI</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopboundcounter.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Counter</a></li>
-								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopboundmeasure.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Measure</a></li>
+								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopboundvaluerecorder.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Value<wbr>Recorder</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noophttptextpropagator.html" class="tsd-kind-icon">Noop<wbr>Http<wbr>Text<wbr>Propagator</a></li>
-								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopmeasuremetric.html" class="tsd-kind-icon">Noop<wbr>Measure<wbr>Metric</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopmeterprovider.html" class="tsd-kind-icon">Noop<wbr>Meter<wbr>Provider</a></li>
 								<li class="tsd-kind-class tsd-has-type-parameter tsd-is-external"><a href="classes/noopmetric.html" class="tsd-kind-icon">Noop<wbr>Metric</a></li>
@@ -94,6 +94,7 @@
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/nooptracer.html" class="tsd-kind-icon">Noop<wbr>Tracer</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/nooptracerprovider.html" class="tsd-kind-icon">Noop<wbr>Tracer<wbr>Provider</a></li>
+								<li class="tsd-kind-class tsd-is-external"><a href="classes/noopvaluerecordermetric.html" class="tsd-kind-icon">Noop<wbr>Value<wbr>Recorder<wbr>Metric</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/propagationapi.html" class="tsd-kind-icon">PropagationAPI</a></li>
 								<li class="tsd-kind-class tsd-is-external"><a href="classes/traceapi.html" class="tsd-kind-icon">TraceAPI</a></li>
 							</ul>
@@ -103,7 +104,7 @@
 							<ul class="tsd-index-list">
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a></li>
-								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a></li>
+								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/boundvaluerecorder.html" class="tsd-kind-icon">Bound<wbr>Value<wbr>Recorder</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/correlationcontext.html" class="tsd-kind-icon">Correlation<wbr>Context</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/counter.html" class="tsd-kind-icon">Counter</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/entryvalue.html" class="tsd-kind-icon">Entry<wbr>Value</a></li>
@@ -111,7 +112,6 @@
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/httptextpropagator.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Propagator</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/link.html" class="tsd-kind-icon">Link</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a></li>
-								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/measure.html" class="tsd-kind-icon">Measure</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/meterprovider.html" class="tsd-kind-icon">Meter<wbr>Provider</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/metric.html" class="tsd-kind-icon">Metric</a></li>
@@ -124,6 +124,7 @@
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/plugininternalfiles.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/plugininternalfilesversion.html" class="tsd-kind-icon">Plugin<wbr>Internal<wbr>Files<wbr>Version</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/sampler.html" class="tsd-kind-icon">Sampler</a></li>
+								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/samplingresult.html" class="tsd-kind-icon">Sampling<wbr>Result</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/span.html" class="tsd-kind-icon">Span</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/spancontext.html" class="tsd-kind-icon">Span<wbr>Context</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/spanoptions.html" class="tsd-kind-icon">Span<wbr>Options</a></li>
@@ -133,18 +134,20 @@
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/tracer.html" class="tsd-kind-icon">Tracer</a></li>
 								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a></li>
 								<li class="tsd-kind-interface tsd-has-type-parameter tsd-is-external"><a href="interfaces/unboundmetric.html" class="tsd-kind-icon">Unbound<wbr>Metric</a></li>
+								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/updowncounter.html" class="tsd-kind-icon">Up<wbr>Down<wbr>Counter</a></li>
+								<li class="tsd-kind-interface tsd-is-external"><a href="interfaces/valuerecorder.html" class="tsd-kind-icon">Value<wbr>Recorder</a></li>
 							</ul>
 						</section>
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Type aliases</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external tsd-is-not-exported"><a href="globals.html#get" class="tsd-kind-icon">Get</a></li>
+								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#get" class="tsd-kind-icon">Get</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#getterfunction" class="tsd-kind-icon">Getter<wbr>Function</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#hrtime" class="tsd-kind-icon">Hr<wbr>Time</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#labels" class="tsd-kind-icon">Labels</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#linkcontext" class="tsd-kind-icon">Link<wbr>Context</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a></li>
-								<li class="tsd-kind-type-alias tsd-is-external tsd-is-not-exported"><a href="globals.html#otelglobal" class="tsd-kind-icon">Otel<wbr>Global</a></li>
+								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#otelglobal" class="tsd-kind-icon">Otel<wbr>Global</a></li>
 								<li class="tsd-kind-type-alias tsd-has-type-parameter tsd-is-external"><a href="globals.html#setterfunction" class="tsd-kind-icon">Setter<wbr>Function</a></li>
 								<li class="tsd-kind-type-alias tsd-is-external"><a href="globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a></li>
 							</ul>
@@ -160,23 +163,23 @@
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#invalid_span_id" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#invalid_trace_id" class="tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_bound_counter" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER</a></li>
-								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_bound_measure" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE</a></li>
-								<li class="tsd-kind-variable tsd-is-external tsd-is-not-exported"><a href="globals.html#noop_context_manager" class="tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER</a></li>
+								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_bound_value_recorder" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>VALUE_<wbr>RECORDER</a></li>
+								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_context_manager" class="tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_http_text_propagator" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</a></li>
-								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_measure_metric" class="tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_meter_provider" class="tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_observer_metric" class="tsd-kind-icon">NOOP_<wbr>OBSERVER_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a></li>
+								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#_global" class="tsd-kind-icon">_global</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#_globalthis" class="tsd-kind-icon">_global<wbr>This</a></li>
-								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#api1" class="tsd-kind-icon">api1</a></li>
-								<li class="tsd-kind-variable tsd-is-not-exported"><a href="globals.html#api2" class="tsd-kind-icon">api2</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#api1" class="tsd-kind-icon">api1</a></li>
+								<li class="tsd-kind-variable"><a href="globals.html#api2" class="tsd-kind-icon">api2</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#context" class="tsd-kind-icon">context</a></li>
-								<li class="tsd-kind-variable tsd-is-external tsd-is-not-exported"><a href="globals.html#contextapi" class="tsd-kind-icon">context<wbr>Api</a></li>
+								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#contextapi" class="tsd-kind-icon">context<wbr>Api</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#metrics" class="tsd-kind-icon">metrics</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#propagation" class="tsd-kind-icon">propagation</a></li>
 								<li class="tsd-kind-variable tsd-is-external"><a href="globals.html#trace" class="tsd-kind-icon">trace</a></li>
@@ -190,10 +193,10 @@
 								<li class="tsd-kind-function tsd-has-type-parameter tsd-is-external"><a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a></li>
 							</ul>
 						</section>
-						<section class="tsd-index-section tsd-is-external tsd-is-not-exported">
+						<section class="tsd-index-section tsd-is-external">
 							<h3>Object literals</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-object-literal tsd-is-external tsd-is-not-exported"><a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a></li>
+								<li class="tsd-kind-object-literal tsd-is-external"><a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a></li>
 							</ul>
 						</section>
 					</div>
@@ -201,13 +204,13 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Type aliases</h2>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 					<a name="get" class="tsd-anchor"></a>
 					<h3>Get</h3>
-					<div class="tsd-signature tsd-kind-icon">Get&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<div class="tsd-signature tsd-kind-icon">Get&lt;T&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">T</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L34">src/api/global-utils.ts:34</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L34">src/api/global-utils.ts:34</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -219,8 +222,8 @@
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
-							<li class="tsd-parameter-siganture">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
 									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>version<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">T</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
@@ -241,10 +244,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 					<a name="getterfunction" class="tsd-anchor"></a>
 					<h3>Getter<wbr>Function</h3>
-					<div class="tsd-signature tsd-kind-icon">Getter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<div class="tsd-signature tsd-kind-icon">Getter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">unknown</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/getter.ts#L17">src/context/propagation/getter.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/context/propagation/getter.ts#L17">src/context/propagation/getter.ts:17</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -256,8 +259,8 @@
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
-							<li class="tsd-parameter-siganture">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
 									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
@@ -284,22 +287,17 @@
 					<div class="tsd-signature tsd-kind-icon">Hr<wbr>Time<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">[</span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">]</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/common/Time.ts#L18">src/common/Time.ts:18</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/common/Time.ts#L16">src/common/Time.ts:16</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>High resolution HrTime: [seconds: number, nanoseconds: number]</p>
-						</div>
-					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
 					<a name="labels" class="tsd-anchor"></a>
 					<h3>Labels</h3>
-					<div class="tsd-signature tsd-kind-icon">Labels<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<div class="tsd-signature tsd-kind-icon">Labels<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/Metric.ts#L165">src/metrics/Metric.ts:165</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/Metric.ts#L164">src/metrics/Metric.ts:164</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -322,7 +320,7 @@
 					<div class="tsd-signature tsd-kind-icon">Link<wbr>Context<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Pick</span><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">, </span><span class="tsd-signature-type">"traceId"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"spanId"</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/link_context.ts#L22">src/trace/link_context.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/link_context.ts#L22">src/trace/link_context.ts:22</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -334,17 +332,17 @@
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
 					<a name="logfunction" class="tsd-anchor"></a>
 					<h3>Log<wbr>Function</h3>
-					<div class="tsd-signature tsd-kind-icon">Log<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<div class="tsd-signature tsd-kind-icon">Log<wbr>Function<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/common/Logger.ts#L17">src/common/Logger.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/common/Logger.ts#L17">src/common/Logger.ts:17</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
-							<li class="tsd-parameter-siganture">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
 									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>message<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, <span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
@@ -365,23 +363,23 @@
 						</ul>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-is-external">
 					<a name="otelglobal" class="tsd-anchor"></a>
 					<h3>Otel<wbr>Global</h3>
-					<div class="tsd-signature tsd-kind-icon">Otel<wbr>Global<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">object</span><span class="tsd-signature-symbol">&gt;</span></div>
+					<div class="tsd-signature tsd-kind-icon">Otel<wbr>Global<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">Partial</span><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-symbol">{ </span>[GLOBAL_CONTEXT_MANAGER_API_KEY]<span class="tsd-signature-symbol">: </span><a href="globals.html#get" class="tsd-signature-type">Get</a><span class="tsd-signature-symbol">&lt;</span><span class="tsd-signature-type">ContextManager</span><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>[GLOBAL_METRICS_API_KEY]<span class="tsd-signature-symbol">: </span><a href="globals.html#get" class="tsd-signature-type">Get</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/meterprovider.html" class="tsd-signature-type">MeterProvider</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>[GLOBAL_PROPAGATION_API_KEY]<span class="tsd-signature-symbol">: </span><a href="globals.html#get" class="tsd-signature-type">Get</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/httptextpropagator.html" class="tsd-signature-type">HttpTextPropagator</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol">; </span>[GLOBAL_TRACE_API_KEY]<span class="tsd-signature-symbol">: </span><a href="globals.html#get" class="tsd-signature-type">Get</a><span class="tsd-signature-symbol">&lt;</span><a href="interfaces/tracerprovider.html" class="tsd-signature-type">TracerProvider</a><span class="tsd-signature-symbol">&gt;</span><span class="tsd-signature-symbol"> }</span><span class="tsd-signature-symbol">&gt;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L35">src/api/global-utils.ts:35</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L35">src/api/global-utils.ts:35</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 					<a name="setterfunction" class="tsd-anchor"></a>
 					<h3>Setter<wbr>Function</h3>
-					<div class="tsd-signature tsd-kind-icon">Setter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">function</span></div>
+					<div class="tsd-signature tsd-kind-icon">Setter<wbr>Function&lt;Carrier&gt;<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/setter.ts#L17">src/context/propagation/setter.ts:17</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/context/propagation/setter.ts#L17">src/context/propagation/setter.ts:17</a></li>
 						</ul>
 					</aside>
 					<h4 class="tsd-type-parameters-title">Type parameters</h4>
@@ -393,8 +391,8 @@
 					<div class="tsd-type-declaration">
 						<h4>Type declaration</h4>
 						<ul class="tsd-parameters">
-							<li class="tsd-parameter-siganture">
-								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias tsd-is-not-exported">
+							<li class="tsd-parameter-signature">
+								<ul class="tsd-signatures tsd-kind-type-literal tsd-parent-kind-type-alias">
 									<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>carrier<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Carrier</span>, key<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">unknown</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 								</ul>
 								<ul class="tsd-descriptions">
@@ -424,7 +422,7 @@
 					<div class="tsd-signature tsd-kind-icon">Time<wbr>Input<span class="tsd-signature-symbol">:</span> <a href="globals.html#hrtime" class="tsd-signature-type">HrTime</a><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">Date</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/common/Time.ts#L25">src/common/Time.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/common/Time.ts#L23">src/common/Time.ts:23</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -440,10 +438,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="api_backwards_compatibility_version" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</h3>
-					<div class="tsd-signature tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> =&nbsp;0</span></div>
+					<div class="tsd-signature tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">0</span><span class="tsd-signature-symbol"> = 0</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L68">src/api/global-utils.ts:68</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L68">src/api/global-utils.ts:68</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -459,190 +457,190 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="global_context_manager_api_key" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY</h3>
-					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&#x27;io.opentelemetry.js.api.context&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>CONTEXT_<wbr>MANAGER_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol.for(&#x27;io.opentelemetry.js.api.context&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L23">src/api/global-utils.ts:23</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L23">src/api/global-utils.ts:23</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="global_metrics_api_key" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> GLOBAL_<wbr>METRICS_<wbr>API_<wbr>KEY</h3>
-					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>METRICS_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&#x27;io.opentelemetry.js.api.metrics&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>METRICS_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol.for(&#x27;io.opentelemetry.js.api.metrics&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L26">src/api/global-utils.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L26">src/api/global-utils.ts:26</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="global_propagation_api_key" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> GLOBAL_<wbr>PROPAGATION_<wbr>API_<wbr>KEY</h3>
-					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>PROPAGATION_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&#x27;io.opentelemetry.js.api.propagation&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>PROPAGATION_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol.for(&#x27;io.opentelemetry.js.api.propagation&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L29">src/api/global-utils.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L29">src/api/global-utils.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="global_trace_api_key" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY</h3>
-					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> =&nbsp;Symbol.for(&#x27;io.opentelemetry.js.api.trace&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">unique symbol</span><span class="tsd-signature-symbol"> = Symbol.for(&#x27;io.opentelemetry.js.api.trace&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L32">src/api/global-utils.ts:32</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L32">src/api/global-utils.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="invalid_span_id" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> INVALID_<wbr>SPAN_<wbr>ID</h3>
-					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;0&quot;</span></div>
+					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> = &quot;0&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L25">src/trace/NoopSpan.ts:25</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L25">src/trace/NoopSpan.ts:25</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="invalid_trace_id" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> INVALID_<wbr>TRACE_<wbr>ID</h3>
-					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> =&nbsp;&quot;0&quot;</span></div>
+					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"0"</span><span class="tsd-signature-symbol"> = &quot;0&quot;</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L24">src/trace/NoopSpan.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L24">src/trace/NoopSpan.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_bound_counter" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>BOUND_<wbr>COUNTER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundcounter.html" class="tsd-signature-type">NoopBoundCounter</a><span class="tsd-signature-symbol"> =&nbsp;new NoopBoundCounter()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundcounter.html" class="tsd-signature-type">NoopBoundCounter</a><span class="tsd-signature-symbol"> = new NoopBoundCounter()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L145">src/metrics/NoopMeter.ts:145</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L155">src/metrics/NoopMeter.ts:155</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
-					<a name="noop_bound_measure" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>BOUND_<wbr>MEASURE</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundmeasure.html" class="tsd-signature-type">NoopBoundMeasure</a><span class="tsd-signature-symbol"> =&nbsp;new NoopBoundMeasure()</span></div>
+					<a name="noop_bound_value_recorder" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>BOUND_<wbr>VALUE_<wbr>RECORDER</h3>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>VALUE_<wbr>RECORDER<span class="tsd-signature-symbol">:</span> <a href="classes/noopboundvaluerecorder.html" class="tsd-signature-type">NoopBoundValueRecorder</a><span class="tsd-signature-symbol"> = new NoopBoundValueRecorder()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L148">src/metrics/NoopMeter.ts:148</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L158">src/metrics/NoopMeter.ts:158</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_context_manager" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>CONTEXT_<wbr>MANAGER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NoopContextManager</span><span class="tsd-signature-symbol"> =&nbsp;new NoopContextManager()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">NoopContextManager</span><span class="tsd-signature-symbol"> = new NoopContextManager()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/context.ts#L29">src/api/context.ts:29</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/context.ts#L29">src/api/context.ts:29</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_counter_metric" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>COUNTER_<wbr>METRIC</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopcountermetric.html" class="tsd-signature-type">NoopCounterMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopCounterMetric(NOOP_BOUND_COUNTER)</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopcountermetric.html" class="tsd-signature-type">NoopCounterMetric</a><span class="tsd-signature-symbol"> = new NoopCounterMetric(NOOP_BOUND_COUNTER)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L146">src/metrics/NoopMeter.ts:146</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L156">src/metrics/NoopMeter.ts:156</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_http_text_propagator" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR<span class="tsd-signature-symbol">:</span> <a href="classes/noophttptextpropagator.html" class="tsd-signature-type">NoopHttpTextPropagator</a><span class="tsd-signature-symbol"> =&nbsp;new NoopHttpTextPropagator()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR<span class="tsd-signature-symbol">:</span> <a href="classes/noophttptextpropagator.html" class="tsd-signature-type">NoopHttpTextPropagator</a><span class="tsd-signature-symbol"> = new NoopHttpTextPropagator()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/NoopHttpTextPropagator.ts#L32">src/context/propagation/NoopHttpTextPropagator.ts:32</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
-					<a name="noop_measure_metric" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>MEASURE_<wbr>METRIC</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeasuremetric.html" class="tsd-signature-type">NoopMeasureMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeasureMetric(NOOP_BOUND_MEASURE)</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L149">src/metrics/NoopMeter.ts:149</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/context/propagation/NoopHttpTextPropagator.ts#L32">src/context/propagation/NoopHttpTextPropagator.ts:32</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_meter" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>METER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeter.html" class="tsd-signature-type">NoopMeter</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeter()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeter.html" class="tsd-signature-type">NoopMeter</a><span class="tsd-signature-symbol"> = new NoopMeter()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L144">src/metrics/NoopMeter.ts:144</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L154">src/metrics/NoopMeter.ts:154</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_meter_provider" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>METER_<wbr>PROVIDER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeterprovider.html" class="tsd-signature-type">NoopMeterProvider</a><span class="tsd-signature-symbol"> =&nbsp;new NoopMeterProvider()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/noopmeterprovider.html" class="tsd-signature-type">NoopMeterProvider</a><span class="tsd-signature-symbol"> = new NoopMeterProvider()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeterProvider.ts#L31">src/metrics/NoopMeterProvider.ts:31</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeterProvider.ts#L31">src/metrics/NoopMeterProvider.ts:31</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_observer_metric" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>OBSERVER_<wbr>METRIC</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>OBSERVER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopobservermetric.html" class="tsd-signature-type">NoopObserverMetric</a><span class="tsd-signature-symbol"> =&nbsp;new NoopObserverMetric()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>OBSERVER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopobservermetric.html" class="tsd-signature-type">NoopObserverMetric</a><span class="tsd-signature-symbol"> = new NoopObserverMetric()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L151">src/metrics/NoopMeter.ts:151</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L163">src/metrics/NoopMeter.ts:163</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_span" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>SPAN</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>SPAN<span class="tsd-signature-symbol">:</span> <a href="classes/noopspan.html" class="tsd-signature-type">NoopSpan</a><span class="tsd-signature-symbol"> =&nbsp;new NoopSpan()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>SPAN<span class="tsd-signature-symbol">:</span> <a href="classes/noopspan.html" class="tsd-signature-type">NoopSpan</a><span class="tsd-signature-symbol"> = new NoopSpan()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L81">src/trace/NoopSpan.ts:81</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L81">src/trace/NoopSpan.ts:81</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_tracer" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>TRACER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracer.html" class="tsd-signature-type">NoopTracer</a><span class="tsd-signature-symbol"> =&nbsp;new NoopTracer()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracer.html" class="tsd-signature-type">NoopTracer</a><span class="tsd-signature-symbol"> = new NoopTracer()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopTracer.ts#L45">src/trace/NoopTracer.ts:45</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopTracer.ts#L45">src/trace/NoopTracer.ts:45</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="noop_tracer_provider" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>TRACER_<wbr>PROVIDER</h3>
-					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracerprovider.html" class="tsd-signature-type">NoopTracerProvider</a><span class="tsd-signature-symbol"> =&nbsp;new NoopTracerProvider()</span></div>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER<span class="tsd-signature-symbol">:</span> <a href="classes/nooptracerprovider.html" class="tsd-signature-type">NoopTracerProvider</a><span class="tsd-signature-symbol"> = new NoopTracerProvider()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopTracerProvider.ts#L33">src/trace/NoopTracerProvider.ts:33</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopTracerProvider.ts#L33">src/trace/NoopTracerProvider.ts:33</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
+					<a name="noop_value_recorder_metric" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagConst">Const</span> NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</h3>
+					<div class="tsd-signature tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC<span class="tsd-signature-symbol">:</span> <a href="classes/noopvaluerecordermetric.html" class="tsd-signature-type">NoopValueRecorderMetric</a><span class="tsd-signature-symbol"> = new NoopValueRecorderMetric(NOOP_BOUND_VALUE_RECORDER)</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L159">src/metrics/NoopMeter.ts:159</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="_global" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> _global</h3>
-					<div class="tsd-signature tsd-kind-icon">_global<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span><span class="tsd-signature-symbol"> =&nbsp;_globalThis as OtelGlobal</span></div>
+					<div class="tsd-signature tsd-kind-icon">_global<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-symbol">{}</span><span class="tsd-signature-symbol"> = _globalThis as OtelGlobal</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L42">src/api/global-utils.ts:42</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L42">src/api/global-utils.ts:42</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-type-declaration">
@@ -654,10 +652,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="_globalthis" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> _global<wbr>This</h3>
-					<div class="tsd-signature tsd-kind-icon">_global<wbr>This<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">globalThis</span><span class="tsd-signature-symbol"> =&nbsp;typeof globalThis &#x3D;&#x3D;&#x3D; &#x27;object&#x27; ? globalThis : global</span></div>
+					<div class="tsd-signature tsd-kind-icon">_global<wbr>This<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">globalThis</span><span class="tsd-signature-symbol"> = typeof globalThis &#x3D;&#x3D;&#x3D; &#x27;object&#x27; ? globalThis : global</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/platform/node/globalThis.ts#L19">src/platform/node/globalThis.ts:19</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/platform/node/globalThis.ts#L19">src/platform/node/globalThis.ts:19</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -666,33 +664,33 @@
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-variable">
 					<a name="api1" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> api1</h3>
-					<div class="tsd-signature tsd-kind-icon">api1<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;/home/runner/work/opentelemetry-js/opentelemetry-js/packages/opentelemetry-api/src/index&quot;</span><span class="tsd-signature-symbol"> =&nbsp;require(&#x27;../../src&#x27;) as typeof import(&#x27;../../src&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">api1<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;/home/runner/work/opentelemetry-js/opentelemetry-js/packages/opentelemetry-api/src/index&quot;</span><span class="tsd-signature-symbol"> = require(&#x27;../../src&#x27;) as typeof import(&#x27;../../src&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/test/api/global.test.ts#L24">test/api/global.test.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/test/api/global.test.ts#L24">test/api/global.test.ts:24</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-variable">
 					<a name="api2" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> api2</h3>
-					<div class="tsd-signature tsd-kind-icon">api2<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;/home/runner/work/opentelemetry-js/opentelemetry-js/packages/opentelemetry-api/src/index&quot;</span><span class="tsd-signature-symbol"> =&nbsp;require(&#x27;../../src&#x27;) as typeof import(&#x27;../../src&#x27;)</span></div>
+					<div class="tsd-signature tsd-kind-icon">api2<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">&quot;/home/runner/work/opentelemetry-js/opentelemetry-js/packages/opentelemetry-api/src/index&quot;</span><span class="tsd-signature-symbol"> = require(&#x27;../../src&#x27;) as typeof import(&#x27;../../src&#x27;)</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/test/api/global.test.ts#L30">test/api/global.test.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/test/api/global.test.ts#L30">test/api/global.test.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="context" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> context</h3>
-					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> =&nbsp;ContextAPI.getInstance()</span></div>
+					<div class="tsd-signature tsd-kind-icon">context<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> = ContextAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/index.ts#L57">src/index.ts:57</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/index.ts#L58">src/index.ts:58</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -701,23 +699,23 @@
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="contextapi" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> context<wbr>Api</h3>
-					<div class="tsd-signature tsd-kind-icon">context<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> =&nbsp;ContextAPI.getInstance()</span></div>
+					<div class="tsd-signature tsd-kind-icon">context<wbr>Api<span class="tsd-signature-symbol">:</span> <a href="classes/contextapi.html" class="tsd-signature-type">ContextAPI</a><span class="tsd-signature-symbol"> = ContextAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/propagation.ts#L30">src/api/propagation.ts:30</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/propagation.ts#L30">src/api/propagation.ts:30</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="metrics" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> metrics</h3>
-					<div class="tsd-signature tsd-kind-icon">metrics<span class="tsd-signature-symbol">:</span> <a href="classes/metricsapi.html" class="tsd-signature-type">MetricsAPI</a><span class="tsd-signature-symbol"> =&nbsp;MetricsAPI.getInstance()</span></div>
+					<div class="tsd-signature tsd-kind-icon">metrics<span class="tsd-signature-symbol">:</span> <a href="classes/metricsapi.html" class="tsd-signature-type">MetricsAPI</a><span class="tsd-signature-symbol"> = MetricsAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/index.ts#L65">src/index.ts:65</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/index.ts#L66">src/index.ts:66</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -729,10 +727,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="propagation" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> propagation</h3>
-					<div class="tsd-signature tsd-kind-icon">propagation<span class="tsd-signature-symbol">:</span> <a href="classes/propagationapi.html" class="tsd-signature-type">PropagationAPI</a><span class="tsd-signature-symbol"> =&nbsp;PropagationAPI.getInstance()</span></div>
+					<div class="tsd-signature tsd-kind-icon">propagation<span class="tsd-signature-symbol">:</span> <a href="classes/propagationapi.html" class="tsd-signature-type">PropagationAPI</a><span class="tsd-signature-symbol"> = PropagationAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/index.ts#L69">src/index.ts:69</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/index.ts#L70">src/index.ts:70</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -744,10 +742,10 @@
 				<section class="tsd-panel tsd-member tsd-kind-variable tsd-is-external">
 					<a name="trace" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> trace</h3>
-					<div class="tsd-signature tsd-kind-icon">trace<span class="tsd-signature-symbol">:</span> <a href="classes/traceapi.html" class="tsd-signature-type">TraceAPI</a><span class="tsd-signature-symbol"> =&nbsp;TraceAPI.getInstance()</span></div>
+					<div class="tsd-signature tsd-kind-icon">trace<span class="tsd-signature-symbol">:</span> <a href="classes/traceapi.html" class="tsd-signature-type">TraceAPI</a><span class="tsd-signature-symbol"> = TraceAPI.getInstance()</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/index.ts#L61">src/index.ts:61</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/index.ts#L62">src/index.ts:62</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
@@ -769,7 +767,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/getter.ts#L29">src/context/propagation/getter.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/context/propagation/getter.ts#L29">src/context/propagation/getter.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -803,7 +801,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/context/propagation/setter.ts#L29">src/context/propagation/setter.ts:29</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/context/propagation/setter.ts#L29">src/context/propagation/setter.ts:29</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -839,7 +837,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/api/global-utils.ts#L52">src/api/global-utils.ts:52</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/api/global-utils.ts#L52">src/api/global-utils.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -880,44 +878,44 @@
 					</ul>
 				</section>
 			</section>
-			<section class="tsd-panel-group tsd-member-group tsd-is-external tsd-is-not-exported">
+			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Object literals</h2>
-				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-is-external tsd-is-not-exported">
+				<section class="tsd-panel tsd-member tsd-kind-object-literal tsd-is-external">
 					<a name="invalid_span_context" class="tsd-anchor"></a>
 					<h3><span class="tsd-flag ts-flagConst">Const</span> INVALID_<wbr>SPAN_<wbr>CONTEXT</h3>
 					<div class="tsd-signature tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L26">src/trace/NoopSpan.ts:26</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L26">src/trace/NoopSpan.ts:26</a></li>
 						</ul>
 					</aside>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external tsd-is-not-exported">
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external">
 						<a name="invalid_span_context.spanid" class="tsd-anchor"></a>
 						<h3>span<wbr>Id</h3>
-						<div class="tsd-signature tsd-kind-icon">span<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;INVALID_SPAN_ID</span></div>
+						<div class="tsd-signature tsd-kind-icon">span<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = INVALID_SPAN_ID</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L28">src/trace/NoopSpan.ts:28</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L28">src/trace/NoopSpan.ts:28</a></li>
 							</ul>
 						</aside>
 					</section>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external tsd-is-not-exported">
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external">
 						<a name="invalid_span_context.traceflags" class="tsd-anchor"></a>
 						<h3>trace<wbr>Flags</h3>
-						<div class="tsd-signature tsd-kind-icon">trace<wbr>Flags<span class="tsd-signature-symbol">:</span> <a href="enums/traceflags.html" class="tsd-signature-type">TraceFlags</a><span class="tsd-signature-symbol"> =&nbsp;TraceFlags.NONE</span></div>
+						<div class="tsd-signature tsd-kind-icon">trace<wbr>Flags<span class="tsd-signature-symbol">:</span> <a href="enums/traceflags.html" class="tsd-signature-type">TraceFlags</a><span class="tsd-signature-symbol"> = TraceFlags.NONE</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L29">src/trace/NoopSpan.ts:29</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L29">src/trace/NoopSpan.ts:29</a></li>
 							</ul>
 						</aside>
 					</section>
-					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external tsd-is-not-exported">
+					<section class="tsd-panel tsd-member tsd-kind-variable tsd-parent-kind-object-literal tsd-is-external">
 						<a name="invalid_span_context.traceid" class="tsd-anchor"></a>
 						<h3>trace<wbr>Id</h3>
-						<div class="tsd-signature tsd-kind-icon">trace<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> =&nbsp;INVALID_TRACE_ID</span></div>
+						<div class="tsd-signature tsd-kind-icon">trace<wbr>Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> = INVALID_TRACE_ID</span></div>
 						<aside class="tsd-sources">
 							<ul>
-								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/65b5ba2/packages/opentelemetry-api/src/trace/NoopSpan.ts#L27">src/trace/NoopSpan.ts:27</a></li>
+								<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/NoopSpan.ts#L27">src/trace/NoopSpan.ts:27</a></li>
 							</ul>
 						</aside>
 					</section>
@@ -941,6 +939,9 @@
 						<a href="enums/entryttl.html" class="tsd-kind-icon">Entry<wbr>Ttl</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-is-external">
+						<a href="enums/samplingdecision.html" class="tsd-kind-icon">Sampling<wbr>Decision</a>
+					</li>
+					<li class=" tsd-kind-enum tsd-is-external">
 						<a href="enums/spankind.html" class="tsd-kind-icon">Span<wbr>Kind</a>
 					</li>
 					<li class=" tsd-kind-enum tsd-is-external">
@@ -959,16 +960,13 @@
 						<a href="classes/noopboundcounter.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Counter</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopboundmeasure.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Measure</a>
+						<a href="classes/noopboundvaluerecorder.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Value<wbr>Recorder</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noophttptextpropagator.html" class="tsd-kind-icon">Noop<wbr>Http<wbr>Text<wbr>Propagator</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopmeasuremetric.html" class="tsd-kind-icon">Noop<wbr>Measure<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a>
@@ -992,6 +990,9 @@
 						<a href="classes/nooptracerprovider.html" class="tsd-kind-icon">Noop<wbr>Tracer<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/noopvaluerecordermetric.html" class="tsd-kind-icon">Noop<wbr>Value<wbr>Recorder<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/propagationapi.html" class="tsd-kind-icon">PropagationAPI</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -1004,7 +1005,7 @@
 						<a href="interfaces/boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/boundmeasure.html" class="tsd-kind-icon">Bound<wbr>Measure</a>
+						<a href="interfaces/boundvaluerecorder.html" class="tsd-kind-icon">Bound<wbr>Value<wbr>Recorder</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/correlationcontext.html" class="tsd-kind-icon">Correlation<wbr>Context</a>
@@ -1026,9 +1027,6 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/logger.html" class="tsd-kind-icon">Logger</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/measure.html" class="tsd-kind-icon">Measure</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/meter.html" class="tsd-kind-icon">Meter</a>
@@ -1067,6 +1065,9 @@
 						<a href="interfaces/sampler.html" class="tsd-kind-icon">Sampler</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/samplingresult.html" class="tsd-kind-icon">Sampling<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/span.html" class="tsd-kind-icon">Span</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
@@ -1093,7 +1094,13 @@
 					<li class=" tsd-kind-interface tsd-has-type-parameter tsd-is-external">
 						<a href="interfaces/unboundmetric.html" class="tsd-kind-icon">Unbound<wbr>Metric</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external tsd-is-not-exported">
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/updowncounter.html" class="tsd-kind-icon">Up<wbr>Down<wbr>Counter</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/valuerecorder.html" class="tsd-kind-icon">Value<wbr>Recorder</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
@@ -1111,7 +1118,7 @@
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#logfunction" class="tsd-kind-icon">Log<wbr>Function</a>
 					</li>
-					<li class=" tsd-kind-type-alias tsd-is-external tsd-is-not-exported">
+					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#otelglobal" class="tsd-kind-icon">Otel<wbr>Global</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
@@ -1145,9 +1152,9 @@
 						<a href="globals.html#noop_bound_counter" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_bound_measure" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>MEASURE</a>
+						<a href="globals.html#noop_bound_value_recorder" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>VALUE_<wbr>RECORDER</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_context_manager" class="tsd-kind-icon">NOOP_<wbr>CONTEXT_<wbr>MANAGER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -1155,9 +1162,6 @@
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_http_text_propagator" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_measure_metric" class="tsd-kind-icon">NOOP_<wbr>MEASURE_<wbr>METRIC</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a>
@@ -1178,21 +1182,24 @@
 						<a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#_global" class="tsd-kind-icon">_global</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#_globalthis" class="tsd-kind-icon">_global<wbr>This</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#api1" class="tsd-kind-icon">api1</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-not-exported">
+					<li class=" tsd-kind-variable">
 						<a href="globals.html#api2" class="tsd-kind-icon">api2</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#context" class="tsd-kind-icon">context</a>
 					</li>
-					<li class=" tsd-kind-variable tsd-is-external tsd-is-not-exported">
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#contextapi" class="tsd-kind-icon">context<wbr>Api</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -1213,7 +1220,7 @@
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a>
 					</li>
-					<li class=" tsd-kind-object-literal tsd-is-external tsd-is-not-exported">
+					<li class=" tsd-kind-object-literal tsd-is-external">
 						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
 					</li>
 				</ul>
@@ -1225,59 +1232,6 @@
 	<div class="container">
 		<h2>Legend</h2>
 		<div class="tsd-legend-group">
-			<ul class="tsd-legend">
-				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
-				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
-				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
-				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
-				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
-				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
-				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
-				<li class="tsd-kind-type-alias tsd-has-type-parameter"><span class="tsd-kind-icon">Type alias with type parameter</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
-				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
-				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
-				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
-				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
-				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
-				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
-			</ul>
-			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
-				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
-			</ul>
 		</div>
 	</div>
 </footer>

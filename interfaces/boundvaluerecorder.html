@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>TracerProvider | OpenTelemetry API for JavaScript</title>
+	<title>BoundValueRecorder | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="tracerprovider.html">TracerProvider</a>
+					<a href="boundvaluerecorder.html">BoundValueRecorder</a>
 				</li>
 			</ul>
-			<h1>Interface TracerProvider</h1>
+			<h1>Interface BoundValueRecorder</h1>
 		</div>
 	</div>
 </header>
@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>A registry for creating named <a href="tracer.html">Tracer</a>s.</p>
+						<p>ValueRecorder to report instantaneous measurement of a value.</p>
 					</div>
 				</div>
 			</section>
@@ -77,14 +77,14 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">TracerProvider</span>
+						<span class="target">BoundValueRecorder</span>
 					</li>
 				</ul>
 			</section>
 			<section class="tsd-panel">
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
-					<li><a href="../classes/nooptracerprovider.html" class="tsd-signature-type">NoopTracerProvider</a></li>
+					<li><a href="../classes/noopboundvaluerecorder.html" class="tsd-signature-type">NoopBoundValueRecorder</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -94,7 +94,7 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="tracerprovider.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="boundvaluerecorder.html#record" class="tsd-kind-icon">record</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,43 +103,72 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-					<a name="gettracer" class="tsd-anchor"></a>
-					<h3>get<wbr>Tracer</h3>
+					<a name="record" class="tsd-anchor"></a>
+					<h3>record</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">get<wbr>Tracer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, version<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="tracer.html" class="tsd-signature-type">Tracer</a></li>
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, correlationContext<span class="tsd-signature-symbol">: </span><a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">record<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, correlationContext<span class="tsd-signature-symbol">: </span><a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a>, spanContext<span class="tsd-signature-symbol">: </span><a href="spancontext.html" class="tsd-signature-type">SpanContext</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/tracer_provider.ts#L34">src/trace/tracer_provider.ts:34</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L39">src/metrics/BoundInstrument.ts:39</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
 								<div class="lead">
-									<p>Returns a Tracer, creating one if one with the given name and version is
-									not already created.</p>
+									<p>Records the given value to this value recorder.</p>
 								</div>
-								<p>This function may return different Tracer types (e.g.
-								<a href="../classes/nooptracerprovider.html">NoopTracerProvider</a> vs. a functional tracer).</p>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
 									<div class="tsd-comment tsd-typography">
-										<p>The name of the tracer or instrumentation library.</p>
-									</div>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> version: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>The version of the tracer or instrumentation library.</p>
+										<p>to record.</p>
 									</div>
 								</li>
 							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="tracer.html" class="tsd-signature-type">Tracer</a></h4>
-							<p>Tracer A Tracer with the given name and version</p>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L40">src/metrics/BoundInstrument.ts:40</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>correlationContext: <a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L41">src/metrics/BoundInstrument.ts:41</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+								<li>
+									<h5>correlationContext: <a href="correlationcontext.html" class="tsd-signature-type">CorrelationContext</a></h5>
+								</li>
+								<li>
+									<h5>spanContext: <a href="spancontext.html" class="tsd-signature-type">SpanContext</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
 						</li>
 					</ul>
 				</section>
@@ -158,10 +187,10 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="tracerprovider.html" class="tsd-kind-icon">Tracer<wbr>Provider</a>
+						<a href="boundvaluerecorder.html" class="tsd-kind-icon">Bound<wbr>Value<wbr>Recorder</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-								<a href="tracerprovider.html#gettracer" class="tsd-kind-icon">get<wbr>Tracer</a>
+								<a href="boundvaluerecorder.html#record" class="tsd-kind-icon">record</a>
 							</li>
 						</ul>
 					</li>

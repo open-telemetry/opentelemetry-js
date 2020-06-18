@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Event | OpenTelemetry API for JavaScript</title>
+	<title>SamplingDecision | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="event.html">Event</a>
+					<a href="samplingdecision.html">SamplingDecision</a>
 				</li>
 			</ul>
-			<h1>Interface Event</h1>
+			<h1>Enumeration SamplingDecision</h1>
 		</div>
 	</div>
 </header>
@@ -69,66 +69,73 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>A text annotation with a set of attributes.</p>
+						<p>A sampling decision that determines how a <a href="../interfaces/span.html">Span</a> will be recorded
+						and collected.</p>
 					</div>
 				</div>
-			</section>
-			<section class="tsd-panel tsd-hierarchy">
-				<h3>Hierarchy</h3>
-				<ul class="tsd-hierarchy">
-					<li>
-						<span class="target">Event</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<a href="timedevent.html" class="tsd-signature-type">TimedEvent</a>
-							</li>
-						</ul>
-					</li>
-				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-external">
-							<h3>Properties</h3>
+							<h3>Enumeration members</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="event.html#attributes" class="tsd-kind-icon">attributes</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="event.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="samplingdecision.html#not_record" class="tsd-kind-icon">NOT_<wbr>RECORD</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="samplingdecision.html#record" class="tsd-kind-icon">RECORD</a></li>
+								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="samplingdecision.html#record_and_sampled" class="tsd-kind-icon">RECORD_<wbr>AND_<wbr>SAMPLED</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Properties</h2>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="attributes" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> attributes</h3>
-					<div class="tsd-signature tsd-kind-icon">attributes<span class="tsd-signature-symbol">:</span> <a href="attributes.html" class="tsd-signature-type">Attributes</a></div>
+				<h2>Enumeration members</h2>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="not_record" class="tsd-anchor"></a>
+					<h3>NOT_<wbr>RECORD</h3>
+					<div class="tsd-signature tsd-kind-icon">NOT_<wbr>RECORD<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/Event.ts#L24">src/trace/Event.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/SamplingResult.ts#L28">src/trace/SamplingResult.ts:28</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The attributes of the event.</p>
+							<p><code>Span.isRecording() === false</code>, span will not be recorded and all events
+							and attributes will be dropped.</p>
 						</div>
 					</div>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="record" class="tsd-anchor"></a>
+					<h3>RECORD</h3>
+					<div class="tsd-signature tsd-kind-icon">RECORD<span class="tsd-signature-symbol">:</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/Event.ts#L22">src/trace/Event.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/SamplingResult.ts#L33">src/trace/SamplingResult.ts:33</a></li>
 						</ul>
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p>The name of the event.</p>
+							<p><code>Span.isRecording() === true</code>, but <code>Sampled</code> flag in <a href="traceflags.html">TraceFlags</a>
+							MUST NOT be set.</p>
+						</div>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+					<a name="record_and_sampled" class="tsd-anchor"></a>
+					<h3>RECORD_<wbr>AND_<wbr>SAMPLED</h3>
+					<div class="tsd-signature tsd-kind-icon">RECORD_<wbr>AND_<wbr>SAMPLED<span class="tsd-signature-symbol">:</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/trace/SamplingResult.ts#L38">src/trace/SamplingResult.ts:38</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-comment tsd-typography">
+						<div class="lead">
+							<p><code>Span.isRecording() === true</code> AND <code>Sampled</code> flag in <a href="traceflags.html">TraceFlags</a>
+							MUST be set.</p>
 						</div>
 					</div>
 				</section>
@@ -146,14 +153,17 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="event.html" class="tsd-kind-icon">Event</a>
+					<li class="current tsd-kind-enum tsd-is-external">
+						<a href="samplingdecision.html" class="tsd-kind-icon">Sampling<wbr>Decision</a>
 						<ul>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="event.html#attributes" class="tsd-kind-icon">attributes</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="samplingdecision.html#not_record" class="tsd-kind-icon">NOT_<wbr>RECORD</a>
 							</li>
-							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="event.html#name" class="tsd-kind-icon">name</a>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="samplingdecision.html#record" class="tsd-kind-icon">RECORD</a>
+							</li>
+							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
+								<a href="samplingdecision.html#record_and_sampled" class="tsd-kind-icon">RECORD_<wbr>AND_<wbr>SAMPLED</a>
 							</li>
 						</ul>
 					</li>
