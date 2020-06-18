@@ -1,5 +1,5 @@
 /*
- * Copyright The OpenTelemetry Authors
+ * Copyright 2020, OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,8 @@ import * as collectorTypes from '../../src/types';
 import { MeterProvider } from '@opentelemetry/metrics';
 import { Labels } from '@opentelemetry/api';
 
-const metricsServiceProtoPath = 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
+const metricsServiceProtoPath =
+  'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
 const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 
 const address = 'localhost:1501';
@@ -46,8 +47,8 @@ const testCollectorMetricExporter = (params: TestParams) =>
       | undefined;
 
     before(done => {
-        server = new grpc.Server();
-        protoLoader
+      server = new grpc.Server();
+      protoLoader
         .load(metricsServiceProtoPath, {
           keepCase: false,
           longs: String,
@@ -61,16 +62,16 @@ const testCollectorMetricExporter = (params: TestParams) =>
             packageDefinition
           );
           server.addService(
-            packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService
-              .service,
+            packageObject.opentelemetry.proto.collector.metrics.v1
+              .MetricsService.service,
             {
               Export: (data: {
                 request: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
               }) => {
                 try {
-                    exportedData = data.request.resourceMetrics[0];
+                  exportedData = data.request.resourceMetrics[0];
                 } catch (e) {
-                    exportedData = undefined;
+                  exportedData = undefined;
                 }
               },
             }

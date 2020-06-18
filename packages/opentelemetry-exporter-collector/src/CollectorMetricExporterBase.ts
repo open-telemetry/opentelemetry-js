@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
-import { Logger } from '@opentelemetry/api';
+import { Attributes, Logger } from '@opentelemetry/api';
 import { ExporterOptions } from './types';
 import { NoopLogger, ExportResult } from '@opentelemetry/core';
 import * as collectorTypes from './types';
+
+const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
 export abstract class CollectorMetricExporterBase implements MetricExporter {
   public readonly logger: Logger;
   public readonly url: string;
   protected readonly _startTime = new Date().getTime() * 1000000;
   private _isShutdown: boolean = false;
+  public readonly attributes?: Attributes;
+  public readonly hostName: string | undefined;
+  public readonly serviceName: string;
 
   constructor(options: ExporterOptions = {}) {
     this.logger = options.logger || new NoopLogger();
+    this.serviceName = options.serviceName || DEFAULT_SERVICE_NAME;
     this.url = this.getDefaultUrl(options.url);
+    this.attributes = options.attributes;
+    if (typeof options.hostName === 'string') {
+      this.hostName = options.hostName;
+    }
     this.onInit();
   }
 
@@ -88,5 +98,9 @@ export abstract class CollectorMetricExporterBase implements MetricExporter {
   abstract getDefaultUrl(url: string | undefined): string;
   abstract onInit(): void;
   abstract onShutdown(): void;
-  abstract sendMetrics(metrics: MetricRecord[], onSuccess: () => void, onError: (error: collectorTypes.CollectorExporterError) => void): void;
+  abstract sendMetrics(
+    metrics: MetricRecord[],
+    onSuccess: () => void,
+    onError: (error: collectorTypes.CollectorExporterError) => void
+  ): void;
 }

@@ -15,7 +15,7 @@
  */
 
 import { MetricRecord } from '@opentelemetry/metrics';
-import  * as collectorTypes  from '../../types';
+import * as collectorTypes from '../../types';
 import { GRPCMetricQueueItem, MetricsServiceClient } from './types';
 import { removeProtocol } from './util';
 import * as path from 'path';
@@ -39,7 +39,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
   constructor(options: collectorTypes.ExporterOptions = {}) {
     super(options);
     this.grpcMetricsQueue = [];
-    this.credentials = options.credentials || grpc.credentials.createInsecure();   
+    this.credentials = options.credentials || grpc.credentials.createInsecure();
   }
 
   getDefaultUrl(url: string | undefined): string {
@@ -52,7 +52,8 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
   onInit(): void {
     this.isShutDown = false;
     const serverAddress = removeProtocol(this.url);
-    const metricServiceProtoPath = 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
+    const metricServiceProtoPath =
+      'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
     const includeDirs = [path.resolve(__dirname, 'protos')];
     protoLoader
       .load(metricServiceProtoPath, {
@@ -89,21 +90,27 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
       return;
     }
     if (this.metricServiceClient) {
-      const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(metrics, this._startTime);
-      this.metricServiceClient.export(exportMetricServiceRequest,  (
-        err: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceError
-      ) => {
-        if (err) {
-          this.logger.error(
-            'exportTraceServiceRequest',
-            {} // exportMetricServiceRequest
-          );
-          onError(err);
-        } else {
-          onSuccess();
+      const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
+        metrics,
+        this._startTime,
+        this
+      );
+      this.metricServiceClient.export(
+        exportMetricServiceRequest,
+        (
+          err: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceError
+        ) => {
+          if (err) {
+            this.logger.error(
+              'exportTraceServiceRequest',
+              {} // exportMetricServiceRequest
+            );
+            onError(err);
+          } else {
+            onSuccess();
+          }
         }
-      }
-    );
+      );
     } else {
       this.grpcMetricsQueue.push({
         metrics,
@@ -119,5 +126,4 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
       this.metricServiceClient.close();
     }
   }
-
 }

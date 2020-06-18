@@ -21,7 +21,6 @@ import { CollectorExporterError } from '../../types';
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 export class CollectorMetricExporter extends CollectorMetricExporterBase {
-
   getDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }
@@ -41,7 +40,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
   ): void {
     const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
       metrics,
-      this._startTime,
+      this._startTime
     );
     const body = JSON.stringify(exportMetricServiceRequest);
     console.log(body);
@@ -112,5 +111,4 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
       }
     };
   }
-
 }

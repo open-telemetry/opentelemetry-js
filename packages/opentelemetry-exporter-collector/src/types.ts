@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { SpanKind, Logger } from '@opentelemetry/api';
+import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
 import * as grpc from 'grpc';
 
@@ -278,8 +278,11 @@ export interface ExporterOptions {
   logger?: Logger;
 
   url?: string;
-  
-  credentials?:  grpc.ChannelCredentials;
+
+  credentials?: grpc.ChannelCredentials;
+  attributes?: Attributes;
+  hostName?: string;
+  serviceName?: string;
 }
 
 /**

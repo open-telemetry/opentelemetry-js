@@ -17,9 +17,7 @@
 import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  CollectorMetricExporter,
-} from '../../src/platform/browser/index';
+import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
 import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
 import { Labels } from '@opentelemetry/api';
@@ -37,17 +35,17 @@ describe('CollectorMetricExporter - web', () => {
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     collectorExporter = new CollectorMetricExporter({
-        logger: new NoopLogger(),
-        url: 'http://foo.bar.com',
-      });
-      const meter = new MeterProvider().getMeter('test-meter');
-      const labels: Labels = { ['keyb']: 'value2', ['keya']: 'value1' };
-      const counter = meter.createCounter('name', {
-        labelKeys: ['keya', 'keyb'],
-      });
-      counter.bind(labels).add(10);
-      meter.collect();
-      records = meter.getBatcher().checkPointSet();
+      logger: new NoopLogger(),
+      url: 'http://foo.bar.com',
+    });
+    const meter = new MeterProvider().getMeter('test-meter');
+    const labels: Labels = { ['keyb']: 'value2', ['keya']: 'value1' };
+    const counter = meter.createCounter('name', {
+      labelKeys: ['keya', 'keyb'],
+    });
+    counter.bind(labels).add(10);
+    meter.collect();
+    records = meter.getBatcher().checkPointSet();
   });
 
   afterEach(() => {

@@ -17,7 +17,7 @@
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporterError } from '../../types';
-import { MetricRecord} from '@opentelemetry/metrics';
+import { MetricRecord } from '@opentelemetry/metrics';
 /**
  * Queue item to be used to save temporary spans in case the GRPC service
  * hasn't been fully initialised yet

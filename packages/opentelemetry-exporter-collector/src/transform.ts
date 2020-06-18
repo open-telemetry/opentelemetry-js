@@ -29,6 +29,7 @@ import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
 } from './CollectorExporterBase';
+import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 
@@ -49,7 +50,9 @@ export function toCollectorAttributes(
 export function toCollectorLabels(
   labels: Labels
 ): opentelemetryProto.common.v1.StringKeyValue[] {
-  return Object.keys(labels).map(key => {return {key: key, value: labels[key]}});
+  return Object.keys(labels).map(key => {
+    return { key: key, value: labels[key] };
+  });
 }
 
 /**
@@ -263,7 +266,7 @@ export function getCollectorPoints(metric: MetricRecord) {
 
 export function toCollectorMetric(
   metric: MetricRecord,
-  startTime: number,
+  startTime: number
 ): opentelemetryProto.metrics.v1.Metric {
   return {
     metricDescriptor: {
@@ -272,7 +275,8 @@ export function toCollectorMetric(
       unit: metric.descriptor.unit,
       labels: toCollectorLabels(metric.labels),
       type: opentelemetryProto.metrics.v1.MetricDescriptor_Type.COUNTER_INT64,
-      temporality: opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE,
+      temporality:
+        opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE,
     },
     doubleDataPoints: [],
     histogramDataPoints: [],
@@ -291,33 +295,36 @@ export function toCollectorMetric(
 }
 
 export function toCollectorExportMetricServiceRequest(
-  metrics: MetricRecord[], 
+  metrics: MetricRecord[],
   startTime: number,
+  collectorMetricExporterBase: CollectorMetricExporterBase,
+  name = ''
 ): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
   const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
     metric => toCollectorMetric(metric, startTime)
   );
-  const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
-    metrics: metricsToBeSent,
-    instrumentationLibrary: {
-      name: `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
-      version: core.SDK_INFO.VERSION,
-    },
-  };
 
   const resource: Resource =
     metrics.length > 0 ? metrics[0].resource : Resource.empty();
   const additionalAttributes = Object.assign(
     {},
-    {},
+    collectorMetricExporterBase.attributes || {},
     {
-      'service.name': 'test',
+      'service.name': collectorMetricExporterBase.serviceName,
     }
   );
   const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
     resource,
     additionalAttributes
   );
+
+  const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
+    metrics: metricsToBeSent,
+    instrumentationLibrary: {
+      name: name || `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
+      version: core.SDK_INFO.VERSION,
+    },
+  };
 
   const resourceMetric: opentelemetryProto.metrics.v1.ResourceMetrics = {
     resource: protoResource,
