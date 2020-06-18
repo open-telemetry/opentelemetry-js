@@ -23,10 +23,7 @@ import {
   SpanOptions,
   Status,
 } from '@opentelemetry/api';
-import {
-  GeneralAttribute,
-  RpcAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { BasePlugin } from '@opentelemetry/core';
 import * as events from 'events';
 import * as grpcTypes from 'grpc';
@@ -177,7 +174,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
                     .startSpan(spanName, spanOptions)
                     .setAttributes({
                       [RpcAttribute.GRPC_KIND]: spanOptions.kind,
-                      [GeneralAttribute.COMPONENT]: GrpcPlugin.component,
                     });
 
                   plugin._tracer.withSpan(span, () => {
@@ -353,11 +349,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
-        const span = plugin._tracer
-          .startSpan(name, {
-            kind: SpanKind.CLIENT,
-          })
-          .setAttribute(GeneralAttribute.COMPONENT, GrpcPlugin.component);
+        const span = plugin._tracer.startSpan(name, {
+          kind: SpanKind.CLIENT,
+        });
         return plugin._tracer.withSpan(span, () =>
           plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(span)
         );

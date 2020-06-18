@@ -24,10 +24,7 @@ import {
 } from '@opentelemetry/core';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
-import {
-  HttpAttribute,
-  GeneralAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -239,10 +236,6 @@ describe('xhr', () => {
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
 
-          assert.ok(
-            attributes[keys[0]] !== '',
-            `attributes ${GeneralAttribute.COMPONENT} is not defined`
-          );
           assert.strictEqual(
             attributes[keys[1]],
             'GET',
@@ -509,10 +502,6 @@ describe('xhr', () => {
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
 
-          assert.ok(
-            attributes[keys[0]] !== '',
-            `attributes ${GeneralAttribute.COMPONENT} is not defined`
-          );
           assert.strictEqual(
             attributes[keys[1]],
             'GET',
