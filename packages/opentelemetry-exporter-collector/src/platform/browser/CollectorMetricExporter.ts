@@ -40,7 +40,8 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
   ): void {
     const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
       metrics,
-      this._startTime
+      this._startTime,
+      this
     );
     const body = JSON.stringify(exportMetricServiceRequest);
     console.log(body);

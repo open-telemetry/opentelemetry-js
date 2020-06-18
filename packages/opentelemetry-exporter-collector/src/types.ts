@@ -136,13 +136,12 @@ export namespace opentelemetryProto {
     }
 
     export enum MetricDescriptor_Type {
-      UNSPECIFIED,
-      GAUGE_INT64,
-      GAUGE_DOUBLE,
-      GAUGE_HISTOGRAM,
-      COUNTER_INT64,
-      COUNTER_DOUBLE,
-      CUMULATIVE_HISTOGRAM,
+      INVALID_TYPE,
+      INT64,
+      MONOTONIC_INT64,
+      DOUBLE,
+      MONOTONIC_DOUBLE,
+      HISTOGRAM,
       SUMMARY,
     }
 

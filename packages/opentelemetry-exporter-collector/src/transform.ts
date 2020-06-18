@@ -32,7 +32,7 @@ import {
 import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
-
+import { ValueType as apiValueType } from '@opentelemetry/api';
 import { MetricRecord } from '@opentelemetry/metrics';
 
 /**
@@ -264,20 +264,47 @@ export function getCollectorPoints(metric: MetricRecord) {
   console.log(valueType, metricKind);
 }
 
+export function toCollectorMetricDescriptor(
+  metric: MetricRecord
+): opentelemetryProto.metrics.v1.MetricDescriptor {
+  let type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
+  const temporality = opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE;
+
+  if (metric.descriptor.valueType === apiValueType.INT) {
+    if (metric.descriptor.monotonic) {
+      type =
+        opentelemetryProto.metrics.v1.MetricDescriptor_Type.MONOTONIC_INT64;
+    } else {
+      type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.INT64;
+    }
+  } else if (metric.descriptor.valueType === apiValueType.DOUBLE) {
+    if (metric.descriptor.monotonic) {
+      type =
+        opentelemetryProto.metrics.v1.MetricDescriptor_Type.MONOTONIC_DOUBLE;
+    } else {
+      type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.DOUBLE;
+    }
+  } else {
+    type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.INVALID_TYPE;
+  }
+    
+
+  return {
+    name: metric.descriptor.name,
+    description: metric.descriptor.description,
+    unit: metric.descriptor.unit,
+    labels: toCollectorLabels(metric.labels),
+    type,
+    temporality,
+  };
+}
+
 export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.Metric {
   return {
-    metricDescriptor: {
-      name: metric.descriptor.name,
-      description: metric.descriptor.description,
-      unit: metric.descriptor.unit,
-      labels: toCollectorLabels(metric.labels),
-      type: opentelemetryProto.metrics.v1.MetricDescriptor_Type.COUNTER_INT64,
-      temporality:
-        opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE,
-    },
+    metricDescriptor: toCollectorMetricDescriptor(metric),
     doubleDataPoints: [],
     histogramDataPoints: [],
     summaryDataPoints: [],
