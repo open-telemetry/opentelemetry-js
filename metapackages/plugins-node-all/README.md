@@ -1,4 +1,5 @@
 # OpenTelemetry Plugins Node Core
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -22,6 +23,7 @@ In addition to all [node core plugins][otel-plugins-node-core], the following pl
 Note: [@opentelemetry/plugin-dns][otel-plugin-dns] is excluded by default because it requires some manual configuration to prevent infinite loops with exporters.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]
