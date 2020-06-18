@@ -17,12 +17,12 @@
     },
     "dependencies": {
         "@opentelemetry/plugins-node-core": "^0.8.3",
-        "@opentelemetry/plugin-express": "^0.8.0",
-        "@opentelemetry/plugin-ioredis": "^0.8.0",
-        "@opentelemetry/plugin-mongodb": "^0.8.0",
-        "@opentelemetry/plugin-mysql": "^0.8.0",
-        "@opentelemetry/plugin-pg-pool": "^0.8.0",
-        "@opentelemetry/plugin-pg": "^0.8.0",
-        "@opentelemetry/plugin-redis": "^0.8.0"
+        "@opentelemetry/plugin-express": "0.8.0",
+        "@opentelemetry/plugin-ioredis": "0.8.0",
+        "@opentelemetry/plugin-mongodb": "0.8.0",
+        "@opentelemetry/plugin-mysql": "0.8.0",
+        "@opentelemetry/plugin-pg-pool": "0.8.0",
+        "@opentelemetry/plugin-pg": "0.8.0",
+        "@opentelemetry/plugin-redis": "0.8.0"
     }
 }
