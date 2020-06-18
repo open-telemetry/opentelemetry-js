@@ -35,7 +35,6 @@ The screen will look as follows:
 
 ![Screenshot of the running example](images/xml-http-request.png)
 
-
 ### Fetch
 
 To see the results, open the browser at <http://localhost:8090/fetch/> and make sure you have the browser console open. The application is using the `ConsoleSpanExporter` and will post the created spans to the browser console.
