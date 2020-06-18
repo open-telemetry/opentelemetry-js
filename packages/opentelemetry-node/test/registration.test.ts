@@ -22,7 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
-import { HttpTraceContext } from '@opentelemetry/core';
+import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { NodeTracerProvider } from '../src';
 
@@ -41,7 +41,7 @@ describe('API registration', () => {
       context['_getContextManager']() instanceof AsyncHooksContextManager
     );
     assert.ok(
-      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+      propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
     assert.ok(trace.getTracerProvider() === tracerProvider);
   });
@@ -72,7 +72,7 @@ describe('API registration', () => {
     assert.ok(context['_getContextManager']() instanceof NoopContextManager);
 
     assert.ok(
-      propagation['_getGlobalPropagator']() instanceof HttpTraceContext
+      propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
     assert.ok(trace.getTracerProvider() === tracerProvider);
   });
