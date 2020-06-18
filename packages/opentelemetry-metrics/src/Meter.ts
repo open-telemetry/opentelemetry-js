@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api';
 import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
+import { UpDownCounterMetric } from './UpDownCounterMetric';
 import {
   Metric,
   CounterMetric,
@@ -77,10 +78,9 @@ export class Meter implements api.Meter {
       return api.NOOP_VALUE_RECORDER_METRIC;
     }
     const opt: MetricOptions = {
-      absolute: true, // value recorders are defined as absolute by default
-      monotonic: false, // not applicable to value recorder, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
+      absolute: true, // value recorders are defined as absolute by default
       ...options,
     };
 
@@ -110,8 +110,6 @@ export class Meter implements api.Meter {
       return api.NOOP_COUNTER_METRIC;
     }
     const opt: MetricOptions = {
-      monotonic: true, // Counters are defined as monotonic by default
-      absolute: false, // not applicable to counter, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -128,6 +126,41 @@ export class Meter implements api.Meter {
   }
 
   /**
+   * Creates a new `UpDownCounter` metric. UpDownCounter is a synchronous
+   * instrument and very similar to Counter except that Add(increment)
+   * supports negative increments. It is generally useful for capturing changes
+   * in an amount of resources used, or any quantity that rises and falls
+   * during a request.
+   *
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   */
+  createUpDownCounter(
+    name: string,
+    options?: api.MetricOptions
+  ): api.UpDownCounter {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_COUNTER_METRIC;
+    }
+    const opt: MetricOptions = {
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const upDownCounter = new UpDownCounterMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource
+    );
+    this._registerMetric(name, upDownCounter);
+    return upDownCounter;
+  }
+
+  /**
    * Creates a new observer metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
@@ -140,8 +173,6 @@ export class Meter implements api.Meter {
       return api.NOOP_OBSERVER_METRIC;
     }
     const opt: MetricOptions = {
-      monotonic: false, // Observers are defined as non-monotonic by default
-      absolute: false, // not applicable to observer, set to false
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -201,7 +232,8 @@ export class Meter implements api.Meter {
    *
    * 2. The first character must be non-numeric, non-space, non-punctuation
    *
-   * 3. Subsequent characters must be belong to the alphanumeric characters, '_', '.', and '-'.
+   * 3. Subsequent characters must be belong to the alphanumeric characters,
+   *    '_', '.', and '-'.
    *
    * Names are case insensitive
    *

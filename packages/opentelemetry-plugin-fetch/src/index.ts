@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/data-http.md#common-attributes
- */
-export enum AttributeNames {
-  COMPONENT = 'component',
-  HTTP_HOST = 'http.host',
-  HTTP_FLAVOR = 'http.flavor',
-  HTTP_METHOD = 'http.method',
-  HTTP_SCHEME = 'http.scheme',
-  HTTP_STATUS_CODE = 'http.status_code',
-  HTTP_STATUS_TEXT = 'http.status_text',
-  HTTP_URL = 'http.url',
-  // NOT ON OFFICIAL SPEC
-  HTTP_USER_AGENT = 'http.user_agent',
-}
+export * from './fetch';
