@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/tracing",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "OpenTelemetry Tracing",
   "main": "build/src/index.js",
   "browser": {
@@ -73,9 +73,9 @@
     "webpack": "4.43.0"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.8.3",
-    "@opentelemetry/context-base": "^0.8.3",
-    "@opentelemetry/core": "^0.8.3",
-    "@opentelemetry/resources": "^0.8.3"
+    "@opentelemetry/api": "^0.9.0",
+    "@opentelemetry/context-base": "^0.9.0",
+    "@opentelemetry/core": "^0.9.0",
+    "@opentelemetry/resources": "^0.9.0"
   }
 }

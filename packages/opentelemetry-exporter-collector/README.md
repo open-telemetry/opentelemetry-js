@@ -15,6 +15,7 @@ npm install --save @opentelemetry/exporter-collector
 ```
 
 ## Usage in Web
+
 The CollectorExporter in Web expects the endpoint to end in `/v1/trace`.
 
 ```js
@@ -36,6 +37,7 @@ provider.register();
 ```
 
 ## Usage in Node
+
 The CollectorExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
 ```js
