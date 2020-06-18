@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-export enum AttributeNames {
-  COMPONENT = 'component',
-  GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD = 'grpc.method',
-  GRPC_STATUS_CODE = 'grpc.status_code',
-  GRPC_ERROR_NAME = 'grpc.error_name',
-  GRPC_ERROR_MESSAGE = 'grpc.error_message',
-}
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

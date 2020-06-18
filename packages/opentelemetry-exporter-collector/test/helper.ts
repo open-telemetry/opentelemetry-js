@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
+import * as grpc from 'grpc';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -508,4 +509,27 @@ export function ensureExportTraceServiceRequestIsSet(
 
   const spans = instrumentationLibrarySpans[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
+}
+
+export function ensureMetadataIsCorrect(
+  actual: grpc.Metadata,
+  expected: grpc.Metadata
+) {
+  //ignore user agent
+  expected.remove('user-agent');
+  actual.remove('user-agent');
+  assert.deepStrictEqual(actual.getMap(), expected.getMap());
+}
+
+export function ensureHeadersContain(
+  actual: { [key: string]: string },
+  expected: { [key: string]: string }
+) {
+  Object.entries(expected).forEach(([k, v]) => {
+    assert.strictEqual(
+      v,
+      actual[k],
+      `Expected ${actual} to contain ${k}: ${v}`
+    );
+  });
 }
