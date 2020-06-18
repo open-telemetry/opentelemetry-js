@@ -1,11 +1,11 @@
-/*!
+/*
  * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-module.exports = {
-  listenAddress: 'localhost',
-  hostname: 'localhost',
-  browsers: ['ChromeHeadless'],
-  frameworks: ['mocha'],
-  coverageIstanbulReporter: {
-    reports: ['html', 'json'],
-    dir: '.nyc_output',
-    fixWebpackSourcePaths: true
-  },
-  reporters: ['spec', 'coverage-istanbul'],
-  files: ['test/index-webpack.ts'],
-  preprocessors: { 'test/index-webpack.ts': ['webpack'] },
-  webpackMiddleware: { noInfo: true }
-};
+/**
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/http.md
+ */
+export enum AttributeNames {
+  COMPONENT = 'component',
+  HTTP_HOST = 'http.host',
+  HTTP_FLAVOR = 'http.flavor',
+  HTTP_METHOD = 'http.method',
+  HTTP_SCHEME = 'http.scheme',
+  HTTP_STATUS_CODE = 'http.status_code',
+  HTTP_STATUS_TEXT = 'http.status_text',
+  HTTP_URL = 'http.url',
+  HTTP_TARGET = 'http.target',
+  HTTP_USER_AGENT = 'http.user_agent',
+}
