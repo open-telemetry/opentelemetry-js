@@ -154,7 +154,8 @@ export class Meter implements api.Meter {
       name,
       opt,
       this._batcher,
-      this._resource
+      this._resource,
+      this._instrumentationLibrary
     );
     this._registerMetric(name, upDownCounter);
     return upDownCounter;
