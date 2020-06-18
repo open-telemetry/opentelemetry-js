@@ -206,7 +206,7 @@ export function toCollectorExportTraceServiceRequest<
   const groupedSpans: Map<
     Resource,
     Map<core.InstrumentationLibrary, ReadableSpan[]>
-  > = groupSpans(spans);
+  > = groupSpansByResourceAndLibrary(spans);
 
   const additionalAttributes = Object.assign(
     {},
@@ -226,7 +226,7 @@ export function toCollectorExportTraceServiceRequest<
  * library
  * @param spans spans
  */
-export function groupSpans(
+export function groupSpansByResourceAndLibrary(
   spans: ReadableSpan[]
 ): Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>> {
   return spans.reduce((spanMap, span) => {

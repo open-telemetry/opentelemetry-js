@@ -127,7 +127,7 @@ describe('transform', () => {
     });
   });
 
-  describe('groupSpans', () => {
+  describe('groupSpansByResourceAndLibrary', () => {
     it('should group by resource', () => {
       const [resource1, resource2] = mockedResources;
       const [instrumentationLibrary] = mockedInstrumentationLibraries;
@@ -138,7 +138,9 @@ describe('transform', () => {
         [resource2, new Map([[instrumentationLibrary, [span2, span3]]])],
       ]);
 
-      const result = transform.groupSpans(multiResourceTrace);
+      const result = transform.groupSpansByResourceAndLibrary(
+        multiResourceTrace
+      );
 
       assert.deepStrictEqual(result, expected);
     });
@@ -158,7 +160,9 @@ describe('transform', () => {
         ],
       ]);
 
-      const result = transform.groupSpans(multiInstrumentationLibraryTrace);
+      const result = transform.groupSpansByResourceAndLibrary(
+        multiInstrumentationLibraryTrace
+      );
 
       assert.deepStrictEqual(result, expected);
     });
