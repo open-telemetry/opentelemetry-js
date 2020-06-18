@@ -33,11 +33,17 @@ All notable changes to this project will be documented in this file.
   * [#1133](https://github.com/open-telemetry/opentelemetry-js/pull/1133) fix(plugin-xml-http-request): support sync requests ([@johnbley](https://github.com/johnbley))
 * `opentelemetry-metrics`
   * [#1145](https://github.com/open-telemetry/opentelemetry-js/pull/1145) chore: creating new metric kind ([@obecny](https://github.com/obecny))
+* `opentelemetry-exporter-collector`
+  * [#1204](https://github.com/open-telemetry/opentelemetry-js/pull/1204) feat: collector exporter custom headers and metadata ([@mwear](https://github.com/mwear))
+* `opentelemetry-exporter-zipkin`
+  * [#1202](https://github.com/open-telemetry/opentelemetry-js/pull/1202) Adds possibility to set headers to zipkin exporter ([@obecny](https://github.com/obecny))
 
 ### :bug: (Bug Fix)
 
 * `opentelemetry-exporter-collector`
   * [#1197](https://github.com/open-telemetry/opentelemetry-js/pull/1197) fix(exporter-collector): default endpoint for node and browser ([@davidwitten](https://github.com/davidwitten))
+* `opentelemetry-context-zone-peer-dep`
+  * [#1209](https://github.com/open-telemetry/opentelemetry-js/pull/1209) chore: fixing zone from which to fork a new zone ([@obecny](https://github.com/obecny))
 
 ### :sparkles: (Feature)
 
@@ -50,8 +56,9 @@ All notable changes to this project will be documented in this file.
   * [#1192](https://github.com/open-telemetry/opentelemetry-js/pull/1192) Fix_typo ([@shivkanya9146](https://github.com/shivkanya9146))
   * [#1147](https://github.com/open-telemetry/opentelemetry-js/pull/1147) ci: lint markdown files ([@naseemkullah](https://github.com/naseemkullah))
   * [#1142](https://github.com/open-telemetry/opentelemetry-js/pull/1142) chore: template prometheus endpoint in examples rather than hardcode ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1217](https://github.com/open-telemetry/opentelemetry-js/pull/1217) chore: fix markdown linting and add npm script ([@dyladan](https://github.com/dyladan))
 
-#### Committers: 12
+#### Committers: 13
 
 * David W. ([@davidwitten](https://github.com/davidwitten))
 * Bartlomiej Obecny ([@obecny](https://github.com/obecny))
@@ -65,6 +72,7 @@ All notable changes to this project will be documented in this file.
 * Leonardo Dalcin ([@leonardodalcin](https://github.com/leonardodalcin))
 * [@rezakrimi](https://github.com/rezakrimi)
 * John Bley ([@johnbley](https://github.com/johnbley))
+* Matthew Wear ([@mwear](https://github.com/mwear))
 
 ## 0.8.3
 
