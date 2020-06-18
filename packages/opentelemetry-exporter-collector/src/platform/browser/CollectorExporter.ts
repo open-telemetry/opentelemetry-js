@@ -22,7 +22,12 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
 
-export type CollectorExporterConfig = CollectorExporterConfigBase;
+/**
+ * Collector Exporter Config for Web
+ */
+export interface CollectorExporterConfig extends CollectorExporterConfigBase {
+  headers?: { [key: string]: string };
+}
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
@@ -32,6 +37,22 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
+  DEFAULT_HEADERS: { [key: string]: string } = {
+    [collectorTypes.OT_REQUEST_HEADER]: '1',
+  };
+  private _headers: { [key: string]: string };
+  private _useXHR: boolean = false;
+
+  /**
+   * @param config
+   */
+  constructor(config: CollectorExporterConfig = {}) {
+    super(config);
+    this._headers = config.headers || this.DEFAULT_HEADERS;
+    this._useXHR =
+      !!config.headers || typeof navigator.sendBeacon !== 'function';
+  }
+
   onInit(): void {
     window.addEventListener('unload', this.shutdown);
   }
@@ -53,13 +74,12 @@ export class CollectorExporter extends CollectorExporterBase<
       spans,
       this
     );
-
     const body = JSON.stringify(exportTraceServiceRequest);
 
-    if (typeof navigator.sendBeacon === 'function') {
-      this._sendSpansWithBeacon(body, onSuccess, onError);
-    } else {
+    if (this._useXHR) {
       this._sendSpansWithXhr(body, onSuccess, onError);
+    } else {
+      this._sendSpansWithBeacon(body, onSuccess, onError);
     }
   }
 
@@ -97,9 +117,12 @@ export class CollectorExporter extends CollectorExporterBase<
   ) {
     const xhr = new XMLHttpRequest();
     xhr.open('POST', this.url);
-    xhr.setRequestHeader(collectorTypes.OT_REQUEST_HEADER, '1');
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.setRequestHeader('Content-Type', 'application/json');
+    Object.entries(this._headers).forEach(([k, v]) => {
+      xhr.setRequestHeader(k, v);
+    });
+
     xhr.send(body);
 
     xhr.onreadystatechange = () => {
