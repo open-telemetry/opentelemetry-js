@@ -15,5 +15,4 @@
  */
 
 export * from './CollectorExporter';
-
 export * from './CollectorMetricExporter';

@@ -248,16 +248,6 @@ export function toCollectorExportTraceServiceRequest<
   };
 }
 
-export function toStringKeyValue(labels: {
-  [key: string]: string;
-}): opentelemetryProto.common.v1.StringKeyValue[] {
-  const collectorLabels: opentelemetryProto.common.v1.StringKeyValue[] = [];
-  for (const [key, value] of Object.entries(labels)) {
-    collectorLabels.push({ key: key, value: value });
-  }
-  return [];
-}
-
 export function getCollectorPoints(metric: MetricRecord) {
   const metricKind = metric.descriptor.metricKind;
   const valueType = metric.descriptor.valueType;
@@ -268,7 +258,8 @@ export function toCollectorMetricDescriptor(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.MetricDescriptor {
   let type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
-  const temporality = opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE;
+  const temporality =
+    opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE;
 
   if (metric.descriptor.valueType === apiValueType.INT) {
     if (metric.descriptor.monotonic) {
@@ -287,7 +278,6 @@ export function toCollectorMetricDescriptor(
   } else {
     type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.INVALID_TYPE;
   }
-    
 
   return {
     name: metric.descriptor.name,
@@ -303,21 +293,30 @@ export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.Metric {
+  let int64DataPoints: opentelemetryProto.metrics.v1.Int64DataPoint[] = [];
+  let doubleDataPoints: opentelemetryProto.metrics.v1.DoubleDataPoint[] = [];
+
+  const points = {
+    labels: toCollectorLabels(metric.labels),
+    value: metric.aggregator.toPoint().value as number,
+    startTimeUnixNano: startTime,
+    timeUnixNano: core.hrTimeToNanoseconds(
+      metric.aggregator.toPoint().timestamp
+    ),
+  };
+
+  if (metric.descriptor.valueType == apiValueType.INT) {
+    int64DataPoints = [points];
+  } else if (metric.descriptor.valueType === apiValueType.DOUBLE) {
+    doubleDataPoints = [points];
+  }
+
   return {
     metricDescriptor: toCollectorMetricDescriptor(metric),
-    doubleDataPoints: [],
-    histogramDataPoints: [],
+    doubleDataPoints,
+    int64DataPoints,
     summaryDataPoints: [],
-    int64DataPoints: [
-      {
-        labels: toCollectorLabels(metric.labels),
-        value: metric.aggregator.toPoint().value as number,
-        startTimeUnixNano: startTime,
-        timeUnixNano: core.hrTimeToNanoseconds(
-          metric.aggregator.toPoint().timestamp
-        ),
-      },
-    ],
+    histogramDataPoints: [],
   };
 }
 

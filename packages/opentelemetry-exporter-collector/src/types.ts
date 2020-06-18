@@ -92,13 +92,12 @@ export namespace opentelemetryProto {
       value: number;
       count: number;
       sum: number;
-      buckets: opentelemetryProto.metrics.v1.HistogramDataPoint_Bucket;
+      buckets: opentelemetryProto.metrics.v1.HistogramDataPointBucket;
       explicitBounds: number[];
     }
 
-    export interface HistogramDataPoint_Bucket {
+    export interface HistogramDataPointBucket {
       count: number;
-      exemplar: number; // CHANGE LATER
     }
 
     export interface SummaryDataPoint {
@@ -108,10 +107,10 @@ export namespace opentelemetryProto {
       value: number;
       count: number;
       sum: number;
-      percentileValues: opentelemetryProto.metrics.v1.SummaryDataPoint_ValueAtPercentile[];
+      percentileValues: opentelemetryProto.metrics.v1.SummaryDataPointValueAtPercentile[];
     }
 
-    export interface SummaryDataPoint_ValueAtPercentile {
+    export interface SummaryDataPointValueAtPercentile {
       percentile: number;
       value: number;
     }

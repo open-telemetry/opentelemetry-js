@@ -31,7 +31,6 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55678';
  */
 export class CollectorMetricExporter extends CollectorMetricExporterBase {
   grpcMetricsQueue: GRPCMetricQueueItem[] = [];
-
   metricServiceClient?: MetricsServiceClient = undefined;
   credentials: grpc.ChannelCredentials;
   isShutDown: boolean = false;
@@ -103,7 +102,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase {
           if (err) {
             this.logger.error(
               'exportTraceServiceRequest',
-              {} // exportMetricServiceRequest
+              exportMetricServiceRequest
             );
             onError(err);
           } else {
