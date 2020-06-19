@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import { hashLabels } from './Utils';
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
   implements api.UnboundMetric<T> {
-  protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
   protected readonly _logger: api.Logger;
@@ -44,7 +43,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _kind: MetricKind,
     readonly resource: Resource
   ) {
-    this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
     this._valueType = _options.valueType;
     this._logger = _options.logger;
@@ -98,8 +96,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
       unit: this._options.unit,
       metricKind: this._kind,
       valueType: this._valueType,
-      labelKeys: this._options.labelKeys,
-      monotonic: this._monotonic,
     };
   }
 
@@ -120,7 +116,6 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     return new BoundCounter(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       // @todo: consider to set to CounterSumAggregator always.
@@ -131,8 +126,8 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific metric
-   *     that you want to record.
+   * @param [labels = {}] key-values pairs that are associated with a specific
+   *     metric that you want to record.
    */
   add(value: number, labels: api.Labels = {}) {
     this.bind(labels).add(value);
@@ -157,7 +152,6 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
     return new BoundValueRecorder(
       labels,
       this._disabled,
-      this._monotonic,
       this._absolute,
       this._valueType,
       this._logger,
@@ -188,7 +182,6 @@ export class ObserverMetric extends Metric<BoundObserver>
     return new BoundObserver(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)

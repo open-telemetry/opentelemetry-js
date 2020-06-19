@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,11 @@ export interface GRPCQueueItem {
  * Trace Service Client for sending spans
  */
 export interface TraceServiceClient extends grpc.Client {
-  export: (request: any, callback: Function) => {};
+  export: (
+    request: any,
+    metadata: grpc.Metadata | undefined,
+    callback: Function
+  ) => {};
 }
 
 /**

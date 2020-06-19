@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -196,6 +196,23 @@ describe('ZoneContextManager', () => {
               'Current span is concurrentSpan3'
             );
           }, 30);
+        });
+      });
+    });
+
+    it('should fork new zone from active one', () => {
+      const context = Context.ROOT_CONTEXT;
+      const rootZone = Zone.current;
+      contextManager.with(context, () => {
+        const zone1 = Zone.current;
+        assert.ok(zone1.parent === rootZone);
+        contextManager.with(context, () => {
+          const zone2 = Zone.current;
+          contextManager.with(context, () => {
+            const zone3 = Zone.current;
+            assert.ok(zone3.parent === zone2);
+          });
+          assert.ok(zone2.parent === zone1);
         });
       });
     });
