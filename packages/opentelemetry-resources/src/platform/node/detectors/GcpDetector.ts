@@ -24,6 +24,7 @@ import {
   K8S_RESOURCE,
   CONTAINER_RESOURCE,
 } from '../../../constants';
+import { ResourceDetectionConfig } from '../../../config';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google
@@ -31,7 +32,7 @@ import {
  * the instance. Returns an empty Resource if detection fails.
  */
 class GcpDetector implements Detector {
-  async detect(): Promise<Resource> {
+  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
     if (!(await gcpMetadata.isAvailable())) return Resource.empty();
 
     const [projectId, instanceId, zoneId, clusterName] = await Promise.all([

@@ -17,7 +17,7 @@
 import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
 import { Detector } from '../../types';
-import { ResourceDetectionConfig } from './config';
+import { ResourceDetectionConfig } from '../../config';
 import { Logger } from '@opentelemetry/api';
 import * as util from 'util';
 
@@ -35,7 +35,7 @@ export const detectResources = async (
   const resources: Array<Resource> = await Promise.all(
     DETECTORS.map(d => {
       try {
-        return d.detect();
+        return d.detect(config);
       } catch {
         return Resource.empty();
       }

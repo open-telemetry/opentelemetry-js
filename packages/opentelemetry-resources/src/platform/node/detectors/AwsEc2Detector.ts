@@ -18,6 +18,7 @@ import * as http from 'http';
 import { Resource } from '../../../Resource';
 import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
 import { Detector } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2
@@ -39,7 +40,7 @@ class AwsEc2Detector implements Detector {
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
    */
-  async detect(): Promise<Resource> {
+  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
     try {
       const {
         accountId,

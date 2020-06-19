@@ -16,6 +16,7 @@
 
 import { Resource } from '../../../Resource';
 import { Detector, ResourceLabels } from '../../../types';
+import { ResourceDetectionConfig } from '../../../config';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -46,7 +47,7 @@ class EnvDetector implements Detector {
    * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
    * to conform to the Detector interface.
    */
-  async detect(): Promise<Resource> {
+  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) return Resource.empty();
