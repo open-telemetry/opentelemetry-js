@@ -15,13 +15,12 @@
  */
 
 import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
+  CollectorTraceExporterBase,
+} from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
-
+import { CollectorExporterConfigBase } from '../../types';
 /**
  * Collector Exporter Config for Web
  */
@@ -34,7 +33,7 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 /**
  * Collector Exporter for Web
  */
-export class CollectorExporter extends CollectorExporterBase<
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfig
 > {
   DEFAULT_HEADERS: { [key: string]: string } = {

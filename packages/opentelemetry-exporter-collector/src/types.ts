@@ -293,6 +293,17 @@ export interface CollectorExporterError {
 }
 
 /**
+ * Collector Exporter base config
+ */
+export interface CollectorExporterConfigBase {
+  hostName?: string;
+  logger?: Logger;
+  serviceName?: string;
+  attributes?: Attributes;
+  url?: string;
+}
+
+/**
  * Mapping between api SpanKind and proto SpanKind
  */
 export const COLLECTOR_SPAN_KIND_MAPPING = {

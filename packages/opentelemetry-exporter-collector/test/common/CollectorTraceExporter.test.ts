@@ -18,15 +18,12 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../src/CollectorExporterBase';
-
+import { CollectorTraceExporterBase } from '../../src/CollectorTraceExporterBase';
+import { CollectorExporterConfigBase } from '../../src/types';
 import { mockedReadableSpan } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
+class CollectorTraceExporter extends CollectorTraceExporterBase<CollectorExporterConfig> {
   onInit() {}
   onShutdown() {}
   sendSpans() {}
@@ -36,14 +33,14 @@ class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
 }
 
 describe('CollectorExporter - common', () => {
-  let collectorExporter: CollectorExporter;
+  let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 
   describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
-      onInitSpy = sinon.stub(CollectorExporter.prototype, 'onInit');
+      onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),
@@ -51,7 +48,7 @@ describe('CollectorExporter - common', () => {
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
 
     afterEach(() => {
@@ -86,7 +83,7 @@ describe('CollectorExporter - common', () => {
 
     describe('when config is missing certain params', () => {
       beforeEach(() => {
-        collectorExporter = new CollectorExporter();
+        collectorExporter = new CollectorTraceExporter();
       });
 
       it('should set default serviceName', () => {
@@ -102,8 +99,8 @@ describe('CollectorExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorExporter.prototype, 'sendSpans');
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      spySend = sinon.stub(CollectorTraceExporter.prototype, 'sendSpans');
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
     afterEach(() => {
       spySend.restore();
@@ -146,7 +143,7 @@ describe('CollectorExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(CollectorExporter.prototype, 'onShutdown');
+      onShutdownSpy = sinon.stub(CollectorTraceExporter.prototype, 'onShutdown');
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),
@@ -154,7 +151,7 @@ describe('CollectorExporter - common', () => {
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
     afterEach(() => {
       onShutdownSpy.restore();

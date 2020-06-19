@@ -21,10 +21,9 @@ import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
-import { CollectorExporterError } from '../../types';
+  CollectorTraceExporterBase,
+} from '../../CollectorTraceExporterBase';
+import { CollectorExporterError, CollectorExporterConfigBase } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { GRPCQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
@@ -42,7 +41,7 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 /**
  * Collector Exporter for Node
  */
-export class CollectorExporter extends CollectorExporterBase<
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfig
 > {
   isShutDown: boolean = false;

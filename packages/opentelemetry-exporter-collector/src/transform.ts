@@ -26,11 +26,10 @@ import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from './CollectorExporterBase';
+  CollectorTraceExporterBase,
+} from './CollectorTraceExporterBase';
 import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
-import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
+import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto, CollectorExporterConfigBase } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { ValueType as apiValueType } from '@opentelemetry/api';
 import {
@@ -208,14 +207,14 @@ export function toCollectorTraceState(
 /**
  * Prepares trace service request to be sent to collector
  * @param spans spans
- * @param collectorExporterBase
+ * @param collectorTraceExporterBase
  * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   spans: ReadableSpan[],
-  collectorExporterBase: CollectorExporterBase<T>,
+  collectorTraceExporterBase: CollectorTraceExporterBase<T>,
   name = ''
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const spansToBeSent: opentelemetryProto.trace.v1.Span[] = spans.map(span =>
@@ -226,9 +225,9 @@ export function toCollectorExportTraceServiceRequest<
 
   const additionalAttributes = Object.assign(
     {},
-    collectorExporterBase.attributes || {},
+    collectorTraceExporterBase.attributes || {},
     {
-      'service.name': collectorExporterBase.serviceName,
+      'service.name': collectorTraceExporterBase.serviceName,
     }
   );
   const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
