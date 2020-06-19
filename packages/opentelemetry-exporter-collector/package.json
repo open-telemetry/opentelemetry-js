@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -63,7 +63,7 @@
     "cpx": "1.5.0",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.0.9",
+    "karma": "5.1.0",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -78,15 +78,15 @@
     "ts-node": "8.10.2",
     "typescript": "3.9.5",
     "webpack": "4.43.0",
-    "webpack-cli": "3.3.11",
+    "webpack-cli": "3.3.12",
     "webpack-merge": "4.2.2"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.3",
-    "@opentelemetry/api": "^0.8.3",
-    "@opentelemetry/core": "^0.8.3",
-    "@opentelemetry/resources": "^0.8.3",
-    "@opentelemetry/tracing": "^0.8.3",
+    "@opentelemetry/api": "^0.9.0",
+    "@opentelemetry/core": "^0.9.0",
+    "@opentelemetry/resources": "^0.9.0",
+    "@opentelemetry/tracing": "^0.9.0",
     "google-protobuf": "^3.11.4",
     "grpc": "^1.24.2"
   }

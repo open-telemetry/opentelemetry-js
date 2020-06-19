@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,7 @@ export class ZipkinExporter implements SpanExporter {
         headers: {
           'Content-Type': 'application/json',
           [OT_REQUEST_HEADER]: 1,
+          ...config.headers,
         },
       },
       urlOpts
