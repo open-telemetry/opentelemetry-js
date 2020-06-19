@@ -68,18 +68,31 @@ sdk
 @ToDo add descriptions for all configurations
 
 ### contextManager
+
 ### httpTextPropagator
+
 ### logger
+
 ### logLevel
+
 ### metricBatcher
+
 ### metricExporter
+
 ### metricInterval
+
 ### metricResource
+
 ### plugins
+
 ### resource
+
 ### sampler
+
 ### traceExporter
+
 ### traceParams
+
 ### traceResource
 
 ## Useful links
