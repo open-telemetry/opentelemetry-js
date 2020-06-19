@@ -14,5 +14,6 @@
  * limitations under the License.
  */
 
+export { NodeTracerConfig } from './config';
+export { Plugins } from './instrumentation/PluginLoader';
 export * from './NodeTracerProvider';
-export { Plugins } from "./instrumentation/PluginLoader";

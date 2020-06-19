@@ -24,3 +24,4 @@ export * from './export/ConsoleMetricExporter';
 export * from './export/types';
 export * from './export/Batcher';
 export * from './UpDownCounterMetric';
+export { MeterConfig } from './types';
