@@ -287,18 +287,19 @@ export interface CollectorExporterConfigBase {
 /**
  * Collector Exporter Config for Web
  */
-export interface CollectorExporterConfigBrowser extends CollectorExporterConfigBase {
+export interface CollectorExporterConfigBrowser
+  extends CollectorExporterConfigBase {
   headers?: { [key: string]: string };
 }
 
 /**
  * Collector Exporter Config for Node
  */
-export interface CollectorExporterConfigNode extends CollectorExporterConfigBase {
+export interface CollectorExporterConfigNode
+  extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
 }
-
 
 /**
  * Mapping between api SpanKind and proto SpanKind

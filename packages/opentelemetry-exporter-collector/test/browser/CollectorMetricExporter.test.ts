@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
-import { Labels } from '@opentelemetry/api';
+import { MetricRecord } from '@opentelemetry/metrics';
+import { mockCounter, mockObserver } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorMetricExporter - web', () => {
@@ -28,7 +28,7 @@ describe('CollectorMetricExporter - web', () => {
   let spyOpen: any;
   let spySend: any;
   let spyBeacon: any;
-  let records: MetricRecord[];
+  let metrics: MetricRecord[];
 
   beforeEach(() => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
@@ -38,14 +38,8 @@ describe('CollectorMetricExporter - web', () => {
       logger: new NoopLogger(),
       url: 'http://foo.bar.com',
     });
-    const meter = new MeterProvider().getMeter('test-meter');
-    const labels: Labels = { ['keyb']: 'value2', ['keya']: 'value1' };
-    const counter = meter.createCounter('name', {
-      labelKeys: ['keya', 'keyb'],
-    });
-    counter.bind(labels).add(10);
-    meter.collect();
-    records = meter.getBatcher().checkPointSet();
+    metrics.push(mockCounter);
+    metrics.push(mockObserver);
   });
 
   afterEach(() => {
@@ -58,7 +52,7 @@ describe('CollectorMetricExporter - web', () => {
   describe('export', () => {
     describe('when "sendBeacon" is available', () => {
       it('should successfully send the spans using sendBeacon', done => {
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const args = spyBeacon.args[0];
@@ -69,8 +63,16 @@ describe('CollectorMetricExporter - web', () => {
           ) as collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+          const metric2 =
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
 
-          assert.ok(typeof metric1 !== 'undefined', "span doesn't exist");
+          assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
+          // ensureCounterIsCorrect(metric1);
+
+          assert.ok(
+            typeof metric2 !== 'undefined',
+            "second metric doesn't exist"
+          );
           /*if (metric1) {
             ensureSpanIsCorrect(span1);
           }*/
@@ -98,7 +100,7 @@ describe('CollectorMetricExporter - web', () => {
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(true);
 
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const response: any = spyLoggerDebug.args[1][0];
@@ -115,7 +117,7 @@ describe('CollectorMetricExporter - web', () => {
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const response: any = spyLoggerError.args[0][0];
@@ -138,7 +140,7 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should successfully send the spans using XMLHttpRequest', done => {
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -175,7 +177,7 @@ describe('CollectorMetricExporter - web', () => {
         const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
         const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];
@@ -193,7 +195,7 @@ describe('CollectorMetricExporter - web', () => {
       it('should log the error message', done => {
         const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
 
-        collectorExporter.export(records, () => {});
+        collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
           const request = server.requests[0];

@@ -23,7 +23,9 @@ import { CollectorExporterConfigBase } from '../../src/types';
 import { mockedReadableSpan } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorTraceExporter extends CollectorTraceExporterBase<CollectorExporterConfig> {
+class CollectorTraceExporter extends CollectorTraceExporterBase<
+  CollectorExporterConfig
+> {
   onInit() {}
   onShutdown() {}
   sendSpans() {}
@@ -143,7 +145,10 @@ describe('CollectorExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(CollectorTraceExporter.prototype, 'onShutdown');
+      onShutdownSpy = sinon.stub(
+        CollectorTraceExporter.prototype,
+        'onShutdown'
+      );
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),

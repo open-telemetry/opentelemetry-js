@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, OpenTelemetry Authors
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,16 @@
 import { MetricRecord } from '@opentelemetry/metrics';
 import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
 import { toCollectorExportMetricServiceRequest } from '../../transform';
-import { CollectorExporterError, CollectorExporterConfigBrowser } from '../../types';
+import {
+  CollectorExporterError,
+  CollectorExporterConfigBrowser,
+} from '../../types';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
-export class CollectorMetricExporter extends CollectorMetricExporterBase<CollectorExporterConfigBrowser> {
+export class CollectorMetricExporter extends CollectorMetricExporterBase<
+  CollectorExporterConfigBrowser
+> {
   getDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }

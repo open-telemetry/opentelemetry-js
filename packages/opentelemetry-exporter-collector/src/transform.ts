@@ -25,11 +25,13 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import {
-  CollectorTraceExporterBase,
-} from './CollectorTraceExporterBase';
+import { CollectorTraceExporterBase } from './CollectorTraceExporterBase';
 import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
-import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto, CollectorExporterConfigBase } from './types';
+import {
+  COLLECTOR_SPAN_KIND_MAPPING,
+  opentelemetryProto,
+  CollectorExporterConfigBase,
+} from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { ValueType as apiValueType } from '@opentelemetry/api';
 import {
@@ -339,7 +341,9 @@ export function toCollectorMetric(
   };
 }
 
-export function toCollectorExportMetricServiceRequest<T extends CollectorExporterConfigBase>(
+export function toCollectorExportMetricServiceRequest<
+  T extends CollectorExporterConfigBase
+>(
   metrics: MetricRecord[],
   startTime: number,
   collectorMetricExporterBase: CollectorMetricExporterBase<T>,

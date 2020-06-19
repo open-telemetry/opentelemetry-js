@@ -20,10 +20,11 @@ import * as path from 'path';
 import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import {
-  CollectorTraceExporterBase,
-} from '../../CollectorTraceExporterBase';
-import { CollectorExporterError, CollectorExporterConfigNode } from '../../types';
+  CollectorExporterError,
+  CollectorExporterConfigNode,
+} from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { GRPCQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
@@ -34,7 +35,7 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55678';
  * Collector Exporter for Node
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
-CollectorExporterConfigNode
+  CollectorExporterConfigNode
 > {
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;

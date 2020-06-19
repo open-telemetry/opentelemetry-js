@@ -17,7 +17,11 @@
 import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { opentelemetryProto, CollectorExporterError, CollectorExporterConfigBase } from './types';
+import {
+  opentelemetryProto,
+  CollectorExporterError,
+  CollectorExporterConfigBase,
+} from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020, OpenTelemetry Authors
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,12 @@ import * as collectorTypes from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
-export abstract class CollectorMetricExporterBase<T extends CollectorExporterConfigBase> implements MetricExporter {
+/**
+ * Collector Metric Exporter abstract base class
+ */
+export abstract class CollectorMetricExporterBase<
+  T extends CollectorExporterConfigBase
+> implements MetricExporter {
   public readonly logger: Logger;
   public readonly url: string;
   protected readonly _startTime = new Date().getTime() * 1000000;

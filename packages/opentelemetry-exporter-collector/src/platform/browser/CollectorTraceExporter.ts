@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-import {
-  CollectorTraceExporterBase,
-} from '../../CollectorTraceExporterBase';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
 import { CollectorExporterConfigBrowser } from '../../types';
-
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
