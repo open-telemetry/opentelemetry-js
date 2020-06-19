@@ -20,7 +20,7 @@ import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
 import { MetricRecord } from '@opentelemetry/metrics';
-import { mockCounter, mockObserver } from '../helper';
+import { mockCounter, mockObserver, ensureCounterIsCorrect, ensureObserverIsCorrect } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorMetricExporter - web', () => {
@@ -38,8 +38,11 @@ describe('CollectorMetricExporter - web', () => {
       logger: new NoopLogger(),
       url: 'http://foo.bar.com',
     });
-    metrics.push(mockCounter);
-    metrics.push(mockObserver);
+    // Overwrites the start time to make tests consistent
+    Object.defineProperty(collectorExporter, '_startTime', {value: 1592602232694000000});
+    metrics = [];
+    metrics.push(Object.assign({}, mockCounter));
+    metrics.push(Object.assign({}, mockObserver));
   });
 
   afterEach(() => {
@@ -64,18 +67,19 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
-          // ensureCounterIsCorrect(metric1);
-
+          if (metric1) {
+            ensureCounterIsCorrect(metric1);
+          }
           assert.ok(
             typeof metric2 !== 'undefined',
             "second metric doesn't exist"
           );
-          /*if (metric1) {
-            ensureSpanIsCorrect(span1);
-          }*/
+          if (metric2) {
+            ensureObserverIsCorrect(metric2);
+          }
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");

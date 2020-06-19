@@ -472,6 +472,58 @@ export function ensureWebResourceIsCorrect(
   });
 }
 
+export function ensureCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      labels: [],
+      type: 2,
+      temporality: 3,
+    },
+    doubleDataPoints: [],
+    int64DataPoints: [
+      {
+        labels: [],
+        value: 0,
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: 0,
+      },
+    ],
+    summaryDataPoints: [],
+    histogramDataPoints: [],
+  });
+}
+
+export function ensureObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-observer',
+      description: 'sample observer description',
+      unit: '2',
+      labels: [],
+      type: 3,
+      temporality: 1,
+    },
+    doubleDataPoints: [
+      {
+        labels: [],
+        value: 0,
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: 0,
+      },
+    ],
+    int64DataPoints: [],
+    summaryDataPoints: [],
+    histogramDataPoints: [],
+  });
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {
