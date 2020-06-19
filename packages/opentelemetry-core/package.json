@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/core",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "OpenTelemetry Core provides default and no-op implementations of the OpenTelemetry types for trace and metrics",
   "main": "build/src/index.js",
   "browser": {
@@ -76,8 +76,8 @@
     "webpack": "4.43.0"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.8.3",
-    "@opentelemetry/context-base": "^0.8.3",
+    "@opentelemetry/api": "^0.9.0",
+    "@opentelemetry/context-base": "^0.9.0",
     "semver": "^7.1.3"
   }
 }
