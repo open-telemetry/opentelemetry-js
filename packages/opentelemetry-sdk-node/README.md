@@ -45,7 +45,7 @@ const jaegerExporter = new JaegerExporter({
 });
 const prometheusExporter = new PrometheusExporter({ startServer: true });
 
-opentelemetry.configure({
+const sdk = new opentelemetry.NodeSDK({
   // Optional - if omitted, the tracing SDK will not be initialized
   traceExporter: jaegerExporter,
   // Optional - If omitted, the metrics SDK will not be initialized
@@ -53,13 +53,20 @@ opentelemetry.configure({
 
   // See the Configuration section below for additional  configuration options
 });
+
+// You can optionally detect resources asynchronously from the environment.
+// Detected resources are merged with the resources provided in the SDK configuration.
+sdk
+  .autoDetectResources()
+  .then(() => {
+    sdk.start();
+  })
 ```
 
 ## Configuration
 
 @ToDo add descriptions for all configurations
 
-### autoDetectResources
 ### contextManager
 ### httpTextPropagator
 ### logger
