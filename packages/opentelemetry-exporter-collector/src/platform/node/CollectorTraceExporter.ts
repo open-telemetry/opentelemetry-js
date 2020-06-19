@@ -23,7 +23,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   CollectorTraceExporterBase,
 } from '../../CollectorTraceExporterBase';
-import { CollectorExporterError, CollectorExporterConfigBase } from '../../types';
+import { CollectorExporterError, CollectorExporterConfigNode } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { GRPCQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
@@ -31,18 +31,10 @@ import { removeProtocol } from './util';
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
- * Collector Exporter Config for Node
- */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  credentials?: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
-}
-
-/**
  * Collector Exporter for Node
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
-  CollectorExporterConfig
+CollectorExporterConfigNode
 > {
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
@@ -52,7 +44,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
     this.metadata = config.metadata;
   }
@@ -64,7 +56,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     }
   }
 
-  onInit(config: CollectorExporterConfig): void {
+  onInit(config: CollectorExporterConfigNode): void {
     this.isShutDown = false;
     this.grpcSpansQueue = [];
     const serverAddress = removeProtocol(this.url);

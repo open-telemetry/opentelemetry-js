@@ -16,6 +16,7 @@
 
 import { MetricRecord } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
+import { CollectorExporterConfigNode } from '../../types';
 import { GRPCMetricQueueItem, MetricsServiceClient } from './types';
 import { removeProtocol } from './util';
 import * as path from 'path';
@@ -29,13 +30,13 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 /**
  * Collector Exporter for Node
  */
-export class CollectorMetricExporter extends CollectorMetricExporterBase {
+export class CollectorMetricExporter extends CollectorMetricExporterBase<CollectorExporterConfigNode> {
   grpcMetricsQueue: GRPCMetricQueueItem[] = [];
   metricServiceClient?: MetricsServiceClient = undefined;
   credentials: grpc.ChannelCredentials;
   isShutDown: boolean = false;
 
-  constructor(options: collectorTypes.ExporterOptions = {}) {
+  constructor(options: CollectorExporterConfigNode = {}) {
     super(options);
     this.grpcMetricsQueue = [];
     this.credentials = options.credentials || grpc.credentials.createInsecure();

@@ -339,10 +339,10 @@ export function toCollectorMetric(
   };
 }
 
-export function toCollectorExportMetricServiceRequest(
+export function toCollectorExportMetricServiceRequest<T extends CollectorExporterConfigBase>(
   metrics: MetricRecord[],
   startTime: number,
-  collectorMetricExporterBase: CollectorMetricExporterBase,
+  collectorMetricExporterBase: CollectorMetricExporterBase<T>,
   name = ''
 ): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
   const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(

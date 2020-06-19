@@ -264,25 +264,6 @@ export namespace opentelemetryProto {
   }
 }
 
-export interface ExporterOptions {
-  /**
-   * App prefix for metrics, if needed
-   */
-  prefix?: string;
-
-  /**
-   * Object implementing the logger interface
-   */
-  logger?: Logger;
-
-  url?: string;
-
-  credentials?: grpc.ChannelCredentials;
-  attributes?: Attributes;
-  hostName?: string;
-  serviceName?: string;
-}
-
 /**
  * Interface for handling error
  */
@@ -302,6 +283,22 @@ export interface CollectorExporterConfigBase {
   attributes?: Attributes;
   url?: string;
 }
+
+/**
+ * Collector Exporter Config for Web
+ */
+export interface CollectorExporterConfigBrowser extends CollectorExporterConfigBase {
+  headers?: { [key: string]: string };
+}
+
+/**
+ * Collector Exporter Config for Node
+ */
+export interface CollectorExporterConfigNode extends CollectorExporterConfigBase {
+  credentials?: grpc.ChannelCredentials;
+  metadata?: grpc.Metadata;
+}
+
 
 /**
  * Mapping between api SpanKind and proto SpanKind

@@ -18,11 +18,12 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporterBase } from '../../src/CollectorMetricExporterBase';
-import { ExporterOptions } from '../../src/types';
+import { CollectorExporterConfigBase } from '../../src/types';
 import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
 import { Labels } from '@opentelemetry/api';
 
-class CollectorMetricExporter extends CollectorMetricExporterBase {
+type CollectorExporterConfig = CollectorExporterConfigBase;
+class CollectorMetricExporter extends CollectorMetricExporterBase<CollectorExporterConfig> {
   onInit() {}
   onShutdown() {}
   sendMetrics() {}
@@ -33,7 +34,7 @@ class CollectorMetricExporter extends CollectorMetricExporterBase {
 
 describe('CollectorMetricExporter - common', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: ExporterOptions;
+  let collectorExporterConfig: CollectorExporterConfig;
   let records: MetricRecord[];
   describe('constructor', () => {
     let onInitSpy: any;

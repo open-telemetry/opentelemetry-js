@@ -16,11 +16,11 @@
 import { MetricRecord } from '@opentelemetry/metrics';
 import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
 import { toCollectorExportMetricServiceRequest } from '../../transform';
-import { CollectorExporterError } from '../../types';
+import { CollectorExporterError, CollectorExporterConfigBrowser } from '../../types';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
-export class CollectorMetricExporter extends CollectorMetricExporterBase {
+export class CollectorMetricExporter extends CollectorMetricExporterBase<CollectorExporterConfigBrowser> {
   getDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }

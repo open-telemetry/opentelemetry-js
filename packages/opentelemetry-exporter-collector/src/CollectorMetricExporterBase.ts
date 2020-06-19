@@ -15,13 +15,13 @@
  */
 import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { Attributes, Logger } from '@opentelemetry/api';
-import { ExporterOptions } from './types';
+import { CollectorExporterConfigBase } from './types';
 import { NoopLogger, ExportResult } from '@opentelemetry/core';
 import * as collectorTypes from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
-export abstract class CollectorMetricExporterBase implements MetricExporter {
+export abstract class CollectorMetricExporterBase<T extends CollectorExporterConfigBase> implements MetricExporter {
   public readonly logger: Logger;
   public readonly url: string;
   protected readonly _startTime = new Date().getTime() * 1000000;
@@ -30,7 +30,7 @@ export abstract class CollectorMetricExporterBase implements MetricExporter {
   public readonly hostName: string | undefined;
   public readonly serviceName: string;
 
-  constructor(options: ExporterOptions = {}) {
+  constructor(options: T = {} as T) {
     this.logger = options.logger || new NoopLogger();
     this.serviceName = options.serviceName || DEFAULT_SERVICE_NAME;
     this.url = this.getDefaultUrl(options.url);

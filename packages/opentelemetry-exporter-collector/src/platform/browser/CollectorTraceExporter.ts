@@ -20,13 +20,8 @@ import {
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
-import { CollectorExporterConfigBase } from '../../types';
-/**
- * Collector Exporter Config for Web
- */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
-}
+import { CollectorExporterConfigBrowser } from '../../types';
+
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
@@ -34,7 +29,7 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
  * Collector Exporter for Web
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
-  CollectorExporterConfig
+  CollectorExporterConfigBrowser
 > {
   DEFAULT_HEADERS: { [key: string]: string } = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
@@ -45,7 +40,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
     this._headers = config.headers || this.DEFAULT_HEADERS;
     this._useXHR =

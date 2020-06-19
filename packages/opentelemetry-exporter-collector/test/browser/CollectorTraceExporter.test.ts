@@ -20,7 +20,6 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   CollectorTraceExporter,
-  CollectorExporterConfig,
 } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
 
@@ -35,7 +34,7 @@ const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
-  let collectorExporterConfig: CollectorExporterConfig;
+  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBrowser;
   let spyOpen: any;
   let spySend: any;
   let spyBeacon: any;
