@@ -120,8 +120,8 @@ export namespace opentelemetryProto {
       description: string;
       unit: string;
       labels: opentelemetryProto.common.v1.StringKeyValue[];
-      type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
-      temporality: opentelemetryProto.metrics.v1.MetricDescriptor_Temporality;
+      type: opentelemetryProto.metrics.v1.MetricDescriptorType;
+      temporality: opentelemetryProto.metrics.v1.MetricDescriptorTemporality;
     }
 
     export interface InstrumentationLibraryMetrics {
@@ -134,7 +134,7 @@ export namespace opentelemetryProto {
       instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
     }
 
-    export enum MetricDescriptor_Type {
+    export enum MetricDescriptorType {
       INVALID_TYPE,
       INT64,
       MONOTONIC_INT64,
@@ -144,7 +144,7 @@ export namespace opentelemetryProto {
       SUMMARY,
     }
 
-    export enum MetricDescriptor_Temporality {
+    export enum MetricDescriptorTemporality {
       INVALID_TEMPORALITY,
       INSTANTANEOUS,
       DELTA,

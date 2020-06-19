@@ -26,7 +26,9 @@ class CollectorMetricExporter extends CollectorMetricExporterBase {
   onInit() {}
   onShutdown() {}
   sendMetrics() {}
-  getDefaultUrl(url: string) { return url || '';}
+  getDefaultUrl(url: string) {
+    return url || '';
+  }
 }
 
 describe('CollectorMetricExporter - common', () => {
@@ -92,7 +94,10 @@ describe('CollectorMetricExporter - common', () => {
       });
 
       it('should set default serviceName', () => {
-        assert.strictEqual(collectorExporter.serviceName, 'collector-metric-exporter');
+        assert.strictEqual(
+          collectorExporter.serviceName,
+          'collector-metric-exporter'
+        );
       });
 
       it('should set default logger', () => {
@@ -148,7 +153,10 @@ describe('CollectorMetricExporter - common', () => {
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(CollectorMetricExporter.prototype, 'onShutdown');
+      onShutdownSpy = sinon.stub(
+        CollectorMetricExporter.prototype,
+        'onShutdown'
+      );
       collectorExporterConfig = {
         hostName: 'foo',
         logger: new NoopLogger(),

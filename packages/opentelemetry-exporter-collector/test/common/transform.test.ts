@@ -17,8 +17,14 @@
 import { Attributes, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
-import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import {
+  ensureSpanIsCorrect,
+  mockedReadableSpan,
+  mockCounter,
+  mockObserver,
+} from '../helper';
 import { Resource } from '@opentelemetry/resources';
+import { opentelemetryProto } from '../../src/types';
 
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
@@ -116,6 +122,34 @@ describe('transform', () => {
           { key: 'success', type: 3, boolValue: true },
         ],
         droppedAttributesCount: 0,
+      });
+    });
+  });
+  describe('toCollectorMetricDescriptor', () => {
+    it('should convert counter', () => {
+      const descriptor = transform.toCollectorMetricDescriptor(mockCounter);
+      assert.deepStrictEqual(descriptor, {
+        description: 'sample counter description',
+        labels: [],
+        name: 'test-counter',
+        temporality:
+          opentelemetryProto.metrics.v1.MetricDescriptorTemporality.CUMULATIVE,
+        type:
+          opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_INT64,
+        unit: '1',
+      });
+    });
+    it('should convert observer', () => {
+      const descriptor = transform.toCollectorMetricDescriptor(mockObserver);
+      assert.deepStrictEqual(descriptor, {
+        description: 'sample observer description',
+        labels: [],
+        name: 'test-observer',
+        temporality:
+          opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+            .INSTANTANEOUS,
+        type: opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE,
+        unit: '2',
       });
     });
   });

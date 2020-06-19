@@ -33,7 +33,11 @@ import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { ValueType as apiValueType } from '@opentelemetry/api';
-import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  MetricRecord,
+  MetricDescriptor,
+  MetricKind,
+} from '@opentelemetry/metrics';
 
 /**
  * Converts attributes
@@ -254,38 +258,54 @@ export function getCollectorPoints(metric: MetricRecord) {
   console.log(valueType, metricKind);
 }
 
+export function toCollectorType(
+  descriptor: MetricDescriptor
+): opentelemetryProto.metrics.v1.MetricDescriptorType {
+  let type: opentelemetryProto.metrics.v1.MetricDescriptorType;
+  if (descriptor.valueType === apiValueType.INT) {
+    if (descriptor.monotonic) {
+      type = opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_INT64;
+    } else {
+      type = opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
+    }
+  } else if (descriptor.valueType === apiValueType.DOUBLE) {
+    if (descriptor.monotonic) {
+      type =
+        opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_DOUBLE;
+    } else {
+      type = opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
+    }
+  } else {
+    type = opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
+  }
+  return type;
+}
+
+export function toCollectorTemporality(
+  descriptor: MetricDescriptor
+): opentelemetryProto.metrics.v1.MetricDescriptorTemporality {
+  if (descriptor.metricKind === MetricKind.COUNTER) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.CUMULATIVE;
+  } else if (descriptor.metricKind === MetricKind.OBSERVER) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+      .INSTANTANEOUS;
+  } else if (descriptor.metricKind === MetricKind.MEASURE) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.DELTA;
+  }
+  return opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+    .INVALID_TEMPORALITY;
+}
+
 export function toCollectorMetricDescriptor(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.MetricDescriptor {
-  let type: opentelemetryProto.metrics.v1.MetricDescriptor_Type;
-  const temporality =
-    opentelemetryProto.metrics.v1.MetricDescriptor_Temporality.CUMULATIVE;
-
-  if (metric.descriptor.valueType === apiValueType.INT) {
-    if (metric.descriptor.monotonic) {
-      type =
-        opentelemetryProto.metrics.v1.MetricDescriptor_Type.MONOTONIC_INT64;
-    } else {
-      type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.INT64;
-    }
-  } else if (metric.descriptor.valueType === apiValueType.DOUBLE) {
-    if (metric.descriptor.monotonic) {
-      type =
-        opentelemetryProto.metrics.v1.MetricDescriptor_Type.MONOTONIC_DOUBLE;
-    } else {
-      type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.DOUBLE;
-    }
-  } else {
-    type = opentelemetryProto.metrics.v1.MetricDescriptor_Type.INVALID_TYPE;
-  }
-
   return {
     name: metric.descriptor.name,
     description: metric.descriptor.description,
     unit: metric.descriptor.unit,
     labels: toCollectorLabels(metric.labels),
-    type,
-    temporality,
+    type: toCollectorType(metric.descriptor),
+    temporality: toCollectorTemporality(metric.descriptor),
   };
 }
 

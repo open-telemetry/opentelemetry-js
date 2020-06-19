@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from '@opentelemetry/api';
+import { TraceFlags, ValueType } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
+import {
+  MetricRecord,
+  MetricKind,
+  CounterSumAggregator,
+  ObserverAggregator,
+} from '@opentelemetry/metrics';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -53,6 +59,36 @@ const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
 const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
 const spanIdBase64 = 'XhByYfZPpT4=';
 const parentIdBase64 = 'eKiRUJiGQ4g=';
+
+export const mockCounter: MetricRecord = {
+  descriptor: {
+    name: 'test-counter',
+    description: 'sample counter description',
+    unit: '1',
+    metricKind: MetricKind.COUNTER,
+    valueType: ValueType.INT,
+    monotonic: true,
+    labelKeys: [],
+  },
+  labels: {},
+  aggregator: new CounterSumAggregator(),
+  resource: Resource.empty(),
+};
+
+export const mockObserver: MetricRecord = {
+  descriptor: {
+    name: 'test-observer',
+    description: 'sample observer description',
+    unit: '2',
+    metricKind: MetricKind.OBSERVER,
+    valueType: ValueType.DOUBLE,
+    monotonic: false,
+    labelKeys: [],
+  },
+  labels: {},
+  aggregator: new ObserverAggregator(),
+  resource: Resource.empty(),
+};
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
