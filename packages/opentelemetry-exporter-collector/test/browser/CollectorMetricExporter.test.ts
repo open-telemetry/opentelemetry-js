@@ -20,7 +20,12 @@ import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
 import { MetricRecord } from '@opentelemetry/metrics';
-import { mockCounter, mockObserver, ensureCounterIsCorrect, ensureObserverIsCorrect } from '../helper';
+import {
+  mockCounter,
+  mockObserver,
+  ensureCounterIsCorrect,
+  ensureObserverIsCorrect,
+} from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorMetricExporter - web', () => {
@@ -39,7 +44,9 @@ describe('CollectorMetricExporter - web', () => {
       url: 'http://foo.bar.com',
     });
     // Overwrites the start time to make tests consistent
-    Object.defineProperty(collectorExporter, '_startTime', {value: 1592602232694000000});
+    Object.defineProperty(collectorExporter, '_startTime', {
+      value: 1592602232694000000,
+    });
     metrics = [];
     metrics.push(Object.assign({}, mockCounter));
     metrics.push(Object.assign({}, mockObserver));
