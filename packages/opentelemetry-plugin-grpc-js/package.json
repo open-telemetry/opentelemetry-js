@@ -43,7 +43,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@grpc/grpc-js": "1.0.5",
+    "@grpc/grpc-js": "1.1.1",
     "@opentelemetry/context-async-hooks": "^0.9.0",
     "@opentelemetry/context-base": "^0.9.0",
     "@opentelemetry/node": "^0.9.0",
