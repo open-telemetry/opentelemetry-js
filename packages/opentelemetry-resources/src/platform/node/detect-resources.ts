@@ -18,6 +18,7 @@ import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
 import { Detector } from '../../types';
 import { ResourceDetectionConfig } from './config';
+import { Logger } from '@opentelemetry/api';
 import * as util from 'util';
 
 const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
@@ -40,7 +41,24 @@ export const detectResources = async (
       }
     })
   );
-  if (config.logger) {
+  logResources(config.logger, resources);
+  return resources.reduce(
+    (acc, resource) => acc.merge(resource),
+    Resource.createTelemetrySDKResource()
+  );
+};
+
+/**
+ * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
+ *
+ * @param logger The logger to write the debug information to.
+ * @param resources The array of resources that should be logged. Empty entried will be ignored.
+ */
+const logResources = (
+  logger: Logger | undefined,
+  resources: Array<Resource>
+) => {
+  if (logger) {
     resources.forEach((resource, index) => {
       // Only print populated resources
       if (Object.keys(resource.labels).length > 0) {
@@ -53,13 +71,9 @@ export const detectResources = async (
         const detectorName = DETECTORS[index].constructor
           ? DETECTORS[index].constructor.name
           : 'Unknown detector';
-        config.logger!.debug(`${detectorName} found resource.`);
-        config.logger!.debug(resourceDebugString);
+        logger.debug(`${detectorName} found resource.`);
+        logger.debug(resourceDebugString);
       }
     });
   }
-  return resources.reduce(
-    (acc, resource) => acc.merge(resource),
-    Resource.createTelemetrySDKResource()
-  );
 };
