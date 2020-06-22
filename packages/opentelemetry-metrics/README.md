@@ -39,6 +39,7 @@ boundCounter.add(10);
 ```
 
 ### Value Observer
+
 Choose this kind of metric when only last value is important without worry about aggregation
 
 ```js
@@ -61,6 +62,7 @@ function getRandomValue() {
 ```
 
 ### Batch Observer
+
 Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
 
 ```js
