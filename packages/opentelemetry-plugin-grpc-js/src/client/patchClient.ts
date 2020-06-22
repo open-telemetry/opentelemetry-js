@@ -19,13 +19,17 @@ import type * as grpcJs from '@grpc/grpc-js';
 import * as shimmer from 'shimmer';
 import { getMethodsToWrap, getPatchedClientMethods } from './utils';
 
+type MakeClientConstructorFunction = typeof grpcJs.makeGenericClientConstructor;
+
 /**
  * Entry point for applying client patches to `grpc.makeClientConstructor(...)` equivalents
  * @param this GrpcJsPlugin
  */
-export function patchClient(this: GrpcJsPlugin) {
+export function patchClient(
+  this: GrpcJsPlugin
+): (original: MakeClientConstructorFunction) => MakeClientConstructorFunction {
   const plugin = this;
-  return (original: typeof grpcJs.makeGenericClientConstructor) => {
+  return (original: MakeClientConstructorFunction) => {
     plugin._logger.debug('patching client');
     return function makeClientConstructor(
       this: typeof grpcJs.Client,

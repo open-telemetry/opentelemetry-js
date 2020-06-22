@@ -33,12 +33,16 @@ import {
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
 
+type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
+
 /**
  * Patch for grpc.Server.prototype.register(...) function. Provides auto-instrumentation for
  * client_stream, server_stream, bidi, unary server handler calls.
  */
-export function patchServer(this: GrpcJsPlugin) {
-  return (originalRegister: typeof grpcJs.Server.prototype.register) => {
+export function patchServer(
+  this: GrpcJsPlugin
+): (originalRegister: ServerRegisterFunction) => ServerRegisterFunction {
+  return (originalRegister: ServerRegisterFunction) => {
     const plugin = this;
 
     plugin.logger.debug('patched gRPC server');
@@ -87,7 +91,7 @@ export function patchServer(this: GrpcJsPlugin) {
                   .startSpan(spanName, spanOptions)
                   .setAttributes({
                     [RpcAttribute.GRPC_KIND]: spanOptions.kind,
-                    // todo: component is deprecated
+                    // @todo: component is deprecated
                     [GeneralAttribute.COMPONENT]: GrpcJsPlugin.component,
                   });
 
@@ -124,7 +128,7 @@ function handleServerFunction<RequestType, ResponseType>(
   originalFunc: HandleCall<RequestType, ResponseType>,
   call: ServerCallWithMeta<RequestType, ResponseType>,
   callback: SendUnaryDataCallback<unknown>
-) {
+): void {
   switch (type) {
     case 'unary':
     case 'clientStream':

@@ -59,7 +59,9 @@ export function getMethodsToWrap(
 /**
  * Parse initial client call properties and start a span to trace its execution
  */
-export function getPatchedClientMethods(this: GrpcJsPlugin) {
+export function getPatchedClientMethods(
+  this: GrpcJsPlugin
+): (original: GrpcClientFunc) => () => EventEmitter {
   const plugin = this;
   return (original: GrpcClientFunc) => {
     plugin._logger.debug('patch all client methods');

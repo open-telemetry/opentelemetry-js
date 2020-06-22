@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import * as grpcModule from 'grpc';
-import * as events from 'events';
+import type * as grpcModule from 'grpc';
+import type * as events from 'events';
 
-export type grpc = typeof grpcModule;
-
+/**
+ * Server Unary callback type
+ */
 export type SendUnaryDataCallback = (
   error: grpcModule.ServiceError | null,
   value?: any,
@@ -26,49 +27,27 @@ export type SendUnaryDataCallback = (
   flags?: grpcModule.writeFlags
 ) => void;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GrpcPluginOptions {}
-
-interface GrpcStatus {
-  code: number;
-  details: string;
-  metadata: grpcModule.Metadata;
-}
-
+/**
+ * Intersection type of all grpc server call types
+ */
 export type ServerCall =
   | typeof grpcModule.ServerUnaryCall
   | typeof grpcModule.ServerReadableStream
   | typeof grpcModule.ServerWritableStream
   | typeof grpcModule.ServerDuplexStream;
 
+  /**
+   * {@link ServerCall} ServerCall extended with misc. missing utility types
+   */
 export type ServerCallWithMeta = ServerCall & {
   metadata: grpcModule.Metadata;
-  status: GrpcStatus;
-  request?: unknown;
 } & events.EventEmitter;
 
+/**
+ * Grpc client callback function extended with missing utility types
+ */
 export type GrpcClientFunc = typeof Function & {
   path: string;
   requestStream: boolean;
   responseStream: boolean;
 };
-
-export type GrpcInternalClientTypes = {
-  makeClientConstructor: typeof grpcModule.makeGenericClientConstructor;
-};
-
-// TODO: Delete if moving internal file loaders to BasePlugin
-/**
- * Maps a name (key) representing a internal file module and its exports
- */
-export interface ModuleNameToFilePath {
-  client: string; // path/to/file
-  [wildcard: string]: string; // string indexer
-}
-
-/**
- * Maps a semver to a module:filepath Map
- */
-export interface ModuleExportsMapping {
-  [semver: string]: ModuleNameToFilePath;
-}
