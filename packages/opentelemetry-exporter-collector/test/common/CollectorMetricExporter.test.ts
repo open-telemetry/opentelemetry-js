@@ -19,8 +19,8 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporterBase } from '../../src/CollectorMetricExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
-import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
-import { Labels } from '@opentelemetry/api';
+import { MetricRecord } from '@opentelemetry/metrics';
+import { mockCounter, mockObserver } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
 class CollectorMetricExporter extends CollectorMetricExporterBase<
@@ -37,7 +37,7 @@ class CollectorMetricExporter extends CollectorMetricExporterBase<
 describe('CollectorMetricExporter - common', () => {
   let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: CollectorExporterConfig;
-  let records: MetricRecord[];
+  let metrics: MetricRecord[];
   describe('constructor', () => {
     let onInitSpy: any;
 
@@ -51,14 +51,9 @@ describe('CollectorMetricExporter - common', () => {
         url: 'http://foo.bar.com',
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
-      const meter = new MeterProvider().getMeter('test-meter');
-      const labels: Labels = { ['keyb']: 'value2', ['keya']: 'value1' };
-      const counter = meter.createCounter('name', {
-        labelKeys: ['keya', 'keyb'],
-      });
-      counter.bind(labels).add(10);
-      meter.collect();
-      records = meter.getBatcher().checkPointSet();
+      metrics = [];
+      metrics.push(Object.assign({}, mockCounter));
+      metrics.push(Object.assign({}, mockObserver));
     });
 
     afterEach(() => {
@@ -119,14 +114,13 @@ describe('CollectorMetricExporter - common', () => {
       spySend.restore();
     });
 
-    it('should export spans as collectorTypes.Spans', done => {
-      const metrics: MetricRecord[] = [];
-      metrics.push(Object.assign({}, records[0]));
-
+    it('should export metrics as collectorTypes.Metrics', done => {
       collectorExporter.export(metrics, () => {});
       setTimeout(() => {
         const metric1 = spySend.args[0][0][0] as MetricRecord;
         assert.deepStrictEqual(metrics[0], metric1);
+        const metric2 = spySend.args[0][0][1] as MetricRecord;
+        assert.deepStrictEqual(metrics[1], metric2);
         done();
       });
       assert.strictEqual(spySend.callCount, 1);
@@ -134,8 +128,6 @@ describe('CollectorMetricExporter - common', () => {
 
     describe('when exporter is shutdown', () => {
       it('should not export anything but return callback with code "FailedNotRetryable"', () => {
-        const metrics: MetricRecord[] = [];
-        metrics.push(Object.assign({}, records[0]));
         collectorExporter.shutdown();
         spySend.resetHistory();
 

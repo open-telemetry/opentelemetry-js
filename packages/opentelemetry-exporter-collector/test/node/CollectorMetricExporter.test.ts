@@ -23,8 +23,14 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
-import { MeterProvider } from '@opentelemetry/metrics';
-import { Labels } from '@opentelemetry/api';
+import { MetricRecord } from '@opentelemetry/metrics';
+import {
+  mockCounter,
+  mockObserver,
+  ensureExportedCounterIsCorrect,
+  ensureExportedObserverIsCorrect,
+  ensureResourceIsCorrect,
+} from '../helper';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -45,6 +51,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     let exportedData:
       | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics
       | undefined;
+    let metrics: MetricRecord[];
 
     before(done => {
       server = new grpc.Server();
@@ -108,8 +115,15 @@ const testCollectorMetricExporter = (params: TestParams) =>
       collectorExporter = new CollectorMetricExporter({
         url: address,
         credentials,
+        serviceName: 'basic-service',
       });
-
+      // Overwrites the start time to make tests consistent
+      Object.defineProperty(collectorExporter, '_startTime', {
+        value: 1592602232694000000,
+      });
+      metrics = [];
+      metrics.push(Object.assign({}, mockCounter));
+      metrics.push(Object.assign({}, mockObserver));
       done();
     });
 
@@ -120,15 +134,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     describe('export', () => {
       it('should export metrics', done => {
         const responseSpy = sinon.spy();
-        const meter = new MeterProvider().getMeter('test-meter');
-        const labels: Labels = { ['keyb']: 'value2', ['keya']: 'value1' };
-        const counter = meter.createCounter('name', {
-          labelKeys: ['keya', 'keyb'],
-        });
-        counter.bind(labels).add(10);
-        meter.collect();
-        const records = meter.getBatcher().checkPointSet();
-        collectorExporter.export(records, responseSpy);
+        collectorExporter.export(metrics, responseSpy);
         setTimeout(() => {
           assert.ok(
             typeof exportedData !== 'undefined',
@@ -136,15 +142,18 @@ const testCollectorMetricExporter = (params: TestParams) =>
           );
           let resource;
           if (exportedData) {
+            const records =
+              exportedData.instrumentationLibraryMetrics[0].metrics;
             resource = exportedData.resource;
-            // ensureExportedSpanIsCorrect(records[0]);
-
+            ensureExportedCounterIsCorrect(records[0]);
+            ensureExportedObserverIsCorrect(records[1]);
+            assert.notEqual(records, {});
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
             if (resource) {
-              //ensureResourceIsCorrect(resource);
+              ensureResourceIsCorrect(resource);
               assert.notEqual(resource, {});
             }
           }

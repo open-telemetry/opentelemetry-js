@@ -73,7 +73,11 @@ export const mockCounter: MetricRecord = {
   },
   labels: {},
   aggregator: new CounterSumAggregator(),
-  resource: Resource.empty(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
 };
 
 export const mockObserver: MetricRecord = {
@@ -88,7 +92,11 @@ export const mockObserver: MetricRecord = {
   },
   labels: {},
   aggregator: new ObserverAggregator(),
-  resource: Resource.empty(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
 };
 
 export const mockedReadableSpan: ReadableSpan = {
@@ -498,6 +506,56 @@ export function ensureCounterIsCorrect(
   });
 }
 
+export function ensureExportedCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      type: 'MONOTONIC_INT64',
+      temporality: 'CUMULATIVE',
+    },
+    doubleDataPoints: [],
+    int64DataPoints: [
+      {
+        labels: [],
+        value: '0',
+        startTimeUnixNano: '1592602232694000128',
+        timeUnixNano: '0',
+      },
+    ],
+    summaryDataPoints: [],
+    histogramDataPoints: [],
+  });
+}
+
+export function ensureExportedObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-observer',
+      description: 'sample observer description',
+      unit: '2',
+      type: 'DOUBLE',
+      temporality: 'INSTANTANEOUS',
+    },
+    doubleDataPoints: [
+      {
+        labels: [],
+        value: 0,
+        startTimeUnixNano: '1592602232694000128',
+        timeUnixNano: '0',
+      },
+    ],
+    int64DataPoints: [],
+    summaryDataPoints: [],
+    histogramDataPoints: [],
+  });
+}
+
 export function ensureObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
 ) {
@@ -597,6 +655,39 @@ export function ensureExportTraceServiceRequestIsSet(
 
   const spans = instrumentationLibrarySpans[0].spans;
   assert.strictEqual(spans && spans.length, 1, 'spans are missing');
+}
+
+export function ensureExportMetricsServiceRequestIsSet(
+  json: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest
+) {
+  const resourceMetrics = json.resourceMetrics;
+  assert.strictEqual(
+    resourceMetrics && resourceMetrics.length,
+    1,
+    'resourceSpans is missing'
+  );
+
+  const resource = resourceMetrics[0].resource;
+  assert.strictEqual(!!resource, true, 'resource is missing');
+
+  const instrumentationLibraryMetrics =
+    resourceMetrics[0].instrumentationLibraryMetrics;
+  assert.strictEqual(
+    instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
+    1,
+    'instrumentationLibrarySpans is missing'
+  );
+
+  const instrumentationLibrary =
+    instrumentationLibraryMetrics[0].instrumentationLibrary;
+  assert.strictEqual(
+    !!instrumentationLibrary,
+    true,
+    'instrumentationLibrary is missing'
+  );
+
+  const metrics = instrumentationLibraryMetrics[0].metrics;
+  assert.strictEqual(metrics.length, 2, 'Metrics are missing');
 }
 
 export function ensureMetadataIsCorrect(

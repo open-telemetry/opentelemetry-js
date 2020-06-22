@@ -25,6 +25,8 @@ import {
   mockObserver,
   ensureCounterIsCorrect,
   ensureObserverIsCorrect,
+  ensureWebResourceIsCorrect,
+  ensureExportMetricsServiceRequestIsSet,
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
@@ -42,6 +44,7 @@ describe('CollectorMetricExporter - web', () => {
     collectorExporter = new CollectorMetricExporter({
       logger: new NoopLogger(),
       url: 'http://foo.bar.com',
+      serviceName: 'bar',
     });
     // Overwrites the start time to make tests consistent
     Object.defineProperty(collectorExporter, '_startTime', {
@@ -90,16 +93,16 @@ describe('CollectorMetricExporter - web', () => {
 
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          /*if (resource) {
+          if (resource) {
             ensureWebResourceIsCorrect(resource);
-          }*/
+          }
 
           assert.strictEqual(url, 'http://foo.bar.com');
           assert.strictEqual(spyBeacon.callCount, 1);
 
           assert.strictEqual(spyOpen.callCount, 0);
 
-          // ensureExportTraceServiceRequestIsSet(json);
+          ensureExportMetricsServiceRequestIsSet(json);
 
           done();
         });
@@ -164,21 +167,28 @@ describe('CollectorMetricExporter - web', () => {
           ) as collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+          const metric2 =
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
 
-          assert.ok(typeof metric1 !== 'undefined', "span doesn't exist");
-          /*if (span1) {
-            ensureSpanIsCorrect(span1);
-          }*/
-
+          assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
+          if (metric1) {
+            ensureCounterIsCorrect(metric1);
+          }
+          assert.ok(
+            typeof metric2 !== 'undefined',
+            "second metric doesn't exist"
+          );
+          if (metric2) {
+            ensureObserverIsCorrect(metric2);
+          }
           const resource = json.resourceMetrics[0].resource;
           assert.ok(typeof resource !== 'undefined', "resource doesn't exist");
-          /*if (resource) {
+          if (resource) {
             ensureWebResourceIsCorrect(resource);
-          }*/
+          }
 
           assert.strictEqual(spyBeacon.callCount, 0);
-
-          // ensureExportTraceServiceRequestIsSet(json);
+          ensureExportMetricsServiceRequestIsSet(json);
 
           done();
         });
