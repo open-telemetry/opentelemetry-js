@@ -2,7 +2,6 @@
   "extends": [
     "config:base"
   ],
-  "rebaseWhen": "behind-base-branch",
   "schedule": [
     "after 9pm and before 5am"
   ],
