@@ -16,32 +16,39 @@
 
 import type * as grpcJs from '@grpc/grpc-js';
 import type { EventEmitter } from 'events';
-import { CALL_SPAN_ENDED } from './utils';
+import type { CALL_SPAN_ENDED } from './utils';
 
-export type grpc = typeof grpcJs;
-
+/**
+ * Server Unary callback type
+ */
 export type SendUnaryDataCallback<T> = grpcJs.requestCallback<T>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GrpcPluginOptions {}
-
+/**
+ * Intersection type of all grpc server call types
+ */
 export type ServerCall<T, U> =
   | grpcJs.ServerUnaryCall<T, U>
   | grpcJs.ServerReadableStream<T, U>
   | grpcJs.ServerWritableStream<T, U>
   | grpcJs.ServerDuplexStream<T, U>;
 
-export type ServerCallWithMeta<T, U> = ServerCall<T, U>;
+/**
+ * {@link ServerCall} ServerCall extended with misc. missing utility types
+ */
+export type ServerCallWithMeta<T, U> = ServerCall<T, U> & {
+  metadata: grpcJs.Metadata;
+};
 
+/**
+ * EventEmitter with span ended symbol indicator
+ */
 export type GrpcEmitter = EventEmitter & { [CALL_SPAN_ENDED]?: boolean };
 
+/**
+ * Grpc client callback function extended with missing utility types
+ */
 export type GrpcClientFunc = ((...args: unknown[]) => GrpcEmitter) & {
   path: string;
   requestStream: boolean;
   responseStream: boolean;
-};
-
-export type GrpcInternalClientTypes = {
-  makeClientConstructor: typeof grpcJs.makeGenericClientConstructor;
-  loadPackageDefinition: typeof grpcJs.loadPackageDefinition;
 };
