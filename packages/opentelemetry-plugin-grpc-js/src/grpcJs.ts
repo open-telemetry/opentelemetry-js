@@ -16,11 +16,10 @@
 
 import type * as grpcJs from '@grpc/grpc-js';
 import { BasePlugin } from '@opentelemetry/core';
-import * as path from 'path';
 import * as shimmer from 'shimmer';
-import { VERSION } from './version';
+import { patchClient, patchLoadPackageDefinition } from './client';
 import { patchServer } from './server';
-import { patchLoadPackageDefinition, patchClient } from './client';
+import { VERSION } from './version';
 
 /**
  * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
@@ -29,12 +28,11 @@ import { patchLoadPackageDefinition, patchClient } from './client';
 export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   static readonly component = '@grpc/grpc-js';
   readonly supportedVersions = ['1.*'];
-  protected readonly _basedir = basedir;
 
   tracer = this._tracer;
   logger = this._logger;
 
-  constructor(readonly moduleName: string, readonly version: string) {
+  constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-grpc-js', VERSION);
   }
 
@@ -85,6 +83,4 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   }
 }
 
-const basedir = path.dirname(require.resolve(GrpcJsPlugin.component));
-const version = require(path.join(basedir, '../../package.json')).version;
-export const plugin = new GrpcJsPlugin(GrpcJsPlugin.component, version);
+export const plugin = new GrpcJsPlugin(GrpcJsPlugin.component);
