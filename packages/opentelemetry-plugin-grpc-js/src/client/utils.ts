@@ -30,7 +30,6 @@ import {
 import type * as grpcJs from '@grpc/grpc-js';
 import {
   grpcStatusCodeToSpanStatus,
-  findIndex,
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
 } from '../utils';
@@ -46,8 +45,8 @@ export function getMethodsToWrap(
 ): string[] {
   const methodsToWrap = [
     ...Object.keys(methods),
-    ...(Object.keys(methods)
-      .map(methodName => methods[methodName].originalName)
+    ...(Object.values(methods)
+      .map(method => method.originalName)
       .filter(
         originalName =>
           // eslint-disable-next-line no-prototype-builtins
@@ -129,7 +128,7 @@ export function makeGrpcClientRemoteCall(
     const metadata = getMetadata.call(plugin, original, args);
     // if unary or clientStream
     if (!original.responseStream) {
-      const callbackFuncIndex = findIndex(args, arg => {
+      const callbackFuncIndex = args.findIndex(arg => {
         return typeof arg === 'function';
       });
       if (callbackFuncIndex !== -1) {
@@ -199,7 +198,7 @@ export function makeGrpcClientRemoteCall(
 function getMetadata(
   this: GrpcJsPlugin,
   original: GrpcClientFunc,
-  args: unknown[]
+  args: Array<unknown | grpcJs.Metadata>
 ): grpcJs.Metadata {
   let metadata: grpcJs.Metadata;
 
@@ -207,12 +206,12 @@ function getMetadata(
   // A possible issue that could occur is if the 'options' parameter from
   // the user contains an '_internal_repr' as well as a 'getMap' function,
   // but this is an extremely rare case.
-  let metadataIndex = findIndex(args, (arg: grpcJs.Metadata) => {
+  let metadataIndex = args.findIndex((arg: unknown | grpcJs.Metadata) => {
     return (
       arg &&
       typeof arg === 'object' &&
-      arg['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js
-      typeof arg.getMap === 'function'
+      (arg as grpcJs.Metadata)['internalRepr'] && // changed from _internal_repr in grpc --> @grpc/grpc-js https://github.com/grpc/grpc-node/blob/95289edcaf36979cccf12797cc27335da8d01f03/packages/grpc-js/src/metadata.ts#L88
+      typeof (arg as grpcJs.Metadata).getMap === 'function'
     );
   });
   if (metadataIndex === -1) {

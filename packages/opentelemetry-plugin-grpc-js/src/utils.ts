@@ -24,21 +24,6 @@ import type * as grpcTypes from '@grpc/grpc-js'; // For types only
  */
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
-// Equivalent to lodash _.findIndex
-export const findIndex: <T>(
-  args: unknown[],
-  fn: (arg: T) => boolean
-) => number = (args, fn: Function) => {
-  let index = -1;
-  for (const arg of args) {
-    index++;
-    if (fn(arg)) {
-      return index;
-    }
-  }
-  return -1;
-};
-
 /**
  * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
  * @param status
