@@ -20,6 +20,7 @@ import * as api from '@opentelemetry/api';
  * Exporter config
  */
 export interface ExporterConfig {
+  headers?: { [key: string]: string };
   logger?: api.Logger;
   serviceName?: string;
   url?: string;

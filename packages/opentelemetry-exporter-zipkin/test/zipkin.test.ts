@@ -97,6 +97,21 @@ describe('ZipkinExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
     });
+    it('should construct an exporter with headers', () => {
+      const exporter = new ZipkinExporter({
+        headers: {
+          foo: 'bar',
+        },
+      });
+      interface ExporterWithHeaders {
+        _reqOpts: {
+          headers: { [key: string]: string };
+        };
+      }
+      const exporterWithHeaders = (exporter as unknown) as ExporterWithHeaders;
+
+      assert.ok(exporterWithHeaders._reqOpts.headers['foo'] === 'bar');
+    });
   });
 
   describe('export', () => {
