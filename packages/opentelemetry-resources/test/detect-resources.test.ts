@@ -180,9 +180,11 @@ describe('detectResources', async () => {
       assert.deepStrictEqual(mockedLoggerMethod.getCall(0).args, [
         'EnvDetector found resource.',
       ]);
-      assert.deepStrictEqual(mockedLoggerMethod.getCall(1).args, [
-        "{\n  'service.instance.id': '627cc493',\n  'service.name': 'my-service',\n  'service.namespace': 'default',\n  'service.version': '0.0.1'\n}",
-      ]);
+      // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
+      assert.match(
+        mockedLoggerMethod.getCall(1).args.toString(),
+        /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
+      );
     });
   });
 });
