@@ -17,6 +17,7 @@ npm install --save @opentelemetry/exporter-collector
 ## Tracing in Web
 
 The CollectorTraceExporter in Web expects the endpoint to end in `/v1/trace`.
+
 ```js
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
@@ -36,6 +37,7 @@ provider.register();
 ```
 
 ## Tracing in Node
+
 The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
 ```js
