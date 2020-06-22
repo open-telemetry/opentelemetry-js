@@ -104,7 +104,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
         ) => {
           if (err) {
             this.logger.error(
-              'exportTraceServiceRequest',
+              'exportMetricServiceRequest',
               exportMetricServiceRequest
             );
             onError(err);

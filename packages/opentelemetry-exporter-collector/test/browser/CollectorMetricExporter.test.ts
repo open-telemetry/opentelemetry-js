@@ -41,15 +41,6 @@ describe('CollectorMetricExporter - web', () => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
-    collectorExporter = new CollectorMetricExporter({
-      logger: new NoopLogger(),
-      url: 'http://foo.bar.com',
-      serviceName: 'bar',
-    });
-    // Overwrites the start time to make tests consistent
-    Object.defineProperty(collectorExporter, '_startTime', {
-      value: 1592602232694000000,
-    });
     metrics = [];
     metrics.push(Object.assign({}, mockCounter));
     metrics.push(Object.assign({}, mockObserver));
@@ -64,7 +55,18 @@ describe('CollectorMetricExporter - web', () => {
 
   describe('export', () => {
     describe('when "sendBeacon" is available', () => {
-      it('should successfully send the spans using sendBeacon', done => {
+      beforeEach(() => {
+        collectorExporter = new CollectorMetricExporter({
+          logger: new NoopLogger(),
+          url: 'http://foo.bar.com',
+          serviceName: 'bar',
+        });
+        // Overwrites the start time to make tests consistent
+        Object.defineProperty(collectorExporter, '_startTime', {
+          value: 1592602232694000000,
+        });
+      });
+      it('should successfully send metrics using sendBeacon', done => {
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
@@ -147,13 +149,22 @@ describe('CollectorMetricExporter - web', () => {
       let server: any;
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
+        collectorExporter = new CollectorMetricExporter({
+          logger: new NoopLogger(),
+          url: 'http://foo.bar.com',
+          serviceName: 'bar',
+        });
+        // Overwrites the start time to make tests consistent
+        Object.defineProperty(collectorExporter, '_startTime', {
+          value: 1592602232694000000,
+        });
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
         server.restore();
       });
 
-      it('should successfully send the spans using XMLHttpRequest', done => {
+      it('should successfully send the metrics using XMLHttpRequest', done => {
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {

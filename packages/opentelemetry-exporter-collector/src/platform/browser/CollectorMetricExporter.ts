@@ -19,13 +19,30 @@ import { toCollectorExportMetricServiceRequest } from '../../transform';
 import {
   CollectorExporterError,
   CollectorExporterConfigBrowser,
+  OT_REQUEST_HEADER,
 } from '../../types';
+import { sendWithBeacon, sendWithXhr } from './util';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 export class CollectorMetricExporter extends CollectorMetricExporterBase<
   CollectorExporterConfigBrowser
 > {
+  DEFAULT_HEADERS: { [key: string]: string } = {
+    [OT_REQUEST_HEADER]: '1',
+  };
+  private _headers: { [key: string]: string };
+  private _useXHR: boolean = false;
+  /**
+   * @param config
+   */
+  constructor(config: CollectorExporterConfigBrowser = {}) {
+    super(config);
+    this._headers = config.headers || this.DEFAULT_HEADERS;
+    this._useXHR =
+      !!config.headers || typeof navigator.sendBeacon !== 'function';
+  }
+
   getDefaultUrl(url: string | undefined): string {
     return url || DEFAULT_COLLECTOR_URL;
   }
@@ -49,72 +66,18 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
       this
     );
     const body = JSON.stringify(exportMetricServiceRequest);
-    console.log(body);
-    if (typeof navigator.sendBeacon === 'function') {
-      this._sendMetricsWithBeacon(body, onSuccess, onError);
+    if (this._useXHR) {
+      sendWithXhr(
+        body,
+        this.url,
+        this._headers,
+        this.logger,
+        onSuccess,
+        onError
+      );
     } else {
-      this._sendMetricsWithXhr(body, onSuccess, onError);
+      sendWithBeacon(body, this.url, this.logger, onSuccess, onError);
     }
     return;
-  }
-
-  /**
-   * send spans using browser navigator.sendBeacon
-   * @param body
-   * @param onSuccess
-   * @param onError
-   */
-  private _sendMetricsWithBeacon(
-    body: string,
-    onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
-  ) {
-    try {
-      if (navigator.sendBeacon(this.url, body)) {
-        this.logger.debug('sendBeacon - can send', body);
-        onSuccess();
-      } else {
-        this.logger.error('sendBeacon - cannot send', body);
-        onError({});
-      }
-    } catch (e) {
-      onError({});
-    }
-  }
-
-  /**
-   * function to send spans using browser XMLHttpRequest
-   *     used when navigator.sendBeacon is not available
-   * @param body
-   * @param onSuccess
-   * @param onError
-   */
-  private _sendMetricsWithXhr(
-    body: string,
-    onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
-  ) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', this.url);
-    xhr.setRequestHeader('x-opentelemetry-outgoing-request', '1');
-    xhr.setRequestHeader('Accept', 'application/json');
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(body);
-
-    xhr.onreadystatechange = () => {
-      if (xhr.readyState === XMLHttpRequest.DONE) {
-        if (xhr.status >= 200 && xhr.status <= 299) {
-          this.logger.debug('xhr success', body);
-          onSuccess();
-        } else {
-          this.logger.error('body', body);
-          this.logger.error('xhr error', xhr);
-          onError({
-            code: xhr.status,
-            message: xhr.responseText,
-          });
-        }
-      }
-    };
   }
 }
