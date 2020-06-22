@@ -14,16 +14,25 @@
  * limitations under the License.
  */
 
-import { PerformanceEntries, PerformanceResourceTimingInfo } from './types';
+import {
+  PerformanceEntries,
+  PerformanceResourceTimingInfo,
+  PropagateTraceHeaderCorsUrls,
+} from './types';
 import { PerformanceTimingNames as PTN } from './enums/PerformanceTimingNames';
 import * as api from '@opentelemetry/api';
-import { hrTimeToNanoseconds, timeInputToHrTime } from '@opentelemetry/core';
+import {
+  hrTimeToNanoseconds,
+  timeInputToHrTime,
+  urlMatches,
+} from '@opentelemetry/core';
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
  * @param obj
  * @param key
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function hasKey<O>(obj: O, key: keyof any): key is keyof O {
   return key in obj;
 }
@@ -55,6 +64,26 @@ export function addSpanNetworkEvent(
 }
 
 /**
+ * Helper function for adding network events
+ * @param span
+ * @param resource
+ */
+export function addSpanNetworkEvents(
+  span: api.Span,
+  resource: PerformanceEntries
+): void {
+  addSpanNetworkEvent(span, PTN.FETCH_START, resource);
+  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_START, resource);
+  addSpanNetworkEvent(span, PTN.DOMAIN_LOOKUP_END, resource);
+  addSpanNetworkEvent(span, PTN.CONNECT_START, resource);
+  addSpanNetworkEvent(span, PTN.SECURE_CONNECTION_START, resource);
+  addSpanNetworkEvent(span, PTN.CONNECT_END, resource);
+  addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
+  addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
+  addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+}
+
+/**
  * sort resources by startTime
  * @param filteredResources
  */
@@ -79,6 +108,7 @@ export function sortResources(filteredResources: PerformanceResourceTiming[]) {
  * @param endTimeHR
  * @param resources
  * @param ignoredResources
+ * @param initiatorType
  */
 export function getResource(
   spanUrl: string,
@@ -87,14 +117,16 @@ export function getResource(
   resources: PerformanceResourceTiming[],
   ignoredResources: WeakSet<PerformanceResourceTiming> = new WeakSet<
     PerformanceResourceTiming
-  >()
+  >(),
+  initiatorType?: string
 ): PerformanceResourceTimingInfo {
   const filteredResources = filterResourcesForSpan(
     spanUrl,
     startTimeHR,
     endTimeHR,
     resources,
-    ignoredResources
+    ignoredResources,
+    initiatorType
   );
 
   if (filteredResources.length === 0) {
@@ -192,7 +224,8 @@ function filterResourcesForSpan(
   startTimeHR: api.HrTime,
   endTimeHR: api.HrTime,
   resources: PerformanceResourceTiming[],
-  ignoredResources: WeakSet<PerformanceResourceTiming>
+  ignoredResources: WeakSet<PerformanceResourceTiming>,
+  initiatorType?: string
 ) {
   const startTime = hrTimeToNanoseconds(startTimeHR);
   const endTime = hrTimeToNanoseconds(endTimeHR);
@@ -205,7 +238,8 @@ function filterResourcesForSpan(
     );
 
     return (
-      resource.initiatorType.toLowerCase() === 'xmlhttprequest' &&
+      resource.initiatorType.toLowerCase() ===
+        (initiatorType || 'xmlhttprequest') &&
       resource.name === spanUrl &&
       resourceStartTime >= startTime &&
       resourceEndTime <= endTime
@@ -237,6 +271,7 @@ export function parseUrl(url: string): HTMLAnchorElement {
  * @param optimised - when id attribute of element is present the xpath can be
  * simplified to contain id
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getElementXPath(target: any, optimised?: boolean) {
   if (target.nodeType === Node.DOCUMENT_NODE) {
     return '/';
@@ -311,4 +346,31 @@ function getNodeValue(target: HTMLElement, optimised?: boolean): string {
     return `/${nodeValue}[${index}]`;
   }
   return `/${nodeValue}`;
+}
+
+/**
+ * Checks if trace headers should be propagated
+ * @param spanUrl
+ * @private
+ */
+export function shouldPropagateTraceHeaders(
+  spanUrl: string,
+  propagateTraceHeaderCorsUrls?: PropagateTraceHeaderCorsUrls
+) {
+  let propagateTraceHeaderUrls = propagateTraceHeaderCorsUrls || [];
+  if (
+    typeof propagateTraceHeaderUrls === 'string' ||
+    propagateTraceHeaderUrls instanceof RegExp
+  ) {
+    propagateTraceHeaderUrls = [propagateTraceHeaderUrls];
+  }
+  const parsedSpanUrl = parseUrl(spanUrl);
+
+  if (parsedSpanUrl.origin === window.location.origin) {
+    return true;
+  } else {
+    return propagateTraceHeaderUrls.some(propagateTraceHeaderUrl =>
+      urlMatches(spanUrl, propagateTraceHeaderUrl)
+    );
+  }
 }

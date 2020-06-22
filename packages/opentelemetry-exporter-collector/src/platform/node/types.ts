@@ -32,5 +32,9 @@ export interface GRPCQueueItem {
  * Trace Service Client for sending spans
  */
 export interface TraceServiceClient extends grpc.Client {
-  export: (request: any, callback: Function) => {};
+  export: (
+    request: any,
+    metadata: grpc.Metadata | undefined,
+    callback: Function
+  ) => {};
 }

@@ -28,6 +28,7 @@ import {
   ensureSpanIsCorrect,
   ensureExportTraceServiceRequestIsSet,
   ensureWebResourceIsCorrect,
+  ensureHeadersContain,
   mockedReadableSpan,
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
@@ -44,14 +45,6 @@ describe('CollectorExporter - web', () => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
-    collectorExporterConfig = {
-      hostName: 'foo',
-      logger: new NoopLogger(),
-      serviceName: 'bar',
-      attributes: {},
-      url: 'http://foo.bar.com',
-    };
-    collectorExporter = new CollectorExporter(collectorExporterConfig);
     spans = [];
     spans.push(Object.assign({}, mockedReadableSpan));
   });
@@ -64,7 +57,21 @@ describe('CollectorExporter - web', () => {
   });
 
   describe('export', () => {
+    beforeEach(() => {
+      collectorExporterConfig = {
+        hostName: 'foo',
+        logger: new NoopLogger(),
+        serviceName: 'bar',
+        attributes: {},
+        url: 'http://foo.bar.com',
+      };
+    });
+
     describe('when "sendBeacon" is available', () => {
+      beforeEach(() => {
+        collectorExporter = new CollectorExporter(collectorExporterConfig);
+      });
+
       it('should successfully send the spans using sendBeacon', done => {
         collectorExporter.export(spans, () => {});
 
@@ -139,6 +146,7 @@ describe('CollectorExporter - web', () => {
       let server: any;
       beforeEach(() => {
         (window.navigator as any).sendBeacon = false;
+        collectorExporter = new CollectorExporter(collectorExporterConfig);
         server = sinon.fakeServer.create();
       });
       afterEach(() => {
@@ -216,6 +224,99 @@ describe('CollectorExporter - web', () => {
           done();
         });
       });
+
+      it('should send custom headers', done => {
+        collectorExporter.export(spans, () => {});
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(200);
+
+          assert.strictEqual(spyBeacon.callCount, 0);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('export with custom headers', () => {
+    let server: any;
+    const customHeaders = {
+      foo: 'bar',
+      bar: 'baz',
+    };
+
+    beforeEach(() => {
+      collectorExporterConfig = {
+        logger: new NoopLogger(),
+        headers: customHeaders,
+      };
+      server = sinon.fakeServer.create();
+    });
+
+    afterEach(() => {
+      server.restore();
+    });
+
+    describe('when "sendBeacon" is available', () => {
+      beforeEach(() => {
+        collectorExporter = new CollectorExporter(collectorExporterConfig);
+      });
+      it('should successfully send custom headers using XMLHTTPRequest', done => {
+        collectorExporter.export(spans, () => {});
+
+        setTimeout(() => {
+          const [{ requestHeaders }] = server.requests;
+
+          ensureHeadersContain(requestHeaders, customHeaders);
+          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(spyOpen.callCount, 0);
+
+          done();
+        });
+      });
+    });
+
+    describe('when "sendBeacon" is NOT available', () => {
+      beforeEach(() => {
+        (window.navigator as any).sendBeacon = false;
+        collectorExporter = new CollectorExporter(collectorExporterConfig);
+      });
+
+      it('should successfully send spans using XMLHttpRequest', done => {
+        collectorExporter.export(spans, () => {});
+
+        setTimeout(() => {
+          const [{ requestHeaders }] = server.requests;
+
+          ensureHeadersContain(requestHeaders, customHeaders);
+          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(spyOpen.callCount, 0);
+
+          done();
+        });
+      });
+    });
+  });
+});
+
+describe('CollectorExporter - browser (getDefaultUrl)', () => {
+  it('should default to v1/trace', done => {
+    const collectorExporter = new CollectorExporter({});
+    setTimeout(() => {
+      assert.strictEqual(
+        collectorExporter['url'],
+        'http://localhost:55678/v1/trace'
+      );
+      done();
+    });
+  });
+  it('should keep the URL if included', done => {
+    const url = 'http://foo.bar.com';
+    const collectorExporter = new CollectorExporter({ url });
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], url);
+      done();
     });
   });
 });

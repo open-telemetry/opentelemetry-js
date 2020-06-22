@@ -26,9 +26,11 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   addSpanNetworkEvent,
+  addSpanNetworkEvents,
   getElementXPath,
   getResource,
   PerformanceEntries,
+  shouldPropagateTraceHeaders,
 } from '../src';
 import { PerformanceTimingNames as PTN } from '../src/enums/PerformanceTimingNames';
 
@@ -132,6 +134,31 @@ describe('utils', () => {
     sandbox.restore();
   });
 
+  describe('addSpanNetworkEvents', () => {
+    it('should add all network events to span', () => {
+      const addEventSpy = sinon.spy();
+      const span = ({
+        addEvent: addEventSpy,
+      } as unknown) as tracing.Span;
+      const entries = {
+        [PTN.FETCH_START]: 123,
+        [PTN.DOMAIN_LOOKUP_START]: 123,
+        [PTN.DOMAIN_LOOKUP_END]: 123,
+        [PTN.CONNECT_START]: 123,
+        [PTN.SECURE_CONNECTION_START]: 123,
+        [PTN.CONNECT_END]: 123,
+        [PTN.REQUEST_START]: 123,
+        [PTN.RESPONSE_START]: 123,
+        [PTN.RESPONSE_END]: 123,
+      } as PerformanceEntries;
+
+      assert.strictEqual(addEventSpy.callCount, 0);
+
+      addSpanNetworkEvents(span, entries);
+
+      assert.strictEqual(addEventSpy.callCount, 9);
+    });
+  });
   describe('addSpanNetworkEvent', () => {
     describe('when entries contain the performance', () => {
       it('should add event to span', () => {
@@ -506,6 +533,40 @@ describe('utils', () => {
       const element = getElementXPath(node);
       assert.strictEqual(element, '//html/body/div/div[4]/div[8]/comment()');
       assert.strictEqual(node, getElementByXpath(element));
+    });
+  });
+
+  describe('shouldPropagateTraceHeaders', () => {
+    it('should propagate trace when url is the same as origin', () => {
+      const result = shouldPropagateTraceHeaders(
+        `${window.location.origin}/foo/bar`
+      );
+      assert.strictEqual(result, true);
+    });
+    it('should propagate trace when url match', () => {
+      const result = shouldPropagateTraceHeaders(
+        'http://foo.com',
+        'http://foo.com'
+      );
+      assert.strictEqual(result, true);
+    });
+    it('should propagate trace when url match regexp', () => {
+      const result = shouldPropagateTraceHeaders('http://foo.com', /foo.+/);
+      assert.strictEqual(result, true);
+    });
+    it('should propagate trace when url match array of string', () => {
+      const result = shouldPropagateTraceHeaders('http://foo.com', [
+        'http://foo.com',
+      ]);
+      assert.strictEqual(result, true);
+    });
+    it('should propagate trace when url match array of regexp', () => {
+      const result = shouldPropagateTraceHeaders('http://foo.com', [/foo.+/]);
+      assert.strictEqual(result, true);
+    });
+    it("should NOT propagate trace when url doesn't match", () => {
+      const result = shouldPropagateTraceHeaders('http://foo.com');
+      assert.strictEqual(result, false);
     });
   });
 });

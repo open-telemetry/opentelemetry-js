@@ -135,6 +135,7 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
@@ -206,6 +207,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 ##### Core
 
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/plugin-fetch][otel-plugin-fetch]
 
 ##### Contrib
 
@@ -241,6 +243,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 
+[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
 [otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
 [otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc-js
 [otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http

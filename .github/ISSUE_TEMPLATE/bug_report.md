@@ -8,19 +8,16 @@ Please answer these questions before submitting a bug report.
 
 ### What version of OpenTelemetry are you using?
 
-
 ### What version of Node are you using?
 
-
 ### What did you do?
-If possible, provide a recipe for reproducing the error.
 
+If possible, provide a recipe for reproducing the error.
 
 ### What did you expect to see?
 
-
 ### What did you see instead?
 
-
 ### Additional context
+
 Add any other context about the problem here.
