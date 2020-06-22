@@ -1,13 +1,3 @@
-/* eslint-disable prefer-const */
-/* eslint-disable no-var */
-/* eslint-disable vars-on-top */
-/* eslint-disable no-unused-vars */
-/* eslint-disable func-names */
-/* eslint-disable camelcase */
-/* eslint-disable no-undef */
-/* eslint-disable no-new-func */
-/* eslint-disable strict */
-
 /**
  * @fileoverview
  * @enhanceable

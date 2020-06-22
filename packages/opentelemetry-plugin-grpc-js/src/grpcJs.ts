@@ -27,9 +27,11 @@ import { VERSION } from './version';
  */
 export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   static readonly component = '@grpc/grpc-js';
+
   readonly supportedVersions = ['1.*'];
 
   tracer = this._tracer;
+
   logger = this._logger;
 
   constructor(readonly moduleName: string) {

@@ -8,7 +8,7 @@ const services = require('./helloworld_grpc_pb');
 
 const PORT = 50051;
 
-/** A function which makes requests and handles response. */
+/** Send a test gRPC Hello Request to the Greeter Service (server.js) */
 function main() {
   // span corresponds to outgoing requests. Here, we have manually created
   // the span, which is created to track work that happens outside of the
