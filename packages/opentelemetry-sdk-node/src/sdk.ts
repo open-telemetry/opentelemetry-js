@@ -114,7 +114,7 @@ export class NodeSDK {
   public start() {
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
-        ...this._tracerProviderConfig,
+        ...this._tracerProviderConfig.tracerConfig,
         resource: this._traceResource,
       });
 
