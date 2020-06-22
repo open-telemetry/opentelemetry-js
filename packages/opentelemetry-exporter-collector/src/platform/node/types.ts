@@ -43,7 +43,11 @@ export interface TraceServiceClient extends grpc.Client {
  * Metric Service Client for sending metrics
  */
 export interface MetricsServiceClient extends grpc.Client {
-  export: (request: any, callback: Function) => {};
+  export: (
+    request: any,
+    metadata: grpc.Metadata | undefined,
+    callback: Function
+  ) => {};
 }
 
 export interface GRPCMetricQueueItem {

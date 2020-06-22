@@ -29,6 +29,7 @@ import {
   mockObserver,
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
+  ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
 } from '../helper';
 
@@ -39,19 +40,24 @@ const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 const address = 'localhost:1501';
 
 type TestParams = {
-  useTLS: boolean;
+  useTLS?: boolean;
+  metadata?: grpc.Metadata;
 };
+
+const metadata = new grpc.Metadata();
+metadata.set('k', 'v');
 
 const testCollectorMetricExporter = (params: TestParams) =>
   describe(`CollectorMetricExporter - node ${
-    params.useTLS ? 'with TLS' : ''
-  }`, () => {
+    params.useTLS ? 'with' : 'without'
+  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
     let collectorExporter: CollectorMetricExporter;
     let server: grpc.Server;
     let exportedData:
       | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics
       | undefined;
     let metrics: MetricRecord[];
+    let reqMetadata: grpc.Metadata | undefined;
 
     before(done => {
       server = new grpc.Server();
@@ -74,9 +80,11 @@ const testCollectorMetricExporter = (params: TestParams) =>
             {
               Export: (data: {
                 request: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
+                metadata: grpc.Metadata;
               }) => {
                 try {
                   exportedData = data.request.resourceMetrics[0];
+                  reqMetadata = data.metadata;
                 } catch (e) {
                   exportedData = undefined;
                 }
@@ -116,6 +124,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
         url: address,
         credentials,
         serviceName: 'basic-service',
+        metadata: params.metadata,
       });
       // Overwrites the start time to make tests consistent
       Object.defineProperty(collectorExporter, '_startTime', {
@@ -129,6 +138,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
 
     afterEach(() => {
       exportedData = undefined;
+      reqMetadata = undefined;
     });
 
     describe('export', () => {
@@ -147,15 +157,16 @@ const testCollectorMetricExporter = (params: TestParams) =>
             resource = exportedData.resource;
             ensureExportedCounterIsCorrect(records[0]);
             ensureExportedObserverIsCorrect(records[1]);
-            assert.notEqual(records, {});
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
             if (resource) {
               ensureResourceIsCorrect(resource);
-              assert.notEqual(resource, {});
             }
+          }
+          if (params.metadata && reqMetadata) {
+            ensureMetadataIsCorrect(reqMetadata, params.metadata);
           }
           done();
         }, 200);
@@ -183,3 +194,4 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
 
 testCollectorMetricExporter({ useTLS: true });
 testCollectorMetricExporter({ useTLS: false });
+testCollectorMetricExporter({ metadata });

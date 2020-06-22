@@ -27,6 +27,7 @@ import {
   ensureObserverIsCorrect,
   ensureWebResourceIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
+  ensureHeadersContain,
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
@@ -239,6 +240,82 @@ describe('CollectorMetricExporter - web', () => {
           assert.strictEqual(response2, 'xhr error');
 
           assert.strictEqual(spyBeacon.callCount, 0);
+          done();
+        });
+      });
+      it('should send custom headers', done => {
+        collectorExporter.export(metrics, () => {});
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(200);
+
+          assert.strictEqual(spyBeacon.callCount, 0);
+          done();
+        });
+      });
+    });
+  });
+
+  describe('export with custom headers', () => {
+    let server: any;
+    const customHeaders = {
+      foo: 'bar',
+      bar: 'baz',
+    };
+    let collectorExporterConfig: collectorTypes.CollectorExporterConfigBrowser;
+
+    beforeEach(() => {
+      collectorExporterConfig = {
+        logger: new NoopLogger(),
+        headers: customHeaders,
+      };
+      server = sinon.fakeServer.create();
+    });
+
+    afterEach(() => {
+      server.restore();
+    });
+
+    describe('when "sendBeacon" is available', () => {
+      beforeEach(() => {
+        collectorExporter = new CollectorMetricExporter(
+          collectorExporterConfig
+        );
+      });
+      it('should successfully send custom headers using XMLHTTPRequest', done => {
+        collectorExporter.export(metrics, () => {});
+
+        setTimeout(() => {
+          const [{ requestHeaders }] = server.requests;
+
+          ensureHeadersContain(requestHeaders, customHeaders);
+          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(spyOpen.callCount, 0);
+
+          done();
+        });
+      });
+    });
+
+    describe('when "sendBeacon" is NOT available', () => {
+      beforeEach(() => {
+        (window.navigator as any).sendBeacon = false;
+        collectorExporter = new CollectorMetricExporter(
+          collectorExporterConfig
+        );
+      });
+
+      it('should successfully send metrics using XMLHttpRequest', done => {
+        collectorExporter.export(metrics, () => {});
+
+        setTimeout(() => {
+          const [{ requestHeaders }] = server.requests;
+
+          ensureHeadersContain(requestHeaders, customHeaders);
+          assert.strictEqual(spyBeacon.callCount, 0);
+          assert.strictEqual(spyOpen.callCount, 0);
+
           done();
         });
       });

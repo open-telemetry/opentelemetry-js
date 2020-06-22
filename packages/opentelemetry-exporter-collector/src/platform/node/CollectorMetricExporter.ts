@@ -33,15 +33,17 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 export class CollectorMetricExporter extends CollectorMetricExporterBase<
   CollectorExporterConfigNode
 > {
+  isShutDown: boolean = false;
   grpcMetricsQueue: GRPCMetricQueueItem[] = [];
   metricServiceClient?: MetricsServiceClient = undefined;
   credentials: grpc.ChannelCredentials;
-  isShutDown: boolean = false;
+  metadata?: grpc.Metadata;
 
-  constructor(options: CollectorExporterConfigNode = {}) {
-    super(options);
+  constructor(config: CollectorExporterConfigNode = {}) {
+    super(config);
     this.grpcMetricsQueue = [];
-    this.credentials = options.credentials || grpc.credentials.createInsecure();
+    this.credentials = config.credentials || grpc.credentials.createInsecure();
+    this.metadata = config.metadata;
   }
 
   getDefaultUrl(url: string | undefined): string {
@@ -99,6 +101,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
       );
       this.metricServiceClient.export(
         exportMetricServiceRequest,
+        this.metadata,
         (
           err: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceError
         ) => {
