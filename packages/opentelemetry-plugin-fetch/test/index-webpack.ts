@@ -13,15 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export enum AttributeNames {
-  COMPONENT = 'component',
-  HTTP_HOST = 'http.host',
-  HTTP_FLAVOR = 'http.flavor',
-  HTTP_METHOD = 'http.method',
-  HTTP_SCHEME = 'http.scheme',
-  HTTP_STATUS_CODE = 'http.status_code',
-  HTTP_STATUS_TEXT = 'http.status_text',
-  HTTP_URL = 'http.url',
-  // NOT ON OFFICIAL SPEC
-  HTTP_USER_AGENT = 'http.user_agent',
-}
+const testsContext = require.context('.', true, /test$/);
+testsContext.keys().forEach(testsContext);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

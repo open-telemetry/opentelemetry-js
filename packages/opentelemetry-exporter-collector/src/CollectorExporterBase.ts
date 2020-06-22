@@ -31,7 +31,6 @@ export interface CollectorExporterConfigBase {
 }
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
  * Collector Exporter abstract base class
@@ -51,7 +50,7 @@ export abstract class CollectorExporterBase<
    */
   constructor(config: T = {} as T) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = config.url || DEFAULT_COLLECTOR_URL;
+    this.url = this.getDefaultUrl(config.url);
     if (typeof config.hostName === 'string') {
       this.hostName = config.hostName;
     }
@@ -135,4 +134,5 @@ export abstract class CollectorExporterBase<
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void;
+  abstract getDefaultUrl(url: string | undefined): string;
 }

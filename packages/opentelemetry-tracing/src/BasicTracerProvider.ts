@@ -15,7 +15,12 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ConsoleLogger, HttpTraceContext } from '@opentelemetry/core';
+import {
+  ConsoleLogger,
+  HttpTraceContext,
+  HttpCorrelationContext,
+  CompositePropagator,
+} from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
@@ -78,7 +83,9 @@ export class BasicTracerProvider implements api.TracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     api.trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
-      config.propagator = new HttpTraceContext();
+      config.propagator = new CompositePropagator({
+        propagators: [new HttpCorrelationContext(), new HttpTraceContext()],
+      });
     }
 
     if (config.contextManager) {

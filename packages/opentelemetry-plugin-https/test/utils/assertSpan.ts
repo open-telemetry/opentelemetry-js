@@ -16,14 +16,15 @@
 
 import { SpanKind } from '@opentelemetry/api';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import {
+  HttpAttribute,
+  GeneralAttribute,
+} from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import * as http from 'http';
 import { DummyPropagation } from './DummyPropagation';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import {
-  AttributeNames,
-  parseResponseStatus,
-} from '@opentelemetry/plugin-http';
+import { parseResponseStatus } from '@opentelemetry/plugin-http';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -48,23 +49,23 @@ export const assertSpan = (
     `${validations.httpMethod} ${validations.pathname}`
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.COMPONENT],
+    span.attributes[GeneralAttribute.COMPONENT],
     validations.component
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_ERROR_MESSAGE],
+    span.attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
     span.status.message
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_METHOD],
+    span.attributes[HttpAttribute.HTTP_METHOD],
     validations.httpMethod
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_TARGET],
+    span.attributes[HttpAttribute.HTTP_TARGET],
     validations.path || validations.pathname
   );
   assert.strictEqual(
-    span.attributes[AttributeNames.HTTP_STATUS_CODE],
+    span.attributes[HttpAttribute.HTTP_STATUS_CODE],
     validations.httpStatusCode
   );
   assert.ok(span.endTime);
@@ -82,25 +83,28 @@ export const assertSpan = (
     const userAgent = validations.reqHeaders['user-agent'];
     if (userAgent) {
       assert.strictEqual(
-        span.attributes[AttributeNames.HTTP_USER_AGENT],
+        span.attributes[HttpAttribute.HTTP_USER_AGENT],
         userAgent
       );
     }
   }
   if (span.kind === SpanKind.CLIENT) {
     assert.strictEqual(
-      span.attributes[AttributeNames.NET_PEER_NAME],
+      span.attributes[GeneralAttribute.NET_PEER_NAME],
       validations.hostname,
       'must be consistent (PEER_NAME and hostname)'
     );
-    assert.ok(span.attributes[AttributeNames.NET_PEER_IP], 'must have PEER_IP');
     assert.ok(
-      span.attributes[AttributeNames.NET_PEER_PORT],
+      span.attributes[GeneralAttribute.NET_PEER_IP],
+      'must have PEER_IP'
+    );
+    assert.ok(
+      span.attributes[GeneralAttribute.NET_PEER_PORT],
       'must have PEER_PORT'
     );
     assert.ok(
-      (span.attributes[AttributeNames.HTTP_URL] as string).indexOf(
-        span.attributes[AttributeNames.NET_PEER_NAME] as string
+      (span.attributes[HttpAttribute.HTTP_URL] as string).indexOf(
+        span.attributes[GeneralAttribute.NET_PEER_NAME] as string
       ) > -1,
       'must be consistent'
     );
@@ -108,16 +112,19 @@ export const assertSpan = (
   if (span.kind === SpanKind.SERVER) {
     if (validations.serverName) {
       assert.strictEqual(
-        span.attributes[AttributeNames.HTTP_SERVER_NAME],
+        span.attributes[HttpAttribute.HTTP_SERVER_NAME],
         validations.serverName,
         ' must have serverName attribute'
       );
     }
     assert.ok(
-      span.attributes[AttributeNames.NET_HOST_PORT],
+      span.attributes[GeneralAttribute.NET_HOST_PORT],
       'must have HOST_PORT'
     );
-    assert.ok(span.attributes[AttributeNames.NET_HOST_IP], 'must have HOST_IP');
+    assert.ok(
+      span.attributes[GeneralAttribute.NET_HOST_IP],
+      'must have HOST_IP'
+    );
     assert.strictEqual(span.parentSpanId, DummyPropagation.SPAN_CONTEXT_KEY);
   } else if (validations.reqHeaders) {
     assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
