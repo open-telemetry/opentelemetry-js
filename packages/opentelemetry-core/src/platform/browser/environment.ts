@@ -20,14 +20,11 @@ import {
   ENVIRONMENT_MAP,
   parseEnvironment,
 } from '../../utils/environment';
-import * as api from '@opentelemetry/api';
 
 /**
  * Gets the environment variables
  */
 export function getEnv(): ENVIRONMENT {
-  const globalEnv = parseEnvironment(
-    (api._globalThis as unknown) as ENVIRONMENT_MAP
-  );
+  const globalEnv = parseEnvironment((window as unknown) as ENVIRONMENT_MAP);
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }

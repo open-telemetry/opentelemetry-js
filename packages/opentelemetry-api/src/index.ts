@@ -30,7 +30,6 @@ export * from './metrics/MetricObservable';
 export * from './metrics/NoopMeter';
 export * from './metrics/NoopMeterProvider';
 export * from './metrics/ObserverResult';
-export * from './platform';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
