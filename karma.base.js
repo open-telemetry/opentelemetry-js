@@ -20,7 +20,7 @@ module.exports = {
   browsers: ['ChromeHeadless'],
   frameworks: ['mocha'],
   coverageIstanbulReporter: {
-    reports: ['json'],
+    reports: ['html', 'json'],
     dir: '.nyc_output',
     fixWebpackSourcePaths: true
   },

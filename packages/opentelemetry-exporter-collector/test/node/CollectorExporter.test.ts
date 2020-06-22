@@ -31,6 +31,7 @@ import * as collectorTypes from '../../src/types';
 import {
   ensureResourceIsCorrect,
   ensureExportedSpanIsCorrect,
+  ensureMetadataIsCorrect,
   mockedReadableSpan,
 } from '../helper';
 
@@ -41,18 +42,23 @@ const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
 const address = 'localhost:1501';
 
 type TestParams = {
-  useTLS: boolean;
+  useTLS?: boolean;
+  metadata?: grpc.Metadata;
 };
+
+const metadata = new grpc.Metadata();
+metadata.set('k', 'v');
 
 const testCollectorExporter = (params: TestParams) =>
   describe(`CollectorExporter - node ${
-    params.useTLS ? 'with TLS' : ''
-  }`, () => {
+    params.useTLS ? 'with' : 'without'
+  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
     let collectorExporter: CollectorExporter;
     let server: grpc.Server;
     let exportedData:
       | collectorTypes.opentelemetryProto.trace.v1.ResourceSpans
       | undefined;
+    let reqMetadata: grpc.Metadata | undefined;
 
     before(done => {
       server = new grpc.Server();
@@ -75,9 +81,11 @@ const testCollectorExporter = (params: TestParams) =>
             {
               Export: (data: {
                 request: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+                metadata: grpc.Metadata;
               }) => {
                 try {
                   exportedData = data.request.resourceSpans[0];
+                  reqMetadata = data.metadata;
                 } catch (e) {
                   exportedData = undefined;
                 }
@@ -117,6 +125,7 @@ const testCollectorExporter = (params: TestParams) =>
         serviceName: 'basic-service',
         url: address,
         credentials,
+        metadata: params.metadata,
       });
 
       const provider = new BasicTracerProvider();
@@ -126,6 +135,7 @@ const testCollectorExporter = (params: TestParams) =>
 
     afterEach(() => {
       exportedData = undefined;
+      reqMetadata = undefined;
     });
 
     describe('export', () => {
@@ -153,11 +163,33 @@ const testCollectorExporter = (params: TestParams) =>
               ensureResourceIsCorrect(resource);
             }
           }
+          if (params.metadata && reqMetadata) {
+            ensureMetadataIsCorrect(reqMetadata, params.metadata);
+          }
           done();
         }, 200);
       });
     });
   });
 
+describe('CollectorExporter - node (getDefaultUrl)', () => {
+  it('should default to localhost', done => {
+    const collectorExporter = new CollectorExporter({});
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], 'localhost:55678');
+      done();
+    });
+  });
+  it('should keep the URL if included', done => {
+    const url = 'http://foo.bar.com';
+    const collectorExporter = new CollectorExporter({ url });
+    setTimeout(() => {
+      assert.strictEqual(collectorExporter['url'], url);
+      done();
+    });
+  });
+});
+
 testCollectorExporter({ useTLS: true });
 testCollectorExporter({ useTLS: false });
+testCollectorExporter({ metadata });
