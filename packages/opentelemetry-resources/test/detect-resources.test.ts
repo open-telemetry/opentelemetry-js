@@ -181,9 +181,10 @@ describe('detectResources', async () => {
         'EnvDetector found resource.',
       ]);
       // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
-      assert.match(
-        mockedLoggerMethod.getCall(1).args.toString(),
-        /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
+      assert.ok(
+        /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/.test(
+          mockedLoggerMethod.getCall(1).args.toString()
+        )
       );
     });
   });
