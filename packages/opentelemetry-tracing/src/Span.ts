@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api';
 import {
   hrTime,
   hrTimeDuration,
+  InstrumentationLibrary,
   isTimeInput,
   timeInputToHrTime,
 } from '@opentelemetry/core';
@@ -41,6 +42,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly events: api.TimedEvent[] = [];
   readonly startTime: api.HrTime;
   readonly resource: Resource;
+  readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.Status = {
     code: api.CanonicalCode.OK,
@@ -69,6 +71,7 @@ export class Span implements api.Span, ReadableSpan {
     this.links = links;
     this.startTime = timeInputToHrTime(startTime);
     this.resource = parentTracer.resource;
+    this.instrumentationLibrary = parentTracer.instrumentationLibrary;
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();

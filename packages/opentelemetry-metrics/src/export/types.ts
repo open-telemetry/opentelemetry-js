@@ -15,7 +15,7 @@
  */
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
 /** The kind of metric. */
@@ -74,6 +74,7 @@ export interface MetricRecord {
   readonly labels: Labels;
   readonly aggregator: Aggregator;
   readonly resource: Resource;
+  readonly instrumentationLibrary: InstrumentationLibrary;
 }
 
 export interface MetricDescriptor {
