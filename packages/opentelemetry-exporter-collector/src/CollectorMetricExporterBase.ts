@@ -27,34 +27,45 @@ const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 export abstract class CollectorMetricExporterBase<
   T extends CollectorExporterConfigBase
 > implements MetricExporter {
-  public readonly logger: Logger;
+  public readonly serviceName: string;
   public readonly url: string;
+  public readonly logger: Logger;
+  public readonly hostName: string | undefined;
+  public readonly attributes?: Attributes;
   protected readonly _startTime = new Date().getTime() * 1000000;
   private _isShutdown: boolean = false;
-  public readonly attributes?: Attributes;
-  public readonly hostName: string | undefined;
-  public readonly serviceName: string;
 
-  constructor(options: T = {} as T) {
-    this.logger = options.logger || new NoopLogger();
-    this.serviceName = options.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = this.getDefaultUrl(options.url);
-    this.attributes = options.attributes;
-    if (typeof options.hostName === 'string') {
-      this.hostName = options.hostName;
+  /**
+   * @param config
+   */
+  constructor(config: T = {} as T) {
+    this.logger = config.logger || new NoopLogger();
+    this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
+    this.url = this.getDefaultUrl(config.url);
+    this.attributes = config.attributes;
+    if (typeof config.hostName === 'string') {
+      this.hostName = config.hostName;
     }
     this.onInit();
   }
 
-  export(metrics: MetricRecord[], cb: (result: ExportResult) => void) {
+  /**
+   * Export metrics
+   * @param metrics
+   * @param resultCallback
+   */
+  export(
+    metrics: MetricRecord[],
+    resultCallback: (result: ExportResult) => void
+  ) {
     if (this._isShutdown) {
-      cb(ExportResult.FAILED_NOT_RETRYABLE);
+      resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
       return;
     }
 
     this._exportMetrics(metrics)
       .then(() => {
-        cb(ExportResult.SUCCESS);
+        resultCallback(ExportResult.SUCCESS);
       })
       .catch(
         (
@@ -64,9 +75,9 @@ export abstract class CollectorMetricExporterBase<
             this.logger.error(error.message);
           }
           if (error.code && error.code < 500) {
-            cb(ExportResult.FAILED_NOT_RETRYABLE);
+            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
           } else {
-            cb(ExportResult.FAILED_RETRYABLE);
+            resultCallback(ExportResult.FAILED_RETRYABLE);
           }
         }
       );

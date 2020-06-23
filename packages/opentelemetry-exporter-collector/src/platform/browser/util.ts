@@ -29,8 +29,6 @@ export function sendWithBeacon(
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ) {
-  console.log('beacon');
-  console.log(body);
   if (navigator.sendBeacon(url, body)) {
     logger.debug('sendBeacon - can send', body);
     onSuccess();

@@ -76,7 +76,7 @@ describe('CollectorMetricExporter - web', () => {
           const body = args[1];
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
+          ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
@@ -176,7 +176,7 @@ describe('CollectorMetricExporter - web', () => {
           const body = request.requestBody;
           const json = JSON.parse(
             body
-          ) as collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
+          ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =

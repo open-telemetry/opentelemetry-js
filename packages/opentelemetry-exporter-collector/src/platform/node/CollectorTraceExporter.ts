@@ -26,7 +26,7 @@ import {
   CollectorExporterConfigNode,
 } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { GRPCQueueItem, TraceServiceClient } from './types';
+import { GRPCSpanQueueItem, TraceServiceClient } from './types';
 import { removeProtocol } from './util';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
@@ -39,7 +39,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
 > {
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
-  grpcSpansQueue: GRPCQueueItem[] = [];
+  grpcSpansQueue: GRPCSpanQueueItem[] = [];
   metadata?: grpc.Metadata;
 
   /**
@@ -87,7 +87,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
         );
         if (this.grpcSpansQueue.length > 0) {
           const queue = this.grpcSpansQueue.splice(0);
-          queue.forEach((item: GRPCQueueItem) => {
+          queue.forEach((item: GRPCSpanQueueItem) => {
             this.sendSpans(item.spans, item.onSuccess, item.onError);
           });
         }

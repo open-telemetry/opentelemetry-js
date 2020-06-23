@@ -22,8 +22,17 @@ import { MetricRecord } from '@opentelemetry/metrics';
  * Queue item to be used to save temporary spans in case the GRPC service
  * hasn't been fully initialised yet
  */
-export interface GRPCQueueItem {
+export interface GRPCSpanQueueItem {
   spans: ReadableSpan[];
+  onSuccess: () => void;
+  onError: (error: CollectorExporterError) => void;
+}
+
+/**
+ * Queue item to be used to save temporary metrics
+ */
+export interface GRPCMetricQueueItem {
+  metrics: MetricRecord[];
   onSuccess: () => void;
   onError: (error: CollectorExporterError) => void;
 }
@@ -48,10 +57,4 @@ export interface MetricsServiceClient extends grpc.Client {
     metadata: grpc.Metadata | undefined,
     callback: Function
   ) => {};
-}
-
-export interface GRPCMetricQueueItem {
-  metrics: MetricRecord[];
-  onSuccess: () => void;
-  onError: (error: CollectorExporterError) => void;
 }

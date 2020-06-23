@@ -43,16 +43,16 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
       !!config.headers || typeof navigator.sendBeacon !== 'function';
   }
 
-  getDefaultUrl(url: string | undefined): string {
-    return url || DEFAULT_COLLECTOR_URL;
-  }
-
   onInit(): void {
     window.addEventListener('unload', this.shutdown);
   }
 
   onShutdown(): void {
     window.removeEventListener('unload', this.shutdown);
+  }
+
+  getDefaultUrl(url: string | undefined): string {
+    return url || DEFAULT_COLLECTOR_URL;
   }
 
   sendMetrics(
@@ -78,6 +78,5 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
     } else {
       sendWithBeacon(body, this.url, this.logger, onSuccess, onError);
     }
-    return;
   }
 }

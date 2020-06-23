@@ -658,7 +658,7 @@ export function ensureExportTraceServiceRequestIsSet(
 }
 
 export function ensureExportMetricsServiceRequestIsSet(
-  json: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest
+  json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(

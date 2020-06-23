@@ -46,13 +46,13 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
     this.metadata = config.metadata;
   }
 
-  getDefaultUrl(url: string | undefined): string {
-    return url || DEFAULT_COLLECTOR_URL;
+  onShutdown(): void {
+    this.isShutDown = true;
+    if (this.metricServiceClient) {
+      this.metricServiceClient.close();
+    }
   }
 
-  /**
-   * @param config
-   */
   onInit(): void {
     this.isShutDown = false;
     const serverAddress = removeProtocol(this.url);
@@ -125,10 +125,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
     }
   }
 
-  onShutdown(): void {
-    this.isShutDown = true;
-    if (this.metricServiceClient) {
-      this.metricServiceClient.close();
-    }
+  getDefaultUrl(url: string | undefined): string {
+    return url || DEFAULT_COLLECTOR_URL;
   }
 }

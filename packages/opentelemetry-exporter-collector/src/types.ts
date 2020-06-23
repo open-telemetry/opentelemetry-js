@@ -32,6 +32,9 @@ export namespace opentelemetryProto {
         message: string;
         stack: string;
       }
+      export interface ExportMetricsServiceRequest {
+        resourceMetrics: opentelemetryProto.metrics.v1.ResourceMetrics[];
+      }
     }
     export namespace trace.v1 {
       export interface TraceService {
@@ -60,9 +63,6 @@ export namespace opentelemetryProto {
   }
 
   export namespace metrics.v1 {
-    export interface ExportMetricsServiceRequest {
-      resourceMetrics: opentelemetryProto.metrics.v1.ResourceMetrics[];
-    }
     export interface Metric {
       metricDescriptor: opentelemetryProto.metrics.v1.MetricDescriptor;
       int64DataPoints?: opentelemetryProto.metrics.v1.Int64DataPoint[];

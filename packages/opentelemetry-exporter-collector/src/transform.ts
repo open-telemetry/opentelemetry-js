@@ -52,6 +52,10 @@ export function toCollectorAttributes(
   });
 }
 
+/**
+ * Converts labels
+ * @param labels
+ */
 export function toCollectorLabels(
   labels: Labels
 ): opentelemetryProto.common.v1.StringKeyValue[] {
@@ -253,6 +257,10 @@ export function toCollectorExportTraceServiceRequest<
   };
 }
 
+/**
+ * Given a MetricDescriptor, return its type in a compatible format with the collector
+ * @param descriptor
+ */
 export function toCollectorType(
   descriptor: MetricDescriptor
 ): opentelemetryProto.metrics.v1.MetricDescriptorType {
@@ -276,6 +284,10 @@ export function toCollectorType(
   return type;
 }
 
+/**
+ * Given a MetricDescriptor, return its temporality in a compatible format with the collector
+ * @param descriptor
+ */
 export function toCollectorTemporality(
   descriptor: MetricDescriptor
 ): opentelemetryProto.metrics.v1.MetricDescriptorTemporality {
@@ -291,6 +303,10 @@ export function toCollectorTemporality(
     .INVALID_TEMPORALITY;
 }
 
+/**
+ * Given a MetricRecord, return the Collector compatible type of MetricDescriptor
+ * @param metric
+ */
 export function toCollectorMetricDescriptor(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.MetricDescriptor {
@@ -304,6 +320,11 @@ export function toCollectorMetricDescriptor(
   };
 }
 
+/**
+ * Converts a metric to be compatible with the collector
+ * @param metric
+ * @param startTime start time in nanoseconds
+ */
 export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
@@ -335,6 +356,13 @@ export function toCollectorMetric(
   };
 }
 
+/**
+ * Prepares metric service request to be sent to collector
+ * @param metrics metrics
+ * @param startTime start time of the metric in nanoseconds
+ * @param collectorMetricExporterBase
+ * @param [name] Instrumentation Library Name
+ */
 export function toCollectorExportMetricServiceRequest<
   T extends CollectorExporterConfigBase
 >(
@@ -342,7 +370,7 @@ export function toCollectorExportMetricServiceRequest<
   startTime: number,
   collectorMetricExporterBase: CollectorMetricExporterBase<T>,
   name = ''
-): opentelemetryProto.metrics.v1.ExportMetricsServiceRequest {
+): opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
   const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
     metric => toCollectorMetric(metric, startTime)
   );

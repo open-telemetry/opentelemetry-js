@@ -79,7 +79,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
               .MetricsService.service,
             {
               Export: (data: {
-                request: collectorTypes.opentelemetryProto.metrics.v1.ExportMetricsServiceRequest;
+                request: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
                 metadata: grpc.Metadata;
               }) => {
                 try {
