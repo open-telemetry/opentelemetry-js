@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-async-hooks",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "OpenTelemetry AsyncHooks-based Context Manager",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -54,6 +54,6 @@
     "typescript": "3.9.5"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.8.3"
+    "@opentelemetry/context-base": "^0.9.0"
   }
 }
