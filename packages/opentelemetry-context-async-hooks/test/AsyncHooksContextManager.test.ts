@@ -35,7 +35,7 @@ for (const contextManagerClass of [
     before(function () {
       if (
         contextManagerClass.name === 'AsyncLocalStorageContextManager' &&
-        (process.version.startsWith('8.') || process.version.startsWith('10.'))
+        (process.version.startsWith('v8.') || process.version.startsWith('v10.'))
       ) {
         this.skip();
       }
