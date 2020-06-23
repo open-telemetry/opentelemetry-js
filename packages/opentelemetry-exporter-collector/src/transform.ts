@@ -253,12 +253,6 @@ export function toCollectorExportTraceServiceRequest<
   };
 }
 
-export function getCollectorPoints(metric: MetricRecord) {
-  const metricKind = metric.descriptor.metricKind;
-  const valueType = metric.descriptor.valueType;
-  console.log(valueType, metricKind);
-}
-
 export function toCollectorType(
   descriptor: MetricDescriptor
 ): opentelemetryProto.metrics.v1.MetricDescriptorType {
