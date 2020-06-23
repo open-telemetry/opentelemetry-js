@@ -36,13 +36,18 @@ const ADD_LISTENER_METHODS = [
   'prependOnceListener' as 'prependOnceListener',
 ];
 
-export abstract class BaseContextManager implements ContextManager {
+export abstract class AbstractAsyncHooksContextManager
+  implements ContextManager {
   abstract active(): Context;
 
   abstract with<T extends (...args: unknown[]) => ReturnType<T>>(
     context: Context,
     fn: T
   ): ReturnType<T>;
+
+  abstract enable(): this;
+
+  abstract disable(): this;
 
   bind<T>(target: T, context?: Context): T {
     // if no specific context to propagate is given, we use the current one
@@ -56,10 +61,6 @@ export abstract class BaseContextManager implements ContextManager {
     }
     return target;
   }
-
-  abstract enable(): this;
-
-  abstract disable(): this;
 
   private _bindFunction<T extends Function>(target: T, context: Context): T {
     const manager = this;

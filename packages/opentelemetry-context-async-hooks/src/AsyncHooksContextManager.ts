@@ -16,9 +16,9 @@
 
 import { Context } from '@opentelemetry/context-base';
 import * as asyncHooks from 'async_hooks';
-import { BaseContextManager } from './BaseContextManager';
+import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
-export class AsyncHooksContextManager extends BaseContextManager {
+export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
   private _contexts: Map<number, Context | undefined> = new Map();
   private _stack: Array<Context | undefined> = [];

@@ -16,9 +16,9 @@
 
 import { Context } from '@opentelemetry/context-base';
 import { AsyncLocalStorage } from 'async_hooks';
-import { BaseContextManager } from './BaseContextManager';
+import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
-export class AsyncLocalStorageContextManager extends BaseContextManager {
+export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextManager {
   private _asyncLocalStorage: AsyncLocalStorage<Context>;
 
   constructor() {
