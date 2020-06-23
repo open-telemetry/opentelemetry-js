@@ -49,14 +49,12 @@ export abstract class AbstractAsyncHooksContextManager
 
   abstract disable(): this;
 
-  bind<T>(target: T, context?: Context): T {
-    // if no specific context to propagate is given, we use the current one
-    if (context === undefined) {
-      context = this.active();
-    }
+  bind<T>(target: T, context: Context = this.active()): T {
     if (target instanceof EventEmitter) {
       return this._bindEventEmitter(target, context);
-    } else if (typeof target === 'function') {
+    }
+
+    if (typeof target === 'function') {
       return this._bindFunction(target, context);
     }
     return target;
