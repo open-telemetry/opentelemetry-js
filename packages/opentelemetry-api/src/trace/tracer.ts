@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ export interface Tracer {
   /**
    * Returns the current Span from the current context if available.
    *
-   * If there is no Span associated with the current context, `null` is
+   * If there is no Span associated with the current context, `undefined` is
    * returned.
    *
    * To install a {@link Span} to the current Context use

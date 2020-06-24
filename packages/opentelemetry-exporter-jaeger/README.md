@@ -43,7 +43,7 @@ Or run the `jaeger-all-in-one(.exe)` executable from the [binary distribution ar
 jaeger-all-in-one --collector.zipkin.http-port=9411
 ```
 
-You can then navigate to http://localhost:16686 to access the Jaeger UI.
+You can then navigate to <http://localhost:16686> to access the Jaeger UI.
 
 ## Installation
 
@@ -65,8 +65,11 @@ import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 const options = {
   serviceName: 'my-service',
   tags: [], // optional
+  // You can use the default UDPSender
   host: 'localhost', // optional
   port: 6832, // optional
+  // OR you can use the HTTPSender as follows
+  // endpoint: 'http://localhost:14268/api/traces',
   maxPacketSize: 65000 // optional
 }
 const exporter = new JaegerExporter(options);
@@ -85,7 +88,7 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 ## Useful links
 
-- To know more about Jaeger, visit: https://www.jaegertracing.io/docs/latest/getting-started/
+- To know more about Jaeger, visit: <https://www.jaegertracing.io/docs/latest/getting-started/>
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

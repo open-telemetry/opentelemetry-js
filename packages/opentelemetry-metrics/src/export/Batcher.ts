@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ export class UngroupedBatcher extends Batcher {
   aggregatorFor(metricDescriptor: MetricDescriptor): Aggregator {
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
+      case MetricKind.UP_DOWN_COUNTER:
         return new CounterSumAggregator();
       case MetricKind.OBSERVER:
         return new ObserverAggregator();
@@ -64,7 +65,7 @@ export class UngroupedBatcher extends Batcher {
   }
 
   process(record: MetricRecord): void {
-    const labels = record.descriptor.labelKeys
+    const labels = Object.keys(record.labels)
       .map(k => `${k}=${record.labels[k]}`)
       .join(',');
     this._batchMap.set(record.descriptor.name + labels, record);

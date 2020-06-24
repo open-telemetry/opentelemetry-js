@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,9 +30,7 @@ describe('Batcher', () => {
         logger: new NoopLogger(),
         interval: 10000,
       }).getMeter('test-meter');
-      counter = meter.createCounter('ungrouped-batcher-test', {
-        labelKeys: ['key'],
-      });
+      counter = meter.createCounter('ungrouped-batcher-test');
       fooCounter = counter.bind({ key: 'foo' });
       barCounter = counter.bind({ key: 'bar' });
     });

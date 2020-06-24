@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ export class PullController extends Controller implements api.MeterProvider {
     if (!this._meters.has(key)) {
       this._meters.set(
         key,
-        new Meter({
+        new Meter({ name, version }, {
           batcher: this._batcher,
           exporter: this._exporter,
           logger: this._logger,

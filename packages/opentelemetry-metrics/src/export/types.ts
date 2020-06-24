@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,18 @@
  */
 
 import { ValueType, HrTime, Labels } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
 /** The kind of metric. */
 export enum MetricKind {
   COUNTER,
+  UP_DOWN_COUNTER,
   VALUE_RECORDER,
-  OBSERVER,
+  OBSERVER, // @TODO remove later #1146
+  SUM_OBSERVER,
+  UP_DOWN_SUM_OBSERVER,
+  VALUE_OBSERVER,
 }
 
 /** Sum returns an aggregated sum. */
@@ -70,6 +74,7 @@ export interface MetricRecord {
   readonly labels: Labels;
   readonly aggregator: Aggregator;
   readonly resource: Resource;
+  readonly instrumentationLibrary: InstrumentationLibrary;
 }
 
 export interface MetricDescriptor {
@@ -78,8 +83,6 @@ export interface MetricDescriptor {
   readonly unit: string;
   readonly metricKind: MetricKind;
   readonly valueType: ValueType;
-  readonly labelKeys: string[];
-  readonly monotonic: boolean;
 }
 
 /**

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,11 @@ import { MetricOptions } from './types';
 import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
 import { Batcher } from './export/Batcher';
 import { hashLabels } from './Utils';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
   implements api.UnboundMetric<T> {
-  protected readonly _monotonic: boolean;
   protected readonly _disabled: boolean;
   protected readonly _valueType: api.ValueType;
   protected readonly _logger: api.Logger;
@@ -42,9 +42,9 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: MetricOptions,
     private readonly _kind: MetricKind,
-    readonly resource: Resource
+    readonly resource: Resource,
+    readonly instrumentationLibrary: InstrumentationLibrary
   ) {
-    this._monotonic = _options.monotonic;
     this._disabled = _options.disabled;
     this._valueType = _options.valueType;
     this._logger = _options.logger;
@@ -88,6 +88,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       labels: instrument.getLabels(),
       aggregator: instrument.getAggregator(),
       resource: this.resource,
+      instrumentationLibrary: this.instrumentationLibrary,
     }));
   }
 
@@ -98,8 +99,6 @@ export abstract class Metric<T extends BaseBoundInstrument>
       unit: this._options.unit,
       metricKind: this._kind,
       valueType: this._valueType,
-      labelKeys: this._options.labelKeys,
-      monotonic: this._monotonic,
     };
   }
 
@@ -112,15 +111,15 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.COUNTER, resource);
+    super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
   }
   protected _makeInstrument(labels: api.Labels): BoundCounter {
     return new BoundCounter(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       // @todo: consider to set to CounterSumAggregator always.
@@ -131,8 +130,8 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
   /**
    * Adds the given value to the current value. Values cannot be negative.
    * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific metric
-   *     that you want to record.
+   * @param [labels = {}] key-values pairs that are associated with a specific
+   *     metric that you want to record.
    */
   add(value: number, labels: api.Labels = {}) {
     this.bind(labels).add(value);
@@ -147,9 +146,16 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.VALUE_RECORDER, resource);
+    super(
+      name,
+      options,
+      MetricKind.VALUE_RECORDER,
+      resource,
+      instrumentationLibrary
+    );
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
@@ -157,7 +163,6 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
     return new BoundValueRecorder(
       labels,
       this._disabled,
-      this._monotonic,
       this._absolute,
       this._valueType,
       this._logger,
@@ -179,16 +184,16 @@ export class ObserverMetric extends Metric<BoundObserver>
     name: string,
     options: MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.OBSERVER, resource);
+    super(name, options, MetricKind.OBSERVER, resource, instrumentationLibrary);
   }
 
   protected _makeInstrument(labels: api.Labels): BoundObserver {
     return new BoundObserver(
       labels,
       this._disabled,
-      this._monotonic,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)

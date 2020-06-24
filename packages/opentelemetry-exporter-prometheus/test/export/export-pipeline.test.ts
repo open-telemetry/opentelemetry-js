@@ -41,7 +41,6 @@ describe('Prometheus Export Pipeline', () => {
 
     const counter = api.metrics.getMeter('test').createCounter('counter', {
       description: 'a test description',
-      labelKeys: ['key1'],
     });
     const boundCounter = counter.bind({ key1: 'labelValue1' });
     boundCounter.add(10);

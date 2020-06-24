@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,7 +15,12 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ConsoleLogger, HttpTraceContext } from '@opentelemetry/core';
+import {
+  ConsoleLogger,
+  HttpTraceContext,
+  HttpCorrelationContext,
+  CompositePropagator,
+} from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
 import { MultiSpanProcessor } from './MultiSpanProcessor';
@@ -47,7 +52,10 @@ export class BasicTracerProvider implements api.TracerProvider {
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
     const key = `${name}@${version}`;
     if (!this._tracers.has(key)) {
-      this._tracers.set(key, new Tracer(config || this._config, this));
+      this._tracers.set(
+        key,
+        new Tracer({ name, version }, config || this._config, this)
+      );
     }
 
     return this._tracers.get(key)!;
@@ -78,7 +86,9 @@ export class BasicTracerProvider implements api.TracerProvider {
   register(config: SDKRegistrationConfig = {}) {
     api.trace.setGlobalTracerProvider(this);
     if (config.propagator === undefined) {
-      config.propagator = new HttpTraceContext();
+      config.propagator = new CompositePropagator({
+        propagators: [new HttpCorrelationContext(), new HttpTraceContext()],
+      });
     }
 
     if (config.contextManager) {

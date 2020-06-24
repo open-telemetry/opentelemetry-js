@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@
 
 import { SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { AttributeNames } from '../../src/enums/AttributeNames';
-import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
@@ -34,10 +32,6 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.strictEqual(
-    span.attributes[AttributeNames.COMPONENT],
-    GrpcPlugin.component
-  );
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 1);

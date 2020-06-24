@@ -1,17 +1,18 @@
 import { metrics, Metric, BoundCounter } from '@opentelemetry/api';
-import { installExportPipeline } from '@opentelemetry/exporter-prometheus';
+import { installExportPipeline, PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 installExportPipeline({
   startServer: true,
 }, () => {
-  console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  console.log(
+    `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+  );
 });
 
 const meter = metrics.getMeter('example-ts');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
   monotonic: true,
-  labelKeys: ["route"],
   description: "Count all incoming requests"
 });
 

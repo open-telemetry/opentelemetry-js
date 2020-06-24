@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "schedule": [
+    "after 9pm and before 5am"
+  ],
+  "labels": ["dependencies"]
+}
