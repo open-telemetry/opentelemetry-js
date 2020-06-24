@@ -114,6 +114,18 @@ describe('Meter', () => {
       assert.ok(record.resource instanceof Resource);
     });
 
+    it('should pipe through instrumentation library', () => {
+      const counter = meter.createCounter('name') as CounterMetric;
+      assert.ok(counter.instrumentationLibrary);
+
+      counter.add(1, { foo: 'bar' });
+
+      const [record] = counter.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
+    });
+
     describe('.bind()', () => {
       it('should create a counter instrument', () => {
         const counter = meter.createCounter('name') as CounterMetric;
@@ -501,6 +513,20 @@ describe('Meter', () => {
       assert.ok(record.resource instanceof Resource);
     });
 
+    it('should pipe through instrumentation library', () => {
+      const valueRecorder = meter.createValueRecorder(
+        'name'
+      ) as ValueRecorderMetric;
+      assert.ok(valueRecorder.instrumentationLibrary);
+
+      valueRecorder.record(1, { foo: 'bar' });
+
+      const [record] = valueRecorder.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const valueRecorder = meter.createValueRecorder('');
@@ -718,6 +744,20 @@ describe('Meter', () => {
 
       const [record] = observer.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
+    });
+
+    it('should pipe through instrumentation library', () => {
+      const observer = meter.createObserver('name') as ObserverMetric;
+      assert.ok(observer.instrumentationLibrary);
+
+      observer.setCallback(result => {
+        result.observe(() => 42, { foo: 'bar' });
+      });
+
+      const [record] = observer.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
     });
   });
 

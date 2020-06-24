@@ -17,7 +17,12 @@
 import * as assert from 'assert';
 import { NoopSpan, Sampler, SamplingDecision } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
-import { NoopLogger, ALWAYS_SAMPLER, NEVER_SAMPLER } from '@opentelemetry/core';
+import {
+  InstrumentationLibrary,
+  NoopLogger,
+  ALWAYS_SAMPLER,
+  NEVER_SAMPLER,
+} from '@opentelemetry/core';
 
 describe('Tracer', () => {
   const tracerProvider = new BasicTracerProvider({
@@ -36,28 +41,57 @@ describe('Tracer', () => {
   }
 
   it('should create a Tracer instance', () => {
-    const tracer = new Tracer({}, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
     assert.ok(tracer instanceof Tracer);
   });
 
   it('should respect NO_RECORD sampling result', () => {
-    const tracer = new Tracer({ sampler: NEVER_SAMPLER }, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: NEVER_SAMPLER },
+      tracerProvider
+    );
     const span = tracer.startSpan('span1');
     assert.ok(span instanceof NoopSpan);
     span.end();
   });
 
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
-    const tracer = new Tracer({ sampler: ALWAYS_SAMPLER }, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: ALWAYS_SAMPLER },
+      tracerProvider
+    );
     const span = tracer.startSpan('span2');
     assert.ok(!(span instanceof NoopSpan));
     span.end();
   });
 
   it('should start a span with attributes in sampling result', () => {
-    const tracer = new Tracer({ sampler: new TestSampler() }, tracerProvider);
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      { sampler: new TestSampler() },
+      tracerProvider
+    );
     const span = tracer.startSpan('span3');
     assert.strictEqual((span as Span).attributes.testAttribute, 'foobar');
     span.end();
+  });
+
+  it('should have an instrumentationLibrary', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
+
+    const lib: InstrumentationLibrary = tracer.instrumentationLibrary;
+
+    assert.strictEqual(lib.name, 'default');
+    assert.strictEqual(lib.version, '0.0.1');
   });
 });

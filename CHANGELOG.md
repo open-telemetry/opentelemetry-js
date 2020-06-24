@@ -4,6 +4,76 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.9.0
+
+### :boom: Breaking Change
+
+* `opentelemetry-api`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
+  * [#1120](https://github.com/open-telemetry/opentelemetry-js/pull/1120) feat: add the UpDownCounter instrument ([@mayurkale22](https://github.com/mayurkale22))
+  * [#1126](https://github.com/open-telemetry/opentelemetry-js/pull/1126) feat!: remove label keys as they are no longer part of the spec ([@naseemkullah](https://github.com/naseemkullah))
+* `opentelemetry-api`, `opentelemetry-metrics`
+  * [#1117](https://github.com/open-telemetry/opentelemetry-js/pull/1117) chore: rename meaure to value recorder ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-tracing`
+  * [#1058](https://github.com/open-telemetry/opentelemetry-js/pull/1058) feat: spec compliant sampling result support ([@legendecas](https://github.com/legendecas))
+
+### :rocket: (Enhancement)
+
+* Other
+  * [#1181](https://github.com/open-telemetry/opentelemetry-js/pull/1181) feat: add node-plugins-all package ([@dyladan](https://github.com/dyladan))
+* `opentelemetry-plugin-fetch`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-web`
+  * [#1121](https://github.com/open-telemetry/opentelemetry-js/pull/1121) chore: adding plugin-fetch and example ([@obecny](https://github.com/obecny))
+* `opentelemetry-node`
+  * [#1153](https://github.com/open-telemetry/opentelemetry-js/pull/1153) feat: add OPENTELEMETRY_NO_PATCH_MODULES ([@markwolff](https://github.com/markwolff))
+  * [#1151](https://github.com/open-telemetry/opentelemetry-js/pull/1151) chore(todo): add missing span sampling test ([@markwolff](https://github.com/markwolff))
+* `opentelemetry-exporter-jaeger`
+  * [#965](https://github.com/open-telemetry/opentelemetry-js/pull/965) feat(opentelemetry-exporter-jaeger): http sender ([@leonardodalcin](https://github.com/leonardodalcin))
+* `opentelemetry-exporter-zipkin`
+  * [#1138](https://github.com/open-telemetry/opentelemetry-js/pull/1138) feat(opentelemetry-js): infer zipkin service name from resource ([@rezakrimi](https://github.com/rezakrimi))
+* `opentelemetry-plugin-xml-http-request`
+  * [#1133](https://github.com/open-telemetry/opentelemetry-js/pull/1133) fix(plugin-xml-http-request): support sync requests ([@johnbley](https://github.com/johnbley))
+* `opentelemetry-metrics`
+  * [#1145](https://github.com/open-telemetry/opentelemetry-js/pull/1145) chore: creating new metric kind ([@obecny](https://github.com/obecny))
+* `opentelemetry-exporter-collector`
+  * [#1204](https://github.com/open-telemetry/opentelemetry-js/pull/1204) feat: collector exporter custom headers and metadata ([@mwear](https://github.com/mwear))
+* `opentelemetry-exporter-zipkin`
+  * [#1202](https://github.com/open-telemetry/opentelemetry-js/pull/1202) Adds possibility to set headers to zipkin exporter ([@obecny](https://github.com/obecny))
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-exporter-collector`
+  * [#1197](https://github.com/open-telemetry/opentelemetry-js/pull/1197) fix(exporter-collector): default endpoint for node and browser ([@davidwitten](https://github.com/davidwitten))
+* `opentelemetry-context-zone-peer-dep`
+  * [#1209](https://github.com/open-telemetry/opentelemetry-js/pull/1209) chore: fixing zone from which to fork a new zone ([@obecny](https://github.com/obecny))
+
+### :sparkles: (Feature)
+
+* `opentelemetry-semantic-conventions`
+  * [#1160](https://github.com/open-telemetry/opentelemetry-js/pull/1160) refactor(attributes): move enums to @opentelemetry/semantic-conventions ([@markwolff](https://github.com/markwolff))
+
+### :books: (Refine Doc)
+
+* Other
+  * [#1192](https://github.com/open-telemetry/opentelemetry-js/pull/1192) Fix_typo ([@shivkanya9146](https://github.com/shivkanya9146))
+  * [#1147](https://github.com/open-telemetry/opentelemetry-js/pull/1147) ci: lint markdown files ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1142](https://github.com/open-telemetry/opentelemetry-js/pull/1142) chore: template prometheus endpoint in examples rather than hardcode ([@naseemkullah](https://github.com/naseemkullah))
+  * [#1217](https://github.com/open-telemetry/opentelemetry-js/pull/1217) chore: fix markdown linting and add npm script ([@dyladan](https://github.com/dyladan))
+
+#### Committers: 13
+
+* David W. ([@davidwitten](https://github.com/davidwitten))
+* Bartlomiej Obecny ([@obecny](https://github.com/obecny))
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+* Mark Wolff ([@markwolff](https://github.com/markwolff))
+* Mayur Kale ([@mayurkale22](https://github.com/mayurkale22))
+* Naseem ([@naseemkullah](https://github.com/naseemkullah))
+* Valentin Marchaud ([@vmarchaud](https://github.com/vmarchaud))
+* legendecas ([@legendecas](https://github.com/legendecas))
+* Shivkanya Andhare ([@shivkanya9146](https://github.com/shivkanya9146))
+* Leonardo Dalcin ([@leonardodalcin](https://github.com/leonardodalcin))
+* [@rezakrimi](https://github.com/rezakrimi)
+* John Bley ([@johnbley](https://github.com/johnbley))
+* Matthew Wear ([@mwear](https://github.com/mwear))
+
 ## 0.8.3
 
 ### :rocket: (Enhancement)
