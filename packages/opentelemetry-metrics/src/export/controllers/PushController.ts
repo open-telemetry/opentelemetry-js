@@ -58,14 +58,17 @@ export class PushController extends Controller implements api.MeterProvider {
     if (!this._meters.has(key)) {
       this._meters.set(
         key,
-        new Meter({ name, version }, {
-          batcher: this._batcher,
-          exporter: this._exporter,
-          logger: this._logger,
-          resource: this.resource,
-          ...this._config,
-          ...config,
-        })
+        new Meter(
+          { name, version },
+          {
+            batcher: this._batcher,
+            exporter: this._exporter,
+            logger: this._logger,
+            resource: this.resource,
+            ...this._config,
+            ...config,
+          }
+        )
       );
     }
 
