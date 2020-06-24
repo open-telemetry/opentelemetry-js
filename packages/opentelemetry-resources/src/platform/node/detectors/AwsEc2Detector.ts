@@ -57,7 +57,10 @@ class AwsEc2Detector implements Detector {
         [HOST_RESOURCE.ID]: instanceId,
         [HOST_RESOURCE.TYPE]: instanceType,
       });
-    } catch {
+    } catch (e) {
+      if (config.logger) {
+        config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
+      }
       return Resource.empty();
     }
   }

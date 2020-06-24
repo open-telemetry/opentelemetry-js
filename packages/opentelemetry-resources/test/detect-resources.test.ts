@@ -165,7 +165,26 @@ describe('detectResources', async () => {
   });
 
   describe('with a debug logger', () => {
-    it('prints detected resources to the logger', async () => {
+    // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
+    // Needed because of race condition with parallel detectors.
+    const callArgsContains = (
+      mockedFunction: sinon.SinonSpy,
+      arg: any
+    ): boolean => {
+      return mockedFunction.getCalls().some(call => {
+        return call.args.some(callarg => arg === callarg);
+      });
+    };
+    const callArgsMatches = (
+      mockedFunction: sinon.SinonSpy,
+      regex: RegExp
+    ): boolean => {
+      return mockedFunction.getCalls().some(call => {
+        return regex.test(call.args.toString());
+      });
+    };
+
+    it('prints detected resources and debug messages to the logger', async () => {
       // This test depends on the env detector to be functioning as intended
       const mockedLoggerMethod = sinon.fake();
       await detectResources({
@@ -177,15 +196,80 @@ describe('detectResources', async () => {
         },
       });
 
-      assert.deepStrictEqual(mockedLoggerMethod.getCall(0).args, [
-        'EnvDetector found resource.',
-      ]);
-      // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
+      // Test for AWS and GCP Detector failure
       assert.ok(
-        /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/.test(
-          mockedLoggerMethod.getCall(1).args.toString()
+        callArgsContains(
+          mockedLoggerMethod,
+          'GcpDetector failed: GCP Metadata unavailable.'
         )
       );
+      assert.ok(
+        callArgsContains(
+          mockedLoggerMethod,
+          'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/dynamic/instance-identity/document"'
+        )
+      );
+      // Test that the Env Detector successfully found its resource and populated it with the right values.
+      assert.ok(
+        callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
+      );
+      // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
+      assert.ok(
+        callArgsMatches(
+          mockedLoggerMethod,
+          /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
+        )
+      );
+    });
+
+    describe('with missing environemnt variable', () => {
+      beforeEach(() => {
+        delete process.env.OTEL_RESOURCE_LABELS;
+      });
+
+      it('prints correct error messages when EnvDetector has no env variable', async () => {
+        const mockedLoggerMethod = sinon.fake();
+        await detectResources({
+          logger: {
+            debug: mockedLoggerMethod,
+            info: sinon.fake(),
+            warn: sinon.fake(),
+            error: sinon.fake(),
+          },
+        });
+
+        assert.ok(
+          callArgsContains(
+            mockedLoggerMethod,
+            'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
+          )
+        );
+      });
+    });
+
+    describe('with a faulty environment variable', () => {
+      beforeEach(() => {
+        process.env.OTEL_RESOURCE_LABELS = 'bad=~label';
+      });
+
+      it('prints correct error messages when EnvDetector has an invalid variable', async () => {
+        const mockedLoggerMethod = sinon.fake();
+        await detectResources({
+          logger: {
+            debug: mockedLoggerMethod,
+            info: sinon.fake(),
+            warn: sinon.fake(),
+            error: sinon.fake(),
+          },
+        });
+
+        assert.ok(
+          callArgsContains(
+            mockedLoggerMethod,
+            'EnvDetector failed: Label value should be a ASCII string with a length not exceed 255 characters.'
+          )
+        );
+      });
     });
   });
 });

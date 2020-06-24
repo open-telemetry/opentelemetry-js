@@ -33,7 +33,12 @@ import { ResourceDetectionConfig } from '../../../config';
  */
 class GcpDetector implements Detector {
   async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
-    if (!(await gcpMetadata.isAvailable())) return Resource.empty();
+    if (!(await gcpMetadata.isAvailable())) {
+      if (config.logger) {
+        config.logger.debug('GcpDetector failed: GCP Metadata unavailable.');
+      }
+      return Resource.empty();
+    }
 
     const [projectId, instanceId, zoneId, clusterName] = await Promise.all([
       this._getProjectId(),

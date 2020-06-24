@@ -50,12 +50,22 @@ class EnvDetector implements Detector {
   async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
-      if (!labelString) return Resource.empty();
+      if (!labelString) {
+        if (config.logger) {
+          config.logger.debug(
+            'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
+          );
+        }
+        return Resource.empty();
+      }
       const labels = this._parseResourceLabels(
         process.env.OTEL_RESOURCE_LABELS
       );
       return new Resource(labels);
-    } catch {
+    } catch (e) {
+      if (config.logger) {
+        config.logger.debug(`EnvDetector failed: ${e.message}`);
+      }
       return Resource.empty();
     }
   }
