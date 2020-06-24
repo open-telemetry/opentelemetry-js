@@ -49,10 +49,6 @@ export const assertSpan = (
     `${validations.httpMethod} ${validations.pathname}`
   );
   assert.strictEqual(
-    span.attributes[GeneralAttribute.COMPONENT],
-    validations.component
-  );
-  assert.strictEqual(
     span.attributes[HttpAttribute.HTTP_ERROR_MESSAGE],
     span.status.message
   );

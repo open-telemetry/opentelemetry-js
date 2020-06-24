@@ -29,7 +29,6 @@ import {
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
-import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 import {
   ClientRequest,
   IncomingMessage,
@@ -461,9 +460,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
       span = new NoRecordingSpan(spanContext);
     } else {
-      span = this._tracer
-        .startSpan(name, options)
-        .setAttribute(GeneralAttribute.COMPONENT, this.component);
+      span = this._tracer.startSpan(name, options);
     }
     this._spanNotEnded.add(span);
     return span;

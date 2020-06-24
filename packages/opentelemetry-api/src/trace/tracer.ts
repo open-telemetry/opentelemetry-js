@@ -29,7 +29,7 @@ export interface Tracer {
   /**
    * Returns the current Span from the current context if available.
    *
-   * If there is no Span associated with the current context, `null` is
+   * If there is no Span associated with the current context, `undefined` is
    * returned.
    *
    * To install a {@link Span} to the current Context use
