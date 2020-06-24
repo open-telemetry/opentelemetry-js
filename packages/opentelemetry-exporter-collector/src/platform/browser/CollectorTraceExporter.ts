@@ -24,7 +24,7 @@ import { sendWithBeacon, sendWithXhr } from './util';
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
- * Collector Exporter for Web
+ * Collector Trace Exporter for Web
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfigBrowser

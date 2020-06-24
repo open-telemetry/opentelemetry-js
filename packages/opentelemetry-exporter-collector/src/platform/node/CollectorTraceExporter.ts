@@ -32,7 +32,7 @@ import { removeProtocol } from './util';
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
- * Collector Exporter for Node
+ * Collector Trace Exporter for Node
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfigNode
@@ -100,6 +100,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     onError: (error: CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
+      this.logger.debug('Shutdown already started. Cannot send spans');
       return;
     }
     if (this.traceServiceClient) {

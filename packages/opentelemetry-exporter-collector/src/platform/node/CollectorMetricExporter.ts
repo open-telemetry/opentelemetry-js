@@ -28,7 +28,7 @@ import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
- * Collector Exporter for Node
+ * Collector Metric Exporter for Node
  */
 export class CollectorMetricExporter extends CollectorMetricExporterBase<
   CollectorExporterConfigNode
@@ -91,6 +91,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
+      this.logger.debug('Shutdown already started. Cannot send metrics');
       return;
     }
     if (this.metricServiceClient) {
