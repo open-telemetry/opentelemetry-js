@@ -20,6 +20,7 @@ npm install --save @opentelemetry/metrics
 
 Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. It is restricted to non-negative increments.
 Example uses for Counter:
+
 - count the number of bytes received
 - count the number of requests completed
 - count the number of accounts created
