@@ -43,6 +43,7 @@
   },
   "files": [
     "build/src/**/*.js",
+    "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
     "build/src/**/*.proto",
     "doc",
