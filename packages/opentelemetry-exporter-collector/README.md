@@ -41,7 +41,7 @@ provider.register();
 The CollectorMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
 
 ```js
-import { MetricProvider } from '@opentelemetry/metrics'; 
+import { MetricProvider } from '@opentelemetry/metrics';
 import { CollectorMetricExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
@@ -137,7 +137,7 @@ Note, that this will only work if TLS is also configured on the server.
 
 ## Metrics in Node
 
-The CollectorMetricExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. The fields in collectorOptions are the same as those used for the CollectorTraceExporter. 
+The CollectorMetricExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. The fields in collectorOptions are the same as those used for the CollectorTraceExporter.
 
 ```js
 const grpc = require('grpc');
@@ -154,7 +154,7 @@ const collectorOptions = {
     fs.readFileSync('./ca.crt'),
     fs.readFileSync('./client.key'),
     fs.readFileSync('./client.crt')
-  ), 
+  ),
   metadata // Optional metadata
 };
 
