@@ -54,7 +54,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.10.2",
+    "@babel/core": "7.10.3",
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.13",
     "@types/sinon": "9.0.4",
