@@ -24,6 +24,7 @@ import {
   TimedEvent,
 } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 export interface ReadableSpan {
   readonly name: string;
@@ -39,4 +40,5 @@ export interface ReadableSpan {
   readonly duration: HrTime;
   readonly ended: boolean;
   readonly resource: Resource;
+  readonly instrumentationLibrary: InstrumentationLibrary;
 }
