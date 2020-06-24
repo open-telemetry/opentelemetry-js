@@ -26,10 +26,7 @@ import {
 } from '@opentelemetry/core';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import * as tracing from '@opentelemetry/tracing';
-import {
-  HttpAttribute,
-  GeneralAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
@@ -283,45 +280,41 @@ describe('xhr', () => {
           const attributes = span.attributes;
           const keys = Object.keys(attributes);
 
-          assert.ok(
-            attributes[keys[0]] !== '',
-            `attributes ${GeneralAttribute.COMPONENT} is not defined`
-          );
           assert.strictEqual(
-            attributes[keys[1]],
+            attributes[keys[0]],
             'GET',
             `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[2]],
+            attributes[keys[1]],
             url,
             `attributes ${HttpAttribute.HTTP_URL} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[3]],
+            attributes[keys[2]],
             200,
             `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[4]],
+            attributes[keys[3]],
             'OK',
             `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[5]],
+            attributes[keys[4]],
             parseUrl(url).host,
             `attributes ${HttpAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
-            attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+            attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
             `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
           );
           assert.ok(
-            attributes[keys[7]] !== '',
+            attributes[keys[6]] !== '',
             `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
           );
 
-          assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+          assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
         });
 
         it('span should have correct events', () => {
@@ -670,7 +663,7 @@ describe('xhr', () => {
             const keys = Object.keys(attributes);
 
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[keys[1]],
               secondUrl,
               `attribute ${HttpAttribute.HTTP_URL} is wrong`
             );
@@ -757,45 +750,41 @@ describe('xhr', () => {
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
-            assert.ok(
-              attributes[keys[0]] !== '',
-              `attributes ${GeneralAttribute.COMPONENT} is not defined`
-            );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[keys[0]],
               'GET',
               `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[keys[1]],
               url,
               `attributes ${HttpAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[keys[2]],
               400,
               `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[keys[3]],
               'Bad Request',
               `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[5]],
+              attributes[keys[4]],
               'raw.githubusercontent.com',
               `attributes ${HttpAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
-              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
               `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
-              attributes[keys[7]] !== '',
+              attributes[keys[6]] !== '',
               `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -888,45 +877,41 @@ describe('xhr', () => {
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
-            assert.ok(
-              attributes[keys[0]] !== '',
-              `attributes ${GeneralAttribute.COMPONENT} is not defined`
-            );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[keys[0]],
               'GET',
               `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[keys[1]],
               url,
               `attributes ${HttpAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[keys[2]],
               0,
               `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[keys[3]],
               '',
               `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[5]],
+              attributes[keys[4]],
               'raw.githubusercontent.com',
               `attributes ${HttpAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
-              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
               `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
-              attributes[keys[7]] !== '',
+              attributes[keys[6]] !== '',
               `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -981,45 +966,41 @@ describe('xhr', () => {
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
-            assert.ok(
-              attributes[keys[0]] !== '',
-              `attributes ${GeneralAttribute.COMPONENT} is not defined`
-            );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[keys[0]],
               'GET',
               `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[keys[1]],
               url,
               `attributes ${HttpAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[keys[2]],
               0,
               `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[keys[3]],
               '',
               `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[5]],
+              attributes[keys[4]],
               'raw.githubusercontent.com',
               `attributes ${HttpAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
-              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
               `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
-              attributes[keys[7]] !== '',
+              attributes[keys[6]] !== '',
               `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
@@ -1076,45 +1057,41 @@ describe('xhr', () => {
             const attributes = span.attributes;
             const keys = Object.keys(attributes);
 
-            assert.ok(
-              attributes[keys[0]] !== '',
-              `attributes ${GeneralAttribute.COMPONENT} is not defined`
-            );
             assert.strictEqual(
-              attributes[keys[1]],
+              attributes[keys[0]],
               'GET',
               `attributes ${HttpAttribute.HTTP_METHOD} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[2]],
+              attributes[keys[1]],
               url,
               `attributes ${HttpAttribute.HTTP_URL} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[3]],
+              attributes[keys[2]],
               0,
               `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[4]],
+              attributes[keys[3]],
               '',
               `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
             );
             assert.strictEqual(
-              attributes[keys[5]],
+              attributes[keys[4]],
               'raw.githubusercontent.com',
               `attributes ${HttpAttribute.HTTP_HOST} is wrong`
             );
             assert.ok(
-              attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
+              attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
               `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
             );
             assert.ok(
-              attributes[keys[7]] !== '',
+              attributes[keys[6]] !== '',
               `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
             );
 
-            assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+            assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
           });
 
           it('span should have correct events', () => {
