@@ -66,9 +66,7 @@ describe('ConsoleMetricExporter', () => {
       assert.deepStrictEqual(descriptor, [
         {
           description: 'a test description',
-          labelKeys: ['key1', 'key2'],
           metricKind: MetricKind.COUNTER,
-          monotonic: true,
           name: 'counter',
           unit: '1',
           valueType: ValueType.DOUBLE,
