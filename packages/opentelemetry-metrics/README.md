@@ -48,7 +48,9 @@ boundCounter.add(10);
 ### UpDownCounter
 
 `UpDownCounter` is similar to `Counter` except that it supports negative increments. It is generally useful for capturing changes in an amount of resources used, or any quantity that rises and falls during a request.
+
 Example uses for UpDownCounter:
+
 - count the number of active requests
 - count memory in use by instrumenting new and delete
 - count queue size by instrumenting enqueue and dequeue
