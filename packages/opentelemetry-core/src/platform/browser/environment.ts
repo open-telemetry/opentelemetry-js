@@ -25,6 +25,7 @@ import {
  * Gets the environment variables
  */
 export function getEnv(): ENVIRONMENT {
-  const globalEnv = parseEnvironment((window as unknown) as ENVIRONMENT_MAP);
+  const _window = window as typeof window & ENVIRONMENT_MAP;
+  const globalEnv = parseEnvironment(_window);
   return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }
