@@ -52,7 +52,10 @@ export class BasicTracerProvider implements api.TracerProvider {
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
     const key = `${name}@${version}`;
     if (!this._tracers.has(key)) {
-      this._tracers.set(key, new Tracer(config || this._config, this));
+      this._tracers.set(
+        key,
+        new Tracer({ name, version }, config || this._config, this)
+      );
     }
 
     return this._tracers.get(key)!;

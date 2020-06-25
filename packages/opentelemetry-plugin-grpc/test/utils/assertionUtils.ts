@@ -16,14 +16,12 @@
 
 import { SpanKind } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { GrpcPlugin } from '../../src/grpc';
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 
 export const assertSpan = (
   span: ReadableSpan,
@@ -34,10 +32,6 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.strictEqual(
-    span.attributes[GeneralAttribute.COMPONENT],
-    GrpcPlugin.component
-  );
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
   assert.strictEqual(span.events.length, 1);
