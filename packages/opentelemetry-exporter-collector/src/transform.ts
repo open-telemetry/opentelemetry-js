@@ -151,7 +151,7 @@ export function toCollectorSpan(
  */
 export function toCollectorResource(
   resource?: Resource,
-  additionalAttributes: { [key: string]: any } = {}
+  additionalAttributes: { [key: string]: unknown } = {}
 ): opentelemetryProto.resource.v1.Resource {
   const attr = Object.assign(
     {},

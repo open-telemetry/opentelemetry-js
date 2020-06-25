@@ -61,8 +61,8 @@ export class CollectorExporter extends CollectorExporterBase<
     window.removeEventListener('unload', this.shutdown);
   }
 
-  getDefaultUrl(url: string | undefined) {
-    return url || DEFAULT_COLLECTOR_URL;
+  getDefaultUrl(config: CollectorExporterConfig) {
+    return config.url || DEFAULT_COLLECTOR_URL;
   }
 
   sendSpans(
