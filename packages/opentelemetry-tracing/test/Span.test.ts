@@ -230,6 +230,11 @@ describe('Span', () => {
     assert.deepStrictEqual(span.attributes, {});
     assert.deepStrictEqual(span.links, []);
     assert.deepStrictEqual(span.events, []);
+
+    assert.ok(span.instrumentationLibrary);
+    const { name, version } = span.instrumentationLibrary;
+    assert.strictEqual(name, 'default');
+    assert.strictEqual(version, '*');
   });
 
   it('should return ReadableSpan with attributes', () => {

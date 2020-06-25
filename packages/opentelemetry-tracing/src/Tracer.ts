@@ -19,6 +19,7 @@ import {
   ConsoleLogger,
   getActiveSpan,
   getParentSpanContext,
+  InstrumentationLibrary,
   isValid,
   NoRecordingSpan,
   randomSpanId,
@@ -39,12 +40,14 @@ export class Tracer implements api.Tracer {
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
   readonly resource: Resource;
+  readonly instrumentationLibrary: InstrumentationLibrary;
   readonly logger: api.Logger;
 
   /**
    * Constructs a new Tracer instance.
    */
   constructor(
+    instrumentationLibrary: InstrumentationLibrary,
     config: TracerConfig,
     private _tracerProvider: BasicTracerProvider
   ) {
@@ -53,6 +56,7 @@ export class Tracer implements api.Tracer {
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
     this.resource = _tracerProvider.resource;
+    this.instrumentationLibrary = instrumentationLibrary;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
   }
 
