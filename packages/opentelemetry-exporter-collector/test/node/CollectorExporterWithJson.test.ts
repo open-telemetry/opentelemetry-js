@@ -48,14 +48,17 @@ const mockResError = {
 describe('CollectorExporter - node with json over http', () => {
   let collectorExporter: CollectorExporter;
   let collectorExporterConfig: CollectorExporterConfig;
-  let spyRequest: any;
-  let spyWrite: any;
+  let spyRequest: sinon.SinonSpy;
+  let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
   describe('export', () => {
     beforeEach(() => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
+        headers: {
+          foo: 'bar',
+        },
         useJson: true,
         hostName: 'foo',
         logger: new core.NoopLogger(),
@@ -82,6 +85,17 @@ describe('CollectorExporter - node with json over http', () => {
         assert.strictEqual(options.hostname, 'foo.bar.com');
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
+        done();
+      });
+    });
+
+    it('should set custom headers', done => {
+      collectorExporter.export(spans, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        assert.strictEqual(options.headers['foo'], 'bar');
         done();
       });
     });

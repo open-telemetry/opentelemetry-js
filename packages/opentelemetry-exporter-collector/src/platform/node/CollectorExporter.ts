@@ -20,7 +20,7 @@ import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
 } from '../../CollectorExporterBase';
-import { CollectorExporterError } from '../../types';
+import * as collectorTypes from '../../types';
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
   onInitWithGrpc,
@@ -35,10 +35,12 @@ import { GRPCQueueItem, TraceServiceClient } from './types';
 
 /**
  * Collector Exporter Config for Node
+ * headers will only work if useJson is set to true
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
+  headers?: { [key: string]: string };
   useJson?: boolean;
 }
 
@@ -48,10 +50,14 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
+  DEFAULT_HEADERS: { [key: string]: string } = {
+    [collectorTypes.OT_REQUEST_HEADER]: '1',
+  };
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
   grpcSpansQueue: GRPCQueueItem[] = [];
   metadata?: grpc.Metadata;
+  headers: { [key: string]: string };
   private readonly _useJson: boolean = false;
 
   /**
@@ -66,6 +72,7 @@ export class CollectorExporter extends CollectorExporterBase<
       this.logger.debug('CollectorExporter - using grpc');
     }
     this.metadata = config.metadata;
+    this.headers = config.headers || this.DEFAULT_HEADERS;
   }
 
   onShutdown(): void {
@@ -88,7 +95,7 @@ export class CollectorExporter extends CollectorExporterBase<
   sendSpans(
     spans: ReadableSpan[],
     onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
+    onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
       return;

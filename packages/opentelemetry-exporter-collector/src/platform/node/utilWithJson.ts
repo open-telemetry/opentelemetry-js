@@ -17,7 +17,6 @@
 import * as url from 'url';
 import * as http from 'http';
 import * as https from 'https';
-import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorExporterError } from '../../types';
@@ -57,7 +56,7 @@ export function sendSpansUsingJson(
     method: 'POST',
     headers: {
       'Content-Length': Buffer.byteLength(body),
-      [collectorTypes.OT_REQUEST_HEADER]: 1,
+      ...collector.headers,
     },
   };
 
