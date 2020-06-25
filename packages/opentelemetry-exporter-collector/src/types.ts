@@ -92,7 +92,7 @@ export namespace opentelemetryProto {
       value: number;
       count: number;
       sum: number;
-      buckets: opentelemetryProto.metrics.v1.HistogramDataPointBucket;
+      buckets: opentelemetryProto.metrics.v1.HistogramDataPointBucket[];
       explicitBounds: number[];
     }
 

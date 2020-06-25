@@ -26,7 +26,7 @@ import {
   CollectorExporterConfigNode,
 } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { GRPCSpanQueueItem, TraceServiceClient } from './types';
+import { GRPCSpanQueueItem, ServiceClient } from './types';
 import { removeProtocol } from './util';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
@@ -38,7 +38,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfigNode
 > {
   isShutDown: boolean = false;
-  traceServiceClient?: TraceServiceClient = undefined;
+  traceServiceClient?: ServiceClient = undefined;
   grpcSpansQueue: GRPCSpanQueueItem[] = [];
   metadata?: grpc.Metadata;
 

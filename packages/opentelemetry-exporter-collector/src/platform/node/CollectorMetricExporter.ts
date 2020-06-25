@@ -17,7 +17,7 @@
 import { MetricRecord } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
 import { CollectorExporterConfigNode } from '../../types';
-import { GRPCMetricQueueItem, MetricsServiceClient } from './types';
+import { GRPCMetricQueueItem, ServiceClient } from './types';
 import { removeProtocol } from './util';
 import * as path from 'path';
 import * as protoLoader from '@grpc/proto-loader';
@@ -35,7 +35,7 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
 > {
   isShutDown: boolean = false;
   grpcMetricsQueue: GRPCMetricQueueItem[] = [];
-  metricServiceClient?: MetricsServiceClient = undefined;
+  metricServiceClient?: ServiceClient = undefined;
   credentials: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
 

@@ -38,20 +38,9 @@ export interface GRPCMetricQueueItem {
 }
 
 /**
- * Trace Service Client for sending spans
+ * Service Client for sending spans or metrics
  */
-export interface TraceServiceClient extends grpc.Client {
-  export: (
-    request: any,
-    metadata: grpc.Metadata | undefined,
-    callback: Function
-  ) => {};
-}
-
-/**
- * Metric Service Client for sending metrics
- */
-export interface MetricsServiceClient extends grpc.Client {
+export interface ServiceClient extends grpc.Client {
   export: (
     request: any,
     metadata: grpc.Metadata | undefined,
