@@ -1,4 +1,5 @@
 # OpenTelemetry Fetch Instrumentation for web
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -41,6 +42,7 @@ fetch('http://localhost:8090/fetch.js');
 ```
 
 ## Example Screenshots
+
 ![Screenshot of the running example](images/trace1.png)
 ![Screenshot of the running example](images/trace2.png)
 ![Screenshot of the running example](images/trace3.png)
@@ -48,6 +50,7 @@ fetch('http://localhost:8090/fetch.js');
 See [examples/tracer-web/fetch](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a short example.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

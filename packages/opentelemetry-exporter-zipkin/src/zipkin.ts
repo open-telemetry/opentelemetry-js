@@ -52,6 +52,7 @@ export class ZipkinExporter implements SpanExporter {
         headers: {
           'Content-Type': 'application/json',
           [OT_REQUEST_HEADER]: 1,
+          ...config.headers,
         },
       },
       urlOpts
