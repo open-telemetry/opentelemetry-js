@@ -37,6 +37,22 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
+export const mockedResources: Resource[] = [
+  new Resource({ name: 'resource 1' }),
+  new Resource({ name: 'resource 2' }),
+];
+
+export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+  {
+    name: 'lib1',
+    version: '0.0.1',
+  },
+  {
+    name: 'lib2',
+    version: '0.0.2',
+  },
+];
+
 const traceIdArr = [
   31,
   16,
@@ -152,22 +168,6 @@ export const mockedReadableSpan: ReadableSpan = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export const mockedResources: Resource[] = [
-  new Resource({ name: 'resource 1' }),
-  new Resource({ name: 'resource 2' }),
-];
-
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
-  {
-    name: 'lib1',
-    version: '0.0.1',
-  },
-  {
-    name: 'lib2',
-    version: '0.0.2',
-  },
-];
-
 export const basicTrace: ReadableSpan[] = [
   {
     name: 'span1',
@@ -243,6 +243,42 @@ export const multiResourceTrace: ReadableSpan[] = [
   {
     ...basicTrace[2],
     resource: mockedResources[1],
+  },
+];
+
+export const multiResourceMetrics: MetricRecord[] = [
+  {
+    ...mockCounter,
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    ...mockObserver,
+    resource: mockedResources[1],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    ...mockCounter,
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+];
+
+export const multiInstrumentationLibraryMetrics: MetricRecord[] = [
+  {
+    ...mockCounter,
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    ...mockObserver,
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[1],
+  },
+  {
+    ...mockCounter,
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
 ];
 
@@ -770,11 +806,7 @@ export function ensureExportMetricsServiceRequestIsSet(
   json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(
-    resourceMetrics && resourceMetrics.length,
-    1,
-    'resourceSpans is missing'
-  );
+  assert.strictEqual(resourceMetrics.length, 2, 'resourceMetrics is missing');
 
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
@@ -784,7 +816,7 @@ export function ensureExportMetricsServiceRequestIsSet(
   assert.strictEqual(
     instrumentationLibraryMetrics && instrumentationLibraryMetrics.length,
     1,
-    'instrumentationLibrarySpans is missing'
+    'instrumentationLibraryMetrics is missing'
   );
 
   const instrumentationLibrary =
@@ -795,8 +827,10 @@ export function ensureExportMetricsServiceRequestIsSet(
     'instrumentationLibrary is missing'
   );
 
-  const metrics = instrumentationLibraryMetrics[0].metrics;
-  assert.strictEqual(metrics.length, 2, 'Metrics are missing');
+  const metric1 = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  const metric2 = resourceMetrics[1].instrumentationLibraryMetrics[0].metrics;
+  assert.strictEqual(metric1.length, 1, 'Metrics are missing');
+  assert.strictEqual(metric2.length, 1, 'Metrics are missing');
 }
 
 export function ensureMetadataIsCorrect(

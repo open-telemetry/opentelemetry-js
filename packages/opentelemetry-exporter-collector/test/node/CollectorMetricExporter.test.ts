@@ -54,7 +54,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
     let collectorExporter: CollectorMetricExporter;
     let server: grpc.Server;
     let exportedData:
-      | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics
+      | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
       | undefined;
     let metrics: MetricRecord[];
     let reqMetadata: grpc.Metadata | undefined;
@@ -83,7 +83,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
                 metadata: grpc.Metadata;
               }) => {
                 try {
-                  exportedData = data.request.resourceMetrics[0];
+                  exportedData = data.request.resourceMetrics;
                   reqMetadata = data.metadata;
                 } catch (e) {
                   exportedData = undefined;
@@ -152,11 +152,13 @@ const testCollectorMetricExporter = (params: TestParams) =>
           );
           let resource;
           if (exportedData) {
-            const records =
-              exportedData.instrumentationLibraryMetrics[0].metrics;
-            resource = exportedData.resource;
-            ensureExportedCounterIsCorrect(records[0]);
-            ensureExportedObserverIsCorrect(records[1]);
+            resource = exportedData[0].resource;
+            const counter =
+              exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
+            const observer =
+              exportedData[1].instrumentationLibraryMetrics[0].metrics[0];
+            ensureExportedCounterIsCorrect(counter);
+            ensureExportedObserverIsCorrect(observer);
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"

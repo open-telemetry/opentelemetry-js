@@ -80,7 +80,7 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
+            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
@@ -180,7 +180,7 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
+            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
 
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {

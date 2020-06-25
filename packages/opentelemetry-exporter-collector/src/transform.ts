@@ -214,14 +214,12 @@ export function toCollectorTraceState(
  * Prepares trace service request to be sent to collector
  * @param spans spans
  * @param collectorTraceExporterBase
- * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   spans: ReadableSpan[],
-  collectorTraceExporterBase: CollectorTraceExporterBase<T>,
-  name = ''
+  collectorTraceExporterBase: CollectorTraceExporterBase<T>
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<
     Resource,
@@ -267,6 +265,56 @@ export function groupSpansByResourceAndLibrary(
   }, new Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>());
 }
 
+/**
+ * Takes an array of metrics and groups them by resource and instrumentation
+ * library
+ * @param metrics metrics
+ */
+export function groupMetricsByResourceAndLibrary(
+  metrics: MetricRecord[]
+): Map<Resource, Map<core.InstrumentationLibrary, MetricRecord[]>> {
+  return metrics.reduce((metricMap, metric) => {
+    //group by resource
+    let resourceMetrics = metricMap.get(metric.resource);
+    if (!resourceMetrics) {
+      resourceMetrics = new Map<core.InstrumentationLibrary, MetricRecord[]>();
+      metricMap.set(metric.resource, resourceMetrics);
+    }
+    //group by instrumentation library
+    let libMetrics = resourceMetrics.get(metric.instrumentationLibrary);
+    if (!libMetrics) {
+      libMetrics = new Array<MetricRecord>();
+      resourceMetrics.set(metric.instrumentationLibrary, libMetrics);
+    }
+    libMetrics.push(metric);
+    return metricMap;
+  }, new Map<Resource, Map<core.InstrumentationLibrary, MetricRecord[]>>());
+}
+
+/**
+ * Convert to InstrumentationLibraryMetrics
+ * @param instrumentationLibrary
+ * @param metrics
+ * @param startTime
+ */
+function toCollectorInstrumentationLibraryMetrics(
+  instrumentationLibrary: core.InstrumentationLibrary,
+  metrics: MetricRecord[],
+  startTime: number
+): opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
+  return {
+    metrics: metrics.map(metric => {
+      return toCollectorMetric(metric, startTime);
+    }),
+    instrumentationLibrary,
+  };
+}
+
+/**
+ * Convert to InstrumentationLibrarySpans
+ * @param instrumentationLibrary
+ * @param spans
+ */
 function toCollectorInstrumentationLibrarySpans(
   instrumentationLibrary: core.InstrumentationLibrary,
   spans: ReadableSpan[]
@@ -382,22 +430,18 @@ export function toCollectorMetric(
  * @param metrics metrics
  * @param startTime start time of the metric in nanoseconds
  * @param collectorMetricExporterBase
- * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportMetricServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   metrics: MetricRecord[],
   startTime: number,
-  collectorMetricExporterBase: CollectorMetricExporterBase<T>,
-  name = ''
+  collectorMetricExporterBase: CollectorMetricExporterBase<T>
 ): opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
-  const metricsToBeSent: opentelemetryProto.metrics.v1.Metric[] = metrics.map(
-    metric => toCollectorMetric(metric, startTime)
-  );
-
-  const resource: Resource =
-    metrics.length > 0 ? metrics[0].resource : Resource.empty();
+  const groupedMetrics: Map<
+    Resource,
+    Map<core.InstrumentationLibrary, MetricRecord[]>
+  > = groupMetricsByResourceAndLibrary(metrics);
   const additionalAttributes = Object.assign(
     {},
     collectorMetricExporterBase.attributes || {},
@@ -405,28 +449,20 @@ export function toCollectorExportMetricServiceRequest<
       'service.name': collectorMetricExporterBase.serviceName,
     }
   );
-  const protoResource: opentelemetryProto.resource.v1.Resource = toCollectorResource(
-    resource,
-    additionalAttributes
-  );
-
-  const instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics = {
-    metrics: metricsToBeSent,
-    instrumentationLibrary: {
-      name: name || `${core.SDK_INFO.NAME} - ${core.SDK_INFO.LANGUAGE}`,
-      version: core.SDK_INFO.VERSION,
-    },
-  };
-
-  const resourceMetric: opentelemetryProto.metrics.v1.ResourceMetrics = {
-    resource: protoResource,
-    instrumentationLibraryMetrics: [instrumentationLibraryMetrics],
-  };
   return {
-    resourceMetrics: [resourceMetric],
+    resourceMetrics: toCollectorResourceMetrics(
+      groupedMetrics,
+      additionalAttributes,
+      startTime
+    ),
   };
 }
 
+/**
+ * Returns a list of resource spans which will be exported to the collector
+ * @param groupedSpans
+ * @param baseAttributes
+ */
 function toCollectorResourceSpans(
   groupedSpans: Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>,
   baseAttributes: Attributes
@@ -438,6 +474,35 @@ function toCollectorResourceSpans(
         libSpans,
         ([instrumentationLibrary, spans]) =>
           toCollectorInstrumentationLibrarySpans(instrumentationLibrary, spans)
+      ),
+    };
+  });
+}
+
+/**
+ * Returns a list of resource metrics which will be exported to the collector
+ * @param groupedSpans
+ * @param baseAttributes
+ */
+function toCollectorResourceMetrics(
+  groupedMetrics: Map<
+    Resource,
+    Map<core.InstrumentationLibrary, MetricRecord[]>
+  >,
+  baseAttributes: Attributes,
+  startTime: number
+): opentelemetryProto.metrics.v1.ResourceMetrics[] {
+  return Array.from(groupedMetrics, ([resource, libMetrics]) => {
+    return {
+      resource: toCollectorResource(resource, baseAttributes),
+      instrumentationLibraryMetrics: Array.from(
+        libMetrics,
+        ([instrumentationLibrary, metrics]) =>
+          toCollectorInstrumentationLibraryMetrics(
+            instrumentationLibrary,
+            metrics,
+            startTime
+          )
       ),
     };
   });
