@@ -23,7 +23,7 @@ import {
 } from '../../types';
 import { sendWithBeacon, sendWithXhr } from './util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/metrics';
 
 /**
  * Collector Metric Exporter for Web

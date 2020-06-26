@@ -49,7 +49,7 @@ const collectorOptions = {
   headers: {}, //an optional object containing custom headers to be sent with each request
 };
 
-const exporter = new MetricExporter(collectorOptions);
+const exporter = new CollectorMetricExporter(collectorOptions);
 
 // Register the exporter
 const meter = new MeterProvider({
@@ -142,7 +142,7 @@ The CollectorMetricExporter in Node expects the URL to only be the hostname. It 
 ```js
 const grpc = require('grpc');
 const { MeterProvider } = require('@opentelemetry/metrics');
-const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector');
 
 const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
@@ -158,7 +158,7 @@ const collectorOptions = {
   metadata // Optional metadata
 };
 
-const exporter = new MetricExporter(collectorOptions);
+const exporter = new CollectorMetricExporter(collectorOptions);
 
 // Register the exporter
 const meter = new MeterProvider({

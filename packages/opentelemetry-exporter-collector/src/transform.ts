@@ -348,7 +348,7 @@ export function toCollectorType(
     }
     return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_DOUBLE;
   } else {
-    // Other types not yet implemented
+    // @TODO: Implement other metric kinds
     return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
   }
 }
@@ -414,7 +414,7 @@ export function toCollectorMetric(
     int64DataPoints = [points];
   } else if (metric.descriptor.valueType === apiValueType.DOUBLE) {
     doubleDataPoints = [points];
-  }
+  } // @TODO: Implement support for histogram/distribution points
 
   return {
     metricDescriptor: toCollectorMetricDescriptor(metric),
