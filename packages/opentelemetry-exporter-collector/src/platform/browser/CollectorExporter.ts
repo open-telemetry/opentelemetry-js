@@ -37,7 +37,7 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
-  DEFAULT_HEADERS: { [key: string]: string } = {
+  DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
   private _headers: Record<string, string>;

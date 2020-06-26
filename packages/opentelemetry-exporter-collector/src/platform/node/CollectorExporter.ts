@@ -58,7 +58,7 @@ export class CollectorExporter extends CollectorExporterBase<
   traceServiceClient?: TraceServiceClient = undefined;
   grpcSpansQueue: GRPCQueueItem[] = [];
   metadata?: grpc.Metadata;
-  headers: { [key: string]: string };
+  headers: Record<string, string>;
   private readonly _protocol: CollectorProtocolNode;
 
   /**
