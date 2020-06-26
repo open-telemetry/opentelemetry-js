@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './CollectorTraceExporter';
+export * from './CollectorExporter';
 export * from './CollectorMetricExporter';
