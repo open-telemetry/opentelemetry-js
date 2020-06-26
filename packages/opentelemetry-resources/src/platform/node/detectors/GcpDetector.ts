@@ -24,7 +24,8 @@ import {
   K8S_RESOURCE,
   CONTAINER_RESOURCE,
 } from '../../../constants';
-import { ResourceDetectionConfig } from '../../../config';
+import { ResourceDetectionConfigWithLogger } from '../../../config';
+import { NoopLogger } from '@opentelemetry/core';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google
@@ -32,11 +33,11 @@ import { ResourceDetectionConfig } from '../../../config';
  * the instance. Returns an empty Resource if detection fails.
  */
 class GcpDetector implements Detector {
-  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
+  async detect(
+    config: ResourceDetectionConfigWithLogger = { logger: new NoopLogger() }
+  ): Promise<Resource> {
     if (!(await gcpMetadata.isAvailable())) {
-      if (config.logger) {
-        config.logger.debug('GcpDetector failed: GCP Metadata unavailable.');
-      }
+      config.logger.debug('GcpDetector failed: GCP Metadata unavailable.');
       return Resource.empty();
     }
 

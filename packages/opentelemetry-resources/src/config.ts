@@ -23,3 +23,9 @@ export interface ResourceDetectionConfig {
   /** Optional Logger. */
   logger?: Logger;
 }
+
+export interface ResourceDetectionConfigWithLogger
+  extends ResourceDetectionConfig {
+  /** Required Logger */
+  logger: Logger;
+}

@@ -15,7 +15,7 @@
  */
 
 import { Resource } from './Resource';
-import { ResourceDetectionConfig } from './config';
+import { ResourceDetectionConfigWithLogger } from './config';
 
 /** Interface for Resource labels  */
 export interface ResourceLabels {
@@ -27,5 +27,5 @@ export interface ResourceLabels {
  * a detector returns a Promise containing a Resource.
  */
 export interface Detector {
-  detect(config?: ResourceDetectionConfig): Promise<Resource>;
+  detect(config: ResourceDetectionConfigWithLogger): Promise<Resource>;
 }

@@ -17,9 +17,13 @@
 import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
 import { Detector } from '../../types';
-import { ResourceDetectionConfig } from '../../config';
+import {
+  ResourceDetectionConfig,
+  ResourceDetectionConfigWithLogger,
+} from '../../config';
 import { Logger } from '@opentelemetry/api';
 import * as util from 'util';
+import { NoopLogger } from '@opentelemetry/core';
 
 const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
@@ -32,16 +36,26 @@ const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 export const detectResources = async (
   config: ResourceDetectionConfig = {}
 ): Promise<Resource> => {
+  const internalConfig: ResourceDetectionConfigWithLogger = Object.assign(
+    {
+      logger: new NoopLogger(),
+    },
+    config
+  );
+
   const resources: Array<Resource> = await Promise.all(
     DETECTORS.map(d => {
       try {
-        return d.detect(config);
+        return d.detect(internalConfig);
       } catch {
         return Resource.empty();
       }
     })
   );
-  logResources(config.logger, resources);
+  // Log Resources only if there is a user-provided logger
+  if (config.logger) {
+    logResources(config.logger, resources);
+  }
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.createTelemetrySDKResource()
@@ -54,26 +68,21 @@ export const detectResources = async (
  * @param logger The logger to write the debug information to.
  * @param resources The array of resources that should be logged. Empty entried will be ignored.
  */
-const logResources = (
-  logger: Logger | undefined,
-  resources: Array<Resource>
-) => {
-  if (logger) {
-    resources.forEach((resource, index) => {
-      // Only print populated resources
-      if (Object.keys(resource.labels).length > 0) {
-        const resourceDebugString = util.inspect(resource.labels, {
-          depth: 2,
-          breakLength: Infinity,
-          sorted: true,
-          compact: false,
-        });
-        const detectorName = DETECTORS[index].constructor
-          ? DETECTORS[index].constructor.name
-          : 'Unknown detector';
-        logger.debug(`${detectorName} found resource.`);
-        logger.debug(resourceDebugString);
-      }
-    });
-  }
+const logResources = (logger: Logger, resources: Array<Resource>) => {
+  resources.forEach((resource, index) => {
+    // Print only populated resources
+    if (Object.keys(resource.labels).length > 0) {
+      const resourceDebugString = util.inspect(resource.labels, {
+        depth: 2,
+        breakLength: Infinity,
+        sorted: true,
+        compact: false,
+      });
+      const detectorName = DETECTORS[index].constructor
+        ? DETECTORS[index].constructor.name
+        : 'Unknown detector';
+      logger.debug(`${detectorName} found resource.`);
+      logger.debug(resourceDebugString);
+    }
+  });
 };

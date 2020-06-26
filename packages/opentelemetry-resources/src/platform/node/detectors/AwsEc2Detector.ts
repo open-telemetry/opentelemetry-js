@@ -18,7 +18,8 @@ import * as http from 'http';
 import { Resource } from '../../../Resource';
 import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
 import { Detector } from '../../../types';
-import { ResourceDetectionConfig } from '../../../config';
+import { ResourceDetectionConfigWithLogger } from '../../../config';
+import { NoopLogger } from '@opentelemetry/core';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2
@@ -40,7 +41,9 @@ class AwsEc2Detector implements Detector {
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
    */
-  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
+  async detect(
+    config: ResourceDetectionConfigWithLogger = { logger: new NoopLogger() }
+  ): Promise<Resource> {
     try {
       const {
         accountId,
@@ -58,9 +61,7 @@ class AwsEc2Detector implements Detector {
         [HOST_RESOURCE.TYPE]: instanceType,
       });
     } catch (e) {
-      if (config.logger) {
-        config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
-      }
+      config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
       return Resource.empty();
     }
   }

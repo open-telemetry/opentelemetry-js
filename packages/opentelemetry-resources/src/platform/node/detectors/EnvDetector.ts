@@ -16,7 +16,8 @@
 
 import { Resource } from '../../../Resource';
 import { Detector, ResourceLabels } from '../../../types';
-import { ResourceDetectionConfig } from '../../../config';
+import { ResourceDetectionConfigWithLogger } from '../../../config';
+import { NoopLogger } from '@opentelemetry/core';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -47,15 +48,15 @@ class EnvDetector implements Detector {
    * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
    * to conform to the Detector interface.
    */
-  async detect(config: ResourceDetectionConfig = {}): Promise<Resource> {
+  async detect(
+    config: ResourceDetectionConfigWithLogger = { logger: new NoopLogger() }
+  ): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) {
-        if (config.logger) {
-          config.logger.debug(
-            'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
-          );
-        }
+        config.logger.debug(
+          'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
+        );
         return Resource.empty();
       }
       const labels = this._parseResourceLabels(
@@ -63,9 +64,7 @@ class EnvDetector implements Detector {
       );
       return new Resource(labels);
     } catch (e) {
-      if (config.logger) {
-        config.logger.debug(`EnvDetector failed: ${e.message}`);
-      }
+      config.logger.debug(`EnvDetector failed: ${e.message}`);
       return Resource.empty();
     }
   }
