@@ -53,3 +53,12 @@ export interface PerformanceResourceTimingInfo {
   corsPreFlightRequest?: PerformanceResourceTiming;
   mainRequest?: PerformanceResourceTiming;
 }
+
+type PropagateTraceHeaderCorsUrl = string | RegExp;
+
+/**
+ * urls which should include trace headers when origin doesn't match
+ */
+export type PropagateTraceHeaderCorsUrls =
+  | PropagateTraceHeaderCorsUrl
+  | PropagateTraceHeaderCorsUrl[];

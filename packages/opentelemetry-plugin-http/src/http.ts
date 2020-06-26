@@ -40,7 +40,6 @@ import { Socket } from 'net';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
 import * as url from 'url';
-import { AttributeNames } from './enums/AttributeNames';
 import {
   Err,
   Func,
@@ -461,9 +460,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
       span = new NoRecordingSpan(spanContext);
     } else {
-      span = this._tracer
-        .startSpan(name, options)
-        .setAttribute(AttributeNames.COMPONENT, this.component);
+      span = this._tracer.startSpan(name, options);
     }
     this._spanNotEnded.add(span);
     return span;

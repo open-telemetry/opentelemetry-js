@@ -132,9 +132,9 @@ Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
@@ -142,6 +142,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
@@ -205,6 +206,7 @@ These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-
 ##### Core
 
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/plugin-fetch][otel-plugin-fetch]
 
 ##### Contrib
 
@@ -240,6 +242,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 
+[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
 [otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
 [otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
 [otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https

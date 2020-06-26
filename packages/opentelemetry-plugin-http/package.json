@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-http",
-  "version": "0.8.3",
+  "version": "0.9.0",
   "description": "OpenTelemetry http automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -32,6 +32,7 @@
   },
   "files": [
     "build/src/**/*.js",
+    "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
@@ -41,15 +42,15 @@
     "access": "public"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "^0.8.3",
-    "@opentelemetry/context-base": "^0.8.3",
-    "@opentelemetry/node": "^0.8.3",
-    "@opentelemetry/tracing": "^0.8.3",
+    "@opentelemetry/context-async-hooks": "^0.9.0",
+    "@opentelemetry/context-base": "^0.9.0",
+    "@opentelemetry/node": "^0.9.0",
+    "@opentelemetry/tracing": "^0.9.0",
     "@types/got": "9.6.11",
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.13",
+    "@types/node": "14.0.14",
     "@types/request-promise-native": "1.0.17",
-    "@types/semver": "7.2.0",
+    "@types/semver": "7.3.1",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "9.0.4",
     "@types/superagent": "4.1.7",
@@ -70,8 +71,9 @@
     "typescript": "3.9.5"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.8.3",
-    "@opentelemetry/core": "^0.8.3",
+    "@opentelemetry/api": "^0.9.0",
+    "@opentelemetry/core": "^0.9.0",
+    "@opentelemetry/semantic-conventions": "^0.9.0",
     "semver": "^7.1.3",
     "shimmer": "^1.2.1"
   }
