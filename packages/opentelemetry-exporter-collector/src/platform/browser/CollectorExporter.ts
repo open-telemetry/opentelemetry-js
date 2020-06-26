@@ -26,7 +26,7 @@ import * as collectorTypes from '../../types';
  * Collector Exporter Config for Web
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
+  headers?: Partial<Record<string, string>>;
 }
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
@@ -37,10 +37,10 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
-  DEFAULT_HEADERS: Record<string, string> = {
+  DEFAULT_HEADERS: Partial<Record<string, string>> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
-  private _headers: Record<string, string>;
+  private _headers: Partial<Record<string, string>>;
   private _useXHR: boolean = false;
 
   /**
@@ -120,7 +120,9 @@ export class CollectorExporter extends CollectorExporterBase<
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.setRequestHeader('Content-Type', 'application/json');
     Object.entries(this._headers).forEach(([k, v]) => {
-      xhr.setRequestHeader(k, v);
+      if (typeof v !== 'undefined') {
+        xhr.setRequestHeader(k, v);
+      }
     });
 
     xhr.send(body);

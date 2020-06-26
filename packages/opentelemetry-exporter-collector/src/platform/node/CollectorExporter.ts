@@ -41,7 +41,7 @@ import { GRPCQueueItem, TraceServiceClient } from './types';
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
-  headers?: Record<string, string>;
+  headers?: Partial<Record<string, string>>;
   protocolNode?: CollectorProtocolNode;
 }
 
@@ -51,14 +51,14 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
-  DEFAULT_HEADERS: { [key: string]: string } = {
+  DEFAULT_HEADERS: Partial<Record<string, string>> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
   grpcSpansQueue: GRPCQueueItem[] = [];
   metadata?: grpc.Metadata;
-  headers: Record<string, string>;
+  headers: Partial<Record<string, string>>;
   private readonly _protocol: CollectorProtocolNode;
 
   /**
