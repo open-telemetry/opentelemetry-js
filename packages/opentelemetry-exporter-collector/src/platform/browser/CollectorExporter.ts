@@ -21,12 +21,13 @@ import {
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
+import { parseHeaders } from '../../util';
 
 /**
  * Collector Exporter Config for Web
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  headers?: Partial<Record<string, string>>;
+  headers?: Partial<Record<string, unknown>>;
 }
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
@@ -37,10 +38,10 @@ const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
-  DEFAULT_HEADERS: Partial<Record<string, string>> = {
+  DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
-  private _headers: Partial<Record<string, string>>;
+  private _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
   /**
@@ -48,7 +49,8 @@ export class CollectorExporter extends CollectorExporterBase<
    */
   constructor(config: CollectorExporterConfig = {}) {
     super(config);
-    this._headers = config.headers || this.DEFAULT_HEADERS;
+    this._headers =
+      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
   }
@@ -120,9 +122,7 @@ export class CollectorExporter extends CollectorExporterBase<
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.setRequestHeader('Content-Type', 'application/json');
     Object.entries(this._headers).forEach(([k, v]) => {
-      if (typeof v !== 'undefined') {
-        xhr.setRequestHeader(k, v);
-      }
+      xhr.setRequestHeader(k, v);
     });
 
     xhr.send(body);

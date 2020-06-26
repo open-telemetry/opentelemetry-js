@@ -22,6 +22,7 @@ import {
 } from '../../CollectorExporterBase';
 import { CollectorProtocolNode } from '../../enums';
 import * as collectorTypes from '../../types';
+import { parseHeaders } from '../../util';
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
   onInitWithGrpc,
@@ -41,7 +42,7 @@ import { GRPCQueueItem, TraceServiceClient } from './types';
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
-  headers?: Partial<Record<string, string>>;
+  headers?: Partial<Record<string, unknown>>;
   protocolNode?: CollectorProtocolNode;
 }
 
@@ -51,14 +52,14 @@ export interface CollectorExporterConfig extends CollectorExporterConfigBase {
 export class CollectorExporter extends CollectorExporterBase<
   CollectorExporterConfig
 > {
-  DEFAULT_HEADERS: Partial<Record<string, string>> = {
+  DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
   isShutDown: boolean = false;
   traceServiceClient?: TraceServiceClient = undefined;
   grpcSpansQueue: GRPCQueueItem[] = [];
   metadata?: grpc.Metadata;
-  headers: Partial<Record<string, string>>;
+  headers: Record<string, string>;
   private readonly _protocol: CollectorProtocolNode;
 
   /**
@@ -79,7 +80,8 @@ export class CollectorExporter extends CollectorExporterBase<
       }
     }
     this.metadata = config.metadata;
-    this.headers = config.headers || this.DEFAULT_HEADERS;
+    this.headers =
+      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
   }
 
   onShutdown(): void {
