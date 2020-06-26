@@ -36,7 +36,7 @@ import { GRPCQueueItem, TraceServiceClient } from './types';
 
 /**
  * Collector Exporter Config for Node
- * headers will only work if useJson is set to true
+ * headers will only work if protocolNode is HTTP_JSON
  */
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
