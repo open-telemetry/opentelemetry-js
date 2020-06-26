@@ -241,7 +241,7 @@ describe('detectResources', async () => {
         assert.ok(
           callArgsContains(
             mockedLoggerMethod,
-            'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
+            'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
           )
         );
       });
