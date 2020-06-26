@@ -54,7 +54,7 @@ class EnvDetector implements Detector {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
       if (!labelString) {
         config.logger.debug(
-          'EnvDetector failed: Environmnet variable "OTEL_RESOURCE_LABELS" is missing.'
+          'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
         );
         return Resource.empty();
       }
