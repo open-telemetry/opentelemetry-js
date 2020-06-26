@@ -24,6 +24,10 @@ export interface ResourceDetectionConfig {
   logger?: Logger;
 }
 
+/**
+ * ResourceDetectionConfigWithLogger provides an interface for interacting with
+ * {@link ResourceDetectionConfig} instances that must have a logger defined.
+ */
 export interface ResourceDetectionConfigWithLogger
   extends ResourceDetectionConfig {
   /** Required Logger */

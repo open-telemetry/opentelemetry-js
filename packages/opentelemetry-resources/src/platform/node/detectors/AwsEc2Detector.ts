@@ -39,6 +39,8 @@ class AwsEc2Detector implements Detector {
    * populated with instance metadata as labels. Returns a promise containing an
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
+   *
+   * @param config The resource detection config with a required logger
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {

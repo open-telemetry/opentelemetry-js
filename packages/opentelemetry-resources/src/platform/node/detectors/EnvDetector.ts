@@ -46,6 +46,8 @@ class EnvDetector implements Detector {
    * Returns a {@link Resource} populated with labels from the
    * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
    * to conform to the Detector interface.
+   *
+   * @param config The resource detection config with a required logger
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {

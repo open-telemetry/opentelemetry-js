@@ -32,6 +32,14 @@ import { ResourceDetectionConfigWithLogger } from '../../../config';
  * the instance. Returns an empty Resource if detection fails.
  */
 class GcpDetector implements Detector {
+  /**
+   * Attempts to connect and obtain instance configuration data from the GCP metadata service.
+   * If the connection is succesful it returns a promise containing a {@link Resource}
+   * populated with instance metadata as labels. Returns a promise containing an
+   * empty {@link Resource} if the connection or parsing of the metadata fails.
+   *
+   * @param config The resource detection config with a required logger
+   */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     if (!(await gcpMetadata.isAvailable())) {
       config.logger.debug('GcpDetector failed: GCP Metadata unavailable.');

@@ -31,7 +31,7 @@ const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
  * Runs all resource detectors and returns the results merged into a single
  * Resource.
  *
- * @param config Configuration object for resource detection
+ * @param config Configuration for resource detection
  */
 export const detectResources = async (
   config: ResourceDetectionConfig = {}
@@ -65,8 +65,8 @@ export const detectResources = async (
 /**
  * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
  *
- * @param logger The logger to write the debug information to.
- * @param resources The array of resources that should be logged. Empty entried will be ignored.
+ * @param logger The {@link Logger} to write the debug information to.
+ * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
  */
 const logResources = (logger: Logger, resources: Array<Resource>) => {
   resources.forEach((resource, index) => {
