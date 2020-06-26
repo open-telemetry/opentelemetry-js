@@ -3,12 +3,12 @@
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
-const { CollectorExporter } = require('@opentelemetry/exporter-collector');
+const { CollectorExporter, CollectorTransportNode } = require('@opentelemetry/exporter-collector');
 
 const exporter = new CollectorExporter({
   logger: new ConsoleLogger(LogLevel.DEBUG),
   serviceName: 'basic-service',
-  // useJson: true,
+  protocol: CollectorTransportNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();

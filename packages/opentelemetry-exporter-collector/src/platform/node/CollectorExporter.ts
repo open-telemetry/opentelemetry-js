@@ -20,6 +20,7 @@ import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
 } from '../../CollectorExporterBase';
+import { CollectorProtocolNode } from '../../enums';
 import * as collectorTypes from '../../types';
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
@@ -40,8 +41,8 @@ import { GRPCQueueItem, TraceServiceClient } from './types';
 export interface CollectorExporterConfig extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
-  headers?: { [key: string]: string };
-  useJson?: boolean;
+  headers?: Record<string, string>;
+  protocolNode?: CollectorProtocolNode;
 }
 
 /**
@@ -58,15 +59,18 @@ export class CollectorExporter extends CollectorExporterBase<
   grpcSpansQueue: GRPCQueueItem[] = [];
   metadata?: grpc.Metadata;
   headers: { [key: string]: string };
-  private readonly _useJson: boolean = false;
+  private readonly _protocol: CollectorProtocolNode;
 
   /**
    * @param config
    */
   constructor(config: CollectorExporterConfig = {}) {
     super(config);
-    this._useJson = !!config.useJson;
-    if (this._useJson) {
+    this._protocol =
+      typeof config.protocolNode !== 'undefined'
+        ? config.protocolNode
+        : CollectorProtocolNode.GRPC;
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
       this.logger.debug('CollectorExporter - using json over http');
     } else {
       this.logger.debug('CollectorExporter - using grpc');
@@ -85,7 +89,7 @@ export class CollectorExporter extends CollectorExporterBase<
   onInit(config: CollectorExporterConfig): void {
     this.isShutDown = false;
 
-    if (config.useJson) {
+    if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
       onInitWithJson(this, config);
     } else {
       onInitWithGrpc(this, config);
@@ -100,7 +104,7 @@ export class CollectorExporter extends CollectorExporterBase<
     if (this.isShutDown) {
       return;
     }
-    if (this._useJson) {
+    if (this._protocol) {
       sendSpansUsingJson(this, spans, onSuccess, onError);
     } else {
       sendSpansUsingGrpc(this, spans, onSuccess, onError);
@@ -109,7 +113,7 @@ export class CollectorExporter extends CollectorExporterBase<
 
   getDefaultUrl(config: CollectorExporterConfig): string {
     if (!config.url) {
-      return config.useJson
+      return config.protocolNode === CollectorProtocolNode.HTTP_JSON
         ? DEFAULT_COLLECTOR_URL_JSON
         : DEFAULT_COLLECTOR_URL_GRPC;
     }

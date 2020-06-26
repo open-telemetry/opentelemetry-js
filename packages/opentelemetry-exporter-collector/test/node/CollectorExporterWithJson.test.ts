@@ -19,6 +19,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { CollectorProtocolNode } from '../../src/enums';
 import {
   CollectorExporter,
   CollectorExporterConfig,
@@ -59,7 +60,7 @@ describe('CollectorExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        useJson: true,
+        protocolNode: CollectorProtocolNode.HTTP_JSON,
         hostName: 'foo',
         logger: new core.NoopLogger(),
         serviceName: 'bar',
@@ -164,7 +165,9 @@ describe('CollectorExporter - node with json over http', () => {
   });
   describe('CollectorExporter - node (getDefaultUrl)', () => {
     it('should default to localhost', done => {
-      const collectorExporter = new CollectorExporter({ useJson: true });
+      const collectorExporter = new CollectorExporter({
+        protocolNode: CollectorProtocolNode.HTTP_JSON,
+      });
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter['url'],

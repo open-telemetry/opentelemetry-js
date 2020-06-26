@@ -40,7 +40,7 @@ export class CollectorExporter extends CollectorExporterBase<
   DEFAULT_HEADERS: { [key: string]: string } = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
-  private _headers: { [key: string]: string };
+  private _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
   /**
