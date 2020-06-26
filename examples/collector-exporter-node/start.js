@@ -8,7 +8,10 @@ const { CollectorExporter, CollectorTransportNode } = require('@opentelemetry/ex
 const exporter = new CollectorExporter({
   logger: new ConsoleLogger(LogLevel.DEBUG),
   serviceName: 'basic-service',
-  protocol: CollectorTransportNode.HTTP_JSON,
+  // headers: {
+  //   foo: 'bar'
+  // },
+  // protocol: CollectorTransportNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();

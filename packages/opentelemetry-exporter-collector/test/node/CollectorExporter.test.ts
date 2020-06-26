@@ -15,6 +15,7 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
+import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import * as grpc from 'grpc';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -136,6 +137,23 @@ const testCollectorExporter = (params: TestParams) =>
     afterEach(() => {
       exportedData = undefined;
       reqMetadata = undefined;
+    });
+
+    describe('instance', () => {
+      it('should warn about headers when using grpc', () => {
+        const logger = new ConsoleLogger(LogLevel.DEBUG);
+        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        collectorExporter = new CollectorExporter({
+          logger,
+          serviceName: 'basic-service',
+          url: address,
+          headers: {
+            foo: 'bar',
+          },
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
+      });
     });
 
     describe('export', () => {

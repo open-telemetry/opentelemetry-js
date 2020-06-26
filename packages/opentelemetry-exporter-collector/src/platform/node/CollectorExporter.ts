@@ -74,6 +74,9 @@ export class CollectorExporter extends CollectorExporterBase<
       this.logger.debug('CollectorExporter - using json over http');
     } else {
       this.logger.debug('CollectorExporter - using grpc');
+      if (config.headers) {
+        this.logger.warn('Headers cannot be set when using grpc');
+      }
     }
     this.metadata = config.metadata;
     this.headers = config.headers || this.DEFAULT_HEADERS;
@@ -104,7 +107,7 @@ export class CollectorExporter extends CollectorExporterBase<
     if (this.isShutDown) {
       return;
     }
-    if (this._protocol) {
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
       sendSpansUsingJson(this, spans, onSuccess, onError);
     } else {
       sendSpansUsingGrpc(this, spans, onSuccess, onError);
