@@ -11,7 +11,7 @@ const exporter = new CollectorExporter({
   // headers: {
   //   foo: 'bar'
   // },
-  // protocol: CollectorTransportNode.HTTP_JSON,
+  protocol: CollectorTransportNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();
