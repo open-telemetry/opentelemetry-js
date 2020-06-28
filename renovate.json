@@ -2,8 +2,27 @@
   "extends": [
     "config:base"
   ],
+  "packageRules": [
+    {
+      "minor": {
+        "groupName": "all non-major dependencies",
+        "groupSlug": "all-minor-patch"
+      }
+    }
+  ],
+  "ignoreDeps": [
+    "gcp-metadata",
+    "got",
+    "mocha",
+    "prom-client"
+  ],
+  "assignees": [
+    "@dyladan",
+    "@mayurkale22",
+    "@obecny"
+  ],
   "schedule": [
-    "after 9pm and before 5am"
+    "before 3am on Friday"
   ],
   "labels": ["dependencies"]
 }
