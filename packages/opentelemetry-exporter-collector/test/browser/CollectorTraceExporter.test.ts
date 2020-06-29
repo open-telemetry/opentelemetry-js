@@ -332,7 +332,7 @@ describe('CollectorExporter - browser (getDefaultUrl)', () => {
     setTimeout(() => {
       assert.strictEqual(
         collectorExporter['url'],
-        'http://localhost:55678/v1/trace'
+        'http://localhost:55680/v1/trace'
       );
       done();
     });

@@ -176,7 +176,7 @@ describe('CollectorExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'localhost:55678');
+      assert.strictEqual(collectorExporter['url'], 'localhost:55680');
       done();
     });
   });
