@@ -16,12 +16,12 @@ npm install --save @opentelemetry/exporter-collector
 
 ## Usage in Web
 
-The CollectorExporter in Web expects the endpoint to end in `/v1/trace`.
+The CollectorTraceExporter in Web expects the endpoint to end in `/v1/trace`.
 
 ```js
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { CollectorExporter } from '@opentelemetry/exporter-collector';
+import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55678/v1/trace
@@ -29,7 +29,7 @@ const collectorOptions = {
 };
 
 const provider = new WebTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
+const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
@@ -38,11 +38,11 @@ provider.register();
 
 ## Usage in Node
 
-The CollectorExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
+The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   serviceName: 'basic-service',
@@ -50,7 +50,7 @@ const collectorOptions = {
 };
 
 const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
+const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
@@ -63,7 +63,7 @@ By default, plaintext connection is used. In order to use TLS in Node.js, provid
 const fs = require('fs');
 const grpc = require('grpc');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   serviceName: 'basic-service',
@@ -76,7 +76,7 @@ const collectorOptions = {
 };
 
 const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
+const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
@@ -89,7 +89,7 @@ The exporter can be configured to send custom metadata with each request as in t
 ```js
 const grpc = require('grpc');
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
@@ -101,7 +101,7 @@ const collectorOptions = {
 };
 
 const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
+const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();

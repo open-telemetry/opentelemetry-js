@@ -1,7 +1,7 @@
 'use strict';
 
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { CollectorExporter } from '@opentelemetry/exporter-collector';
+import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { FetchPlugin } from '@opentelemetry/plugin-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
@@ -21,7 +21,7 @@ const provider = new WebTracerProvider({
 });
 
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+provider.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
 provider.register({
   contextManager: new ZoneContextManager(),
   propagator: new B3Propagator(),
