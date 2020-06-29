@@ -26,10 +26,7 @@ import {
   propagation,
   Span,
 } from '@opentelemetry/api';
-import {
-  RpcAttribute,
-  GeneralAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
 
@@ -91,8 +88,6 @@ export function patchServer(
                   .startSpan(spanName, spanOptions)
                   .setAttributes({
                     [RpcAttribute.GRPC_KIND]: spanOptions.kind,
-                    // @todo: component is deprecated
-                    [GeneralAttribute.COMPONENT]: GrpcJsPlugin.component,
                   });
 
                 plugin.tracer.withSpan(span, () => {

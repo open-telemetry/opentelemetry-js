@@ -23,10 +23,7 @@ import {
   Status,
   propagation,
 } from '@opentelemetry/api';
-import {
-  GeneralAttribute,
-  RpcAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import type * as grpcJs from '@grpc/grpc-js';
 import {
   grpcStatusCodeToSpanStatus,
@@ -68,12 +65,9 @@ export function getPatchedClientMethods(
     return function clientMethodTrace(this: grpcJs.Client) {
       const name = `grpc.${original.path.replace('/', '')}`;
       const args = Array.prototype.slice.call(arguments);
-      const span = plugin.tracer
-        .startSpan(name, {
-          kind: SpanKind.CLIENT,
-        })
-        // @todo: component attribute is deprecated
-        .setAttribute(GeneralAttribute.COMPONENT, GrpcJsPlugin.component);
+      const span = plugin.tracer.startSpan(name, {
+        kind: SpanKind.CLIENT,
+      });
       return plugin.tracer.withSpan(span, () =>
         makeGrpcClientRemoteCall(original, args, this, plugin)(span)
       );
