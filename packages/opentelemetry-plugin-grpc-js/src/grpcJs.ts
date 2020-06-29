@@ -31,27 +31,29 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
 
   readonly supportedVersions = ['1.*'];
 
+  constructor(readonly moduleName: string) {
+    super('@opentelemetry/plugin-grpc-js', VERSION);
+  }
+
   /**
    * @internal
    * Public reference to the protected BasePlugin `_tracer` instance to be used by this
    * plugin's external helper functions
    */
-  tracer: Tracer = this._tracer;
+  get tracer(): Tracer {
+    return this._tracer;
+  }
 
   /**
    * @internal
    * Public reference to the protected BasePlugin `_logger` instance to be used by this
    * plugin's external helper functions
    */
-  logger: Logger = this._logger;
-
-  constructor(readonly moduleName: string) {
-    super('@opentelemetry/plugin-grpc-js', VERSION);
+  get logger(): Logger {
+    return this._logger;
   }
 
   protected patch(): typeof grpcJs {
-    this.tracer = this._tracer;
-    this.logger = this._logger;
     // Patch Server methods
     shimmer.wrap(
       this._moduleExports.Server.prototype,
@@ -80,10 +82,6 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   }
 
   protected unpatch(): void {
-    // null these out to enable garbage collection in the future
-    (this.tracer as Tracer | null) = null;
-    (this.logger as Logger | null) = null;
-
     this._logger.debug(
       'removing patch to %s@%s',
       this.moduleName,
