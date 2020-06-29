@@ -17,7 +17,14 @@
 import { Attributes, TimedEvent } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as transform from '../../src/transform';
-import { ensureSpanIsCorrect, mockedReadableSpan } from '../helper';
+import {
+  ensureSpanIsCorrect,
+  mockedReadableSpan,
+  mockedResources,
+  mockedInstrumentationLibraries,
+  multiResourceTrace,
+  multiInstrumentationLibraryTrace,
+} from '../helper';
 import { Resource } from '@opentelemetry/resources';
 
 describe('transform', () => {
@@ -117,6 +124,47 @@ describe('transform', () => {
         ],
         droppedAttributesCount: 0,
       });
+    });
+  });
+
+  describe('groupSpansByResourceAndLibrary', () => {
+    it('should group by resource', () => {
+      const [resource1, resource2] = mockedResources;
+      const [instrumentationLibrary] = mockedInstrumentationLibraries;
+      const [span1, span2, span3] = multiResourceTrace;
+
+      const expected = new Map([
+        [resource1, new Map([[instrumentationLibrary, [span1]]])],
+        [resource2, new Map([[instrumentationLibrary, [span2, span3]]])],
+      ]);
+
+      const result = transform.groupSpansByResourceAndLibrary(
+        multiResourceTrace
+      );
+
+      assert.deepStrictEqual(result, expected);
+    });
+
+    it('should group by instrumentation library', () => {
+      const [resource] = mockedResources;
+      const [lib1, lib2] = mockedInstrumentationLibraries;
+      const [span1, span2, span3] = multiInstrumentationLibraryTrace;
+
+      const expected = new Map([
+        [
+          resource,
+          new Map([
+            [lib1, [span1, span2]],
+            [lib2, [span3]],
+          ]),
+        ],
+      ]);
+
+      const result = transform.groupSpansByResourceAndLibrary(
+        multiInstrumentationLibraryTrace
+      );
+
+      assert.deepStrictEqual(result, expected);
     });
   });
 });

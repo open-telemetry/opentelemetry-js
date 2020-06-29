@@ -199,6 +199,23 @@ describe('ZoneContextManager', () => {
         });
       });
     });
+
+    it('should fork new zone from active one', () => {
+      const context = Context.ROOT_CONTEXT;
+      const rootZone = Zone.current;
+      contextManager.with(context, () => {
+        const zone1 = Zone.current;
+        assert.ok(zone1.parent === rootZone);
+        contextManager.with(context, () => {
+          const zone2 = Zone.current;
+          contextManager.with(context, () => {
+            const zone3 = Zone.current;
+            assert.ok(zone3.parent === zone2);
+          });
+          assert.ok(zone2.parent === zone1);
+        });
+      });
+    });
   });
 
   describe('.bind(function)', () => {

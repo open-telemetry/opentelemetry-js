@@ -54,6 +54,7 @@ function getReadableSpan() {
     links: [],
     events: [],
     resource: Resource.empty(),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
   };
   return readableSpan;
 }
@@ -96,6 +97,21 @@ describe('ZipkinExporter', () => {
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
+    });
+    it('should construct an exporter with headers', () => {
+      const exporter = new ZipkinExporter({
+        headers: {
+          foo: 'bar',
+        },
+      });
+      interface ExporterWithHeaders {
+        _reqOpts: {
+          headers: { [key: string]: string };
+        };
+      }
+      const exporterWithHeaders = (exporter as unknown) as ExporterWithHeaders;
+
+      assert.ok(exporterWithHeaders._reqOpts.headers['foo'] === 'bar');
     });
   });
 
@@ -161,6 +177,7 @@ describe('ZipkinExporter', () => {
           },
         ],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -181,6 +198,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
       const exporter = new ZipkinExporter({
@@ -371,6 +389,7 @@ describe('ZipkinExporter', () => {
           },
         ],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -391,6 +410,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
       const exporter = new ZipkinExporter({});
@@ -443,6 +463,7 @@ describe('ZipkinExporter', () => {
         resource: new Resource({
           [SERVICE_RESOURCE.NAME]: resource_service_name,
         }),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
       const span2: ReadableSpan = {
         name: 'my-span',
@@ -463,6 +484,7 @@ describe('ZipkinExporter', () => {
         links: [],
         events: [],
         resource: Resource.empty(),
+        instrumentationLibrary: { name: 'default', version: '0.0.1' },
       };
 
       const exporter = new ZipkinExporter({});

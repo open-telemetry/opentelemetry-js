@@ -30,8 +30,6 @@ This package provides default implementations of the OpenTelemetry API for trace
 
 OpenTelemetry provides a text-based approach to propagate context to remote services using the [W3C Trace Context](https://www.w3.org/TR/trace-context/) HTTP headers.
 
-> This is used as a default Propagator
-
 ```js
 const api = require("@opentelemetry/api");
 const { HttpTraceContext } = require("@opentelemetry/core");
@@ -55,6 +53,8 @@ api.propagation.setGlobalPropagator(new B3Propagator());
 #### Composite Propagator
 
 Combines multiple propagators into a single propagator.
+
+> This is used as a default Propagator
 
 ```js
 const api = require("@opentelemetry/api");

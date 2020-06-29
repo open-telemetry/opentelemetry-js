@@ -13,10 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export const GeneralAttribute = {
-  // Not in spec
-  COMPONENT: 'component',
 
+/**
+ * General purpose networking attributes defined by the OpenTelemetry Semantic Conventions Specification
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/semantic_conventions/span-general.md
+ */
+export const GeneralAttribute = {
   NET_PEER_IP: 'net.peer.ip',
   NET_PEER_ADDRESS: 'net.peer.address',
   NET_PEER_HOSTNAME: 'net.peer.host',

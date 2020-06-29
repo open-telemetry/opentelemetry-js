@@ -48,7 +48,8 @@ prometheus --config.file=prometheus.yml
 
 If you are using the default configurations, the prometheus client will be available at <http://localhost:9090>
 
-<p align="center"><img src="images/prom-ui.png?raw=true"/></p>
+<p align="center"><img src="images/prom-counter.png?raw=true"/></p>
+<p align="center"><img src="images/prom-updowncounter.png?raw=true"/></p>
 
 ## Useful links
 
