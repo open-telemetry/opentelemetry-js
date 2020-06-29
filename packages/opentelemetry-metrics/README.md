@@ -18,7 +18,14 @@ npm install --save @opentelemetry/metrics
 
 ### Counter
 
-Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
+Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. It is restricted to non-negative increments.
+Example uses for Counter:
+
+- count the number of bytes received
+- count the number of requests completed
+- count the number of accounts created
+- count the number of checkpoints run
+- count the number of 5xx errors.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
@@ -35,6 +42,35 @@ const labels = { pid: process.pid };
 // Create a BoundInstrument associated with specified label values.
 const boundCounter = counter.bind(labels);
 boundCounter.add(10);
+
+```
+
+### UpDownCounter
+
+`UpDownCounter` is similar to `Counter` except that it supports negative increments. It is generally useful for capturing changes in an amount of resources used, or any quantity that rises and falls during a request.
+
+Example uses for UpDownCounter:
+
+- count the number of active requests
+- count memory in use by instrumenting new and delete
+- count queue size by instrumenting enqueue and dequeue
+- count semaphore up and down operations
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+// Initialize the Meter to capture measurements in various ways.
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+const counter = meter.createUpDownCounter('metric_name', {
+  description: 'Example of a UpDownCounter'
+});
+
+const labels = { pid: process.pid };
+
+// Create a BoundInstrument associated with specified label values.
+const boundCounter = counter.bind(labels);
+boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ```
 

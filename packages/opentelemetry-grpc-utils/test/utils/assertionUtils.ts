@@ -23,7 +23,6 @@ import {
   hrTimeToMilliseconds,
   hrTimeToMicroseconds,
 } from '@opentelemetry/core';
-import { GeneralAttribute } from '@opentelemetry/semantic-conventions';
 
 export const assertSpan = (
   component: string,
@@ -35,7 +34,6 @@ export const assertSpan = (
   assert.strictEqual(span.spanContext.spanId.length, 16);
   assert.strictEqual(span.kind, kind);
 
-  assert.strictEqual(span.attributes[GeneralAttribute.COMPONENT], component);
   assert.ok(span.endTime);
   assert.strictEqual(span.links.length, 0);
 

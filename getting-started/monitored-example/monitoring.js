@@ -20,7 +20,6 @@ const meter = new MeterProvider({
 }).getMeter('example-monitored');
 
 const requestCount = meter.createCounter("requests", {
-  monotonic: true,
   description: "Count all incoming requests"
 });
 

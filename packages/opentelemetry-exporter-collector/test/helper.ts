@@ -20,6 +20,7 @@ import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import * as grpc from 'grpc';
 
 if (typeof Buffer === 'undefined') {
@@ -106,7 +107,117 @@ export const mockedReadableSpan: ReadableSpan = {
     version: 1,
     cost: 112.12,
   }),
+  instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
+
+export const mockedResources: Resource[] = [
+  new Resource({ name: 'resource 1' }),
+  new Resource({ name: 'resource 2' }),
+];
+
+export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+  {
+    name: 'lib1',
+    version: '0.0.1',
+  },
+  {
+    name: 'lib2',
+    version: '0.0.2',
+  },
+];
+
+export const basicTrace: ReadableSpan[] = [
+  {
+    name: 'span1',
+    kind: 0,
+    spanContext: {
+      traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+      spanId: '5e107261f64fa53e',
+      traceFlags: TraceFlags.SAMPLED,
+    },
+    parentSpanId: '78a8915098864388',
+    startTime: [1574120165, 429803070],
+    endTime: [1574120165, 438688070],
+    ended: true,
+    status: { code: 0 },
+    attributes: {},
+    links: [],
+    events: [],
+    duration: [0, 8885000],
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    name: 'span2',
+    kind: 0,
+    spanContext: {
+      traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+      spanId: 'f64fa53e5e107261',
+      traceFlags: TraceFlags.SAMPLED,
+    },
+    parentSpanId: '78a8915098864388',
+    startTime: [1575120165, 439803070],
+    endTime: [1575120165, 448688070],
+    ended: true,
+    status: { code: 0 },
+    attributes: {},
+    links: [],
+    events: [],
+    duration: [0, 8775000],
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    name: 'span3',
+    kind: 0,
+    spanContext: {
+      traceId: '1f1008dc8e270e85c40a0d7c3939b278',
+      spanId: '07261f64fa53e5e1',
+      traceFlags: TraceFlags.SAMPLED,
+    },
+    parentSpanId: 'a891578098864388',
+    startTime: [1575120165, 439803070],
+    endTime: [1575120165, 448688070],
+    ended: true,
+    status: { code: 0 },
+    attributes: {},
+    links: [],
+    events: [],
+    duration: [0, 8775000],
+    resource: mockedResources[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+];
+
+export const multiResourceTrace: ReadableSpan[] = [
+  {
+    ...basicTrace[0],
+    resource: mockedResources[0],
+  },
+  {
+    ...basicTrace[1],
+    resource: mockedResources[1],
+  },
+  {
+    ...basicTrace[2],
+    resource: mockedResources[1],
+  },
+];
+
+export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
+  {
+    ...basicTrace[0],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    ...basicTrace[1],
+    instrumentationLibrary: mockedInstrumentationLibraries[0],
+  },
+  {
+    ...basicTrace[2],
+    instrumentationLibrary: mockedInstrumentationLibraries[1],
+  },
+];
 
 export function ensureExportedEventsAreCorrect(
   events: opentelemetryProto.trace.v1.Span.Event[]
