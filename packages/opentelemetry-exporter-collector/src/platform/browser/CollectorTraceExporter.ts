@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorExporterConfigBrowser } from '../../types';
 import * as collectorTypes from '../../types';
-
-/**
- * Collector Exporter Config for Web
- */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
-}
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
 
 /**
  * Collector Exporter for Web
  */
-export class CollectorExporter extends CollectorExporterBase<
-  CollectorExporterConfig
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
+  CollectorExporterConfigBrowser
 > {
   DEFAULT_HEADERS: { [key: string]: string } = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
@@ -46,7 +37,7 @@ export class CollectorExporter extends CollectorExporterBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
     this._headers = config.headers || this.DEFAULT_HEADERS;
     this._useXHR =

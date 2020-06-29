@@ -2,7 +2,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { CollectorExporter } from '@opentelemetry/exporter-collector';
+import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/core';
 
 const providerWithZone = new WebTracerProvider({
@@ -17,7 +17,7 @@ const providerWithZone = new WebTracerProvider({
 });
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
