@@ -20,6 +20,7 @@ import * as shimmer from 'shimmer';
 import { patchClient, patchLoadPackageDefinition } from './client';
 import { patchServer } from './server';
 import { VERSION } from './version';
+import { Tracer, Logger } from '@opentelemetry/api';
 
 /**
  * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
@@ -30,9 +31,19 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
 
   readonly supportedVersions = ['1.*'];
 
-  tracer = this._tracer;
+  /**
+   * @internal
+   * Public reference to the protected BasePlugin `_tracer` instance to be used by this
+   * plugin's external helper functions
+   */
+  tracer: Tracer = this._tracer;
 
-  logger = this._logger;
+  /**
+   * @internal
+   * Public reference to the protected BasePlugin `_logger` instance to be used by this
+   * plugin's external helper functions
+   */
+  logger: Logger = this._logger;
 
   constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-grpc-js', VERSION);
@@ -69,6 +80,10 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   }
 
   protected unpatch(): void {
+    // null these out to enable garbage collection in the future
+    (this.tracer as Tracer | null) = null;
+    (this.logger as Logger | null) = null;
+
     this._logger.debug(
       'removing patch to %s@%s',
       this.moduleName,
