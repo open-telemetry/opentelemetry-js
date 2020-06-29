@@ -17,25 +17,18 @@
 import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { opentelemetryProto, CollectorExporterError } from './types';
-
-/**
- * Collector Exporter base config
- */
-export interface CollectorExporterConfigBase {
-  hostName?: string;
-  logger?: Logger;
-  serviceName?: string;
-  attributes?: Attributes;
-  url?: string;
-}
+import {
+  opentelemetryProto,
+  CollectorExporterError,
+  CollectorExporterConfigBase,
+} from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
 
 /**
- * Collector Exporter abstract base class
+ * Collector Trace Exporter abstract base class
  */
-export abstract class CollectorExporterBase<
+export abstract class CollectorTraceExporterBase<
   T extends CollectorExporterConfigBase
 > implements SpanExporter {
   public readonly serviceName: string;
