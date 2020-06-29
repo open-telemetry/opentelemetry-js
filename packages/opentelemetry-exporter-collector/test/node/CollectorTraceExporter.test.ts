@@ -25,7 +25,7 @@ import {
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorExporter } from '../../src/platform/node';
+import { CollectorTraceExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -53,7 +53,7 @@ const testCollectorExporter = (params: TestParams) =>
   describe(`CollectorExporter - node ${
     params.useTLS ? 'with' : 'without'
   } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
-    let collectorExporter: CollectorExporter;
+    let collectorExporter: CollectorTraceExporter;
     let server: grpc.Server;
     let exportedData:
       | collectorTypes.opentelemetryProto.trace.v1.ResourceSpans
@@ -121,7 +121,7 @@ const testCollectorExporter = (params: TestParams) =>
             fs.readFileSync('./test/certs/client.crt')
           )
         : undefined;
-      collectorExporter = new CollectorExporter({
+      collectorExporter = new CollectorTraceExporter({
         serviceName: 'basic-service',
         url: address,
         credentials,
@@ -174,7 +174,7 @@ const testCollectorExporter = (params: TestParams) =>
 
 describe('CollectorExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
-    const collectorExporter = new CollectorExporter({});
+    const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], 'localhost:55678');
       done();
@@ -182,7 +182,7 @@ describe('CollectorExporter - node (getDefaultUrl)', () => {
   });
   it('should keep the URL if included', done => {
     const url = 'http://foo.bar.com';
-    const collectorExporter = new CollectorExporter({ url });
+    const collectorExporter = new CollectorTraceExporter({ url });
     setTimeout(() => {
       assert.strictEqual(collectorExporter['url'], url);
       done();

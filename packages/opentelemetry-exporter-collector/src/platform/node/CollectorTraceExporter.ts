@@ -20,40 +20,32 @@ import * as path from 'path';
 import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
-import { CollectorExporterError } from '../../types';
+  CollectorExporterError,
+  CollectorExporterConfigNode,
+} from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { GRPCQueueItem, TraceServiceClient } from './types';
+import { GRPCSpanQueueItem, ServiceClient } from './types';
 import { removeProtocol } from './util';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
 /**
- * Collector Exporter Config for Node
+ * Collector Trace Exporter for Node
  */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  credentials?: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
-}
-
-/**
- * Collector Exporter for Node
- */
-export class CollectorExporter extends CollectorExporterBase<
-  CollectorExporterConfig
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
+  CollectorExporterConfigNode
 > {
   isShutDown: boolean = false;
-  traceServiceClient?: TraceServiceClient = undefined;
-  grpcSpansQueue: GRPCQueueItem[] = [];
+  traceServiceClient?: ServiceClient = undefined;
+  grpcSpansQueue: GRPCSpanQueueItem[] = [];
   metadata?: grpc.Metadata;
 
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
     this.metadata = config.metadata;
   }
@@ -65,7 +57,7 @@ export class CollectorExporter extends CollectorExporterBase<
     }
   }
 
-  onInit(config: CollectorExporterConfig): void {
+  onInit(config: CollectorExporterConfigNode): void {
     this.isShutDown = false;
     this.grpcSpansQueue = [];
     const serverAddress = removeProtocol(this.url);
@@ -95,7 +87,7 @@ export class CollectorExporter extends CollectorExporterBase<
         );
         if (this.grpcSpansQueue.length > 0) {
           const queue = this.grpcSpansQueue.splice(0);
-          queue.forEach((item: GRPCQueueItem) => {
+          queue.forEach((item: GRPCSpanQueueItem) => {
             this.sendSpans(item.spans, item.onSuccess, item.onError);
           });
         }
@@ -108,6 +100,7 @@ export class CollectorExporter extends CollectorExporterBase<
     onError: (error: CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
+      this.logger.debug('Shutdown already started. Cannot send spans');
       return;
     }
     if (this.traceServiceClient) {
