@@ -27,7 +27,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
-} from './CollectorExporterBase';
+} from './CollectorTraceExporterBase';
 import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { InstrumentationLibrary } from '@opentelemetry/core';

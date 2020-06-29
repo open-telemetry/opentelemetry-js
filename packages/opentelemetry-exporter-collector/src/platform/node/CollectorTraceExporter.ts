@@ -23,7 +23,7 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
+} from '../../CollectorTraceExporterBase';
 import { CollectorExporterError } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { GRPCQueueItem, TraceServiceClient } from './types';

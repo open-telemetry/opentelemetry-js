@@ -21,7 +21,7 @@ import * as sinon from 'sinon';
 import {
   CollectorExporterBase,
   CollectorExporterConfigBase,
-} from '../../src/CollectorExporterBase';
+} from '../../src/CollectorTraceExporterBase';
 
 import { mockedReadableSpan } from '../helper';
 
