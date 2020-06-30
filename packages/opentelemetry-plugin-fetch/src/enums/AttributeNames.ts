@@ -28,4 +28,5 @@ export enum AttributeNames {
   HTTP_URL = 'http.url',
   HTTP_TARGET = 'http.target',
   HTTP_USER_AGENT = 'http.user_agent',
+  TRANSFER_SIZE = 'transferSize',
 }
