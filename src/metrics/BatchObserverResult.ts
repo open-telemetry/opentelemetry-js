@@ -13,20 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export interface MetricObservable {
+
+import { Labels } from './Metric';
+import { Observation } from './Observation';
+
+/**
+ * Interface that is being used in callback function for Observer Metric
+ * for batch
+ */
+export interface BatchObserverResult {
   /**
-   * Sets the next value for observable metric
-   * @param value
+   * Used to observe (update) observations for certain labels
+   * @param labels
+   * @param observations
    */
-  next: (value: number) => void;
-  /**
-   * Subscribes for every value change
-   * @param callback
-   */
-  subscribe: (callback: (value: number) => void) => void;
-  /**
-   * Removes the subscriber
-   * @param [callback]
-   */
-  unsubscribe: (callback?: (value: number) => void) => void;
+  observe(labels: Labels, observations: Observation[]): void;
 }

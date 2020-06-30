@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { Labels } from './Metric';
+import { BaseObserver } from './Metric';
 
 /**
- * Interface that is being used in callback function for Observer Metric
+ * Interface for updating value of certain value observer
  */
-export interface ObserverResult {
-  observe(value: number, labels: Labels): void;
+export interface Observation {
+  observer: BaseObserver;
+  value: number;
 }
