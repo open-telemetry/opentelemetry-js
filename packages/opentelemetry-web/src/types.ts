@@ -33,6 +33,7 @@ export type PerformanceEntries = {
   [PerformanceTimingNames.RESPONSE_END]?: number;
   [PerformanceTimingNames.RESPONSE_START]?: number;
   [PerformanceTimingNames.SECURE_CONNECTION_START]?: number;
+  [PerformanceTimingNames.TRANSFER_SIZE]?: number;
   [PerformanceTimingNames.UNLOAD_EVENT_END]?: number;
   [PerformanceTimingNames.UNLOAD_EVENT_START]?: number;
 };
