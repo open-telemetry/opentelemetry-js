@@ -19,27 +19,24 @@ import * as http from 'http';
 import * as https from 'https';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import {
-  CollectorExporter,
-  CollectorExporterConfig,
-} from './CollectorExporter';
+import { CollectorTraceExporter } from './CollectorTraceExporter';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55678/v1/trace';
+export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
 
 export function onInitWithJson(
-  _collector: CollectorExporter,
-  _config: CollectorExporterConfig
+  _collector: CollectorTraceExporter,
+  _config: collectorTypes.CollectorExporterConfigNode
 ): void {
   // nothing to be done for json yet
 }
 
 export function sendSpansUsingJson(
-  collector: CollectorExporter,
+  collector: CollectorTraceExporter,
   spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (error: CollectorExporterError) => void
+  onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
   const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
     spans,

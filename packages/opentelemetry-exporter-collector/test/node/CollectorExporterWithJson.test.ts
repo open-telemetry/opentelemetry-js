@@ -20,10 +20,7 @@ import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorProtocolNode } from '../../src/enums';
-import {
-  CollectorExporter,
-  CollectorExporterConfig,
-} from '../../src/platform/node';
+import { CollectorTraceExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -47,8 +44,8 @@ const mockResError = {
 };
 
 describe('CollectorExporter - node with json over http', () => {
-  let collectorExporter: CollectorExporter;
-  let collectorExporterConfig: CollectorExporterConfig;
+  let collectorExporter: CollectorTraceExporter;
+  let collectorExporterConfig: collectorTypes.CollectorExporterConfigNode;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -67,7 +64,7 @@ describe('CollectorExporter - node with json over http', () => {
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
     });
@@ -163,9 +160,9 @@ describe('CollectorExporter - node with json over http', () => {
       });
     });
   });
-  describe('CollectorExporter - node (getDefaultUrl)', () => {
+  describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
     it('should default to localhost', done => {
-      const collectorExporter = new CollectorExporter({
+      const collectorExporter = new CollectorTraceExporter({
         protocolNode: CollectorProtocolNode.HTTP_JSON,
       });
       setTimeout(() => {
@@ -179,7 +176,7 @@ describe('CollectorExporter - node with json over http', () => {
 
     it('should keep the URL if included', done => {
       const url = 'http://foo.bar.com';
-      const collectorExporter = new CollectorExporter({ url });
+      const collectorExporter = new CollectorTraceExporter({ url });
       setTimeout(() => {
         assert.strictEqual(collectorExporter['url'], url);
         done();

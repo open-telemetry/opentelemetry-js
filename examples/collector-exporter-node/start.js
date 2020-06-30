@@ -1,21 +1,20 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
-const { CollectorExporter, CollectorTransportNode } = require('@opentelemetry/exporter-collector');
+const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorTraceExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
 
-const exporter = new CollectorExporter({
-  logger: new ConsoleLogger(LogLevel.DEBUG),
+const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
   // headers: {
   //   foo: 'bar'
   // },
-  protocol: CollectorTransportNode.HTTP_JSON,
+  protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 provider.register();
 
 const tracer = opentelemetry.trace.getTracer('example-collector-exporter-node');

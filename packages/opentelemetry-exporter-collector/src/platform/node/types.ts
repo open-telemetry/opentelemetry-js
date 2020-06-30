@@ -22,16 +22,16 @@ import { CollectorExporterError } from '../../types';
  * Queue item to be used to save temporary spans in case the GRPC service
  * hasn't been fully initialised yet
  */
-export interface GRPCQueueItem {
+export interface GRPCSpanQueueItem {
   spans: ReadableSpan[];
   onSuccess: () => void;
   onError: (error: CollectorExporterError) => void;
 }
 
 /**
- * Trace Service Client for sending spans
+ * Service Client for sending spans or metrics
  */
-export interface TraceServiceClient extends grpc.Client {
+export interface ServiceClient extends grpc.Client {
   export: (
     request: any,
     metadata: grpc.Metadata | undefined,

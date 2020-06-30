@@ -14,29 +14,20 @@
  * limitations under the License.
  */
 
-import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorExporterConfigBrowser } from '../../types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 
-/**
- * Collector Exporter Config for Web
- */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  headers?: Partial<Record<string, unknown>>;
-}
-
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55678/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
 
 /**
  * Collector Exporter for Web
  */
-export class CollectorExporter extends CollectorExporterBase<
-  CollectorExporterConfig
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
+  CollectorExporterConfigBrowser
 > {
   DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
@@ -47,7 +38,7 @@ export class CollectorExporter extends CollectorExporterBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
     this._headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
@@ -63,7 +54,7 @@ export class CollectorExporter extends CollectorExporterBase<
     window.removeEventListener('unload', this.shutdown);
   }
 
-  getDefaultUrl(config: CollectorExporterConfig) {
+  getDefaultUrl(config: CollectorExporterConfigBrowser) {
     return config.url || DEFAULT_COLLECTOR_URL;
   }
 

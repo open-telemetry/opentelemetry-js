@@ -16,13 +16,12 @@
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as grpc from 'grpc';
-import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../CollectorExporterBase';
-import { CollectorProtocolNode } from '../../enums';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import * as collectorTypes from '../../types';
+
+import { CollectorProtocolNode } from '../../enums';
 import { parseHeaders } from '../../util';
+import { GRPCSpanQueueItem, ServiceClient } from './types';
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
   onInitWithGrpc,
@@ -33,31 +32,19 @@ import {
   onInitWithJson,
   sendSpansUsingJson,
 } from './utilWithJson';
-import { GRPCQueueItem, TraceServiceClient } from './types';
 
 /**
- * Collector Exporter Config for Node
- * headers will only work if protocolNode is HTTP_JSON
+ * Collector Trace Exporter for Node
  */
-export interface CollectorExporterConfig extends CollectorExporterConfigBase {
-  credentials?: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
-  headers?: Partial<Record<string, unknown>>;
-  protocolNode?: CollectorProtocolNode;
-}
-
-/**
- * Collector Exporter for Node
- */
-export class CollectorExporter extends CollectorExporterBase<
-  CollectorExporterConfig
+export class CollectorTraceExporter extends CollectorTraceExporterBase<
+  collectorTypes.CollectorExporterConfigNode
 > {
   DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
   isShutDown: boolean = false;
-  traceServiceClient?: TraceServiceClient = undefined;
-  grpcSpansQueue: GRPCQueueItem[] = [];
+  traceServiceClient?: ServiceClient = undefined;
+  grpcSpansQueue: GRPCSpanQueueItem[] = [];
   metadata?: grpc.Metadata;
   headers: Record<string, string>;
   private readonly _protocol: CollectorProtocolNode;
@@ -65,7 +52,7 @@ export class CollectorExporter extends CollectorExporterBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfig = {}) {
+  constructor(config: collectorTypes.CollectorExporterConfigNode = {}) {
     super(config);
     this._protocol =
       typeof config.protocolNode !== 'undefined'
@@ -91,7 +78,7 @@ export class CollectorExporter extends CollectorExporterBase<
     }
   }
 
-  onInit(config: CollectorExporterConfig): void {
+  onInit(config: collectorTypes.CollectorExporterConfigNode): void {
     this.isShutDown = false;
 
     if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
@@ -107,6 +94,7 @@ export class CollectorExporter extends CollectorExporterBase<
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
+      this.logger.debug('Shutdown already started. Cannot send spans');
       return;
     }
     if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
@@ -116,7 +104,7 @@ export class CollectorExporter extends CollectorExporterBase<
     }
   }
 
-  getDefaultUrl(config: CollectorExporterConfig): string {
+  getDefaultUrl(config: collectorTypes.CollectorExporterConfigNode): string {
     if (!config.url) {
       return config.protocolNode === CollectorProtocolNode.HTTP_JSON
         ? DEFAULT_COLLECTOR_URL_JSON

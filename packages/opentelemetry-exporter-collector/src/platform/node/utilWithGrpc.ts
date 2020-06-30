@@ -20,20 +20,16 @@ import * as path from 'path';
 import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import {
-  CollectorExporter,
-  CollectorExporterConfig,
-} from './CollectorExporter';
-import { GRPCQueueItem } from './types';
+import { CollectorTraceExporter } from './CollectorTraceExporter';
+import { GRPCSpanQueueItem } from './types';
 import { removeProtocol } from './util';
 
-export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55678';
+export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 
 export function onInitWithGrpc(
-  collector: CollectorExporter,
-  config: CollectorExporterConfig
+  collector: CollectorTraceExporter,
+  config: collectorTypes.CollectorExporterConfigNode
 ): void {
   collector.grpcSpansQueue = [];
   const serverAddress = removeProtocol(collector.url);
@@ -61,7 +57,7 @@ export function onInitWithGrpc(
       );
       if (collector.grpcSpansQueue.length > 0) {
         const queue = collector.grpcSpansQueue.splice(0);
-        queue.forEach((item: GRPCQueueItem) => {
+        queue.forEach((item: GRPCSpanQueueItem) => {
           collector.sendSpans(item.spans, item.onSuccess, item.onError);
         });
       }
@@ -69,10 +65,10 @@ export function onInitWithGrpc(
 }
 
 export function sendSpansUsingGrpc(
-  collector: CollectorExporter,
+  collector: CollectorTraceExporter,
   spans: ReadableSpan[],
   onSuccess: () => void,
-  onError: (error: CollectorExporterError) => void
+  onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
   if (collector.traceServiceClient) {
     const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(

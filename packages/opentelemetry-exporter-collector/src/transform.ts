@@ -24,11 +24,12 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorTraceExporterBase } from './CollectorTraceExporterBase';
 import {
-  CollectorExporterBase,
+  COLLECTOR_SPAN_KIND_MAPPING,
+  opentelemetryProto,
   CollectorExporterConfigBase,
-} from './CollectorExporterBase';
-import { COLLECTOR_SPAN_KIND_MAPPING, opentelemetryProto } from './types';
+} from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
 import { InstrumentationLibrary } from '@opentelemetry/core';
 
@@ -194,14 +195,12 @@ export function toCollectorTraceState(
  * Prepares trace service request to be sent to collector
  * @param spans spans
  * @param collectorExporterBase
- * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   spans: ReadableSpan[],
-  collectorExporterBase: CollectorExporterBase<T>,
-  name = ''
+  collectorExporterBase: CollectorTraceExporterBase<T>
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<
     Resource,
