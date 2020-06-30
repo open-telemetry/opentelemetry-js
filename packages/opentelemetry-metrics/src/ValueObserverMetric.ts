@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
 import { Batcher } from './export/Batcher';
@@ -27,6 +28,7 @@ export class ValueObserverMetric extends BaseObserverMetric
     options: api.MetricOptions,
     batcher: Batcher,
     resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => void
   ) {
     super(
@@ -35,6 +37,7 @@ export class ValueObserverMetric extends BaseObserverMetric
       batcher,
       resource,
       MetricKind.VALUE_OBSERVER,
+      instrumentationLibrary,
       callback
     );
   }

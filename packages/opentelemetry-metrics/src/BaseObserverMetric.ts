@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import * as api from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundObserver } from './BoundInstrument';
 import { Batcher } from './export/Batcher';
@@ -37,9 +38,10 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
     private readonly _batcher: Batcher,
     resource: Resource,
     metricKind: MetricKind,
+    instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => void
   ) {
-    super(name, options, metricKind, resource);
+    super(name, options, metricKind, resource, instrumentationLibrary);
     this._callback = callback || NOOP_CALLBACK;
   }
 

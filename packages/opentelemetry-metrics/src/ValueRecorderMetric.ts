@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundValueRecorder } from './BoundInstrument';
 import { Batcher } from './export/Batcher';
@@ -30,9 +31,16 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.VALUE_RECORDER, resource);
+    super(
+      name,
+      options,
+      MetricKind.VALUE_RECORDER,
+      resource,
+      instrumentationLibrary
+    );
 
     this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }

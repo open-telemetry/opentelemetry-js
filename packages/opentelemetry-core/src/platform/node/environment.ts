@@ -14,27 +14,17 @@
  * limitations under the License.
  */
 
-import * as grpc from 'grpc';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import {
+  DEFAULT_ENVIRONMENT,
+  ENVIRONMENT,
+  ENVIRONMENT_MAP,
+  parseEnvironment,
+} from '../../utils/environment';
 
 /**
- * Queue item to be used to save temporary spans in case the GRPC service
- * hasn't been fully initialised yet
+ * Gets the environment variables
  */
-export interface GRPCSpanQueueItem {
-  spans: ReadableSpan[];
-  onSuccess: () => void;
-  onError: (error: CollectorExporterError) => void;
-}
-
-/**
- * Service Client for sending spans or metrics
- */
-export interface ServiceClient extends grpc.Client {
-  export: (
-    request: any,
-    metadata: grpc.Metadata | undefined,
-    callback: Function
-  ) => {};
+export function getEnv(): ENVIRONMENT {
+  const processEnv = parseEnvironment(process.env as ENVIRONMENT_MAP);
+  return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
 }

@@ -252,7 +252,6 @@ import { Metric, BoundCounter } from '@opentelemetry/api';
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
-  monotonic: true,
   description: "Count all incoming requests"
 });
 
@@ -321,7 +320,6 @@ const meter = new MeterProvider({
 }).getMeter('your-meter-name');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
-  monotonic: true,
   description: "Count all incoming requests"
 });
 

@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BoundCounter } from './BoundInstrument';
 import { Batcher } from './export/Batcher';
@@ -27,9 +28,10 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.COUNTER, resource);
+    super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
   }
   protected _makeInstrument(labels: api.Labels): BoundCounter {
     return new BoundCounter(

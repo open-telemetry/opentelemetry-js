@@ -110,6 +110,18 @@ describe('Meter', () => {
       assert.ok(record.resource instanceof Resource);
     });
 
+    it('should pipe through instrumentation library', async () => {
+      const counter = meter.createCounter('name') as CounterMetric;
+      assert.ok(counter.instrumentationLibrary);
+
+      counter.add(1, { foo: 'bar' });
+
+      const [record] = await counter.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
+    });
+
     describe('.bind()', () => {
       it('should create a counter instrument', async () => {
         const counter = meter.createCounter('name') as CounterMetric;
@@ -497,6 +509,20 @@ describe('Meter', () => {
       assert.ok(record.resource instanceof Resource);
     });
 
+    it('should pipe through instrumentation library', async () => {
+      const valueRecorder = meter.createValueRecorder(
+        'name'
+      ) as ValueRecorderMetric;
+      assert.ok(valueRecorder.instrumentationLibrary);
+
+      valueRecorder.record(1, { foo: 'bar' });
+
+      const [record] = await valueRecorder.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
+    });
+
     describe('names', () => {
       it('should return no op metric if name is an empty string', () => {
         const valueRecorder = meter.createValueRecorder('');
@@ -843,6 +869,22 @@ describe('Meter', () => {
       );
 
       meter.collect();
+    });
+
+    it('should pipe through instrumentation library', async () => {
+      const observer = meter.createValueObserver(
+        'name',
+        {},
+        (observerResult: api.ObserverResult) => {
+          observerResult.observe(42, { foo: 'bar' });
+        }
+      ) as ValueObserverMetric;
+      assert.ok(observer.instrumentationLibrary);
+
+      const [record] = await observer.getMetricRecord();
+      const { name, version } = record.instrumentationLibrary;
+      assert.strictEqual(name, 'test-meter');
+      assert.strictEqual(version, '*');
     });
   });
 

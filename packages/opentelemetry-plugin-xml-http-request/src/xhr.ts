@@ -22,10 +22,7 @@ import {
   isWrapped,
   otperformance,
 } from '@opentelemetry/core';
-import {
-  HttpAttribute,
-  GeneralAttribute,
-} from '@opentelemetry/semantic-conventions';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 import {
   addSpanNetworkEvents,
   getResource,
@@ -279,7 +276,6 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
     const currentSpan = this._tracer.startSpan(url, {
       kind: api.SpanKind.CLIENT,
       attributes: {
-        [GeneralAttribute.COMPONENT]: this.component,
         [HttpAttribute.HTTP_METHOD]: method,
         [HttpAttribute.HTTP_URL]: url,
       },

@@ -19,6 +19,7 @@ import { Resource } from '@opentelemetry/resources';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { MetricDescriptor, MetricKind, MetricRecord } from './export/types';
 import { hashLabels } from './Utils';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /** This is a SDK implementation of {@link Metric} interface. */
 export abstract class Metric<T extends BaseBoundInstrument>
@@ -33,7 +34,8 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
-    readonly resource: Resource
+    readonly resource: Resource,
+    readonly instrumentationLibrary: InstrumentationLibrary
   ) {
     this._disabled = !!_options.disabled;
     this._valueType =
@@ -83,6 +85,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
           labels: instrument.getLabels(),
           aggregator: instrument.getAggregator(),
           resource: this.resource,
+          instrumentationLibrary: this.instrumentationLibrary,
         }))
       );
     });

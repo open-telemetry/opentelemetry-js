@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserverResult } from './BatchObserverResult';
 import { BoundObserver } from './BoundInstrument';
@@ -36,9 +37,10 @@ export class BatchObserverMetric extends Metric<BoundObserver>
     options: api.BatchMetricOptions,
     private readonly _batcher: Batcher,
     resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {
-    super(name, options, MetricKind.OBSERVER, resource);
+    super(name, options, MetricKind.OBSERVER, resource, instrumentationLibrary);
     this._maxTimeoutUpdateMS =
       options.maxTimeoutUpdateMS ?? MAX_TIMEOUT_UPDATE_MS;
     this._callback = callback || NOOP_CALLBACK;

@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ConsoleLogger } from '@opentelemetry/core';
+import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
@@ -38,14 +38,19 @@ export class Meter implements api.Meter {
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
   private readonly _resource: Resource;
+  private readonly _instrumentationLibrary: InstrumentationLibrary;
 
   /**
    * Constructs a new Meter instance.
    */
-  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+  constructor(
+    instrumentationLibrary: InstrumentationLibrary,
+    config: MeterConfig = DEFAULT_CONFIG
+  ) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = config.batcher ?? new UngroupedBatcher();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
+    this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
     const exporter = config.exporter || new NoopExporter();
     const interval = config.interval;
@@ -78,7 +83,8 @@ export class Meter implements api.Meter {
       name,
       opt,
       this._batcher,
-      this._resource
+      this._resource,
+      this._instrumentationLibrary
     );
     this._registerMetric(name, valueRecorder);
     return valueRecorder;
@@ -103,7 +109,13 @@ export class Meter implements api.Meter {
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const counter = new CounterMetric(name, opt, this._batcher, this._resource);
+    const counter = new CounterMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource,
+      this._instrumentationLibrary
+    );
     this._registerMetric(name, counter);
     return counter;
   }
@@ -137,7 +149,8 @@ export class Meter implements api.Meter {
       name,
       opt,
       this._batcher,
-      this._resource
+      this._resource,
+      this._instrumentationLibrary
     );
     this._registerMetric(name, upDownCounter);
     return upDownCounter;
@@ -170,6 +183,7 @@ export class Meter implements api.Meter {
       opt,
       this._batcher,
       this._resource,
+      this._instrumentationLibrary,
       callback
     );
     this._registerMetric(name, valueObserver);
@@ -203,6 +217,7 @@ export class Meter implements api.Meter {
       opt,
       this._batcher,
       this._resource,
+      this._instrumentationLibrary,
       callback
     );
     this._registerMetric(name, batchObserver);

@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import { BoundUpDownCounter } from './BoundInstrument';
 import { MetricKind } from './export/types';
 import { Batcher } from './export/Batcher';
@@ -28,9 +29,16 @@ export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource
+    resource: Resource,
+    instrumentationLibrary: InstrumentationLibrary
   ) {
-    super(name, options, MetricKind.UP_DOWN_COUNTER, resource);
+    super(
+      name,
+      options,
+      MetricKind.UP_DOWN_COUNTER,
+      resource,
+      instrumentationLibrary
+    );
   }
   protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
     return new BoundUpDownCounter(
