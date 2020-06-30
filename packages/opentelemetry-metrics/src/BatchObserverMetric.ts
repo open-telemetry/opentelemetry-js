@@ -40,7 +40,13 @@ export class BatchObserverMetric extends Metric<BoundObserver>
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {
-    super(name, options, MetricKind.OBSERVER, resource, instrumentationLibrary);
+    super(
+      name,
+      options,
+      MetricKind.VALUE_OBSERVER,
+      resource,
+      instrumentationLibrary
+    );
     this._maxTimeoutUpdateMS =
       options.maxTimeoutUpdateMS ?? MAX_TIMEOUT_UPDATE_MS;
     this._callback = callback || NOOP_CALLBACK;

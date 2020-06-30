@@ -84,7 +84,6 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 meter.createValueObserver('cpu_core_usage', {
-  monotonic: false,
   description: 'Example of a sync observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { core: '1' });
@@ -120,14 +119,10 @@ const meter = new MeterProvider({
 }).getMeter('example-observer');
 
 const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
-  monotonic: false,
-  labelKeys: ['app'],
   description: 'CPU',
 });
 
 const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
-  monotonic: false,
-  labelKeys: ['app'],
   description: 'Memory',
 });
 

@@ -211,7 +211,6 @@ export class PrometheusExporter implements MetricExporter {
       // case MetricKind.VALUE_RECORDER:
       // case MetricKind.SUM_OBSERVER:
       // case MetricKind.UP_DOWN_SUM_OBSERVER:
-      case MetricKind.OBSERVER: // deprecated
       case MetricKind.VALUE_OBSERVER:
         return new Gauge(metricObject);
       default:
