@@ -118,7 +118,7 @@ const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/e
 const collectorOptions = {
   protocolNode: CollectorTransportNode.HTTP_JSON,
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
   headers: {
     foo: 'bar'
   }, //an optional object containing custom headers to be sent with each request will only work with json over http
