@@ -67,20 +67,16 @@ export abstract class CollectorMetricExporterBase<
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch(
-        (
-          error: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
-          if (error.message) {
-            this.logger.error(error.message);
-          }
-          if (error.code && error.code < 500) {
-            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-          } else {
-            resultCallback(ExportResult.FAILED_RETRYABLE);
-          }
+      .catch((error: collectorTypes.ExportServiceError) => {
+        if (error.message) {
+          this.logger.error(error.message);
         }
-      );
+        if (error.code && error.code < 500) {
+          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+        } else {
+          resultCallback(ExportResult.FAILED_RETRYABLE);
+        }
+      });
   }
 
   private _exportMetrics(metrics: MetricRecord[]): Promise<unknown> {

@@ -18,9 +18,9 @@ import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import {
-  opentelemetryProto,
   CollectorExporterError,
   CollectorExporterConfigBase,
+  ExportServiceError,
 } from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
@@ -76,20 +76,16 @@ export abstract class CollectorTraceExporterBase<
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch(
-        (
-          error: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
-          if (error.message) {
-            this.logger.error(error.message);
-          }
-          if (error.code && error.code < 500) {
-            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-          } else {
-            resultCallback(ExportResult.FAILED_RETRYABLE);
-          }
+      .catch((error: ExportServiceError) => {
+        if (error.message) {
+          this.logger.error(error.message);
         }
-      );
+        if (error.code && error.code < 500) {
+          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+        } else {
+          resultCallback(ExportResult.FAILED_RETRYABLE);
+        }
+      });
   }
 
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {

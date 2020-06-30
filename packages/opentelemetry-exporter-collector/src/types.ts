@@ -32,14 +32,6 @@ export namespace opentelemetryProto {
       export interface ExportTraceServiceRequest {
         resourceSpans: opentelemetryProto.trace.v1.ResourceSpans[];
       }
-
-      export interface ExportTraceServiceError {
-        code: number;
-        details: string;
-        metadata: { [key: string]: unknown };
-        message: string;
-        stack: string;
-      }
     }
   }
 
@@ -169,6 +161,17 @@ export interface CollectorExporterError {
   code?: number;
   message?: string;
   stack?: string;
+}
+
+/**
+ * Interface for handling export service errors
+ */
+export interface ExportServiceError {
+  code: number;
+  details: string;
+  metadata: { [key: string]: unknown };
+  message: string;
+  stack: string;
 }
 
 /**
