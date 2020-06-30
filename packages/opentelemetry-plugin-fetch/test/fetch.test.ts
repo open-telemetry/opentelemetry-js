@@ -301,7 +301,7 @@ describe('fetch', () => {
         `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
       );
       assert.ok(
-        (attributes[keys[8]] as Number) > 0,
+        (attributes[keys[8]] as number) > 0,
         `attributes ${AttributeNames.TRANSFER_SIZE} is <= 0`
       );
 

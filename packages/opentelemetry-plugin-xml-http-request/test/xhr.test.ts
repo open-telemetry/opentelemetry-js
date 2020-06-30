@@ -291,8 +291,8 @@ describe('xhr', () => {
             `attributes ${HttpAttribute.HTTP_URL} is wrong`
           );
           assert.ok(
-            (attributes[keys[2]] as Number) > 0,
-            `attributes transferSize <= 0`
+            (attributes[keys[2]] as number) > 0,
+            'attributes transferSize <= 0'
           );
           assert.strictEqual(
             attributes[keys[3]],
