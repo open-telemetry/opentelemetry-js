@@ -25,8 +25,8 @@ import * as grpc from 'grpc';
 import {
   MetricRecord,
   MetricKind,
-  CounterSumAggregator,
-  ObserverAggregator,
+  SumAggregator,
+  LastValueAggregator,
 } from '@opentelemetry/metrics';
 
 if (typeof Buffer === 'undefined') {
@@ -67,7 +67,7 @@ export const mockCounter: MetricRecord = {
     valueType: ValueType.INT,
   },
   labels: {},
-  aggregator: new CounterSumAggregator(),
+  aggregator: new SumAggregator(),
   resource: new Resource({
     service: 'ui',
     version: 1,
@@ -81,11 +81,11 @@ export const mockObserver: MetricRecord = {
     name: 'test-observer',
     description: 'sample observer description',
     unit: '2',
-    metricKind: MetricKind.OBSERVER,
+    metricKind: MetricKind.VALUE_OBSERVER,
     valueType: ValueType.DOUBLE,
   },
   labels: {},
-  aggregator: new ObserverAggregator(),
+  aggregator: new LastValueAggregator(),
   resource: new Resource({
     service: 'ui',
     version: 1,
