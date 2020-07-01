@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-import { Resource } from './Resource';
-import { ResourceDetectionConfigWithLogger } from './config';
+import { Logger } from '@opentelemetry/api';
 
-/** Interface for Resource labels  */
-export interface ResourceLabels {
-  [key: string]: number | string | boolean;
+/**
+ * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
+ */
+export interface ResourceDetectionConfig {
+  /** Optional Logger. */
+  logger?: Logger;
 }
 
 /**
- * Interface for a Resource Detector. In order to detect resources in parallel
- * a detector returns a Promise containing a Resource.
+ * ResourceDetectionConfigWithLogger provides an interface for interacting with
+ * {@link ResourceDetectionConfig} instances that must have a logger defined.
  */
-export interface Detector {
-  detect(config: ResourceDetectionConfigWithLogger): Promise<Resource>;
+export interface ResourceDetectionConfigWithLogger
+  extends ResourceDetectionConfig {
+  /** Required Logger */
+  logger: Logger;
 }
