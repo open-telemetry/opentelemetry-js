@@ -14,27 +14,12 @@
  * limitations under the License.
  */
 
-import * as grpc from 'grpc';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import { BaseObserver } from './Metric';
 
 /**
- * Queue item to be used to save temporary spans in case the GRPC service
- * hasn't been fully initialised yet
+ * Interface for updating value of certain value observer
  */
-export interface GRPCSpanQueueItem {
-  spans: ReadableSpan[];
-  onSuccess: () => void;
-  onError: (error: CollectorExporterError) => void;
-}
-
-/**
- * Service Client for sending spans or metrics
- */
-export interface ServiceClient extends grpc.Client {
-  export: (
-    request: any,
-    metadata: grpc.Metadata | undefined,
-    callback: Function
-  ) => {};
+export interface Observation {
+  observer: BaseObserver;
+  value: number;
 }
