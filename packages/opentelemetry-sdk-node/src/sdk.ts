@@ -22,7 +22,7 @@ import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 
-/** This class represents everything needed to register a fully configured OpenTelemetry NodeJS SDK */
+/** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;

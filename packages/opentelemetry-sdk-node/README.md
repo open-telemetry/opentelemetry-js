@@ -1,4 +1,4 @@
-# OpenTelemetry SDK for NodeJS
+# OpenTelemetry SDK for Node.js
 
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
