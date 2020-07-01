@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as api from '@opentelemetry/api';
+import { NoopLogger } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
-import {
-  BoundCounter,
-  BaseBoundInstrument,
-  BoundValueRecorder,
-  BoundObserver,
-} from './BoundInstrument';
-import { ObserverResult } from './ObserverResult';
-import { MetricOptions } from './types';
-import { MetricKind, MetricDescriptor, MetricRecord } from './export/types';
-import { Batcher } from './export/Batcher';
+import { BaseBoundInstrument } from './BoundInstrument';
+import { MetricDescriptor, MetricKind, MetricRecord } from './export/types';
 import { hashLabels } from './Utils';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 
@@ -40,14 +32,17 @@ export abstract class Metric<T extends BaseBoundInstrument>
 
   constructor(
     private readonly _name: string,
-    private readonly _options: MetricOptions,
+    private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
     readonly resource: Resource,
     readonly instrumentationLibrary: InstrumentationLibrary
   ) {
-    this._disabled = _options.disabled;
-    this._valueType = _options.valueType;
-    this._logger = _options.logger;
+    this._disabled = !!_options.disabled;
+    this._valueType =
+      typeof _options.valueType === 'number'
+        ? _options.valueType
+        : api.ValueType.DOUBLE;
+    this._logger = _options.logger ?? new NoopLogger();
     this._descriptor = this._getMetricDescriptor();
   }
 
@@ -82,143 +77,29 @@ export abstract class Metric<T extends BaseBoundInstrument>
     this._instruments.clear();
   }
 
-  getMetricRecord(): MetricRecord[] {
-    return Array.from(this._instruments.values()).map(instrument => ({
-      descriptor: this._descriptor,
-      labels: instrument.getLabels(),
-      aggregator: instrument.getAggregator(),
-      resource: this.resource,
-      instrumentationLibrary: this.instrumentationLibrary,
-    }));
+  getMetricRecord(): Promise<MetricRecord[]> {
+    return new Promise(resolve => {
+      resolve(
+        Array.from(this._instruments.values()).map(instrument => ({
+          descriptor: this._descriptor,
+          labels: instrument.getLabels(),
+          aggregator: instrument.getAggregator(),
+          resource: this.resource,
+          instrumentationLibrary: this.instrumentationLibrary,
+        }))
+      );
+    });
   }
 
   private _getMetricDescriptor(): MetricDescriptor {
     return {
       name: this._name,
-      description: this._options.description,
-      unit: this._options.unit,
+      description: this._options.description || '',
+      unit: this._options.unit || '1',
       metricKind: this._kind,
       valueType: this._valueType,
     };
   }
 
   protected abstract _makeInstrument(labels: api.Labels): T;
-}
-
-/** This is a SDK implementation of Counter Metric. */
-export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
-  constructor(
-    name: string,
-    options: MetricOptions,
-    private readonly _batcher: Batcher,
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary
-  ) {
-    super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);
-  }
-  protected _makeInstrument(labels: api.Labels): BoundCounter {
-    return new BoundCounter(
-      labels,
-      this._disabled,
-      this._valueType,
-      this._logger,
-      // @todo: consider to set to CounterSumAggregator always.
-      this._batcher.aggregatorFor(this._descriptor)
-    );
-  }
-
-  /**
-   * Adds the given value to the current value. Values cannot be negative.
-   * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific
-   *     metric that you want to record.
-   */
-  add(value: number, labels: api.Labels = {}) {
-    this.bind(labels).add(value);
-  }
-}
-
-export class ValueRecorderMetric extends Metric<BoundValueRecorder>
-  implements api.ValueRecorder {
-  protected readonly _absolute: boolean;
-
-  constructor(
-    name: string,
-    options: MetricOptions,
-    private readonly _batcher: Batcher,
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary
-  ) {
-    super(
-      name,
-      options,
-      MetricKind.VALUE_RECORDER,
-      resource,
-      instrumentationLibrary
-    );
-
-    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
-  }
-  protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
-    return new BoundValueRecorder(
-      labels,
-      this._disabled,
-      this._absolute,
-      this._valueType,
-      this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
-    );
-  }
-
-  record(value: number, labels: api.Labels = {}) {
-    this.bind(labels).record(value);
-  }
-}
-
-/** This is a SDK implementation of Observer Metric. */
-export class ObserverMetric extends Metric<BoundObserver>
-  implements api.Observer {
-  private _observerResult = new ObserverResult();
-
-  constructor(
-    name: string,
-    options: MetricOptions,
-    private readonly _batcher: Batcher,
-    resource: Resource,
-    instrumentationLibrary: InstrumentationLibrary
-  ) {
-    super(name, options, MetricKind.OBSERVER, resource, instrumentationLibrary);
-  }
-
-  protected _makeInstrument(labels: api.Labels): BoundObserver {
-    return new BoundObserver(
-      labels,
-      this._disabled,
-      this._valueType,
-      this._logger,
-      this._batcher.aggregatorFor(this._descriptor)
-    );
-  }
-
-  getMetricRecord(): MetricRecord[] {
-    this._observerResult.callbackObservers.forEach((callback, labels) => {
-      const instrument = this.bind(labels);
-      instrument.update(callback());
-    });
-    return super.getMetricRecord();
-  }
-
-  /**
-   * Sets a callback where user can observe value for certain labels
-   * @param callback
-   */
-  setCallback(callback: (observerResult: api.ObserverResult) => void): void {
-    callback(this._observerResult);
-    this._observerResult.observers.forEach((observer, labels) => {
-      observer.subscribe(value => {
-        const instrument = this.bind(labels);
-        instrument.update(value);
-      });
-    });
-  }
 }

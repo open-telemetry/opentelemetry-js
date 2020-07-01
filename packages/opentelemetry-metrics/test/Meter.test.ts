@@ -23,21 +23,17 @@ import {
   Sum,
   MeterProvider,
   ValueRecorderMetric,
-  Distribution,
-  ObserverMetric,
+  ValueObserverMetric,
   MetricRecord,
   Aggregator,
-  MetricObservable,
   MetricDescriptor,
+  LastValueAggregator,
   UpDownCounterMetric,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
-import {
-  CounterSumAggregator,
-  ObserverAggregator,
-} from '../src/export/aggregators';
-import { ValueType } from '@opentelemetry/api';
+import { BatchObserverResult } from '../src/BatchObserverResult';
+import { SumAggregator } from '../src/export/aggregators';
 import { Resource } from '@opentelemetry/resources';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
@@ -71,10 +67,10 @@ describe('Meter', () => {
       assert.ok(counter instanceof Metric);
     });
 
-    it('should be able to call add() directly on counter', () => {
+    it('should be able to call add() directly on counter', async () => {
       const counter = meter.createCounter('name') as CounterMetric;
       counter.add(10, labels);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -92,46 +88,46 @@ describe('Meter', () => {
       );
     });
 
-    it('should be able to call add with no labels', () => {
+    it('should be able to call add with no labels', async () => {
       const counter = meter.createCounter('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       });
       counter.add(1);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
       assert.strictEqual(record1.aggregator.toPoint().value, 1);
     });
 
-    it('should pipe through resource', () => {
+    it('should pipe through resource', async () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assert.ok(counter.resource instanceof Resource);
 
       counter.add(1, { foo: 'bar' });
 
-      const [record] = counter.getMetricRecord();
+      const [record] = await counter.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
 
-    it('should pipe through instrumentation library', () => {
+    it('should pipe through instrumentation library', async () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assert.ok(counter.instrumentationLibrary);
 
       counter.add(1, { foo: 'bar' });
 
-      const [record] = counter.getMetricRecord();
+      const [record] = await counter.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
       assert.strictEqual(version, '*');
     });
 
     describe('.bind()', () => {
-      it('should create a counter instrument', () => {
+      it('should create a counter instrument', async () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -143,16 +139,16 @@ describe('Meter', () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof CounterSumAggregator);
+        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
-      it('should add positive values only', () => {
+      it('should add positive values only', async () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
         assert.strictEqual(meter.getBatcher().checkPointSet().length, 0);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -160,24 +156,24 @@ describe('Meter', () => {
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
       });
 
-      it('should not add the instrument data when disabled', () => {
+      it('should not add the instrument data when disabled', async () => {
         const counter = meter.createCounter('name', {
           disabled: true,
         }) as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
       });
 
-      it('should return same instrument on same label values', () => {
+      it('should return same instrument on same label values', async () => {
         const counter = meter.createCounter('name') as CounterMetric;
         const boundCounter = counter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = counter.bind(labels);
         boundCounter1.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
@@ -212,7 +208,7 @@ describe('Meter', () => {
     });
 
     describe('.registerMetric()', () => {
-      it('skip already registered Metric', () => {
+      it('skip already registered Metric', async () => {
         const counter1 = meter.createCounter('name1') as CounterMetric;
         counter1.bind(labels).add(10);
 
@@ -222,7 +218,7 @@ describe('Meter', () => {
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
-        meter.collect();
+        await meter.collect();
         const record = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record.length, 1);
@@ -231,7 +227,7 @@ describe('Meter', () => {
           metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
-          valueType: ValueType.DOUBLE,
+          valueType: api.ValueType.DOUBLE,
         });
         assert.strictEqual(record[0].aggregator.toPoint().value, 10);
       });
@@ -283,10 +279,10 @@ describe('Meter', () => {
       assert.ok(upDownCounter instanceof Metric);
     });
 
-    it('should be able to call add() directly on UpDownCounter', () => {
+    it('should be able to call add() directly on UpDownCounter', async () => {
       const upDownCounter = meter.createUpDownCounter('name');
       upDownCounter.add(10, labels);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -304,19 +300,19 @@ describe('Meter', () => {
       );
     });
 
-    it('should be able to call add with no labels', () => {
+    it('should be able to call add with no labels', async () => {
       const upDownCounter = meter.createUpDownCounter('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
       });
       upDownCounter.add(1);
-      meter.collect();
+      await meter.collect();
       const [record1] = meter.getBatcher().checkPointSet();
       assert.strictEqual(record1.aggregator.toPoint().value, 1);
     });
 
-    it('should pipe through resource', () => {
+    it('should pipe through resource', async () => {
       const upDownCounter = meter.createUpDownCounter(
         'name'
       ) as UpDownCounterMetric;
@@ -324,16 +320,16 @@ describe('Meter', () => {
 
       upDownCounter.add(1, { foo: 'bar' });
 
-      const [record] = upDownCounter.getMetricRecord();
+      const [record] = await upDownCounter.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
 
     describe('.bind()', () => {
-      it('should create a UpDownCounter instrument', () => {
+      it('should create a UpDownCounter instrument', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 10);
@@ -347,28 +343,28 @@ describe('Meter', () => {
         ) as UpDownCounterMetric;
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(20);
-        assert.ok(boundCounter.getAggregator() instanceof CounterSumAggregator);
+        assert.ok(boundCounter.getAggregator() instanceof SumAggregator);
         assert.strictEqual(boundCounter.getLabels(), labels);
       });
 
-      it('should not add the instrument data when disabled', () => {
+      it('should not add the instrument data when disabled', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           disabled: true,
         });
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.strictEqual(record1.aggregator.toPoint().value, 0);
       });
 
-      it('should return same instrument on same label values', () => {
+      it('should return same instrument on same label values', async () => {
         const upDownCounter = meter.createUpDownCounter('name');
         const boundCounter = upDownCounter.bind(labels);
         boundCounter.add(10);
         const boundCounter1 = upDownCounter.bind(labels);
         boundCounter1.add(10);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
@@ -407,7 +403,7 @@ describe('Meter', () => {
     });
 
     describe('.registerMetric()', () => {
-      it('skip already registered Metric', () => {
+      it('skip already registered Metric', async () => {
         const counter1 = meter.createCounter('name1') as CounterMetric;
         counter1.bind(labels).add(10);
 
@@ -417,7 +413,7 @@ describe('Meter', () => {
         }) as CounterMetric;
         counter2.bind(labels).add(500);
 
-        meter.collect();
+        await meter.collect();
         const record = meter.getBatcher().checkPointSet();
 
         assert.strictEqual(record.length, 1);
@@ -426,7 +422,7 @@ describe('Meter', () => {
           metricKind: MetricKind.COUNTER,
           name: 'name1',
           unit: '1',
-          valueType: ValueType.DOUBLE,
+          valueType: api.ValueType.DOUBLE,
         });
         assert.strictEqual(record[0].aggregator.toPoint().value, 10);
       });
@@ -501,7 +497,7 @@ describe('Meter', () => {
       );
     });
 
-    it('should pipe through resource', () => {
+    it('should pipe through resource', async () => {
       const valueRecorder = meter.createValueRecorder(
         'name'
       ) as ValueRecorderMetric;
@@ -509,11 +505,11 @@ describe('Meter', () => {
 
       valueRecorder.record(1, { foo: 'bar' });
 
-      const [record] = valueRecorder.getMetricRecord();
+      const [record] = await valueRecorder.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
 
-    it('should pipe through instrumentation library', () => {
+    it('should pipe through instrumentation library', async () => {
       const valueRecorder = meter.createValueRecorder(
         'name'
       ) as ValueRecorderMetric;
@@ -521,7 +517,7 @@ describe('Meter', () => {
 
       valueRecorder.record(1, { foo: 'bar' });
 
-      const [record] = valueRecorder.getMetricRecord();
+      const [record] = await valueRecorder.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
       assert.strictEqual(version, '*');
@@ -559,70 +555,53 @@ describe('Meter', () => {
         assert.doesNotThrow(() => boundValueRecorder.record(10));
       });
 
-      it('should not accept negative values by default', () => {
+      it('should not accept negative values by default', async () => {
         const valueRecorder = meter.createValueRecorder('name');
         const boundValueRecorder = valueRecorder.bind(labels);
         boundValueRecorder.record(-10);
 
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value as number, 0);
       });
 
-      it('should not set the instrument data when disabled', () => {
+      it('should not set the instrument data when disabled', async () => {
         const valueRecorder = meter.createValueRecorder('name', {
           disabled: true,
         }) as ValueRecorderMetric;
         const boundValueRecorder = valueRecorder.bind(labels);
         boundValueRecorder.record(10);
 
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value as number, 0);
       });
 
-      it('should accept negative (and positive) values when absolute is set to false', () => {
-        const valueRecorder = meter.createValueRecorder('name', {
-          absolute: false,
-        });
-        const boundValueRecorder = valueRecorder.bind(labels);
-        boundValueRecorder.record(-10);
-        boundValueRecorder.record(50);
+      it(
+        'should accept negative (and positive) values when absolute is set' +
+          ' to false',
+        async () => {
+          const valueRecorder = meter.createValueRecorder('name', {
+            absolute: false,
+          });
+          const boundValueRecorder = valueRecorder.bind(labels);
+          boundValueRecorder.record(-10);
+          boundValueRecorder.record(50);
 
-        meter.collect();
-        const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 2,
-            max: 50,
-            min: -10,
-            sum: 40,
-          }
-        );
-        assert.ok(
-          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
-            hrTimeToNanoseconds(performanceTimeOrigin)
-        );
-      });
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+          assert.deepStrictEqual(
+            record1.aggregator.toPoint().value as number,
+            50
+          );
+          assert.ok(
+            hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+              hrTimeToNanoseconds(performanceTimeOrigin)
+          );
+        }
+      );
 
-      it('should return same instrument on same label values', () => {
+      it('should return same instrument on same label values', async () => {
         const valueRecorder = meter.createValueRecorder(
           'name'
         ) as ValueRecorderMetric;
@@ -630,16 +609,11 @@ describe('Meter', () => {
         boundValueRecorder1.record(10);
         const boundValueRecorder2 = valueRecorder.bind(labels);
         boundValueRecorder2.record(100);
-        meter.collect();
+        await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 2,
-            max: 100,
-            min: 10,
-            sum: 110,
-          }
+          record1.aggregator.toPoint().value as number,
+          100
         );
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
       });
@@ -676,52 +650,48 @@ describe('Meter', () => {
     });
   });
 
-  describe('#observer', () => {
-    it('should create an observer', () => {
-      const valueRecorder = meter.createObserver('name') as ObserverMetric;
-      assert.ok(valueRecorder instanceof Metric);
+  describe('#valueObserver', () => {
+    it('should create a value observer', () => {
+      const valueObserver = meter.createValueObserver(
+        'name'
+      ) as ValueObserverMetric;
+      assert.ok(valueObserver instanceof Metric);
     });
 
     it('should create observer with options', () => {
-      const valueRecorder = meter.createObserver('name', {
+      const valueObserver = meter.createValueObserver('name', {
         description: 'desc',
         unit: '1',
         disabled: false,
-      }) as ObserverMetric;
-      assert.ok(valueRecorder instanceof Metric);
+      }) as ValueObserverMetric;
+      assert.ok(valueObserver instanceof Metric);
     });
 
-    it('should set callback and observe value ', () => {
-      const valueRecorder = meter.createObserver('name', {
-        description: 'desc',
-      }) as ObserverMetric;
+    it('should set callback and observe value ', async () => {
+      const valueRecorder = meter.createValueObserver(
+        'name',
+        {
+          description: 'desc',
+        },
+        (observerResult: api.ObserverResult) => {
+          observerResult.observe(getCpuUsage(), { pid: '123', core: '1' });
+          observerResult.observe(getCpuUsage(), { pid: '123', core: '2' });
+          observerResult.observe(getCpuUsage(), { pid: '123', core: '3' });
+          observerResult.observe(getCpuUsage(), { pid: '123', core: '4' });
+        }
+      ) as ValueObserverMetric;
 
       function getCpuUsage() {
         return Math.random();
       }
 
-      const metricObservable = new MetricObservable();
+      const metricRecords: MetricRecord[] = await valueRecorder.getMetricRecord();
+      assert.strictEqual(metricRecords.length, 4);
 
-      valueRecorder.setCallback((observerResult: api.ObserverResult) => {
-        observerResult.observe(getCpuUsage, { pid: '123', core: '1' });
-        observerResult.observe(getCpuUsage, { pid: '123', core: '2' });
-        observerResult.observe(getCpuUsage, { pid: '123', core: '3' });
-        observerResult.observe(getCpuUsage, { pid: '123', core: '4' });
-        observerResult.observe(metricObservable, { pid: '123', core: '5' });
-      });
-
-      metricObservable.next(0.123);
-
-      const metricRecords: MetricRecord[] = valueRecorder.getMetricRecord();
-      assert.strictEqual(metricRecords.length, 5);
-
-      const metric5 = metricRecords[0];
-      assert.strictEqual(hashLabels(metric5.labels), '|#core:5,pid:123');
-
-      const metric1 = metricRecords[1];
-      const metric2 = metricRecords[2];
-      const metric3 = metricRecords[3];
-      const metric4 = metricRecords[4];
+      const metric1 = metricRecords[0];
+      const metric2 = metricRecords[1];
+      const metric3 = metricRecords[2];
+      const metric4 = metricRecords[3];
       assert.strictEqual(hashLabels(metric1.labels), '|#core:1,pid:123');
       assert.strictEqual(hashLabels(metric2.labels), '|#core:2,pid:123');
       assert.strictEqual(hashLabels(metric3.labels), '|#core:3,pid:123');
@@ -731,30 +701,187 @@ describe('Meter', () => {
       ensureMetric(metric2);
       ensureMetric(metric3);
       ensureMetric(metric4);
-      ensureMetric(metric5);
     });
 
-    it('should pipe through resource', () => {
-      const observer = meter.createObserver('name') as ObserverMetric;
-      assert.ok(observer.resource instanceof Resource);
+    it('should pipe through resource', async () => {
+      const valueObserver = meter.createValueObserver('name', {}, result => {
+        result.observe(42, { foo: 'bar' });
+      }) as ValueObserverMetric;
+      assert.ok(valueObserver.resource instanceof Resource);
 
-      observer.setCallback(result => {
-        result.observe(() => 42, { foo: 'bar' });
-      });
-
-      const [record] = observer.getMetricRecord();
+      const [record] = await valueObserver.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
     });
+  });
 
-    it('should pipe through instrumentation library', () => {
-      const observer = meter.createObserver('name') as ObserverMetric;
+  describe('#batchObserver', () => {
+    it('should create a batch observer', () => {
+      const measure = meter.createBatchObserver('name', () => {});
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should create batch observer with options', () => {
+      const measure = meter.createBatchObserver('name', () => {}, {
+        description: 'desc',
+        unit: '1',
+        disabled: false,
+        maxTimeoutUpdateMS: 100,
+      });
+      assert.ok(measure instanceof Metric);
+    });
+
+    it('should use callback to observe values ', async () => {
+      const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
+        description: 'desc',
+      }) as ValueObserverMetric;
+
+      const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+        description: 'desc',
+      }) as ValueObserverMetric;
+
+      meter.createBatchObserver(
+        'metric_batch_observer',
+        observerBatchResult => {
+          interface StatItem {
+            usage: number;
+            temp: number;
+          }
+
+          interface Stat {
+            name: string;
+            core1: StatItem;
+            core2: StatItem;
+          }
+
+          function someAsyncMetrics() {
+            return new Promise(resolve => {
+              const stats: Stat[] = [
+                {
+                  name: 'app1',
+                  core1: { usage: 2.1, temp: 67 },
+                  core2: { usage: 3.1, temp: 69 },
+                },
+                {
+                  name: 'app2',
+                  core1: { usage: 1.2, temp: 67 },
+                  core2: { usage: 4.5, temp: 69 },
+                },
+              ];
+              resolve(stats);
+            });
+          }
+
+          Promise.all([
+            someAsyncMetrics(),
+            // simulate waiting
+            new Promise((resolve, reject) => {
+              setTimeout(resolve, 1);
+            }),
+          ]).then((stats: unknown[]) => {
+            const apps = (stats[0] as unknown) as Stat[];
+            apps.forEach(app => {
+              observerBatchResult.observe({ app: app.name, core: '1' }, [
+                tempMetric.observation(app.core1.temp),
+                cpuUsageMetric.observation(app.core1.usage),
+              ]);
+              observerBatchResult.observe({ app: app.name, core: '2' }, [
+                tempMetric.observation(app.core2.temp),
+                cpuUsageMetric.observation(app.core2.usage),
+              ]);
+            });
+          });
+        }
+      );
+
+      await meter.collect();
+
+      const tempMetricRecords: MetricRecord[] = await tempMetric.getMetricRecord();
+      const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
+      assert.strictEqual(tempMetricRecords.length, 4);
+      assert.strictEqual(cpuUsageMetricRecords.length, 4);
+
+      const metric1 = tempMetricRecords[0];
+      const metric2 = tempMetricRecords[1];
+      const metric3 = tempMetricRecords[2];
+      const metric4 = tempMetricRecords[3];
+      assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
+      assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
+      assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
+      assert.strictEqual(hashLabels(metric4.labels), '|#app:app2,core:2');
+
+      ensureMetric(metric1, 'cpu_temp_per_app', 67);
+      ensureMetric(metric2, 'cpu_temp_per_app', 69);
+      ensureMetric(metric3, 'cpu_temp_per_app', 67);
+      ensureMetric(metric4, 'cpu_temp_per_app', 69);
+
+      const metric5 = cpuUsageMetricRecords[0];
+      const metric6 = cpuUsageMetricRecords[1];
+      const metric7 = cpuUsageMetricRecords[2];
+      const metric8 = cpuUsageMetricRecords[3];
+      assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
+      assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
+      assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
+      assert.strictEqual(hashLabels(metric4.labels), '|#app:app2,core:2');
+
+      ensureMetric(metric5, 'cpu_usage_per_app', 2.1);
+      ensureMetric(metric6, 'cpu_usage_per_app', 3.1);
+      ensureMetric(metric7, 'cpu_usage_per_app', 1.2);
+      ensureMetric(metric8, 'cpu_usage_per_app', 4.5);
+    });
+
+    it('should not observe values when timeout', done => {
+      const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+        description: 'desc',
+      }) as ValueObserverMetric;
+
+      meter.createBatchObserver(
+        'metric_batch_observer',
+        observerBatchResult => {
+          Promise.all([
+            // simulate waiting 11ms
+            new Promise((resolve, reject) => {
+              setTimeout(resolve, 11);
+            }),
+          ]).then(async () => {
+            // try to hack to be able to update
+            (observerBatchResult as BatchObserverResult).cancelled = false;
+            observerBatchResult.observe({ foo: 'bar' }, [
+              cpuUsageMetric.observation(123),
+            ]);
+
+            // simulate some waiting
+            await setTimeout(() => {}, 5);
+
+            const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
+            const value = cpuUsageMetric
+              .bind({ foo: 'bar' })
+              .getAggregator()
+              .toPoint().value as number;
+
+            assert.strictEqual(value, 0);
+            assert.strictEqual(cpuUsageMetricRecords.length, 0);
+            done();
+          });
+        },
+        {
+          maxTimeoutUpdateMS: 10, // timeout after 10ms
+        }
+      );
+
+      meter.collect();
+    });
+
+    it('should pipe through instrumentation library', async () => {
+      const observer = meter.createValueObserver(
+        'name',
+        {},
+        (observerResult: api.ObserverResult) => {
+          observerResult.observe(42, { foo: 'bar' });
+        }
+      ) as ValueObserverMetric;
       assert.ok(observer.instrumentationLibrary);
 
-      observer.setCallback(result => {
-        result.observe(() => 42, { foo: 'bar' });
-      });
-
-      const [record] = observer.getMetricRecord();
+      const [record] = await observer.getMetricRecord();
       const { name, version } = record.instrumentationLibrary;
       assert.strictEqual(name, 'test-meter');
       assert.strictEqual(version, '*');
@@ -762,7 +889,7 @@ describe('Meter', () => {
   });
 
   describe('#getMetrics', () => {
-    it('should create a DOUBLE counter', () => {
+    it('should create a DOUBLE counter', async () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
@@ -771,7 +898,7 @@ describe('Meter', () => {
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
 
-      meter.collect();
+      await meter.collect();
       const record = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record.length, 1);
@@ -780,14 +907,14 @@ describe('Meter', () => {
         description: 'test',
         metricKind: MetricKind.COUNTER,
         unit: '1',
-        valueType: ValueType.DOUBLE,
+        valueType: api.ValueType.DOUBLE,
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
       assert.strictEqual(value, 10.45);
     });
 
-    it('should create a INT counter', () => {
+    it('should create an INT counter', async () => {
       const key = 'key';
       const counter = meter.createCounter('counter', {
         description: 'test',
@@ -797,7 +924,7 @@ describe('Meter', () => {
       const boundCounter = counter.bind(labels);
       boundCounter.add(10.45);
 
-      meter.collect();
+      await meter.collect();
       const record = meter.getBatcher().checkPointSet();
 
       assert.strictEqual(record.length, 1);
@@ -806,7 +933,7 @@ describe('Meter', () => {
         description: 'test',
         metricKind: MetricKind.COUNTER,
         unit: '1',
-        valueType: ValueType.INT,
+        valueType: api.ValueType.INT,
       });
       assert.strictEqual(record[0].labels, labels);
       const value = record[0].aggregator.toPoint().value as Sum;
@@ -834,20 +961,18 @@ class CustomBatcher extends Batcher {
   }
 }
 
-function ensureMetric(metric: MetricRecord) {
-  assert.ok(metric.aggregator instanceof ObserverAggregator);
-  assert.ok(
-    metric.aggregator.toPoint().value >= 0 &&
-      metric.aggregator.toPoint().value <= 1
-  );
-  assert.ok(
-    metric.aggregator.toPoint().value >= 0 &&
-      metric.aggregator.toPoint().value <= 1
-  );
+function ensureMetric(metric: MetricRecord, name?: string, value?: number) {
+  assert.ok(metric.aggregator instanceof LastValueAggregator);
+  const lastValue = metric.aggregator.toPoint().value;
+  if (typeof value === 'number') {
+    assert.strictEqual(lastValue, value);
+  } else {
+    assert.ok(lastValue >= 0 && lastValue <= 1);
+  }
   const descriptor = metric.descriptor;
-  assert.strictEqual(descriptor.name, 'name');
+  assert.strictEqual(descriptor.name, name || 'name');
   assert.strictEqual(descriptor.description, 'desc');
   assert.strictEqual(descriptor.unit, '1');
-  assert.strictEqual(descriptor.metricKind, MetricKind.OBSERVER);
-  assert.strictEqual(descriptor.valueType, ValueType.DOUBLE);
+  assert.strictEqual(descriptor.metricKind, MetricKind.VALUE_OBSERVER);
+  assert.strictEqual(descriptor.valueType, api.ValueType.DOUBLE);
 }

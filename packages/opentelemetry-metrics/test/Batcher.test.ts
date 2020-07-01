@@ -35,11 +35,11 @@ describe('Batcher', () => {
       barCounter = counter.bind({ key: 'bar' });
     });
 
-    it('should process a batch', () => {
+    it('should process a batch', async () => {
       fooCounter.add(1);
       barCounter.add(1);
       barCounter.add(2);
-      meter.collect();
+      await meter.collect();
       const checkPointSet = meter.getBatcher().checkPointSet();
       assert.strictEqual(checkPointSet.length, 2);
       for (const record of checkPointSet) {
