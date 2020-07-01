@@ -27,7 +27,7 @@ $ npm install \
     @opentelemetry/plugin-http # add plugins as needed
 ```
 
-> Note: this example is for node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
+> Note: this example is for Node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
 
 ### Initialize the SDK
 
