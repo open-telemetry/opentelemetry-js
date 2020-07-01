@@ -232,7 +232,7 @@ describe('HttpTraceContext', () => {
         invalidFutureVersion:
           'ff-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
         invalidFutureFieldAfterFlag:
-          'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01.what-the-future-will-be-like',
+          'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01.what-the-future-will-not-be-like',
       };
 
       Object.getOwnPropertyNames(testCases).forEach(testCase => {
