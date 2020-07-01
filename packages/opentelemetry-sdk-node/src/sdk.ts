@@ -44,7 +44,8 @@ export class NodeSDK {
       const tracerProviderConfig = {} as NodeTracerConfig;
 
       if (configuration.defaultAttributes) {
-        tracerProviderConfig.defaultAttributes = configuration.defaultAttributes;
+        tracerProviderConfig.defaultAttributes =
+          configuration.defaultAttributes;
       }
       if (typeof configuration.logLevel === 'number') {
         tracerProviderConfig.logLevel = configuration.logLevel;
