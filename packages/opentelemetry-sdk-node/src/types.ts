@@ -32,5 +32,4 @@ export interface NodeSDKConfiguration {
   spanProcessor: tracing.SpanProcessor;
   traceExporter: tracing.SpanExporter;
   traceParams: tracing.TraceParams;
-  traceResource: resources.Resource;
 }

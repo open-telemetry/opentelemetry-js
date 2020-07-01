@@ -38,21 +38,29 @@ export class NodeSDK {
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
-    const resource = configuration.resource ?? new Resource({});
-
-    this._resource = configuration.traceResource ?? new Resource({});
-
-    this._resource = this._resource.merge(resource);
+    this._resource = configuration.resource ?? new Resource({});
 
     if (configuration.spanProcessor || configuration.traceExporter) {
-      const tracerProviderConfig = {
-        defaultAttributes: configuration.defaultAttributes,
-        logLevel: configuration.logLevel,
-        logger: configuration.logger,
-        plugins: configuration.plugins,
-        sampler: configuration.sampler,
-        traceParams: configuration.traceParams,
-      };
+      const tracerProviderConfig = {} as NodeTracerConfig;
+
+      if (configuration.defaultAttributes) {
+        tracerProviderConfig.defaultAttributes = configuration.defaultAttributes;
+      }
+      if (typeof configuration.logLevel === 'number') {
+        tracerProviderConfig.logLevel = configuration.logLevel;
+      }
+      if (configuration.logger) {
+        tracerProviderConfig.logger = configuration.logger;
+      }
+      if (configuration.plugins) {
+        tracerProviderConfig.plugins = configuration.plugins;
+      }
+      if (configuration.sampler) {
+        tracerProviderConfig.sampler = configuration.sampler;
+      }
+      if (configuration.traceParams) {
+        tracerProviderConfig.traceParams = configuration.traceParams;
+      }
 
       const spanProcessor =
         configuration.spanProcessor ??
@@ -67,13 +75,25 @@ export class NodeSDK {
     }
 
     if (configuration.metricExporter) {
-      this.configureMeterProvider({
-        batcher: configuration.metricBatcher,
-        exporter: configuration.metricExporter,
-        interval: configuration.metricInterval,
-        logLevel: configuration.logLevel,
-        logger: configuration.logger,
-      });
+      const meterConfig: MeterConfig = {};
+
+      if (configuration.metricBatcher) {
+        meterConfig.batcher = configuration.metricBatcher;
+      }
+      if (configuration.metricExporter) {
+        meterConfig.exporter = configuration.metricExporter;
+      }
+      if (typeof configuration.metricInterval === 'number') {
+        meterConfig.interval = configuration.metricInterval;
+      }
+      if (typeof configuration.logLevel === 'number') {
+        meterConfig.logLevel = configuration.logLevel;
+      }
+      if (configuration.logger) {
+        meterConfig.logger = configuration.logger;
+      }
+
+      this.configureMeterProvider(meterConfig);
     }
   }
 
