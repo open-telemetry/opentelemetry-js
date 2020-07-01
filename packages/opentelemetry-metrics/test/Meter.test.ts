@@ -818,6 +818,25 @@ describe('Meter', () => {
       }
     );
 
+    it('should reject getMetricRecord when callback throws an error', async () => {
+      const upDownSumObserver = meter.createUpDownSumObserver(
+        'name',
+        {
+          description: 'desc',
+        },
+        (observerResult: api.ObserverResult) => {
+          observerResult.observe(1, { pid: '123', core: '1' });
+          throw new Error('Boom');
+        }
+      ) as UpDownSumObserverMetric;
+      await upDownSumObserver
+        .getMetricRecord()
+        .then()
+        .catch(e => {
+          assert.strictEqual(e.message, 'Boom');
+        });
+    });
+
     it('should pipe through resource', async () => {
       const upDownSumObserver = meter.createUpDownSumObserver(
         'name',
