@@ -50,6 +50,100 @@ export namespace opentelemetryProto {
     }
   }
 
+  export namespace metrics.v1 {
+    export interface Metric {
+      metricDescriptor: opentelemetryProto.metrics.v1.MetricDescriptor;
+      int64DataPoints?: opentelemetryProto.metrics.v1.Int64DataPoint[];
+      doubleDataPoints?: opentelemetryProto.metrics.v1.DoubleDataPoint[];
+      histogramDataPoints?: opentelemetryProto.metrics.v1.HistogramDataPoint[];
+      summaryDataPoints?: opentelemetryProto.metrics.v1.SummaryDataPoint[];
+    }
+
+    export interface Int64DataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+    }
+
+    export interface DoubleDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      value: number;
+    }
+
+    export interface HistogramDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      count: number;
+      sum: number;
+      buckets?: opentelemetryProto.metrics.v1.HistogramDataPointBucket[];
+      explicitBounds?: number[];
+    }
+
+    export interface HistogramDataPointBucket {
+      count: number;
+      exemplar?: opentelemetryProto.metrics.v1.HistogramExemplar;
+    }
+
+    export interface HistogramExemplar {
+      value: number;
+      timeUnixNano: number;
+      attachments: opentelemetryProto.common.v1.StringKeyValue[];
+    }
+
+    export interface SummaryDataPoint {
+      labels: opentelemetryProto.common.v1.StringKeyValue[];
+      startTimeUnixNano: number;
+      timeUnixNano: number;
+      count?: number;
+      sum?: number;
+      percentileValues: opentelemetryProto.metrics.v1.SummaryDataPointValueAtPercentile[];
+    }
+
+    export interface SummaryDataPointValueAtPercentile {
+      percentile: number;
+      value: number;
+    }
+
+    export interface MetricDescriptor {
+      name: string;
+      description: string;
+      unit: string;
+      type: opentelemetryProto.metrics.v1.MetricDescriptorType;
+      temporality: opentelemetryProto.metrics.v1.MetricDescriptorTemporality;
+    }
+
+    export interface InstrumentationLibraryMetrics {
+      instrumentationLibrary?: opentelemetryProto.common.v1.InstrumentationLibrary;
+      metrics: opentelemetryProto.metrics.v1.Metric[];
+    }
+
+    export interface ResourceMetrics {
+      resource?: opentelemetryProto.resource.v1.Resource;
+      instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
+    }
+
+    export enum MetricDescriptorType {
+      INVALID_TYPE,
+      INT64,
+      MONOTONIC_INT64,
+      DOUBLE,
+      MONOTONIC_DOUBLE,
+      HISTOGRAM,
+      SUMMARY,
+    }
+
+    export enum MetricDescriptorTemporality {
+      INVALID_TEMPORALITY,
+      INSTANTANEOUS,
+      DELTA,
+      CUMULATIVE,
+    }
+  }
+
   export namespace trace.v1 {
     export namespace ConstantSampler {
       export enum ConstantDecision {
