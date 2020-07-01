@@ -25,7 +25,6 @@ export interface NodeSDKConfiguration {
   metricBatcher: metrics.Batcher;
   metricExporter: metrics.MetricExporter;
   metricInterval: number;
-  metricResource: resources.Resource;
   plugins: node.Plugins;
   httpTextPropagator: api.HttpTextPropagator;
   resource: resources.Resource;

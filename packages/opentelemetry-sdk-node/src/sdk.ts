@@ -22,6 +22,7 @@ import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 
+/** This class represents everything needed to register a fully configured OpenTelemetry NodeJS SDK */
 export class NodeSDK {
   private _tracerProviderConfig?: {
     tracerConfig: NodeTracerConfig;
@@ -31,17 +32,17 @@ export class NodeSDK {
   };
   private _meterProviderConfig?: MeterConfig;
 
-  private _traceResource: Resource;
-  private _metricsResource: Resource;
+  private _resource: Resource;
 
+  /**
+   * Create a new NodeJS SDK instance
+   */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     const resource = configuration.resource ?? new Resource({});
 
-    this._traceResource = configuration.traceResource ?? new Resource({});
-    this._metricsResource = configuration.metricResource ?? new Resource({});
+    this._resource = configuration.traceResource ?? new Resource({});
 
-    this._traceResource = this._traceResource.merge(resource);
-    this._metricsResource = this._metricsResource.merge(resource);
+    this._resource = this._resource.merge(resource);
 
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig = {
@@ -76,6 +77,7 @@ export class NodeSDK {
     }
   }
 
+  /** Set configurations required to register a NodeTracerProvider */
   public configureTracerProvider(
     tracerConfig: NodeTracerConfig,
     spanProcessor: SpanProcessor,
@@ -90,32 +92,29 @@ export class NodeSDK {
     };
   }
 
+  /** Set configurations needed to register a MeterProvider */
   public configureMeterProvider(config: MeterConfig) {
     this._meterProviderConfig = config;
   }
 
+  /** Detect resource attributes from the execution environment */
   public async detectResources() {
     this.addResource(await detectResources());
   }
 
+  /** Manually add a resource */
   public async addResource(resource: Resource) {
-    this.addTraceResource(resource);
-    this.addMetricsResource(resource);
+    this._resource.merge(resource);
   }
 
-  public async addTraceResource(resource: Resource) {
-    this._traceResource.merge(resource);
-  }
-
-  public async addMetricsResource(resource: Resource) {
-    this._metricsResource.merge(resource);
-  }
-
+  /**
+   * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   */
   public start() {
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,
-        resource: this._traceResource,
+        resource: this._resource,
       });
 
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
@@ -128,7 +127,7 @@ export class NodeSDK {
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         ...this._meterProviderConfig,
-        resource: this._metricsResource,
+        resource: this._resource,
       });
 
       metrics.setGlobalMeterProvider(meterProvider);

@@ -18,15 +18,21 @@ import {
   context,
   metrics,
   NoopHttpTextPropagator,
-  NoopMeterProvider, NoopTracerProvider, propagation,
-  trace
+  NoopMeterProvider,
+  NoopTracerProvider,
+  propagation,
+  trace,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import { ConsoleSpanExporter, InMemorySpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
+import {
+  ConsoleSpanExporter,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+} from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { api, NodeSDK, tracing } from '../src';
 
@@ -38,15 +44,13 @@ describe('Node SDK', () => {
     metrics.disable();
   });
 
-  describe("Basic Registration", () => {
+  describe('Basic Registration', () => {
     it('should not register any unconfigured SDK components', () => {
       const sdk = new NodeSDK();
 
       sdk.start();
 
-      assert.ok(
-        context['_getContextManager']() instanceof NoopContextManager
-      );
+      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
       );
@@ -62,9 +66,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
-
 
       assert.ok(
         context['_getContextManager']() instanceof AsyncHooksContextManager
@@ -85,9 +87,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
-
 
       assert.ok(
         context['_getContextManager']() instanceof AsyncHooksContextManager
@@ -98,7 +98,6 @@ describe('Node SDK', () => {
       assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
     });
 
-
     it('should register a meter provider if an exporter is provided', () => {
       const exporter = new ConsoleMetricExporter();
 
@@ -108,9 +107,7 @@ describe('Node SDK', () => {
 
       sdk.start();
 
-      assert.ok(
-        context['_getContextManager']() instanceof NoopContextManager
-      );
+      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
       );
@@ -120,7 +117,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });
 
-    describe("Tracing Options", () => {
+    describe('Tracing Options', () => {
       let traceExporter: InMemorySpanExporter;
       let spanProcessor: SimpleSpanProcessor;
 
@@ -133,29 +130,28 @@ describe('Node SDK', () => {
         traceExporter.reset();
       });
 
-      it("should apply global attributes to every span", () => {
+      it('should apply global attributes to every span', () => {
         const sdk = new NodeSDK({
           spanProcessor,
           defaultAttributes: {
-            "default.attribute": "test"
-          }
+            'default.attribute': 'test',
+          },
         });
 
         sdk.start();
-        const tracer = api.trace.getTracer("test");
+        const tracer = api.trace.getTracer('test');
 
         assert(tracer instanceof tracing.Tracer);
 
-        const provider = tracer["_tracerProvider"];
+        const provider = tracer['_tracerProvider'];
 
         assert(provider instanceof NodeTracerProvider);
-        
 
-        const span = api.trace.getTracer("test").startSpan("test");
+        const span = api.trace.getTracer('test').startSpan('test');
 
         assert(span instanceof tracing.Span);
-        assert.strictEqual(span.attributes["default.attribute"], "test")
-      })
-    })
+        assert.strictEqual(span.attributes['default.attribute'], 'test');
+      });
+    });
   });
 });
