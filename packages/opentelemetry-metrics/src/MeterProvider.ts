@@ -46,7 +46,10 @@ export class MeterProvider implements api.MeterProvider {
   getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
-      this._meters.set(key, new Meter(config || this._config));
+      this._meters.set(
+        key,
+        new Meter({ name, version }, config || this._config)
+      );
     }
 
     return this._meters.get(key)!;

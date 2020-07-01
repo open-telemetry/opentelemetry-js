@@ -2,7 +2,7 @@ import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing
 import { WebTracerProvider } from '@opentelemetry/web';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
-import { CollectorExporter } from '@opentelemetry/exporter-collector';
+import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { B3Propagator } from '@opentelemetry/core';
 
 const providerWithZone = new WebTracerProvider({
@@ -17,7 +17,7 @@ const providerWithZone = new WebTracerProvider({
 });
 
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorExporter()));
+providerWithZone.addSpanProcessor(new SimpleSpanProcessor(new CollectorTraceExporter()));
 
 providerWithZone.register({
   contextManager: new ZoneContextManager(),
@@ -26,16 +26,19 @@ providerWithZone.register({
 
 const webTracerWithZone = providerWithZone.getTracer('example-tracer-web');
 
-const getData = (url) => new Promise((resolve, _reject) => {
+const getData = (url) => new Promise((resolve, reject) => {
   // eslint-disable-next-line no-undef
   const req = new XMLHttpRequest();
   req.open('GET', url, true);
   req.setRequestHeader('Content-Type', 'application/json');
   req.setRequestHeader('Accept', 'application/json');
-  req.send();
   req.onload = () => {
     resolve();
   };
+  req.onerror = () => {
+    reject();
+  };
+  req.send();
 });
 
 // example of keeping track of context between async operations
@@ -52,6 +55,9 @@ const prepareClickEvent = () => {
       webTracerWithZone.withSpan(span1, () => {
         getData(url1).then((_data) => {
           webTracerWithZone.getCurrentSpan().addEvent('fetching-span1-completed');
+          span1.end();
+        }, ()=> {
+          webTracerWithZone.getCurrentSpan().addEvent('fetching-error');
           span1.end();
         });
       });

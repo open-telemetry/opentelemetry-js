@@ -1,6 +1,5 @@
 receivers:
-  otlp:
-    endpoint: 0.0.0.0:55678
+  otlp: {}
 
 exporters:
   zipkin:

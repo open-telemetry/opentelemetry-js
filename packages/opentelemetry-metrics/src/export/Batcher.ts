@@ -14,11 +14,7 @@
  * limitations under the License.
  */
 
-import {
-  CounterSumAggregator,
-  ValueRecorderExactAggregator,
-  ObserverAggregator,
-} from './aggregators';
+import * as aggregators from './aggregators';
 import {
   MetricRecord,
   MetricKind,
@@ -56,11 +52,14 @@ export class UngroupedBatcher extends Batcher {
     switch (metricDescriptor.metricKind) {
       case MetricKind.COUNTER:
       case MetricKind.UP_DOWN_COUNTER:
-        return new CounterSumAggregator();
-      case MetricKind.OBSERVER:
-        return new ObserverAggregator();
+      case MetricKind.SUM_OBSERVER:
+      case MetricKind.UP_DOWN_SUM_OBSERVER:
+        return new aggregators.SumAggregator();
+      case MetricKind.VALUE_RECORDER:
+      case MetricKind.VALUE_OBSERVER:
+        return new aggregators.LastValueAggregator();
       default:
-        return new ValueRecorderExactAggregator();
+        return new aggregators.MinMaxSumCountAggregator();
     }
   }
 

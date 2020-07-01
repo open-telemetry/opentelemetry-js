@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
+import {
+  DEFAULT_ENVIRONMENT,
+  ENVIRONMENT,
+  ENVIRONMENT_MAP,
+  parseEnvironment,
+} from '../../utils/environment';
 
-/** Basic aggregator for Observer which keeps the last recorded value. */
-export class ObserverAggregator implements Aggregator {
-  private _current: number = 0;
-  private _lastUpdateTime: HrTime = [0, 0];
-
-  update(value: number): void {
-    this._current = value;
-    this._lastUpdateTime = hrTime();
-  }
-
-  toPoint(): Point {
-    return {
-      value: this._current,
-      timestamp: this._lastUpdateTime,
-    };
-  }
+/**
+ * Gets the environment variables
+ */
+export function getEnv(): ENVIRONMENT {
+  const _window = window as typeof window & ENVIRONMENT_MAP;
+  const globalEnv = parseEnvironment(_window);
+  return Object.assign({}, DEFAULT_ENVIRONMENT, globalEnv);
 }

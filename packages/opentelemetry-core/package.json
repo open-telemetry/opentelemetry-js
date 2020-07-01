@@ -42,6 +42,7 @@
   },
   "files": [
     "build/src/**/*.js",
+    "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
@@ -52,8 +53,8 @@
   },
   "devDependencies": {
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.13",
-    "@types/semver": "7.2.0",
+    "@types/node": "14.0.14",
+    "@types/semver": "7.3.1",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.0",

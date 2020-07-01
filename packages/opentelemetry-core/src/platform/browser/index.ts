@@ -15,6 +15,7 @@
  */
 
 export * from './BasePlugin';
+export * from './environment';
 export * from './hex-to-base64';
 export * from './id';
 export * from './performance';

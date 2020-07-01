@@ -15,7 +15,7 @@ Knowing this if you want to change the submodule to point to a different version
     ```
 
 3. Find the SHA which you want to update to and copy it (the long one)
-the latest sha when this guide was written is `e6c3c4a74d57f870a0d781bada02cb2b2c497d14`
+the latest sha when this guide was written is `b54688569186e0b862bf7462a983ccf2c50c0547`
 
 4. Enter a submodule directory from this directory
 

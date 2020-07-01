@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import {
   ExportResult,
-  NoopLogger,
   hrTimeToMilliseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
 import {
-  CounterSumAggregator,
-  LastValue,
-  MetricExporter,
-  MetricRecord,
+  Distribution,
+  Histogram,
   MetricDescriptor,
+  MetricExporter,
   MetricKind,
-  ObserverAggregator,
+  MetricRecord,
   Sum,
 } from '@opentelemetry/metrics';
-import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, Metric, Registry } from 'prom-client';
 import * as url from 'url';
@@ -143,18 +142,33 @@ export class PrometheusExporter implements MetricExporter {
     }
 
     if (metric instanceof Gauge) {
-      if (record.aggregator instanceof CounterSumAggregator) {
-        metric.set(labels, point.value as Sum);
-      } else if (record.aggregator instanceof ObserverAggregator) {
+      if (typeof point.value === 'number') {
+        if (
+          record.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
+          record.descriptor.metricKind === MetricKind.VALUE_RECORDER
+        ) {
+          metric.set(
+            labels,
+            point.value,
+            hrTimeToMilliseconds(point.timestamp)
+          );
+        } else {
+          metric.set(labels, point.value);
+        }
+      } else if ((point.value as Histogram).buckets) {
         metric.set(
           labels,
-          point.value as LastValue,
+          (point.value as Histogram).sum,
+          hrTimeToMilliseconds(point.timestamp)
+        );
+      } else if (typeof (point.value as Distribution).max === 'number') {
+        metric.set(
+          labels,
+          (point.value as Distribution).sum,
           hrTimeToMilliseconds(point.timestamp)
         );
       }
     }
-
-    // TODO: only counter and gauge are implemented in metrics so far
   }
 
   private _registerMetric(record: MetricRecord): Metric | undefined {
@@ -194,7 +208,10 @@ export class PrometheusExporter implements MetricExporter {
         return new Counter(metricObject);
       case MetricKind.UP_DOWN_COUNTER:
         return new Gauge(metricObject);
-      case MetricKind.OBSERVER:
+      // case MetricKind.VALUE_RECORDER:
+      // case MetricKind.SUM_OBSERVER:
+      // case MetricKind.UP_DOWN_SUM_OBSERVER:
+      case MetricKind.VALUE_OBSERVER:
         return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented

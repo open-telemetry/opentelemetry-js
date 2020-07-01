@@ -44,3 +44,8 @@ export interface BoundValueRecorder {
     spanContext: SpanContext
   ): void;
 }
+
+/** An Instrument for Base Observer */
+export interface BoundBaseObserver {
+  update(value: number): void;
+}
