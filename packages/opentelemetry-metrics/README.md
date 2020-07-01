@@ -122,6 +122,7 @@ function getRandomValue() {
 
 Choose this kind of metric when sum is important;
 Callback can return either nothing or promise to support async operation
+
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
 
