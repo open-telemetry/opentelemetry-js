@@ -30,7 +30,9 @@ const NOOP_CALLBACK = () => {};
  */
 export abstract class BaseObserverMetric extends Metric<BoundObserver>
   implements api.BaseObserver {
-  protected _callback: (observerResult: api.ObserverResult) => void;
+  protected _callback: (
+    observerResult: api.ObserverResult
+  ) => Promise<unknown> | unknown;
 
   constructor(
     name: string,
@@ -39,7 +41,9 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
     resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => void
+    callback?: (
+      observerResult: api.ObserverResult
+    ) => Promise<unknown> | unknown
   ) {
     super(name, options, metricKind, resource, instrumentationLibrary);
     this._callback = callback || NOOP_CALLBACK;
@@ -56,13 +60,23 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
   }
 
   getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = new ObserverResult();
-    this._callback(observerResult);
-    observerResult.values.forEach((value, labels) => {
-      const instrument = this.bind(labels);
-      instrument.update(value);
+    return new Promise((resolve, reject) => {
+      const observerResult = new ObserverResult();
+      Promise.resolve()
+        .then(() => {
+          return this._callback(observerResult) || Promise.resolve();
+        })
+        .then(() => {
+          observerResult.values.forEach((value, labels) => {
+            const instrument = this.bind(labels);
+            instrument.update(value);
+          });
+          super.getMetricRecord().then(resolve, reject);
+        })
+        .catch(e => {
+          reject(e);
+        });
     });
-    return super.getMetricRecord();
   }
 
   observation(value: number) {

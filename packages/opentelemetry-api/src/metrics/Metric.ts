@@ -176,6 +176,9 @@ export interface BaseObserver extends UnboundMetric<BoundBaseObserver> {
 /** Base interface for the Value Observer metrics. */
 export type ValueObserver = BaseObserver;
 
+/** Base interface for the Up Down Sum Observer metrics. */
+export type UpDownSumObserver = BaseObserver;
+
 /** Base interface for the Batch Observer metrics. */
 export type BatchObserver = Metric;
 
