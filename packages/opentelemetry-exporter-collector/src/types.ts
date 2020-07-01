@@ -16,7 +16,6 @@
 
 import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
-import * as grpc from 'grpc';
 
 // header to prevent instrumentation on request
 export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
@@ -274,23 +273,6 @@ export interface CollectorExporterConfigBase {
   serviceName?: string;
   attributes?: Attributes;
   url?: string;
-}
-
-/**
- * Collector Exporter Config for Web
- */
-export interface CollectorExporterConfigBrowser
-  extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
-}
-
-/**
- * Collector Exporter Config for Node
- */
-export interface CollectorExporterConfigNode
-  extends CollectorExporterConfigBase {
-  credentials?: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
 }
 
 /**
