@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   Meter,
   Metric,
@@ -659,6 +660,17 @@ describe('Meter', () => {
       assert.ok(valueObserver instanceof Metric);
     });
 
+    it('should return noop observer when name is invalid', () => {
+      const spy = sinon.stub(meter['_logger'], 'warn');
+      const valueObserver = meter.createValueObserver('na me');
+      assert.ok(valueObserver === api.NOOP_VALUE_OBSERVER_METRIC);
+      const args = spy.args[0];
+      assert.ok(
+        args[0],
+        'Invalid metric name na me. Defaulting to noop metric implementation.'
+      );
+    });
+
     it('should create observer with options', () => {
       const valueObserver = meter.createValueObserver('name', {
         description: 'desc',
@@ -727,6 +739,17 @@ describe('Meter', () => {
         'name'
       ) as UpDownSumObserverMetric;
       assert.ok(upDownSumObserver instanceof Metric);
+    });
+
+    it('should return noop observer when name is invalid', () => {
+      const spy = sinon.stub(meter['_logger'], 'warn');
+      const upDownSumObserver = meter.createUpDownSumObserver('na me');
+      assert.ok(upDownSumObserver === api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC);
+      const args = spy.args[0];
+      assert.ok(
+        args[0],
+        'Invalid metric name na me. Defaulting to noop metric implementation.'
+      );
     });
 
     it('should create observer with options', () => {
