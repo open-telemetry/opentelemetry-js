@@ -6,13 +6,11 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-@ToDo
-This package provides...
+This package provides the full OpenTelemetry SDK for Node.js including tracing and metrics.
 
 ## Quick Start
 
-@ToDo
-To get started you need to ...
+To get started you need to install `@opentelemetry/sdk-node`, a metrics and/or tracing exporter, and any appropriate plugins for the node modules used by your application.
 
 ### Installation
 
@@ -25,6 +23,9 @@ $ npm install \
     @opentelemetry/exporter-jaeger \ # add tracing exporters as needed
     @opentelemetry/exporter-prometheus # add metrics exporters as needed
     @opentelemetry/plugin-http # add plugins as needed
+
+$ # or install all officially supported core and contrib plugins
+$ npm install @opentelemetry/plugins-node-all
 ```
 
 > Note: this example is for Node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
@@ -65,35 +66,57 @@ sdk
 
 ## Configuration
 
-@ToDo add descriptions for all configurations
+Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;
 
 ### contextManager
 
+Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemetry-context-async-hooks/README.md)
+
 ### httpTextPropagator
+
+Use a custom propagator. Default: [CompositePropagator]() using [W3C Trace Context](../opentelemetry-core/README.md#httptracecontext-propagator) and [Correlation Context](../opentelemetry-core/README.md#correlation-context-propagator)
 
 ### logger
 
+Use a custom logger. Default: Logging disabled
+
 ### logLevel
+
+Default: [INFO](../opentelemetry-core/src/common/types.ts#L19)
 
 ### metricBatcher
 
+Use a custom batcher for metrics. Default: [UngroupedBatcher](../opentelemetry-metrics/src/export/Batcher.ts#L50)
+
 ### metricExporter
+
+Configure a metric exporter. If an exporter is not configured, the metrics SDK will not be initialized and registered.
 
 ### metricInterval
 
-### metricResource
+Configure an interval for metrics export in ms. Default: 60,000 (60 seconds)
 
 ### plugins
 
+Configure plugins. By default, all plugins which are installed and in the [Default Plugins List](../opentelemetry-node/src/config.ts#L29) will be enabled.
+
 ### resource
+
+Configure a resource. Resources may also be detected by using the `autoDetectResources` method of the SDK.
 
 ### sampler
 
+Configure a custom sampler. By default all traces will be sampled.
+
+### spanProcessor
+
 ### traceExporter
+
+Configure a trace exporter. If an exporter OR span processor is not configured, the tracing SDK will not be initialized and registered. If an exporter is configured, it will be used with a [BatchSpanProcessor](../opentelemetry-tracing/src/export/BatchSpanProcessor.ts).
 
 ### traceParams
 
-### traceResource
+Configure tracing parameters. These are the same trace parameters used to [configure a tracer](../opentelemetry-tracing/src/types.ts#L71).
 
 ## Useful links
 
