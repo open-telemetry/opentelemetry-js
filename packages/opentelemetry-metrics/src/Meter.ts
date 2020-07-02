@@ -158,7 +158,7 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new value observer metric.
+   * Creates a new `ValueObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the value observer callback
@@ -194,7 +194,7 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new up down sum observer metric.
+   * Creates a new `UpDownSumObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the value observer callback

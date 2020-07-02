@@ -21,7 +21,7 @@ import { BaseObserverMetric } from './BaseObserverMetric';
 import { Batcher } from './export/Batcher';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Up Down Sum Observer Metric. */
+/** This is a SDK implementation of UpDownSumObserver Metric. */
 export class UpDownSumObserverMetric extends BaseObserverMetric
   implements api.UpDownSumObserver {
   constructor(

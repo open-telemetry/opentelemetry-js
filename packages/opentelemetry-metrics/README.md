@@ -77,7 +77,7 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 ### Value Observer
 
 Choose this kind of metric when only last value is important without worry about aggregation.
-Callback can return either nothing or promise to support async operation
+The callback can return either nothing or promise to support async operation.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
@@ -118,10 +118,10 @@ function getRandomValue() {
 }
 ```
 
-### Up Down Sum Observer
+### UpDownSumObserver
 
-Choose this kind of metric when sum is important;
-Callback can return either nothing or promise to support async operation
+Choose this kind of metric when sum is important.
+The callback can return either nothing or promise to support async operation.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
