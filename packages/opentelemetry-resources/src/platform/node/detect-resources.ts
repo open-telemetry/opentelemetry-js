@@ -17,25 +17,72 @@
 import { Resource } from '../../Resource';
 import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
 import { Detector } from '../../types';
+import {
+  ResourceDetectionConfig,
+  ResourceDetectionConfigWithLogger,
+} from '../../config';
+import { Logger } from '@opentelemetry/api';
+import * as util from 'util';
+import { NoopLogger } from '@opentelemetry/core';
 
 const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
 /**
  * Runs all resource detectors and returns the results merged into a single
  * Resource.
+ *
+ * @param config Configuration for resource detection
  */
-export const detectResources = async (): Promise<Resource> => {
+export const detectResources = async (
+  config: ResourceDetectionConfig = {}
+): Promise<Resource> => {
+  const internalConfig: ResourceDetectionConfigWithLogger = Object.assign(
+    {
+      logger: new NoopLogger(),
+    },
+    config
+  );
+
   const resources: Array<Resource> = await Promise.all(
     DETECTORS.map(d => {
       try {
-        return d.detect();
+        return d.detect(internalConfig);
       } catch {
         return Resource.empty();
       }
     })
   );
+  // Log Resources only if there is a user-provided logger
+  if (config.logger) {
+    logResources(config.logger, resources);
+  }
   return resources.reduce(
     (acc, resource) => acc.merge(resource),
     Resource.createTelemetrySDKResource()
   );
+};
+
+/**
+ * Writes debug information about the detected resources to the logger defined in the resource detection config, if one is provided.
+ *
+ * @param logger The {@link Logger} to write the debug information to.
+ * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
+ */
+const logResources = (logger: Logger, resources: Array<Resource>) => {
+  resources.forEach((resource, index) => {
+    // Print only populated resources
+    if (Object.keys(resource.labels).length > 0) {
+      const resourceDebugString = util.inspect(resource.labels, {
+        depth: 2,
+        breakLength: Infinity,
+        sorted: true,
+        compact: false,
+      });
+      const detectorName = DETECTORS[index].constructor
+        ? DETECTORS[index].constructor.name
+        : 'Unknown detector';
+      logger.debug(`${detectorName} found resource.`);
+      logger.debug(resourceDebugString);
+    }
+  });
 };
