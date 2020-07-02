@@ -757,7 +757,7 @@ describe('Meter', () => {
         description: 'desc',
         unit: '1',
         disabled: false,
-      }) as ValueObserverMetric;
+      }) as UpDownSumObserverMetric;
       assert.ok(upDownSumObserver instanceof Metric);
     });
 

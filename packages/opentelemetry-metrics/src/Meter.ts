@@ -201,7 +201,7 @@ export class Meter implements api.Meter {
     name: string,
     options: api.MetricOptions = {},
     callback?: (observerResult: api.ObserverResult) => unknown
-  ): api.ValueObserver {
+  ): api.UpDownSumObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
