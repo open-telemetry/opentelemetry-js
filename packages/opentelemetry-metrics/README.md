@@ -85,7 +85,7 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 
-// async callback - for operations that needs to wait for value
+// async callback - for operation that needs to wait for value
 meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
 }, async (observerResult) => {
@@ -124,7 +124,7 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-// async callback - for operations that needs to wait for value
+// async callback - for operation that needs to wait for value
 meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, async (observerResult) => {
