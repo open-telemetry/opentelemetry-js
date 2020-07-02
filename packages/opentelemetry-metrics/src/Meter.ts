@@ -166,9 +166,7 @@ export class Meter implements api.Meter {
   createValueObserver(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (
-      observerResult: api.ObserverResult
-    ) => Promise<unknown> | unknown
+    callback?: (observerResult: api.ObserverResult) => unknown
   ): api.ValueObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(
@@ -202,9 +200,7 @@ export class Meter implements api.Meter {
   createUpDownSumObserver(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (
-      observerResult: api.ObserverResult
-    ) => Promise<unknown> | unknown
+    callback?: (observerResult: api.ObserverResult) => unknown
   ): api.ValueObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(

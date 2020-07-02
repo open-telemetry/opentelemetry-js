@@ -29,9 +29,7 @@ export class ValueObserverMetric extends BaseObserverMetric
     batcher: Batcher,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (
-      observerResult: api.ObserverResult
-    ) => Promise<unknown> | unknown
+    callback?: (observerResult: api.ObserverResult) => unknown
   ) {
     super(
       name,

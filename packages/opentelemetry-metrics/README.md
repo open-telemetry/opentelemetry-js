@@ -77,7 +77,7 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 ### Value Observer
 
 Choose this kind of metric when only last value is important without worry about aggregation.
-The callback can return either nothing or promise to support async operation.
+The callback can be sync or async.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
@@ -85,16 +85,12 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 
-// callback with promise - for operations that needs to wait for value
-meter.createValueObserver('cpu_core_usage', {
+// async callback - for operations that needs to wait for value
+meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
-}, (observerResult) => {
-  return new Promise((resolve) => {
-    getAsyncValue().then((value) => {
-      observerResult.observe(value, { core: '1' });
-      resolve();
-    });
-  });
+}, async (observerResult) => {
+  const value = getAsyncValue()
+  observerResult.observe(value, { core: '1' });
 });
 
 function getAsyncValue() {
@@ -105,8 +101,8 @@ function getAsyncValue() {
   });
 }
 
-// callback without promise in case you don't need to wait for value
-meter.createValueObserver('cpu_core_usage', {
+// sync callback in case you don't need to wait for value
+meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { core: '1' });
@@ -121,23 +117,19 @@ function getRandomValue() {
 ### UpDownSumObserver
 
 Choose this kind of metric when sum is important.
-The callback can return either nothing or promise to support async operation.
+The callback can be sync or async.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-// callback with promise - for operations that needs to wait for value
-meter.createUpDownSumObserver('cpu_core_usage', {
+// async callback - for operations that needs to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
-}, (observerResult) => {
-  return new Promise((resolve) => {
-    getAsyncValue().then((value) => {
-      observerResult.observe(value, { core: '1' });
-      resolve();
-    });
-  });
+}, async (observerResult) => {
+  const value = getAsyncValue()
+  observerResult.observe(value, { core: '1' });
 });
 
 function getAsyncValue() {
@@ -148,12 +140,11 @@ function getAsyncValue() {
   });
 }
 
-// callback without promise in case you don't need to wait for value
-meter.createUpDownSumObserver('cpu_core_usage', {
+// sync callback in case you don't need to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { core: '1' });
-  resolve();
 });
 
 function getRandomValue() {
