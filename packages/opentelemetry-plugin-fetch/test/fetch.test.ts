@@ -302,7 +302,7 @@ describe('fetch', () => {
       );
       assert.ok(
         (attributes[keys[8]] as number) > 0,
-        `attributes ${AttributeNames.TRANSFER_SIZE} is <= 0`
+        `attributes ${AttributeNames.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
       );
 
       assert.strictEqual(keys.length, 9, 'number of attributes is wrong');

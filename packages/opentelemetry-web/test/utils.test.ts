@@ -152,7 +152,7 @@ describe('utils', () => {
         [PTN.REQUEST_START]: 123,
         [PTN.RESPONSE_START]: 123,
         [PTN.RESPONSE_END]: 123,
-        [PTN.TRANSFER_SIZE]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 123,
       } as PerformanceEntries;
 
       assert.strictEqual(addEventSpy.callCount, 0);

@@ -24,6 +24,7 @@ export type PerformanceEntries = {
   [PerformanceTimingNames.DOM_INTERACTIVE]?: number;
   [PerformanceTimingNames.DOMAIN_LOOKUP_END]?: number;
   [PerformanceTimingNames.DOMAIN_LOOKUP_START]?: number;
+  [PerformanceTimingNames.ENCODED_BODY_SIZE]?: number;
   [PerformanceTimingNames.FETCH_START]?: number;
   [PerformanceTimingNames.LOAD_EVENT_END]?: number;
   [PerformanceTimingNames.LOAD_EVENT_START]?: number;
@@ -33,7 +34,6 @@ export type PerformanceEntries = {
   [PerformanceTimingNames.RESPONSE_END]?: number;
   [PerformanceTimingNames.RESPONSE_START]?: number;
   [PerformanceTimingNames.SECURE_CONNECTION_START]?: number;
-  [PerformanceTimingNames.TRANSFER_SIZE]?: number;
   [PerformanceTimingNames.UNLOAD_EVENT_END]?: number;
   [PerformanceTimingNames.UNLOAD_EVENT_START]?: number;
 };

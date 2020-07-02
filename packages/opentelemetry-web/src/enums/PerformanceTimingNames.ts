@@ -23,6 +23,7 @@ export enum PerformanceTimingNames {
   DOM_INTERACTIVE = 'domInteractive',
   DOMAIN_LOOKUP_END = 'domainLookupEnd',
   DOMAIN_LOOKUP_START = 'domainLookupStart',
+  ENCODED_BODY_SIZE = 'encodedBodySize',
   FETCH_START = 'fetchStart',
   LOAD_EVENT_END = 'loadEventEnd',
   LOAD_EVENT_START = 'loadEventStart',
@@ -32,7 +33,6 @@ export enum PerformanceTimingNames {
   RESPONSE_END = 'responseEnd',
   RESPONSE_START = 'responseStart',
   SECURE_CONNECTION_START = 'secureConnectionStart',
-  TRANSFER_SIZE = 'transferSize',
   UNLOAD_EVENT_END = 'unloadEventEnd',
   UNLOAD_EVENT_START = 'unloadEventStart',
 }
