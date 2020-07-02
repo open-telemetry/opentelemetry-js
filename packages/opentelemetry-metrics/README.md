@@ -89,8 +89,8 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
 }, async (observerResult) => {
-  const value = getAsyncValue()
-  observerResult.observe(value, { core: '1' });
+  const value = getAsyncValue();
+  observerResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -105,8 +105,8 @@ function getAsyncValue() {
 meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
 }, (observerResult) => {
-  observerResult.observe(getRandomValue(), { core: '1' });
-  observerResult.observe(getRandomValue(), { core: '2' });
+  observerResult.observe(getRandomValue(), { label: '1' });
+  observerResult.observe(getRandomValue(), { label: '2' });
 });
 
 function getRandomValue() {
@@ -128,8 +128,8 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, async (observerResult) => {
-  const value = getAsyncValue()
-  observerResult.observe(value, { core: '1' });
+  const value = getAsyncValue();
+  observerResult.observe(value, { label: '1' });
 });
 
 function getAsyncValue() {
@@ -144,7 +144,7 @@ function getAsyncValue() {
 meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, (observerResult) => {
-  observerResult.observe(getRandomValue(), { core: '1' });
+  observerResult.observe(getRandomValue(), { label: '1' });
 });
 
 function getRandomValue() {
