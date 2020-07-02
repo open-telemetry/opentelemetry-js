@@ -56,7 +56,7 @@ describe('CollectorExporter - web', () => {
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},

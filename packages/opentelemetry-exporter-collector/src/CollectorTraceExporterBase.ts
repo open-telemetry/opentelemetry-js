@@ -34,7 +34,7 @@ export abstract class CollectorTraceExporterBase<
   public readonly serviceName: string;
   public readonly url: string;
   public readonly logger: Logger;
-  public readonly hostName: string | undefined;
+  public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
   private _isShutdown: boolean = false;
 
@@ -44,8 +44,8 @@ export abstract class CollectorTraceExporterBase<
   constructor(config: T = {} as T) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = this.getDefaultUrl(config.url);
-    if (typeof config.hostName === 'string') {
-      this.hostName = config.hostName;
+    if (typeof config.hostname === 'string') {
+      this.hostname = config.hostname;
     }
 
     this.attributes = config.attributes;

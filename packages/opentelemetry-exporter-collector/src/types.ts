@@ -178,7 +178,7 @@ export interface ExportServiceError {
  * Collector Exporter base config
  */
 export interface CollectorExporterConfigBase {
-  hostName?: string;
+  hostname?: string;
   logger?: Logger;
   serviceName?: string;
   attributes?: Attributes;

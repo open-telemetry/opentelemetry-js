@@ -31,7 +31,7 @@ export abstract class CollectorMetricExporterBase<
   public readonly serviceName: string;
   public readonly url: string;
   public readonly logger: Logger;
-  public readonly hostName: string | undefined;
+  public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
   protected readonly _startTime = new Date().getTime() * 1000000;
   private _isShutdown: boolean = false;
@@ -44,8 +44,8 @@ export abstract class CollectorMetricExporterBase<
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = this.getDefaultUrl(config.url);
     this.attributes = config.attributes;
-    if (typeof config.hostName === 'string') {
-      this.hostName = config.hostName;
+    if (typeof config.hostname === 'string') {
+      this.hostname = config.hostname;
     }
     this.onInit();
   }

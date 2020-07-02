@@ -44,7 +44,7 @@ describe('CollectorMetricExporter - common', () => {
     beforeEach(() => {
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
@@ -70,7 +70,7 @@ describe('CollectorMetricExporter - common', () => {
 
     describe('when config contains certain params', () => {
       it('should set hostName', () => {
-        assert.strictEqual(collectorExporter.hostName, 'foo');
+        assert.strictEqual(collectorExporter.hostname, 'foo');
       });
 
       it('should set serviceName', () => {
@@ -134,13 +134,57 @@ describe('CollectorMetricExporter - common', () => {
         const callbackSpy = sinon.spy();
         collectorExporter.export(metrics, callbackSpy);
         const returnCode = callbackSpy.args[0][0];
-
         assert.strictEqual(
           returnCode,
           ExportResult.FAILED_NOT_RETRYABLE,
           'return value is wrong'
         );
         assert.strictEqual(spySend.callCount, 0, 'should not call send');
+      });
+    });
+    describe('when an error occurs', () => {
+      it('should return a Not Retryable Error', done => {
+        spySend.throws({
+          code: 100,
+          details: 'Test error',
+          metadata: {},
+          message: 'Non-retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(metrics, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_NOT_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
+          done();
+        }, 500);
+      });
+
+      it('should return a Retryable Error', done => {
+        spySend.throws({
+          code: 600,
+          details: 'Test error',
+          metadata: {},
+          message: 'Retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(metrics, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
+          done();
+        }, 500);
       });
     });
   });
@@ -153,7 +197,7 @@ describe('CollectorMetricExporter - common', () => {
         'onShutdown'
       );
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
