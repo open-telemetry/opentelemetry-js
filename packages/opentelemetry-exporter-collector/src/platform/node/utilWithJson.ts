@@ -53,6 +53,7 @@ export function sendSpansUsingJson(
     method: 'POST',
     headers: {
       'Content-Length': Buffer.byteLength(body),
+      'Content-Type': 'application/json',
       ...collector.headers,
     },
   };

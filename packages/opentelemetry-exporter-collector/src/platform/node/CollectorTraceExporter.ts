@@ -60,6 +60,9 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
         : CollectorProtocolNode.GRPC;
     if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
       this.logger.debug('CollectorExporter - using json over http');
+      if (config.metadata) {
+        this.logger.warn('Metadata cannot be set when using json');
+      }
     } else {
       this.logger.debug('CollectorExporter - using grpc');
       if (config.headers) {

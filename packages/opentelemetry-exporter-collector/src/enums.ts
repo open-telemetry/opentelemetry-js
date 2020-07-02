@@ -16,6 +16,7 @@
 
 /**
  * Collector transport protocol node options
+ * Default is GRPC
  */
 export enum CollectorProtocolNode {
   GRPC,
