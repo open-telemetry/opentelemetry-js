@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './CounterMetric';
-export * from './ValueRecorderMetric';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
-export * from './ValueObserverMetric';
-export * from './export/aggregators';
-export * from './export/Batcher';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
-export * from './UpDownCounterMetric';
+import { Labels } from './Metric';
+import { Observation } from './Observation';
+
+/**
+ * Interface that is being used in callback function for Observer Metric
+ * for batch
+ */
+export interface BatchObserverResult {
+  /**
+   * Used to observe (update) observations for certain labels
+   * @param labels
+   * @param observations
+   */
+  observe(labels: Labels, observations: Observation[]): void;
+}

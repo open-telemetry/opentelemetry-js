@@ -1,6 +1,7 @@
 'use strict';
 
-const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
+const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -19,25 +20,68 @@ const meter = new MeterProvider({
   interval: 2000,
 }).getMeter('example-observer');
 
-const otelCpuUsage = meter.createObserver('metric_observer', {
-  monotonic: false,
-  description: 'Example of a observer',
+meter.createValueObserver('cpu_core_usage', {
+  description: 'Example of a sync value observer with callback',
+}, (observerResult) => { // this callback is called once per each interval
+  observerResult.observe(getRandomValue(), { core: '1' });
+  observerResult.observe(getRandomValue(), { core: '2' });
 });
 
-function getCpuUsage() {
-  return Math.random();
+// no callback as they will be updated in batch observer
+const tempMetric = meter.createValueObserver('cpu_temp_per_app', {
+  description: 'Example of sync value observer used with async batch observer',
+});
+
+// no callback as they will be updated in batch observer
+const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+  description: 'Example of sync value observer used with async batch observer',
+});
+
+meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+    Promise.all([
+      someAsyncMetrics(),
+      // simulate waiting
+      new Promise((resolve, reject) => {
+        setTimeout(resolve, 300);
+      }),
+    ]).then(([apps, waiting]) => {
+      apps.forEach(app => {
+        observerBatchResult.observe({ app: app.name, core: '1' }, [
+          tempMetric.observation(app.core1.temp),
+          cpuUsageMetric.observation(app.core1.usage),
+        ]);
+        observerBatchResult.observe({ app: app.name, core: '2' }, [
+          tempMetric.observation(app.core2.temp),
+          cpuUsageMetric.observation(app.core2.usage),
+        ]);
+      });
+    });
+  }, {
+    maxTimeoutUpdateMS: 500,
+    logger: new ConsoleLogger(LogLevel.DEBUG)
+  },
+);
+
+function someAsyncMetrics() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const stats = [
+        {
+          name: 'app1',
+          core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+          core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+        },
+        {
+          name: 'app2',
+          core1: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+          core2: { usage: getRandomValue(), temp: getRandomValue() * 100 },
+        },
+      ];
+      resolve(stats);
+    }, 200);
+  });
 }
 
-const observable = new MetricObservable();
-
-setInterval(() => {
-  observable.next(getCpuUsage());
-}, 5000);
-
-otelCpuUsage.setCallback((observerResult) => {
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '2' });
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '3' });
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '4' });
-  observerResult.observe(observable, { pid: process.pid, core: '5' });
-});
+function getRandomValue() {
+  return Math.random();
+}
