@@ -69,7 +69,7 @@ describe('CollectorMetricExporter - common', () => {
     });
 
     describe('when config contains certain params', () => {
-      it('should set hostName', () => {
+      it('should set hostname', () => {
         assert.strictEqual(collectorExporter.hostname, 'foo');
       });
 
