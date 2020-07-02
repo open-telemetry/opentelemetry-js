@@ -15,16 +15,18 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { Resource } from '@opentelemetry/resources';
 import { InstrumentationLibrary } from '@opentelemetry/core';
-import { BoundUpDownCounter } from './BoundInstrument';
-import { MetricKind } from './export/types';
+import { Resource } from '@opentelemetry/resources';
+import { BoundValueRecorder } from './BoundInstrument';
 import { Batcher } from './export/Batcher';
+import { MetricKind } from './export/types';
 import { Metric } from './Metric';
 
-/** This is a SDK implementation of UpDownCounter Metric. */
-export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
-  implements api.UpDownCounter {
+/** This is a SDK implementation of Value Recorder Metric. */
+export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+  implements api.ValueRecorder {
+  protected readonly _absolute: boolean;
+
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -35,28 +37,25 @@ export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
     super(
       name,
       options,
-      MetricKind.UP_DOWN_COUNTER,
+      MetricKind.VALUE_RECORDER,
       resource,
       instrumentationLibrary
     );
+
+    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
-  protected _makeInstrument(labels: api.Labels): BoundUpDownCounter {
-    return new BoundUpDownCounter(
+  protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
+    return new BoundValueRecorder(
       labels,
       this._disabled,
+      this._absolute,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)
     );
   }
 
-  /**
-   * Adds the given value to the current value. Values cannot be negative.
-   * @param value the value to add.
-   * @param [labels = {}] key-values pairs that are associated with a specific
-   *     metric that you want to record.
-   */
-  add(value: number, labels: api.Labels = {}) {
-    this.bind(labels).add(value);
+  record(value: number, labels: api.Labels = {}) {
+    this.bind(labels).record(value);
   }
 }
