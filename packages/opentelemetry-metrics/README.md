@@ -89,7 +89,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 meter.createValueObserver('your_metric_name', {
   description: 'Example of a async observer with callback',
 }, async (observerResult) => {
-  const value = getAsyncValue();
+  const value = await getAsyncValue();
   observerResult.observe(value, { label: '1' });
 });
 
@@ -116,7 +116,7 @@ function getRandomValue() {
 
 ### UpDownSumObserver
 
-Choose this kind of metric when sum is important.
+Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
 The callback can be sync or async.
 
 ```js
@@ -128,7 +128,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 meter.createUpDownSumObserver('your_metric_name', {
   description: 'Example of an async observer with callback',
 }, async (observerResult) => {
-  const value = getAsyncValue();
+  const value = await getAsyncValue();
   observerResult.observe(value, { label: '1' });
 });
 
