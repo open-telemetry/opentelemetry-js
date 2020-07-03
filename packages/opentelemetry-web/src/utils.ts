@@ -81,8 +81,8 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
-  if (resource.encodedBodySize) {
-    span.setAttribute('http.response_content_length', resource.encodedBodySize);
+  if (resource[PTN.ENCODED_BODY_SIZE]) {
+    span.setAttribute('http.response_content_length', resource[PTN.ENCODED_BODY_SIZE]);
   }
 }
 
