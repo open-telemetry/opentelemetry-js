@@ -30,7 +30,7 @@ import {
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
-describe('CollectorExporter - web', () => {
+describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
   let collectorExporterConfig: collectorTypes.CollectorExporterConfigBrowser;
   let spyOpen: any;
@@ -326,7 +326,7 @@ describe('CollectorExporter - web', () => {
   });
 });
 
-describe('CollectorExporter - browser (getDefaultUrl)', () => {
+describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
   it('should default to v1/trace', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {

@@ -34,7 +34,7 @@ class CollectorTraceExporter extends CollectorTraceExporterBase<
   }
 }
 
-describe('CollectorExporter - common', () => {
+describe('CollectorTraceExporter - common', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 
