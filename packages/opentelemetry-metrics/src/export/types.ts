@@ -37,6 +37,7 @@ export type LastValue = number;
 export interface Distribution {
   min: number;
   max: number;
+  last: number;
   count: number;
   sum: number;
 }
