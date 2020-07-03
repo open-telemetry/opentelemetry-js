@@ -127,12 +127,9 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Roch Devost](https://github.com/rochdev), DataDog
-- [Brandon Gonzalez](https://github.com/bg451), LightStep
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
 - [Naseem K. Ullah](https://github.com/naseemkullah), Transit
 - [Chengzhong Wu](https://github.com/legendecas), Alibaba
@@ -143,6 +140,7 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Point, CounterSumAggregator } from '@opentelemetry/metrics';
+import { Point, SumAggregator } from '@opentelemetry/metrics';
 import { HrTime } from '@opentelemetry/api';
 
 export const mockedHrTime: HrTime = [1586347902211, 0];
@@ -21,13 +21,13 @@ export const mockedTimeMS = 1586347902211000;
 
 let toPoint: () => Point;
 before(() => {
-  toPoint = CounterSumAggregator.prototype.toPoint;
-  CounterSumAggregator.prototype.toPoint = function (): Point {
+  toPoint = SumAggregator.prototype.toPoint;
+  SumAggregator.prototype.toPoint = function (): Point {
     const point = toPoint.apply(this);
     point.timestamp = mockedHrTime;
     return point;
   };
 });
 after(() => {
-  CounterSumAggregator.prototype.toPoint = toPoint;
+  SumAggregator.prototype.toPoint = toPoint;
 });

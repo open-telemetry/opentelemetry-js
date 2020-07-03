@@ -12,7 +12,6 @@ installExportPipeline({
 const meter = metrics.getMeter('example-ts');
 
 const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
-  monotonic: true,
   description: "Count all incoming requests"
 });
 

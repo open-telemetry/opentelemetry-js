@@ -83,7 +83,7 @@ describe('ConsoleMetricExporter', () => {
   });
 
   describe('.export()', () => {
-    it('should export information about metrics', () => {
+    it('should export information about metrics', async () => {
       const spyConsole = sinon.spy(console, 'log');
 
       const meter = new PushController().getMeter(
@@ -98,7 +98,7 @@ describe('ConsoleMetricExporter', () => {
       });
       boundCounter.add(10);
 
-      meter.collect();
+      await meter.collect();
       consoleExporter.export(meter.getBatcher().checkPointSet(), () => {});
       assert.strictEqual(spyConsole.args.length, 3);
       const [descriptor, labels, value] = spyConsole.args;
