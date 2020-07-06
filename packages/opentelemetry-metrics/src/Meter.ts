@@ -231,20 +231,14 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  collect(): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-      const metrics: Promise<MetricRecord[]>[] = [];
-      Array.from(this._metrics.values()).forEach(metric => {
-        metrics.push(metric.getMetricRecord());
+  collect(): Promise<void> {
+    const metrics = Array.from(this._metrics.values()).map(metric => {
+      return metric.getMetricRecord();
+    });
+    return Promise.all(metrics).then(records => {
+      records.forEach(metrics => {
+        metrics.forEach(metric => this._batcher.process(metric));
       });
-      Promise.all(metrics)
-        .then(records => {
-          records.forEach(metrics => {
-            metrics.forEach(metric => this._batcher.process(metric));
-          });
-          resolve();
-        })
-        .catch(reject);
     });
   }
 
