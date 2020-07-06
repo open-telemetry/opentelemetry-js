@@ -29,8 +29,8 @@ class CollectorTraceExporter extends CollectorTraceExporterBase<
   onInit() {}
   onShutdown() {}
   sendSpans() {}
-  getDefaultUrl(url: string | undefined) {
-    return url || '';
+  getDefaultUrl(config: CollectorExporterConfig) {
+    return config.url || '';
   }
 }
 
