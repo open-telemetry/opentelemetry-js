@@ -49,7 +49,7 @@ export class PrometheusExporter implements MetricExporter {
   private readonly _server: Server;
   private readonly _prefix?: string;
   private readonly _invalidCharacterRegex = /[^a-z0-9_]/gi;
-  private _pullCallback: (() => void) | undefined;
+  private _pullCallback: (() => Promise<unknown>) | undefined;
 
   // This will be required when histogram is implemented. Leaving here so it is not forgotten
   // Histogram cannot have a label named 'le'
@@ -118,11 +118,12 @@ export class PrometheusExporter implements MetricExporter {
   }
 
   /**
-   * Set the pulling callback will be called on request of metrics.
+   * Set the pulling callback will be called on request of metrics. The
+   * callback can return a promise for asynchronous metric collection.
    *
    * @param cb The callback
    */
-  setPullCallback(cb?: () => void) {
+  setPullCallback(cb?: () => Promise<unknown>) {
     this._pullCallback = cb;
   }
 
@@ -302,12 +303,12 @@ export class PrometheusExporter implements MetricExporter {
    * @param request Incoming HTTP request to export server
    * @param response HTTP response object used to respond to request
    */
-  private _requestHandler = (
+  private _requestHandler = async (
     request: IncomingMessage,
     response: ServerResponse
   ) => {
     if (url.parse(request.url!).pathname === this._endpoint) {
-      this._pullCallback?.();
+      await this._pullCallback?.();
       this._exportMetrics(response);
     } else {
       this._notFound(response);
