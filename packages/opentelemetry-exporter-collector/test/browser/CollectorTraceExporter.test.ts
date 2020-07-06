@@ -34,9 +34,9 @@ const sendBeacon = navigator.sendBeacon;
 describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfigBrowser;
-  let spyOpen: any;
-  let spySend: any;
-  let spyBeacon: any;
+  let spyOpen: sinon.SinonSpy;
+  let spySend: sinon.SinonSpy;
+  let spyBeacon: sinon.SinonSpy;
   let spans: ReadableSpan[];
 
   beforeEach(() => {
