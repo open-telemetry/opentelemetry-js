@@ -50,7 +50,7 @@ const metadata = new grpc.Metadata();
 metadata.set('k', 'v');
 
 const testCollectorExporter = (params: TestParams) =>
-  describe(`CollectorExporter - node ${
+  describe(`CollectorTraceExporter - node ${
     params.useTLS ? 'with' : 'without'
   } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
     let collectorExporter: CollectorTraceExporter;
@@ -172,7 +172,7 @@ const testCollectorExporter = (params: TestParams) =>
     });
   });
 
-describe('CollectorExporter - node (getDefaultUrl)', () => {
+describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
