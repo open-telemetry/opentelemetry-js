@@ -112,9 +112,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
       this.traceServiceClient.export(
         exportTraceServiceRequest,
         this.metadata,
-        (
-          err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
+        (err: collectorTypes.ExportServiceError) => {
           if (err) {
             this.logger.error(
               'exportTraceServiceRequest',
