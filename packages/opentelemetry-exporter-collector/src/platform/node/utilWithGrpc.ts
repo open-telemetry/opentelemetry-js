@@ -79,7 +79,7 @@ export function sendSpansUsingGrpc(
       exportTraceServiceRequest,
       collector.metadata,
       (
-        err: collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceError
+        err: collectorTypes.ExportServiceError
       ) => {
         if (err) {
           collector.logger.error(
