@@ -17,7 +17,7 @@
 import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorExporterConfigBrowser } from '../../types';
+import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 

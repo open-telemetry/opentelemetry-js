@@ -21,6 +21,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorProtocolNode } from '../../src/enums';
 import { CollectorTraceExporter } from '../../src/platform/node';
+import { CollectorExporterConfigNode } from '../../src/platform/node/types';
 import * as collectorTypes from '../../src/types';
 
 import {
@@ -45,7 +46,7 @@ const mockResError = {
 
 describe('CollectorExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigNode;
+  let collectorExporterConfig: CollectorExporterConfigNode;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -58,7 +59,7 @@ describe('CollectorExporter - node with json over http', () => {
           foo: 'bar',
         },
         protocolNode: CollectorProtocolNode.HTTP_JSON,
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new core.NoopLogger(),
         serviceName: 'bar',
         attributes: {},

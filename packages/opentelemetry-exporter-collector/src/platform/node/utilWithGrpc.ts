@@ -22,14 +22,14 @@ import * as collectorTypes from '../../types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { GRPCSpanQueueItem } from './types';
+import { CollectorExporterConfigNode, GRPCSpanQueueItem } from './types';
 import { removeProtocol } from './util';
 
 export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 
 export function onInitWithGrpc(
   collector: CollectorTraceExporter,
-  config: collectorTypes.CollectorExporterConfigNode
+  config: CollectorExporterConfigNode
 ): void {
   collector.grpcSpansQueue = [];
   const serverAddress = removeProtocol(collector.url);
@@ -78,9 +78,7 @@ export function sendSpansUsingGrpc(
     collector.traceServiceClient.export(
       exportTraceServiceRequest,
       collector.metadata,
-      (
-        err: collectorTypes.ExportServiceError
-      ) => {
+      (err: collectorTypes.ExportServiceError) => {
         if (err) {
           collector.logger.error(
             'exportTraceServiceRequest',

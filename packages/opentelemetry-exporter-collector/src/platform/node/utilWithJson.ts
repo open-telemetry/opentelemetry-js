@@ -22,12 +22,13 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
+import { CollectorExporterConfigNode } from './types';
 
 export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
 
 export function onInitWithJson(
   _collector: CollectorTraceExporter,
-  _config: collectorTypes.CollectorExporterConfigNode
+  _config: CollectorExporterConfigNode
 ): void {
   // nothing to be done for json yet
 }

@@ -21,7 +21,12 @@ import * as collectorTypes from '../../types';
 
 import { CollectorProtocolNode } from '../../enums';
 import { parseHeaders } from '../../util';
-import { GRPCSpanQueueItem, ServiceClient } from './types';
+import {
+  GRPCSpanQueueItem,
+  ServiceClient,
+  CollectorExporterConfigNode,
+} from './types';
+
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
   onInitWithGrpc,
@@ -37,7 +42,7 @@ import {
  * Collector Trace Exporter for Node
  */
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
-  collectorTypes.CollectorExporterConfigNode
+  CollectorExporterConfigNode
 > {
   DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
@@ -52,7 +57,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
   /**
    * @param config
    */
-  constructor(config: collectorTypes.CollectorExporterConfigNode = {}) {
+  constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
     this._protocol =
       typeof config.protocolNode !== 'undefined'
@@ -81,7 +86,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     }
   }
 
-  onInit(config: collectorTypes.CollectorExporterConfigNode): void {
+  onInit(config: CollectorExporterConfigNode): void {
     this.isShutDown = false;
 
     if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
@@ -107,7 +112,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     }
   }
 
-  getDefaultUrl(config: collectorTypes.CollectorExporterConfigNode): string {
+  getDefaultUrl(config: CollectorExporterConfigNode): string {
     if (!config.url) {
       return config.protocolNode === CollectorProtocolNode.HTTP_JSON
         ? DEFAULT_COLLECTOR_URL_JSON
