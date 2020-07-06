@@ -18,6 +18,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { ConsoleMetricExporter, PushController, MetricKind } from '../../src';
 import { ValueType, metrics } from '@opentelemetry/api';
+import { callbackStub } from '../util';
 
 describe('ConsoleMetricExporter', () => {
   let consoleExporter: ConsoleMetricExporter;
@@ -42,11 +43,12 @@ describe('ConsoleMetricExporter', () => {
       clock.restore();
     });
 
-    it('should install export pipeline to global metric provider', () => {
+    it('should install export pipeline to global metric provider', async () => {
       const spyConsole = sinon.spy(console, 'log');
+      const { callback, onNextCall } = callbackStub();
       const interval = 1000;
 
-      ConsoleMetricExporter.installPipeline({ interval });
+      ConsoleMetricExporter.installPipeline({ interval, onPushed: callback });
 
       const meter = metrics.getMeter('test-console-metric-exporter');
       const counter = meter.createCounter('counter', {
@@ -60,6 +62,7 @@ describe('ConsoleMetricExporter', () => {
 
       // tick push interval.
       clock.tick(interval);
+      await onNextCall();
 
       assert.strictEqual(spyConsole.args.length, 3);
       const [descriptor, labels, value] = spyConsole.args;

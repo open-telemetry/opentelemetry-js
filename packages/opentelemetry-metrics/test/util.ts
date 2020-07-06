@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-import { MeterConfig } from '../../types';
+export function callbackStub() {
+  let listener: () => void | undefined;
+  const callback = () => {
+    listener?.();
+  };
+  const onNextCall = () => {
+    return new Promise(resolve => {
+      listener = resolve;
+    });
+  };
 
-export interface PushControllerConfig extends MeterConfig {
-  /** Metric collect interval */
-  interval?: number;
-  /** Called on each time the metrics were pushed */
-  onPushed?: () => void;
+  return { callback, onNextCall };
 }

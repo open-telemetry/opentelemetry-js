@@ -42,8 +42,12 @@ export class PushController extends Controller implements api.MeterProvider {
     );
     this.resource = _config.resource ?? Resource.createTelemetrySDKResource();
 
+    const onPushed = _config?.onPushed;
     this._timer = setInterval(() => {
-      this.collect();
+      const promise = this.collect();
+      if (onPushed) {
+        promise.then(() => onPushed());
+      }
     }, _config.interval ?? DEFAULT_EXPORT_INTERVAL);
     unrefTimer(this._timer);
   }

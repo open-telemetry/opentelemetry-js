@@ -15,11 +15,7 @@
  */
 
 import { ObserverResult } from '@opentelemetry/api';
-import {
-  CounterMetric,
-  Meter,
-  PushController,
-} from '@opentelemetry/metrics';
+import { CounterMetric, Meter, PushController } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
