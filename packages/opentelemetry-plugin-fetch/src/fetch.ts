@@ -113,7 +113,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
         h.set(k, typeof v === 'string' ? v : String(v))
       );
     } else {
-      const headers: { [key: string]: unknown } = {};
+      const headers: Partial<Record<string, unknown>> = {};
       api.propagation.inject(headers);
       options.headers = Object.assign({}, headers, options.headers || {});
     }
