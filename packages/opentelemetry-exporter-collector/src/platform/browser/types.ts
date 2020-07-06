@@ -14,5 +14,12 @@
  * limitations under the License.
  */
 
-export * from './platform';
-export * from './enums';
+import { CollectorExporterConfigBase } from '../../types';
+
+/**
+ * Collector Exporter Config for Web
+ */
+export interface CollectorExporterConfigBrowser
+  extends CollectorExporterConfigBase {
+  headers?: { [key: string]: string };
+}
