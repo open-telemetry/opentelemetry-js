@@ -15,34 +15,34 @@
  */
 
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
-import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorTraceExporterBase } from '../../src/CollectorTraceExporterBase';
+import { CollectorMetricExporterBase } from '../../src/CollectorMetricExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
-import { mockedReadableSpan } from '../helper';
+import { MetricRecord } from '@opentelemetry/metrics';
+import { mockCounter, mockObserver } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorTraceExporter extends CollectorTraceExporterBase<
+class CollectorMetricExporter extends CollectorMetricExporterBase<
   CollectorExporterConfig
 > {
   onInit() {}
   onShutdown() {}
-  sendSpans() {}
-  getDefaultUrl(url: string | undefined) {
+  sendMetrics() {}
+  getDefaultUrl(url: string) {
     return url || '';
   }
 }
 
-describe('CollectorTraceExporter - common', () => {
-  let collectorExporter: CollectorTraceExporter;
+describe('CollectorMetricExporter - common', () => {
+  let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: CollectorExporterConfig;
-
+  let metrics: MetricRecord[];
   describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
-      onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
+      onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
         logger: new NoopLogger(),
@@ -50,7 +50,10 @@ describe('CollectorTraceExporter - common', () => {
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
+      collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
+      metrics = [];
+      metrics.push(Object.assign({}, mockCounter));
+      metrics.push(Object.assign({}, mockObserver));
     });
 
     afterEach(() => {
@@ -85,11 +88,14 @@ describe('CollectorTraceExporter - common', () => {
 
     describe('when config is missing certain params', () => {
       beforeEach(() => {
-        collectorExporter = new CollectorTraceExporter();
+        collectorExporter = new CollectorMetricExporter();
       });
 
       it('should set default serviceName', () => {
-        assert.strictEqual(collectorExporter.serviceName, 'collector-exporter');
+        assert.strictEqual(
+          collectorExporter.serviceName,
+          'collector-metric-exporter'
+        );
       });
 
       it('should set default logger', () => {
@@ -101,21 +107,20 @@ describe('CollectorTraceExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorTraceExporter.prototype, 'sendSpans');
-      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
+      spySend = sinon.stub(CollectorMetricExporter.prototype, 'sendMetrics');
+      collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
     });
     afterEach(() => {
       spySend.restore();
     });
 
-    it('should export spans as collectorTypes.Spans', done => {
-      const spans: ReadableSpan[] = [];
-      spans.push(Object.assign({}, mockedReadableSpan));
-
-      collectorExporter.export(spans, () => {});
+    it('should export metrics as collectorTypes.Metrics', done => {
+      collectorExporter.export(metrics, () => {});
       setTimeout(() => {
-        const span1 = spySend.args[0][0][0] as ReadableSpan;
-        assert.deepStrictEqual(spans[0], span1);
+        const metric1 = spySend.args[0][0][0] as MetricRecord;
+        assert.deepStrictEqual(metrics[0], metric1);
+        const metric2 = spySend.args[0][0][1] as MetricRecord;
+        assert.deepStrictEqual(metrics[1], metric2);
         done();
       });
       assert.strictEqual(spySend.callCount, 1);
@@ -123,15 +128,12 @@ describe('CollectorTraceExporter - common', () => {
 
     describe('when exporter is shutdown', () => {
       it('should not export anything but return callback with code "FailedNotRetryable"', () => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
         collectorExporter.shutdown();
         spySend.resetHistory();
 
         const callbackSpy = sinon.spy();
-        collectorExporter.export(spans, callbackSpy);
+        collectorExporter.export(metrics, callbackSpy);
         const returnCode = callbackSpy.args[0][0];
-
         assert.strictEqual(
           returnCode,
           ExportResult.FAILED_NOT_RETRYABLE,
@@ -142,8 +144,6 @@ describe('CollectorTraceExporter - common', () => {
     });
     describe('when an error occurs', () => {
       it('should return a Not Retryable Error', done => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
         spySend.throws({
           code: 100,
           details: 'Test error',
@@ -152,7 +152,7 @@ describe('CollectorTraceExporter - common', () => {
           stack: 'Stack',
         });
         const callbackSpy = sinon.spy();
-        collectorExporter.export(spans, callbackSpy);
+        collectorExporter.export(metrics, callbackSpy);
         setTimeout(() => {
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
@@ -166,8 +166,6 @@ describe('CollectorTraceExporter - common', () => {
       });
 
       it('should return a Retryable Error', done => {
-        const spans: ReadableSpan[] = [];
-        spans.push(Object.assign({}, mockedReadableSpan));
         spySend.throws({
           code: 600,
           details: 'Test error',
@@ -176,7 +174,7 @@ describe('CollectorTraceExporter - common', () => {
           stack: 'Stack',
         });
         const callbackSpy = sinon.spy();
-        collectorExporter.export(spans, callbackSpy);
+        collectorExporter.export(metrics, callbackSpy);
         setTimeout(() => {
           const returnCode = callbackSpy.args[0][0];
           assert.strictEqual(
@@ -195,7 +193,7 @@ describe('CollectorTraceExporter - common', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
       onShutdownSpy = sinon.stub(
-        CollectorTraceExporter.prototype,
+        CollectorMetricExporter.prototype,
         'onShutdown'
       );
       collectorExporterConfig = {
@@ -205,7 +203,7 @@ describe('CollectorTraceExporter - common', () => {
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
+      collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
     });
     afterEach(() => {
       onShutdownSpy.restore();
