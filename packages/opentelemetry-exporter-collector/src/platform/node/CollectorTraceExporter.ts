@@ -14,23 +14,29 @@
  * limitations under the License.
  */
 
-import * as protoLoader from '@grpc/proto-loader';
+import { ReadableSpan } from '@opentelemetry/tracing';
 import * as grpc from 'grpc';
-import * as path from 'path';
+import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import * as collectorTypes from '../../types';
 
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
-import { CollectorExporterError } from '../../types';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorProtocolNode } from '../../enums';
+import { parseHeaders } from '../../util';
 import {
   GRPCSpanQueueItem,
   ServiceClient,
   CollectorExporterConfigNode,
 } from './types';
-import { removeProtocol } from './util';
 
-const DEFAULT_COLLECTOR_URL = 'localhost:55680';
+import {
+  DEFAULT_COLLECTOR_URL_GRPC,
+  onInitWithGrpc,
+  sendSpansUsingGrpc,
+} from './utilWithGrpc';
+import {
+  DEFAULT_COLLECTOR_URL_JSON,
+  onInitWithJson,
+  sendSpansUsingJson,
+} from './utilWithJson';
 
 /**
  * Collector Trace Exporter for Node
@@ -38,17 +44,39 @@ const DEFAULT_COLLECTOR_URL = 'localhost:55680';
 export class CollectorTraceExporter extends CollectorTraceExporterBase<
   CollectorExporterConfigNode
 > {
+  DEFAULT_HEADERS: Record<string, string> = {
+    [collectorTypes.OT_REQUEST_HEADER]: '1',
+  };
   isShutDown: boolean = false;
   traceServiceClient?: ServiceClient = undefined;
   grpcSpansQueue: GRPCSpanQueueItem[] = [];
   metadata?: grpc.Metadata;
+  headers: Record<string, string>;
+  private readonly _protocol: CollectorProtocolNode;
 
   /**
    * @param config
    */
   constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
+    this._protocol =
+      typeof config.protocolNode !== 'undefined'
+        ? config.protocolNode
+        : CollectorProtocolNode.GRPC;
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+      this.logger.debug('CollectorExporter - using json over http');
+      if (config.metadata) {
+        this.logger.warn('Metadata cannot be set when using json');
+      }
+    } else {
+      this.logger.debug('CollectorExporter - using grpc');
+      if (config.headers) {
+        this.logger.warn('Headers cannot be set when using grpc');
+      }
+    }
     this.metadata = config.metadata;
+    this.headers =
+      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
   }
 
   onShutdown(): void {
@@ -60,81 +88,36 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
 
   onInit(config: CollectorExporterConfigNode): void {
     this.isShutDown = false;
-    this.grpcSpansQueue = [];
-    const serverAddress = removeProtocol(this.url);
-    const credentials: grpc.ChannelCredentials =
-      config.credentials || grpc.credentials.createInsecure();
 
-    const traceServiceProtoPath =
-      'opentelemetry/proto/collector/trace/v1/trace_service.proto';
-    const includeDirs = [path.resolve(__dirname, 'protos')];
-
-    protoLoader
-      .load(traceServiceProtoPath, {
-        keepCase: false,
-        longs: String,
-        enums: String,
-        defaults: true,
-        oneofs: true,
-        includeDirs,
-      })
-      .then(packageDefinition => {
-        const packageObject: any = grpc.loadPackageDefinition(
-          packageDefinition
-        );
-        this.traceServiceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-          serverAddress,
-          credentials
-        );
-        if (this.grpcSpansQueue.length > 0) {
-          const queue = this.grpcSpansQueue.splice(0);
-          queue.forEach((item: GRPCSpanQueueItem) => {
-            this.sendSpans(item.spans, item.onSuccess, item.onError);
-          });
-        }
-      });
+    if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
+      onInitWithJson(this, config);
+    } else {
+      onInitWithGrpc(this, config);
+    }
   }
 
   sendSpans(
     spans: ReadableSpan[],
     onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
+    onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this.isShutDown) {
       this.logger.debug('Shutdown already started. Cannot send spans');
       return;
     }
-    if (this.traceServiceClient) {
-      const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-        spans,
-        this
-      );
-
-      this.traceServiceClient.export(
-        exportTraceServiceRequest,
-        this.metadata,
-        (err: collectorTypes.ExportServiceError) => {
-          if (err) {
-            this.logger.error(
-              'exportTraceServiceRequest',
-              exportTraceServiceRequest
-            );
-            onError(err);
-          } else {
-            onSuccess();
-          }
-        }
-      );
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+      sendSpansUsingJson(this, spans, onSuccess, onError);
     } else {
-      this.grpcSpansQueue.push({
-        spans,
-        onSuccess,
-        onError,
-      });
+      sendSpansUsingGrpc(this, spans, onSuccess, onError);
     }
   }
 
-  getDefaultUrl(url: string | undefined): string {
-    return url || DEFAULT_COLLECTOR_URL;
+  getDefaultUrl(config: CollectorExporterConfigNode): string {
+    if (!config.url) {
+      return config.protocolNode === CollectorProtocolNode.HTTP_JSON
+        ? DEFAULT_COLLECTOR_URL_JSON
+        : DEFAULT_COLLECTOR_URL_GRPC;
+    }
+    return config.url;
   }
 }
