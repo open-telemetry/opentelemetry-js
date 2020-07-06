@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from '@opentelemetry/api';
+import { TraceFlags, ValueType } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -22,6 +22,12 @@ import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import * as grpc from 'grpc';
+import {
+  MetricRecord,
+  MetricKind,
+  SumAggregator,
+  LastValueAggregator,
+} from '@opentelemetry/metrics';
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -51,6 +57,42 @@ const traceIdArr = [
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
+
+export const mockCounter: MetricRecord = {
+  descriptor: {
+    name: 'test-counter',
+    description: 'sample counter description',
+    unit: '1',
+    metricKind: MetricKind.COUNTER,
+    valueType: ValueType.INT,
+  },
+  labels: {},
+  aggregator: new SumAggregator(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+};
+
+export const mockObserver: MetricRecord = {
+  descriptor: {
+    name: 'test-observer',
+    description: 'sample observer description',
+    unit: '2',
+    metricKind: MetricKind.VALUE_OBSERVER,
+    valueType: ValueType.DOUBLE,
+  },
+  labels: {},
+  aggregator: new LastValueAggregator(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+};
 
 const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
 const spanIdBase64 = 'XhByYfZPpT4=';

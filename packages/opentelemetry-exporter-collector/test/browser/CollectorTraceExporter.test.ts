@@ -31,7 +31,7 @@ import {
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
-describe('CollectorExporter - web', () => {
+describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfigBrowser;
   let spyOpen: any;
@@ -57,7 +57,7 @@ describe('CollectorExporter - web', () => {
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
@@ -327,7 +327,7 @@ describe('CollectorExporter - web', () => {
   });
 });
 
-describe('CollectorExporter - browser (getDefaultUrl)', () => {
+describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
   it('should default to v1/trace', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
