@@ -20,10 +20,16 @@ import * as transform from '../../src/transform';
 import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
+  mockCounter,
+  mockObserver,
   mockedResources,
   mockedInstrumentationLibraries,
   multiResourceTrace,
   multiInstrumentationLibraryTrace,
+  multiResourceMetrics,
+  multiInstrumentationLibraryMetrics,
+  ensureCounterIsCorrect,
+  ensureObserverIsCorrect,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
 
@@ -99,6 +105,17 @@ describe('transform', () => {
     });
   });
 
+  describe('toCollectorMetric', () => {
+    it('should convert metric', () => {
+      ensureCounterIsCorrect(
+        transform.toCollectorMetric(mockCounter, 1592602232694000000)
+      );
+      ensureObserverIsCorrect(
+        transform.toCollectorMetric(mockObserver, 1592602232694000000)
+      );
+    });
+  });
+
   describe('toCollectorResource', () => {
     it('should convert resource', () => {
       const resource = transform.toCollectorResource(
@@ -126,7 +143,6 @@ describe('transform', () => {
       });
     });
   });
-
   describe('groupSpansByResourceAndLibrary', () => {
     it('should group by resource', () => {
       const [resource1, resource2] = mockedResources;
@@ -165,6 +181,47 @@ describe('transform', () => {
       );
 
       assert.deepStrictEqual(result, expected);
+    });
+  });
+  describe('toCollectorMetricDescriptor', () => {
+    describe('groupMetricsByResourceAndLibrary', () => {
+      it('should group by resource', () => {
+        const [resource1, resource2] = mockedResources;
+        const [library] = mockedInstrumentationLibraries;
+        const [metric1, metric2, metric3] = multiResourceMetrics;
+
+        const expected = new Map([
+          [resource1, new Map([[library, [metric1, metric3]]])],
+          [resource2, new Map([[library, [metric2]]])],
+        ]);
+
+        const result = transform.groupMetricsByResourceAndLibrary(
+          multiResourceMetrics
+        );
+
+        assert.deepStrictEqual(result, expected);
+      });
+
+      it('should group by instrumentation library', () => {
+        const [resource] = mockedResources;
+        const [lib1, lib2] = mockedInstrumentationLibraries;
+        const [metric1, metric2, metric3] = multiInstrumentationLibraryMetrics;
+        const expected = new Map([
+          [
+            resource,
+            new Map([
+              [lib1, [metric1, metric3]],
+              [lib2, [metric2]],
+            ]),
+          ],
+        ]);
+
+        const result = transform.groupMetricsByResourceAndLibrary(
+          multiInstrumentationLibraryMetrics
+        );
+
+        assert.deepStrictEqual(result, expected);
+      });
     });
   });
 });

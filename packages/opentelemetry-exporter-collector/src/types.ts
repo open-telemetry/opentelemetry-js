@@ -32,6 +32,11 @@ export namespace opentelemetryProto {
         resourceSpans: opentelemetryProto.trace.v1.ResourceSpans[];
       }
     }
+    export namespace metrics.v1 {
+      export interface ExportMetricsServiceRequest {
+        resourceMetrics: opentelemetryProto.metrics.v1.ResourceMetrics[];
+      }
+    }
   }
 
   export namespace resource.v1 {
