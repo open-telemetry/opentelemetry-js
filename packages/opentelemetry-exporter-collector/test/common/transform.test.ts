@@ -30,8 +30,12 @@ import {
   multiInstrumentationLibraryMetrics,
   ensureCounterIsCorrect,
   ensureObserverIsCorrect,
+  mockHistogram,
+  ensureHistogramIsCorrect,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
+import { HistogramAggregator } from '@opentelemetry/metrics';
+import { hrTimeToNanoseconds } from '@opentelemetry/core';
 
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
@@ -107,11 +111,22 @@ describe('transform', () => {
 
   describe('toCollectorMetric', () => {
     it('should convert metric', () => {
+      mockCounter.aggregator.update(1);
       ensureCounterIsCorrect(
-        transform.toCollectorMetric(mockCounter, 1592602232694000000)
+        transform.toCollectorMetric(mockCounter, 1592602232694000000),
+        hrTimeToNanoseconds(mockCounter.aggregator.toPoint().timestamp)
       );
+      mockObserver.aggregator.update(10);
       ensureObserverIsCorrect(
-        transform.toCollectorMetric(mockObserver, 1592602232694000000)
+        transform.toCollectorMetric(mockObserver, 1592602232694000000),
+        hrTimeToNanoseconds(mockObserver.aggregator.toPoint().timestamp)
+      );
+      mockHistogram.aggregator.update(7);
+      mockHistogram.aggregator.update(14);
+      (mockHistogram.aggregator as HistogramAggregator).reset();
+      ensureHistogramIsCorrect(
+        transform.toCollectorMetric(mockHistogram, 1592602232694000000),
+        hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
       );
     });
   });

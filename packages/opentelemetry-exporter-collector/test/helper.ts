@@ -25,6 +25,7 @@ import {
   MetricKind,
   SumAggregator,
   MinMaxLastSumCountAggregator,
+  HistogramAggregator,
 } from '@opentelemetry/metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import * as grpc from 'grpc';
@@ -106,6 +107,24 @@ export const mockObserver: MetricRecord = {
   },
   labels: {},
   aggregator: new MinMaxLastSumCountAggregator(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+};
+
+export const mockHistogram: MetricRecord = {
+  descriptor: {
+    name: 'test-hist',
+    description: 'sample observer description',
+    unit: '2',
+    metricKind: MetricKind.VALUE_OBSERVER,
+    valueType: ValueType.DOUBLE,
+  },
+  labels: {},
+  aggregator: new HistogramAggregator([10, 20]),
   resource: new Resource({
     service: 'ui',
     version: 1,
@@ -626,7 +645,8 @@ export function ensureWebResourceIsCorrect(
 }
 
 export function ensureCounterIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
 ) {
   assert.deepStrictEqual(metric, {
     metricDescriptor: {
@@ -640,9 +660,9 @@ export function ensureCounterIsCorrect(
     int64DataPoints: [
       {
         labels: [],
-        value: 0,
+        value: 1,
         startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: 0,
+        timeUnixNano: time,
       },
     ],
     summaryDataPoints: [],
@@ -651,7 +671,8 @@ export function ensureCounterIsCorrect(
 }
 
 export function ensureObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
 ) {
   assert.deepStrictEqual(metric, {
     metricDescriptor: {
@@ -659,19 +680,48 @@ export function ensureObserverIsCorrect(
       description: 'sample observer description',
       unit: '2',
       type: 3,
-      temporality: 1,
+      temporality: 2,
     },
     doubleDataPoints: [
       {
         labels: [],
-        value: 0,
+        value: 10,
         startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: 0,
+        timeUnixNano: time,
       },
     ],
     int64DataPoints: [],
     summaryDataPoints: [],
     histogramDataPoints: [],
+  });
+}
+
+export function ensureHistogramIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-hist',
+      description: 'sample observer description',
+      unit: '2',
+      type: 5,
+      temporality: 2,
+    },
+    histogramDataPoints: [
+      {
+        labels: [],
+        buckets: [{ count: 1 }, { count: 1 }, { count: 0 }],
+        count: 2,
+        sum: 21,
+        explicitBounds: [10, 20],
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: time,
+      },
+    ],
+    int64DataPoints: [],
+    summaryDataPoints: [],
+    doubleDataPoints: [],
   });
 }
 
