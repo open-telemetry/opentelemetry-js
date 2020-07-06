@@ -16,6 +16,7 @@
 
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorProtocolNode } from '../../enums';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,
@@ -49,4 +50,5 @@ export interface CollectorExporterConfigNode
   extends CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
+  protocolNode?: CollectorProtocolNode;
 }

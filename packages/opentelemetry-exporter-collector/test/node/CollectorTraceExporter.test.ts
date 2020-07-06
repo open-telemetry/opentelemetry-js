@@ -15,23 +15,25 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
-import * as grpc from 'grpc';
-import * as path from 'path';
-import * as fs from 'fs';
+import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import {
   BasicTracerProvider,
   SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 
 import * as assert from 'assert';
+import * as fs from 'fs';
+import * as grpc from 'grpc';
+import * as path from 'path';
 import * as sinon from 'sinon';
+import { CollectorProtocolNode } from '../../src';
 import { CollectorTraceExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
 
 import {
-  ensureResourceIsCorrect,
   ensureExportedSpanIsCorrect,
   ensureMetadataIsCorrect,
+  ensureResourceIsCorrect,
   mockedReadableSpan,
 } from '../helper';
 
@@ -136,6 +138,38 @@ const testCollectorExporter = (params: TestParams) =>
     afterEach(() => {
       exportedData = undefined;
       reqMetadata = undefined;
+    });
+
+    describe('instance', () => {
+      it('should warn about headers when using grpc', () => {
+        const logger = new ConsoleLogger(LogLevel.DEBUG);
+        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        collectorExporter = new CollectorTraceExporter({
+          logger,
+          serviceName: 'basic-service',
+          url: address,
+          headers: {
+            foo: 'bar',
+          },
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
+      });
+      it('should warn about metadata when using json', () => {
+        const metadata = new grpc.Metadata();
+        metadata.set('k', 'v');
+        const logger = new ConsoleLogger(LogLevel.DEBUG);
+        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        collectorExporter = new CollectorTraceExporter({
+          logger,
+          serviceName: 'basic-service',
+          url: address,
+          metadata,
+          protocolNode: CollectorProtocolNode.HTTP_JSON,
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'Metadata cannot be set when using json');
+      });
     });
 
     describe('export', () => {

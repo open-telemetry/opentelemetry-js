@@ -152,7 +152,7 @@ export function toCollectorSpan(
  */
 export function toCollectorResource(
   resource?: Resource,
-  additionalAttributes: { [key: string]: any } = {}
+  additionalAttributes: { [key: string]: unknown } = {}
 ): opentelemetryProto.resource.v1.Resource {
   const attr = Object.assign(
     {},
@@ -195,14 +195,12 @@ export function toCollectorTraceState(
  * Prepares trace service request to be sent to collector
  * @param spans spans
  * @param collectorExporterBase
- * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   spans: ReadableSpan[],
-  collectorExporterBase: CollectorTraceExporterBase<T>,
-  name = ''
+  collectorExporterBase: CollectorTraceExporterBase<T>
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<
     Resource,
