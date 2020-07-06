@@ -16,32 +16,31 @@
 
 import * as api from '@opentelemetry/api';
 import { unrefTimer, ConsoleLogger } from '@opentelemetry/core';
-import { DEFAULT_CONFIG, MeterConfig } from '../../types';
+import { DEFAULT_CONFIG } from '../../types';
 import { PushControllerConfig } from './types';
 import { Controller } from './Controller';
 import { UngroupedBatcher } from '../Batcher';
 import { NoopExporter } from '../NoopExporter';
 import { Resource } from '@opentelemetry/resources';
-import { Meter } from '../..';
 
 const DEFAULT_EXPORT_INTERVAL = 60_000;
 
 /**
- * This class represents a controller collecting metric instrument values
- * periodically.
+ * This class represents a {@link Controller} collecting metric instrument
+ * values periodically.
+ *
+ * The PushController can be installed as the global Meter provider.
  */
 export class PushController extends Controller implements api.MeterProvider {
-  readonly resource: Resource;
   private _timer: NodeJS.Timeout;
 
-  constructor(private readonly _config: PushControllerConfig = DEFAULT_CONFIG) {
+  constructor(_config: PushControllerConfig = DEFAULT_CONFIG) {
     super(
       _config.batcher ?? new UngroupedBatcher(),
       _config.exporter ?? new NoopExporter(),
-      _config.logger ?? new ConsoleLogger(_config.logLevel)
+      _config.logger ?? new ConsoleLogger(_config.logLevel),
+      _config.resource ?? Resource.createTelemetrySDKResource()
     );
-    this.resource = _config.resource ?? Resource.createTelemetrySDKResource();
-
     const onPushed = _config?.onPushed;
     this._timer = setInterval(() => {
       const promise = this.collect();
@@ -50,32 +49,5 @@ export class PushController extends Controller implements api.MeterProvider {
       }
     }, _config.interval ?? DEFAULT_EXPORT_INTERVAL);
     unrefTimer(this._timer);
-  }
-
-  /**
-   * Returns a Meter, creating one if one with the given name and version is not already created
-   *
-   * @returns Meter A Meter with the given name and version
-   */
-  getMeter(name: string, version = '*', config?: MeterConfig): Meter {
-    const key = `${name}@${version}`;
-    if (!this._meters.has(key)) {
-      this._meters.set(
-        key,
-        new Meter(
-          { name, version },
-          {
-            batcher: this._batcher,
-            exporter: this._exporter,
-            logger: this._logger,
-            resource: this.resource,
-            ...this._config,
-            ...config,
-          }
-        )
-      );
-    }
-
-    return this._meters.get(key)!;
   }
 }
