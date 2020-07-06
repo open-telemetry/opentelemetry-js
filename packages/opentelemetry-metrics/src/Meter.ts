@@ -21,7 +21,6 @@ import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
-import { MetricRecord } from './export/types';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
 import { Metric } from './Metric';
 import { ValueObserverMetric } from './ValueObserverMetric';
