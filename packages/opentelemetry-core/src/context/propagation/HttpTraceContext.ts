@@ -27,7 +27,7 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
-const VALID_TRACE_PARENT_REGEX = /^00-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})$/;
+const VALID_TRACE_PARENT_REGEX = /^(?!ff)[\da-f]{2}-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})(-|$)/;
 const VERSION = '00';
 
 /**
