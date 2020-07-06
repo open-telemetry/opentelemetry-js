@@ -28,4 +28,5 @@ export enum AttributeNames {
   HTTP_URL = 'http.url',
   HTTP_TARGET = 'http.target',
   HTTP_USER_AGENT = 'http.user_agent',
+  HTTP_RESPONSE_CONTENT_LENGTH = 'http.response_content_length',
 }
