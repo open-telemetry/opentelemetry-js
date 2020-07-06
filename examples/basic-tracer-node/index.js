@@ -2,14 +2,15 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
+const { DatadogSpanProcessor, DatadogExporter } = require('@opentelemetry/exporter-datadog');
 
 const provider = new BasicTracerProvider();
 
 // Configure span processor to send spans to the exporter
-const exporter = new JaegerExporter({ serviceName: 'basic-service' });
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+// const exporter = new DatadogExporter();
+const processor = new DatadogSpanProcessor(new ConsoleSpanExporter())
+provider.addSpanProcessor(processor);
+// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 /**
  * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.
