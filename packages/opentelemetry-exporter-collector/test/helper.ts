@@ -24,7 +24,7 @@ import {
   MetricRecord,
   MetricKind,
   SumAggregator,
-  LastValueAggregator,
+  MinMaxLastSumCountAggregator,
 } from '@opentelemetry/metrics';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import * as grpc from 'grpc';
@@ -105,7 +105,7 @@ export const mockObserver: MetricRecord = {
     valueType: ValueType.DOUBLE,
   },
   labels: {},
-  aggregator: new LastValueAggregator(),
+  aggregator: new MinMaxLastSumCountAggregator(),
   resource: new Resource({
     service: 'ui',
     version: 1,
