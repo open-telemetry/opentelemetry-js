@@ -20,6 +20,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
+import { CollectorExporterConfigBrowser } from '../../src/platform/browser/types';
 
 import {
   ensureSpanIsCorrect,
@@ -32,7 +33,7 @@ const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBrowser;
+  let collectorExporterConfig: CollectorExporterConfigBrowser;
   let spyOpen: any;
   let spySend: any;
   let spyBeacon: any;

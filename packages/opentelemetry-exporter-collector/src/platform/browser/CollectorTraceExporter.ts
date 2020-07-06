@@ -17,7 +17,7 @@
 import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorExporterConfigBrowser } from '../../types';
+import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
