@@ -21,12 +21,13 @@ import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
-import {
-  CollectorExporterError,
-  CollectorExporterConfigNode,
-} from '../../types';
+import { CollectorExporterError } from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { GRPCSpanQueueItem, ServiceClient } from './types';
+import {
+  GRPCSpanQueueItem,
+  ServiceClient,
+  CollectorExporterConfigNode,
+} from './types';
 import { removeProtocol } from './util';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:55680';
