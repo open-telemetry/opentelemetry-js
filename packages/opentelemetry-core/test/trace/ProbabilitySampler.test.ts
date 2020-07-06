@@ -16,11 +16,7 @@
 
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
-import {
-  ProbabilitySampler,
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
-} from '../../src/trace/sampler/ProbabilitySampler';
+import { ProbabilitySampler } from '../../src/trace/sampler/ProbabilitySampler';
 
 describe('ProbabilitySampler', () => {
   it('should return a always sampler for 1', () => {
@@ -64,20 +60,6 @@ describe('ProbabilitySampler', () => {
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
-  });
-
-  it('should return api.SamplingDecision.RECORD_AND_SAMPLED for ALWAYS_SAMPLER', () => {
-    assert.deepStrictEqual(ALWAYS_SAMPLER.shouldSample(), {
-      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-    });
-    assert.strictEqual(ALWAYS_SAMPLER.toString(), 'ProbabilitySampler{1}');
-  });
-
-  it('should return decision: api.SamplingDecision.NOT_RECORD for NEVER_SAMPLER', () => {
-    assert.deepStrictEqual(NEVER_SAMPLER.shouldSample(), {
-      decision: api.SamplingDecision.NOT_RECORD,
-    });
-    assert.strictEqual(NEVER_SAMPLER.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle NaN', () => {

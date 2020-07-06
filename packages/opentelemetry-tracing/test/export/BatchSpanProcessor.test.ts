@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ALWAYS_SAMPLER } from '@opentelemetry/core';
+import { AlwaysOnSampler } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -26,7 +26,7 @@ import {
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
-    sampler: ALWAYS_SAMPLER,
+    sampler: new AlwaysOnSampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
   span.end();
@@ -149,7 +149,7 @@ describe('BatchSpanProcessor', () => {
       const clock = sinon.useFakeTimers();
 
       const tracer = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
 
