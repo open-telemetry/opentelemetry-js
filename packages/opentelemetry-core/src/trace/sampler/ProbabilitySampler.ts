@@ -29,9 +29,8 @@ export class ProbabilitySampler implements Sampler {
 
   shouldSample(parentContext?: SpanContext) {
     // Respect the parent sampling decision if there is one.
-    // TODO(legendecas): add an option to ignore parent regarding to spec:
-    // https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#probability
-    if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
+    // TODO(#1284): add an option to ignore parent regarding to spec.
+    if (parentContext) {
       return {
         decision:
           (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
