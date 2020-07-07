@@ -230,11 +230,11 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  collect(): Promise<void> {
+  async collect(): Promise<void> {
     const metrics = Array.from(this._metrics.values()).map(metric => {
       return metric.getMetricRecord();
     });
-    return Promise.all(metrics).then(records => {
+    await Promise.all(metrics).then(records => {
       records.forEach(metrics => {
         metrics.forEach(metric => this._batcher.process(metric));
       });
