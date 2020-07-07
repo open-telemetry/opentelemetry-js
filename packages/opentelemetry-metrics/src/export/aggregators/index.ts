@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-export * from './countersum';
-export * from './observer';
-export * from './ValueRecorderExact';
 export * from './histogram';
+export * from './MinMaxLastSumCount';
+export * from './Sum';

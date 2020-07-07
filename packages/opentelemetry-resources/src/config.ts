@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
+import { Logger } from '@opentelemetry/api';
 
-/** Basic aggregator for Observer which keeps the last recorded value. */
-export class ObserverAggregator implements Aggregator {
-  private _current: number = 0;
-  private _lastUpdateTime: HrTime = [0, 0];
+/**
+ * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
+ */
+export interface ResourceDetectionConfig {
+  /** Optional Logger. */
+  logger?: Logger;
+}
 
-  update(value: number): void {
-    this._current = value;
-    this._lastUpdateTime = hrTime();
-  }
-
-  toPoint(): Point {
-    return {
-      value: this._current,
-      timestamp: this._lastUpdateTime,
-    };
-  }
+/**
+ * ResourceDetectionConfigWithLogger provides an interface for interacting with
+ * {@link ResourceDetectionConfig} instances that must have a logger defined.
+ */
+export interface ResourceDetectionConfigWithLogger
+  extends ResourceDetectionConfig {
+  /** Required Logger */
+  logger: Logger;
 }

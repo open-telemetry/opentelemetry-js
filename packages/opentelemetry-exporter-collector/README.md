@@ -24,7 +24,7 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55678/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
   headers: {}, //an optional object containing custom headers to be sent with each request
 };
 
@@ -36,7 +36,7 @@ provider.register();
 
 ```
 
-## Usage in Node
+## Usage in Node - GRPC
 
 The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
@@ -46,7 +46,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector')
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55678
+  url: '<opentelemetry-collector-url>' // url is optional and can be omitted - default is localhost:55680
 };
 
 const provider = new BasicTracerProvider();
@@ -67,7 +67,7 @@ const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector')
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55678
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
   credentials: grpc.credentials.createSsl(
     fs.readFileSync('./ca.crt'),
     fs.readFileSync('./client.key'),
@@ -96,7 +96,7 @@ metadata.set('k', 'v');
 
 const collectorOptions = {
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55678
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55680
   metadata, // // an optional grpc.Metadata object to be sent with each request
 };
 
@@ -108,6 +108,29 @@ provider.register();
 ```
 
 Note, that this will only work if TLS is also configured on the server.
+
+## Usage in Node - JSON over http
+
+```js
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
+
+const collectorOptions = {
+  protocolNode: CollectorTransportNode.HTTP_JSON,
+  serviceName: 'basic-service',
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
+  headers: {
+    foo: 'bar'
+  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+};
+
+const provider = new BasicTracerProvider();
+const exporter = new CollectorExporter(collectorOptions);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+
+provider.register();
+
+```
 
 ## Running opentelemetry-collector locally to see the traces
 

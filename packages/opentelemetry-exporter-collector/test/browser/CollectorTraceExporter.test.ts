@@ -20,6 +20,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
+import { CollectorExporterConfigBrowser } from '../../src/platform/browser/types';
 
 import {
   ensureSpanIsCorrect,
@@ -30,12 +31,12 @@ import {
 } from '../helper';
 const sendBeacon = navigator.sendBeacon;
 
-describe('CollectorExporter - web', () => {
+describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
-  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBrowser;
-  let spyOpen: any;
-  let spySend: any;
-  let spyBeacon: any;
+  let collectorExporterConfig: CollectorExporterConfigBrowser;
+  let spyOpen: sinon.SinonSpy;
+  let spySend: sinon.SinonSpy;
+  let spyBeacon: sinon.SinonSpy;
   let spans: ReadableSpan[];
 
   beforeEach(() => {
@@ -56,7 +57,7 @@ describe('CollectorExporter - web', () => {
   describe('export', () => {
     beforeEach(() => {
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
@@ -326,13 +327,13 @@ describe('CollectorExporter - web', () => {
   });
 });
 
-describe('CollectorExporter - browser (getDefaultUrl)', () => {
+describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
   it('should default to v1/trace', done => {
     const collectorExporter = new CollectorTraceExporter({});
     setTimeout(() => {
       assert.strictEqual(
         collectorExporter['url'],
-        'http://localhost:55678/v1/trace'
+        'http://localhost:55680/v1/trace'
       );
       done();
     });

@@ -23,7 +23,6 @@ export enum MetricKind {
   COUNTER,
   UP_DOWN_COUNTER,
   VALUE_RECORDER,
-  OBSERVER, // @TODO remove later #1146
   SUM_OBSERVER,
   UP_DOWN_SUM_OBSERVER,
   VALUE_OBSERVER,
@@ -38,6 +37,7 @@ export type LastValue = number;
 export interface Distribution {
   min: number;
   max: number;
+  last: number;
   count: number;
   sum: number;
 }
