@@ -2,12 +2,14 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
 
-const address = '127.0.0.1:55680';
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
-  url: address,
+  // headers: {
+  //   foo: 'bar'
+  // },
+  protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();
