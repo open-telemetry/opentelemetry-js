@@ -417,17 +417,15 @@ export function toSingularPoint(
   timeUnixNano: number;
   value: number;
 } {
-  let value: number;
+  let pointValue: number;
   if (metric.aggregator instanceof MinMaxLastSumCountAggregator) {
-    value = (metric.aggregator.toPoint().value as Distribution).last;
+    pointValue = (metric.aggregator.toPoint().value as Distribution).last;
   } else {
-    value = metric.aggregator.toPoint().value as number;
+    pointValue = metric.aggregator.toPoint().value as number;
   }
-  console.log(metric.aggregator.toPoint().timestamp);
-  console.log(core.hrTimeToNanoseconds(metric.aggregator.toPoint().timestamp));
   return {
     labels: toCollectorLabels(metric.labels),
-    value,
+    value: pointValue,
     startTimeUnixNano: startTime,
     timeUnixNano: core.hrTimeToNanoseconds(
       metric.aggregator.toPoint().timestamp
