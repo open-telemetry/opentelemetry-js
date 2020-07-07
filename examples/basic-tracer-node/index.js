@@ -1,14 +1,15 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor, BatchSpanProcessor } = require('@opentelemetry/tracing');
 const { DatadogSpanProcessor, DatadogExporter } = require('@opentelemetry/exporter-datadog');
 
 const provider = new BasicTracerProvider();
 
 // Configure span processor to send spans to the exporter
-// const exporter = new DatadogExporter();
-const processor = new DatadogSpanProcessor(new ConsoleSpanExporter())
+const exporter = new DatadogExporter({agent_url: "http://localhost:8126"});
+// const exporter = new ConsoleSpanExporter()
+const processor = new DatadogSpanProcessor(exporter)
 provider.addSpanProcessor(processor);
 // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
@@ -33,7 +34,11 @@ for (let i = 0; i < 10; i += 1) {
 parentSpan.end();
 
 // flush and close the connection.
-exporter.shutdown();
+setTimeout(() => {
+
+      console.log('okok')
+    }, 5000);
+// processor.shutdown();
 
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
