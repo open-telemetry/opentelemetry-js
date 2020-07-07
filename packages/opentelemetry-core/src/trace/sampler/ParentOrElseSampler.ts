@@ -24,7 +24,10 @@ import {
   Link,
 } from '@opentelemetry/api';
 
-/** Sampler that samples a given fraction of traces. */
+/**
+ * A composite sampler that either respects the parent span's sampling decision
+ * or delegates to `delegateSampler` for root spans.
+ */
 export class ParentOrElseSampler implements Sampler {
   constructor(private _delegateSampler: Sampler) {}
 
