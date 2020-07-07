@@ -656,7 +656,6 @@ export function ensureCounterIsCorrect(
       type: 2,
       temporality: 3,
     },
-    doubleDataPoints: [],
     int64DataPoints: [
       {
         labels: [],
@@ -665,8 +664,6 @@ export function ensureCounterIsCorrect(
         timeUnixNano: time,
       },
     ],
-    summaryDataPoints: [],
-    histogramDataPoints: [],
   });
 }
 
@@ -690,9 +687,6 @@ export function ensureObserverIsCorrect(
         timeUnixNano: time,
       },
     ],
-    int64DataPoints: [],
-    summaryDataPoints: [],
-    histogramDataPoints: [],
   });
 }
 
@@ -719,9 +713,6 @@ export function ensureHistogramIsCorrect(
         timeUnixNano: time,
       },
     ],
-    int64DataPoints: [],
-    summaryDataPoints: [],
-    doubleDataPoints: [],
   });
 }
 

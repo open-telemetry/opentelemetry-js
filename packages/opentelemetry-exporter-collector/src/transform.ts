@@ -33,7 +33,7 @@ import {
   CollectorExporterConfigBase,
 } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
-import { ValueType as apiValueType } from '@opentelemetry/api';
+import * as api from '@opentelemetry/api';
 import {
   MetricRecord,
   MetricKind,
@@ -62,8 +62,8 @@ export function toCollectorAttributes(
 export function toCollectorLabels(
   labels: Labels
 ): opentelemetryProto.common.v1.StringKeyValue[] {
-  return Object.keys(labels).map(key => {
-    return { key: key, value: labels[key] };
+  return Object.entries(labels).map(([key, value]) => {
+    return { key, value };
   });
 }
 
@@ -231,7 +231,7 @@ export function toCollectorExportTraceServiceRequest<
 
   const additionalAttributes = Object.assign(
     {},
-    collectorTraceExporterBase.attributes || {},
+    collectorTraceExporterBase.attributes,
     {
       'service.name': collectorTraceExporterBase.serviceName,
     }
@@ -306,9 +306,7 @@ function toCollectorInstrumentationLibraryMetrics(
   startTime: number
 ): opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics {
   return {
-    metrics: metrics.map(metric => {
-      return toCollectorMetric(metric, startTime);
-    }),
+    metrics: metrics.map(metric => toCollectorMetric(metric, startTime)),
     instrumentationLibrary,
   };
 }
@@ -335,21 +333,19 @@ function toCollectorInstrumentationLibrarySpans(
 export function toCollectorType(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.MetricDescriptorType {
-  const metricKind = metric.descriptor.metricKind;
-  const valueType = metric.descriptor.valueType;
   if (
-    metricKind === MetricKind.COUNTER ||
-    metricKind === MetricKind.SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.COUNTER ||
+    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
   ) {
-    if (valueType === apiValueType.INT) {
+    if (metric.descriptor.valueType === api.ValueType.INT) {
       return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_INT64;
     }
     return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_DOUBLE;
   } else if (metric.aggregator instanceof HistogramAggregator) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
-  } else if (valueType == apiValueType.INT) {
+  } else if (metric.descriptor.valueType == api.ValueType.INT) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
-  } else if (valueType === apiValueType.DOUBLE) {
+  } else if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
   } else {
     // TODO: Add Summary once implemented
@@ -364,20 +360,19 @@ export function toCollectorType(
 export function toCollectorTemporality(
   metric: MetricRecord
 ): opentelemetryProto.metrics.v1.MetricDescriptorTemporality {
-  const metricKind = metric.descriptor.metricKind;
   if (
-    metricKind === MetricKind.COUNTER ||
-    metricKind === MetricKind.SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.COUNTER ||
+    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
   ) {
     return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.CUMULATIVE;
   } else if (
-    metricKind === MetricKind.UP_DOWN_COUNTER ||
-    metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER ||
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
   ) {
     return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.DELTA;
   } else if (
-    metricKind === MetricKind.VALUE_OBSERVER ||
-    metricKind === MetricKind.VALUE_RECORDER
+    metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
+    metric.descriptor.metricKind === MetricKind.VALUE_RECORDER
   ) {
     // TODO: Change once LastValueAggregator is implemented.
     // If the aggregator is LastValue or Exact, then it will be instantaneous
@@ -417,12 +412,11 @@ export function toSingularPoint(
   timeUnixNano: number;
   value: number;
 } {
-  let pointValue: number;
-  if (metric.aggregator instanceof MinMaxLastSumCountAggregator) {
-    pointValue = (metric.aggregator.toPoint().value as Distribution).last;
-  } else {
-    pointValue = metric.aggregator.toPoint().value as number;
-  }
+  const pointValue =
+    metric.aggregator instanceof MinMaxLastSumCountAggregator
+      ? (metric.aggregator.toPoint().value as Distribution).last
+      : (metric.aggregator.toPoint().value as number);
+
   return {
     labels: toCollectorLabels(metric.labels),
     value: pointValue,
@@ -467,29 +461,29 @@ export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.Metric {
-  // All data points are set as empty by default
-  let int64DataPoints: opentelemetryProto.metrics.v1.Int64DataPoint[] = [];
-  let doubleDataPoints: opentelemetryProto.metrics.v1.DoubleDataPoint[] = [];
-  let histogramDataPoints: opentelemetryProto.metrics.v1.HistogramDataPoint[] = [];
-  const descriptor = toCollectorMetricDescriptor(metric);
-
   if (
-    descriptor.type ===
+    toCollectorType(metric) ===
     opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM
   ) {
-    histogramDataPoints = [toHistogramPoint(metric, startTime)];
-  } else if (metric.descriptor.valueType == apiValueType.INT) {
-    int64DataPoints = [toSingularPoint(metric, startTime)];
-  } else if (metric.descriptor.valueType === apiValueType.DOUBLE) {
-    doubleDataPoints = [toSingularPoint(metric, startTime)];
+    return {
+      metricDescriptor: toCollectorMetricDescriptor(metric),
+      histogramDataPoints: [toHistogramPoint(metric, startTime)],
+    };
+  } else if (metric.descriptor.valueType == api.ValueType.INT) {
+    return {
+      metricDescriptor: toCollectorMetricDescriptor(metric),
+      int64DataPoints: [toSingularPoint(metric, startTime)],
+    };
+  } else if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
+    return {
+      metricDescriptor: toCollectorMetricDescriptor(metric),
+      doubleDataPoints: [toSingularPoint(metric, startTime)],
+    };
   } // TODO: Add support for summary points once implemented
 
   return {
     metricDescriptor: toCollectorMetricDescriptor(metric),
-    doubleDataPoints,
-    int64DataPoints,
-    summaryDataPoints: [], // TODO: Add support for summary points once implemented
-    histogramDataPoints,
+    int64DataPoints: [],
   };
 }
 
@@ -512,7 +506,7 @@ export function toCollectorExportMetricServiceRequest<
   > = groupMetricsByResourceAndLibrary(metrics);
   const additionalAttributes = Object.assign(
     {},
-    collectorMetricExporterBase.attributes || {},
+    collectorMetricExporterBase.attributes,
     {
       'service.name': collectorMetricExporterBase.serviceName,
     }
