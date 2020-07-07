@@ -300,8 +300,12 @@ describe('fetch', () => {
         attributes[keys[7]] !== '',
         `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
       );
+      assert.ok(
+        (attributes[keys[8]] as number) > 0,
+        `attributes ${AttributeNames.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+      );
 
-      assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
     });
 
     it('span should have correct events', () => {
