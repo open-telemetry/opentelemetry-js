@@ -38,22 +38,6 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export const mockedResources: Resource[] = [
-  new Resource({ name: 'resource 1' }),
-  new Resource({ name: 'resource 2' }),
-];
-
-export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
-  {
-    name: 'lib1',
-    version: '0.0.1',
-  },
-  {
-    name: 'lib2',
-    version: '0.0.2',
-  },
-];
-
 const traceIdArr = [
   31,
   16,
@@ -74,10 +58,6 @@ const traceIdArr = [
 ];
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
-
-const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
-const spanIdBase64 = 'XhByYfZPpT4=';
-const parentIdBase64 = 'eKiRUJiGQ4g=';
 
 export const mockCounter: MetricRecord = {
   descriptor: {
@@ -133,6 +113,10 @@ export const mockHistogram: MetricRecord = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
+const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
+const spanIdBase64 = 'XhByYfZPpT4=';
+const parentIdBase64 = 'eKiRUJiGQ4g=';
+
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
@@ -186,6 +170,22 @@ export const mockedReadableSpan: ReadableSpan = {
   }),
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
+
+export const mockedResources: Resource[] = [
+  new Resource({ name: 'resource 1' }),
+  new Resource({ name: 'resource 2' }),
+];
+
+export const mockedInstrumentationLibraries: InstrumentationLibrary[] = [
+  {
+    name: 'lib1',
+    version: '0.0.1',
+  },
+  {
+    name: 'lib2',
+    version: '0.0.2',
+  },
+];
 
 export const basicTrace: ReadableSpan[] = [
   {
