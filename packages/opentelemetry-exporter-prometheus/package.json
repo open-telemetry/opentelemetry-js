@@ -55,7 +55,6 @@
   "dependencies": {
     "@opentelemetry/api": "^0.9.0",
     "@opentelemetry/core": "^0.9.0",
-    "@opentelemetry/metrics": "^0.9.0",
-    "prom-client": "^11.5.3"
+    "@opentelemetry/metrics": "^0.9.0"
   }
 }

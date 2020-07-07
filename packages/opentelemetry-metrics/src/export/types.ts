@@ -28,12 +28,23 @@ export enum MetricKind {
   VALUE_OBSERVER,
 }
 
+/** The kind of aggregator. */
+export enum AggregatorKind {
+  SUM,
+  LAST_VALUE,
+  DISTRIBUTION,
+  HISTOGRAM,
+}
+
 /** Sum returns an aggregated sum. */
 export type Sum = number;
 
 /** LastValue returns last value. */
 export type LastValue = number;
 
+/**
+ *
+ */
 export interface Distribution {
   min: number;
   max: number;
@@ -69,6 +80,11 @@ export interface Histogram {
   count: number;
 }
 
+/**
+ *
+ */
+export type PointValueType = Sum | LastValue | Distribution | Histogram;
+
 export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
   readonly labels: Labels;
@@ -102,16 +118,64 @@ export interface MetricExporter {
 /**
  * Base interface for aggregators. Aggregators are responsible for holding
  * aggregated values and taking a snapshot of these values upon export.
+ *
+ * Use {@link Aggregator} instead of this BaseAggregator.
  */
-export interface Aggregator {
+interface BaseAggregator {
+  /** The kind of the aggregator. */
+  kind: AggregatorKind;
+
   /** Updates the current with the new value. */
   update(value: number): void;
-
-  /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point;
 }
 
-export interface Point {
-  value: Sum | LastValue | Distribution | Histogram;
+/**
+ *
+ */
+export interface SumAggregatorType extends BaseAggregator {
+  kind: AggregatorKind.SUM;
+
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point<Sum>;
+}
+
+/**
+ *
+ */
+export interface LastValueAggregatorType extends BaseAggregator {
+  kind: AggregatorKind.LAST_VALUE;
+
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point<LastValue>;
+}
+
+/**
+ *
+ */
+export interface DistributionAggregatorType extends BaseAggregator {
+  kind: AggregatorKind.DISTRIBUTION;
+
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point<Distribution>;
+}
+
+/**
+ *
+ */
+export interface HistogramAggregatorType extends BaseAggregator {
+  kind: AggregatorKind.HISTOGRAM;
+
+  /** Returns snapshot of the current point (value with timestamp). */
+  toPoint(): Point<Histogram>;
+}
+
+export type Aggregator =
+  | SumAggregatorType
+  | LastValueAggregatorType
+  | DistributionAggregatorType
+  | HistogramAggregatorType;
+
+export interface Point<T extends PointValueType> {
+  value: T;
   timestamp: HrTime;
 }

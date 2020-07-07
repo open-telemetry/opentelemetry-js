@@ -21,6 +21,7 @@ import {
   Meter,
   MeterProvider,
   Point,
+  Sum,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -30,10 +31,10 @@ const mockedHrTime: HrTime = [1586347902211, 0];
 const mockedTimeMS = 1586347902211000;
 
 describe('PrometheusExporter', () => {
-  let toPoint: () => Point;
+  let toPoint: () => Point<Sum>;
   before(() => {
     toPoint = SumAggregator.prototype.toPoint;
-    SumAggregator.prototype.toPoint = function (): Point {
+    SumAggregator.prototype.toPoint = function (): Point<Sum> {
       const point = toPoint.apply(this);
       point.timestamp = mockedHrTime;
       return point;
@@ -205,6 +206,7 @@ describe('PrometheusExporter', () => {
       boundCounter.add(10);
       meter.collect().then(() => {
         exporter.export(meter.getBatcher().checkPointSet(), () => {
+          // TODO: Remove this special case once the PR is ready.
           // This is to test the special case where counters are destroyed
           // and recreated in the exporter in order to get around prom-client's
           // aggregation and use ours.
@@ -270,10 +272,11 @@ describe('PrometheusExporter', () => {
                   );
                   assert.strictEqual(lines[1], '# TYPE metric_observer gauge');
 
+                  // TODO: test all lines
                   const line3 = lines[2].split(' ');
                   assert.strictEqual(
                     line3[0],
-                    'metric_observer{pid="123",core="1"}'
+                    'metric_observer_min{pid="123",core="1"}'
                   );
                   assert.ok(
                     parseFloat(line3[1]) >= 0 && parseFloat(line3[1]) <= 1
@@ -404,8 +407,8 @@ describe('PrometheusExporter', () => {
               res.on('data', chunk => {
                 assert.deepStrictEqual(chunk.toString().split('\n'), [
                   '# HELP counter a test description',
-                  '# TYPE counter gauge',
-                  'counter{key1="labelValue1"} 20',
+                  '# TYPE counter counter',
+                  `counter{key1="labelValue1"} 20 ${mockedTimeMS}`,
                   '',
                 ]);
 

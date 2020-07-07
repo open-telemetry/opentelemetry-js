@@ -13,6 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as assert from 'assert';
+import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
 
-export * from './PrometheusExporter';
-export * from './export/types';
+describe('PrometheusBatcher', () => {
+  describe('constructor', () => {
+    it('should construct a batcher', () => {
+      const batcher = new PrometheusLabelsBatcher();
+      assert(batcher instanceof PrometheusLabelsBatcher);
+    });
+  });
+});
