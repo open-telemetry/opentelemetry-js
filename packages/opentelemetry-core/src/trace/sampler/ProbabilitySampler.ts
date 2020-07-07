@@ -19,6 +19,7 @@ import {
   SpanContext,
   TraceFlags,
   SamplingDecision,
+  SamplingResult,
 } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces. */
@@ -27,7 +28,7 @@ export class ProbabilitySampler implements Sampler {
     this._probability = this._normalize(_probability);
   }
 
-  shouldSample(parentContext?: SpanContext) {
+  shouldSample(parentContext?: SpanContext): SamplingResult {
     // Respect the parent sampling decision if there is one.
     // TODO(#1284): add an option to ignore parent regarding to spec.
     if (parentContext) {

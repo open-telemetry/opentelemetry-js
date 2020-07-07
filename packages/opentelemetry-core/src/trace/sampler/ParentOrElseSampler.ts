@@ -22,6 +22,7 @@ import {
   SpanKind,
   Attributes,
   Link,
+  SamplingResult,
 } from '@opentelemetry/api';
 
 /**
@@ -38,7 +39,7 @@ export class ParentOrElseSampler implements Sampler {
     spanKind: SpanKind,
     attributes: Attributes,
     links: Link[]
-  ) {
+  ): SamplingResult {
     // Respect the parent sampling decision if there is one
     if (parentContext) {
       return {

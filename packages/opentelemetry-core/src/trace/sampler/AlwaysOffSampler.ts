@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision } from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
 /** Sampler that samples no traces. */
 export class AlwaysOffSampler implements Sampler {
-  shouldSample() {
+  shouldSample(): SamplingResult {
     return {
       decision: SamplingDecision.NOT_RECORD,
     };

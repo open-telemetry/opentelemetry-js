@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { Sampler, SamplingDecision } from '@opentelemetry/api';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
 /** Sampler that samples all traces. */
 export class AlwaysOnSampler implements Sampler {
-  shouldSample() {
+  shouldSample(): SamplingResult {
     return {
       decision: SamplingDecision.RECORD_AND_SAMPLED,
     };
