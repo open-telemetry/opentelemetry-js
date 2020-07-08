@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -113,7 +113,7 @@ export class ZoneContextManager implements ContextManager {
    * @param context A context (span) to be bind with Zone
    */
   private _createZone(zoneName: string, context: unknown): Zone {
-    return Zone.root.fork({
+    return Zone.current.fork({
       name: zoneName,
       properties: {
         [ZONE_CONTEXT_KEY]: context,

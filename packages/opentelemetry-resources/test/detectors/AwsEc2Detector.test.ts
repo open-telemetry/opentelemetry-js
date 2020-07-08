@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ import {
   assertHostResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
+import { NoopLogger } from '@opentelemetry/core';
 
 const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
   awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
@@ -52,7 +53,9 @@ describe('awsEc2Detector', () => {
       const scope = nock(AWS_HOST)
         .get(AWS_PATH)
         .reply(200, () => mockedAwsResponse);
-      const resource: Resource = await awsEc2Detector.detect();
+      const resource: Resource = await awsEc2Detector.detect({
+        logger: new NoopLogger(),
+      });
       scope.done();
 
       assert.ok(resource);
@@ -74,7 +77,9 @@ describe('awsEc2Detector', () => {
       const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
         code: 'ENOTFOUND',
       });
-      const resource: Resource = await awsEc2Detector.detect();
+      const resource: Resource = await awsEc2Detector.detect({
+        logger: new NoopLogger(),
+      });
       scope.done();
 
       assert.ok(resource);

@@ -7,32 +7,40 @@ This is a simple example that demonstrates basic metrics collection and exports 
 ## Installation
 
 ```sh
-$ # from this directory
-$ npm install
+# from this directory
+npm install
 ```
 
 How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) please check
 [Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus)
 
 ## Run the Application
+
 - Run the example
 
 ### Observer
+
 ```sh
-$ npm run start:observer
+npm run start:observer
 ```
 
 ### Prometheus
-1. In prometheus search for "metric_observer"
+
+1. In prometheus search for "cpu_core_usage", "cpu_temp_per_app", "cpu_usage_per_app"
 
 ### Links
-1. Prometheus Scrape Endpoint http://localhost:9464/metrics
-2. Prometheus graph http://localhost:9090/graph
+
+1. Prometheus Scrape Endpoint <http://localhost:9464/metrics>
+2. Prometheus graph <http://localhost:9090/graph>
 
 ### Example
-<p align="center"><img src="metrics/observer.png"/></p>
+
+![Screenshot of the running example](metrics/observer.png)
+![Screenshot of the running example](metrics/observer_batch.png)
+![Screenshot of the running example](metrics/observer_batch2.png)
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more information on OpenTelemetry metrics, visit: <https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics>
 

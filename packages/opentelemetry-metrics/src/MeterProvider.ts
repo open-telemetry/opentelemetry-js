@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,10 @@ export class MeterProvider implements api.MeterProvider {
   getMeter(name: string, version = '*', config?: MeterConfig): Meter {
     const key = `${name}@${version}`;
     if (!this._meters.has(key)) {
-      this._meters.set(key, new Meter(config || this._config));
+      this._meters.set(
+        key,
+        new Meter({ name, version }, config || this._config)
+      );
     }
 
     return this._meters.get(key)!;

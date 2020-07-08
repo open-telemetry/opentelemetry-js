@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import {
   assertContainerResource,
   assertEmptyResource,
 } from '../util/resource-assertions';
+import { NoopLogger } from '@opentelemetry/core';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
@@ -80,7 +81,9 @@ describe('gcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource: Resource = await gcpDetector.detect();
+      const resource: Resource = await gcpDetector.detect({
+        logger: new NoopLogger(),
+      });
       secondaryScope.done();
       scope.done();
 
@@ -111,7 +114,7 @@ describe('gcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource = await gcpDetector.detect();
+      const resource = await gcpDetector.detect({ logger: new NoopLogger() });
       secondaryScope.done();
       scope.done();
 
@@ -143,7 +146,7 @@ describe('gcpDetector', () => {
       const secondaryScope = nock(SECONDARY_HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
-      const resource = await gcpDetector.detect();
+      const resource = await gcpDetector.detect({ logger: new NoopLogger() });
       secondaryScope.done();
       scope.done();
 
@@ -155,7 +158,7 @@ describe('gcpDetector', () => {
     });
 
     it('returns empty resource if not detected', async () => {
-      const resource = await gcpDetector.detect();
+      const resource = await gcpDetector.detect({ logger: new NoopLogger() });
       assertEmptyResource(resource);
     });
   });

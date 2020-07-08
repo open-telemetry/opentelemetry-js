@@ -1,4 +1,5 @@
 # OpenTelemetry Metrics SDK
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -16,7 +17,15 @@ npm install --save @opentelemetry/metrics
 ## Usage
 
 ### Counter
-Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. Counters are defined as `Monotonic = true` by default, meaning that positive values are expected.
+
+Choose this kind of metric when the value is a quantity, the sum is of primary interest, and the event count and value distribution are not of primary interest. It is restricted to non-negative increments.
+Example uses for Counter:
+
+- count the number of bytes received
+- count the number of requests completed
+- count the number of accounts created
+- count the number of checkpoints run
+- count the number of 5xx errors.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
@@ -25,7 +34,6 @@ const { MeterProvider } = require('@opentelemetry/metrics');
 const meter = new MeterProvider().getMeter('your-meter-name');
 
 const counter = meter.createCounter('metric_name', {
-  labelKeys: ['pid'],
   description: 'Example of a counter'
 });
 
@@ -37,46 +45,119 @@ boundCounter.add(10);
 
 ```
 
-### Observable
-Choose this kind of metric when only last value is important without worry about aggregation
+### UpDownCounter
+
+`UpDownCounter` is similar to `Counter` except that it supports negative increments. It is generally useful for capturing changes in an amount of resources used, or any quantity that rises and falls during a request.
+
+Example uses for UpDownCounter:
+
+- count the number of active requests
+- count memory in use by instrumenting new and delete
+- count queue size by instrumenting enqueue and dequeue
+- count semaphore up and down operations
 
 ```js
-const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 
 // Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-const observer = meter.createObserver('metric_name', {
-  labelKeys: ['pid', 'core'],
-  description: 'Example of a observer'
+const counter = meter.createUpDownCounter('metric_name', {
+  description: 'Example of a UpDownCounter'
 });
 
-function getCpuUsage() {
+const labels = { pid: process.pid };
+
+// Create a BoundInstrument associated with specified label values.
+const boundCounter = counter.bind(labels);
+boundCounter.add(Math.random() > 0.5 ? 1 : -1);
+
+```
+
+### Value Observer
+
+Choose this kind of metric when only last value is important without worry about aggregation
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+meter.createValueObserver('cpu_core_usage', {
+  description: 'Example of a sync observer with callback',
+}, (observerResult) => {
+  observerResult.observe(getRandomValue(), { core: '1' });
+  observerResult.observe(getRandomValue(), { core: '2' });
+});
+
+function getRandomValue() {
   return Math.random();
 }
 
-const metricObservable = new MetricObservable();
+```
 
-observer.setCallback((observerResult) => {
-  // synchronous callback
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
-  // asynchronous callback
-  observerResult.observe(metricObservable, { pid: process.pid, core: '2' });
+### Batch Observer
+
+Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  },
+);
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 3000,
+}).getMeter('example-observer');
+
+const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+  description: 'CPU',
 });
 
-// simulate asynchronous operation
-setInterval(()=> {
-  metricObservable.next(getCpuUsage());
-}, 2000)
+const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
+  description: 'Memory',
+});
+
+meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+  getSomeAsyncMetrics().then(metrics => {
+    observerBatchResult.observe({ app: 'myApp' }, [
+      cpuUsageMetric.observation(metrics.value1),
+      MemUsageMetric.observation(metrics.value2)
+    ]);
+  });
+});
+
+function getSomeAsyncMetrics() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        value1: Math.random(),
+        value2: Math.random(),
+      });
+    }, 100)
+  });
+}
 
 ```
 
 See [examples/prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/prometheus) for a short example.
 
-### Measure
-***Work in progress***
+### Value Recorder
+
+`ValueRecorder` is a non-additive synchronous instrument useful for recording any non-additive number, positive or negative.
+Values captured by `ValueRecorder.record(value)` are treated as individual events belonging to a distribution that is being summarized.
+`ValueRecorder` should be chosen either when capturing measurements that do not contribute meaningfully to a sum, or when capturing numbers that are additive in nature, but where the distribution of individual increments is considered interesting.
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
 - For help or feedback on this project, join us on [gitter][gitter-url]

@@ -8,7 +8,9 @@ const exporter = new PrometheusExporter(
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+    );
   },
 );
 
@@ -17,23 +19,17 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('example-prometheus');
 
-// Monotonic counters can only be increased.
-const monotonicCounter = meter.createCounter('monotonic_counter', {
-  monotonic: true,
-  labelKeys: ['pid'],
-  description: 'Example of a monotonic counter',
+const requestCounter = meter.createCounter('requests', {
+  description: 'Example of a Counter',
 });
 
-// Non-monotonic counters can be increased or decreased.
-const nonMonotonicCounter = meter.createCounter('non_monotonic_counter', {
-  monotonic: false,
-  labelKeys: ['pid'],
-  description: 'Example of a non-monotonic counter',
+const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
+  description: 'Example of a UpDownCounter',
 });
 
-const labels = { pid: process.pid };
+const labels = { pid: process.pid, environment: 'staging' };
 
 setInterval(() => {
-  monotonicCounter.bind(labels).add(1);
-  nonMonotonicCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+  requestCounter.bind(labels).add(1);
+  upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
 }, 1000);

@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,10 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-/**
- * Performance metrics
- */
 import { PerformanceTimingNames } from './enums/PerformanceTimingNames';
 
 export type PerformanceEntries = {
@@ -28,6 +24,7 @@ export type PerformanceEntries = {
   [PerformanceTimingNames.DOM_INTERACTIVE]?: number;
   [PerformanceTimingNames.DOMAIN_LOOKUP_END]?: number;
   [PerformanceTimingNames.DOMAIN_LOOKUP_START]?: number;
+  [PerformanceTimingNames.ENCODED_BODY_SIZE]?: number;
   [PerformanceTimingNames.FETCH_START]?: number;
   [PerformanceTimingNames.LOAD_EVENT_END]?: number;
   [PerformanceTimingNames.LOAD_EVENT_START]?: number;
@@ -57,3 +54,12 @@ export interface PerformanceResourceTimingInfo {
   corsPreFlightRequest?: PerformanceResourceTiming;
   mainRequest?: PerformanceResourceTiming;
 }
+
+type PropagateTraceHeaderCorsUrl = string | RegExp;
+
+/**
+ * urls which should include trace headers when origin doesn't match
+ */
+export type PropagateTraceHeaderCorsUrls =
+  | PropagateTraceHeaderCorsUrl
+  | PropagateTraceHeaderCorsUrl[];

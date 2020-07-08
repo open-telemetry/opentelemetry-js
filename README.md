@@ -42,6 +42,7 @@
 ---
 
 ## About this project
+
 This is the JavaScript version of [OpenTelemetry](https://opentelemetry.io/), a framework for collecting traces and metrics from applications.
 
 ## Quick start
@@ -59,7 +60,6 @@ If you are a library author looking to build OpenTelemetry into your library, pl
 | Platform Version | Supported                                       |
 |------------------|-------------------------------------------------|
 | Node.JS `v14`    | ✅                                               |
-| Node.JS `v13`    | ✅                                               |
 | Node.JS `v12`    | ✅                                               |
 | Node.JS `v10`    | ✅                                               |
 | Node.JS `v8`     | See [Node Support](#node-support) below         |
@@ -127,13 +127,12 @@ We have a weekly SIG meeting! See the [community page](https://github.com/open-t
 
 Approvers ([@open-telemetry/js-approvers](https://github.com/orgs/open-telemetry/teams/javascript-approvers)):
 
-- [Roch Devost](https://github.com/rochdev), DataDog
-- [Brandon Gonzalez](https://github.com/bg451), LightStep
 - [Olivier Albertini](https://github.com/OlivierAlbertini), Ville de Montréal
 - [Valentin Marchaud](https://github.com/vmarchaud), Open Source Contributor
 - [Mark Wolff](https://github.com/markwolff), Microsoft
-- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 - [Matthew Wear](https://github.com/mwear), LightStep
+- [Naseem K. Ullah](https://github.com/naseemkullah), Transit
+- [Chengzhong Wu](https://github.com/legendecas), Alibaba
 
 *Find more about the approver role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#approver).*
 
@@ -141,10 +140,11 @@ Maintainers ([@open-telemetry/js-maintainers](https://github.com/orgs/open-telem
 
 - [Mayur Kale](https://github.com/mayurkale22), Google
 - [Daniel Dyla](https://github.com/dyladan), Dynatrace
+- [Bartlomiej Obecny](https://github.com/obecny), LightStep
 
 *Find more about the maintainer role in [community repository](https://github.com/open-telemetry/community/blob/master/community-membership.md#maintainer).*
 
-### Thanks to all the people who already contributed!
+### Thanks to all the people who already contributed
 
 <a href="https://github.com/open-telemetry/opentelemetry-js/graphs/contributors">
   <img src="https://contributors-img.web.app/image?repo=open-telemetry/opentelemetry-js" />
@@ -188,7 +188,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 
 ##### Contrib
 
-These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node
+These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node>
 
 - [@opentelemetry/plugin-mongodb][otel-contrib-plugin-mongodb]
 - [@opentelemetry/plugin-mysql][otel-contrib-plugin-mysql]
@@ -204,10 +204,11 @@ These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-c
 ##### Core
 
 - [@opentelemetry/plugin-xml-http-request][otel-plugin-xml-http-request]
+- [@opentelemetry/plugin-fetch][otel-plugin-fetch]
 
 ##### Contrib
 
-These plugins are hosted at https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web
+These plugins are hosted at <https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web>
 
 - [@opentelemetry/plugin-document-load][otel-contrib-plugin-document-load]
 - [@opentelemetry/plugin-user-interaction][otel-contrib-plugin-user-interaction]
@@ -239,6 +240,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-metrics]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-metrics
 [otel-node]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-node
 
+[otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
 [otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
 [otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
 [otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https
@@ -261,4 +263,3 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 [otel-contrib-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
 [otel-contrib-plugin-user-interaction]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-user-interaction
 [otel-contrib-plugin-document-load]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/web/opentelemetry-plugin-document-load
-

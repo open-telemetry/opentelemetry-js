@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,39 @@
 
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import { CollectorProtocolNode } from '../../enums';
+import {
+  CollectorExporterError,
+  CollectorExporterConfigBase,
+} from '../../types';
 
 /**
  * Queue item to be used to save temporary spans in case the GRPC service
  * hasn't been fully initialised yet
  */
-export interface GRPCQueueItem {
+export interface GRPCSpanQueueItem {
   spans: ReadableSpan[];
   onSuccess: () => void;
   onError: (error: CollectorExporterError) => void;
 }
 
 /**
- * Trace Service Client for sending spans
+ * Service Client for sending spans or metrics
  */
-export interface TraceServiceClient extends grpc.Client {
-  export: (request: any, callback: Function) => {};
+export interface ServiceClient extends grpc.Client {
+  export: (
+    request: any,
+    metadata: grpc.Metadata | undefined,
+    callback: Function
+  ) => {};
+}
+
+/**
+ * Collector Exporter Config for Node
+ */
+export interface CollectorExporterConfigNode
+  extends CollectorExporterConfigBase {
+  credentials?: grpc.ChannelCredentials;
+  metadata?: grpc.Metadata;
+  protocolNode?: CollectorProtocolNode;
 }

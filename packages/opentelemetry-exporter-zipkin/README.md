@@ -1,4 +1,5 @@
 # OpenTelemetry Zipkin Trace Exporter
+
 [![Gitter chat][gitter-image]][gitter-url]
 [![NPM Published Version][npm-img]][npm-url]
 [![dependencies][dependencies-image]][dependencies-url]
@@ -17,14 +18,18 @@ npm install --save @opentelemetry/exporter-zipkin
 
 ## Usage
 
-Install the exporter on your application and pass the options, it must contain a service name.
+Install the exporter on your application and pass the options. `serviceName` is an optional string. If omitted, the exporter will first try to get the service name from the Resource. If no service name can be detected on the Resource, a fallback name of "OpenTelemetry Service" will be used.
 
 ```js
 const { ZipkinExporter } = require('@opentelemetry/exporter-zipkin');
 
 // Add your zipkin url (`http://localhost:9411/api/v2/spans` is used as
-// default) and application name to the Zipkin options
+// default) and application name to the Zipkin options.
+// You can also define your custom headers which will be added automatically.
 const options = {
+  headers: {
+    'my-header': 'header-value',
+  },
   url: 'your-zipkin-url',
   serviceName: 'your-application-name'
 }
@@ -44,12 +49,13 @@ You can use built-in `SimpleSpanProcessor` or `BatchSpanProcessor` or write your
 
 ## Viewing your traces
 
-Please visit the Zipkin UI endpoint http://localhost:9411
+Please visit the Zipkin UI endpoint <http://localhost:9411>
 
 ## Useful links
+
 - For more information on OpenTelemetry, visit: <https://opentelemetry.io/>
 - For more about OpenTelemetry JavaScript: <https://github.com/open-telemetry/opentelemetry-js>
-- For Zipkin project at https://zipkin.io/
+- For Zipkin project at <https://zipkin.io/>
 - For help or feedback on this project, join us on [gitter][gitter-url]
 
 ## License

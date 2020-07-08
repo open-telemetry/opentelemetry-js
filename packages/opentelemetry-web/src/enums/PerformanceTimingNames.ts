@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ export enum PerformanceTimingNames {
   DOM_INTERACTIVE = 'domInteractive',
   DOMAIN_LOOKUP_END = 'domainLookupEnd',
   DOMAIN_LOOKUP_START = 'domainLookupStart',
+  ENCODED_BODY_SIZE = 'encodedBodySize',
   FETCH_START = 'fetchStart',
   LOAD_EVENT_END = 'loadEventEnd',
   LOAD_EVENT_START = 'loadEventStart',

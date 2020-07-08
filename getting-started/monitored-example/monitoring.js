@@ -8,7 +8,9 @@ const exporter = new PrometheusExporter(
     startServer: true,
   },
   () => {
-    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+    console.log(
+      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+    );
   },
 );
 
@@ -18,8 +20,6 @@ const meter = new MeterProvider({
 }).getMeter('example-monitored');
 
 const requestCount = meter.createCounter("requests", {
-  monotonic: true,
-  labelKeys: ["route"],
   description: "Count all incoming requests"
 });
 

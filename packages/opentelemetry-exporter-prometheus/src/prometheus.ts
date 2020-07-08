@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
+import * as api from '@opentelemetry/api';
 import {
   ExportResult,
-  NoopLogger,
   hrTimeToMilliseconds,
+  NoopLogger,
 } from '@opentelemetry/core';
 import {
-  CounterSumAggregator,
-  LastValue,
-  MetricExporter,
-  MetricRecord,
+  Distribution,
+  Histogram,
   MetricDescriptor,
+  MetricExporter,
   MetricKind,
-  ObserverAggregator,
+  MetricRecord,
   Sum,
 } from '@opentelemetry/metrics';
-import * as api from '@opentelemetry/api';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
-import { Counter, Gauge, labelValues, Metric, Registry } from 'prom-client';
+import { Counter, Gauge, Metric, Registry } from 'prom-client';
 import * as url from 'url';
 import { ExporterConfig } from './export/types';
 
@@ -126,11 +125,9 @@ export class PrometheusExporter implements MetricExporter {
     const metric = this._registerMetric(record);
     if (!metric) return;
 
-    const labelValues = this._getLabelValues(
-      record.descriptor.labelKeys,
-      record.labels
-    );
     const point = record.aggregator.toPoint();
+
+    const labels = record.labels;
 
     if (metric instanceof Counter) {
       // Prometheus counter saves internal state and increments by given value.
@@ -138,35 +135,40 @@ export class PrometheusExporter implements MetricExporter {
       // Currently, _registerMetric creates a new counter every time the value changes,
       // so the increment here behaves as a set value (increment from 0)
       metric.inc(
-        labelValues,
+        labels,
         point.value as Sum,
         hrTimeToMilliseconds(point.timestamp)
       );
     }
 
     if (metric instanceof Gauge) {
-      if (record.aggregator instanceof CounterSumAggregator) {
-        metric.set(labelValues, point.value as Sum);
-      } else if (record.aggregator instanceof ObserverAggregator) {
+      if (typeof point.value === 'number') {
+        if (
+          record.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
+          record.descriptor.metricKind === MetricKind.VALUE_RECORDER
+        ) {
+          metric.set(
+            labels,
+            point.value,
+            hrTimeToMilliseconds(point.timestamp)
+          );
+        } else {
+          metric.set(labels, point.value);
+        }
+      } else if ((point.value as Histogram).buckets) {
         metric.set(
-          labelValues,
-          point.value as LastValue,
+          labels,
+          (point.value as Histogram).sum,
+          hrTimeToMilliseconds(point.timestamp)
+        );
+      } else if (typeof (point.value as Distribution).last === 'number') {
+        metric.set(
+          labels,
+          (point.value as Distribution).last,
           hrTimeToMilliseconds(point.timestamp)
         );
       }
     }
-
-    // TODO: only counter and gauge are implemented in metrics so far
-  }
-
-  private _getLabelValues(keys: string[], labels: api.Labels) {
-    const labelValues: labelValues = {};
-    for (let i = 0; i < keys.length; i++) {
-      if (labels[keys[i]] !== null) {
-        labelValues[keys[i]] = labels[keys[i]];
-      }
-    }
-    return labelValues;
   }
 
   private _registerMetric(record: MetricRecord): Metric | undefined {
@@ -183,9 +185,7 @@ export class PrometheusExporter implements MetricExporter {
      * https://prometheus.io/docs/instrumenting/exposition_formats/
      */
     if (metric instanceof Counter) {
-      metric.remove(
-        ...record.descriptor.labelKeys.map(k => record.labels[k].toString())
-      );
+      metric.remove(...Object.values(record.labels));
     }
 
     if (metric) return metric;
@@ -198,18 +198,20 @@ export class PrometheusExporter implements MetricExporter {
       name,
       // prom-client throws with empty description which is our default
       help: record.descriptor.description || 'description missing',
-      labelNames: record.descriptor.labelKeys,
+      labelNames: Object.keys(record.labels),
       // list of registries to register the newly created metric
       registers: [this._registry],
     };
 
     switch (record.descriptor.metricKind) {
       case MetricKind.COUNTER:
-        // there is no such thing as a non-monotonic counter in prometheus
-        return record.descriptor.monotonic
-          ? new Counter(metricObject)
-          : new Gauge(metricObject);
-      case MetricKind.OBSERVER:
+        return new Counter(metricObject);
+      case MetricKind.UP_DOWN_COUNTER:
+        return new Gauge(metricObject);
+      // case MetricKind.VALUE_RECORDER:
+      // case MetricKind.SUM_OBSERVER:
+      // case MetricKind.UP_DOWN_SUM_OBSERVER:
+      case MetricKind.VALUE_OBSERVER:
         return new Gauge(metricObject);
       default:
         // Other metric types are currently unimplemented

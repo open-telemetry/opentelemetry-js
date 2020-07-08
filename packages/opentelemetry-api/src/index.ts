@@ -1,5 +1,5 @@
-/*!
- * Copyright 2019, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,14 @@ export * from './context/propagation/NoopHttpTextPropagator';
 export * from './context/propagation/setter';
 export * from './correlation_context/CorrelationContext';
 export * from './correlation_context/EntryValue';
+export * from './metrics/BatchObserverResult';
 export * from './metrics/BoundInstrument';
 export * from './metrics/Meter';
 export * from './metrics/MeterProvider';
 export * from './metrics/Metric';
-export * from './metrics/MetricObservable';
 export * from './metrics/NoopMeter';
 export * from './metrics/NoopMeterProvider';
+export * from './metrics/Observation';
 export * from './metrics/ObserverResult';
 export * from './trace/attributes';
 export * from './trace/Event';

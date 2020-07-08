@@ -1,5 +1,5 @@
-/*!
- * Copyright 2020, OpenTelemetry Authors
+/*
+ * Copyright The OpenTelemetry Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,10 @@
  */
 
 import { Labels } from './Metric';
-import { MetricObservable } from './MetricObservable';
 
 /**
- * Interface that is being used in function setCallback for Observer Metric
+ * Interface that is being used in callback function for Observer Metric
  */
 export interface ObserverResult {
-  observe(callback: Function | MetricObservable, labels: Labels): void;
+  observe(value: number, labels: Labels): void;
 }
