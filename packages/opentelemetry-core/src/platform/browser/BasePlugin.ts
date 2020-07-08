@@ -19,6 +19,7 @@ import {
   Plugin,
   PluginConfig,
   TracerProvider,
+  MeterProvider,
 } from '@opentelemetry/api';
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
@@ -28,6 +29,7 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
+    meterProvider: MeterProvider,
     logger: Logger,
     config?: PluginConfig
   ): T {

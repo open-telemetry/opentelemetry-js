@@ -55,7 +55,7 @@ interface WebPluginEnablerConfig {
 
 export class WebPluginEnabler {
   readonly logger: Logger;
-  readonly meterPrpvider: MeterProvider;
+  readonly meterProvider: MeterProvider;
   readonly tracerProvider: TracerProvider;
 
   /**
@@ -65,7 +65,7 @@ export class WebPluginEnabler {
     this.logger =
       config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
     this.tracerProvider = config.tracerProvider ?? new NoopTracerProvider();
-    this.meterPrpvider = config.meterProvider ?? new NoopMeterProvider();
+    this.meterProvider = config.meterProvider ?? new NoopMeterProvider();
   }
 
   /**
@@ -74,7 +74,7 @@ export class WebPluginEnabler {
    */
   enable(plugins: BasePlugin<unknown>[]) {
     for (const plugin of plugins) {
-      plugin.enable([], this.tracerProvider, this.meterPrpvider, this.logger);
+      plugin.enable([], this.tracerProvider, this.meterProvider, this.logger);
     }
   }
 }

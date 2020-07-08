@@ -16,6 +16,7 @@
 
 import { Logger } from '../../common/Logger';
 import { TracerProvider } from '../tracer_provider';
+import { MeterProvider } from '../../metrics/MeterProvider';
 
 /** Interface Plugin to apply patch. */
 export interface Plugin<T = any> {
@@ -37,12 +38,14 @@ export interface Plugin<T = any> {
    * @param moduleExports The value of the `module.exports` property that would
    *     normally be exposed by the required module. ex: `http`, `https` etc.
    * @param TracerProvider a tracer provider.
+   * @param MeterProvider a meter provider.
    * @param logger a logger instance.
    * @param [config] an object to configure the plugin.
    */
   enable(
     moduleExports: T,
     TracerProvider: TracerProvider,
+    MeterProvider: MeterProvider,
     logger: Logger,
     config?: PluginConfig
   ): T;

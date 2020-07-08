@@ -16,10 +16,12 @@
 
 import {
   Tracer,
+  Meter,
   Plugin,
   Logger,
   PluginConfig,
   TracerProvider,
+  MeterProvider,
   PluginInternalFiles,
 } from '@opentelemetry/api';
 
@@ -36,6 +38,7 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   protected _logger!: Logger;
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
+  protected _meter!: Meter;
 
   constructor(
     protected readonly _tracerName: string,
@@ -49,6 +52,7 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   abstract enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
+    meterProvider: MeterProvider,
     logger: Logger,
     config?: PluginConfig
   ): T;

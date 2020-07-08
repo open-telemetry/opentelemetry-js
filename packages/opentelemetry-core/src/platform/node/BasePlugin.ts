@@ -21,6 +21,7 @@ import {
   PluginInternalFiles,
   PluginInternalFilesVersion,
   TracerProvider,
+  MeterProvider,
 } from '@opentelemetry/api';
 import * as semver from 'semver';
 import * as path from 'path';
@@ -32,6 +33,7 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
+    meterProvider: MeterProvider,
     logger: Logger,
     config?: PluginConfig
   ): T {
