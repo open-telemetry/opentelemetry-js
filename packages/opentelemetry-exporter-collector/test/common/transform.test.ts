@@ -20,24 +20,12 @@ import * as transform from '../../src/transform';
 import {
   ensureSpanIsCorrect,
   mockedReadableSpan,
-  mockCounter,
-  mockObserver,
   mockedResources,
   mockedInstrumentationLibraries,
   multiResourceTrace,
   multiInstrumentationLibraryTrace,
-  multiResourceMetrics,
-  multiInstrumentationLibraryMetrics,
-  ensureCounterIsCorrect,
-  ensureObserverIsCorrect,
-  mockHistogram,
-  ensureHistogramIsCorrect,
-  ensureValueRecorderIsCorrect,
-  mockValueRecorder,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
-import { HistogramAggregator } from '@opentelemetry/metrics';
-import { hrTimeToNanoseconds } from '@opentelemetry/core';
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
@@ -110,34 +98,6 @@ describe('transform', () => {
     });
   });
 
-  describe('toCollectorMetric', () => {
-    it('should convert metric', () => {
-      mockCounter.aggregator.update(1);
-      ensureCounterIsCorrect(
-        transform.toCollectorMetric(mockCounter, 1592602232694000000),
-        hrTimeToNanoseconds(mockCounter.aggregator.toPoint().timestamp)
-      );
-      mockObserver.aggregator.update(10);
-      ensureObserverIsCorrect(
-        transform.toCollectorMetric(mockObserver, 1592602232694000000),
-        hrTimeToNanoseconds(mockObserver.aggregator.toPoint().timestamp)
-      );
-      mockHistogram.aggregator.update(7);
-      mockHistogram.aggregator.update(14);
-      (mockHistogram.aggregator as HistogramAggregator).reset();
-      ensureHistogramIsCorrect(
-        transform.toCollectorMetric(mockHistogram, 1592602232694000000),
-        hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
-      );
-
-      mockValueRecorder.aggregator.update(5);
-      ensureValueRecorderIsCorrect(
-        transform.toCollectorMetric(mockValueRecorder, 1592602232694000000),
-        hrTimeToNanoseconds(mockValueRecorder.aggregator.toPoint().timestamp)
-      );
-    });
-  });
-
   describe('toCollectorResource', () => {
     it('should convert resource', () => {
       const resource = transform.toCollectorResource(
@@ -203,47 +163,6 @@ describe('transform', () => {
       );
 
       assert.deepStrictEqual(result, expected);
-    });
-  });
-  describe('toCollectorMetricDescriptor', () => {
-    describe('groupMetricsByResourceAndLibrary', () => {
-      it('should group by resource', () => {
-        const [resource1, resource2] = mockedResources;
-        const [library] = mockedInstrumentationLibraries;
-        const [metric1, metric2, metric3] = multiResourceMetrics;
-
-        const expected = new Map([
-          [resource1, new Map([[library, [metric1, metric3]]])],
-          [resource2, new Map([[library, [metric2]]])],
-        ]);
-
-        const result = transform.groupMetricsByResourceAndLibrary(
-          multiResourceMetrics
-        );
-
-        assert.deepStrictEqual(result, expected);
-      });
-
-      it('should group by instrumentation library', () => {
-        const [resource] = mockedResources;
-        const [lib1, lib2] = mockedInstrumentationLibraries;
-        const [metric1, metric2, metric3] = multiInstrumentationLibraryMetrics;
-        const expected = new Map([
-          [
-            resource,
-            new Map([
-              [lib1, [metric1, metric3]],
-              [lib2, [metric2]],
-            ]),
-          ],
-        ]);
-
-        const result = transform.groupMetricsByResourceAndLibrary(
-          multiInstrumentationLibraryMetrics
-        );
-
-        assert.deepStrictEqual(result, expected);
-      });
     });
   });
 });
