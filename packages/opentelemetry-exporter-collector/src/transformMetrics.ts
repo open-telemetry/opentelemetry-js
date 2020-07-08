@@ -56,16 +56,19 @@ export function toCollectorType(
       return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_INT64;
     }
     return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_DOUBLE;
-  } else if (metric.aggregator instanceof HistogramAggregator) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
-  } else if (metric.descriptor.valueType == api.ValueType.INT) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
-  } else if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
-  } else {
-    // TODO: Add Summary once implemented
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
   }
+  if (metric.aggregator instanceof HistogramAggregator) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
+  }
+  if (metric.descriptor.valueType == api.ValueType.INT) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
+  }
+  if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
+  }
+
+  // TODO: Add Summary once implemented
+  return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
 }
 
 /**
@@ -80,12 +83,14 @@ export function toCollectorTemporality(
     metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
   ) {
     return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.CUMULATIVE;
-  } else if (
+  }
+  if (
     metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER ||
     metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
   ) {
     return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.DELTA;
-  } else if (
+  }
+  if (
     metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
     metric.descriptor.metricKind === MetricKind.VALUE_RECORDER
   ) {
@@ -184,12 +189,14 @@ export function toCollectorMetric(
       metricDescriptor: toCollectorMetricDescriptor(metric),
       histogramDataPoints: [toHistogramPoint(metric, startTime)],
     };
-  } else if (metric.descriptor.valueType == api.ValueType.INT) {
+  }
+  if (metric.descriptor.valueType == api.ValueType.INT) {
     return {
       metricDescriptor: toCollectorMetricDescriptor(metric),
       int64DataPoints: [toSingularPoint(metric, startTime)],
     };
-  } else if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
+  }
+  if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
     return {
       metricDescriptor: toCollectorMetricDescriptor(metric),
       doubleDataPoints: [toSingularPoint(metric, startTime)],
