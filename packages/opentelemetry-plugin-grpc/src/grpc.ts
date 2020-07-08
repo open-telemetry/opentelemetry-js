@@ -331,14 +331,14 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   ): string[] {
     const methodsToWrap = [
       ...Object.keys(methods),
-      ...(Object.keys(methods)
+      ...Object.keys(methods)
         .map(methodName => methods[methodName].originalName)
         .filter(
           originalName =>
             // eslint-disable-next-line no-prototype-builtins
             !!originalName && client.prototype.hasOwnProperty(originalName)
-        ) as string[]),
-    ];
+        ),
+    ].filter((name, index, list) => list.indexOf(name) === index) as string[]; // remove duplicates
     return methodsToWrap;
   }
 
