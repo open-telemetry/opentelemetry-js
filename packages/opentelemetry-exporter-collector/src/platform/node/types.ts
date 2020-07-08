@@ -16,7 +16,11 @@
 
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorExporterError } from '../../types';
+import { CollectorProtocolNode } from '../../enums';
+import {
+  CollectorExporterError,
+  CollectorExporterConfigBase,
+} from '../../types';
 
 /**
  * Queue item to be used to save temporary spans in case the GRPC service
@@ -37,4 +41,14 @@ export interface ServiceClient extends grpc.Client {
     metadata: grpc.Metadata | undefined,
     callback: Function
   ) => {};
+}
+
+/**
+ * Collector Exporter Config for Node
+ */
+export interface CollectorExporterConfigNode
+  extends CollectorExporterConfigBase {
+  credentials?: grpc.ChannelCredentials;
+  metadata?: grpc.Metadata;
+  protocolNode?: CollectorProtocolNode;
 }
