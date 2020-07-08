@@ -329,17 +329,18 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     client: typeof grpcTypes.Client,
     methods: { [key: string]: { originalName?: string } }
   ): string[] {
-    const methodsToWrap = [
-      ...Object.keys(methods),
-      ...Object.keys(methods)
-        .map(methodName => methods[methodName].originalName)
-        .filter(
-          originalName =>
-            // eslint-disable-next-line no-prototype-builtins
-            !!originalName && client.prototype.hasOwnProperty(originalName)
-        ),
-    ].filter((name, index, list) => list.indexOf(name) === index) as string[]; // remove duplicates
-    return methodsToWrap;
+    const methodSet = new Set<string>(); // use set to remove duplicates caused by "camelCase"
+
+    // For a method defined in .proto as "UnaryMethod"
+    Object.entries(methods).forEach(([name, { originalName }]) => {
+      methodSet.add(name); // adds camel case method name: "unaryMethod"
+      if (originalName && client.prototype.hasOwnProperty(originalName)) {
+        // adds original method name: "UnaryMethod",
+        methodSet.add(originalName);
+      }
+    });
+
+    return Array.from(methodSet);
   }
 
   private _getPatchedClientMethods() {
