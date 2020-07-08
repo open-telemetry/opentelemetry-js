@@ -32,11 +32,12 @@ import {
   ensureObserverIsCorrect,
   mockHistogram,
   ensureHistogramIsCorrect,
+  ensureValueRecorderIsCorrect,
+  mockValueRecorder,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
 import { HistogramAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
-
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
@@ -127,6 +128,12 @@ describe('transform', () => {
       ensureHistogramIsCorrect(
         transform.toCollectorMetric(mockHistogram, 1592602232694000000),
         hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
+      );
+
+      mockValueRecorder.aggregator.update(5);
+      ensureValueRecorderIsCorrect(
+        transform.toCollectorMetric(mockValueRecorder, 1592602232694000000),
+        hrTimeToNanoseconds(mockValueRecorder.aggregator.toPoint().timestamp)
       );
     });
   });

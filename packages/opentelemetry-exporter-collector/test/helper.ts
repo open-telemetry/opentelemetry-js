@@ -95,6 +95,24 @@ export const mockObserver: MetricRecord = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
+export const mockValueRecorder: MetricRecord = {
+  descriptor: {
+    name: 'test-recorder',
+    description: 'sample recorder description',
+    unit: '3',
+    metricKind: MetricKind.VALUE_RECORDER,
+    valueType: ValueType.INT,
+  },
+  labels: {},
+  aggregator: new MinMaxLastSumCountAggregator(),
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+  instrumentationLibrary: { name: 'default', version: '0.0.1' },
+};
+
 export const mockHistogram: MetricRecord = {
   descriptor: {
     name: 'test-hist',
@@ -683,6 +701,29 @@ export function ensureObserverIsCorrect(
       {
         labels: [],
         value: 10,
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: time,
+      },
+    ],
+  });
+}
+
+export function ensureValueRecorderIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-recorder',
+      description: 'sample recorder description',
+      unit: '3',
+      type: 1,
+      temporality: 2,
+    },
+    int64DataPoints: [
+      {
+        labels: [],
+        value: 5,
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
       },
