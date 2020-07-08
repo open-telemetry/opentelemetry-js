@@ -3,7 +3,7 @@ import * as api from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { translateToDatadog } from './transform';
-import { AgentExporter, format, datadog, PrioritySampler } from './types';
+import { AgentExporter, format, PrioritySampler } from './types';
 
 
 /**
@@ -21,7 +21,7 @@ export class DatadogExporter implements SpanExporter {
   constructor(config: any) {
     this._url = 'http://localhost:8126' || config.agent_url || process.env.DD_TRACE_AGENT_URL;
     this._logger = config.logger || new NoopLogger();
-    this._service_name = config.service_name || process.env.DD_SERVICE;
+    this._service_name = config.service_name || process.env.DD_SERVICE || 'dd-service';
     this._env = config.env || process.env.DD_ENV;
     this._version = config.version || process.env.DD_VERSION;
     this._tags = config.tags || process.env.DD_TAGS;
@@ -57,7 +57,10 @@ export class DatadogExporter implements SpanExporter {
 
     const formattedSpans = datadogSpans.map(format)
     this._logger.debug('exporting dd spans')
-    console.log('formatted spans arer', formattedSpans)
+    // console.log(formattedSpans)
+    // formattedSpans.forEach( (x: any) => {
+    //   console.log(x.parent_id.toString())
+    // })
     const response = this._exporter.export(formattedSpans)
     console.log('response ', response)
   }

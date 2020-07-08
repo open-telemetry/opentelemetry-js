@@ -16,7 +16,7 @@
 
 import { unrefTimer } from '@opentelemetry/core';
 import { SpanProcessor, SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
-// import * as datadog from 'dd-trace';
+import * as datadog from 'dd-trace';
 import { id, SpanContext } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
@@ -67,7 +67,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
         : DEFAULT_MAX_TRACE_SIZE;
 
     // this._exporter = 
-    // this._tracer = datadog.tracer.init({ "plugins": false })
+    this._tracer = datadog.tracer.init({ "plugins": false })
     console.log(this._maxQueueSize, this._maxTraceSize);
   }
 
@@ -163,7 +163,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
     this._check_traces_queue.forEach( (traceId) => {
       // check again in case spans have been added
       if(this._isExportable(traceId)) {
-        console.log('tryyng to expot')
+        console.log('tryng to export')
         const spans = this._traces.get(traceId).get(SPANS_KEY)
         this._traces.delete(traceId)
         this._check_traces_queue.delete(traceId)        

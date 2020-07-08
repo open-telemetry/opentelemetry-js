@@ -24,5 +24,7 @@ export const SpanContext = require('dd-trace/packages/dd-trace/src/opentracing/s
 export const AgentExporter = require('dd-trace/packages/dd-trace/src/exporters/agent')
 export const format = require('dd-trace/packages/dd-trace/src/format')
 export const PrioritySampler = require('dd-trace/packages/dd-trace/src/priority_sampler')
+export const Sampler = require('dd-trace/packages/dd-trace/src/sampler')
 export const Span = require('dd-trace/packages/dd-trace/src/opentracing/span')
+export const NoopTracer = require('dd-trace/packages/dd-trace/src/noop/tracer')
 export const datadog = require('dd-trace')
