@@ -334,6 +334,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // For a method defined in .proto as "UnaryMethod"
     Object.entries(methods).forEach(([name, { originalName }]) => {
       methodSet.add(name); // adds camel case method name: "unaryMethod"
+      // eslint-disable-next-line no-prototype-builtins
       if (originalName && client.prototype.hasOwnProperty(originalName)) {
         // adds original method name: "UnaryMethod",
         methodSet.add(originalName);
