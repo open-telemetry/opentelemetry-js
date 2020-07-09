@@ -26,7 +26,7 @@ export class MultiSpanProcessor implements SpanProcessor {
 
   forceFlush(cb: () => void = () => {}): void {
     let finished = 0;
-    let total = this._spanProcessors.length;
+    const total = this._spanProcessors.length;
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.forceFlush(() => {
         if (++finished === total) {
@@ -50,7 +50,7 @@ export class MultiSpanProcessor implements SpanProcessor {
 
   shutdown(cb: () => void = () => {}): void {
     let finished = 0;
-    let total = this._spanProcessors.length;
+    const total = this._spanProcessors.length;
     for (const spanProcessor of this._spanProcessors) {
       spanProcessor.shutdown(() => {
         if (++finished === total) {

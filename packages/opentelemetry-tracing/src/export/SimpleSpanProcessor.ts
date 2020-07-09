@@ -25,25 +25,25 @@ import { ReadableSpan } from './ReadableSpan';
  * Only spans that are sampled are converted.
  */
 export class SimpleSpanProcessor implements SpanProcessor {
-  constructor(private readonly _exporter: SpanExporter) { }
+  constructor(private readonly _exporter: SpanExporter) {}
   private _isShutdown = false;
 
-  forceFlush(cb: () => void = () => { }): void {
+  forceFlush(cb: () => void = () => {}): void {
     // do nothing as all spans are being exported without waiting
     setImmediate(cb);
   }
 
   // does nothing.
-  onStart(span: ReadableSpan): void { }
+  onStart(span: ReadableSpan): void {}
 
   onEnd(span: ReadableSpan): void {
     if (this._isShutdown) {
       return;
     }
-    this._exporter.export([span], () => { });
+    this._exporter.export([span], () => {});
   }
 
-  shutdown(cb: () => void = () => { }): void {
+  shutdown(cb: () => void = () => {}): void {
     if (this._isShutdown) {
       setImmediate(cb);
       return;
@@ -52,5 +52,5 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
     this._exporter.shutdown();
     setImmediate(cb);
-  } 
+  }
 }

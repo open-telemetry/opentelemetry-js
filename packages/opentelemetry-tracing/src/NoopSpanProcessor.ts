@@ -21,6 +21,10 @@ import { ReadableSpan } from './export/ReadableSpan';
 export class NoopSpanProcessor implements SpanProcessor {
   onStart(span: ReadableSpan): void {}
   onEnd(span: ReadableSpan): void {}
-  shutdown(cb: () => unknown = () => {}): void { setImmediate(cb) }
-  forceFlush(cb: () => unknown = () => {}): void { setImmediate(cb) }
+  shutdown(cb: () => unknown = () => {}): void {
+    setImmediate(cb);
+  }
+  forceFlush(cb: () => unknown = () => {}): void {
+    setImmediate(cb);
+  }
 }
