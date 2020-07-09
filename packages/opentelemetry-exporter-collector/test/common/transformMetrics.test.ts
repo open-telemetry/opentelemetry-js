@@ -29,7 +29,6 @@ import {
   ensureValueRecorderIsCorrect,
   mockValueRecorder,
 } from '../helper';
-import { HistogramAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 describe('transformMetrics', () => {
   describe('toCollectorMetric', () => {
@@ -46,7 +45,6 @@ describe('transformMetrics', () => {
       );
       mockHistogram.aggregator.update(7);
       mockHistogram.aggregator.update(14);
-      (mockHistogram.aggregator as HistogramAggregator).reset();
       ensureHistogramIsCorrect(
         transform.toCollectorMetric(mockHistogram, 1592602232694000000),
         hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
