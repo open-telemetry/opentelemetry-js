@@ -21,7 +21,6 @@ import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
-import { MetricRecord } from './export/types';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
 import { Metric } from './Metric';
@@ -266,20 +265,14 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  collect(): Promise<unknown> {
-    return new Promise((resolve, reject) => {
-      const metrics: Promise<MetricRecord[]>[] = [];
-      Array.from(this._metrics.values()).forEach(metric => {
-        metrics.push(metric.getMetricRecord());
+  async collect(): Promise<void> {
+    const metrics = Array.from(this._metrics.values()).map(metric => {
+      return metric.getMetricRecord();
+    });
+    await Promise.all(metrics).then(records => {
+      records.forEach(metrics => {
+        metrics.forEach(metric => this._batcher.process(metric));
       });
-      Promise.all(metrics)
-        .then(records => {
-          records.forEach(metrics => {
-            metrics.forEach(metric => this._batcher.process(metric));
-          });
-          resolve();
-        })
-        .catch(reject);
     });
   }
 
