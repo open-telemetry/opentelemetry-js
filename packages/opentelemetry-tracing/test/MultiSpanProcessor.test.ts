@@ -16,7 +16,14 @@
 
 import * as assert from 'assert';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
-import { SpanProcessor, Span, BasicTracerProvider } from '../src';
+import {
+  SpanProcessor,
+  Span,
+  BasicTracerProvider,
+  SimpleSpanProcessor,
+  InMemorySpanExporter,
+} from '../src';
+import Sinon = require('sinon');
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
@@ -90,5 +97,28 @@ describe('MultiSpanProcessor', () => {
     const multiSpanProcessor = new MultiSpanProcessor([processor]);
     multiSpanProcessor.forceFlush();
     assert.ok(flushed);
+  });
+
+  it('should wait for all span processors to finish flushing', done => {
+    let flushed = 0;
+    const processor1 = new SimpleSpanProcessor(new InMemorySpanExporter());
+    const processor2 = new SimpleSpanProcessor(new InMemorySpanExporter());
+
+    const spy1 = Sinon.stub(processor1, 'forceFlush').callsFake(cb => {
+      flushed++;
+      cb!();
+    });
+    const spy2 = Sinon.stub(processor2, 'forceFlush').callsFake(cb => {
+      flushed++;
+      cb!();
+    });
+
+    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+    multiSpanProcessor.forceFlush(() => {
+      Sinon.assert.calledOnce(spy1);
+      Sinon.assert.calledOnce(spy2);
+      assert.strictEqual(flushed, 2);
+      done();
+    });
   });
 });
