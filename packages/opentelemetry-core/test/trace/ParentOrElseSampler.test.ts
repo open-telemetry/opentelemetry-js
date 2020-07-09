@@ -34,7 +34,10 @@ describe('ParentOrElseSampler', () => {
     assert.strictEqual(sampler.toString(), 'ParentOrElse{AlwaysOnSampler}');
 
     sampler = new ParentOrElseSampler(new ProbabilitySampler(0.5));
-    assert.strictEqual(sampler.toString(), 'ParentOrElse{ProbabilitySampler{0.5}}');
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentOrElse{ProbabilitySampler{0.5}}'
+    );
   });
 
   it('should return api.SamplingDecision.NOT_RECORD for not sampled parent while composited with AlwaysOnSampler', () => {
