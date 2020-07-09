@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ALWAYS_SAMPLER } from '@opentelemetry/core';
+import { ALWAYS_SAMPLER, ExportResult } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -23,6 +23,7 @@ import {
   InMemorySpanExporter,
   Span,
 } from '../../src';
+import Sinon = require('sinon');
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -206,13 +207,23 @@ describe('BatchSpanProcessor', () => {
 
       it('should call an async callback when flushing is complete', done => {
         processor.forceFlush(() => {
+          assert.strictEqual(exporter.getFinishedSpans().length, 1);
           done();
         });
       });
 
       it('should call an async callback when shutdown is complete', done => {
-        const processor = new BatchSpanProcessor(exporter);
+        let exportedSpans = 0;
+        Sinon.stub(exporter, 'export').callsFake((spans, callback) => {
+          console.log('uh, export?');
+          setTimeout(() => {
+            exportedSpans = exportedSpans + spans.length;
+            callback(ExportResult.SUCCESS);
+          }, 0);
+        });
+
         processor.shutdown(() => {
+          assert.strictEqual(exportedSpans, 1);
           done();
         });
       });
