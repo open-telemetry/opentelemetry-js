@@ -48,8 +48,6 @@ export class ProbabilitySampler implements Sampler {
   }
 
   toString(): string {
-    // TODO: Consider to use `AlwaysSampleSampler` and `NeverSampleSampler`
-    // based on the specs.
     return `ProbabilitySampler{${this._probability}}`;
   }
 

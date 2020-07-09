@@ -19,6 +19,32 @@ import * as api from '@opentelemetry/api';
 import { ProbabilitySampler } from '../../src/trace/sampler/ProbabilitySampler';
 
 describe('ProbabilitySampler', () => {
+  it('should reflect sampler name with probability', () => {
+    let sampler = new ProbabilitySampler(1.0);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
+
+    sampler = new ProbabilitySampler(0.5);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0.5}');
+
+    sampler = new ProbabilitySampler(0);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+
+    sampler = new ProbabilitySampler(-0);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+
+    sampler = new ProbabilitySampler(undefined);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+
+    sampler = new ProbabilitySampler(NaN);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+
+    sampler = new ProbabilitySampler(+Infinity);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
+
+    sampler = new ProbabilitySampler(-Infinity);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
+  });
+
   it('should return a always sampler for 1', () => {
     const sampler = new ProbabilitySampler(1);
     assert.deepStrictEqual(sampler.shouldSample(), {
@@ -31,7 +57,6 @@ describe('ProbabilitySampler', () => {
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{1}');
   });
 
   it('should return a never sampler for 0', () => {
@@ -54,7 +79,6 @@ describe('ProbabilitySampler', () => {
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0.2}');
 
     Math.random = () => 5 / 10;
     assert.deepStrictEqual(sampler.shouldSample(), {
@@ -64,25 +88,25 @@ describe('ProbabilitySampler', () => {
 
   it('should handle NaN', () => {
     const sampler = new ProbabilitySampler(NaN);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle -NaN', () => {
     const sampler = new ProbabilitySampler(-NaN);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 
   it('should handle undefined', () => {
     const sampler = new ProbabilitySampler(undefined);
+    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
-    assert.strictEqual(sampler.toString(), 'ProbabilitySampler{0}');
   });
 });
