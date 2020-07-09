@@ -15,3 +15,4 @@
  */
 
 export * from './NodeTracerProvider';
+export * from './NodePluginEnabler';

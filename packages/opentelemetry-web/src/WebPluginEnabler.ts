@@ -28,11 +28,6 @@ import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
  */
 interface WebPluginEnablerConfig {
   /**
-   * List of plugins to be enabled
-   */
-  plugins: BasePlugin<unknown>[];
-
-  /**
    * Tracer provider for the plugins
    */
   tracerProvider: TracerProvider;

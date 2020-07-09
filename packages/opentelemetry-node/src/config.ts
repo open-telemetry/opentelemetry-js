@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import {
+  Logger,
+  TracerProvider,
+  MeterProvider
+} from '@opentelemetry/api';
+import { LogLevel } from '@opentelemetry/core';
 import { Plugins } from './instrumentation/PluginLoader';
 import { TracerConfig } from '@opentelemetry/tracing';
 
@@ -23,6 +28,35 @@ import { TracerConfig } from '@opentelemetry/tracing';
 export interface NodeTracerConfig extends TracerConfig {
   /** Plugins options. */
   plugins?: Plugins;
+}
+
+/**
+ * NodePluginEnablerConfig provides an interface for passing plugins to the NodePluginEnabler
+ */
+export interface NodePluginEnablerConfig {
+  /**
+   * Tracer provider for the plugins
+   */
+  tracerProvider: TracerProvider;
+
+  /**
+   * Meter Provider for the plugins;
+   */
+  meterProvider: MeterProvider;
+  /**
+   * Plugins to be enabled
+   */
+  plugins?: Plugins;
+
+  /**
+   * Logger for plugins
+   */
+  logger?: Logger;
+
+  /**
+   * Level of logger
+   */
+  logLevel?: LogLevel;
 }
 
 /** List of all default supported plugins */
