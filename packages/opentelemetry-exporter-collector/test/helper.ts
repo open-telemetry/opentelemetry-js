@@ -26,7 +26,7 @@ import {
   MetricRecord,
   MetricKind,
   SumAggregator,
-  LastValueAggregator,
+  MinMaxLastSumCountAggregator,
 } from '@opentelemetry/metrics';
 
 if (typeof Buffer === 'undefined') {
@@ -85,7 +85,7 @@ export const mockObserver: MetricRecord = {
     valueType: ValueType.DOUBLE,
   },
   labels: {},
-  aggregator: new LastValueAggregator(),
+  aggregator: new MinMaxLastSumCountAggregator(),
   resource: new Resource({
     service: 'ui',
     version: 1,

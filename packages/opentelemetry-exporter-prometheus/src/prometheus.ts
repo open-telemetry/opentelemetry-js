@@ -161,10 +161,10 @@ export class PrometheusExporter implements MetricExporter {
           (point.value as Histogram).sum,
           hrTimeToMilliseconds(point.timestamp)
         );
-      } else if (typeof (point.value as Distribution).max === 'number') {
+      } else if (typeof (point.value as Distribution).last === 'number') {
         metric.set(
           labels,
-          (point.value as Distribution).sum,
+          (point.value as Distribution).last,
           hrTimeToMilliseconds(point.timestamp)
         );
       }

@@ -17,20 +17,37 @@
 import { Aggregator, Point } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
+import { Distribution } from '../types';
 
-/** Basic aggregator for LastValue which keeps the last recorded value. */
-export class LastValueAggregator implements Aggregator {
-  private _current: number = 0;
+/**
+ * Basic aggregator keeping all raw values (events, sum, max, last and min).
+ */
+export class MinMaxLastSumCountAggregator implements Aggregator {
+  private _distribution: Distribution;
   private _lastUpdateTime: HrTime = [0, 0];
 
+  constructor() {
+    this._distribution = {
+      min: Infinity,
+      max: -Infinity,
+      last: 0,
+      sum: 0,
+      count: 0,
+    };
+  }
+
   update(value: number): void {
-    this._current = value;
+    this._distribution.count++;
+    this._distribution.sum += value;
+    this._distribution.last = value;
+    this._distribution.min = Math.min(this._distribution.min, value);
+    this._distribution.max = Math.max(this._distribution.max, value);
     this._lastUpdateTime = hrTime();
   }
 
   toPoint(): Point {
     return {
-      value: this._current,
+      value: this._distribution,
       timestamp: this._lastUpdateTime,
     };
   }
