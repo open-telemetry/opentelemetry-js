@@ -22,9 +22,9 @@ export class NoopSpanProcessor implements SpanProcessor {
   onStart(span: ReadableSpan): void {}
   onEnd(span: ReadableSpan): void {}
   shutdown(cb: () => unknown = () => {}): void {
-    setImmediate(cb);
+    setTimeout(cb, 0);
   }
   forceFlush(cb: () => unknown = () => {}): void {
-    setImmediate(cb);
+    setTimeout(cb, 0);
   }
 }

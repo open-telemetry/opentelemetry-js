@@ -46,7 +46,7 @@ export class BatchSpanProcessor implements SpanProcessor {
 
   forceFlush(cb: () => void = () => {}): void {
     if (this._isShutdown) {
-      setImmediate(cb);
+      setTimeout(cb, 0);
       return;
     }
     this._flush(cb);
@@ -84,7 +84,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _flush(cb: () => void = () => {}) {
     this._clearTimer();
     if (this._finishedSpans.length === 0) {
-      setImmediate(cb);
+      setTimeout(cb, 0);
       return;
     }
     this._exporter.export(this._finishedSpans, cb);

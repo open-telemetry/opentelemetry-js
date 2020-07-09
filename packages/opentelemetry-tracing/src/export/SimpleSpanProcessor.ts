@@ -30,7 +30,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
   forceFlush(cb: () => void = () => {}): void {
     // do nothing as all spans are being exported without waiting
-    setImmediate(cb);
+    setTimeout(cb, 0);
   }
 
   // does nothing.
@@ -45,12 +45,12 @@ export class SimpleSpanProcessor implements SpanProcessor {
 
   shutdown(cb: () => void = () => {}): void {
     if (this._isShutdown) {
-      setImmediate(cb);
+      setTimeout(cb, 0);
       return;
     }
     this._isShutdown = true;
 
     this._exporter.shutdown();
-    setImmediate(cb);
+    setTimeout(cb, 0);
   }
 }
