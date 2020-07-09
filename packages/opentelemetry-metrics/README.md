@@ -87,7 +87,7 @@ const meter = new MeterProvider().getMeter('your-meter-name');
 
 // async callback - for operation that needs to wait for value
 meter.createValueObserver('your_metric_name', {
-  description: 'Example of a async observer with callback',
+  description: 'Example of an async observer with callback',
 }, async (observerResult) => {
   const value = await getAsyncValue();
   observerResult.observe(value, { label: '1' });
@@ -103,7 +103,7 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createValueObserver('your_metric_name', {
-  description: 'Example of a async observer with callback',
+  description: 'Example of a sync observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { label: '1' });
   observerResult.observe(getRandomValue(), { label: '2' });
@@ -142,7 +142,7 @@ function getAsyncValue() {
 
 // sync callback in case you don't need to wait for value
 meter.createUpDownSumObserver('your_metric_name', {
-  description: 'Example of an async observer with callback',
+  description: 'Example of a sync observer with callback',
 }, (observerResult) => {
   observerResult.observe(getRandomValue(), { label: '1' });
 });
