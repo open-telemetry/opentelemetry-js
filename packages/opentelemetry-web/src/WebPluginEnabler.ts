@@ -13,54 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BasePlugin } from '@opentelemetry/core';
-import {
-  Logger,
-  TracerProvider,
-  MeterProvider,
-  NoopTracerProvider,
-  NoopMeterProvider,
-} from '@opentelemetry/api';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { BasePlugin, PluginEnabler, PluginEnablerConfig } from '@opentelemetry/core';
 
 /**
  * WebPluginEnablerConfig provides an interface for passing plugins to the WebPluginEnabler
  */
-interface WebPluginEnablerConfig {
+interface WebPluginEnablerConfig extends PluginEnablerConfig{
   /**
-   * Tracer provider for the plugins
+   * Plugins to be enabled
    */
-  tracerProvider: TracerProvider;
-
-  /**
-   * Meter Provider for the plugins;
-   */
-  meterProvider: MeterProvider;
-
-  /**
-   * Logger for plugins
-   */
-  logger?: Logger;
-
-  /**
-   * Level of logger
-   */
-  logLevel?: LogLevel;
+  plugins: BasePlugin<unknown>[]
 }
 
-export class WebPluginEnabler {
-  readonly logger: Logger;
-  readonly meterProvider: MeterProvider;
-  readonly tracerProvider: TracerProvider;
-
+export class WebPluginEnabler extends PluginEnabler{
   /**
    * Constructs a plugin enabler and automatically enables given plugins
    */
   constructor(config: WebPluginEnablerConfig) {
-    this.logger =
-      config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
-    this.tracerProvider = config.tracerProvider ?? new NoopTracerProvider();
-    this.meterProvider = config.meterProvider ?? new NoopMeterProvider();
+    super(config);
+    this.enable(config.plugins)
   }
 
   /**

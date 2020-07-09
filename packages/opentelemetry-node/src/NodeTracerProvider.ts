@@ -19,7 +19,7 @@ import {
   BasicTracerProvider,
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
-import { NodeTracerConfig } from './config';
+import { TracerConfig } from '@opentelemetry/tracing';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -32,7 +32,7 @@ export class NodeTracerProvider extends BasicTracerProvider {
   /**
    * Constructs a new Tracer instance.
    */
-  constructor(config: NodeTracerConfig = {}) {
+  constructor(config: TracerConfig = {}) {
     super(config);
   }
 

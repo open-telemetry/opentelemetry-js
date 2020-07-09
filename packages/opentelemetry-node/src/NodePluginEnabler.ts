@@ -1,27 +1,15 @@
-import {
-    Logger,
-    TracerProvider,
-    MeterProvider,
-    NoopTracerProvider,
-    NoopMeterProvider
-} from '@opentelemetry/api';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+
+import { PluginEnabler } from '@opentelemetry/core';
 import { NodePluginEnablerConfig } from './config';
 import { DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
 import { PluginLoader, Plugins } from './instrumentation/PluginLoader';
 
-export class NodePluginEnabler {
-    readonly logger: Logger;
-    readonly meterProvider: MeterProvider;
-    readonly tracerProvider: TracerProvider;
+export class NodePluginEnabler extends PluginEnabler{
     private readonly _pluginLoader: PluginLoader;
 
 
     constructor(config: NodePluginEnablerConfig){
-        this.logger =
-      config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
-    this.tracerProvider = config.tracerProvider ?? new NoopTracerProvider();
-    this.meterProvider = config.meterProvider ?? new NoopMeterProvider();
+        super(config);
 
     this._pluginLoader = new PluginLoader(this.tracerProvider, this.meterProvider, this.logger);
 
