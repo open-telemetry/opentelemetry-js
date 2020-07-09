@@ -67,7 +67,7 @@ export function toCollectorType(
     return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
   }
 
-  // TODO: Add Summary once implemented
+  // @TODO #1294: Add Summary once implemented
   return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
 }
 
