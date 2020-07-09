@@ -13,25 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { BasePlugin, PluginEnabler, PluginEnablerConfig } from '@opentelemetry/core';
+import {
+  BasePlugin,
+  PluginEnabler,
+  PluginEnablerConfig,
+} from '@opentelemetry/core';
 
 /**
  * WebPluginEnablerConfig provides an interface for passing plugins to the WebPluginEnabler
  */
-interface WebPluginEnablerConfig extends PluginEnablerConfig{
+interface WebPluginEnablerConfig extends PluginEnablerConfig {
   /**
    * Plugins to be enabled
    */
-  plugins: BasePlugin<unknown>[]
+  plugins: BasePlugin<unknown>[];
 }
 
-export class WebPluginEnabler extends PluginEnabler{
+export class WebPluginEnabler extends PluginEnabler {
   /**
    * Constructs a plugin enabler and automatically enables given plugins
    */
   constructor(config: WebPluginEnablerConfig) {
     super(config);
-    this.enable(config.plugins)
+    this.enable(config.plugins);
   }
 
   /**
