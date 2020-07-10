@@ -1,5 +1,5 @@
 
-import { SpanKind, TraceFlags } from '@opentelemetry/api';
+import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
@@ -7,6 +7,7 @@ import { id, Span, Sampler, NoopTracer } from './types'
 
 const SAMPLE_RATE_METRIC_KEY = '_sample_rate';
 const INTERNAL_TRACE_REGEX = /v\d\.\d\/traces/;
+const ERR_NAME_SUBSTRING = '.error_name';
 const ENV_KEY = 'env';
 const VERSION_KEY = 'version';
 const DD_ORIGIN = '_dd_origin';
@@ -66,8 +67,17 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
 
   // set error code
   if (span.status && span.status.code && span.status.code > 0) {
-    // TODO: set error.msg error.type error.stack
-    ddSpanBase.setTag('error', 1) 
+    // TODO: set error.msg error.type error.stack based on error events
+    // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
+    // the type and stacktrace are not officially recorded. Until this implemented, 
+    // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
+    const possibleType = inferType(span)
+    ddSpanBase.setTag('error', 1)
+    ddSpanBase.setTag('error.msg', span.status.message)
+
+    if (possibleType) {
+      ddSpanBase.setTag('error.type', possibleType);
+    }
   }
 
   // set env tag
@@ -84,12 +94,10 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
   ddSpanBase.addTags(span.attributes)
   
   // filter for internal requests to trace-agent and set sampling rate
-  // TODO: implement isInternalRequest(span)
-
   const samplingRate = getSamplingRate(span)
-  const shouldFilter = filterInternalRequest(span)
+  const internalRequest = isInternalRequest(span)
 
-  if (shouldFilter) {
+  if (internalRequest) {
     ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, USER_REJECT)
   } else if (samplingRate) {
     ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, samplingRate)
@@ -175,8 +183,30 @@ function getSamplingRate(span: ReadableSpan): number {
   }
 }
 
-function filterInternalRequest(span: ReadableSpan): boolean | void {
+// hacky way to get a valid error type
+// get canonicalCode key string
+// then check if `<library>.error_name` attribute exists
+function inferType(span: ReadableSpan): any {
+  let typeName = undefined;
+  for (const [key, value] of Object.entries(CanonicalCode)) {
+    if (span.status.code === value) {
+      typeName = key.toString();
+      break;
+    }
+  }
+
+  for (const [key, value] of Object.entries(span.attributes)) {
+    if (key.indexOf(ERR_NAME_SUBSTRING) >= 0) {
+      typeName = value;
+      break;
+    }
+  }
+
+  return typeName;
+}
+
+function isInternalRequest(span: ReadableSpan): boolean | void {
   if (typeof span.attributes['http.route'] === 'string') {
     return span.attributes['http.route'].match(INTERNAL_TRACE_REGEX) ? true : false
   }
- }
+}
