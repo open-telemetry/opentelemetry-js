@@ -129,9 +129,7 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     if (!config.url) {
       if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
         return DEFAULT_COLLECTOR_URL_JSON;
-      } else if (
-        config.protocolNode === CollectorProtocolNode.HTTP_PROTO
-      ) {
+      } else if (config.protocolNode === CollectorProtocolNode.HTTP_PROTO) {
         return DEFAULT_COLLECTOR_URL_JSON_PROTO;
       } else {
         return DEFAULT_COLLECTOR_URL_GRPC;
