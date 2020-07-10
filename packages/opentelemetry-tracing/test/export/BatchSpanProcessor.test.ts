@@ -23,7 +23,6 @@ import {
   InMemorySpanExporter,
   Span,
 } from '../../src';
-import Sinon = require('sinon');
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -214,7 +213,7 @@ describe('BatchSpanProcessor', () => {
 
       it('should call an async callback when shutdown is complete', done => {
         let exportedSpans = 0;
-        Sinon.stub(exporter, 'export').callsFake((spans, callback) => {
+        sinon.stub(exporter, 'export').callsFake((spans, callback) => {
           console.log('uh, export?');
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;

@@ -15,15 +15,15 @@
  */
 
 import * as assert from 'assert';
-import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
+import * as Sinon from 'sinon';
 import {
-  SpanProcessor,
-  Span,
   BasicTracerProvider,
-  SimpleSpanProcessor,
   InMemorySpanExporter,
+  SimpleSpanProcessor,
+  Span,
+  SpanProcessor,
 } from '../src';
-import Sinon = require('sinon');
+import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
