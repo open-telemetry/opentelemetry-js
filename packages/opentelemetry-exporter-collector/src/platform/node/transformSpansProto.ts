@@ -154,26 +154,6 @@ export function toCollectorSpan(span: ReadableSpan) {
   protoSpan.setDroppedLinksCount(0);
 
   return protoSpan;
-
-  // return new pgTrace.Span({
-  //   trace_id: hexToBuffer(span.spanContext.traceId),
-  //   span_id: hexToBuffer(span.spanContext.spanId),
-  //   parent_span_id: span.parentSpanId
-  //     ? hexToBuffer(span.parentSpanId)
-  //     : undefined,
-  //   trace_state: toCollectorTraceState(span.spanContext.traceState),
-  //   name: span.name,
-  //   kind: toCollectorKind(span.kind),
-  //   start_time_unix_nano: core.hrTimeToNanoseconds(span.startTime),
-  //   end_time_unix_nano: core.hrTimeToNanoseconds(span.endTime),
-  //   attributes: toCollectorAttributes(span.attributes),
-  //   dropped_attributes_count: 0,
-  //   events: toCollectorEvents(span.events),
-  //   dropped_events_count: 0,
-  //   status: toCollectorStatus(span.status),
-  //   links: toCollectorLinks(span),
-  //   dropped_links_count: 0,
-  // });
 }
 
 /**
