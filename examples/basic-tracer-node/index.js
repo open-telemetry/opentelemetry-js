@@ -7,7 +7,7 @@ const { DatadogSpanProcessor, DatadogExporter } = require('@opentelemetry/export
 const provider = new BasicTracerProvider();
 
 // Configure span processor to send spans to the exporter
-const exporter = new DatadogExporter({agent_url: "http://localhost:8126"});
+const exporter = new DatadogExporter({agent_url: "http://localhost:8126", service_name: 'js-example-service', env: 'test', version: "v1.0", tags: "is_test:true"});
 // const exporter = new ConsoleSpanExporter()
 const processor = new DatadogSpanProcessor(exporter)
 provider.addSpanProcessor(processor);
