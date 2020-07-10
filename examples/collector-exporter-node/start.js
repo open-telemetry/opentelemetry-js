@@ -9,7 +9,7 @@ const exporter = new CollectorTraceExporter({
   // headers: {
   //   foo: 'bar'
   // },
-  protocolNode: CollectorProtocolNode.HTTP_JSON_PROTO,
+  protocolNode: CollectorProtocolNode.HTTP_PROTO,
   // protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
