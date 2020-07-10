@@ -16,16 +16,18 @@
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "postcompile": "npm run submodule && npm run protos:copy",
+    "generate:http-proto": "rimraf ./generated/*  && ./gen.sh",
+    "postcompile": "npm run submodule && npm run protos:copy && npm run generated:copy",
     "prepare": "npm run compile",
     "protos:copy": "cpx src/platform/node/protos/opentelemetry/**/*.* build/src/platform/node/protos/opentelemetry",
+    "generated:copy": "cpx generated/**/*.* build/generated",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w"
+    "watch": "npm run protos:copy && npm run generated:copy && tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -55,6 +57,7 @@
   },
   "devDependencies": {
     "@babel/core": "7.10.3",
+    "@types/google-protobuf": "^3.7.2",
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.14",
     "@types/sinon": "9.0.4",
@@ -83,7 +86,7 @@
     "webpack-merge": "4.2.2"
   },
   "dependencies": {
-    "@grpc/proto-loader": "^0.5.3",
+    "@grpc/proto-loader": "^0.5.4",
     "@opentelemetry/api": "^0.9.0",
     "@opentelemetry/core": "^0.9.0",
     "@opentelemetry/resources": "^0.9.0",

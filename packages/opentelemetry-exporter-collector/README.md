@@ -132,10 +132,33 @@ provider.register();
 
 ```
 
+## Usage in Node - PROTO over http
+
+```js
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
+
+const collectorOptions = {
+  protocolNode: CollectorTransportNode.HTTP_PROTO,
+  serviceName: 'basic-service',
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
+  headers: {
+    foo: 'bar'
+  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+};
+
+const provider = new BasicTracerProvider();
+const exporter = new CollectorExporter(collectorOptions);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+
+provider.register();
+
+```
+
 ## Running opentelemetry-collector locally to see the traces
 
-1. Go to examples/basic-tracer-node
-2. run `npm run collector:docker:ot`
+1. Go to examples/collector-exporter-node
+2. run `npm run docker:start`
 3. Open page at `http://localhost:9411/zipkin/` to observe the traces
 
 ## Useful links

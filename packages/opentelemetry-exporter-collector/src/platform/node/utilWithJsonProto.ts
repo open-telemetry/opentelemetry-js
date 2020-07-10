@@ -17,27 +17,28 @@
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as collectorTypes from '../../types';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { toCollectorExportTraceServiceRequest } from './transformSpansProto';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
+export const DEFAULT_COLLECTOR_URL_JSON_PROTO =
+  'http://localhost:55680/v1/trace';
 
-export function onInitWithJson(
+export function onInitWithJsonProto(
   _collector: CollectorTraceExporter,
   _config: CollectorExporterConfigNode
 ): void {
-  // nothing to be done for json yet
+  // nothing to be done for json proto yet
 }
 
 /**
- * Send spans using json over http
+ * Send spans using proto over http
  * @param collector
  * @param spans
  * @param onSuccess
  * @param onError
  */
-export function sendSpansUsingJson(
+export function sendSpansUsingJsonProto(
   collector: CollectorTraceExporter,
   spans: ReadableSpan[],
   onSuccess: () => void,
@@ -48,12 +49,12 @@ export function sendSpansUsingJson(
     collector
   );
 
-  const body = JSON.stringify(exportTraceServiceRequest);
+  const body = exportTraceServiceRequest.serializeBinary();
 
   return sendDataUsingHttp(
     collector,
-    body,
-    'application/json',
+    Buffer.from(body),
+    'application/x-protobuf',
     onSuccess,
     onError
   );

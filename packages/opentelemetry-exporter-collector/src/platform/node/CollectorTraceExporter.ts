@@ -37,6 +37,11 @@ import {
   onInitWithJson,
   sendSpansUsingJson,
 } from './utilWithJson';
+import {
+  DEFAULT_COLLECTOR_URL_JSON_PROTO,
+  onInitWithJsonProto,
+  sendSpansUsingJsonProto,
+} from './utilWithJsonProto';
 
 /**
  * Collector Trace Exporter for Node
@@ -63,15 +68,19 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
       typeof config.protocolNode !== 'undefined'
         ? config.protocolNode
         : CollectorProtocolNode.GRPC;
-    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
-      this.logger.debug('CollectorExporter - using json over http');
-      if (config.metadata) {
-        this.logger.warn('Metadata cannot be set when using json');
-      }
-    } else {
+    if (this._protocol === CollectorProtocolNode.GRPC) {
       this.logger.debug('CollectorExporter - using grpc');
       if (config.headers) {
         this.logger.warn('Headers cannot be set when using grpc');
+      }
+    } else {
+      if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+        this.logger.debug('CollectorExporter - using json over http');
+      } else {
+        this.logger.debug('CollectorExporter - using proto over http');
+      }
+      if (config.metadata) {
+        this.logger.warn('Metadata cannot be set when using http');
       }
     }
     this.metadata = config.metadata;
@@ -91,6 +100,8 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
 
     if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
       onInitWithJson(this, config);
+    } else if (config.protocolNode === CollectorProtocolNode.HTTP_PROTO) {
+      onInitWithJsonProto(this, config);
     } else {
       onInitWithGrpc(this, config);
     }
@@ -107,6 +118,8 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     }
     if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
       sendSpansUsingJson(this, spans, onSuccess, onError);
+    } else if (this._protocol === CollectorProtocolNode.HTTP_PROTO) {
+      sendSpansUsingJsonProto(this, spans, onSuccess, onError);
     } else {
       sendSpansUsingGrpc(this, spans, onSuccess, onError);
     }
@@ -114,9 +127,15 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
 
   getDefaultUrl(config: CollectorExporterConfigNode): string {
     if (!config.url) {
-      return config.protocolNode === CollectorProtocolNode.HTTP_JSON
-        ? DEFAULT_COLLECTOR_URL_JSON
-        : DEFAULT_COLLECTOR_URL_GRPC;
+      if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
+        return DEFAULT_COLLECTOR_URL_JSON;
+      } else if (
+        config.protocolNode === CollectorProtocolNode.HTTP_PROTO
+      ) {
+        return DEFAULT_COLLECTOR_URL_JSON_PROTO;
+      } else {
+        return DEFAULT_COLLECTOR_URL_GRPC;
+      }
     }
     return config.url;
   }

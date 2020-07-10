@@ -5,6 +5,7 @@
   "exclude": [
     "**/*.d.ts",
     "build/**/*.*",
+    "generated/**/*.*",
     "src/index.ts",
     "src/platform/**/index.ts",
     "src/platform/browser/*.ts",

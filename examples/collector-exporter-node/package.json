@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./start.js",
-    "docker:start": "cd ./docker && docker-compose down && docker-compose up -d",
+    "docker:start": "cd ./docker && docker-compose down && docker-compose up",
+    "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
     "docker:stop": "cd ./docker && docker-compose down"
   },
   "repository": {
