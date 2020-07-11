@@ -205,7 +205,7 @@ export class Meter implements api.Meter {
     const opt: api.MetricOptions = {
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
-      ...options
+      ...options,
     };
     const sumObserver = new SumObserverMetric(
       name,

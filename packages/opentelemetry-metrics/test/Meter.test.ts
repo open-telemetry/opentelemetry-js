@@ -36,7 +36,7 @@ import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
 import { BatchObserverResult } from '../src/BatchObserverResult';
 import { SumAggregator } from '../src/export/aggregators';
-import { SumObserverMetric } from '../src/SumObserverMetric'
+import { SumObserverMetric } from '../src/SumObserverMetric';
 import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
@@ -686,9 +686,7 @@ describe('Meter', () => {
 
   describe('#SumObserverMetric', () => {
     it('should create an Sum observer', () => {
-      const sumObserver = meter.createSumObserver(
-        'name'
-      ) as SumObserverMetric;
+      const sumObserver = meter.createSumObserver('name') as SumObserverMetric;
       assert.ok(sumObserver instanceof Metric);
     });
 
@@ -812,14 +810,10 @@ describe('Meter', () => {
     });
 
     it('should pipe through resource', async () => {
-      const sumObserver = meter.createSumObserver(
-        'name',
-        {},
-        result => {
-          result.observe(42, { foo: 'bar' });
-          return Promise.resolve();
-        }
-      ) as SumObserverMetric;
+      const sumObserver = meter.createSumObserver('name', {}, result => {
+        result.observe(42, { foo: 'bar' });
+        return Promise.resolve();
+      }) as SumObserverMetric;
       assert.ok(sumObserver.resource instanceof Resource);
 
       const [record] = await sumObserver.getMetricRecord();
