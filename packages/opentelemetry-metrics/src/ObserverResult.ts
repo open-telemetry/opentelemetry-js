@@ -29,3 +29,11 @@ export class ObserverResult implements TypeObserverResult {
     this.values.set(labels, value);
   }
 }
+
+export class MonotonicObserverResult extends ObserverResult {
+  observe(value: number, labels: Labels): void {
+    if (value >= 0) {
+      this.values.set(labels, value);
+    }
+  }
+}

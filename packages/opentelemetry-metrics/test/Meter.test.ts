@@ -713,8 +713,7 @@ describe('Meter', () => {
     it('should set callback and observe value ', async () => {
       let counter = 0;
       function getValue() {
-        counter++;
-        if (counter % 2 === 0) {
+        if (++counter % 2 == 0) {
           return -1;
         }
         return 3;
@@ -747,12 +746,12 @@ describe('Meter', () => {
       metricRecords = await sumObserver.getMetricRecord();
       assert.strictEqual(metricRecords.length, 1);
       point = metricRecords[0].aggregator.toPoint();
-      assert.strictEqual(point.value, 2);
+      assert.strictEqual(point.value, 3);
 
       metricRecords = await sumObserver.getMetricRecord();
       assert.strictEqual(metricRecords.length, 1);
       point = metricRecords[0].aggregator.toPoint();
-      assert.strictEqual(point.value, 5);
+      assert.strictEqual(point.value, 6);
     });
 
     it('should set callback and observe value when callback returns nothing', async () => {

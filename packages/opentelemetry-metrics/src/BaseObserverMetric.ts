@@ -55,8 +55,12 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
     );
   }
 
+  protected getObserverResult(): ObserverResult {
+    return new ObserverResult();
+  }
+
   async getMetricRecord(): Promise<MetricRecord[]> {
-    const observerResult = new ObserverResult();
+    const observerResult = this.getObserverResult();
     await this._callback(observerResult);
     observerResult.values.forEach((value, labels) => {
       const instrument = this.bind(labels);

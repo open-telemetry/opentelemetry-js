@@ -18,6 +18,7 @@ import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BaseObserverMetric } from './BaseObserverMetric';
+import { MonotonicObserverResult, ObserverResult } from './ObserverResult';
 import { Batcher } from './export/Batcher';
 import { MetricKind } from './export/types';
 
@@ -41,5 +42,9 @@ export class SumObserverMetric extends BaseObserverMetric
       instrumentationLibrary,
       callback
     );
+  }
+
+  protected getObserverResult(): ObserverResult {
+    return new MonotonicObserverResult();
   }
 }
