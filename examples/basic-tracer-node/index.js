@@ -2,9 +2,10 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor, BatchSpanProcessor } = require('@opentelemetry/tracing');
-const { DatadogSpanProcessor, DatadogExporter } = require('@opentelemetry/exporter-datadog');
+const { DatadogSpanProcessor, DatadogExporter, DatadogPropagator } = require('@opentelemetry/exporter-datadog');
 
 const provider = new BasicTracerProvider();
+const { B3Propagator } = require("@opentelemetry/core");
 
 // Configure span processor to send spans to the exporter
 const exporter = new DatadogExporter({agent_url: "http://localhost:8126", service_name: 'js-example-service', env: 'test', version: "v1.0", tags: "is_test:true"});
@@ -22,7 +23,10 @@ provider.addSpanProcessor(processor);
  * do not register a global tracer provider, instrumentation which calls these
  * methods will receive no-op implementations.
  */
-provider.register();
+provider.register({
+  // Datadog B3 Propagation
+  propagator: new DatadogPropagator()
+});
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
 // Create a span. A span must be closed.
