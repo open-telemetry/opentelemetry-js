@@ -836,7 +836,11 @@ export function ensureExportMetricsServiceRequestIsSet(
   json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(resourceMetrics.length, 2, 'resourceMetrics is missing');
+  assert.strictEqual(
+    resourceMetrics.length,
+    4,
+    'resourceMetrics is the incorrect length'
+  );
 
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');

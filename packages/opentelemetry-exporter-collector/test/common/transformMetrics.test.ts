@@ -33,26 +33,40 @@ import { HistogramAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 describe('transformMetrics', () => {
   describe('toCollectorMetric', () => {
-    it('should convert metric', () => {
+    beforeEach(() => {
+      // Counter
       mockCounter.aggregator.update(1);
+
+      // Observer
+      mockObserver.aggregator.update(10);
+
+      // Histogram
+      mockHistogram.aggregator.update(7);
+      mockHistogram.aggregator.update(14);
+      (mockHistogram.aggregator as HistogramAggregator).reset();
+
+      // ValueRecorder
+      mockValueRecorder.aggregator.update(5);
+    });
+
+    afterEach(() => {
+      mockCounter.aggregator.update(-1); // Reset counter
+      (mockHistogram.aggregator as HistogramAggregator).reset();
+    });
+    it('should convert metric', () => {
       ensureCounterIsCorrect(
         transform.toCollectorMetric(mockCounter, 1592602232694000000),
         hrTimeToNanoseconds(mockCounter.aggregator.toPoint().timestamp)
       );
-      mockObserver.aggregator.update(10);
       ensureObserverIsCorrect(
         transform.toCollectorMetric(mockObserver, 1592602232694000000),
         hrTimeToNanoseconds(mockObserver.aggregator.toPoint().timestamp)
       );
-      mockHistogram.aggregator.update(7);
-      mockHistogram.aggregator.update(14);
-      (mockHistogram.aggregator as HistogramAggregator).reset();
       ensureHistogramIsCorrect(
         transform.toCollectorMetric(mockHistogram, 1592602232694000000),
         hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
       );
 
-      mockValueRecorder.aggregator.update(5);
       ensureValueRecorderIsCorrect(
         transform.toCollectorMetric(mockValueRecorder, 1592602232694000000),
         hrTimeToNanoseconds(mockValueRecorder.aggregator.toPoint().timestamp)
