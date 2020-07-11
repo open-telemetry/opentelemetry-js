@@ -2,7 +2,9 @@
 
 const opentelemetry = require('@opentelemetry/api');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor, BatchSpanProcessor } = require('@opentelemetry/tracing');
-const { DatadogSpanProcessor, DatadogExporter, DatadogPropagator } = require('@opentelemetry/exporter-datadog');
+const { DatadogSpanProcessor, DatadogExporter, DatadogPropagator, DatadogProbabilitySampler } = require('@opentelemetry/exporter-datadog');
+
+const { ProbabilitySampler } = require("@opentelemetry/core");
 
 const provider = new BasicTracerProvider();
 const { B3Propagator } = require("@opentelemetry/core");
@@ -25,7 +27,11 @@ provider.addSpanProcessor(processor);
  */
 provider.register({
   // Datadog B3 Propagation
-  propagator: new DatadogPropagator()
+  propagator: new DatadogPropagator(),
+  // while datadog suggests the default ALWAYS_ON sampling, for probability sampling,
+  // to ensure the appropriate generation of tracing metrics by the datadog-agent,
+  // use the `DatadogProbabilitySampler`
+  sampler: new DatadogProbabilitySampler(0.75)
 });
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
