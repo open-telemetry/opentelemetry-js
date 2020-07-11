@@ -29,7 +29,7 @@ export const X_DD_PARENT_ID = 'x-datadog-parent-id';
 export const X_DD_SAMPLING_PRIORITY = 'x-datadog-sampling-priority';
 export const X_DD_ORIGIN = 'x-datadog-origin';
 
-va
+const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
 const DD_ORIGIN = '_dd_origin';
