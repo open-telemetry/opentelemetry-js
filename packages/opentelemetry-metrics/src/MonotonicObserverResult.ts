@@ -14,18 +14,12 @@
  * limitations under the License.
  */
 
-import {
-  ObserverResult as TypeObserverResult,
-  Labels,
-} from '@opentelemetry/api';
-
-/**
- * Implementation of {@link TypeObserverResult}
- */
-export class ObserverResult implements TypeObserverResult {
-  values: Map<Labels, number> = new Map<Labels, number>();
-
+import { Labels } from '@opentelemetry/api';
+import { ObserverResult } from './ObserverResult';
+export class MonotonicObserverResult extends ObserverResult {
   observe(value: number, labels: Labels): void {
-    this.values.set(labels, value);
+    if (value >= 0) {
+      this.values.set(labels, value);
+    }
   }
 }
