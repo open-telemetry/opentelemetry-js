@@ -16,8 +16,8 @@
 
 import { context, TraceFlags } from '@opentelemetry/api';
 import {
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
   setActiveSpan,
@@ -76,7 +76,7 @@ describe('NodeTracerProvider', () => {
 
     it('should construct an instance with sampler', () => {
       provider = new NodeTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       });
       assert.ok(provider instanceof NodeTracerProvider);
     });
@@ -143,9 +143,9 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
     });
 
-    it('should return a default span with no sampling (NEVER_SAMPLER)', () => {
+    it('should return a default span with no sampling (AlwaysOffSampler)', () => {
       provider = new NodeTracerProvider({
-        sampler: NEVER_SAMPLER,
+        sampler: new AlwaysOffSampler(),
         logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
@@ -154,9 +154,9 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), false);
     });
 
-    it('should start a recording span with always sampling (ALWAYS_SAMPLER)', () => {
+    it('should start a recording span with always sampling (AlwaysOnSampler)', () => {
       provider = new NodeTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
         logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span');
@@ -165,13 +165,13 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should not sample with ALWAYS_SAMPLER if parent was not sampled', () => {
+    it('should sample with AlwaysOnSampler if parent was not sampled', () => {
       provider = new NodeTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
         logger: new NoopLogger(),
       });
 
-      const notSampledParent = provider
+      const sampledParent = provider
         .getTracer('default')
         .startSpan('not-sampled-span', {
           parent: {
@@ -180,19 +180,19 @@ describe('NodeTracerProvider', () => {
             traceFlags: TraceFlags.NONE,
           },
         });
-      assert.ok(notSampledParent instanceof NoRecordingSpan);
+      assert.ok(sampledParent instanceof Span);
       assert.strictEqual(
-        notSampledParent.context().traceFlags,
-        TraceFlags.NONE
+        sampledParent.context().traceFlags,
+        TraceFlags.SAMPLED
       );
-      assert.strictEqual(notSampledParent.isRecording(), false);
+      assert.strictEqual(sampledParent.isRecording(), true);
 
       const span = provider.getTracer('default').startSpan('child-span', {
-        parent: notSampledParent,
+        parent: sampledParent,
       });
-      assert.ok(span instanceof NoRecordingSpan);
-      assert.strictEqual(span.context().traceFlags, TraceFlags.NONE);
-      assert.strictEqual(span.isRecording(), false);
+      assert.ok(span instanceof Span);
+      assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
+      assert.strictEqual(span.isRecording(), true);
     });
 
     it('should set default attributes on span', () => {

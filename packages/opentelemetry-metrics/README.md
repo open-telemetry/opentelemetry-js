@@ -76,18 +76,75 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ### Value Observer
 
-Choose this kind of metric when only last value is important without worry about aggregation
+Choose this kind of metric when only last value is important without worry about aggregation.
+The callback can be sync or async.
 
 ```js
 const { MeterProvider } = require('@opentelemetry/metrics');
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-meter.createValueObserver('cpu_core_usage', {
+
+// async callback - for operation that needs to wait for value
+meter.createValueObserver('your_metric_name', {
+  description: 'Example of an async observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(()=> {
+      resolve(Math.random());
+    }, 100);
+  });
+}
+
+// sync callback in case you don't need to wait for value
+meter.createValueObserver('your_metric_name', {
   description: 'Example of a sync observer with callback',
 }, (observerResult) => {
-  observerResult.observe(getRandomValue(), { core: '1' });
-  observerResult.observe(getRandomValue(), { core: '2' });
+  observerResult.observe(getRandomValue(), { label: '1' });
+  observerResult.observe(getRandomValue(), { label: '2' });
+});
+
+function getRandomValue() {
+  return Math.random();
+}
+```
+
+### UpDownSumObserver
+
+Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
+The callback can be sync or async.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+// async callback - for operation that needs to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
+  description: 'Example of an async observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(()=> {
+      resolve(Math.random());
+    }, 100);
+  });
+}
+
+// sync callback in case you don't need to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
+  description: 'Example of a sync observer with callback',
+}, (observerResult) => {
+  observerResult.observe(getRandomValue(), { label: '1' });
 });
 
 function getRandomValue() {
