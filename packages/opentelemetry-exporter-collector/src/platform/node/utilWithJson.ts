@@ -23,6 +23,10 @@ import * as collectorTypes from '../../types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
 import { CollectorExporterConfigNode } from './types';
+import { CollectorMetricExporter } from './CollectorMetricExporter';
+import { MetricRecord } from '@opentelemetry/metrics';
+import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
+import { Logger } from '@opentelemetry/api';
 
 export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
 
@@ -31,6 +35,30 @@ export function onInitWithJson(
   _config: CollectorExporterConfigNode
 ): void {
   // nothing to be done for json yet
+}
+
+export function sendMetricsUsingJson(
+  collector: CollectorMetricExporter,
+  metrics: MetricRecord[],
+  startTime: number,
+  onSuccess: () => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void
+): void {
+  const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
+    metrics,
+    startTime,
+    collector
+  );
+
+  const body = JSON.stringify(exportMetricServiceRequest);
+  _sendWithJson(
+    body,
+    collector.url,
+    collector.headers,
+    collector.logger,
+    onSuccess,
+    onError
+  );
 }
 
 export function sendSpansUsingJson(
@@ -45,7 +73,25 @@ export function sendSpansUsingJson(
   );
 
   const body = JSON.stringify(exportTraceServiceRequest);
-  const parsedUrl = new url.URL(collector.url);
+  _sendWithJson(
+    body,
+    collector.url,
+    collector.headers,
+    collector.logger,
+    onSuccess,
+    onError
+  );
+}
+
+function _sendWithJson(
+  body: string,
+  collectorUrl: string,
+  collectorHeaders: Partial<Record<string, unknown>>,
+  logger: Logger,
+  onSuccess: () => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void
+): void {
+  const parsedUrl = new url.URL(collectorUrl);
 
   const options = {
     hostname: parsedUrl.hostname,
@@ -55,17 +101,17 @@ export function sendSpansUsingJson(
     headers: {
       'Content-Length': Buffer.byteLength(body),
       'Content-Type': 'application/json',
-      ...collector.headers,
+      ...collectorHeaders,
     },
   };
 
   const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
   const req = request(options, (res: http.IncomingMessage) => {
     if (res.statusCode && res.statusCode < 299) {
-      collector.logger.debug(`statusCode: ${res.statusCode}`);
+      logger.debug(`statusCode: ${res.statusCode}`);
       onSuccess();
     } else {
-      collector.logger.error(`statusCode: ${res.statusCode}`);
+      logger.error(`statusCode: ${res.statusCode}`);
       onError({
         code: res.statusCode,
         message: res.statusMessage,
@@ -74,7 +120,7 @@ export function sendSpansUsingJson(
   });
 
   req.on('error', (error: Error) => {
-    collector.logger.error('error', error.message);
+    logger.error('error', error.message);
     onError({
       message: error.message,
     });

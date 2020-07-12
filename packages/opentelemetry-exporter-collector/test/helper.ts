@@ -757,6 +757,51 @@ export function ensureHistogramIsCorrect(
   });
 }
 
+export function ensureExportedCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-counter',
+    description: 'sample counter description',
+    unit: '1',
+    type: 'MONOTONIC_INT64',
+    temporality: 'CUMULATIVE',
+  });
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.int64DataPoints);
+  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.int64DataPoints[0].value, '1');
+  assert.deepStrictEqual(
+    metric.int64DataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-observer',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'DOUBLE',
+    temporality: 'DELTA',
+  });
+
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.doubleDataPoints);
+  assert.deepStrictEqual(metric.doubleDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.doubleDataPoints[0].value, 10);
+  assert.deepStrictEqual(
+    metric.doubleDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {

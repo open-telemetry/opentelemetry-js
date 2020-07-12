@@ -17,6 +17,7 @@
 import * as grpc from 'grpc';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorProtocolNode } from '../../enums';
+import { MetricRecord } from '@opentelemetry/metrics';
 import {
   CollectorExporterError,
   CollectorExporterConfigBase,
@@ -28,6 +29,15 @@ import {
  */
 export interface GRPCSpanQueueItem {
   spans: ReadableSpan[];
+  onSuccess: () => void;
+  onError: (error: CollectorExporterError) => void;
+}
+
+/**
+ * Queue item to be used to save temporary metrics
+ */
+export interface GRPCMetricQueueItem {
+  metrics: MetricRecord[];
   onSuccess: () => void;
   onError: (error: CollectorExporterError) => void;
 }
