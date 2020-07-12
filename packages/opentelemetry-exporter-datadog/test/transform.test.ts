@@ -18,7 +18,7 @@ import * as assert from 'assert';
 import { Resource } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { hrTimeToMilliseconds } from '@opentelemetry/core';
+import { hrTimeToMilliseconds, TraceState } from '@opentelemetry/core';
 import { id } from '../src/types'
 import { translateToDatadog } from '../src/transform';
 
@@ -35,11 +35,12 @@ describe('transform', () => {
     traceFlags: api.TraceFlags.SAMPLED,
   };
 
-  // const spanContextOrign = {
-  //   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-  //   spanId: '6e0c63257de34c92',
-  //   traceFlags: api.TraceFlags.SAMPLED
-  // };
+  const spanContextOrigin = {
+    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+    spanId: '6e0c63257de34c92',
+    traceFlags: api.TraceFlags.SAMPLED,
+    traceState: new TraceState('dd_origin=synthetics-example')
+  };
 
   const service_name = 'my-service';
 
@@ -48,7 +49,6 @@ describe('transform', () => {
     const span: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
-        spanContext: spanContextUnsampled,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
@@ -126,7 +126,7 @@ describe('transform', () => {
         datadogSpan.start,
         Math.round( hrTimeToMilliseconds(spans[0].startTime) * 1e6 )
       );
-      assert.strictEqual(Object.keys(datadogSpan.meta).length, 2);
+      assert.strictEqual(Object.keys(datadogSpan.meta).length, 3);
       assert.strictEqual(datadogSpan.metrics['_sample_rate'], spanContextUnsampled.traceFlags);
       // const [
       //   tag1,
@@ -186,7 +186,15 @@ describe('transform', () => {
       const datadogSpan = datadogSpans[0]
 
       assert.strictEqual(datadogSpan.metrics['_sample_rate'], spanContextSampled.traceFlags);
-    })   
+    })
+
+    it('should set origin tag for spans with origin traceState', () => {
+      const spans = generateOtelSpans({spanContext: spanContextOrigin})
+      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpan = datadogSpans[0]
+
+      assert.strictEqual(datadogSpan.meta['_dd_origin'], 'synthetics-example');
+    }) 
 
     // it('should convert an OpenTelemetry span to a Thrift when links, events and attributes are empty', () => {
     //   const readableSpan: ReadableSpan = {

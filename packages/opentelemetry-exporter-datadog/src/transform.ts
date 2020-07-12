@@ -11,6 +11,7 @@ const ERR_NAME_SUBSTRING = '.error_name';
 const ENV_KEY = 'env';
 const VERSION_KEY = 'version';
 const DD_ORIGIN = '_dd_origin';
+const OT_ALLOWED_DD_ORIGIN = 'dd_origin';
 const USER_REJECT = -1;
 const AUTO_REJECT = 0;
 const AUTO_KEEP = 1;
@@ -38,9 +39,7 @@ export function translateToDatadog(spans: ReadableSpan[],
   tags?: string): typeof Span[] { 
     return spans.map( (span) => {
       const defaultTags = createDefaultTags(tags);
-
       const ddSpan = createSpan(span, service_name, defaultTags, env, version)
-      console.log(ddSpan.parent_id)
       return ddSpan
     }).map(format)
 }
@@ -85,13 +84,20 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
 
   // set origin and version on root span only
   if (span.parentSpanId === undefined) { 
-    const origin = createOriginString(span)
+    const origin = createOriginString(span)   
     if (origin) { ddSpanBase.setTag(DD_ORIGIN, origin); }
     if (version) { ddSpanBase.setTag(VERSION_KEY, version); }
   }
 
   // set span attibutes as tags - takes precedence over env vars
-  ddSpanBase.addTags(span.attributes)
+  // span tags should be strings
+  for (const [key, value] of Object.entries(span.attributes)) {
+    let val: any = value;
+
+    if(val !== undefined) {
+      ddSpanBase.setTag(key, val.toString());
+    }
+  }
   
   // filter for internal requests to trace-agent and set sampling rate
   const samplingRate = getSamplingRate(span)
@@ -142,7 +148,9 @@ function createDefaultTags(tags: string | undefined): object {
 }
 
 function createOriginString(span: ReadableSpan): string | undefined {
-  return span.spanContext.traceState && span.spanContext.traceState.get(DD_ORIGIN)
+  // for some reason traceState keys must be w3c compliant and not stat with underscore
+  // using dd_origin for internal tracestate and setting datadog tag as _dd_origin
+  return span.spanContext.traceState && span.spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
 }
 
 function createSpanName(span: ReadableSpan): string {
@@ -197,7 +205,7 @@ function inferType(span: ReadableSpan): any {
 
   for (const [key, value] of Object.entries(span.attributes)) {
     if (key.indexOf(ERR_NAME_SUBSTRING) >= 0) {
-      typeName = value.toString();
+      typeName = value;
       break;
     }
   }

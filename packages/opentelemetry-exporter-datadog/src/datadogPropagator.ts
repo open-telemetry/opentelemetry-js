@@ -33,6 +33,7 @@ const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
 const DD_ORIGIN = '_dd_origin';
+const OT_ALLOWED_DD_ORIGIN = 'dd_origin';
 
 function isValidTraceId(traceId: string): boolean {
   return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
@@ -117,7 +118,7 @@ export class DatadogPropagator implements HttpTextPropagator {
       }
 
       if(origin) {
-        contextOptions['traceState'] = new TraceState(`${DD_ORIGIN}=${origin}`)
+        contextOptions['traceState'] = new TraceState(`${OT_ALLOWED_DD_ORIGIN}=${origin}`)
       }
       return setExtractedSpanContext(context, contextOptions);
     }
