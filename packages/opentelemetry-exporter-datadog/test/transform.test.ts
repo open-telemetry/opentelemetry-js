@@ -23,20 +23,32 @@ import { id } from '../src/types'
 import { translateToDatadog } from '../src/transform';
 
 describe('transform', () => {
-  const spanContext = {
+  const spanContextUnsampled = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
     traceFlags: api.TraceFlags.NONE,
   };
 
+  const spanContextSampled = {
+    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+    spanId: '6e0c63257de34c92',
+    traceFlags: api.TraceFlags.SAMPLED,
+  };
+
+  // const spanContextOrign = {
+  //   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+  //   spanId: '6e0c63257de34c92',
+  //   traceFlags: api.TraceFlags.SAMPLED
+  // };
+
   const service_name = 'my-service';
 
-  describe('translateToDatadog', () => {
-    it('should convert an OpenTelemetry span to a Thrift', () => {
-      const spans: ReadableSpan[] = [{
+  const generateOtelSpans = function (options: any): ReadableSpan[] {
+    const otelSpans = []
+    const span: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
-        spanContext: spanContext,
+        spanContext: spanContextUnsampled,
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
@@ -80,8 +92,15 @@ describe('transform', () => {
         //   name: 'default',
         //   version: '0.0.1',
         // },
-      }];
+      };
+      const updatedSpan = Object.assign(span, options)
+      otelSpans.push(updatedSpan)
+      return otelSpans
+    }
 
+  describe('translateToDatadog', () => {
+    it('should convert an OpenTelemetry span to a DatadogSpan', () => {
+      const spans = generateOtelSpans({spanContext: spanContextUnsampled})
       const datadogSpans = translateToDatadog(spans, service_name);
       const datadogSpan = datadogSpans[0]
       // const result = ThriftUtils._thrift.Span.rw.toBuffer(thriftSpan);
@@ -93,12 +112,12 @@ describe('transform', () => {
 
       assert.deepStrictEqual(
         datadogSpan.trace_id,
-        id(spanContext.traceId)
+        id(spanContextUnsampled.traceId)
       );
 
       assert.deepStrictEqual(
         datadogSpan.span_id.toString('hex'),
-        spanContext.spanId
+        spanContextUnsampled.spanId
       );
 
       assert.deepStrictEqual(datadogSpan.parent_id.toString('hex'), '0000000000000000');
@@ -108,7 +127,7 @@ describe('transform', () => {
         Math.round( hrTimeToMilliseconds(spans[0].startTime) * 1e6 )
       );
       assert.strictEqual(Object.keys(datadogSpan.meta).length, 2);
-      assert.strictEqual(datadogSpan.metrics['_sample_rate'], spanContext.traceFlags);
+      assert.strictEqual(datadogSpan.metrics['_sample_rate'], spanContextUnsampled.traceFlags);
       // const [
       //   tag1,
       //   tag2,
@@ -160,6 +179,14 @@ describe('transform', () => {
       // assert.strictEqual(field2.vType, 'BOOL');
       // assert.strictEqual(field2.vBool, true);
     });
+
+    it('should sample spans with sampled traceFlag', () => {
+      const spans = generateOtelSpans({spanContext: spanContextSampled})
+      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpan = datadogSpans[0]
+
+      assert.strictEqual(datadogSpan.metrics['_sample_rate'], spanContextSampled.traceFlags);
+    })   
 
     // it('should convert an OpenTelemetry span to a Thrift when links, events and attributes are empty', () => {
     //   const readableSpan: ReadableSpan = {
