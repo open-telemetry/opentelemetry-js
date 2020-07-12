@@ -54,9 +54,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.10.3",
+    "@babel/core": "7.10.4",
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.14",
+    "@types/node": "14.0.22",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
     "babel-loader": "8.1.0",
@@ -77,7 +77,7 @@
     "ts-loader": "8.0.0",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.5",
+    "typescript": "3.9.6",
     "webpack": "4.43.0",
     "webpack-cli": "3.3.12",
     "webpack-merge": "5.0.9"
