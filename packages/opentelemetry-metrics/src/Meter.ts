@@ -21,6 +21,7 @@ import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
+import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
 import { ValueRecorderMetric } from './ValueRecorderMetric';
 import { Metric } from './Metric';
 import { ValueObserverMetric } from './ValueObserverMetric';
@@ -156,7 +157,7 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new value observer metric.
+   * Creates a new `ValueObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
    * @param [callback] the value observer callback
@@ -164,7 +165,7 @@ export class Meter implements api.Meter {
   createValueObserver(
     name: string,
     options: api.MetricOptions = {},
-    callback?: (observerResult: api.ObserverResult) => void
+    callback?: (observerResult: api.ObserverResult) => unknown
   ): api.ValueObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(
@@ -187,6 +188,40 @@ export class Meter implements api.Meter {
     );
     this._registerMetric(name, valueObserver);
     return valueObserver;
+  }
+
+  /**
+   * Creates a new `UpDownSumObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the value observer callback
+   */
+  createUpDownSumObserver(
+    name: string,
+    options: api.MetricOptions = {},
+    callback?: (observerResult: api.ObserverResult) => unknown
+  ): api.UpDownSumObserver {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+    }
+    const opt: api.MetricOptions = {
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const upDownSumObserver = new UpDownSumObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource,
+      this._instrumentationLibrary,
+      callback
+    );
+    this._registerMetric(name, upDownSumObserver);
+    return upDownSumObserver;
   }
 
   /**

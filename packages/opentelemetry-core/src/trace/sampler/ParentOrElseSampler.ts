@@ -19,18 +19,28 @@ import {
   SpanContext,
   TraceFlags,
   SamplingDecision,
+  SpanKind,
+  Attributes,
+  Link,
   SamplingResult,
 } from '@opentelemetry/api';
 
-/** Sampler that samples a given fraction of traces. */
-export class ProbabilitySampler implements Sampler {
-  constructor(private readonly _probability: number = 0) {
-    this._probability = this._normalize(_probability);
-  }
+/**
+ * A composite sampler that either respects the parent span's sampling decision
+ * or delegates to `delegateSampler` for root spans.
+ */
+export class ParentOrElseSampler implements Sampler {
+  constructor(private _delegateSampler: Sampler) {}
 
-  shouldSample(parentContext?: SpanContext): SamplingResult {
-    // Respect the parent sampling decision if there is one.
-    // TODO(#1284): add an option to ignore parent regarding to spec.
+  shouldSample(
+    parentContext: SpanContext | undefined,
+    traceId: string,
+    spanName: string,
+    spanKind: SpanKind,
+    attributes: Attributes,
+    links: Link[]
+  ): SamplingResult {
+    // Respect the parent sampling decision if there is one
     if (parentContext) {
       return {
         decision:
@@ -39,20 +49,17 @@ export class ProbabilitySampler implements Sampler {
             : SamplingDecision.NOT_RECORD,
       };
     }
-    return {
-      decision:
-        Math.random() < this._probability
-          ? SamplingDecision.RECORD_AND_SAMPLED
-          : SamplingDecision.NOT_RECORD,
-    };
+    return this._delegateSampler.shouldSample(
+      parentContext,
+      traceId,
+      spanName,
+      spanKind,
+      attributes,
+      links
+    );
   }
 
   toString(): string {
-    return `ProbabilitySampler{${this._probability}}`;
-  }
-
-  private _normalize(probability: number): number {
-    if (typeof probability !== 'number' || isNaN(probability)) return 0;
-    return probability >= 1 ? 1 : probability <= 0 ? 0 : probability;
+    return `ParentOrElse{${this._delegateSampler.toString()}}`;
   }
 }
