@@ -3,7 +3,7 @@ import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { id, Span, Sampler, NoopTracer } from './types'
+import { id, format, Span, Sampler, NoopTracer } from './types'
 
 const SAMPLE_RATE_METRIC_KEY = '_sample_rate';
 const INTERNAL_TRACE_REGEX = /v\d\.\d\/traces/;
@@ -42,7 +42,7 @@ export function translateToDatadog(spans: ReadableSpan[],
       const ddSpan = createSpan(span, service_name, defaultTags, env, version)
       console.log(ddSpan.parent_id)
       return ddSpan
-    })
+    }).map(format)
 }
 
 function createSpan(span: ReadableSpan, service_name: string, tags: object, env?: string, version?: string): typeof Span {
@@ -99,7 +99,7 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
 
   if (internalRequest) {
     ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, USER_REJECT)
-  } else if (samplingRate) {
+  } else if (samplingRate !== undefined) {
     ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, samplingRate)
   }
 
@@ -197,7 +197,7 @@ function inferType(span: ReadableSpan): any {
 
   for (const [key, value] of Object.entries(span.attributes)) {
     if (key.indexOf(ERR_NAME_SUBSTRING) >= 0) {
-      typeName = value;
+      typeName = value.toString();
       break;
     }
   }
