@@ -29,8 +29,8 @@ class CollectorMetricExporter extends CollectorMetricExporterBase<
   onInit() {}
   onShutdown() {}
   sendMetrics() {}
-  getDefaultUrl(url: string) {
-    return url || '';
+  getDefaultUrl(config: CollectorExporterConfig) {
+    return config.url || '';
   }
 }
 

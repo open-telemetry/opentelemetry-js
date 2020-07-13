@@ -834,6 +834,27 @@ export function ensureExportedHistogramIsCorrect(
   );
 }
 
+export function ensureExportedValueRecorderIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-recorder',
+    description: 'sample recorder description',
+    unit: '3',
+    type: 'INT64',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.int64DataPoints);
+  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.deepStrictEqual(
+    metric.int64DataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {
@@ -913,7 +934,11 @@ export function ensureExportMetricsServiceRequestIsSet(
   json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(resourceMetrics.length, 2, 'resourceMetrics is missing');
+  assert.strictEqual(
+    resourceMetrics.length,
+    4,
+    'resourceMetrics is the incorrect length'
+  );
 
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');

@@ -42,7 +42,7 @@ export abstract class CollectorMetricExporterBase<
   constructor(config: T = {} as T) {
     this.logger = config.logger || new NoopLogger();
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = this.getDefaultUrl(config.url);
+    this.url = this.getDefaultUrl(config);
     this.attributes = config.attributes;
     if (typeof config.hostname === 'string') {
       this.hostname = config.hostname;
@@ -108,7 +108,7 @@ export abstract class CollectorMetricExporterBase<
     this.onShutdown();
   }
 
-  abstract getDefaultUrl(url: string | undefined): string;
+  abstract getDefaultUrl(config: T): string;
   abstract onInit(): void;
   abstract onShutdown(): void;
   abstract sendMetrics(

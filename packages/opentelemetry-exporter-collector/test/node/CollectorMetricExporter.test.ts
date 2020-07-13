@@ -33,6 +33,8 @@ import {
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
   ensureExportedHistogramIsCorrect,
+  ensureExportedValueRecorderIsCorrect,
+  mockValueRecorder,
 } from '../helper';
 import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
 import { CollectorProtocolNode } from '../../src';
@@ -138,11 +140,14 @@ const testCollectorMetricExporter = (params: TestParams) =>
       metrics.push(Object.assign({}, mockCounter));
       metrics.push(Object.assign({}, mockObserver));
       metrics.push(Object.assign({}, mockHistogram));
+      metrics.push(Object.assign({}, mockValueRecorder));
+
       metrics[0].aggregator.update(1);
       metrics[1].aggregator.update(10);
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
       (metrics[2].aggregator as HistogramAggregator).reset();
+      metrics[3].aggregator.update(5);
       done();
     });
 
@@ -203,9 +208,12 @@ const testCollectorMetricExporter = (params: TestParams) =>
               exportedData[1].instrumentationLibraryMetrics[0].metrics[0];
             const histogram =
               exportedData[2].instrumentationLibraryMetrics[0].metrics[0];
+            const recorder =
+              exportedData[3].instrumentationLibraryMetrics[0].metrics[0];
             ensureExportedCounterIsCorrect(counter);
             ensureExportedObserverIsCorrect(observer);
             ensureExportedHistogramIsCorrect(histogram);
+            ensureExportedValueRecorderIsCorrect(recorder);
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
@@ -227,7 +235,7 @@ describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
   it('should default to localhost', done => {
     const collectorExporter = new CollectorMetricExporter({});
     setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'localhost:55678');
+      assert.strictEqual(collectorExporter['url'], 'localhost:55680');
       done();
     });
   });
