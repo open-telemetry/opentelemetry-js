@@ -15,20 +15,42 @@
  */
 
 import { ReadableSpan } from '@opentelemetry/tracing';
+import * as path from 'path';
+import { Type } from 'protobufjs';
+import * as protobufjs from 'protobufjs';
+import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { toCollectorExportTraceServiceRequest } from './transformSpansProto';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
 export const DEFAULT_COLLECTOR_URL_JSON_PROTO =
   'http://localhost:55680/v1/trace';
 
+let ExportTraceServiceRequestProto: Type | undefined;
+
+export function getExportTraceServiceRequestProto(): Type | undefined {
+  return ExportTraceServiceRequestProto;
+}
+
 export function onInitWithJsonProto(
   _collector: CollectorTraceExporter,
   _config: CollectorExporterConfigNode
 ): void {
-  // nothing to be done for json proto yet
+  const dir = path.resolve(__dirname, 'protos');
+  const root = new protobufjs.Root();
+  root.resolvePath = function (origin, target) {
+    return `${dir}/${target}`;
+  };
+  const proto = root.loadSync([
+    'opentelemetry/proto/common/v1/common.proto',
+    'opentelemetry/proto/resource/v1/resource.proto',
+    'opentelemetry/proto/trace/v1/trace.proto',
+    'opentelemetry/proto/collector/trace/v1/trace_service.proto',
+  ]);
+  ExportTraceServiceRequestProto = proto?.lookupType(
+    'ExportTraceServiceRequest'
+  );
 }
 
 /**
@@ -49,13 +71,20 @@ export function sendSpansUsingJsonProto(
     collector
   );
 
-  const body = exportTraceServiceRequest.serializeBinary();
-
-  return sendDataUsingHttp(
-    collector,
-    Buffer.from(body),
-    'application/x-protobuf',
-    onSuccess,
-    onError
+  const message = ExportTraceServiceRequestProto?.create(
+    exportTraceServiceRequest
   );
+
+  if (message) {
+    const body = ExportTraceServiceRequestProto?.encode(message).finish();
+    if (body) {
+      sendDataUsingHttp(
+        collector,
+        Buffer.from(body),
+        'application/x-protobuf',
+        onSuccess,
+        onError
+      );
+    }
+  }
 }

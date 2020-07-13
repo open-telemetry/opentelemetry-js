@@ -16,18 +16,16 @@
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "generate:http-proto": "rimraf ./generated/*  && ./gen.sh",
-    "postcompile": "npm run submodule && npm run protos:copy && npm run generated:copy",
+    "postcompile": "npm run submodule && npm run protos:copy",
     "prepare": "npm run compile",
     "protos:copy": "cpx src/platform/node/protos/opentelemetry/**/*.* build/src/platform/node/protos/opentelemetry",
-    "generated:copy": "cpx generated/**/*.* build/generated",
     "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
-    "watch": "npm run protos:copy && npm run generated:copy && tsc -w"
+    "watch": "npm run protos:copy && tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -93,7 +91,7 @@
     "@opentelemetry/resources": "^0.9.0",
     "@opentelemetry/metrics": "^0.9.0",
     "@opentelemetry/tracing": "^0.9.0",
-    "google-protobuf": "^3.11.4",
+    "protobufjs": "^6.9.0",
     "grpc": "^1.24.2"
   }
 }
