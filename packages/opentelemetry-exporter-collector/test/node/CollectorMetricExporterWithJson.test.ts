@@ -50,7 +50,7 @@ const mockResError = {
   statusCode: 400,
 };
 
-describe('CollectorExporter - node with json over http', () => {
+describe('CollectorMetricExporter - node with json over http', () => {
   let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: CollectorExporterConfigNode;
   let spyRequest: sinon.SinonSpy;
@@ -207,7 +207,7 @@ describe('CollectorExporter - node with json over http', () => {
       });
     });
   });
-  describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
+  describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
     it('should default to localhost', done => {
       const collectorExporter = new CollectorMetricExporter({
         protocolNode: CollectorProtocolNode.HTTP_JSON,
