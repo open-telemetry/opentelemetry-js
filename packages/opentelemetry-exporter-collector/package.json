@@ -46,7 +46,6 @@
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
     "build/src/**/*.proto",
-    "build/generated/**/*.js",
     "doc",
     "LICENSE",
     "README.md"
