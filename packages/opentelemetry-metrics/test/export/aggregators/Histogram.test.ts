@@ -40,14 +40,6 @@ describe('HistogramAggregator', () => {
   });
 
   describe('.update()', () => {
-    it('should not update checkpoint', () => {
-      const aggregator = new HistogramAggregator([100, 200]);
-      aggregator.update(150);
-      const point = aggregator.toPoint().value as Histogram;
-      assert.equal(point.count, 0);
-      assert.equal(point.sum, 0);
-    });
-
     it('should update the second bucket', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(150);
