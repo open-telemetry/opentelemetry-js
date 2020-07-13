@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 import * as api from '@opentelemetry/api';
 import { InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -20,9 +21,9 @@ import { BaseObserverMetric } from './BaseObserverMetric';
 import { Batcher } from './export/Batcher';
 import { MetricKind } from './export/types';
 
-/** This is a SDK implementation of Value Observer Metric. */
-export class ValueObserverMetric extends BaseObserverMetric
-  implements api.ValueObserver {
+/** This is a SDK implementation of UpDownSumObserver Metric. */
+export class UpDownSumObserverMetric extends BaseObserverMetric
+  implements api.UpDownSumObserver {
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -36,7 +37,7 @@ export class ValueObserverMetric extends BaseObserverMetric
       options,
       batcher,
       resource,
-      MetricKind.VALUE_OBSERVER,
+      MetricKind.UP_DOWN_SUM_OBSERVER,
       instrumentationLibrary,
       callback
     );

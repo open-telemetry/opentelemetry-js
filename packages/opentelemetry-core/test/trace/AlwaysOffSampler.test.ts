@@ -13,18 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import * as assert from 'assert';
+import * as api from '@opentelemetry/api';
+import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
 
-import { SpanProcessor } from './SpanProcessor';
-import { ReadableSpan } from './export/ReadableSpan';
+describe('AlwaysOffSampler', () => {
+  it('should reflect sampler name', () => {
+    const sampler = new AlwaysOffSampler();
+    assert.strictEqual(sampler.toString(), 'AlwaysOffSampler');
+  });
 
-/** No-op implementation of SpanProcessor */
-export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: ReadableSpan): void {}
-  onEnd(span: ReadableSpan): void {}
-  shutdown(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
-  }
-  forceFlush(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
-  }
-}
+  it('should return decision: api.SamplingDecision.NOT_RECORD for AlwaysOffSampler', () => {
+    const sampler = new AlwaysOffSampler();
+    assert.deepStrictEqual(sampler.shouldSample(), {
+      decision: api.SamplingDecision.NOT_RECORD,
+    });
+  });
+});

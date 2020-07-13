@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from './SpanProcessor';
-import { ReadableSpan } from './export/ReadableSpan';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
-/** No-op implementation of SpanProcessor */
-export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: ReadableSpan): void {}
-  onEnd(span: ReadableSpan): void {}
-  shutdown(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
+/** Sampler that samples no traces. */
+export class AlwaysOffSampler implements Sampler {
+  shouldSample(): SamplingResult {
+    return {
+      decision: SamplingDecision.NOT_RECORD,
+    };
   }
-  forceFlush(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
+
+  toString(): string {
+    return `AlwaysOffSampler`;
   }
 }
