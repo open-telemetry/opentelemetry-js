@@ -802,6 +802,38 @@ export function ensureExportedObserverIsCorrect(
   );
 }
 
+export function ensureExportedHistogramIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-hist',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'HISTOGRAM',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.histogramDataPoints);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].count, '2');
+  assert.deepStrictEqual(metric.histogramDataPoints[0].sum, 21);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].buckets, [
+    { count: '1', exemplar: null },
+    { count: '1', exemplar: null },
+    { count: '0', exemplar: null },
+  ]);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].explicitBounds, [
+    10,
+    20,
+  ]);
+  assert.deepStrictEqual(
+    metric.histogramDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {

@@ -30,10 +30,14 @@ import { Logger } from '@opentelemetry/api';
 
 export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
 
-export function onInitWithJson(
+export function traceInitWithJson(
   _collector: CollectorTraceExporter,
   _config: CollectorExporterConfigNode
 ): void {
+  // nothing to be done for json yet
+}
+
+export function metricInitWithJson(_collector: CollectorMetricExporter): void {
   // nothing to be done for json yet
 }
 

@@ -29,12 +29,12 @@ import {
 
 import {
   DEFAULT_COLLECTOR_URL_GRPC,
-  onInitWithGrpc,
+  traceInitWithGrpc,
   sendSpansUsingGrpc,
 } from './utilWithGrpc';
 import {
   DEFAULT_COLLECTOR_URL_JSON,
-  onInitWithJson,
+  traceInitWithJson,
   sendSpansUsingJson,
 } from './utilWithJson';
 
@@ -90,9 +90,9 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     this.isShutDown = false;
 
     if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
-      onInitWithJson(this, config);
+      traceInitWithJson(this, config);
     } else {
-      onInitWithGrpc(this, config);
+      traceInitWithGrpc(this, config);
     }
   }
 

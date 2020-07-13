@@ -18,13 +18,12 @@ import { MetricRecord } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
 import { CollectorExporterConfigNode } from './types';
 import { GRPCMetricQueueItem, ServiceClient } from './types';
-import { removeProtocol } from './util';
-import * as path from 'path';
-import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
-import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
 import { parseHeaders } from '../../util';
+import { CollectorProtocolNode } from '../../enums';
+import { sendMetricsUsingJson, metricInitWithJson } from './utilWithJson';
+import { metricInitWithGrpc, sendMetricsUsingGrpc } from './utilWithGrpc';
 
 const DEFAULT_COLLECTOR_URL = 'localhost:55678';
 
@@ -43,9 +42,25 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
   credentials: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
   headers: Record<string, string>;
+  private readonly _protocol: CollectorProtocolNode;
 
   constructor(config: CollectorExporterConfigNode = {}) {
     super(config);
+    this._protocol =
+      typeof config.protocolNode !== 'undefined'
+        ? config.protocolNode
+        : CollectorProtocolNode.GRPC;
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+      this.logger.debug('CollectorExporter - using json over http');
+      if (config.metadata) {
+        this.logger.warn('Metadata cannot be set when using json');
+      }
+    } else {
+      this.logger.debug('CollectorExporter - using grpc');
+      if (config.headers) {
+        this.logger.warn('Headers cannot be set when using grpc');
+      }
+    }
     this.grpcMetricsQueue = [];
     this.credentials = config.credentials || grpc.credentials.createInsecure();
     this.metadata = config.metadata;
@@ -62,34 +77,12 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
 
   onInit(): void {
     this.isShutDown = false;
-    const serverAddress = removeProtocol(this.url);
-    const metricServiceProtoPath =
-      'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
-    const includeDirs = [path.resolve(__dirname, 'protos')];
-    protoLoader
-      .load(metricServiceProtoPath, {
-        keepCase: false,
-        longs: String,
-        enums: String,
-        defaults: true,
-        oneofs: true,
-        includeDirs,
-      })
-      .then(packageDefinition => {
-        const packageObject: any = grpc.loadPackageDefinition(
-          packageDefinition
-        );
-        this.metricServiceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-          serverAddress,
-          this.credentials
-        );
-        if (this.grpcMetricsQueue.length > 0) {
-          const queue = this.grpcMetricsQueue.splice(0);
-          queue.forEach((item: GRPCMetricQueueItem) => {
-            this.sendMetrics(item.metrics, item.onSuccess, item.onError);
-          });
-        }
-      });
+
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+      metricInitWithJson(this);
+    } else {
+      metricInitWithGrpc(this);
+    }
   }
 
   sendMetrics(
@@ -101,33 +94,10 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
       this.logger.debug('Shutdown already started. Cannot send metrics');
       return;
     }
-    if (this.metricServiceClient) {
-      const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
-        metrics,
-        this._startTime,
-        this
-      );
-      this.metricServiceClient.export(
-        exportMetricServiceRequest,
-        this.metadata,
-        (err: collectorTypes.ExportServiceError) => {
-          if (err) {
-            this.logger.error(
-              'exportMetricServiceRequest',
-              exportMetricServiceRequest
-            );
-            onError(err);
-          } else {
-            onSuccess();
-          }
-        }
-      );
+    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+      sendMetricsUsingJson(this, metrics, this._startTime, onSuccess, onError);
     } else {
-      this.grpcMetricsQueue.push({
-        metrics,
-        onSuccess,
-        onError,
-      });
+      sendMetricsUsingGrpc(this, metrics, this._startTime, onSuccess, onError);
     }
   }
 

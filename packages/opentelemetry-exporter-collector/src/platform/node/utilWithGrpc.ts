@@ -21,13 +21,20 @@ import * as collectorTypes from '../../types';
 
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { CollectorExporterConfigNode, GRPCSpanQueueItem } from './types';
+import {
+  CollectorExporterConfigNode,
+  GRPCSpanQueueItem,
+  GRPCMetricQueueItem,
+} from './types';
 import { removeProtocol } from './util';
+import { CollectorMetricExporter } from './CollectorMetricExporter';
+import { MetricRecord } from '@opentelemetry/metrics';
 
 export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 
-export function onInitWithGrpc(
+export function traceInitWithGrpc(
   collector: CollectorTraceExporter,
   config: CollectorExporterConfigNode
 ): void {
@@ -64,6 +71,37 @@ export function onInitWithGrpc(
     });
 }
 
+export function metricInitWithGrpc(collector: CollectorMetricExporter): void {
+  collector.grpcMetricsQueue = [];
+  collector.isShutDown = false;
+  const serverAddress = removeProtocol(collector.url);
+  const metricServiceProtoPath =
+    'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
+  const includeDirs = [path.resolve(__dirname, 'protos')];
+  protoLoader
+    .load(metricServiceProtoPath, {
+      keepCase: false,
+      longs: String,
+      enums: String,
+      defaults: true,
+      oneofs: true,
+      includeDirs,
+    })
+    .then(packageDefinition => {
+      const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
+      collector.metricServiceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
+        serverAddress,
+        collector.credentials
+      );
+      if (collector.grpcMetricsQueue.length > 0) {
+        const queue = collector.grpcMetricsQueue.splice(0);
+        queue.forEach((item: GRPCMetricQueueItem) => {
+          collector.sendMetrics(item.metrics, item.onSuccess, item.onError);
+        });
+      }
+    });
+}
+
 export function sendSpansUsingGrpc(
   collector: CollectorTraceExporter,
   spans: ReadableSpan[],
@@ -94,6 +132,43 @@ export function sendSpansUsingGrpc(
   } else {
     collector.grpcSpansQueue.push({
       spans,
+      onSuccess,
+      onError,
+    });
+  }
+}
+
+export function sendMetricsUsingGrpc(
+  collector: CollectorMetricExporter,
+  metrics: MetricRecord[],
+  startTime: number,
+  onSuccess: () => void,
+  onError: (error: collectorTypes.CollectorExporterError) => void
+): void {
+  if (collector.metricServiceClient) {
+    const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
+      metrics,
+      startTime,
+      collector
+    );
+    collector.metricServiceClient.export(
+      exportMetricServiceRequest,
+      collector.metadata,
+      (err: collectorTypes.ExportServiceError) => {
+        if (err) {
+          collector.logger.error(
+            'exportMetricServiceRequest',
+            exportMetricServiceRequest
+          );
+          onError(err);
+        } else {
+          onSuccess();
+        }
+      }
+    );
+  } else {
+    collector.grpcMetricsQueue.push({
+      metrics,
       onSuccess,
       onError,
     });

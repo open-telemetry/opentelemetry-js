@@ -23,15 +23,19 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord } from '@opentelemetry/metrics';
+import { MetricRecord, HistogramAggregator } from '@opentelemetry/metrics';
 import {
   mockCounter,
   mockObserver,
+  mockHistogram,
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
   ensureMetadataIsCorrect,
   ensureResourceIsCorrect,
+  ensureExportedHistogramIsCorrect,
 } from '../helper';
+import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import { CollectorProtocolNode } from '../../src';
 
 const metricsServiceProtoPath =
   'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
@@ -133,15 +137,52 @@ const testCollectorMetricExporter = (params: TestParams) =>
       metrics = [];
       metrics.push(Object.assign({}, mockCounter));
       metrics.push(Object.assign({}, mockObserver));
+      metrics.push(Object.assign({}, mockHistogram));
       metrics[0].aggregator.update(1);
       metrics[1].aggregator.update(10);
+      metrics[2].aggregator.update(7);
+      metrics[2].aggregator.update(14);
+      (metrics[2].aggregator as HistogramAggregator).reset();
       done();
     });
 
     afterEach(() => {
       metrics[0].aggregator.update(-1); // Aggregator is not deep-copied
+      (metrics[2].aggregator as HistogramAggregator).reset();
       exportedData = undefined;
       reqMetadata = undefined;
+    });
+
+    describe('instance', () => {
+      it('should warn about headers when using grpc', () => {
+        const logger = new ConsoleLogger(LogLevel.DEBUG);
+        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        collectorExporter = new CollectorMetricExporter({
+          logger,
+          serviceName: 'basic-service',
+          url: address,
+          headers: {
+            foo: 'bar',
+          },
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
+      });
+      it('should warn about metadata when using json', () => {
+        const metadata = new grpc.Metadata();
+        metadata.set('k', 'v');
+        const logger = new ConsoleLogger(LogLevel.DEBUG);
+        const spyLoggerWarn = sinon.stub(logger, 'warn');
+        collectorExporter = new CollectorMetricExporter({
+          logger,
+          serviceName: 'basic-service',
+          url: address,
+          metadata,
+          protocolNode: CollectorProtocolNode.HTTP_JSON,
+        });
+        const args = spyLoggerWarn.args[0];
+        assert.strictEqual(args[0], 'Metadata cannot be set when using json');
+      });
     });
 
     describe('export', () => {
@@ -160,8 +201,11 @@ const testCollectorMetricExporter = (params: TestParams) =>
               exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
             const observer =
               exportedData[1].instrumentationLibraryMetrics[0].metrics[0];
+            const histogram =
+              exportedData[2].instrumentationLibraryMetrics[0].metrics[0];
             ensureExportedCounterIsCorrect(counter);
             ensureExportedObserverIsCorrect(observer);
+            ensureExportedHistogramIsCorrect(histogram);
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
