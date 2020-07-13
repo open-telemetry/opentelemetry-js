@@ -155,7 +155,7 @@ function getRandomValue() {
 
 ### Sum Observer
 
-Choose this kind of metric when collecting a sum that never falls over the lifetime of the process.
+Choose this kind of metric when collecting a sum that never decreases.
 The callback can be sync or async.
 
 ```js
