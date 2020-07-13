@@ -19,6 +19,7 @@ import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 import { CollectorExporterError, OT_REQUEST_HEADER } from '../../types';
 import { CollectorExporterConfigBrowser } from './types';
 import { sendWithBeacon, sendWithXhr } from './util';
+import { parseHeaders } from '../../util';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/metrics';
 
@@ -33,12 +34,14 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
   };
   private _headers: { [key: string]: string };
   private _useXHR: boolean = false;
+
   /**
    * @param config
    */
   constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
-    this._headers = config.headers || this.DEFAULT_HEADERS;
+    this._headers =
+      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
   }
