@@ -45,7 +45,8 @@ the latest sha when this guide was written is `b54688569186e0b862bf7462a983ccf2c
 
 9. If you look now at git log you will notice that the folder `protos` has been changed and it will show what was the previous sha and what is current one
 
-10. After upgrading protos you should regenerate proto files for js. To do that go run
+10. After upgrading protos you should regenerate proto files for js.
+**You need to have protocol buffers installed to be able to generate them**.
 
 ```shell script
 npm run generate:http-proto
