@@ -25,7 +25,8 @@ import { CollectorProtocolNode } from '../../enums';
 import { sendMetricsUsingJson, metricInitWithJson } from './utilWithJson';
 import { metricInitWithGrpc, sendMetricsUsingGrpc } from './utilWithGrpc';
 
-const DEFAULT_COLLECTOR_URL = 'localhost:55678';
+const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
+const DEFAULT_COLLECTOR_URL_JSON = 'localhost:55680/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node
@@ -102,6 +103,11 @@ export class CollectorMetricExporter extends CollectorMetricExporterBase<
   }
 
   getDefaultUrl(url: string | undefined): string {
-    return url || DEFAULT_COLLECTOR_URL;
+    if (!url) {
+      return this._protocol === CollectorProtocolNode.HTTP_JSON
+        ? DEFAULT_COLLECTOR_URL_JSON
+        : DEFAULT_COLLECTOR_URL_GRPC;
+    }
+    return url;
   }
 }
