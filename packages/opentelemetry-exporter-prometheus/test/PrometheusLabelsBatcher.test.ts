@@ -15,12 +15,41 @@
  */
 import * as assert from 'assert';
 import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
+import {
+  CounterMetric,
+  AggregatorKind,
+  MeterProvider,
+  Meter,
+} from '@opentelemetry/metrics';
 
 describe('PrometheusBatcher', () => {
+  let meter: Meter;
+  before(() => {
+    meter = new MeterProvider({}).getMeter('test');
+  });
+
   describe('constructor', () => {
     it('should construct a batcher', () => {
       const batcher = new PrometheusLabelsBatcher();
       assert(batcher instanceof PrometheusLabelsBatcher);
+    });
+  });
+
+  describe('process', () => {
+    it('should aggregate metric records with same metric name', async () => {
+      const batcher = new PrometheusLabelsBatcher();
+      const counter = meter.createCounter('test_counter') as CounterMetric;
+      counter.bind({ val: '1' }).add(1);
+      counter.bind({ val: '2' }).add(1);
+
+      const records = await counter.getMetricRecord();
+      records.forEach(it => batcher.process(it));
+
+      const checkPointSet = batcher.checkPointSet();
+      assert.strictEqual(checkPointSet.length, 1);
+      assert.strictEqual(checkPointSet[0].descriptor.name, 'test_counter');
+      assert.strictEqual(checkPointSet[0].aggregatorKind, AggregatorKind.SUM);
+      assert.strictEqual(checkPointSet[0].records.length, 2);
     });
   });
 });
