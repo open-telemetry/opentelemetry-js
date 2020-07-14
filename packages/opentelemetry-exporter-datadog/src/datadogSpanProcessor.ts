@@ -16,8 +16,8 @@
 
 import { unrefTimer } from '@opentelemetry/core';
 import { SpanProcessor, SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
-import * as datadog from 'dd-trace';
-import { id, SpanContext } from './types';
+// import * as datadog from 'dd-trace';
+import { id } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
 const DEFAULT_BUFFER_TIMEOUT_MS = 3_000;
@@ -45,7 +45,6 @@ export class DatadogSpanProcessor implements SpanProcessor {
   private readonly _maxQueueSize: number;
   private readonly _maxTraceSize: number;
   private _isShutdown = false;
-  private _tracer: any;
   // private _exporter: SpanExporter;
   private _timer: NodeJS.Timeout | undefined;
   private _traces = new Map();
@@ -67,7 +66,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
         : DEFAULT_MAX_TRACE_SIZE;
 
     // this._exporter = 
-    this._tracer = datadog.tracer.init({ "plugins": false })
+    // this._tracer = datadog.tracer.init({ "plugins": false })
     console.log(this._maxQueueSize, this._maxTraceSize);
   }
 
@@ -89,6 +88,11 @@ export class DatadogSpanProcessor implements SpanProcessor {
 
   // does nothing.
   onStart(span: ReadableSpan): void {
+    console.log('stating a span', span)
+    if(1 > 0) {
+      return;
+    }
+
     const traceId = span.spanContext['traceId'];
 
     if (!this._traces.has(traceId)) {
@@ -106,6 +110,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
   }
 
   onEnd(span: ReadableSpan): void {
+    console.log('endig thhat span')
     if (this._isShutdown) {
       return;
     }
@@ -135,24 +140,24 @@ export class DatadogSpanProcessor implements SpanProcessor {
     ]
   }
 
-  encode(span: ReadableSpan): void {
-    // convert to datadog span
-    const [ddTraceId, ddSpanId, ddParentId] = this.getTraceContext(span)
-    // const datadogSpanContext  = new SpanOptions 
-    // tracer.startSpan
-    console.log('this ran', ddTraceId, ddSpanId, ddParentId)
-    const ddSpanContext = new SpanContext({
-      traceId: ddTraceId,
-      spanId: ddSpanId,
-      parentId: ddParentId,
-    })
+  // encode(span: ReadableSpan): void {
+  //   // convert to datadog span
+  //   const [ddTraceId, ddSpanId, ddParentId] = this.getTraceContext(span)
+  //   // const datadogSpanContext  = new SpanOptions 
+  //   // tracer.startSpan
+  //   console.log('this ran', ddTraceId, ddSpanId, ddParentId)
+  //   const ddSpanContext = new SpanContext({
+  //     traceId: ddTraceId,
+  //     spanId: ddSpanId,
+  //     parentId: ddParentId,
+  //   })
 
 
-    const output = this._tracer.startSpan(span.name, { childOf: ddSpanContext})
+  //   // const output = this._tracer.startSpan(span.name, { childOf: ddSpanContext})
 
-    console.log('output: ', output.context()._trace)
-    // console.log('i am: ', this._tracer.scope()["_spans"])    
-  }
+  //   console.log('output: ', output.context()._trace)
+  //   // console.log('i am: ', this._tracer.scope()["_spans"])    
+  // }
 
   /** Send the span data list to exporter */
   private _flush() {

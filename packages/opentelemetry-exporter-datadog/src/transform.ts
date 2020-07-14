@@ -25,6 +25,7 @@ const DD_SPAN_KIND_MAPPING = {
   [SpanKind.INTERNAL]: 'internal',
 };
 
+// dummy tracer and default sampling logic
 const NOOP_TRACER = new NoopTracer()
 const SAMPLER = new Sampler(1)
 
@@ -59,6 +60,7 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
   ddSpanBaseContext._spanId = ddSpanId;
   ddSpanBaseContext._parentId = ddParentId;
   
+  // set reserved service and resource tags
   ddSpanBase.addTags({  
     'resource.name': createResource(span),
     'service.name': service_name
@@ -78,6 +80,9 @@ function createSpan(span: ReadableSpan, service_name: string, tags: object, env?
       ddSpanBase.setTag('error.type', possibleType);
     }
   }
+
+  // set span kind
+  if (DD_SPAN_KIND_MAPPING[span.kind]) { ddSpanBase.setTag('span.kind', DD_SPAN_KIND_MAPPING[span.kind]); }
 
   // set env tag
   if (env) { ddSpanBase.setTag(ENV_KEY, env); }
@@ -136,9 +141,9 @@ function createDefaultTags(tags: string | undefined): object {
   }, {}) : {}
 
   // ensure default tag env var or  arg is not malformed
-  if (Object.keys(tagMap).indexOf('') ||
-    Object.values(tagMap).indexOf('') || 
-    Object.values(tagMap).some( (v: string) => { v.endsWith(':') }) 
+  if (Object.keys(tagMap).indexOf('') >= 0 ||
+    Object.values(tagMap).indexOf('') >= 0 || 
+    Object.values(tagMap).some( (v: string) => { return v.endsWith(':') }) 
   ) {
     // TODO: add debug log
     return {}
@@ -154,11 +159,8 @@ function createOriginString(span: ReadableSpan): string | undefined {
 }
 
 function createSpanName(span: ReadableSpan): string {
-  //  TODO: capture instumentation library name, ie "express" "http"
-  const instrumentationName = undefined;
-  // This is not in v0.9.0 but has been merged
-  // instrumentationName = span.instrumentationLibrary && span.instrumentationLibrary.name
-
+  // span.instrumentationLibrary.name is not in v0.9.0 but has been merged
+  const instrumentationName = getInstrumentationName(span);
   const spanKind = DD_SPAN_KIND_MAPPING[span.kind]
 
   if (instrumentationName) {  
@@ -181,6 +183,10 @@ function createResource (span: ReadableSpan): string {
   } else {
     return span.name
   }
+}
+
+function getInstrumentationName(span: any): string | undefined {
+  return span.instrumentationLibrary && span.instrumentationLibrary.name
 }
 
 function getSamplingRate(span: ReadableSpan): number {

@@ -17,23 +17,17 @@ export class DatadogExporter implements SpanExporter {
   private _version: string;
   private _tags: string;
   private _url: string;
+  private _flushInterval: string;
   
   constructor(config: any) {
-    this._url = 'http://localhost:8126' || config.agent_url || process.env.DD_TRACE_AGENT_URL;
+    this._url = config.agent_url || process.env.DD_TRACE_AGENT_URL || 'http://localhost:8126';
     this._logger = config.logger || new NoopLogger();
     this._service_name = config.service_name || process.env.DD_SERVICE || 'dd-service';
     this._env = config.env || process.env.DD_ENV;
     this._version = config.version || process.env.DD_VERSION;
     this._tags = config.tags || process.env.DD_TAGS;
-
-    // datadog.init({plugins: false, debug: true})
-
-    console.log(this._url)
-    // const url = this._url
-    // const flushInterval = 1000
-    const hostname = 'localhost'
-    const port = 8126
-    this._exporter = new AgentExporter({hostname, port}, new PrioritySampler())
+    this._flushInterval = config.flushInterval || 1000;
+    this._exporter = new AgentExporter({url: this._url, flushInterval: this._flushInterval}, new PrioritySampler())
   }
 
   /**
@@ -60,6 +54,7 @@ export class DatadogExporter implements SpanExporter {
     // formattedSpans.forEach( (x: any) => {
     //   console.log(x.parent_id.toString())
     // })
+
     const response = this._exporter.export(formattedDatadogSpans)
     console.log('response ', response)
   }

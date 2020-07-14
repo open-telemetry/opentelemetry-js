@@ -49,7 +49,9 @@ function isValidSpanId(spanId: string): boolean {
  */
 export class DatadogPropagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
+    console.log('context is, ', context)
     const spanContext = getParentSpanContext(context);
+    console.log('injecting', spanContext)
     if (!spanContext) return;
 
     if (
