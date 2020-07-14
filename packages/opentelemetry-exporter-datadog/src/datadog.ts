@@ -27,7 +27,7 @@ export class DatadogExporter implements SpanExporter {
     this._version = config.version || process.env.DD_VERSION;
     this._tags = config.tags || process.env.DD_TAGS;
     this._flushInterval = config.flushInterval || 1000;
-    this._exporter = new AgentExporter({url: this._url, flushInterval: this._flushInterval}, new PrioritySampler())
+    this._exporter = new AgentExporter({url: new URL(this._url), flushInterval: this._flushInterval}, new PrioritySampler())
   }
 
   /**
@@ -48,17 +48,19 @@ export class DatadogExporter implements SpanExporter {
       this._version,
       this._tags)
 
-    // const formattedSpans = datadogSpans.map(format)
-    this._logger.debug('exporting dd spans')
-    // console.log(formattedSpans)
-    // formattedSpans.forEach( (x: any) => {
-    //   console.log(x.parent_id.toString())
-    // })
-
-    const response = this._exporter.export(formattedDatadogSpans)
-    console.log('response ', response)
+    try {
+      this._exporter.export(formattedDatadogSpans)
+      return resultCallback(ExportResult.SUCCESS);
+    } catch (error) {
+      this._logger.debug(error)
+      return resultCallback(ExportResult.FAILED_NOT_RETRYABLE)
+    }
   }
 
   /** Stops the exporter. */
-  shutdown(): void {}
+  shutdown(): void {
+    if(this._exporter._scheduler !== undefined) {
+      this._exporter._scheduler.stop()
+    }
+  }
 }

@@ -16,12 +16,12 @@
 
 import * as assert from 'assert';
 import { DatadogExporter } from '../src';
-// import { NoopLogger } from '@opentelemetry/core';
-// import * as api from '@opentelemetry/api';
-// import { ReadableSpan } from '@opentelemetry/tracing';
-// import { Resource } from '@opentelemetry/resources';
+import { ExportResult } from '@opentelemetry/core';
+import * as api from '@opentelemetry/api';
+import { ReadableSpan } from '@opentelemetry/tracing';
+import { Resource } from '@opentelemetry/resources';
 import { AgentExporter } from '../src/types'
-// import * as nock from 'nock';
+import * as nock from 'nock';
 
 describe('DatadogExporter', () => {
   describe('constructor', () => {
@@ -115,7 +115,6 @@ describe('DatadogExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      console.log(exporter['_exporter']);
       assert.strictEqual(exporter['_exporter']['_scheduler']['_interval'], 2000);
     });
 
@@ -131,103 +130,107 @@ describe('DatadogExporter', () => {
   });
 
   describe('export', () => {
-  //   let exporter: JaegerExporter;
-  //   beforeEach(() => {
-  //     exporter = new JaegerExporter({
-  //       serviceName: 'opentelemetry',
-  //     });
-  //   });
+    let exporter: typeof AgentExporter;
 
-  //   afterEach(() => {
-  //     exporter.shutdown();
-  //   });
+    before(() => {
+      nock.disableNetConnect();
+      exporter = new DatadogExporter({
+        service_name: 'opentelemetry',
+        flushInterval: 100
+      });      
+    });
 
-  //   it('should skip send with empty list', () => {
-  //     exporter.export([], (result: ExportResult) => {
-  //       assert.strictEqual(result, ExportResult.SUCCESS);
-  //     });
-  //   });
+    after(() => {
+      nock.enableNetConnect();
+      exporter.shutdown();
+    });
 
-  //   it('should send spans to Jaeger backend and return with Success', () => {
-  //     const spanContext = {
-  //       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-  //       spanId: '6e0c63257de34c92',
-  //       traceFlags: TraceFlags.NONE,
-  //     };
-  //     const readableSpan: ReadableSpan = {
-  //       name: 'my-span1',
-  //       kind: api.SpanKind.CLIENT,
-  //       spanContext,
-  //       startTime: [1566156729, 709],
-  //       endTime: [1566156731, 709],
-  //       ended: true,
-  //       status: {
-  //         code: api.CanonicalCode.DATA_LOSS,
-  //       },
-  //       attributes: {},
-  //       links: [],
-  //       events: [],
-  //       duration: [32, 800000000],
-  //       resource: Resource.empty(),
-  //       instrumentationLibrary: {
-  //         name: 'default',
-  //         version: '0.0.1',
-  //       },
-  //     };
+    it('should skip send with empty list', (done) => {
+      const scope = nock('http://localhost:8126')
+        .put('/v0.4/traces')
+        .reply(200);
 
-  //     exporter.export([readableSpan], (result: ExportResult) => {
-  //       assert.strictEqual(result, ExportResult.SUCCESS);
-  //     });
-  //   });
+      exporter.export([], (result: ExportResult) => {
+        setTimeout( () => {
+          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert(scope.isDone() === false)
+          nock.cleanAll()
+          done()
+        }, 200)
+      });
+    });
 
-  //   it('should use httpSender if config.endpoint is setten and set x-opentelemetry-outgoing-request header', done => {
-  //     const mockedEndpoint = 'http://testendpoint';
-  //     nock(mockedEndpoint)
-  //       .post('/')
-  //       .reply(function () {
-  //         assert.strictEqual(this.req.headers[OT_REQUEST_HEADER], 1);
-  //         assert.strictEqual(
-  //           this.req.headers['content-type'],
-  //           'application/x-thrift'
-  //         );
-  //         assert.strictEqual(this.req.headers.host, 'testendpoint');
-  //         done();
-  //       });
-  //     const exporter = new JaegerExporter({
-  //       serviceName: 'opentelemetry',
-  //       endpoint: mockedEndpoint,
-  //     });
-  //     assert.strictEqual(exporter['_sender'].constructor.name, 'HTTPSender');
-  //     assert.strictEqual(
-  //       exporter['_sender']._httpOptions.headers[OT_REQUEST_HEADER],
-  //       1
-  //     );
-  //     const spanContext = {
-  //       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-  //       spanId: '6e0c63257de34c92',
-  //       traceFlags: TraceFlags.NONE,
-  //     };
-  //     const readableSpan: ReadableSpan = {
-  //       name: 'my-span1',
-  //       kind: api.SpanKind.CLIENT,
-  //       spanContext,
-  //       startTime: [1566156729, 709],
-  //       endTime: [1566156731, 709],
-  //       ended: true,
-  //       status: {
-  //         code: api.CanonicalCode.DATA_LOSS,
-  //       },
-  //       attributes: {},
-  //       links: [],
-  //       events: [],
-  //       duration: [32, 800000000],
-  //       resource: Resource.empty(),
-  //       instrumentationLibrary: {
-  //         name: 'default',
-  //         version: '0.0.1',
-  //       },
-  //     };
-  //     exporter.export([readableSpan], () => {});
-  //   });
+    it('should send spans to Datadog backend and return with Success', (done) => {
+      const scope = nock('http://localhost:8126')
+        .put('/v0.4/traces')
+        .reply(200);
+
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: api.TraceFlags.NONE,
+      };
+      const readableSpan: ReadableSpan = {
+        name: 'my-span1',
+        kind: api.SpanKind.CLIENT,
+        spanContext,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
+        ended: true,
+        status: {
+          code: api.CanonicalCode.DATA_LOSS,
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [32, 800000000],
+        resource: Resource.empty()
+      };
+
+      exporter.export([readableSpan], (result: ExportResult) => {        
+        setTimeout( () => {
+          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert(scope.isDone())
+          done()
+        }, 200)        
+      });
+    });
+
+    it('should returrn Success even with a 4xx response', (done) => {
+      const scope = nock('http://localhost:8126')
+        .put('/v0.4/traces')
+        .reply(400);
+
+      const spanContext = {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: api.TraceFlags.NONE,
+      };
+      const readableSpan: ReadableSpan = {
+        name: 'my-span1',
+        kind: api.SpanKind.CLIENT,
+        spanContext,
+        startTime: [1566156729, 709],
+        endTime: [1566156731, 709],
+        ended: true,
+        status: {
+          code: api.CanonicalCode.DATA_LOSS,
+        },
+        attributes: {},
+        links: [],
+        events: [],
+        duration: [32, 800000000],
+        resource: Resource.empty()
+      };
+
+      exporter.export([readableSpan], (result: ExportResult) => {        
+  
+        setTimeout( () => {
+          assert.strictEqual(result, ExportResult.SUCCESS);
+          assert(scope.isDone())
+          done()
+        }, 200)        
+      });
+    })
   });
 });

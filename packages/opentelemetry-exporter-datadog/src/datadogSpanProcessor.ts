@@ -14,25 +14,15 @@
  * limitations under the License.
  */
 
-import { unrefTimer } from '@opentelemetry/core';
+import { unrefTimer, NoopLogger } from '@opentelemetry/core';
 import { SpanProcessor, SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
-// import * as datadog from 'dd-trace';
+import { Logger } from '@opentelemetry/api';
 import { id } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
 const DEFAULT_BUFFER_TIMEOUT_MS = 3_000;
 const DEFAULT_MAX_QUEUE_SIZE = 2048
 const DEFAULT_MAX_TRACE_SIZE = 1024
-
-const STARTED_KEY = 'started'
-const FINISHED_KEY = 'finished'
-const SPANS_KEY = 'spans'
-
-// const DEFAULT_TRACE_MAP = [
-//   [STARTED_KEY, 0],
-//   [FINISHED_KEY, 0],
-//   [SPANS_KEY, []]
-// ]
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -48,9 +38,13 @@ export class DatadogSpanProcessor implements SpanProcessor {
   // private _exporter: SpanExporter;
   private _timer: NodeJS.Timeout | undefined;
   private _traces = new Map();
+  private _traces_spans_started = new Map();
+  private _traces_spans_finished = new Map();
   private _check_traces_queue: Set<string> = new Set();
+  public readonly logger: Logger;
 
   constructor(private readonly _exporter: SpanExporter, config?: any) {
+    this.logger = config && config.logger || new NoopLogger();
     this._bufferTimeout =
       config && typeof config.bufferTimeout === 'number'
         ? config.bufferTimeout
@@ -88,29 +82,37 @@ export class DatadogSpanProcessor implements SpanProcessor {
 
   // does nothing.
   onStart(span: ReadableSpan): void {
-    console.log('stating a span', span)
-    if(1 > 0) {
+    if (this._isShutdown) {
+      return;
+    }
+
+    if (this._allSpansCount(this._traces_spans_started) >= this._maxQueueSize){
+      this.logger.debug('Max Queue Size reached, dropping span');
       return;
     }
 
     const traceId = span.spanContext['traceId'];
 
     if (!this._traces.has(traceId)) {
-       this._traces.set(traceId, new Map());
-       this._traces.get(traceId).set(SPANS_KEY, [])
-       this._traces.get(traceId).set(STARTED_KEY, 0)
-       this._traces.get(traceId).set(FINISHED_KEY, 0)
+       this._traces.set(traceId, []);
+       // this._traces.get(traceId).set(SPANS_KEY, [])
+       this._traces_spans_started.set(traceId, 0)
+       this._traces_spans_finished.set(traceId, 0)
     }
       
-    const traceMap = this._traces.get(traceId);
-    const tracesStarted = traceMap.get(STARTED_KEY);
+    const trace = this._traces.get(traceId);
+    const traceSpansStarted = this._traces_spans_started.get(traceId)
     
-    traceMap.get(SPANS_KEY).push(span);
-    traceMap.set(STARTED_KEY, tracesStarted + 1);
+    if (traceSpansStarted >= this._maxTraceSize) {
+      this.logger.debug('Max Trace Size reached, dropping span');
+      return;
+    }
+
+    trace.push(span);
+    this._traces_spans_started.set(traceId, traceSpansStarted + 1);
   }
 
   onEnd(span: ReadableSpan): void {
-    console.log('endig thhat span')
     if (this._isShutdown) {
       return;
     }
@@ -121,10 +123,9 @@ export class DatadogSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const traceMap = this._traces.get(traceId);
-    const tracesFinished = traceMap.get(FINISHED_KEY);
+    const traceSpansFinished = this._traces_spans_finished.get(traceId);
 
-    traceMap.set(FINISHED_KEY, tracesFinished + 1);
+    this._traces_spans_finished.set(traceId, traceSpansFinished + 1);
 
     if(this._isExportable(traceId)) {
       this._check_traces_queue.add(traceId)
@@ -140,25 +141,6 @@ export class DatadogSpanProcessor implements SpanProcessor {
     ]
   }
 
-  // encode(span: ReadableSpan): void {
-  //   // convert to datadog span
-  //   const [ddTraceId, ddSpanId, ddParentId] = this.getTraceContext(span)
-  //   // const datadogSpanContext  = new SpanOptions 
-  //   // tracer.startSpan
-  //   console.log('this ran', ddTraceId, ddSpanId, ddParentId)
-  //   const ddSpanContext = new SpanContext({
-  //     traceId: ddTraceId,
-  //     spanId: ddSpanId,
-  //     parentId: ddParentId,
-  //   })
-
-
-  //   // const output = this._tracer.startSpan(span.name, { childOf: ddSpanContext})
-
-  //   console.log('output: ', output.context()._trace)
-  //   // console.log('i am: ', this._tracer.scope()["_spans"])    
-  // }
-
   /** Send the span data list to exporter */
   private _flush() {
     console.log('ioi flush')
@@ -169,8 +151,10 @@ export class DatadogSpanProcessor implements SpanProcessor {
       // check again in case spans have been added
       if(this._isExportable(traceId)) {
         console.log('tryng to export')
-        const spans = this._traces.get(traceId).get(SPANS_KEY)
+        const spans = this._traces.get(traceId)
         this._traces.delete(traceId)
+        this._traces_spans_started.delete(traceId)
+        this._traces_spans_finished.delete(traceId)
         this._check_traces_queue.delete(traceId)        
         this._exporter.export(spans, () => {});
       }
@@ -194,13 +178,18 @@ export class DatadogSpanProcessor implements SpanProcessor {
     }
   }
 
-  private _isExportable(traceId: string) {
-    const traceMap = this._traces.get(traceId)
+  private _allSpansCount(traces: Map<string, number>): number {
+    // sum all started spans in all traces
+    return [ ...traces.values() ].reduce((a, b) => a + b, 0);
+  }
 
-    if (!traceMap) {
+  private _isExportable(traceId: string) {
+    const trace = this._traces.get(traceId)
+
+    if (!trace || !this._traces_spans_started.has(traceId) || !this._traces_spans_finished.has(traceId)) {
       return;
     }
 
-    return traceMap.get(STARTED_KEY) - traceMap.get(FINISHED_KEY) <= 0
+    return this._traces_spans_started.get(traceId) - this._traces_spans_finished.get(traceId) <= 0
   }
 }
