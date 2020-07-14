@@ -153,6 +153,45 @@ function getRandomValue() {
 
 ```
 
+### Sum Observer
+
+Choose this kind of metric when collecting a sum that never decreases.
+The callback can be sync or async.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+// async callback in case you need to wait for values
+meter.createSumObserver('example_metric', {
+  description: 'Example of an async sum observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 100)
+  });
+}
+
+// sync callback in case you don't need to wait for values
+meter.createSumObserver('example_metric', {
+  description: 'Example of a sync sum observer with callback',
+}, (observerResult) => {
+  const value = getRandomValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getRandomValue() {
+  return Math.random();
+}
+```
+
 ### Batch Observer
 
 Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
