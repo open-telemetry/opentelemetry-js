@@ -32,7 +32,6 @@ export const X_DD_ORIGIN = 'x-datadog-origin';
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
-const DD_ORIGIN = '_dd_origin';
 const OT_ALLOWED_DD_ORIGIN = 'dd_origin';
 
 function isValidTraceId(traceId: string): boolean {
@@ -49,9 +48,8 @@ function isValidSpanId(spanId: string): boolean {
  */
 export class DatadogPropagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
-    console.log('context is, ', context)
     const spanContext = getParentSpanContext(context);
-    console.log('injecting', spanContext)
+    
     if (!spanContext) return;
 
     if (
@@ -59,7 +57,7 @@ export class DatadogPropagator implements HttpTextPropagator {
       isValidSpanId(spanContext.spanId)
     ) {
       const ddTraceId = id(spanContext.traceId).toString(10);
-      const ddSpanId = id(spanContext.traceId).toString(10);
+      const ddSpanId = id(spanContext.spanId).toString(10);
 
       setter(carrier, X_DD_TRACE_ID, ddTraceId);
       setter(carrier, X_DD_PARENT_ID, ddSpanId);
@@ -75,8 +73,8 @@ export class DatadogPropagator implements HttpTextPropagator {
 
       // Current Otel-DD exporter behavior in other languages is to only set origin tag
       // if it exists, otherwise don't set header
-      if (spanContext.traceState !== undefined && spanContext.traceState.get(DD_ORIGIN) ) {
-        setter(carrier, X_DD_ORIGIN, spanContext.traceState.get(DD_ORIGIN) );
+      if (spanContext.traceState !== undefined && spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN) ) {
+        setter(carrier, X_DD_ORIGIN, spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN) );
       }
     }
   }
@@ -109,7 +107,7 @@ export class DatadogPropagator implements HttpTextPropagator {
 
     // TODO: is this accurate?
     const traceId = id(traceIdHeaderValue, 10).toString('hex')
-    const spanId = id(traceIdHeaderValue, 10).toString('hex')
+    const spanId = id(spanIdHeaderValue, 10).toString('hex')
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
       const contextOptions:any = {

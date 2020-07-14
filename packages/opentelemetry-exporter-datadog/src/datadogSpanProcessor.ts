@@ -58,10 +58,6 @@ export class DatadogSpanProcessor implements SpanProcessor {
       config && typeof config.maxTraceSize === 'number'
         ? config.maxTraceSize
         : DEFAULT_MAX_TRACE_SIZE;
-
-    // this._exporter = 
-    // this._tracer = datadog.tracer.init({ "plugins": false })
-    console.log(this._maxQueueSize, this._maxTraceSize);
   }
 
   forceFlush(): void {
@@ -143,14 +139,12 @@ export class DatadogSpanProcessor implements SpanProcessor {
 
   /** Send the span data list to exporter */
   private _flush() {
-    console.log('ioi flush')
     this._clearTimer();
     if (this._check_traces_queue.size === 0) return;
 
     this._check_traces_queue.forEach( (traceId) => {
       // check again in case spans have been added
       if(this._isExportable(traceId)) {
-        console.log('tryng to export')
         const spans = this._traces.get(traceId)
         this._traces.delete(traceId)
         this._traces_spans_started.delete(traceId)
@@ -165,7 +159,6 @@ export class DatadogSpanProcessor implements SpanProcessor {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      console.log('rrun')
       this._flush();
     }, this._bufferTimeout);
     unrefTimer(this._timer);

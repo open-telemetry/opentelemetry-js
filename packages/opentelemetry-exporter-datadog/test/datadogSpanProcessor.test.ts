@@ -14,31 +14,35 @@
  * limitations under the License.
  */
 
-// import { ALWAYS_SAMPLER } from '@opentelemetry/core';
-import { Span } from '@opentelemetry/api';
-import { InMemorySpanExporter, BasicTracerProvider } from '@opentelemetry/tracing';
+import { TraceFlags } from '@opentelemetry/api';
+import { InMemorySpanExporter, BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
   DatadogSpanProcessor, DATADOG_ALWAYS_SAMPLER
 } from '../src';
 
-function createSampledSpan(spanName: string): Span {
+function createSampledSpan(spanName: string, parent?: boolean): Span {
   const tracer = new BasicTracerProvider({
     sampler: DATADOG_ALWAYS_SAMPLER,
   }).getTracer('default');
-  const span = tracer.startSpan(spanName);
+  const span = parent ? tracer.startSpan(spanName, { parent: {
+    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+    spanId: '6e0c63257de34c92',
+    traceFlags: TraceFlags.SAMPLED
+  }}) : tracer.startSpan(spanName);
+  
   span.end();
+
   return span as Span;
 }
 
-console.log(createSampledSpan)
-
 describe('DatadogSpanProcessor', () => {
   const name = 'span-name';
-  const defaultBufferConfig = {
+  const defaultProcessorConfig = {
     maxQueueSize: 10,
     maxTraceSize: 3,
+    bufferTimeout: 3000
   };
   let exporter: InMemorySpanExporter;
   beforeEach(() => {
@@ -57,7 +61,7 @@ describe('DatadogSpanProcessor', () => {
     });
 
     it('should create a DatadogSpanProcessor instance with config', () => {
-      const processor = new DatadogSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
       assert.ok(processor instanceof DatadogSpanProcessor);
       assert.strictEqual(processor['_maxQueueSize'], 10)
       assert.strictEqual(processor['_maxTraceSize'], 3)
@@ -73,14 +77,12 @@ describe('DatadogSpanProcessor', () => {
 
   describe('.onStart/.onEnd/.shutdown', () => {
     it('should do nothing after processor is shutdown', () => {
-      const processor = new DatadogSpanProcessor(exporter, defaultBufferConfig);
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
       const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
-
       const span = createSampledSpan(`${name}_0`);
 
       processor.onStart(span);
       processor.onEnd(span);
-      console.log(processor)
       assert.strictEqual(processor['_traces'].size, 1);
 
       processor.forceFlush();
@@ -102,86 +104,89 @@ describe('DatadogSpanProcessor', () => {
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    // it('should export the sampled spans with buffer size reached', () => {
-    //   const processor = new DatadogSpanProcessor(exporter, defaultBufferConfig);
-    //   for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
-    //     const span = createSampledSpan(`${name}_${i}`);
-    //     processor.onStart(span);
-    //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    it('should reach but not exceed the max buffer size', () => {
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
+      const maxQueueSize = defaultProcessorConfig.maxQueueSize;
+      const aboveMaxQueueSize = maxQueueSize + 1;
+      for (let i = 0; i < aboveMaxQueueSize; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-    //     processor.onEnd(span);
-    //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
-    //   }
-    //   // Now we should start seeing the spans in exporter
-    //   const span = createSampledSpan(`${name}_6`);
-    //   processor.onEnd(span);
-    //   assert.strictEqual(exporter.getFinishedSpans().length, 6);
+        processor.onEnd(span);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      }
 
-    //   processor.shutdown();
-    //   assert.strictEqual(exporter.getFinishedSpans().length, 0);
-    // });
+      //export all traces
+      processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, maxQueueSize);
 
-    // it('should reach but not exceed the max buffer size', done => {
-    // })
+      processor.shutdown();
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    })
    
-    // it('should reach but not exceed the max trace size', done => {
-    //   const clock = sinon.useFakeTimers();
-    //   const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-    //   for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
-    //     const span = createSampledSpan(`${name}_${i}`);
-    //     processor.onEnd(span);
-    //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
-    //   }
+    it('should reach but not exceed the max trace size', () => {
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
+      const maxTraceSize = defaultProcessorConfig.maxTraceSize;
+      const aboveMaxTraceSize = maxTraceSize + 1;
 
-    //   setTimeout(() => {
-    //     assert.strictEqual(exporter.getFinishedSpans().length, 5);
-    //     done();
-    //   }, defaultBufferConfig.bufferTimeout + 1000);
+      for (let i = 0; i < aboveMaxTraceSize; i++) {
+        const span = createSampledSpan(`${name}_${i}`, true);
+        processor.onStart(span);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-    //   clock.tick(defaultBufferConfig.bufferTimeout + 1000);
+        processor.onEnd(span);
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      }
 
-    //   clock.restore();
-    // });
+      //export all traces
+      processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, maxTraceSize);
 
-  //   it('should force flush on demand', () => {
-  //     const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
-  //     for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
-  //       const span = createSampledSpan(`${name}_${i}`);
-  //       processor.onEnd(span);
-  //     }
-  //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
-  //     processor.forceFlush();
-  //     assert.strictEqual(exporter.getFinishedSpans().length, 5);
-  //   });
+      processor.shutdown();
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+    })
+   
+    it('should force flush on demand', () => {
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
+      for (let i = 0; i < defaultProcessorConfig.maxQueueSize; i++) {
+        const span = createSampledSpan(`${name}_${i}`);
+        processor.onStart(span);
+        processor.onEnd(span);
+      }
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      processor.forceFlush();
+      assert.strictEqual(exporter.getFinishedSpans().length, defaultProcessorConfig.maxQueueSize);
+    });
 
-  //   it('should not export empty span lists', done => {
-  //     const spy = sinon.spy(exporter, 'export');
-  //     const clock = sinon.useFakeTimers();
+    it('should not export empty span lists', done => {
+      const spy = sinon.spy(exporter, 'export');
+      const clock = sinon.useFakeTimers();
 
-  //     const tracer = new BasicTracerProvider({
-  //       sampler: ALWAYS_SAMPLER,
-  //     }).getTracer('default');
-  //     const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
+      const tracer = new BasicTracerProvider({
+        sampler: DATADOG_ALWAYS_SAMPLER,
+      }).getTracer('default');
+      const processor = new DatadogSpanProcessor(exporter, defaultProcessorConfig);
 
-  //     // start but do not end spans
-  //     for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
-  //       const span = tracer.startSpan('spanName');
-  //       processor.onStart(span as Span);
-  //     }
+      // start but do not end spans
+      for (let i = 0; i < defaultProcessorConfig.maxQueueSize; i++) {
+        const span = tracer.startSpan('spanName');
+        processor.onStart(span as Span);
+      }
 
-  //     setTimeout(() => {
-  //       assert.strictEqual(exporter.getFinishedSpans().length, 0);
-  //       // after the timeout, export should not have been called
-  //       // because no spans are ended
-  //       sinon.assert.notCalled(spy);
-  //       done();
-  //     }, defaultBufferConfig.bufferTimeout + 1000);
+      setTimeout(() => {
+        assert.strictEqual(exporter.getFinishedSpans().length, 0);
+        // after the timeout, export should not have been called
+        // because no spans are ended
+        sinon.assert.notCalled(spy);
+        done();
+      }, defaultProcessorConfig.bufferTimeout + 2000);
 
-  //     // no spans have been finished
-  //     assert.strictEqual(exporter.getFinishedSpans().length, 0);
-  //     clock.tick(defaultBufferConfig.bufferTimeout + 1000);
+      // no spans have been finished
+      assert.strictEqual(exporter.getFinishedSpans().length, 0);
+      clock.tick(defaultProcessorConfig.bufferTimeout + 2000);
 
-  //     clock.restore();
-  //   });
+      clock.restore();
+    });
   });
 });
