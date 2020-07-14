@@ -126,13 +126,11 @@ describe('DatadogExporter', () => {
 
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
-
-      console.log(exporter['_exporter']);
       assert.strictEqual(exporter['_exporter']['_scheduler']['_interval'], 1000);
     });
-  // });
+  });
 
-  // describe('export', () => {
+  describe('export', () => {
   //   let exporter: JaegerExporter;
   //   beforeEach(() => {
   //     exporter = new JaegerExporter({
