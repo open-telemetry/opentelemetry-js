@@ -25,14 +25,14 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
 export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 
-export function initWithGrpc<ExportItem, ExportedType>(
-  exporter: CollectorExporterNodeBase<ExportItem, ExportedType>
+export function initWithGrpc<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>
 ): void {
-  const serverAddress = removeProtocol(exporter.url);
+  const serverAddress = removeProtocol(collector.url);
   const includeDirs = [path.resolve(__dirname, 'protos')];
 
   protoLoader
-    .load(exporter.getServiceProtoPath(), {
+    .load(collector.getServiceProtoPath(), {
       keepCase: false,
       longs: String,
       enums: String,
@@ -42,21 +42,21 @@ export function initWithGrpc<ExportItem, ExportedType>(
     })
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
-      exporter.serviceClient = exporter.getServiceClient(
+      collector.serviceClient = collector.getServiceClient(
         packageObject,
         serverAddress
       );
-      if (exporter.grpcQueue.length > 0) {
-        const queue = exporter.grpcQueue.splice(0);
+      if (collector.grpcQueue.length > 0) {
+        const queue = collector.grpcQueue.splice(0);
         queue.forEach((item: GRPCQueueItem<ExportItem>) => {
-          exporter.send(item.objects, item.onSuccess, item.onError);
+          collector.send(item.objects, item.onSuccess, item.onError);
         });
       }
     });
 }
 
-export function sendUsingGrpc<ExportItem, ExportedType>(
-  collector: CollectorExporterNodeBase<ExportItem, ExportedType>,
+export function sendUsingGrpc<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void

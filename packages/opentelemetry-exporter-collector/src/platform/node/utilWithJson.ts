@@ -29,8 +29,8 @@ export function initWithJson<ExportItem, ServiceRequest>(
   // nothing to be done for json yet
 }
 
-export function sendWithJson<ExportItem, ExportRequest>(
-  collector: CollectorExporterNodeBase<ExportItem, ExportRequest>,
+export function sendWithJson<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
