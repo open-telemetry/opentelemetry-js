@@ -22,7 +22,7 @@ import {
 
 type Constructor<T, R extends Aggregator> = new (...args: T[]) => R;
 
-export class TestBatcher<T, R extends Aggregator> extends Batcher {
+export class ExactBatcher<T, R extends Aggregator> extends Batcher {
   private readonly args: ConstructorParameters<Constructor<T, R>>;
   public aggregators: R[] = [];
 

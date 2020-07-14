@@ -28,7 +28,7 @@ import * as assert from 'assert';
 import { HrTime, Labels } from '@opentelemetry/api';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
-import { TestBatcher } from './TestBatcher';
+import { ExactBatcher } from './ExactBatcher';
 
 const mockedHrTime: HrTime = [1586347902211, 0];
 const mockedHrTimeMs = 1586347902211000;
@@ -53,7 +53,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter.bind(labels).add(1);
@@ -75,7 +75,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter.bind(labels).add(1);
@@ -98,7 +98,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter.bind(labels).add(1);
@@ -124,7 +124,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter.bind(labels).add(1);
@@ -153,7 +153,7 @@ describe('PrometheusSerializer', () => {
       it('should serialize metric record with sum aggregator', async () => {
         const serializer = new PrometheusSerializer();
 
-        const batcher = new TestBatcher(HistogramAggregator, [1, 10, 100]);
+        const batcher = new ExactBatcher(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ batcher }).getMeter('test');
         const recorder = meter.createValueRecorder('test', {
           description: 'foobar',
@@ -183,7 +183,7 @@ describe('PrometheusSerializer', () => {
       it('serialize metric record with sum aggregator without timestamp', async () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
-        const batcher = new TestBatcher(HistogramAggregator, [1, 10, 100]);
+        const batcher = new ExactBatcher(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ batcher }).getMeter('test');
         const recorder = meter.createValueRecorder('test', {
           description: 'foobar',
@@ -220,7 +220,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const batcher = new PrometheusLabelsBatcher();
         const counter = meter.createCounter('test', {
@@ -247,7 +247,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const batcher = new PrometheusLabelsBatcher();
         const counter = meter.createCounter('test', {
@@ -278,7 +278,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
         }).getMeter('test');
         const batcher = new PrometheusLabelsBatcher();
         const counter = meter.createCounter('test', {
@@ -316,7 +316,7 @@ describe('PrometheusSerializer', () => {
       it('serialize metric record with MinMaxLastSumCountAggregator aggregator', async () => {
         const serializer = new PrometheusSerializer();
 
-        const batcher = new TestBatcher(HistogramAggregator, [1, 10, 100]);
+        const batcher = new ExactBatcher(HistogramAggregator, [1, 10, 100]);
         const meter = new MeterProvider({ batcher }).getMeter('test');
         const recorder = meter.createValueRecorder('test', {
           description: 'foobar',
@@ -361,7 +361,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter.bind({}).add(1);
@@ -380,7 +380,7 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new TestBatcher(SumAggregator),
+          batcher: new ExactBatcher(SumAggregator),
         }).getMeter('test');
         const counter = meter.createCounter('test') as CounterMetric;
         counter
@@ -414,7 +414,7 @@ describe('PrometheusSerializer', () => {
 
         for (const esac of cases) {
           const meter = new MeterProvider({
-            batcher: new TestBatcher(SumAggregator),
+            batcher: new ExactBatcher(SumAggregator),
           }).getMeter('test');
           const counter = meter.createUpDownCounter(
             'test'
