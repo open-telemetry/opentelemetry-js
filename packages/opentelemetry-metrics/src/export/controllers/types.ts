@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { MeterConfig } from '../../types';
-
-export interface PushControllerConfig extends MeterConfig {
+export interface PushControllerConfig {
   /** Metric collect interval */
   interval?: number;
   /** Called on each time the metrics were pushed */

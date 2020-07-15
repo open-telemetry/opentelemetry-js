@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { ConsoleMetricExporter, PushController, MetricKind } from '../../src';
+import { ConsoleMetricExporter, MetricKind, MeterProvider } from '../../src';
 import { ValueType, metrics } from '@opentelemetry/api';
 import { callbackStub } from '../util';
 
@@ -34,7 +34,7 @@ describe('ConsoleMetricExporter', () => {
     console.log = previousConsoleLog;
   });
 
-  describe('.installPipeline()', () => {
+  describe('.installExportPipeline()', () => {
     let clock: sinon.SinonFakeTimers;
     beforeEach(() => {
       clock = sinon.useFakeTimers();
@@ -48,7 +48,7 @@ describe('ConsoleMetricExporter', () => {
       const { callback, onNextCall } = callbackStub();
       const interval = 1000;
 
-      ConsoleMetricExporter.installPipeline({ interval, onPushed: callback });
+      ConsoleMetricExporter.installExportPipeline({ interval, onPushed: callback });
 
       const meter = metrics.getMeter('test-console-metric-exporter');
       const counter = meter.createCounter('counter', {
@@ -89,7 +89,7 @@ describe('ConsoleMetricExporter', () => {
     it('should export information about metrics', async () => {
       const spyConsole = sinon.spy(console, 'log');
 
-      const meter = new PushController().getMeter(
+      const meter = new MeterProvider().getMeter(
         'test-console-metric-exporter'
       );
       const counter = meter.createCounter('counter', {

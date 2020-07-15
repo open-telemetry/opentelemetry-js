@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-import { ObserverResult } from '@opentelemetry/api';
-import { CounterMetric, Meter, PushController } from '@opentelemetry/metrics';
+import * as api from '@opentelemetry/api';
+import { CounterMetric, Meter, MeterProvider } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
 import { mockedTimeMS } from './sandbox';
+import { get } from './request-util';
 
 describe('PrometheusExporter', () => {
   describe('constructor', () => {
@@ -51,6 +52,46 @@ describe('PrometheusExporter', () => {
     it('should not start the server by default', () => {
       const exporter = new PrometheusExporter();
       assert.ok(exporter['_server']!.listening === false);
+    });
+  });
+
+  describe('export pipeline', () => {
+    let exporter: PrometheusExporter;
+
+    afterEach(done => {
+      exporter?.shutdown(done);
+    });
+
+    it('should install export pipeline to global metrics api', async () => {
+      let meterProvider: MeterProvider;
+      await new Promise(resolve => {
+        ({ exporter, meterProvider } = PrometheusExporter.installExportPipeline(
+          { startServer: true },
+          resolve
+        ));
+      });
+
+      assert.strictEqual(api.metrics.getMeterProvider(), meterProvider!);
+
+      const counter = api.metrics.getMeter('test').createCounter('counter', {
+        description: 'a test description',
+      });
+      const boundCounter = counter.bind({ key1: 'labelValue1' });
+      boundCounter.add(10);
+
+      const res = await get('http://localhost:9464/metrics');
+      assert.strictEqual(res.statusCode, 200);
+      assert(res.body != null);
+      const lines = res.body!.split('\n');
+
+      assert.strictEqual(lines[0], '# HELP counter a test description');
+
+      assert.deepStrictEqual(lines, [
+        '# HELP counter a test description',
+        '# TYPE counter counter',
+        `counter{key1="labelValue1"} 10 ${mockedTimeMS}`,
+        '',
+      ]);
     });
   });
 
@@ -168,7 +209,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new PushController().getMeter('test-prometheus');
+      meter = new MeterProvider().getMeter('test-prometheus');
       exporter.startServer(done);
     });
 
@@ -227,7 +268,7 @@ describe('PrometheusExporter', () => {
         {
           description: 'a test description',
         },
-        (observerResult: ObserverResult) => {
+        (observerResult: api.ObserverResult) => {
           observerResult.observe(getCpuUsage(), {
             pid: String(123),
             core: '1',
@@ -404,7 +445,7 @@ describe('PrometheusExporter', () => {
     let exporter: PrometheusExporter | undefined;
 
     beforeEach(() => {
-      meter = new PushController().getMeter('test-prometheus');
+      meter = new MeterProvider().getMeter('test-prometheus');
       counter = meter.createCounter('counter') as CounterMetric;
       counter.bind({ key1: 'labelValue1' }).add(10);
     });

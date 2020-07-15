@@ -15,32 +15,32 @@
  */
 
 import * as assert from 'assert';
-import { PullController, Meter, CounterMetric } from '../../../src';
+import { MeterProvider, Meter, CounterMetric } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 
-describe('PullController', () => {
+describe('MeterProvider', () => {
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
-      const controller = new PullController();
-      assert.ok(controller instanceof PullController);
+      const controller = new MeterProvider();
+      assert.ok(controller instanceof MeterProvider);
     });
 
     it('should construct an instance with logger', () => {
-      const controller = new PullController({
+      const controller = new MeterProvider({
         logger: new NoopLogger(),
       });
-      assert.ok(controller instanceof PullController);
+      assert.ok(controller instanceof MeterProvider);
     });
   });
 
   describe('getMeter', () => {
     it('should return an instance of Meter', () => {
-      const meter = new PullController().getMeter('test-pull-controller');
+      const meter = new MeterProvider().getMeter('test-pull-controller');
       assert.ok(meter instanceof Meter);
     });
 
     it('should propagate resources', () => {
-      const controller = new PullController();
+      const controller = new MeterProvider();
       const meter = controller.getMeter('test-meter-provider');
       const counter = meter.createCounter('test-counter') as CounterMetric;
       assert.strictEqual((meter as any)._resource, controller.resource);
@@ -48,21 +48,21 @@ describe('PullController', () => {
     });
 
     it('should return the meter with default version without a version option', () => {
-      const controller = new PullController();
+      const controller = new MeterProvider();
       const meter1 = controller.getMeter('default');
       const meter2 = controller.getMeter('default', '*');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return the same Meter instance with same name & version', () => {
-      const controller = new PullController();
+      const controller = new MeterProvider();
       const meter1 = controller.getMeter('meter1', 'ver1');
       const meter2 = controller.getMeter('meter1', 'ver1');
       assert.deepEqual(meter1, meter2);
     });
 
     it('should return different Meter instance with different name or version', () => {
-      const controller = new PullController();
+      const controller = new MeterProvider();
 
       const meter1 = controller.getMeter('meter1', 'ver1');
       const meter2 = controller.getMeter('meter1');

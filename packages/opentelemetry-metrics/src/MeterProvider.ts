@@ -14,33 +14,37 @@
  * limitations under the License.
  */
 
-import { Logger, MeterProvider } from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
-import { Meter } from '../../Meter';
-import { MetricExporter } from '../types';
-import { Batcher } from '../Batcher';
+import * as api from '@opentelemetry/api';
+import { ExportResult, ConsoleLogger } from '@opentelemetry/core';
+import { Meter } from './Meter';
+import { MetricExporter } from './export/types';
+import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { Resource } from '@opentelemetry/resources';
-import { MeterConfig } from '../../types';
+import { MeterConfig, DEFAULT_CONFIG } from './types';
+import { NoopExporter } from './export/NoopExporter';
 
 /**
- * Controller is not only a api.MeterProvider per se. An controller
- * orchestrates the export pipeline. For example, a "push" controller will
- * establish a periodic timer to regularly collect and export metrics. A
- * "pull" controller will await a pull request before initiating metric
- * collection. Either way, the job of the controller is to call the SDK
- * `collect()` method, then read the checkpoint, then invoke the exporters.
- * Controllers are expected to implement the public api.MeterProvider
- * API, meaning they can be installed as the global Meter provider.
+ * This class represents a meter provider which platform libraries can extend
  */
-export class Controller implements MeterProvider {
-  protected readonly _meters: Map<string, Meter> = new Map();
+export class MeterProvider implements api.MeterProvider {
+  private readonly _config: MeterConfig;
+  private readonly _meters: Map<string, Meter> = new Map();
+  private readonly _batcher: Batcher;
+  private readonly _exporter: MetricExporter;
+  readonly resource: Resource;
+  readonly logger: api.Logger;
 
-  constructor(
-    protected readonly _batcher: Batcher,
-    protected readonly _exporter: MetricExporter,
-    protected readonly _logger: Logger,
-    readonly resource: Resource
-  ) {}
+  constructor(config: MeterConfig = DEFAULT_CONFIG) {
+    this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
+    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this._batcher = config.batcher ?? new UngroupedBatcher();
+    this._exporter = config.exporter ?? new NoopExporter();
+    this._config = Object.assign({}, config, {
+      logger: this.logger,
+      resource: this.resource,
+      batcher: this._batcher,
+    });
+  }
 
   async collect() {
     await Promise.all(
@@ -50,7 +54,7 @@ export class Controller implements MeterProvider {
       this._exporter.export(this._batcher.checkPointSet(), result => {
         // TODO: retry strategy
         if (result !== ExportResult.SUCCESS) {
-          this._logger.error(
+          this.logger.error(
             'Metric exporter reported non success result(%s).',
             result
           );
@@ -73,10 +77,7 @@ export class Controller implements MeterProvider {
         new Meter(
           { name, version },
           {
-            batcher: this._batcher,
-            exporter: this._exporter,
-            logger: this._logger,
-            resource: this.resource,
+            ...this._config,
             ...config,
           }
         )

@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { unrefTimer, ConsoleLogger } from '@opentelemetry/core';
-import { DEFAULT_CONFIG } from '../../types';
+import { unrefTimer } from '@opentelemetry/core';
 import { PushControllerConfig } from './types';
-import { Controller } from './Controller';
-import { UngroupedBatcher } from '../Batcher';
-import { NoopExporter } from '../NoopExporter';
-import { Resource } from '@opentelemetry/resources';
+import { MeterProvider } from '../../MeterProvider';
 
 const DEFAULT_EXPORT_INTERVAL = 60_000;
 
@@ -31,23 +26,21 @@ const DEFAULT_EXPORT_INTERVAL = 60_000;
  *
  * The PushController can be installed as the global Meter provider.
  */
-export class PushController extends Controller implements api.MeterProvider {
+export class PushController {
   private _timer: NodeJS.Timeout;
 
-  constructor(_config: PushControllerConfig = DEFAULT_CONFIG) {
-    super(
-      _config.batcher ?? new UngroupedBatcher(),
-      _config.exporter ?? new NoopExporter(),
-      _config.logger ?? new ConsoleLogger(_config.logLevel),
-      _config.resource ?? Resource.createTelemetrySDKResource()
-    );
-    const onPushed = _config?.onPushed;
+  constructor(meterProvider: MeterProvider, config?: PushControllerConfig) {
+    const onPushed = config?.onPushed;
     this._timer = setInterval(() => {
-      const promise = this.collect();
+      const promise = meterProvider.collect();
       if (onPushed) {
         promise.then(() => onPushed());
       }
-    }, _config.interval ?? DEFAULT_EXPORT_INTERVAL);
+    }, config?.interval ?? DEFAULT_EXPORT_INTERVAL);
     unrefTimer(this._timer);
+  }
+
+  shutdown() {
+    clearInterval(this._timer);
   }
 }

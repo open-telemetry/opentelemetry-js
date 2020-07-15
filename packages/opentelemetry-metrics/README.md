@@ -25,7 +25,7 @@ import { ConsoleMetricExporter } from '@opentelemetry/metrics'
 import { metrics } from '@opentelemetry/api'
 
 // Install the export pipeline before all subsequent call to metrics.
-ConsoleMetricExporter.installPipeline();
+ConsoleMetricExporter.installExportPipeline();
 
 const meter = metrics.getMeter('example-meter');
 const counter = meter.createCounter('foo');

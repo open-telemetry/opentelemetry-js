@@ -28,6 +28,7 @@ import {
   MetricKind,
   MetricRecord,
   Sum,
+  MeterProvider,
 } from '@opentelemetry/metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import { Counter, Gauge, Metric, Registry } from 'prom-client';
@@ -41,6 +42,25 @@ export class PrometheusExporter implements MetricExporter {
     endpoint: '/metrics',
     prefix: '',
   };
+
+  /**
+   * Install Prometheus export pipeline to global metrics api.
+   * @param exporterConfig Exporter configuration
+   * @param callback Callback to be called after a server was started
+   * @param controllerConfig Default meter configuration
+   */
+  static installExportPipeline(
+    exporterConfig?: ExporterConfig,
+    callback?: () => void,
+    controllerConfig?: ConstructorParameters<typeof MeterProvider>[0]
+  ) {
+    const exporter = new PrometheusExporter(exporterConfig, callback);
+    const meterProvider = new MeterProvider({ ...controllerConfig, exporter });
+    exporter.setPullCallback(() => meterProvider.collect());
+    api.metrics.setGlobalMeterProvider(meterProvider);
+    return { exporter, meterProvider };
+  }
+
 
   private readonly _registry = new Registry();
   private readonly _logger: api.Logger;

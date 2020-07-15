@@ -17,7 +17,9 @@
 import { MetricExporter, MetricRecord, Distribution, Histogram } from './types';
 import * as api from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
-import { PushController, PushControllerConfig } from './controllers';
+import { PushControllerConfig, PushController } from './controllers';
+import { MeterProvider } from '..';
+import { MeterConfig } from '../types';
 
 /**
  * This is implementation of {@link MetricExporter} that prints metrics data to
@@ -28,11 +30,15 @@ export class ConsoleMetricExporter implements MetricExporter {
    * Install console export pipeline to global metrics api.
    * @param config Default meter configuration
    */
-  static installPipeline(config?: PushControllerConfig) {
+  static installExportPipeline(
+    config?: PushControllerConfig,
+    meterConfig?: MeterConfig
+  ) {
     const exporter = new ConsoleMetricExporter();
-    const pullController = new PushController({ ...config, exporter });
-    api.metrics.setGlobalMeterProvider(pullController);
-    return { exporter, controller: pullController };
+    const meterProvider = new MeterProvider({ ...meterConfig, exporter });
+    const controller = new PushController(meterProvider, config);
+    api.metrics.setGlobalMeterProvider(meterProvider);
+    return { exporter, controller, meterProvider };
   }
 
   export(

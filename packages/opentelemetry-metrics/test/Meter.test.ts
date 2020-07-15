@@ -22,7 +22,6 @@ import {
   CounterMetric,
   MetricKind,
   Sum,
-  PushController,
   ValueRecorderMetric,
   ValueObserverMetric,
   MetricRecord,
@@ -31,6 +30,7 @@ import {
   UpDownCounterMetric,
   Distribution,
   MinMaxLastSumCountAggregator,
+  MeterProvider,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -49,7 +49,7 @@ describe('Meter', () => {
   const labels: api.Labels = { [keyb]: 'value2', [keya]: 'value1' };
 
   beforeEach(() => {
-    meter = new PushController({
+    meter = new MeterProvider({
       logger: new NoopLogger(),
     }).getMeter('test-meter');
   });
@@ -1326,7 +1326,7 @@ describe('Meter', () => {
   });
 
   it('should allow custom batcher', () => {
-    const customMeter = new PushController().getMeter('custom-batcher', '*', {
+    const customMeter = new MeterProvider().getMeter('custom-batcher', '*', {
       batcher: new CustomBatcher(),
     });
     assert.throws(() => {

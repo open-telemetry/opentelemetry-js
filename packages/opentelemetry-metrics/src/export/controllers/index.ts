@@ -14,6 +14,5 @@
  * limitations under the License.
  */
 
-export * from './PullController';
 export * from './PushController';
 export * from './types';

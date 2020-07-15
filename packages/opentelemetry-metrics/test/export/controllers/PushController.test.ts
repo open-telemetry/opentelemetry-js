@@ -15,62 +15,44 @@
  */
 
 import * as assert from 'assert';
-import { PushController, Meter, CounterMetric } from '../../../src';
-import { NoopLogger } from '@opentelemetry/core';
+import * as sinon from 'sinon';
+import { PushController, MeterProvider } from '../../../src';
 
 describe('PushController', () => {
   describe('constructor', () => {
-    it('should construct an instance without any options', () => {
-      const controller = new PushController();
-      assert.ok(controller instanceof PushController);
-    });
-
-    it('should construct an instance with logger', () => {
-      const controller = new PushController({
-        logger: new NoopLogger(),
-      });
+    it('should construct an instance with a meter provider', () => {
+      const controller = new PushController(new MeterProvider());
       assert.ok(controller instanceof PushController);
     });
   });
 
-  describe('getMeter', () => {
-    it('should return an instance of Meter', () => {
-      const meter = new PushController().getMeter('test-push-controller');
-      assert.ok(meter instanceof Meter);
+  describe('shutdown', () => {
+    it('should shutdown without errors', () => {
+      const controller = new PushController(new MeterProvider());
+      controller.shutdown();
     });
+  });
 
-    it('should propagate resources', () => {
-      const controller = new PushController();
-      const meter = controller.getMeter('test-meter-provider');
-      const counter = meter.createCounter('test-counter') as CounterMetric;
-      assert.strictEqual((meter as any)._resource, controller.resource);
-      assert.strictEqual(counter.resource, controller.resource);
+  describe('collect', () => {
+    let clock: sinon.SinonFakeTimers;
+    beforeEach(() => {
+      clock = sinon.useFakeTimers();
     });
-
-    it('should return the meter with default version without a version option', () => {
-      const controller = new PushController();
-      const meter1 = controller.getMeter('default');
-      const meter2 = controller.getMeter('default', '*');
-      assert.deepEqual(meter1, meter2);
+    afterEach(() => {
+      clock.restore();
     });
+    it('should collect on tick', () => {
+      const meterProvider = new MeterProvider();
+      const stub = sinon.stub(meterProvider, 'collect');
 
-    it('should return the same Meter instance with same name & version', () => {
-      const controller = new PushController();
-      const meter1 = controller.getMeter('meter1', 'ver1');
-      const meter2 = controller.getMeter('meter1', 'ver1');
-      assert.deepEqual(meter1, meter2);
-    });
+      const controller = new PushController(meterProvider, { interval: 1000 });
+      clock.tick(1000);
+      assert.strictEqual(stub.callCount, 1);
 
-    it('should return different Meter instance with different name or version', () => {
-      const controller = new PushController();
+      clock.tick(2000);
+      assert.strictEqual(stub.callCount, 3);
 
-      const meter1 = controller.getMeter('meter1', 'ver1');
-      const meter2 = controller.getMeter('meter1');
-      assert.notEqual(meter1, meter2);
-
-      const meter3 = controller.getMeter('meter2', 'ver2');
-      const meter4 = controller.getMeter('meter3', 'ver2');
-      assert.notEqual(meter3, meter4);
+      controller.shutdown();
     });
   });
 });

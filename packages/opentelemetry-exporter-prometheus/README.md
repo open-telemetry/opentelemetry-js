@@ -21,12 +21,12 @@ npm install --save @opentelemetry/exporter-prometheus @opentelemetry/api
 Create & register the exporter on your application.
 
 ```js
-const prometheus = require('@opentelemetry/exporter-prometheus');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 const api  = require('@opentelemetry/api');
 
 // Add your port and startServer to the Prometheus options
 const options = { port: 9464, startServer: true };
-prometheus.installExportPipeline(options);
+PrometheusExporter.installExportPipeline(options);
 
 // Register the exporter
 const meter = api.metrics.getMeter('example-prometheus');

@@ -17,7 +17,7 @@
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
-import { Meter, PushController } from '../src';
+import { Meter, MeterProvider } from '../src';
 
 describe('Batcher', () => {
   describe('Ungrouped', () => {
@@ -26,9 +26,8 @@ describe('Batcher', () => {
     let barCounter: api.BoundCounter;
     let counter: api.Counter;
     beforeEach(() => {
-      meter = new PushController({
+      meter = new MeterProvider({
         logger: new NoopLogger(),
-        interval: 10000,
       }).getMeter('test-meter');
       counter = meter.createCounter('ungrouped-batcher-test');
       fooCounter = counter.bind({ key: 'foo' });
