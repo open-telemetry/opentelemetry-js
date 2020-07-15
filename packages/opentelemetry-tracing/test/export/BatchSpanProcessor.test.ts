@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { AlwaysOnSampler } from '@opentelemetry/core';
+import { AlwaysOnSampler, ExportResult } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -172,6 +172,60 @@ describe('BatchSpanProcessor', () => {
       clock.tick(defaultBufferConfig.bufferTimeout + 1000);
 
       clock.restore();
+    });
+  });
+
+  describe('force flush', () => {
+    describe('no waiting spans', () => {
+      it('should call an async callback when flushing is complete', done => {
+        const processor = new BatchSpanProcessor(exporter);
+        processor.forceFlush(() => {
+          done();
+        });
+      });
+
+      it('should call an async callback when shutdown is complete', done => {
+        const processor = new BatchSpanProcessor(exporter);
+        processor.shutdown(() => {
+          done();
+        });
+      });
+    });
+
+    describe('spans waiting to flush', () => {
+      let processor: BatchSpanProcessor;
+
+      beforeEach(() => {
+        processor = new BatchSpanProcessor(exporter);
+        const span = createSampledSpan('test');
+        processor.onStart(span);
+        processor.onEnd(span);
+
+        assert.strictEqual(processor['_finishedSpans'].length, 1);
+      });
+
+      it('should call an async callback when flushing is complete', done => {
+        processor.forceFlush(() => {
+          assert.strictEqual(exporter.getFinishedSpans().length, 1);
+          done();
+        });
+      });
+
+      it('should call an async callback when shutdown is complete', done => {
+        let exportedSpans = 0;
+        sinon.stub(exporter, 'export').callsFake((spans, callback) => {
+          console.log('uh, export?');
+          setTimeout(() => {
+            exportedSpans = exportedSpans + spans.length;
+            callback(ExportResult.SUCCESS);
+          }, 0);
+        });
+
+        processor.shutdown(() => {
+          assert.strictEqual(exportedSpans, 1);
+          done();
+        });
+      });
     });
   });
 });

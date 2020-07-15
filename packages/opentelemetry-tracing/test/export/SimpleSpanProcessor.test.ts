@@ -80,5 +80,21 @@ describe('SimpleSpanProcessor', () => {
       processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
+
+    describe('force flush', () => {
+      it('should call an async callback when flushing is complete', done => {
+        const processor = new SimpleSpanProcessor(exporter);
+        processor.forceFlush(() => {
+          done();
+        });
+      });
+
+      it('should call an async callback when shutdown is complete', done => {
+        const processor = new SimpleSpanProcessor(exporter);
+        processor.shutdown(() => {
+          done();
+        });
+      });
+    });
   });
 });
