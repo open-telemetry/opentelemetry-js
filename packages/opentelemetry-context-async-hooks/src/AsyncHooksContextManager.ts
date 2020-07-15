@@ -84,7 +84,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   }
 
   /**
-   * Before hook is called just beforing executing a async context.
+   * Before hook is called just before executing a async context.
    * @param uid uid of the async context
    */
   private _before(uid: number) {
