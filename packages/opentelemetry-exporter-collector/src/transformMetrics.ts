@@ -60,6 +60,9 @@ export function toCollectorType(
   if (metric.aggregator instanceof HistogramAggregator) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
   }
+  if (metric.aggregator instanceof MinMaxLastSumCountAggregator) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY;
+  }
   if (metric.descriptor.valueType == api.ValueType.INT) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
   }
@@ -132,10 +135,7 @@ export function toSingularPoint(
   timeUnixNano: number;
   value: number;
 } {
-  const pointValue =
-    metric.aggregator instanceof MinMaxLastSumCountAggregator
-      ? (metric.aggregator.toPoint().value as Distribution).last
-      : (metric.aggregator.toPoint().value as number);
+  const pointValue = metric.aggregator.toPoint().value as number;
 
   return {
     labels: toCollectorLabels(metric.labels),
@@ -173,6 +173,31 @@ export function toHistogramPoint(
 }
 
 /**
+ * Returns a SummaryPoint to the collector
+ * @param metric
+ * @param startTime
+ */
+export function toSummaryPoint(
+  metric: MetricRecord,
+  startTime: number
+): opentelemetryProto.metrics.v1.SummaryDataPoint {
+  const distValue = metric.aggregator.toPoint().value as Distribution;
+  return {
+    labels: toCollectorLabels(metric.labels),
+    sum: distValue.sum,
+    count: distValue.count,
+    startTimeUnixNano: startTime,
+    timeUnixNano: core.hrTimeToNanoseconds(
+      metric.aggregator.toPoint().timestamp
+    ),
+    percentileValues: [
+      { percentile: 0, value: distValue.min },
+      { percentile: 100, value: distValue.max },
+    ],
+  };
+}
+
+/**
  * Converts a metric to be compatible with the collector
  * @param metric
  * @param startTime start time in nanoseconds
@@ -190,6 +215,15 @@ export function toCollectorMetric(
       histogramDataPoints: [toHistogramPoint(metric, startTime)],
     };
   }
+  if (
+    toCollectorType(metric) ===
+    opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY
+  ) {
+    return {
+      metricDescriptor: toCollectorMetricDescriptor(metric),
+      summaryDataPoints: [toSummaryPoint(metric, startTime)],
+    };
+  }
   if (metric.descriptor.valueType == api.ValueType.INT) {
     return {
       metricDescriptor: toCollectorMetricDescriptor(metric),
@@ -201,7 +235,7 @@ export function toCollectorMetric(
       metricDescriptor: toCollectorMetricDescriptor(metric),
       doubleDataPoints: [toSingularPoint(metric, startTime)],
     };
-  } // TODO: Add support for summary points once implemented
+  }
 
   return {
     metricDescriptor: toCollectorMetricDescriptor(metric),

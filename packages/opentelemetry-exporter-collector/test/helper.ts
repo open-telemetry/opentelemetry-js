@@ -59,77 +59,105 @@ const traceIdArr = [
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
 
-export const mockCounter: MetricRecord = {
-  descriptor: {
-    name: 'test-counter',
-    description: 'sample counter description',
-    unit: '1',
-    metricKind: MetricKind.COUNTER,
-    valueType: ValueType.INT,
-  },
-  labels: {},
-  aggregator: new SumAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockCounter(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      metricKind: MetricKind.COUNTER,
+      valueType: ValueType.INT,
+    },
+    labels: {},
+    aggregator: new SumAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockObserver: MetricRecord = {
-  descriptor: {
-    name: 'test-observer',
-    description: 'sample observer description',
-    unit: '2',
-    metricKind: MetricKind.VALUE_OBSERVER,
-    valueType: ValueType.DOUBLE,
-  },
-  labels: {},
-  aggregator: new MinMaxLastSumCountAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockDoubleCounter(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      metricKind: MetricKind.COUNTER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new SumAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockValueRecorder: MetricRecord = {
-  descriptor: {
-    name: 'test-recorder',
-    description: 'sample recorder description',
-    unit: '3',
-    metricKind: MetricKind.VALUE_RECORDER,
-    valueType: ValueType.INT,
-  },
-  labels: {},
-  aggregator: new MinMaxLastSumCountAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockObserver(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-observer',
+      description: 'sample observer description',
+      unit: '2',
+      metricKind: MetricKind.VALUE_OBSERVER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new MinMaxLastSumCountAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockHistogram: MetricRecord = {
-  descriptor: {
-    name: 'test-hist',
-    description: 'sample observer description',
-    unit: '2',
-    metricKind: MetricKind.VALUE_OBSERVER,
-    valueType: ValueType.DOUBLE,
-  },
-  labels: {},
-  aggregator: new HistogramAggregator([10, 20]),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockValueRecorder(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-recorder',
+      description: 'sample recorder description',
+      unit: '3',
+      metricKind: MetricKind.VALUE_RECORDER,
+      valueType: ValueType.INT,
+    },
+    labels: {},
+    aggregator: new MinMaxLastSumCountAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
+
+export function mockHistogram(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-hist',
+      description: 'sample observer description',
+      unit: '2',
+      metricKind: MetricKind.VALUE_OBSERVER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new HistogramAggregator([10, 20]),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
 const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
 const spanIdBase64 = 'XhByYfZPpT4=';
@@ -285,17 +313,17 @@ export const multiResourceTrace: ReadableSpan[] = [
 
 export const multiResourceMetrics: MetricRecord[] = [
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockObserver,
+    ...mockObserver(),
     resource: mockedResources[1],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
@@ -303,17 +331,17 @@ export const multiResourceMetrics: MetricRecord[] = [
 
 export const multiInstrumentationLibraryMetrics: MetricRecord[] = [
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockObserver,
+    ...mockObserver(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[1],
   },
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
@@ -685,6 +713,29 @@ export function ensureCounterIsCorrect(
   });
 }
 
+export function ensureDoubleCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      type: 4,
+      temporality: 3,
+    },
+    doubleDataPoints: [
+      {
+        labels: [],
+        value: 8,
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: time,
+      },
+    ],
+  });
+}
+
 export function ensureObserverIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
   time: number
@@ -694,15 +745,23 @@ export function ensureObserverIsCorrect(
       name: 'test-observer',
       description: 'sample observer description',
       unit: '2',
-      type: 3,
+      type: 6,
       temporality: 2,
     },
-    doubleDataPoints: [
+    summaryDataPoints: [
       {
-        labels: [],
-        value: 10,
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
+        count: 2,
+        sum: 9,
+        labels: [],
+        percentileValues: [
+          {
+            percentile: 0,
+            value: 3,
+          },
+          { percentile: 100, value: 6 },
+        ],
       },
     ],
   });
@@ -717,13 +776,18 @@ export function ensureValueRecorderIsCorrect(
       name: 'test-recorder',
       description: 'sample recorder description',
       unit: '3',
-      type: 1,
+      type: 6,
       temporality: 2,
     },
-    int64DataPoints: [
+    summaryDataPoints: [
       {
+        count: 1,
+        sum: 5,
         labels: [],
-        value: 5,
+        percentileValues: [
+          { percentile: 0, value: 5 },
+          { percentile: 100, value: 5 },
+        ],
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
       },
