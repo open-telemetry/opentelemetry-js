@@ -19,6 +19,7 @@ import {
   SpanContext,
   TraceFlags,
   SamplingDecision,
+  SamplingResult,
 } from '@opentelemetry/api';
 
 /** Sampler that samples a given fraction of traces. */
@@ -27,9 +28,10 @@ export class ProbabilitySampler implements Sampler {
     this._probability = this._normalize(_probability);
   }
 
-  shouldSample(parentContext?: SpanContext) {
-    // Respect the parent sampling decision if there is one
-    if (parentContext && typeof parentContext.traceFlags !== 'undefined') {
+  shouldSample(parentContext?: SpanContext): SamplingResult {
+    // Respect the parent sampling decision if there is one.
+    // TODO(#1284): add an option to ignore parent regarding to spec.
+    if (parentContext) {
       return {
         decision:
           (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
@@ -46,8 +48,6 @@ export class ProbabilitySampler implements Sampler {
   }
 
   toString(): string {
-    // TODO: Consider to use `AlwaysSampleSampler` and `NeverSampleSampler`
-    // based on the specs.
     return `ProbabilitySampler{${this._probability}}`;
   }
 
@@ -56,6 +56,3 @@ export class ProbabilitySampler implements Sampler {
     return probability >= 1 ? 1 : probability <= 0 ? 0 : probability;
   }
 }
-
-export const ALWAYS_SAMPLER = new ProbabilitySampler(1);
-export const NEVER_SAMPLER = new ProbabilitySampler(0);

@@ -42,21 +42,21 @@
   "devDependencies": {
     "@commitlint/cli": "9.0.1",
     "@commitlint/config-conventional": "9.0.1",
-    "@typescript-eslint/eslint-plugin": "3.4.0",
-    "@typescript-eslint/parser": "3.4.0",
+    "@typescript-eslint/eslint-plugin": "3.6.0",
+    "@typescript-eslint/parser": "3.6.0",
     "beautify-benchmark": "0.2.4",
     "benchmark": "2.1.4",
-    "eslint": "7.3.1",
+    "eslint": "7.4.0",
     "eslint-config-airbnb-base": "14.2.0",
     "eslint-plugin-header": "3.0.0",
-    "eslint-plugin-import": "2.21.2",
+    "eslint-plugin-import": "2.22.0",
     "gh-pages": "3.1.0",
     "gts": "2.0.2",
     "husky": "4.2.5",
     "lerna": "3.22.1",
     "lerna-changelog": "1.0.1",
-    "markdownlint-cli": "0.23.1",
-    "typescript": "3.9.5"
+    "markdownlint-cli": "0.23.2",
+    "typescript": "3.9.6"
   },
   "husky": {
     "hooks": {

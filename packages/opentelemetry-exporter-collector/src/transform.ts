@@ -31,7 +31,6 @@ import {
   CollectorExporterConfigBase,
 } from './types';
 import ValueType = opentelemetryProto.common.v1.ValueType;
-import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /**
  * Converts attributes
@@ -152,7 +151,7 @@ export function toCollectorSpan(
  */
 export function toCollectorResource(
   resource?: Resource,
-  additionalAttributes: { [key: string]: any } = {}
+  additionalAttributes: { [key: string]: unknown } = {}
 ): opentelemetryProto.resource.v1.Resource {
   const attr = Object.assign(
     {},
@@ -195,14 +194,12 @@ export function toCollectorTraceState(
  * Prepares trace service request to be sent to collector
  * @param spans spans
  * @param collectorExporterBase
- * @param [name] Instrumentation Library Name
  */
 export function toCollectorExportTraceServiceRequest<
   T extends CollectorExporterConfigBase
 >(
   spans: ReadableSpan[],
-  collectorExporterBase: CollectorTraceExporterBase<T>,
-  name = ''
+  collectorTraceExporterBase: CollectorTraceExporterBase<T>
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<
     Resource,
@@ -211,9 +208,9 @@ export function toCollectorExportTraceServiceRequest<
 
   const additionalAttributes = Object.assign(
     {},
-    collectorExporterBase.attributes || {},
+    collectorTraceExporterBase.attributes,
     {
-      'service.name': collectorExporterBase.serviceName,
+      'service.name': collectorTraceExporterBase.serviceName,
     }
   );
 
@@ -248,8 +245,13 @@ export function groupSpansByResourceAndLibrary(
   }, new Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>());
 }
 
+/**
+ * Convert to InstrumentationLibrarySpans
+ * @param instrumentationLibrary
+ * @param spans
+ */
 function toCollectorInstrumentationLibrarySpans(
-  instrumentationLibrary: InstrumentationLibrary,
+  instrumentationLibrary: core.InstrumentationLibrary,
   spans: ReadableSpan[]
 ): opentelemetryProto.trace.v1.InstrumentationLibrarySpans {
   return {
@@ -258,6 +260,11 @@ function toCollectorInstrumentationLibrarySpans(
   };
 }
 
+/**
+ * Returns a list of resource spans which will be exported to the collector
+ * @param groupedSpans
+ * @param baseAttributes
+ */
 function toCollectorResourceSpans(
   groupedSpans: Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>>,
   baseAttributes: Attributes

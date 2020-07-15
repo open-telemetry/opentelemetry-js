@@ -29,7 +29,7 @@ export class ValueObserverMetric extends BaseObserverMetric
     batcher: Batcher,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => void
+    callback?: (observerResult: api.ObserverResult) => unknown
   ) {
     super(
       name,
