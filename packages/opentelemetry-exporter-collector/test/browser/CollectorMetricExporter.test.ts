@@ -253,17 +253,6 @@ describe('CollectorMetricExporter - web', () => {
           }
 
           assert.ok(
-            typeof metric2 !== 'undefined',
-            "second metric doesn't exist"
-          );
-          if (metric2) {
-            ensureObserverIsCorrect(
-              metric2,
-              hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
-            );
-          }
-
-          assert.ok(
             typeof metric3 !== 'undefined',
             "third metric doesn't exist"
           );
