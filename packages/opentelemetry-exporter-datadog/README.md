@@ -137,7 +137,7 @@ new DatadogExporter({
   agent_url: 'http://localhost:8126' // optional
   tags: 'example_key:example_value,example_key_two:value_two', // optional
   env: 'production', // optional
-  version: '1.0' // optional
+  version: '1.1' // optional
 });
 ```
 
