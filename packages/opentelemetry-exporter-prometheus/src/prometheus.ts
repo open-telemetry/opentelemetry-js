@@ -61,7 +61,6 @@ export class PrometheusExporter implements MetricExporter {
     return { exporter, meterProvider };
   }
 
-
   private readonly _registry = new Registry();
   private readonly _logger: api.Logger;
   private readonly _port: number;
