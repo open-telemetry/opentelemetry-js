@@ -25,16 +25,16 @@ import * as assert from 'assert';
 import {
   getExtractedSpanContext,
   setExtractedSpanContext,
-  TraceState
-} from '@opentelemetry/core';;
-import { 
+  TraceState,
+} from '@opentelemetry/core';
+import {
   DatadogPropagator,
   X_DD_SAMPLING_PRIORITY,
   X_DD_PARENT_ID,
   X_DD_TRACE_ID,
-  X_DD_ORIGIN } from '../src/'; 
-import { id } from '../src/types'; 
-
+  X_DD_ORIGIN,
+} from '../src/';
+import { id } from '../src/types';
 
 describe('DatadogPropagator', () => {
   const datadogPropagator = new DatadogPropagator();
@@ -46,7 +46,7 @@ describe('DatadogPropagator', () => {
 
   describe('.inject()', () => {
     it('should set datadog traceId and spanId headers', () => {
-      const traceId = 'd4cda95b652f4a1592b449d5929fda1b'
+      const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
       const spanId = '6e0c63257de34c92';
       const spanContext: SpanContext = {
         traceId: traceId,
@@ -59,23 +59,20 @@ describe('DatadogPropagator', () => {
         carrier,
         defaultSetter
       );
-      assert.deepStrictEqual(
-        carrier[X_DD_TRACE_ID],
-        id(traceId).toString(10)
-      );
+      assert.deepStrictEqual(carrier[X_DD_TRACE_ID], id(traceId).toString(10));
       assert.deepStrictEqual(carrier[X_DD_PARENT_ID], id(spanId).toString(10));
       assert.deepStrictEqual(carrier[X_DD_SAMPLING_PRIORITY], '1');
     });
 
     it('should set b3 traceId and spanId headers and also traceflags and tracestate', () => {
-      const traceId = 'd4cda95b652f4a1592b449d5929fda1b'
+      const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
       const spanId = '6e0c63257de34c92';
       const spanContext: SpanContext = {
         traceId: traceId,
         spanId: spanId,
         traceFlags: TraceFlags.NONE,
         traceState: new TraceState('dd_origin=synthetics-example'),
-        isRemote: true
+        isRemote: true,
       };
 
       datadogPropagator.inject(
@@ -83,10 +80,7 @@ describe('DatadogPropagator', () => {
         carrier,
         defaultSetter
       );
-      assert.deepStrictEqual(
-        carrier[X_DD_TRACE_ID],
-        id(traceId).toString(10)
-      );
+      assert.deepStrictEqual(carrier[X_DD_TRACE_ID], id(traceId).toString(10));
       assert.deepStrictEqual(carrier[X_DD_PARENT_ID], id(spanId).toString(10));
       assert.deepStrictEqual(carrier[X_DD_SAMPLING_PRIORITY], '0');
       assert.deepStrictEqual(carrier[X_DD_ORIGIN], 'synthetics-example');
@@ -110,7 +104,9 @@ describe('DatadogPropagator', () => {
 
   describe('.extract()', () => {
     it('should extract context of a unsampled span from carrier', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(10);
+      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
+        10
+      );
       carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
       const extractedSpanContext = getExtractedSpanContext(
         datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
@@ -125,7 +121,9 @@ describe('DatadogPropagator', () => {
     });
 
     it('should extract context of a sampled span from carrier', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(10);
+      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
+        10
+      );
       carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
       carrier[X_DD_SAMPLING_PRIORITY] = '1';
 
@@ -146,18 +144,28 @@ describe('DatadogPropagator', () => {
       carrier[X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          datadogPropagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          )
         ),
         undefined
       );
     });
 
     it('should return undefined when options and spanId are undefined', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(10);
+      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
+        10
+      );
       carrier[X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          datadogPropagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          )
         ),
         undefined
       );
@@ -166,7 +174,11 @@ describe('DatadogPropagator', () => {
     it('returns undefined if datadog header is missing', () => {
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          datadogPropagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          )
         ),
         undefined
       );
@@ -176,14 +188,20 @@ describe('DatadogPropagator', () => {
       carrier[X_DD_TRACE_ID] = 'invalid!';
       assert.deepStrictEqual(
         getExtractedSpanContext(
-          datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          datadogPropagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          )
         ),
         undefined
       );
     });
 
     it('extracts datadog from list of header', () => {
-      carrier[X_DD_TRACE_ID] = [id('0af7651916cd43dd8448eb211c80319c').toString(10)];
+      carrier[X_DD_TRACE_ID] = [
+        id('0af7651916cd43dd8448eb211c80319c').toString(10),
+      ];
       carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
       carrier[X_DD_SAMPLING_PRIORITY] = '01';
       const extractedSpanContext = getExtractedSpanContext(
@@ -220,8 +238,8 @@ describe('DatadogPropagator', () => {
       assert.ok(ctx3 === Context.ROOT_CONTEXT);
     });
 
-  // TODO: this is implemented for b3 64 bit, not sure if we should implement for datadog
-  //   it('should left-pad 64 bit trace ids with 0', () => {
-  //   });
+    // TODO: this is implemented for b3 64 bit, not sure if we should implement for datadog
+    //   it('should left-pad 64 bit trace ids with 0', () => {
+    //   });
   });
 });

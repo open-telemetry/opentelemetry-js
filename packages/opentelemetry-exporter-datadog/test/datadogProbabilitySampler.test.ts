@@ -70,14 +70,20 @@ describe('DatadogProbabilitySampler', () => {
     assert.deepStrictEqual(DATADOG_ALWAYS_SAMPLER.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
-    assert.strictEqual(DATADOG_ALWAYS_SAMPLER.toString(), 'DatadogProbabilitySampler{1}');
+    assert.strictEqual(
+      DATADOG_ALWAYS_SAMPLER.toString(),
+      'DatadogProbabilitySampler{1}'
+    );
   });
 
   it('should return decision: api.SamplingDecision.RECORD for DATADOG_NEVER_SAMPLER', () => {
     assert.deepStrictEqual(DATADOG_NEVER_SAMPLER.shouldSample(), {
       decision: api.SamplingDecision.RECORD,
     });
-    assert.strictEqual(DATADOG_NEVER_SAMPLER.toString(), 'DatadogProbabilitySampler{0}');
+    assert.strictEqual(
+      DATADOG_NEVER_SAMPLER.toString(),
+      'DatadogProbabilitySampler{0}'
+    );
   });
 
   it('should handle NaN', () => {

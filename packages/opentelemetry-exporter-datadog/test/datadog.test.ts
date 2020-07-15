@@ -20,7 +20,7 @@ import { ExportResult } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
-import { AgentExporter } from '../src/types'
+import { AgentExporter } from '../src/types';
 import * as nock from 'nock';
 
 describe('DatadogExporter', () => {
@@ -36,7 +36,7 @@ describe('DatadogExporter', () => {
       const exporter = new DatadogExporter({ service_name: 'opentelemetry' });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
-      const _exporter = exporter['_exporter']
+      const _exporter = exporter['_exporter'];
 
       assert.ok(_exporter._writer !== undefined);
       assert.strictEqual(exporter['_service_name'], 'opentelemetry');
@@ -57,7 +57,7 @@ describe('DatadogExporter', () => {
       const exporter = new DatadogExporter({
         env: 'prod',
         version: 'v1.0',
-        tags: 'testkey:testvalue'
+        tags: 'testkey:testvalue',
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -88,13 +88,13 @@ describe('DatadogExporter', () => {
       process.env.DD_ENV = 'staging';
       process.env.DD_VERSION = 'v2';
       process.env.DD_TAGS = 'alt_key:alt_value';
-      
+
       const exporter = new DatadogExporter({
         env: 'prod',
         version: 'v1',
         tags: 'main_key:main_value',
         service_name: 'first-service',
-        agent_url: 'http://other-dd-agent:8126'
+        agent_url: 'http://other-dd-agent:8126',
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
@@ -115,17 +115,23 @@ describe('DatadogExporter', () => {
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
-      assert.strictEqual(exporter['_exporter']['_scheduler']['_interval'], 2000);
+      assert.strictEqual(
+        exporter['_exporter']['_scheduler']['_interval'],
+        2000
+      );
     });
 
     it('should construct an exporter without flushInterval', () => {
       const exporter = new DatadogExporter({
-        serviceName: 'opentelemetry'
+        serviceName: 'opentelemetry',
       });
 
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
-      assert.strictEqual(exporter['_exporter']['_scheduler']['_interval'], 1000);
+      assert.strictEqual(
+        exporter['_exporter']['_scheduler']['_interval'],
+        1000
+      );
     });
   });
 
@@ -136,8 +142,8 @@ describe('DatadogExporter', () => {
       nock.disableNetConnect();
       exporter = new DatadogExporter({
         service_name: 'opentelemetry',
-        flushInterval: 100
-      });      
+        flushInterval: 100,
+      });
     });
 
     after(() => {
@@ -145,22 +151,22 @@ describe('DatadogExporter', () => {
       exporter.shutdown();
     });
 
-    it('should skip send with empty list', (done) => {
+    it('should skip send with empty list', done => {
       const scope = nock('http://localhost:8126')
         .put('/v0.4/traces')
         .reply(200);
 
       exporter.export([], (result: ExportResult) => {
-        setTimeout( () => {
+        setTimeout(() => {
           assert.strictEqual(result, ExportResult.SUCCESS);
-          assert(scope.isDone() === false)
-          nock.cleanAll()
-          done()
-        }, 200)
+          assert(scope.isDone() === false);
+          nock.cleanAll();
+          done();
+        }, 200);
       });
     });
 
-    it('should send spans to Datadog backend and return with Success', (done) => {
+    it('should send spans to Datadog backend and return with Success', done => {
       const scope = nock('http://localhost:8126')
         .put('/v0.4/traces')
         .reply(200);
@@ -184,19 +190,19 @@ describe('DatadogExporter', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty()
+        resource: Resource.empty(),
       };
 
-      exporter.export([readableSpan], (result: ExportResult) => {        
-        setTimeout( () => {
+      exporter.export([readableSpan], (result: ExportResult) => {
+        setTimeout(() => {
           assert.strictEqual(result, ExportResult.SUCCESS);
-          assert(scope.isDone())
-          done()
-        }, 200)        
+          assert(scope.isDone());
+          done();
+        }, 200);
       });
     });
 
-    it('should returrn Success even with a 4xx response', (done) => {
+    it('should returrn Success even with a 4xx response', done => {
       const scope = nock('http://localhost:8126')
         .put('/v0.4/traces')
         .reply(400);
@@ -220,17 +226,16 @@ describe('DatadogExporter', () => {
         links: [],
         events: [],
         duration: [32, 800000000],
-        resource: Resource.empty()
+        resource: Resource.empty(),
       };
 
-      exporter.export([readableSpan], (result: ExportResult) => {        
-  
-        setTimeout( () => {
+      exporter.export([readableSpan], (result: ExportResult) => {
+        setTimeout(() => {
           assert.strictEqual(result, ExportResult.SUCCESS);
-          assert(scope.isDone())
-          done()
-        }, 200)        
+          assert(scope.isDone());
+          done();
+        }, 200);
       });
-    })
+    });
   });
 });

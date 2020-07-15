@@ -19,10 +19,14 @@ import {
   GetterFunction,
   HttpTextPropagator,
   SetterFunction,
-  TraceFlags
+  TraceFlags,
 } from '@opentelemetry/api';
-import { getParentSpanContext, setExtractedSpanContext, TraceState } from '@opentelemetry/core';
-import { id } from './types'
+import {
+  getParentSpanContext,
+  setExtractedSpanContext,
+  TraceState,
+} from '@opentelemetry/core';
+import { id } from './types';
 
 export const X_DD_TRACE_ID = 'x-datadog-trace-id';
 export const X_DD_PARENT_ID = 'x-datadog-parent-id';
@@ -49,7 +53,7 @@ function isValidSpanId(spanId: string): boolean {
 export class DatadogPropagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
-    
+
     if (!spanContext) return;
 
     if (
@@ -73,8 +77,15 @@ export class DatadogPropagator implements HttpTextPropagator {
 
       // Current Otel-DD exporter behavior in other languages is to only set origin tag
       // if it exists, otherwise don't set header
-      if (spanContext.traceState !== undefined && spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN) ) {
-        setter(carrier, X_DD_ORIGIN, spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN) );
+      if (
+        spanContext.traceState !== undefined &&
+        spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
+      ) {
+        setter(
+          carrier,
+          X_DD_ORIGIN,
+          spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
+        );
       }
     }
   }
@@ -90,15 +101,15 @@ export class DatadogPropagator implements HttpTextPropagator {
     const traceIdHeaderValue = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]
       : traceIdHeader;
-    const spanIdHeaderValue = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
+    const spanIdHeaderValue = Array.isArray(spanIdHeader)
+      ? spanIdHeader[0]
+      : spanIdHeader;
 
     const sampled = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
 
-    const origin = Array.isArray(originHeader)
-      ? originHeader[0]
-      : originHeader;
+    const origin = Array.isArray(originHeader) ? originHeader[0] : originHeader;
 
     // check if we've extracted a trace and span
     if (!traceIdHeaderValue || !spanIdHeaderValue) {
@@ -106,19 +117,21 @@ export class DatadogPropagator implements HttpTextPropagator {
     }
 
     // TODO: is this accurate?
-    const traceId = id(traceIdHeaderValue, 10).toString('hex')
-    const spanId = id(spanIdHeaderValue, 10).toString('hex')
+    const traceId = id(traceIdHeaderValue, 10).toString('hex');
+    const spanId = id(spanIdHeaderValue, 10).toString('hex');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
-      const contextOptions:any = {
+      const contextOptions: any = {
         traceId: traceId,
         spanId: spanId,
         isRemote: true,
-        traceFlags: isNaN(Number(sampled)) ? TraceFlags.NONE : Number(sampled)
-      }
+        traceFlags: isNaN(Number(sampled)) ? TraceFlags.NONE : Number(sampled),
+      };
 
-      if(origin) {
-        contextOptions['traceState'] = new TraceState(`${OT_ALLOWED_DD_ORIGIN}=${origin}`)
+      if (origin) {
+        contextOptions['traceState'] = new TraceState(
+          `${OT_ALLOWED_DD_ORIGIN}=${origin}`
+        );
       }
       return setExtractedSpanContext(context, contextOptions);
     }
