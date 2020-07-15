@@ -1,20 +1,15 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
-const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor, BatchSpanProcessor } = require('@opentelemetry/tracing');
-const { DatadogSpanProcessor, DatadogExporter, DatadogPropagator, DatadogProbabilitySampler } = require('@opentelemetry/exporter-datadog');
-
-const { ProbabilitySampler } = require("@opentelemetry/core");
+const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { JaegerExporter } = require('@opentelemetry/exporter-jaeger');
 
 const provider = new BasicTracerProvider();
-const { B3Propagator } = require("@opentelemetry/core");
 
 // Configure span processor to send spans to the exporter
-const exporter = new DatadogExporter({agent_url: "http://localhost:8126", service_name: 'js-example-service', env: 'test', version: "v1.0", tags: "is_test:true"});
-// const exporter = new ConsoleSpanExporter()
-const processor = new DatadogSpanProcessor(exporter)
-provider.addSpanProcessor(processor);
-// provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+const exporter = new JaegerExporter({ serviceName: 'basic-service' });
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
 
 /**
  * Initialize the OpenTelemetry APIs to use the BasicTracerProvider bindings.
@@ -25,14 +20,7 @@ provider.addSpanProcessor(processor);
  * do not register a global tracer provider, instrumentation which calls these
  * methods will receive no-op implementations.
  */
-provider.register({
-  // Datadog B3 Propagation
-  propagator: new DatadogPropagator(),
-  // while datadog suggests the default ALWAYS_ON sampling, for probability sampling,
-  // to ensure the appropriate generation of tracing metrics by the datadog-agent,
-  // use the `DatadogProbabilitySampler`
-  sampler: new DatadogProbabilitySampler(0.75)
-});
+provider.register();
 const tracer = opentelemetry.trace.getTracer('example-basic-tracer-node');
 
 // Create a span. A span must be closed.
@@ -44,11 +32,7 @@ for (let i = 0; i < 10; i += 1) {
 parentSpan.end();
 
 // flush and close the connection.
-setTimeout(() => {
-
-      console.log('okok')
-    }, 5000);
-// processor.shutdown();
+exporter.shutdown();
 
 function doWork(parent) {
   // Start another span. In this example, the main method already started a
