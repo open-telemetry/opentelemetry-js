@@ -20,6 +20,7 @@ import {
   HttpTextPropagator,
   SetterFunction,
   TraceFlags,
+  SpanContext,
 } from '@opentelemetry/api';
 import {
   getParentSpanContext,
@@ -121,7 +122,7 @@ export class DatadogPropagator implements HttpTextPropagator {
     const spanId = id(spanIdHeaderValue, 10).toString('hex');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
-      const contextOptions: any = {
+      const contextOptions: SpanContext = {
         traceId: traceId,
         spanId: spanId,
         isRemote: true,

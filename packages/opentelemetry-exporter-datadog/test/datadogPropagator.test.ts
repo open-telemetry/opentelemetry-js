@@ -19,8 +19,8 @@ import {
   defaultSetter,
   SpanContext,
   TraceFlags,
+  Context,
 } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import {
   getExtractedSpanContext,

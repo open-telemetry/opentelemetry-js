@@ -17,7 +17,8 @@ import * as api from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { translateToDatadog } from './transform';
-import { AgentExporter, PrioritySampler } from './types';
+import { AgentExporter, PrioritySampler, DatadogExporterConfig } from './types';
+import { URL } from 'url';
 
 /**
  * Format and sends span information to Datadog Exporter.
@@ -26,13 +27,13 @@ export class DatadogExporter implements SpanExporter {
   private readonly _logger: api.Logger;
   private readonly _exporter: typeof AgentExporter;
   private _service_name: string;
-  private _env: string;
-  private _version: string;
-  private _tags: string;
+  private _env: string | undefined;
+  private _version: string | undefined;
+  private _tags: string | undefined;
   private _url: string;
-  private _flushInterval: string;
+  private _flushInterval: number;
 
-  constructor(config: any) {
+  constructor(config: DatadogExporterConfig = {}) {
     this._url =
       config.agent_url ||
       process.env.DD_TRACE_AGENT_URL ||

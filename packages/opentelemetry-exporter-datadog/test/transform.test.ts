@@ -60,7 +60,7 @@ describe('transform', () => {
       attributes: {
         testBool: true,
         testString: 'test',
-        testNum: 3.142,
+        testNum: '3.142',
       },
       links: [
         {

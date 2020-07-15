@@ -108,7 +108,7 @@ describe('DatadogExporter', () => {
 
     it('should construct an exporter with a flush interval', () => {
       const exporter = new DatadogExporter({
-        serviceName: 'opentelemetry',
+        service_name: 'opentelemetry',
         flushInterval: 2000,
       });
 
@@ -123,7 +123,7 @@ describe('DatadogExporter', () => {
 
     it('should construct an exporter without flushInterval', () => {
       const exporter = new DatadogExporter({
-        serviceName: 'opentelemetry',
+        service_name: 'opentelemetry',
       });
 
       assert.ok(typeof exporter.export === 'function');

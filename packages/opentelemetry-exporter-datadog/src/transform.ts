@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
-
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import { id, format, Span, Sampler, NoopTracer } from './types';
+import {
+  id,
+  format,
+  Span,
+  Sampler,
+  NoopTracer,
+  DatadogReadableSpan,
+} from './types';
 
 const SAMPLE_RATE_METRIC_KEY = '_sample_rate';
 const INTERNAL_TRACE_REGEX = /v\d\.\d\/traces/;
@@ -30,13 +36,26 @@ const USER_REJECT = -1;
 const AUTO_REJECT = 0;
 const AUTO_KEEP = 1;
 // const USER_KEEP = 2;
-const DD_SPAN_KIND_MAPPING = {
+const DD_SPAN_KIND_MAPPING: { [key: string]: string } = {
   [SpanKind.CLIENT]: 'client',
   [SpanKind.SERVER]: 'server',
   [SpanKind.CONSUMER]: 'consumer',
   [SpanKind.PRODUCER]: 'producer',
   // When absent, the span is local.
   [SpanKind.INTERNAL]: 'internal',
+};
+
+const DD_SPAN_TYPE_MAPPING: { [key: string]: string } = {
+  '@opentelemetry/plugin-grpc': 'web',
+  '@opentelemetry/plugin-http': 'http',
+  '@opentelemetry/plugin-https': 'http',
+  '@opentelemetry/plugin-express': 'web',
+  '@opentelemetry/plugin-ioredis': 'redis',
+  '@opentelemetry/plugin-mongodb': 'mongodb',
+  '@opentelemetry/plugin-mysql': 'sql',
+  '@opentelemetry/plugin-pg-pool': 'sql',
+  '@opentelemetry/plugin-pg': 'sql',
+  '@opentelemetry/plugin-redis': 'redis',
 };
 
 // dummy tracer and default sampling logic
@@ -96,7 +115,7 @@ function createSpan(
     // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
     // the type and stacktrace are not officially recorded. Until this implemented,
     // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
-    const possibleType = inferType(span);
+    const possibleType = inferErrorType(span);
     ddSpanBase.setTag('error', 1);
     ddSpanBase.setTag('error.msg', span.status.message);
 
@@ -108,6 +127,17 @@ function createSpan(
   // set span kind
   if (DD_SPAN_KIND_MAPPING[span.kind]) {
     ddSpanBase.setTag('span.kind', DD_SPAN_KIND_MAPPING[span.kind]);
+  }
+
+  // set span type
+  // span.instrumentationLibrary.name is not in v0.9.0 but has been merged
+  if (getInstrumentationName(span)) {
+    if (DD_SPAN_TYPE_MAPPING[getInstrumentationName(span) || '']) {
+      ddSpanBase.setTag(
+        'span.type',
+        DD_SPAN_TYPE_MAPPING[getInstrumentationName(span) || '']
+      );
+    }
   }
 
   // set env tag
@@ -129,10 +159,8 @@ function createSpan(
   // set span attibutes as tags - takes precedence over env vars
   // span tags should be strings
   for (const [key, value] of Object.entries(span.attributes)) {
-    const val: any = value;
-
-    if (val !== undefined) {
-      ddSpanBase.setTag(key, val.toString());
+    if (value !== undefined) {
+      ddSpanBase.setTag(key, value);
     }
   }
 
@@ -207,7 +235,10 @@ function createSpanName(span: ReadableSpan): string {
   const spanKind = DD_SPAN_KIND_MAPPING[span.kind];
 
   if (instrumentationName) {
-    return `${instrumentationName}.${spanKind}`;
+    const sanitizedName = instrumentationName
+      .replace('@', '')
+      .replace('/', '_');
+    return `${sanitizedName}.${spanKind}`;
   } else if (spanKind) {
     return spanKind;
   } else {
@@ -229,7 +260,7 @@ function createResource(span: ReadableSpan): string {
   }
 }
 
-function getInstrumentationName(span: any): string | undefined {
+function getInstrumentationName(span: DatadogReadableSpan): string | undefined {
   return span.instrumentationLibrary && span.instrumentationLibrary.name;
 }
 
@@ -247,7 +278,7 @@ function getSamplingRate(span: ReadableSpan): number {
 // hacky way to get a valid error type
 // get canonicalCode key string
 // then check if `<library>.error_name` attribute exists
-function inferType(span: ReadableSpan): any {
+function inferErrorType(span: ReadableSpan): unknown {
   let typeName = undefined;
   for (const [key, value] of Object.entries(CanonicalCode)) {
     if (span.status.code === value) {

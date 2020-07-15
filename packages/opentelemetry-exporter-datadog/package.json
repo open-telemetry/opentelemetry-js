@@ -1,7 +1,6 @@
-// "@opentelemetry/core": "file:../opentelemetry-core/",
-
 {
   "name": "@opentelemetry/exporter-datadog",
+  "version": "0.9.0",
   "description": "OpenTelemetry Exporter Datadog allows user to send collected traces to Datadog",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -65,4 +64,3 @@
     "dd-trace": "^0.21.0"
   }
 }
-

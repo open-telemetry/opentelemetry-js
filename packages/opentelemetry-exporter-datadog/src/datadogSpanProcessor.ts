@@ -21,7 +21,7 @@ import {
   ReadableSpan,
 } from '@opentelemetry/tracing';
 import { Logger } from '@opentelemetry/api';
-import { id } from './types';
+import { id, DatadogBufferConfig } from './types';
 
 // const DEFAULT_BUFFER_SIZE = 100;
 const DEFAULT_BUFFER_TIMEOUT_MS = 3_000;
@@ -47,7 +47,10 @@ export class DatadogSpanProcessor implements SpanProcessor {
   private _check_traces_queue: Set<string> = new Set();
   public readonly logger: Logger;
 
-  constructor(private readonly _exporter: SpanExporter, config?: any) {
+  constructor(
+    private readonly _exporter: SpanExporter,
+    config?: DatadogBufferConfig
+  ) {
     this.logger = (config && config.logger) || new NoopLogger();
     this._bufferTimeout =
       config && typeof config.bufferTimeout === 'number'
@@ -133,11 +136,11 @@ export class DatadogSpanProcessor implements SpanProcessor {
     }
   }
 
-  getTraceContext(span: ReadableSpan): any[] {
+  getTraceContext(span: ReadableSpan): string | undefined[] {
     return [
       id(span.spanContext['traceId']),
       id(span.spanContext['spanId']),
-      span.parentSpanId ? id(span.parentSpanId) : null,
+      span.parentSpanId ? id(span.parentSpanId) : undefined,
     ];
   }
 

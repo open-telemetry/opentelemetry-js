@@ -15,6 +15,7 @@ cache_1: &cache_1
     - packages/opentelemetry-context-zone/node_modules
     - packages/opentelemetry-context-zone-peer-dep/node_modules
     - packages/opentelemetry-core/node_modules
+    - packages/opentelemetry-exporter-datadog/node_modules
     - packages/opentelemetry-exporter-jaeger/node_modules
     - packages/opentelemetry-exporter-prometheus/node_modules
     - packages/opentelemetry-exporter-zipkin/node_modules
