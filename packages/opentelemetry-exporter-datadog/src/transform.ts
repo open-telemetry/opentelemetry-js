@@ -16,14 +16,7 @@
 import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
-import {
-  id,
-  format,
-  Span,
-  Sampler,
-  NoopTracer,
-  DatadogReadableSpan,
-} from './types';
+import { id, format, Span, Sampler, NoopTracer } from './types';
 
 const SAMPLE_RATE_METRIC_KEY = '_sample_rate';
 const INTERNAL_TRACE_REGEX = /v\d\.\d\/traces/;
@@ -260,7 +253,7 @@ function createResource(span: ReadableSpan): string {
   }
 }
 
-function getInstrumentationName(span: DatadogReadableSpan): string | undefined {
+function getInstrumentationName(span: ReadableSpan): string | undefined {
   return span.instrumentationLibrary && span.instrumentationLibrary.name;
 }
 

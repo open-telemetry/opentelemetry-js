@@ -59,7 +59,6 @@ provider.register({
 })
 ```
 
-
 It's recommended to use the `DatadogSpanProcessor`
 
 - `DatadogSpanProcessor`: The implementation of `SpanProcessor` that passes ended complete traces to the configured `SpanExporter`.
@@ -98,19 +97,18 @@ const provider = new NodeTracerProvider();
 
 provider.register({
   propagator: new DaCompositePropagator({
-  	propagators: [new B3Propagator(), new DatadogPropagator()]
+    propagators: [new B3Propagator(), new DatadogPropagator()]
   }),
 });
 ```
 
-
 ## Configuration Options
 
-#### Configuration Options - Datadog Agent URL
+### Configuration Options - Datadog Agent URL
 
 By default the OpenTelemetry Datadog Exporter transmits traces to `http://localhost:8126`. You can configure the application to send traces to a diffent URL using the following environmennt variables:
 
- - `DD_TRACE_AGENT_URL`: The `<host>:<port:` where you Datadog Agent is listening for traces. (e.g. `agent-host:8126`)
+- `DD_TRACE_AGENT_URL`: The `<host>:<port:` where you Datadog Agent is listening for traces. (e.g. `agent-host:8126`)
 
 These values can also be overridden at the trace exporter level:
 
@@ -119,16 +117,16 @@ These values can also be overridden at the trace exporter level:
 new DatadogExporter({agent_url: 'http://dd-agent:8126'});
 ```
 
-#### Configuration Options - Tagging
+### Configuration Options - Tagging
 
 You can configure the application to automatically tag your Datadog exported traces, using the following environment variables:
 
- - `DD_ENV`: Your application environment (e.g. `production`, `staging`, etc.)
- - `DD_SERVICE`: Your application's default service name (e.g. `billing-api`)
- - `DD_VERSION`: Your application version (e.g. `2.5`, `202003181415`, `1.3-alpha`, etc.)
- - `DD_TAGS`: Custom tags in value pairs separated by `,` (e.g. `layer:api,team:intake`)
-    - If `DD_ENV`, `DD_SERVICE` or `DD_VERSION` are set, it will override any respective `env`/`service`/`version` tag defined in `DD_TAGS`.
-    - If `DD_ENV`, `DD_SERVICE` or `DD_VERSION` are NOT set, tags defined in `DD_TAGS` will be used to populate `env`/`service`/`version` respectively.
+- `DD_ENV`: Your application environment (e.g. `production`, `staging`, etc.)
+- `DD_SERVICE`: Your application's default service name (e.g. `billing-api`)
+- `DD_VERSION`: Your application version (e.g. `2.5`, `202003181415`, `1.3-alpha`, etc.)
+- `DD_TAGS`: Custom tags in value pairs separated by `,` (e.g. `layer:api,team:intake`)
+- If `DD_ENV`, `DD_SERVICE` or `DD_VERSION` are set, it will override any respective `env`/`service`/`version` tag defined in `DD_TAGS`.
+- If `DD_ENV`, `DD_SERVICE` or `DD_VERSION` are NOT set, tags defined in `DD_TAGS` will be used to populate `env`/`service`/`version` respectively.
 
 These values can also be overridden at the trace exporter level:
 

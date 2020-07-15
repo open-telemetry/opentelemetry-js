@@ -15,15 +15,15 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+// import { ReadableSpan } from '@opentelemetry/tracing';
+// import { InstrumentationLibrary } from '@opentelemetry/core';
 
 /**
- * Datadog Exporter config
+ * Datadog Readable Span config
  */
-export interface DatadogReadableSpan extends ReadableSpan {
-  instrumentationLibrary?: InstrumentationLibrary;
-}
+// export interface DatadogReadableSpan extends ReadableSpan {
+//   instrumentationLibrary?: InstrumentationLibrary;
+// }
 
 /**
  * Datadog Exporter config

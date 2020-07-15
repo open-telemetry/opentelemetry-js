@@ -90,10 +90,10 @@ describe('transform', () => {
         version: 1,
         cost: 112.12,
       }),
-      // instrumentationLibrary: {
-      //   name: 'default',
-      //   version: '0.0.1',
-      // }
+      instrumentationLibrary: {
+        name: 'default',
+        version: '0.0.1',
+      },
     };
     const updatedSpan = Object.assign(span, options);
     otelSpans.push(updatedSpan);
@@ -106,7 +106,7 @@ describe('transform', () => {
       const datadogSpans = translateToDatadog(spans, service_name);
       const datadogSpan = datadogSpans[0];
 
-      assert.deepStrictEqual(datadogSpan.name, 'internal');
+      assert.deepStrictEqual(datadogSpan.name, 'default.internal');
       assert.deepStrictEqual(datadogSpan.meta['span.kind'], 'internal');
       assert.deepStrictEqual(datadogSpan.resource, spans[0].name);
       assert.deepStrictEqual(datadogSpan.service, service_name);
