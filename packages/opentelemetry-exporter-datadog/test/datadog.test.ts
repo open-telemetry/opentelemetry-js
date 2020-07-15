@@ -191,6 +191,10 @@ describe('DatadogExporter', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.empty(),
+        instrumentationLibrary: {
+          name: 'default',
+          version: '0.0.1',
+        },
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {
@@ -227,6 +231,10 @@ describe('DatadogExporter', () => {
         events: [],
         duration: [32, 800000000],
         resource: Resource.empty(),
+        instrumentationLibrary: {
+          name: 'default',
+          version: '0.0.1',
+        },
       };
 
       exporter.export([readableSpan], (result: ExportResult) => {
