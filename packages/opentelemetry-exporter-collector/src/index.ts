@@ -15,3 +15,4 @@
  */
 
 export * from './platform';
+export * from './enums';

@@ -18,9 +18,9 @@ import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import {
-  opentelemetryProto,
   CollectorExporterError,
   CollectorExporterConfigBase,
+  ExportServiceError,
 } from './types';
 
 const DEFAULT_SERVICE_NAME = 'collector-exporter';
@@ -34,7 +34,7 @@ export abstract class CollectorTraceExporterBase<
   public readonly serviceName: string;
   public readonly url: string;
   public readonly logger: Logger;
-  public readonly hostName: string | undefined;
+  public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
   private _isShutdown: boolean = false;
 
@@ -43,9 +43,9 @@ export abstract class CollectorTraceExporterBase<
    */
   constructor(config: T = {} as T) {
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = this.getDefaultUrl(config.url);
-    if (typeof config.hostName === 'string') {
-      this.hostName = config.hostName;
+    this.url = this.getDefaultUrl(config);
+    if (typeof config.hostname === 'string') {
+      this.hostname = config.hostname;
     }
 
     this.attributes = config.attributes;
@@ -76,20 +76,16 @@ export abstract class CollectorTraceExporterBase<
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch(
-        (
-          error: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
-          if (error.message) {
-            this.logger.error(error.message);
-          }
-          if (error.code && error.code < 500) {
-            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-          } else {
-            resultCallback(ExportResult.FAILED_RETRYABLE);
-          }
+      .catch((error: ExportServiceError) => {
+        if (error.message) {
+          this.logger.error(error.message);
         }
-      );
+        if (error.code && error.code < 500) {
+          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+        } else {
+          resultCallback(ExportResult.FAILED_RETRYABLE);
+        }
+      });
   }
 
   private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
@@ -127,5 +123,5 @@ export abstract class CollectorTraceExporterBase<
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void;
-  abstract getDefaultUrl(url: string | undefined): string;
+  abstract getDefaultUrl(config: T): string;
 }

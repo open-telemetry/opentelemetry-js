@@ -15,6 +15,5 @@
  */
 
 export * from './histogram';
-export * from './MinMaxSumCount';
-export * from './LastValue';
+export * from './MinMaxLastSumCount';
 export * from './Sum';

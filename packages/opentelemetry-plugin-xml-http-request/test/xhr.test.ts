@@ -290,31 +290,35 @@ describe('xhr', () => {
             url,
             `attributes ${HttpAttribute.HTTP_URL} is wrong`
           );
+          assert.ok(
+            (attributes[keys[2]] as number) > 0,
+            'attributes ${HttpAttributes.HTTP_RESPONSE_CONTENT_SIZE} <= 0'
+          );
           assert.strictEqual(
-            attributes[keys[2]],
+            attributes[keys[3]],
             200,
             `attributes ${HttpAttribute.HTTP_STATUS_CODE} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[3]],
+            attributes[keys[4]],
             'OK',
             `attributes ${HttpAttribute.HTTP_STATUS_TEXT} is wrong`
           );
           assert.strictEqual(
-            attributes[keys[4]],
+            attributes[keys[5]],
             parseUrl(url).host,
             `attributes ${HttpAttribute.HTTP_HOST} is wrong`
           );
           assert.ok(
-            attributes[keys[5]] === 'http' || attributes[keys[5]] === 'https',
+            attributes[keys[6]] === 'http' || attributes[keys[6]] === 'https',
             `attributes ${HttpAttribute.HTTP_SCHEME} is wrong`
           );
           assert.ok(
-            attributes[keys[6]] !== '',
+            attributes[keys[7]] !== '',
             `attributes ${HttpAttribute.HTTP_USER_AGENT} is not defined`
           );
 
-          assert.strictEqual(keys.length, 7, 'number of attributes is wrong');
+          assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
         });
 
         it('span should have correct events', () => {

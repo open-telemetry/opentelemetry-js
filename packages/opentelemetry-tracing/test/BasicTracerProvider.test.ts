@@ -17,8 +17,8 @@
 import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import {
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
   setActiveSpan,
@@ -49,7 +49,7 @@ describe('BasicTracerProvider', () => {
 
     it('should construct an instance with sampler', () => {
       const provider = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       });
       assert.ok(provider instanceof BasicTracerProvider);
     });
@@ -294,7 +294,7 @@ describe('BasicTracerProvider', () => {
 
     it('should return a no recording span when never sampling', () => {
       const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
+        sampler: new AlwaysOffSampler(),
         logger: new NoopLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
@@ -309,7 +309,7 @@ describe('BasicTracerProvider', () => {
 
     it('should create real span when sampled', () => {
       const tracer = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof Span);

@@ -117,7 +117,7 @@ describe('fetch', () => {
     sandbox.stub(core.otperformance, 'timeOrigin').value(0);
     sandbox.stub(core.otperformance, 'now').callsFake(() => fakeNow);
 
-    function fakeFetch(input: RequestInfo, init: RequestInit = {}) {
+    function fakeFetch(input: RequestInfo | Request, init: RequestInit = {}) {
       return new Promise((resolve, reject) => {
         const response: any = {
           args: {},
@@ -300,8 +300,12 @@ describe('fetch', () => {
         attributes[keys[7]] !== '',
         `attributes ${AttributeNames.HTTP_USER_AGENT} is not defined`
       );
+      assert.ok(
+        (attributes[keys[8]] as number) > 0,
+        `attributes ${AttributeNames.HTTP_RESPONSE_CONTENT_LENGTH} is <= 0`
+      );
 
-      assert.strictEqual(keys.length, 8, 'number of attributes is wrong');
+      assert.strictEqual(keys.length, 9, 'number of attributes is wrong');
     });
 
     it('span should have correct events', () => {
@@ -453,6 +457,12 @@ describe('fetch', () => {
         String(span.context().traceFlags),
         `trace header '${core.X_B3_SAMPLED}' not set`
       );
+    });
+
+    it('should set trace headers with a request object', () => {
+      const r = new Request('url');
+      window.fetch(r);
+      assert.ok(typeof r.headers.get(core.X_B3_TRACE_ID) === 'string');
     });
 
     it('should NOT clear the resources', () => {
