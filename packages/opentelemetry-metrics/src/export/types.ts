@@ -42,9 +42,7 @@ export type Sum = number;
 /** LastValue returns last value. */
 export type LastValue = number;
 
-/**
- *
- */
+/** Distribution returns an aggregated distribution. */
 export interface Distribution {
   min: number;
   max: number;
@@ -80,9 +78,6 @@ export interface Histogram {
   count: number;
 }
 
-/**
- *
- */
 export type PointValueType = Sum | LastValue | Distribution | Histogram;
 
 export interface MetricRecord {
@@ -129,9 +124,7 @@ interface BaseAggregator {
   update(value: number): void;
 }
 
-/**
- *
- */
+/** SumAggregatorType aggregate values into a {@link Sum} point type. */
 export interface SumAggregatorType extends BaseAggregator {
   kind: AggregatorKind.SUM;
 
@@ -140,7 +133,8 @@ export interface SumAggregatorType extends BaseAggregator {
 }
 
 /**
- *
+ * LastValueAggregatorType aggregate values into a {@link LastValue} point
+ * type.
  */
 export interface LastValueAggregatorType extends BaseAggregator {
   kind: AggregatorKind.LAST_VALUE;
@@ -150,7 +144,8 @@ export interface LastValueAggregatorType extends BaseAggregator {
 }
 
 /**
- *
+ * DistributionAggregatorType aggregate values into a {@link Distribution}
+ * point type.
  */
 export interface DistributionAggregatorType extends BaseAggregator {
   kind: AggregatorKind.DISTRIBUTION;
@@ -160,7 +155,8 @@ export interface DistributionAggregatorType extends BaseAggregator {
 }
 
 /**
- *
+ * HistogramAggregatorType aggregate values into a {@link Histogram} point
+ * type.
  */
 export interface HistogramAggregatorType extends BaseAggregator {
   kind: AggregatorKind.HISTOGRAM;
@@ -175,6 +171,9 @@ export type Aggregator =
   | DistributionAggregatorType
   | HistogramAggregatorType;
 
+/**
+ * Point represents a snapshot of aggregated values of aggregators.
+ */
 export interface Point<T extends PointValueType> {
   value: T;
   timestamp: HrTime;
