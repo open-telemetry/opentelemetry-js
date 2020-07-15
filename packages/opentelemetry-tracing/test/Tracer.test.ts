@@ -20,8 +20,8 @@ import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
   InstrumentationLibrary,
   NoopLogger,
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {
@@ -52,7 +52,7 @@ describe('Tracer', () => {
   it('should respect NO_RECORD sampling result', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
-      { sampler: NEVER_SAMPLER },
+      { sampler: new AlwaysOffSampler() },
       tracerProvider
     );
     const span = tracer.startSpan('span1');
@@ -63,7 +63,7 @@ describe('Tracer', () => {
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
-      { sampler: ALWAYS_SAMPLER },
+      { sampler: new AlwaysOnSampler() },
       tracerProvider
     );
     const span = tracer.startSpan('span2');

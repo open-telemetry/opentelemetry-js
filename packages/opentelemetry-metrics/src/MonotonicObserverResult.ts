@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-import { SpanProcessor } from './SpanProcessor';
-import { ReadableSpan } from './export/ReadableSpan';
-
-/** No-op implementation of SpanProcessor */
-export class NoopSpanProcessor implements SpanProcessor {
-  onStart(span: ReadableSpan): void {}
-  onEnd(span: ReadableSpan): void {}
-  shutdown(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
-  }
-  forceFlush(cb: () => unknown = () => {}): void {
-    setTimeout(cb, 0);
+import { Labels } from '@opentelemetry/api';
+import { ObserverResult } from './ObserverResult';
+export class MonotonicObserverResult extends ObserverResult {
+  observe(value: number, labels: Labels): void {
+    if (value >= 0) {
+      this.values.set(labels, value);
+    }
   }
 }

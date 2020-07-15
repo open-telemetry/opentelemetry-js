@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ALWAYS_SAMPLER, LogLevel } from '@opentelemetry/core';
+import { AlwaysOnSampler, LogLevel } from '@opentelemetry/core';
 
 /** Default limit for Message events per span */
 export const DEFAULT_MAX_EVENTS_PER_SPAN = 128;
@@ -32,7 +32,7 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
 export const DEFAULT_CONFIG = {
   defaultAttributes: {},
   logLevel: LogLevel.INFO,
-  sampler: ALWAYS_SAMPLER,
+  sampler: new AlwaysOnSampler(),
   traceParams: {
     numberOfAttributesPerSpan: DEFAULT_MAX_ATTRIBUTES_PER_SPAN,
     numberOfLinksPerSpan: DEFAULT_MAX_LINKS_PER_SPAN,
