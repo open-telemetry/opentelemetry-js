@@ -72,7 +72,7 @@ export function sendUsingGrpc<ExportItem, ServiceRequest>(
           collector.logger.error('Service request', serviceRequest);
           onError(err);
         } else {
-          collector.logger.debug('spans sent');
+          collector.logger.debug('Objects sent');
           onSuccess();
         }
       }

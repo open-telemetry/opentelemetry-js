@@ -86,7 +86,7 @@ export abstract class CollectorExporterNodeBase<
     onError: (error: collectorTypes.CollectorExporterError) => void
   ): void {
     if (this._isShutdown) {
-      this.logger.debug('Shutdown already started. Cannot send spans');
+      this.logger.debug('Shutdown already started. Cannot send objects');
       return;
     }
     if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
