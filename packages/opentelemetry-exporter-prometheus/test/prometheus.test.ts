@@ -420,7 +420,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a UpDownCounter as gague on SIGTERM', done => {
+    it('should export a UpDownCounter as gauge on SIGTERM', done => {
       const counter = meter.createUpDownCounter('counter', {
         description: 'a test description',
       });
