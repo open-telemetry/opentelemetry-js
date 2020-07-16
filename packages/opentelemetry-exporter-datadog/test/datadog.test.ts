@@ -17,10 +17,8 @@
 import * as assert from 'assert';
 import { DatadogExporter } from '../src';
 import { ExportResult } from '@opentelemetry/core';
-import * as api from '@opentelemetry/api';
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { Resource } from '@opentelemetry/resources';
 import { AgentExporter } from '../src/types';
+import { mockReadableSpan } from './mocks';
 import * as nock from 'nock';
 
 describe('DatadogExporter', () => {
@@ -33,23 +31,23 @@ describe('DatadogExporter', () => {
     });
 
     it('should construct an exporter that contains a writerr', () => {
-      const exporter = new DatadogExporter({ service_name: 'opentelemetry' });
+      const exporter = new DatadogExporter({ serviceName: 'opentelemetry' });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
       const _exporter = exporter['_exporter'];
 
       assert.ok(_exporter._writer !== undefined);
-      assert.strictEqual(exporter['_service_name'], 'opentelemetry');
+      assert.strictEqual(exporter['_serviceName'], 'opentelemetry');
       // assert.strictEqual(exporter._tags.length, 0);
     });
 
-    it('should construct an exporter with default url, service_name, and flushInterval', () => {
+    it('should construct an exporter with default url, serviceName, and flushInterval', () => {
       const exporter = new DatadogExporter({});
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
 
       assert.strictEqual(exporter['_url'], 'http://localhost:8126');
-      assert.strictEqual(exporter['_service_name'], 'dd-service');
+      assert.strictEqual(exporter['_serviceName'], 'dd-service');
       assert.strictEqual(exporter['_flushInterval'], 1000);
     });
 
@@ -67,48 +65,9 @@ describe('DatadogExporter', () => {
       assert.strictEqual(exporter['_tags'], 'testkey:testvalue');
     });
 
-    it('should respect relevant env variables', () => {
-      process.env.DD_TRACE_AGENT_URL = 'http://dd-agent:8125';
-      process.env.DD_SERVICE = 'second-service';
-      process.env.DD_ENV = 'staging';
-      process.env.DD_VERSION = 'v2';
-      process.env.DD_TAGS = 'alt_key:alt_value';
-
-      const exporter = new DatadogExporter({});
-      assert.strictEqual(exporter['_env'], 'staging');
-      assert.strictEqual(exporter['_version'], 'v2');
-      assert.strictEqual(exporter['_tags'], 'alt_key:alt_value');
-      assert.strictEqual(exporter['_url'], 'http://dd-agent:8125');
-      assert.strictEqual(exporter['_service_name'], 'second-service');
-    });
-
-    it('should prioritize host option over env variable', () => {
-      process.env.DD_TRACE_AGENT_URL = 'http://dd-agent:8125';
-      process.env.DD_SERVICE = 'second-service';
-      process.env.DD_ENV = 'staging';
-      process.env.DD_VERSION = 'v2';
-      process.env.DD_TAGS = 'alt_key:alt_value';
-
-      const exporter = new DatadogExporter({
-        env: 'prod',
-        version: 'v1',
-        tags: 'main_key:main_value',
-        service_name: 'first-service',
-        agent_url: 'http://other-dd-agent:8126',
-      });
-      assert.ok(typeof exporter.export === 'function');
-      assert.ok(typeof exporter.shutdown === 'function');
-
-      assert.strictEqual(exporter['_env'], 'prod');
-      assert.strictEqual(exporter['_version'], 'v1');
-      assert.strictEqual(exporter['_tags'], 'main_key:main_value');
-      assert.strictEqual(exporter['_url'], 'http://other-dd-agent:8126');
-      assert.strictEqual(exporter['_service_name'], 'first-service');
-    });
-
     it('should construct an exporter with a flush interval', () => {
       const exporter = new DatadogExporter({
-        service_name: 'opentelemetry',
+        serviceName: 'opentelemetry',
         flushInterval: 2000,
       });
 
@@ -123,7 +82,7 @@ describe('DatadogExporter', () => {
 
     it('should construct an exporter without flushInterval', () => {
       const exporter = new DatadogExporter({
-        service_name: 'opentelemetry',
+        serviceName: 'opentelemetry',
       });
 
       assert.ok(typeof exporter.export === 'function');
@@ -133,6 +92,44 @@ describe('DatadogExporter', () => {
         1000
       );
     });
+
+    describe('with env vars', () => {
+      beforeEach(() => {
+        process.env.DD_TRACE_AGENT_URL = 'http://dd-agent:8125';
+        process.env.DD_SERVICE = 'second-service';
+        process.env.DD_ENV = 'staging';
+        process.env.DD_VERSION = 'v2';
+        process.env.DD_TAGS = 'alt_key:alt_value';
+      });
+
+      it('should respect relevant env variables', () => {
+        const exporter = new DatadogExporter({});
+
+        assert.strictEqual(exporter['_env'], 'staging');
+        assert.strictEqual(exporter['_version'], 'v2');
+        assert.strictEqual(exporter['_tags'], 'alt_key:alt_value');
+        assert.strictEqual(exporter['_url'], 'http://dd-agent:8125');
+        assert.strictEqual(exporter['_serviceName'], 'second-service');
+      });
+
+      it('should prioritize host option over env variable', () => {
+        const exporter = new DatadogExporter({
+          env: 'prod',
+          version: 'v1',
+          tags: 'main_key:main_value',
+          serviceName: 'first-service',
+          agentUrl: 'http://other-dd-agent:8126',
+        });
+        assert.ok(typeof exporter.export === 'function');
+        assert.ok(typeof exporter.shutdown === 'function');
+
+        assert.strictEqual(exporter['_env'], 'prod');
+        assert.strictEqual(exporter['_version'], 'v1');
+        assert.strictEqual(exporter['_tags'], 'main_key:main_value');
+        assert.strictEqual(exporter['_url'], 'http://other-dd-agent:8126');
+        assert.strictEqual(exporter['_serviceName'], 'first-service');
+      });
+    });
   });
 
   describe('export', () => {
@@ -141,7 +138,7 @@ describe('DatadogExporter', () => {
     before(() => {
       nock.disableNetConnect();
       exporter = new DatadogExporter({
-        service_name: 'opentelemetry',
+        serviceName: 'opentelemetry',
         flushInterval: 100,
       });
     });
@@ -171,31 +168,7 @@ describe('DatadogExporter', () => {
         .put('/v0.4/traces')
         .reply(200);
 
-      const spanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-        traceFlags: api.TraceFlags.NONE,
-      };
-      const readableSpan: ReadableSpan = {
-        name: 'my-span1',
-        kind: api.SpanKind.CLIENT,
-        spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
-        ended: true,
-        status: {
-          code: api.CanonicalCode.DATA_LOSS,
-        },
-        attributes: {},
-        links: [],
-        events: [],
-        duration: [32, 800000000],
-        resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
-      };
+      const readableSpan = mockReadableSpan;
 
       exporter.export([readableSpan], (result: ExportResult) => {
         setTimeout(() => {
@@ -211,31 +184,7 @@ describe('DatadogExporter', () => {
         .put('/v0.4/traces')
         .reply(400);
 
-      const spanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-        traceFlags: api.TraceFlags.NONE,
-      };
-      const readableSpan: ReadableSpan = {
-        name: 'my-span1',
-        kind: api.SpanKind.CLIENT,
-        spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
-        ended: true,
-        status: {
-          code: api.CanonicalCode.DATA_LOSS,
-        },
-        attributes: {},
-        links: [],
-        events: [],
-        duration: [32, 800000000],
-        resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
-      };
+      const readableSpan = mockReadableSpan;
 
       exporter.export([readableSpan], (result: ExportResult) => {
         setTimeout(() => {

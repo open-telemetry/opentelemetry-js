@@ -17,38 +17,35 @@ import { SpanKind, TraceFlags, CanonicalCode } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { id, format, Span, Sampler, NoopTracer } from './types';
+import {
+  DatadogDefaults,
+  DatadogInstrumentationTypes,
+  DatadogOtelInstrumentations,
+  DatadogSamplingCodes,
+} from './defaults';
 
-const SAMPLE_RATE_METRIC_KEY = '_sample_rate';
 const INTERNAL_TRACE_REGEX = /v\d\.\d\/traces/;
-const ERR_NAME_SUBSTRING = '.error_name';
-const ENV_KEY = 'env';
-const VERSION_KEY = 'version';
-const DD_ORIGIN = '_dd_origin';
-const OT_ALLOWED_DD_ORIGIN = 'dd_origin';
-const USER_REJECT = -1;
-const AUTO_REJECT = 0;
-const AUTO_KEEP = 1;
-// const USER_KEEP = 2;
-const DD_SPAN_KIND_MAPPING: { [key: string]: string } = {
-  [SpanKind.CLIENT]: 'client',
-  [SpanKind.SERVER]: 'server',
-  [SpanKind.CONSUMER]: 'consumer',
-  [SpanKind.PRODUCER]: 'producer',
+
+const DD_SPAN_KIND_MAPPING: { [key: string]: DatadogDefaults } = {
+  [SpanKind.CLIENT]: DatadogDefaults.CLIENT,
+  [SpanKind.SERVER]: DatadogDefaults.SERVER,
+  [SpanKind.CONSUMER]: DatadogDefaults.CONSUMER,
+  [SpanKind.PRODUCER]: DatadogDefaults.PRODUCER,
   // When absent, the span is local.
-  [SpanKind.INTERNAL]: 'internal',
+  [SpanKind.INTERNAL]: DatadogDefaults.INTERNAL,
 };
 
-const DD_SPAN_TYPE_MAPPING: { [key: string]: string } = {
-  '@opentelemetry/plugin-grpc': 'web',
-  '@opentelemetry/plugin-http': 'http',
-  '@opentelemetry/plugin-https': 'http',
-  '@opentelemetry/plugin-express': 'web',
-  '@opentelemetry/plugin-ioredis': 'redis',
-  '@opentelemetry/plugin-mongodb': 'mongodb',
-  '@opentelemetry/plugin-mysql': 'sql',
-  '@opentelemetry/plugin-pg-pool': 'sql',
-  '@opentelemetry/plugin-pg': 'sql',
-  '@opentelemetry/plugin-redis': 'redis',
+const DD_SPAN_TYPE_MAPPING: { [key: string]: DatadogInstrumentationTypes } = {
+  [DatadogOtelInstrumentations.GRPC]: DatadogInstrumentationTypes.WEB,
+  [DatadogOtelInstrumentations.HTTP]: DatadogInstrumentationTypes.HTTP,
+  [DatadogOtelInstrumentations.HTTPS]: DatadogInstrumentationTypes.HTTP,
+  [DatadogOtelInstrumentations.EXPRESS]: DatadogInstrumentationTypes.WEB,
+  [DatadogOtelInstrumentations.IOREDIS]: DatadogInstrumentationTypes.REDIS,
+  [DatadogOtelInstrumentations.MONGODB]: DatadogInstrumentationTypes.MONGODB,
+  [DatadogOtelInstrumentations.MYSQL]: DatadogInstrumentationTypes.SQL,
+  [DatadogOtelInstrumentations.PGPOOL]: DatadogInstrumentationTypes.SQL,
+  [DatadogOtelInstrumentations.PG]: DatadogInstrumentationTypes.SQL,
+  [DatadogOtelInstrumentations.REDIS]: DatadogInstrumentationTypes.REDIS,
 };
 
 // dummy tracer and default sampling logic
@@ -61,7 +58,7 @@ const SAMPLER = new Sampler(1);
  */
 export function translateToDatadog(
   spans: ReadableSpan[],
-  service_name: string,
+  serviceName: string,
   env?: string,
   version?: string,
   tags?: string
@@ -69,7 +66,7 @@ export function translateToDatadog(
   return spans
     .map(span => {
       const defaultTags = createDefaultTags(tags);
-      const ddSpan = createSpan(span, service_name, defaultTags, env, version);
+      const ddSpan = createSpan(span, serviceName, defaultTags, env, version);
       return ddSpan;
     })
     .map(format);
@@ -77,7 +74,7 @@ export function translateToDatadog(
 
 function createSpan(
   span: ReadableSpan,
-  service_name: string,
+  serviceName: string,
   tags: object,
   env?: string,
   version?: string
@@ -96,56 +93,106 @@ function createSpan(
   ddSpanBaseContext._spanId = ddSpanId;
   ddSpanBaseContext._parentId = ddParentId;
 
-  // set reserved service and resource tags
-  ddSpanBase.addTags({
-    'resource.name': createResource(span),
-    'service.name': service_name,
-  });
-
   // set error code
+  addErrors(ddSpanBase, span);
+
+  // set span kind
+  addSpanKind(ddSpanBase, span);
+
+  // set span type
+  addSpanType(ddSpanBase, span);
+
+  // set datadog specific env and version tags
+  addDatadogTags(ddSpanBase, span, serviceName, env, version);
+
+  // set sampling rate
+  setSamplingRate(ddSpanBase, span);
+
+  // set span duration
+  setDuration(ddSpanBase, span);
+
+  // mark as finished span so that it is exported
+  ddSpanBaseContext._isFinished = true;
+
+  return ddSpanBase;
+}
+
+function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
   if (span.status && span.status.code && span.status.code > 0) {
     // TODO: set error.msg error.type error.stack based on error events
     // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
     // the type and stacktrace are not officially recorded. Until this implemented,
     // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
     const possibleType = inferErrorType(span);
-    ddSpanBase.setTag('error', 1);
-    ddSpanBase.setTag('error.msg', span.status.message);
+    ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, 1);
+    ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
     if (possibleType) {
-      ddSpanBase.setTag('error.type', possibleType);
+      ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, possibleType);
     }
   }
+  if (span.status && span.status.code && span.status.code > 0) {
+    // TODO: set error.msg error.type error.stack based on error events
+    // Opentelemetry-js has not yet implemented https://github.com/open-telemetry/opentelemetry-specification/pull/697
+    // the type and stacktrace are not officially recorded. Until this implemented,
+    // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
+    const possibleType = inferErrorType(span);
+    ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, 1);
+    ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
-  // set span kind
-  if (DD_SPAN_KIND_MAPPING[span.kind]) {
-    ddSpanBase.setTag('span.kind', DD_SPAN_KIND_MAPPING[span.kind]);
+    if (possibleType) {
+      ddSpanBase.setTag(DatadogDefaults.ERROR_TYPE_TAG, possibleType);
+    }
   }
+}
 
-  // set span type
+function addSpanKind(ddSpanBase: typeof Span, span: ReadableSpan): void {
+  if (DD_SPAN_KIND_MAPPING[span.kind]) {
+    ddSpanBase.setTag(
+      DatadogDefaults.SPAN_KIND,
+      DD_SPAN_KIND_MAPPING[span.kind]
+    );
+  }
+}
+
+function addSpanType(ddSpanBase: typeof Span, span: ReadableSpan): void {
   // span.instrumentationLibrary.name is not in v0.9.0 but has been merged
   if (getInstrumentationName(span)) {
     if (DD_SPAN_TYPE_MAPPING[getInstrumentationName(span) || '']) {
       ddSpanBase.setTag(
-        'span.type',
+        DatadogDefaults.SPAN_TYPE,
         DD_SPAN_TYPE_MAPPING[getInstrumentationName(span) || '']
       );
     }
   }
+}
+
+function addDatadogTags(
+  ddSpanBase: typeof Span,
+  span: ReadableSpan,
+  serviceName?: string | undefined,
+  env?: string | undefined,
+  version?: string | undefined
+): void {
+  // set reserved service and resource tags
+  ddSpanBase.addTags({
+    'resource.name': createResource(span),
+    'service.name': serviceName,
+  });
 
   // set env tag
   if (env) {
-    ddSpanBase.setTag(ENV_KEY, env);
+    ddSpanBase.setTag(DatadogDefaults.ENV_KEY, env);
   }
 
   // set origin and version on root span only
   if (span.parentSpanId === undefined) {
     const origin = createOriginString(span);
     if (origin) {
-      ddSpanBase.setTag(DD_ORIGIN, origin);
+      ddSpanBase.setTag(DatadogDefaults.DD_ORIGIN, origin);
     }
     if (version) {
-      ddSpanBase.setTag(VERSION_KEY, version);
+      ddSpanBase.setTag(DatadogDefaults.VERSION_KEY, version);
     }
   }
 
@@ -156,30 +203,12 @@ function createSpan(
       ddSpanBase.setTag(key, value);
     }
   }
-
-  // filter for internal requests to trace-agent and set sampling rate
-  const samplingRate = getSamplingRate(span);
-  const internalRequest = isInternalRequest(span);
-
-  if (internalRequest) {
-    ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, USER_REJECT);
-  } else if (samplingRate !== undefined) {
-    ddSpanBase.setTag(SAMPLE_RATE_METRIC_KEY, samplingRate);
-  }
-
-  // set span duration and mark as finished span so that it is exported
-  const duration =
-    hrTimeToMilliseconds(span.endTime) - hrTimeToMilliseconds(span.startTime);
-  ddSpanBase._duration = duration;
-  ddSpanBaseContext._isFinished = true;
-
-  return ddSpanBase;
 }
 
 function getTraceContext(span: ReadableSpan): typeof Span[] {
   return [
-    id(span.spanContext['traceId']),
-    id(span.spanContext['spanId']),
+    id(span.spanContext.traceId),
+    id(span.spanContext.spanId),
     span.parentSpanId ? id(span.parentSpanId) : null,
   ];
 }
@@ -199,18 +228,11 @@ function createDefaultTags(tags: string | undefined): object {
     : {};
 
   // ensure default tag env var or  arg is not malformed
-  if (
-    Object.keys(tagMap).indexOf('') >= 0 ||
-    Object.values(tagMap).indexOf('') >= 0 ||
-    Object.values(tagMap).some((v: string) => {
-      return v.endsWith(':');
-    })
-  ) {
-    // TODO: add debug log
-    return {};
-  } else {
-    return tagMap;
+  for (const [key, value] of Object.entries(tagMap)) {
+    if (key === '' || value === '' || value.endsWith(':')) return {};
   }
+
+  return tagMap;
 }
 
 function createOriginString(span: ReadableSpan): string | undefined {
@@ -218,11 +240,11 @@ function createOriginString(span: ReadableSpan): string | undefined {
   // using dd_origin for internal tracestate and setting datadog tag as _dd_origin
   return (
     span.spanContext.traceState &&
-    span.spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
+    span.spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
   );
 }
 
-function createSpanName(span: ReadableSpan): string {
+function createSpanName(span: ReadableSpan): string | DatadogDefaults {
   // span.instrumentationLibrary.name is not in v0.9.0 but has been merged
   const instrumentationName = getInstrumentationName(span);
   const spanKind = DD_SPAN_KIND_MAPPING[span.kind];
@@ -232,25 +254,24 @@ function createSpanName(span: ReadableSpan): string {
       .replace('@', '')
       .replace('/', '_');
     return `${sanitizedName}.${spanKind}`;
-  } else if (spanKind) {
-    return spanKind;
-  } else {
-    return span.name;
   }
+
+  return spanKind || span.name;
 }
 
 function createResource(span: ReadableSpan): string {
-  if (span.attributes['http.method']) {
+  if (span.attributes[DatadogDefaults.HTTP_METHOD]) {
     const route =
-      span.attributes['http.route'] || span.attributes['http.target'];
+      span.attributes['http.route'] ||
+      span.attributes[DatadogDefaults.HTTP_TARGET];
 
     if (route) {
-      return span.attributes['http.method'] + ' ' + route;
+      return span.attributes[DatadogDefaults.HTTP_METHOD] + ' ' + route;
     }
-    return `${span.attributes['http.method']}`;
-  } else {
-    return span.name;
+    return `${span.attributes[DatadogDefaults.HTTP_METHOD]}`;
   }
+
+  return span.name;
 }
 
 function getInstrumentationName(span: ReadableSpan): string | undefined {
@@ -262,9 +283,9 @@ function getSamplingRate(span: ReadableSpan): number {
     (TraceFlags.SAMPLED & span.spanContext.traceFlags) ===
     TraceFlags.SAMPLED
   ) {
-    return AUTO_KEEP;
+    return DatadogSamplingCodes.AUTO_KEEP;
   } else {
-    return AUTO_REJECT;
+    return DatadogSamplingCodes.AUTO_REJECT;
   }
 }
 
@@ -281,7 +302,7 @@ function inferErrorType(span: ReadableSpan): unknown {
   }
 
   for (const [key, value] of Object.entries(span.attributes)) {
-    if (key.indexOf(ERR_NAME_SUBSTRING) >= 0) {
+    if (key.indexOf(DatadogDefaults.ERR_NAME_SUBSTRING) >= 0) {
       typeName = value;
       break;
     }
@@ -295,5 +316,27 @@ function isInternalRequest(span: ReadableSpan): boolean | void {
     return span.attributes['http.route'].match(INTERNAL_TRACE_REGEX)
       ? true
       : false;
+  }
+}
+
+function setDuration(ddSpanBase: typeof Span, span: ReadableSpan): void {
+  // set span duration
+  const duration =
+    hrTimeToMilliseconds(span.endTime) - hrTimeToMilliseconds(span.startTime);
+  ddSpanBase._duration = duration;
+}
+
+function setSamplingRate(ddSpanBase: typeof Span, span: ReadableSpan): void {
+  // filter for internal requests to trace-agent and set sampling rate
+  const samplingRate = getSamplingRate(span);
+  const internalRequest = isInternalRequest(span);
+
+  if (internalRequest) {
+    ddSpanBase.setTag(
+      DatadogDefaults.SAMPLE_RATE_METRIC_KEY,
+      DatadogSamplingCodes.USER_REJECT
+    );
+  } else if (samplingRate !== undefined) {
+    ddSpanBase.setTag(DatadogDefaults.SAMPLE_RATE_METRIC_KEY, samplingRate);
   }
 }

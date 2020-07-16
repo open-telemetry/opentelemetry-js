@@ -15,86 +15,31 @@
  */
 
 import * as assert from 'assert';
-import { Resource } from '@opentelemetry/resources';
 import * as api from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { hrTimeToMilliseconds, TraceState } from '@opentelemetry/core';
+import { hrTimeToMilliseconds } from '@opentelemetry/core';
 import { id } from '../src/types';
 import { translateToDatadog } from '../src/transform';
+import {
+  mockSpanContextUnsampled,
+  mockSpanContextSampled,
+  mockSpanContextOrigin,
+  mockExandedReadableSpan,
+} from './mocks';
 
 describe('transform', () => {
-  const spanContextUnsampled = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
-    traceFlags: api.TraceFlags.NONE,
-  };
+  const spanContextUnsampled = mockSpanContextUnsampled;
 
-  const spanContextSampled = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
-    traceFlags: api.TraceFlags.SAMPLED,
-  };
+  const spanContextSampled = mockSpanContextSampled;
 
-  const spanContextOrigin = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
-    traceFlags: api.TraceFlags.SAMPLED,
-    traceState: new TraceState('dd_origin=synthetics-example'),
-  };
+  const spanContextOrigin = mockSpanContextOrigin;
 
   const parentSpanId = '6e0c63257de34c93';
-  const service_name = 'my-service';
+  const serviceName = 'my-service';
 
   const generateOtelSpans = function (options: any): ReadableSpan[] {
     const otelSpans = [];
-    const span: ReadableSpan = {
-      name: 'my-span',
-      kind: api.SpanKind.INTERNAL,
-      spanContext: spanContextUnsampled,
-      startTime: [1566156729, 709],
-      endTime: [1566156731, 709],
-      ended: true,
-      status: {
-        code: api.CanonicalCode.OK,
-      },
-      attributes: {
-        testBool: true,
-        testString: 'test',
-        testNum: '3.142',
-      },
-      links: [
-        {
-          context: {
-            traceId: 'a4cda95b652f4a1592b449d5929fda1b',
-            spanId: '3e0c63257de34c92',
-          },
-          attributes: {
-            testBool: true,
-            testString: 'test',
-            testNum: 3.142,
-          },
-        },
-      ],
-      events: [
-        {
-          name: 'something happened',
-          attributes: {
-            error: true,
-          },
-          time: [1566156729, 809],
-        },
-      ],
-      duration: [32, 800000000],
-      resource: new Resource({
-        service: 'ui',
-        version: 1,
-        cost: 112.12,
-      }),
-      instrumentationLibrary: {
-        name: 'default',
-        version: '0.0.1',
-      },
-    };
+    const span: ReadableSpan = mockExandedReadableSpan;
     const updatedSpan = Object.assign(span, options);
     otelSpans.push(updatedSpan);
     return otelSpans;
@@ -103,13 +48,13 @@ describe('transform', () => {
   describe('translateToDatadog', () => {
     it('should convert an OpenTelemetry span and its properties to a finished DatadogSpan', () => {
       const spans = generateOtelSpans({ spanContext: spanContextUnsampled });
-      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
 
       assert.deepStrictEqual(datadogSpan.name, 'default.internal');
       assert.deepStrictEqual(datadogSpan.meta['span.kind'], 'internal');
       assert.deepStrictEqual(datadogSpan.resource, spans[0].name);
-      assert.deepStrictEqual(datadogSpan.service, service_name);
+      assert.deepStrictEqual(datadogSpan.service, serviceName);
 
       assert.deepStrictEqual(
         datadogSpan.trace_id,
@@ -141,7 +86,7 @@ describe('transform', () => {
 
     it('should sample spans with sampled traceFlag', () => {
       const spans = generateOtelSpans({ spanContext: spanContextSampled });
-      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
 
       assert.strictEqual(
@@ -152,7 +97,7 @@ describe('transform', () => {
 
     it('should set origin tag for spans with origin traceState', () => {
       const spans = generateOtelSpans({ spanContext: spanContextOrigin });
-      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
 
       assert.strictEqual(datadogSpan.meta['_dd_origin'], 'synthetics-example');
@@ -162,7 +107,7 @@ describe('transform', () => {
       const spans = generateOtelSpans({ spanContext: spanContextOrigin });
       const datadogSpans = translateToDatadog(
         spans,
-        service_name,
+        serviceName,
         'test_env',
         'v1.0',
         'is_test:true'
@@ -182,7 +127,7 @@ describe('transform', () => {
       });
       const datadogSpans = translateToDatadog(
         spans,
-        service_name,
+        serviceName,
         'test_env',
         'v1.0',
         'is_test:true'
@@ -202,7 +147,7 @@ describe('transform', () => {
         },
         kind: api.SpanKind.CONSUMER,
       });
-      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
 
       assert.strictEqual(datadogSpan.error, 1);
@@ -217,7 +162,7 @@ describe('transform', () => {
           'http.route': '/v0.4/traces/',
         },
       });
-      const datadogSpans = translateToDatadog(spans, service_name);
+      const datadogSpans = translateToDatadog(spans, serviceName);
       const datadogSpan = datadogSpans[0];
       assert.strictEqual(datadogSpan.metrics['_sample_rate'], -1);
     });

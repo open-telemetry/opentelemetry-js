@@ -27,14 +27,9 @@ import {
   setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
-import {
-  DatadogPropagator,
-  X_DD_SAMPLING_PRIORITY,
-  X_DD_PARENT_ID,
-  X_DD_TRACE_ID,
-  X_DD_ORIGIN,
-} from '../src/';
+import { DatadogPropagator } from '../src/';
 import { id } from '../src/types';
+import { DatadogPropagationDefaults } from '../src/defaults';
 
 describe('DatadogPropagator', () => {
   const datadogPropagator = new DatadogPropagator();
@@ -59,9 +54,18 @@ describe('DatadogPropagator', () => {
         carrier,
         defaultSetter
       );
-      assert.deepStrictEqual(carrier[X_DD_TRACE_ID], id(traceId).toString(10));
-      assert.deepStrictEqual(carrier[X_DD_PARENT_ID], id(spanId).toString(10));
-      assert.deepStrictEqual(carrier[X_DD_SAMPLING_PRIORITY], '1');
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
+        id(traceId).toString(10)
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_PARENT_ID],
+        id(spanId).toString(10)
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY],
+        '1'
+      );
     });
 
     it('should set b3 traceId and spanId headers and also traceflags and tracestate', () => {
@@ -80,10 +84,22 @@ describe('DatadogPropagator', () => {
         carrier,
         defaultSetter
       );
-      assert.deepStrictEqual(carrier[X_DD_TRACE_ID], id(traceId).toString(10));
-      assert.deepStrictEqual(carrier[X_DD_PARENT_ID], id(spanId).toString(10));
-      assert.deepStrictEqual(carrier[X_DD_SAMPLING_PRIORITY], '0');
-      assert.deepStrictEqual(carrier[X_DD_ORIGIN], 'synthetics-example');
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
+        id(traceId).toString(10)
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_PARENT_ID],
+        id(spanId).toString(10)
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY],
+        '0'
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_ORIGIN],
+        'synthetics-example'
+      );
     });
 
     it('should not inject empty spancontext', () => {
@@ -97,17 +113,25 @@ describe('DatadogPropagator', () => {
         carrier,
         defaultSetter
       );
-      assert.deepStrictEqual(carrier[X_DD_TRACE_ID], undefined);
-      assert.deepStrictEqual(carrier[X_DD_PARENT_ID], undefined);
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_TRACE_ID],
+        undefined
+      );
+      assert.deepStrictEqual(
+        carrier[DatadogPropagationDefaults.X_DD_PARENT_ID],
+        undefined
+      );
     });
   });
 
   describe('.extract()', () => {
     it('should extract context of a unsampled span from carrier', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
-        10
-      );
-      carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = id(
+        '0af7651916cd43dd8448eb211c80319c'
+      ).toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = id(
+        'b7ad6b7169203331'
+      ).toString(10);
       const extractedSpanContext = getExtractedSpanContext(
         datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
@@ -121,11 +145,13 @@ describe('DatadogPropagator', () => {
     });
 
     it('should extract context of a sampled span from carrier', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
-        10
-      );
-      carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
-      carrier[X_DD_SAMPLING_PRIORITY] = '1';
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = id(
+        '0af7651916cd43dd8448eb211c80319c'
+      ).toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = id(
+        'b7ad6b7169203331'
+      ).toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY] = '1';
 
       const extractedSpanContext = getExtractedSpanContext(
         datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
@@ -140,8 +166,8 @@ describe('DatadogPropagator', () => {
     });
 
     it('should return undefined when traceId is undefined', () => {
-      carrier[X_DD_TRACE_ID] = undefined;
-      carrier[X_DD_PARENT_ID] = undefined;
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = undefined;
+      carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
           datadogPropagator.extract(
@@ -155,10 +181,10 @@ describe('DatadogPropagator', () => {
     });
 
     it('should return undefined when options and spanId are undefined', () => {
-      carrier[X_DD_TRACE_ID] = id('0af7651916cd43dd8448eb211c80319c').toString(
-        10
-      );
-      carrier[X_DD_PARENT_ID] = undefined;
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = id(
+        '0af7651916cd43dd8448eb211c80319c'
+      ).toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = undefined;
       assert.deepStrictEqual(
         getExtractedSpanContext(
           datadogPropagator.extract(
@@ -185,7 +211,7 @@ describe('DatadogPropagator', () => {
     });
 
     it('returns undefined if datadog header is invalid', () => {
-      carrier[X_DD_TRACE_ID] = 'invalid!';
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = 'invalid!';
       assert.deepStrictEqual(
         getExtractedSpanContext(
           datadogPropagator.extract(
@@ -199,11 +225,13 @@ describe('DatadogPropagator', () => {
     });
 
     it('extracts datadog from list of header', () => {
-      carrier[X_DD_TRACE_ID] = [
+      carrier[DatadogPropagationDefaults.X_DD_TRACE_ID] = [
         id('0af7651916cd43dd8448eb211c80319c').toString(10),
       ];
-      carrier[X_DD_PARENT_ID] = id('b7ad6b7169203331').toString(10);
-      carrier[X_DD_SAMPLING_PRIORITY] = '01';
+      carrier[DatadogPropagationDefaults.X_DD_PARENT_ID] = id(
+        'b7ad6b7169203331'
+      ).toString(10);
+      carrier[DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY] = '01';
       const extractedSpanContext = getExtractedSpanContext(
         datadogPropagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );

@@ -23,14 +23,14 @@ import {
 } from '../src';
 
 describe('DatadogProbabilitySampler', () => {
-  it('should return a always sampler for 1', () => {
+  it('should return a DATADOG_ALWAYS_SAMPLER for 1', () => {
     const sampler = new DatadogProbabilitySampler(1);
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
   });
 
-  it('should return a always sampler for >1', () => {
+  it('should return a DATADOG_ALWAYS_SAMPLER for >1', () => {
     const sampler = new DatadogProbabilitySampler(100);
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
@@ -38,14 +38,14 @@ describe('DatadogProbabilitySampler', () => {
     assert.strictEqual(sampler.toString(), 'DatadogProbabilitySampler{1}');
   });
 
-  it('should return a never sampler for 0', () => {
+  it('should return a DATADOG_NEVER_SAMPLER for 0', () => {
     const sampler = new DatadogProbabilitySampler(0);
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD,
     });
   });
 
-  it('should return a never sampler for <0', () => {
+  it('should return a DATADOG_NEVER_SAMPLER for <0', () => {
     const sampler = new DatadogProbabilitySampler(-1);
     assert.deepStrictEqual(sampler.shouldSample(), {
       decision: api.SamplingDecision.RECORD,

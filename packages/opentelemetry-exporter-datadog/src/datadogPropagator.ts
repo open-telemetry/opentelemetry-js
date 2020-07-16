@@ -28,16 +28,11 @@ import {
   TraceState,
 } from '@opentelemetry/core';
 import { id } from './types';
-
-export const X_DD_TRACE_ID = 'x-datadog-trace-id';
-export const X_DD_PARENT_ID = 'x-datadog-parent-id';
-export const X_DD_SAMPLING_PRIORITY = 'x-datadog-sampling-priority';
-export const X_DD_ORIGIN = 'x-datadog-origin';
+import { DatadogPropagationDefaults, DatadogDefaults } from './defaults';
 
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
-const OT_ALLOWED_DD_ORIGIN = 'dd_origin';
 
 function isValidTraceId(traceId: string): boolean {
   return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
@@ -64,13 +59,13 @@ export class DatadogPropagator implements HttpTextPropagator {
       const ddTraceId = id(spanContext.traceId).toString(10);
       const ddSpanId = id(spanContext.spanId).toString(10);
 
-      setter(carrier, X_DD_TRACE_ID, ddTraceId);
-      setter(carrier, X_DD_PARENT_ID, ddSpanId);
+      setter(carrier, DatadogPropagationDefaults.X_DD_TRACE_ID, ddTraceId);
+      setter(carrier, DatadogPropagationDefaults.X_DD_PARENT_ID, ddSpanId);
 
       // Current Otel-DD exporter behavior in other languages is to set to zero if falsey
       setter(
         carrier,
-        X_DD_SAMPLING_PRIORITY,
+        DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY,
         (TraceFlags.SAMPLED & spanContext.traceFlags) === TraceFlags.SAMPLED
           ? '1'
           : '0'
@@ -80,22 +75,34 @@ export class DatadogPropagator implements HttpTextPropagator {
       // if it exists, otherwise don't set header
       if (
         spanContext.traceState !== undefined &&
-        spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
+        spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
       ) {
         setter(
           carrier,
-          X_DD_ORIGIN,
-          spanContext.traceState.get(OT_ALLOWED_DD_ORIGIN)
+          DatadogPropagationDefaults.X_DD_ORIGIN,
+          spanContext.traceState.get(DatadogDefaults.OT_ALLOWED_DD_ORIGIN)
         );
       }
     }
   }
 
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const traceIdHeader = getter(carrier, X_DD_TRACE_ID);
-    const spanIdHeader = getter(carrier, X_DD_PARENT_ID);
-    const sampledHeader = getter(carrier, X_DD_SAMPLING_PRIORITY);
-    const originHeader = getter(carrier, X_DD_ORIGIN);
+    const traceIdHeader = getter(
+      carrier,
+      DatadogPropagationDefaults.X_DD_TRACE_ID
+    );
+    const spanIdHeader = getter(
+      carrier,
+      DatadogPropagationDefaults.X_DD_PARENT_ID
+    );
+    const sampledHeader = getter(
+      carrier,
+      DatadogPropagationDefaults.X_DD_SAMPLING_PRIORITY
+    );
+    const originHeader = getter(
+      carrier,
+      DatadogPropagationDefaults.X_DD_ORIGIN
+    );
 
     // I suppose header formats can format these as arrays
     // keeping this from b3propagator
@@ -130,8 +137,8 @@ export class DatadogPropagator implements HttpTextPropagator {
       };
 
       if (origin) {
-        contextOptions['traceState'] = new TraceState(
-          `${OT_ALLOWED_DD_ORIGIN}=${origin}`
+        contextOptions[DatadogDefaults.TRACE_STATE] = new TraceState(
+          `${DatadogDefaults.OT_ALLOWED_DD_ORIGIN}=${origin}`
         );
       }
       return setExtractedSpanContext(context, contextOptions);

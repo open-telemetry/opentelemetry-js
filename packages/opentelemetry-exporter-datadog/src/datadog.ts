@@ -19,6 +19,7 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { translateToDatadog } from './transform';
 import { AgentExporter, PrioritySampler, DatadogExporterConfig } from './types';
 import { URL } from 'url';
+import { DatadogExportDefaults } from './defaults';
 
 /**
  * Format and sends span information to Datadog Exporter.
@@ -26,7 +27,7 @@ import { URL } from 'url';
 export class DatadogExporter implements SpanExporter {
   private readonly _logger: api.Logger;
   private readonly _exporter: typeof AgentExporter;
-  private _service_name: string;
+  private _serviceName: string;
   private _env: string | undefined;
   private _version: string | undefined;
   private _tags: string | undefined;
@@ -35,16 +36,20 @@ export class DatadogExporter implements SpanExporter {
 
   constructor(config: DatadogExporterConfig = {}) {
     this._url =
-      config.agent_url ||
+      config.agentUrl ||
       process.env.DD_TRACE_AGENT_URL ||
-      'http://localhost:8126';
+      DatadogExportDefaults.AGENT_URL;
     this._logger = config.logger || new NoopLogger();
-    this._service_name =
-      config.service_name || process.env.DD_SERVICE || 'dd-service';
+    this._serviceName =
+      config.serviceName ||
+      process.env.DD_SERVICE ||
+      DatadogExportDefaults.SERVICE_NAME;
     this._env = config.env || process.env.DD_ENV;
+
     this._version = config.version || process.env.DD_VERSION;
     this._tags = config.tags || process.env.DD_TAGS;
-    this._flushInterval = config.flushInterval || 1000;
+    this._flushInterval =
+      config.flushInterval || DatadogExportDefaults.FLUSH_INTERVAL;
     this._exporter = new AgentExporter(
       { url: new URL(this._url), flushInterval: this._flushInterval },
       new PrioritySampler()
@@ -65,7 +70,7 @@ export class DatadogExporter implements SpanExporter {
 
     const formattedDatadogSpans = translateToDatadog(
       spans,
-      this._service_name,
+      this._serviceName,
       this._env,
       this._version,
       this._tags
