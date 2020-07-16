@@ -38,4 +38,5 @@ export const DEFAULT_CONFIG = {
     numberOfLinksPerSpan: DEFAULT_MAX_LINKS_PER_SPAN,
     numberOfEventsPerSpan: DEFAULT_MAX_EVENTS_PER_SPAN,
   },
+  gracefulShutdown: true,
 };

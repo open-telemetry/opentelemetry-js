@@ -188,11 +188,14 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterProvider().getMeter('test-prometheus');
+      meter = new MeterProvider().getMeter('test-prometheus', '1', {
+        exporter: exporter,
+      });
       exporter.startServer(done);
     });
 
     afterEach(done => {
+      process.removeAllListeners('SIGTERM');
       exporter.shutdown(done);
     });
 
@@ -416,6 +419,30 @@ describe('PrometheusExporter', () => {
         });
       });
     });
+
+    it('should export a UpDownCounter upon shutdown', done => {
+      const counter = meter.createUpDownCounter('counter', {
+        description: 'a test description',
+      });
+
+      counter.bind({ key1: 'labelValue1' }).add(20);
+      process.once('SIGTERM', () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              assert.deepStrictEqual(chunk.toString().split('\n'), [
+                '# HELP counter a test description',
+                '# TYPE counter gauge',
+                'counter{key1="labelValue1"} 20',
+                '',
+              ]);
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+      process.kill(process.pid, 'SIGTERM');
+    });
   });
 
   describe('configuration', () => {
@@ -425,6 +452,7 @@ describe('PrometheusExporter', () => {
 
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
+      process.removeAllListeners('SIGTERM');
       counter = meter.createCounter('counter') as CounterMetric;
       counter.bind({ key1: 'labelValue1' }).add(10);
     });

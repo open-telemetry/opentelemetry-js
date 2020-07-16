@@ -15,10 +15,15 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('MeterProvider', () => {
+  afterEach(() => {
+    process.removeAllListeners('SIGTERM');
+  });
+
   describe('constructor', () => {
     it('should construct an instance without any options', () => {
       const provider = new MeterProvider();
@@ -71,6 +76,43 @@ describe('MeterProvider', () => {
       const meter3 = provider.getMeter('meter2', 'ver2');
       const meter4 = provider.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
+    });
+  });
+
+  describe('shutdown()', () => {
+    it('should call shutdown when SIGTERM is received', () => {
+      const meterProvider = new MeterProvider();
+      const sandbox = sinon.createSandbox();
+      const shutdownStub1 = sandbox.stub(
+        meterProvider.getMeter('meter1'),
+        'shutdown'
+      );
+      const shutdownStub2 = sandbox.stub(
+        meterProvider.getMeter('meter2'),
+        'shutdown'
+      );
+      process.once('SIGTERM', () => {
+        sinon.assert.calledOnce(shutdownStub1);
+        sinon.assert.calledOnce(shutdownStub2);
+        sandbox.restore();
+      });
+      process.kill(process.pid, 'SIGTERM');
+    });
+
+    it('should not trigger shutdown if graceful shutdown is turned off', () => {
+      const meterProvider = new MeterProvider({
+        gracefulShutdown: false,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub = sandbox.stub(
+        meterProvider.getMeter('meter1'),
+        'shutdown'
+      );
+      process.once('SIGTERM', () => {
+        sinon.assert.notCalled(shutdownStub);
+        sandbox.restore();
+      });
+      process.kill(process.pid, 'SIGTERM');
     });
   });
 });

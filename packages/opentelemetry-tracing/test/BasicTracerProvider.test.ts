@@ -27,11 +27,16 @@ import {
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
   beforeEach(() => {
     context.disable();
+  });
+
+  afterEach(() => {
+    process.removeAllListeners('SIGTERM');
   });
 
   describe('constructor', () => {
@@ -379,6 +384,38 @@ describe('BasicTracerProvider', () => {
     it('should return a Resource', () => {
       const tracerProvider = new BasicTracerProvider();
       assert.ok(tracerProvider.resource instanceof Resource);
+    });
+  });
+
+  describe('.shutdown()', () => {
+    it('should trigger shutdown when SIGTERM is recieved', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const sandbox = sinon.createSandbox();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      process.once('SIGTERM', () => {
+        sinon.assert.calledOnce(shutdownStub);
+        sandbox.restore();
+      });
+      process.kill(process.pid, 'SIGTERM');
+    });
+
+    it('should not trigger shutdown if graceful shutdown is turned off', () => {
+      const tracerProvider = new BasicTracerProvider({
+        gracefulShutdown: false,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      process.once('SIGTERM', () => {
+        sinon.assert.notCalled(shutdownStub);
+        sandbox.restore();
+      });
+      process.kill(process.pid, 'SIGTERM');
     });
   });
 });

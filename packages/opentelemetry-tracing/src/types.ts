@@ -52,6 +52,9 @@ export interface TracerConfig {
 
   /** Resource associated with trace telemetry  */
   resource?: Resource;
+
+  /** Bool for whether or not graceful shutdown is enabled */
+  gracefulShutdown?: boolean;
 }
 
 /**

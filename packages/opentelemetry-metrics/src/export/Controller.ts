@@ -38,8 +38,13 @@ export class PushController extends Controller {
     unrefTimer(this._timer);
   }
 
-  private _collect() {
-    this._meter.collect();
+  shutdown() {
+    this._collect();
+  }
+
+  private async _collect() {
+    await this._meter.collect();
+
     this._exporter.export(this._meter.getBatcher().checkPointSet(), result => {
       if (result !== ExportResult.SUCCESS) {
         // @todo: log error

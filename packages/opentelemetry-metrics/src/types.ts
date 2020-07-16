@@ -39,11 +39,15 @@ export interface MeterConfig {
 
   /** Metric batcher. */
   batcher?: Batcher;
+
+  /** Bool for whether or not graceful shutdown is enabled */
+  gracefulShutdown?: boolean;
 }
 
 /** Default Meter configuration. */
 export const DEFAULT_CONFIG = {
   logLevel: LogLevel.INFO,
+  gracefulShutdown: true,
 };
 
 /** The default metric creation options value. */

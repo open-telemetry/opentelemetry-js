@@ -36,6 +36,9 @@ export class MeterProvider implements api.MeterProvider {
       logger: this.logger,
       resource: this.resource,
     });
+    if (this._config['gracefulShutdown']) {
+      process.once('SIGTERM', this.shutdown.bind(this));
+    }
   }
 
   /**
@@ -53,5 +56,14 @@ export class MeterProvider implements api.MeterProvider {
     }
 
     return this._meters.get(key)!;
+  }
+
+  shutdown(): void {
+    if (this._config['exporter']) {
+      this._config['exporter'].shutdown();
+    }
+    this._meters.forEach((meter, _) => {
+      meter.shutdown();
+    });
   }
 }

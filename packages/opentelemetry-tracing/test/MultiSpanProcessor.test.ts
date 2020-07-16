@@ -31,6 +31,10 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
+  afterEach(() => {
+    process.removeAllListeners('SIGTERM');
+  });
+
   it('should handle empty span processor', () => {
     const multiSpanProcessor = new MultiSpanProcessor([]);
 
@@ -75,6 +79,30 @@ describe('MultiSpanProcessor', () => {
     multiSpanProcessor.shutdown();
     assert.strictEqual(processor1.spans.length, 0);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
+  });
+
+  it('should export spans on graceful shutdown from two span processor', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    assert.strictEqual(processor1.spans.length, 0);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    span.end();
+    assert.strictEqual(processor1.spans.length, 1);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    process.once('SIGTERM', () => {
+      assert.strictEqual(processor1.spans.length, 0);
+      assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    });
+
+    process.kill(process.pid, 'SIGTERM');
   });
 
   it('should force span processors to flush', () => {
