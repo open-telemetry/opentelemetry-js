@@ -34,11 +34,15 @@ export class NodeSDK {
 
   private _resource: Resource;
 
+  private _autoDetectResources: boolean;
+
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
+
+    this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig = {} as NodeTracerConfig;
@@ -124,14 +128,18 @@ export class NodeSDK {
   }
 
   /** Manually add a resource */
-  public async addResource(resource: Resource) {
+  public addResource(resource: Resource) {
     this._resource.merge(resource);
   }
 
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public start() {
+  public async start() {
+    if (this._autoDetectResources) {
+      await this.detectResources();
+    }
+
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,

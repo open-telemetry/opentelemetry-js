@@ -18,6 +18,8 @@ import type { ContextManager } from '@opentelemetry/context-base';
 import type { api, core, metrics, node, resources, tracing } from '.';
 
 export interface NodeSDKConfiguration {
+  autoDetectResources: boolean;
+
   defaultAttributes: api.Attributes;
   logger: api.Logger;
   logLevel: core.LogLevel;

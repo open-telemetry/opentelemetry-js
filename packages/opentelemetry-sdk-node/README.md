@@ -58,15 +58,19 @@ const sdk = new opentelemetry.NodeSDK({
 // You can optionally detect resources asynchronously from the environment.
 // Detected resources are merged with the resources provided in the SDK configuration.
 sdk
-  .autoDetectResources()
+  .start()
   .then(() => {
-    sdk.start();
+    // Resources have been detected and SDK is started
   })
 ```
 
 ## Configuration
 
 Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;
+
+### autoDetectResources
+
+Detect resources automatically from the environment using the default resource detectors. Default `true`.
 
 ### contextManager
 
