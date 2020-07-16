@@ -59,7 +59,7 @@ export class MeterProvider implements api.MeterProvider {
   }
 
   shutdown(): void {
-    if (this._config['exporter']) {
+    if (this._config.exporter) {
       this._config['exporter'].shutdown();
     }
     this._meters.forEach((meter, _) => {
