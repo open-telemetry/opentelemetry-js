@@ -36,7 +36,7 @@ export class MeterProvider implements api.MeterProvider {
       logger: this.logger,
       resource: this.resource,
     });
-    if (this._config['gracefulShutdown']) {
+    if (this._config.gracefulShutdown) {
       process.once('SIGTERM', this.shutdown.bind(this));
     }
   }
