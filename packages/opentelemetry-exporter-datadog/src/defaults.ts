@@ -39,6 +39,9 @@ export enum DatadogDefaults {
   /** The datadog error tag name */
   ERROR_TAG = 'error',
 
+  /** A datadog error tag's value */
+  ERROR = 1,
+
   /** The datadog error type tag name */
   ERROR_TYPE_TAG = 'error.type',
 
@@ -50,6 +53,12 @@ export enum DatadogDefaults {
 
   /** The datadog span type tag name */
   SPAN_TYPE = 'span.type',
+
+  /** The datadog resource tag name */
+  RESOURCE_TAG = 'resource.name',
+
+  /** The datadog service tag name */
+  SERVICE_TAG = 'service.name',
 
   /** The datadog span kind client name */
   CLIENT = 'client',

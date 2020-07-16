@@ -124,7 +124,7 @@ function addErrors(ddSpanBase: typeof Span, span: ReadableSpan): void {
     // the type and stacktrace are not officially recorded. Until this implemented,
     // we can infer a type by using the status code and also the non spec `<library>.error_name` attribute
     const possibleType = inferErrorType(span);
-    ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, 1);
+    ddSpanBase.setTag(DatadogDefaults.ERROR_TAG, DatadogDefaults.ERROR);
     ddSpanBase.setTag(DatadogDefaults.ERROR_MSG_TAG, span.status.message);
 
     if (possibleType) {
@@ -176,8 +176,8 @@ function addDatadogTags(
 ): void {
   // set reserved service and resource tags
   ddSpanBase.addTags({
-    'resource.name': createResource(span),
-    'service.name': serviceName,
+    [DatadogDefaults.RESOURCE_TAG]: createResource(span),
+    [DatadogDefaults.SERVICE_TAG]: serviceName,
   });
 
   // set env tag
@@ -216,22 +216,21 @@ function getTraceContext(span: ReadableSpan): typeof Span[] {
 function createDefaultTags(tags: string | undefined): object {
   // Parse a string of tags typically provided via environment variables.
   // The expected string is of the form: "key1:value1,key2:value2"
+  const tagMap: { [key: string]: string } = {};
+  const tagArray = tags?.split(',') || [];
+  for (let i = 0, j = tagArray.length; i < j; i++) {
+    const kvTuple = tagArray[i].split(':');
+    // ensure default tag env var or  arg is not malformed
+    if (
+      kvTuple.length !== 2 ||
+      !kvTuple[0] ||
+      !kvTuple[1] ||
+      kvTuple[1].endsWith(':')
+    )
+      return {};
 
-  const tagMap = tags
-    ? tags
-        .split(',')
-        .reduce((tags: { [key: string]: string }, kvPair: string) => {
-          const kvTuple = kvPair.split(':');
-          tags[kvTuple[0]] = kvTuple[1];
-          return tags;
-        }, {})
-    : {};
-
-  // ensure default tag env var or  arg is not malformed
-  for (const [key, value] of Object.entries(tagMap)) {
-    if (key === '' || value === '' || value.endsWith(':')) return {};
+    tagMap[kvTuple[0]] = kvTuple[1];
   }
-
   return tagMap;
 }
 
@@ -266,7 +265,7 @@ function createResource(span: ReadableSpan): string {
       span.attributes[DatadogDefaults.HTTP_TARGET];
 
     if (route) {
-      return span.attributes[DatadogDefaults.HTTP_METHOD] + ' ' + route;
+      return `${span.attributes[DatadogDefaults.HTTP_METHOD]} ${route}`;
     }
     return `${span.attributes[DatadogDefaults.HTTP_METHOD]}`;
   }
