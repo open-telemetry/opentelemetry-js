@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { unrefTimer } from '@opentelemetry/core';
+import { unrefTimer, ExportResult, NoopLogger } from '@opentelemetry/core';
 import { PushControllerConfig } from './types';
 import { MeterProvider } from '../../MeterProvider';
 
@@ -30,12 +30,22 @@ export class PushController {
   private _timer: NodeJS.Timeout;
 
   constructor(meterProvider: MeterProvider, config?: PushControllerConfig) {
+    const logger = config?.logger ?? new NoopLogger();
     const onPushed = config?.onPushed;
-    this._timer = setInterval(() => {
-      const promise = meterProvider.collect();
-      if (onPushed) {
-        promise.then(() => onPushed());
+    this._timer = setInterval(async () => {
+      try {
+        const result = await meterProvider.collect();
+        if (result !== ExportResult.SUCCESS) {
+          // TODO: retry strategy
+          logger.error(
+            'Metric exporter reported non success result(%s).',
+            result
+          );
+        }
+      } catch (e) {
+        logger.error('Metric collection rejected with error: %s', e);
       }
+      onPushed?.();
     }, config?.interval ?? DEFAULT_EXPORT_INTERVAL);
     unrefTimer(this._timer);
   }

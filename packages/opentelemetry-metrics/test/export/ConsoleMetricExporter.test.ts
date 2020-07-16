@@ -48,7 +48,8 @@ describe('ConsoleMetricExporter', () => {
       const { callback, onNextCall } = callbackStub();
       const interval = 1000;
 
-      ConsoleMetricExporter.installExportPipeline({
+      const exporter = new ConsoleMetricExporter();
+      exporter.installExportPipeline({
         interval,
         onPushed: callback,
       });

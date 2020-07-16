@@ -65,10 +65,8 @@ describe('PrometheusExporter', () => {
     it('should install export pipeline to global metrics api', async () => {
       let meterProvider: MeterProvider;
       await new Promise(resolve => {
-        ({ exporter, meterProvider } = PrometheusExporter.installExportPipeline(
-          { startServer: true },
-          resolve
-        ));
+        exporter = new PrometheusExporter({ startServer: true }, resolve);
+        ({ meterProvider } = exporter.installExportPipeline());
       });
 
       assert.strictEqual(api.metrics.getMeterProvider(), meterProvider!);

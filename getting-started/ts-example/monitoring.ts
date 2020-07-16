@@ -1,13 +1,14 @@
 import { metrics, Metric, BoundCounter } from '@opentelemetry/api';
-import { installExportPipeline, PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-installExportPipeline({
+const exporter = new PrometheusExporter({
   startServer: true,
 }, () => {
   console.log(
     `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
   );
 });
+exporter.installExportPipeline();
 
 const meter = metrics.getMeter('example-ts');
 

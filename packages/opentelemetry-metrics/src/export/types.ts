@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ValueType, HrTime, Labels } from '@opentelemetry/api';
+import { ValueType, HrTime, Labels, MeterProvider } from '@opentelemetry/api';
 import { ExportResult, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
@@ -97,6 +97,10 @@ export interface MetricExporter {
 
   /** Stops the exporter. */
   shutdown(): void;
+}
+
+export interface ExportPipelineInstaller {
+  installExportPipeline(): { meterProvider: MeterProvider };
 }
 
 /**

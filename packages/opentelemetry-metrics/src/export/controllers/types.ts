@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+import { Logger } from '@opentelemetry/api';
+
 export interface PushControllerConfig {
+  /** User provided logger. */
+  logger?: Logger;
   /** Metric collect interval */
   interval?: number;
   /** Called on each time the metrics were pushed */

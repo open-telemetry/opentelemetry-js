@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { MetricExporter, MetricRecord, Distribution, Histogram } from './types';
+import {
+  MetricExporter,
+  MetricRecord,
+  Distribution,
+  Histogram,
+  ExportPipelineInstaller,
+} from './types';
 import * as api from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 import { PushControllerConfig, PushController } from './controllers';
@@ -25,20 +31,21 @@ import { MeterConfig } from '../types';
  * This is implementation of {@link MetricExporter} that prints metrics data to
  * the console. This class can be used for diagnostic purposes.
  */
-export class ConsoleMetricExporter implements MetricExporter {
+export class ConsoleMetricExporter
+  implements MetricExporter, ExportPipelineInstaller {
   /**
    * Install console export pipeline to global metrics api.
-   * @param config Default meter configuration
+   * @param meterConfig Default meter configuration
+   * @param pushConfig push controller configuration
    */
-  static installExportPipeline(
-    config?: PushControllerConfig,
+  installExportPipeline(
+    pushConfig?: PushControllerConfig,
     meterConfig?: MeterConfig
   ) {
-    const exporter = new ConsoleMetricExporter();
-    const meterProvider = new MeterProvider({ ...meterConfig, exporter });
-    const controller = new PushController(meterProvider, config);
+    const meterProvider = new MeterProvider({ ...meterConfig, exporter: this });
+    const controller = new PushController(meterProvider, pushConfig);
     api.metrics.setGlobalMeterProvider(meterProvider);
-    return { exporter, controller, meterProvider };
+    return { controller, meterProvider };
   }
 
   export(

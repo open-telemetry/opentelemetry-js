@@ -26,7 +26,8 @@ const api  = require('@opentelemetry/api');
 
 // Add your port and startServer to the Prometheus options
 const options = { port: 9464, startServer: true };
-PrometheusExporter.installExportPipeline(options);
+const exporter = new PrometheusExporter(options);
+exporter.installExportPipeline();
 
 // Register the exporter
 const meter = api.metrics.getMeter('example-prometheus');

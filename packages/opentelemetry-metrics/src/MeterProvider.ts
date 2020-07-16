@@ -46,20 +46,13 @@ export class MeterProvider implements api.MeterProvider {
     });
   }
 
-  async collect() {
+  async collect(): Promise<ExportResult> {
     await Promise.all(
       Array.from(this._meters.values()).map(meter => meter.collect())
     );
     return new Promise(resolve => {
       this._exporter.export(this._batcher.checkPointSet(), result => {
-        // TODO: retry strategy
-        if (result !== ExportResult.SUCCESS) {
-          this.logger.error(
-            'Metric exporter reported non success result(%s).',
-            result
-          );
-        }
-        resolve();
+        resolve(result);
       });
     });
   }
