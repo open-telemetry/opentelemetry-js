@@ -24,7 +24,6 @@ import {
   getCorrelationContext,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
-import { Context, CorrelationContext, defaultSetter } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -78,7 +77,7 @@ export class SpanContextShim extends opentracing.SpanContext {
 
   constructor(
     spanContext: api.SpanContext,
-    correlationContext: CorrelationContext
+    correlationContext: api.CorrelationContext
   ) {
     super();
     this._spanContext = spanContext;
@@ -151,7 +150,7 @@ export class TracerShim extends opentracing.Tracer {
       getContextWithParent(options)
     );
 
-    let correlationContext: CorrelationContext = {};
+    let correlationContext: api.CorrelationContext = {};
     if (options.childOf) {
       if (options.childOf instanceof SpanShim) {
         const shimContext = options.childOf.context() as SpanContextShim;
@@ -180,7 +179,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
-          defaultSetter,
+          api.defaultSetter,
           setCorrelationContext(
             setExtractedSpanContext(api.Context.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanCorrelationContext
@@ -203,7 +202,7 @@ export class TracerShim extends opentracing.Tracer {
     switch (format) {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
-        const context: Context = api.propagation.extract(carrier);
+        const context: api.Context = api.propagation.extract(carrier);
         const spanContext = getExtractedSpanContext(context);
         const correlationContext = getCorrelationContext(
           api.propagation.extract(carrier)
@@ -242,7 +241,7 @@ export class SpanShim extends opentracing.Span {
   constructor(
     tracerShim: TracerShim,
     span: api.Span,
-    correlationalCtx: CorrelationContext
+    correlationalCtx: api.CorrelationContext
   ) {
     super();
     this._span = span;
