@@ -135,7 +135,7 @@ describe('OpenTracing Shim', () => {
 
   describe('SpanContextShim', () => {
     it('returns the correct context', () => {
-      const shim = new SpanContextShim(INVALID_SPAN_CONTEXT);
+      const shim = new SpanContextShim(INVALID_SPAN_CONTEXT, {});
       assert.strictEqual(shim.getSpanContext(), INVALID_SPAN_CONTEXT);
       assert.strictEqual(shim.toTraceId(), INVALID_SPAN_CONTEXT.traceId);
       assert.strictEqual(shim.toSpanId(), INVALID_SPAN_CONTEXT.spanId);
