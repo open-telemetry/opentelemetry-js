@@ -37,7 +37,7 @@ export class MeterProvider implements api.MeterProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      process.once('SIGTERM', this.onShutdown.bind(this));
+      process.once('SIGTERM', this.shutdownAllMeters.bind(this));
     }
   }
 
@@ -59,15 +59,17 @@ export class MeterProvider implements api.MeterProvider {
   }
 
   shutdown(cb: () => void = () => {}) {
-    this.onShutdown().then(() => {
+    this.shutdownAllMeters().then(() => {
       setTimeout(cb, 0);
     });
   }
 
-  private async onShutdown() {
+  private async shutdownAllMeters() {
     if (this._config.exporter) {
       this._config.exporter.shutdown();
     }
-    await Promise.all(this._meters.map(meter => meter.shutdown());
+    await Promise.all(
+      Array.from(this._meters, ([_, meter]) => meter.shutdown())
+    );
   }
 }
