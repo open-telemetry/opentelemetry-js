@@ -58,7 +58,6 @@ export class MeterProvider implements api.MeterProvider {
     return this._meters.get(key)!;
   }
 
-<<<<<<< HEAD
   shutdown(cb: () => void = () => {}) {
     this.onShutdown().then(() => {
       setTimeout(cb, 0);
@@ -68,11 +67,6 @@ export class MeterProvider implements api.MeterProvider {
   private async onShutdown() {
     if (this._config.exporter) {
       this._config.exporter.shutdown();
-=======
-  shutdown(): void {
-    if (this._config.exporter) {
-      this._config['exporter'].shutdown();
->>>>>>> f0b9ef652d7e938ffbce100ddf9a8eb30840961d
     }
     const shutdownPromises: Promise<void>[] = [];
     this._meters.forEach((meter, _) => {
