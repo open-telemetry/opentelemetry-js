@@ -14,32 +14,36 @@
  * limitations under the License.
  */
 
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
-
-import { CollectorProtocolNode } from '../../enums';
 import { CollectorExporterConfigNode, ServiceClient } from './types';
+import { CollectorProtocolNode } from '../../enums';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
+import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 
-import { toCollectorExportTraceServiceRequest } from '../../transform';
-
-const DEFAULT_SERVICE_NAME = 'collector-exporter';
+const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/metrics';
 
 /**
- * Collector Trace Exporter for Node
+ * Collector Metric Exporter for Node
  */
-export class CollectorTraceExporter
+export class CollectorMetricExporter
   extends CollectorExporterNodeBase<
-    ReadableSpan,
-    collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+    MetricRecord,
+    collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
-  implements SpanExporter {
+  implements MetricExporter {
+  protected readonly _startTime = new Date().getTime() * 1000000;
+
   convert(
-    spans: ReadableSpan[]
-  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
-    return toCollectorExportTraceServiceRequest(spans, this);
+    metrics: MetricRecord[]
+  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+    return toCollectorExportMetricServiceRequest(
+      metrics,
+      this._startTime,
+      this
+    );
   }
 
   getDefaultUrl(config: CollectorExporterConfigNode): string {
@@ -56,13 +60,13 @@ export class CollectorTraceExporter
   }
 
   getServiceClient(packageObject: any, serverAddress: string): ServiceClient {
-    return new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+    return new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
       serverAddress,
       this.credentials
     );
   }
 
   getServiceProtoPath(): string {
-    return 'opentelemetry/proto/collector/trace/v1/trace_service.proto';
+    return 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
   }
 }
