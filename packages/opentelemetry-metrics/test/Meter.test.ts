@@ -21,7 +21,6 @@ import {
   Metric,
   CounterMetric,
   MetricKind,
-  Sum,
   MeterProvider,
   ValueRecorderMetric,
   ValueObserverMetric,
@@ -566,16 +565,13 @@ describe('Meter', () => {
 
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            last: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value, {
+          count: 0,
+          last: 0,
+          max: -Infinity,
+          min: Infinity,
+          sum: 0,
+        });
       });
 
       it('should not set the instrument data when disabled', async () => {
@@ -587,16 +583,13 @@ describe('Meter', () => {
 
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            last: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value, {
+          count: 0,
+          last: 0,
+          max: -Infinity,
+          min: Infinity,
+          sum: 0,
+        });
       });
 
       it(
@@ -612,16 +605,13 @@ describe('Meter', () => {
 
           await meter.collect();
           const [record1] = meter.getBatcher().checkPointSet();
-          assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 2,
-              last: 50,
-              max: 50,
-              min: -10,
-              sum: 40,
-            }
-          );
+          assert.deepStrictEqual(record1.aggregator.toPoint().value, {
+            count: 2,
+            last: 50,
+            max: 50,
+            min: -10,
+            sum: 40,
+          });
           assert.ok(
             hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
               hrTimeToNanoseconds(performanceTimeOrigin)
@@ -639,16 +629,13 @@ describe('Meter', () => {
         boundValueRecorder2.record(100);
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 2,
-            last: 100,
-            max: 100,
-            min: 10,
-            sum: 110,
-          }
-        );
+        assert.deepStrictEqual(record1.aggregator.toPoint().value, {
+          count: 2,
+          last: 100,
+          max: 100,
+          min: 10,
+          sum: 110,
+        });
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
       });
     });
@@ -1234,7 +1221,7 @@ describe('Meter', () => {
             const value = cpuUsageMetric
               .bind({ foo: 'bar' })
               .getAggregator()
-              .toPoint().value as Distribution;
+              .toPoint().value;
 
             assert.deepStrictEqual(value, {
               count: 0,
@@ -1294,7 +1281,7 @@ describe('Meter', () => {
         valueType: api.ValueType.DOUBLE,
       });
       assert.strictEqual(record[0].labels, labels);
-      const value = record[0].aggregator.toPoint().value as Sum;
+      const value = record[0].aggregator.toPoint().value;
       assert.strictEqual(value, 10.45);
     });
 
@@ -1320,7 +1307,7 @@ describe('Meter', () => {
         valueType: api.ValueType.INT,
       });
       assert.strictEqual(record[0].labels, labels);
-      const value = record[0].aggregator.toPoint().value as Sum;
+      const value = record[0].aggregator.toPoint().value;
       assert.strictEqual(value, 10);
     });
   });
@@ -1351,7 +1338,7 @@ function ensureMetric(
   value?: Distribution
 ) {
   assert.ok(metric.aggregator instanceof MinMaxLastSumCountAggregator);
-  const distribution = metric.aggregator.toPoint().value as Distribution;
+  const distribution = metric.aggregator.toPoint().value;
   if (value) {
     assert.deepStrictEqual(distribution, value);
   } else {
