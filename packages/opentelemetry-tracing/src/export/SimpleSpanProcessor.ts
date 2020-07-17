@@ -28,8 +28,9 @@ export class SimpleSpanProcessor implements SpanProcessor {
   constructor(private readonly _exporter: SpanExporter) {}
   private _isShutdown = false;
 
-  forceFlush(): void {
+  forceFlush(cb: () => void = () => {}): void {
     // do nothing as all spans are being exported without waiting
+    setTimeout(cb, 0);
   }
 
   // does nothing.
@@ -42,12 +43,14 @@ export class SimpleSpanProcessor implements SpanProcessor {
     this._exporter.export([span], () => {});
   }
 
-  shutdown(): void {
+  shutdown(cb: () => void = () => {}): void {
     if (this._isShutdown) {
+      setTimeout(cb, 0);
       return;
     }
     this._isShutdown = true;
 
     this._exporter.shutdown();
+    setTimeout(cb, 0);
   }
 }
