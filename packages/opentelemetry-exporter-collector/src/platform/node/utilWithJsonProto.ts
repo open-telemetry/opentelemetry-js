@@ -25,9 +25,10 @@ import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
 export const DEFAULT_COLLECTOR_URL_JSON_PROTO =
-  'http://localhost:55680/v1/trace';
+  'http://localhost:55681/v1/trace';
 
 let ExportTraceServiceRequestProto: Type | undefined;
+let proto: any;
 
 export function getExportTraceServiceRequestProto(): Type | undefined {
   return ExportTraceServiceRequestProto;
@@ -42,7 +43,7 @@ export function onInitWithJsonProto(
   root.resolvePath = function (origin, target) {
     return `${dir}/${target}`;
   };
-  const proto = root.loadSync([
+  proto = root.loadSync([
     'opentelemetry/proto/common/v1/common.proto',
     'opentelemetry/proto/resource/v1/resource.proto',
     'opentelemetry/proto/trace/v1/trace.proto',
@@ -75,8 +76,25 @@ export function sendSpansUsingJsonProto(
     exportTraceServiceRequest
   );
 
+  // function check(obj: any) {
+  //   const AnyValue = proto?.lookupType('AnyValue');
+  //   const aMessage = AnyValue.create(obj);
+  //   const aData = AnyValue.decode(AnyValue.encode(aMessage).finish());
+  //   return aData.toJSON();
+  // }
   if (message) {
+    // console.log(check({stringValue: 'bartek', key: 'foo', value: 'stringValue'}));
+    // console.log(check({key: 'bartek'}));
+    // console.log(check({key: 'test', stringValue: 'bartek'}));
+    // console.log(check({key: 'test', type: 0, stringValue: 'bartek'}));
+    // console.log(check({key: 'test', type: 'STRING', stringValue: 'bartek'}));
+    // console.log(check({key: 'test', value: {stringValue: 'bartek'}}));
+    // console.log(check({key: 'test', value: {stringValue: 'bartek', type: 0}}));
+
     const body = ExportTraceServiceRequestProto?.encode(message).finish();
+    // const data = ExportTraceServiceRequestProto?.decode(body as Uint8Array);
+    // const json = data?.toJSON();
+    // console.log(json);
     if (body) {
       sendDataUsingHttp(
         collector,

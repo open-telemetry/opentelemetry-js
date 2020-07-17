@@ -6,6 +6,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./start.js",
+    "start:grpc": "node ./grpc_tmp.js",
     "docker:start": "cd ./docker && docker-compose down && docker-compose up",
     "docker:startd": "cd ./docker && docker-compose down && docker-compose up -d",
     "docker:stop": "cd ./docker && docker-compose down"
@@ -27,6 +28,8 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
+    "grpc": "^1.25.0-pre1",
+    "@grpc/proto-loader": "^0.6.0-pre4",
     "@opentelemetry/api": "^0.9.0",
     "@opentelemetry/core": "^0.9.0",
     "@opentelemetry/exporter-collector": "^0.9.0",

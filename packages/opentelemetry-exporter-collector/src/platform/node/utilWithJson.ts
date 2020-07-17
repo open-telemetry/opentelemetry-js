@@ -21,7 +21,7 @@ import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
+export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/trace';
 
 export function onInitWithJson(
   _collector: CollectorTraceExporter,

@@ -394,7 +394,7 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -550,14 +550,13 @@ export function ensureProtoEventsAreCorrect(
 }
 
 export function ensureAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
         key: 'component',
-        type: 0,
         stringValue: 'document-load',
       },
     ],
@@ -566,7 +565,7 @@ export function ensureAttributesAreCorrect(
 }
 
 export function ensureProtoAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
@@ -593,7 +592,6 @@ export function ensureLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            type: 0,
             stringValue: 'document-load',
           },
         ],
@@ -774,18 +772,15 @@ export function ensureWebResourceIsCorrect(
     attributes: [
       {
         key: 'service.name',
-        type: 0,
         stringValue: 'bar',
       },
       {
         key: 'service',
-        type: 0,
         stringValue: 'ui',
       },
-      { key: 'version', type: 2, doubleValue: 1 },
+      { key: 'version', doubleValue: 1 },
       {
         key: 'cost',
-        type: 2,
         doubleValue: 112.12,
       },
     ],

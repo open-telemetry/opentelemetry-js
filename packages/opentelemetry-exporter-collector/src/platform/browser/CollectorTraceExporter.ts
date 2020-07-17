@@ -21,7 +21,7 @@ import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Exporter for Web
@@ -40,10 +40,17 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
    */
   constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
-    this._headers =
-      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
+    this._useXHR = true;
+    if (this._useXHR) {
+      this._headers = {
+        ...parseHeaders(config.headers, this.logger),
+        ...this.DEFAULT_HEADERS
+      }
+    } else {
+      this._headers = {};
+    }
   }
 
   onInit(): void {

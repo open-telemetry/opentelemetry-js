@@ -18,6 +18,7 @@ import * as http from 'http';
 import * as https from 'https';
 import * as collectorTypes from '../../types';
 import { CollectorTraceExporter } from './CollectorTraceExporter';
+// const axios = require('axios');
 
 export function removeProtocol(url: string): string {
   return url.replace(/^https?:\/\//, '');
@@ -38,8 +39,22 @@ export function sendDataUsingHttp(
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  const parsedUrl = new url.URL(collector.url);
+  // axios({
+  //   method: 'post',
+  //   url: collector.url,
+  //   data: data,
+  //   headers: {
+  //     'Content-Type': contentType,
+  //     'Content-Length':  Buffer.byteLength(data),
+  //     ...collector.headers,
+  //   }
+  // }).then((response: any) => {
+  //   console.log('ok');
+  // }).catch(((error: any)=> {
+  //   console.log('error', error.response.statusText, error.response.data.message);
+  // }))
 
+  const parsedUrl = new url.URL(collector.url);
   const options = {
     hostname: parsedUrl.hostname,
     port: parsedUrl.port,
