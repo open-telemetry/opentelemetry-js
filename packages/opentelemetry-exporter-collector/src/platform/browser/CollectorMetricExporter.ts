@@ -14,73 +14,36 @@
  * limitations under the License.
  */
 
-import { MetricRecord } from '@opentelemetry/metrics';
-import { CollectorMetricExporterBase } from '../../CollectorMetricExporterBase';
+import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
+import * as collectorTypes from '../../types';
+import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
-import { CollectorExporterError, OT_REQUEST_HEADER } from '../../types';
 import { CollectorExporterConfigBrowser } from './types';
-import { sendWithBeacon, sendWithXhr } from './util';
-import { parseHeaders } from '../../util';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/metrics';
 
 /**
  * Collector Metric Exporter for Web
  */
-export class CollectorMetricExporter extends CollectorMetricExporterBase<
-  CollectorExporterConfigBrowser
-> {
-  DEFAULT_HEADERS: { [key: string]: string } = {
-    [OT_REQUEST_HEADER]: '1',
-  };
-  private _headers: { [key: string]: string };
-  private _useXHR: boolean = false;
+export class CollectorMetricExporter
+  extends CollectorExporterBrowserBase<
+    MetricRecord,
+    collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  >
+  implements MetricExporter {
+  private readonly _startTime = new Date().getTime() * 1000000;
 
-  /**
-   * @param config
-   */
-  constructor(config: CollectorExporterConfigBrowser = {}) {
-    super(config);
-    this._headers =
-      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
-    this._useXHR =
-      !!config.headers || typeof navigator.sendBeacon !== 'function';
-  }
-
-  onInit(): void {
-    window.addEventListener('unload', this.shutdown);
-  }
-
-  onShutdown(): void {
-    window.removeEventListener('unload', this.shutdown);
-  }
-
-  getDefaultUrl(url: string | undefined): string {
-    return url || DEFAULT_COLLECTOR_URL;
-  }
-
-  sendMetrics(
-    metrics: MetricRecord[],
-    onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
-  ): void {
-    const exportMetricServiceRequest = toCollectorExportMetricServiceRequest(
+  convert(
+    metrics: MetricRecord[]
+  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+    return toCollectorExportMetricServiceRequest(
       metrics,
       this._startTime,
       this
     );
-    const body = JSON.stringify(exportMetricServiceRequest);
-    if (this._useXHR) {
-      sendWithXhr(
-        body,
-        this.url,
-        this._headers,
-        this.logger,
-        onSuccess,
-        onError
-      );
-    } else {
-      sendWithBeacon(body, this.url, this.logger, onSuccess, onError);
-    }
+  }
+
+  getDefaultUrl(config: CollectorExporterConfigBrowser): string {
+    return config.url || DEFAULT_COLLECTOR_URL;
   }
 }

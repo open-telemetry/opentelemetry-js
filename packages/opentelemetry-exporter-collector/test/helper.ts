@@ -850,20 +850,25 @@ export function ensureExportedObserverIsCorrect(
     name: 'test-observer',
     description: 'sample observer description',
     unit: '2',
-    type: 'DOUBLE',
+    type: 'SUMMARY',
     temporality: 'DELTA',
   });
 
   assert.deepStrictEqual(metric.int64DataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
   assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.ok(metric.doubleDataPoints);
-  assert.deepStrictEqual(metric.doubleDataPoints[0].labels, []);
-  assert.deepStrictEqual(metric.doubleDataPoints[0].value, 10);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 9);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '2');
   assert.deepStrictEqual(
-    metric.doubleDataPoints[0].startTimeUnixNano,
+    metric.summaryDataPoints[0].startTimeUnixNano,
     '1592602232694000128'
   );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 3 },
+    { percentile: 100, value: 6 },
+  ]);
 }
 
 export function ensureExportedHistogramIsCorrect(
@@ -905,18 +910,24 @@ export function ensureExportedValueRecorderIsCorrect(
     name: 'test-recorder',
     description: 'sample recorder description',
     unit: '3',
-    type: 'INT64',
+    type: 'SUMMARY',
     temporality: 'DELTA',
   });
   assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.int64DataPoints, []);
   assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.ok(metric.int64DataPoints);
-  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
   assert.deepStrictEqual(
-    metric.int64DataPoints[0].startTimeUnixNano,
+    metric.summaryDataPoints[0].startTimeUnixNano,
     '1592602232694000128'
   );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 5 },
+    { percentile: 100, value: 5 },
+  ]);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '1');
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 5);
 }
 
 export function ensureResourceIsCorrect(
