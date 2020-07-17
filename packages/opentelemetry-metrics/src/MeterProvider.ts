@@ -36,8 +36,8 @@ export class MeterProvider implements api.MeterProvider {
       logger: this.logger,
       resource: this.resource,
     });
-    if (this._config['gracefulShutdown']) {
-      process.once('SIGTERM', this.shutdown.bind(this));
+    if (this._config.gracefulShutdown) {
+      process.once('SIGTERM', this.onShutdown.bind(this));
     }
   }
 
@@ -58,12 +58,20 @@ export class MeterProvider implements api.MeterProvider {
     return this._meters.get(key)!;
   }
 
-  shutdown(): void {
-    if (this._config['exporter']) {
-      this._config['exporter'].shutdown();
-    }
-    this._meters.forEach((meter, _) => {
-      meter.shutdown();
+  shutdown(cb: () => void = () => {}) {
+    this.onShutdown().then(() => {
+      setTimeout(cb, 0);
     });
+  }
+
+  private async onShutdown() {
+    if (this._config.exporter) {
+      this._config.exporter.shutdown();
+    }
+    const shutdownPromises: Promise<void>[] = [];
+    this._meters.forEach((meter, _) => {
+      shutdownPromises.push(meter.shutdown());
+    });
+    await Promise.all(shutdownPromises);
   }
 }

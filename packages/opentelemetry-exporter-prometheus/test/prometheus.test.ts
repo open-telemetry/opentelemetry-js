@@ -184,11 +184,13 @@ describe('PrometheusExporter', () => {
 
   describe('export', () => {
     let exporter: PrometheusExporter;
+    let meterProvider: MeterProvider;
     let meter: Meter;
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterProvider().getMeter('test-prometheus', '1', {
+      meterProvider = new MeterProvider();
+      meter = meterProvider.getMeter('test-prometheus', '1', {
         exporter: exporter,
       });
       exporter.startServer(done);
@@ -322,6 +324,69 @@ describe('PrometheusExporter', () => {
       });
     });
 
+    it('should export multiple labels on graceful shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      process.once('SIGTERM', () => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+      process.kill(process.pid, 'SIGTERM');
+    });
+
+    it('should export multiple labels on manual shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      meterProvider.shutdown(() => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
+
     it('should export a comment if no metrics are registered', done => {
       exporter.export([], () => {
         http
@@ -418,30 +483,6 @@ describe('PrometheusExporter', () => {
             .on('error', errorHandler(done));
         });
       });
-    });
-
-    it('should export a UpDownCounter as gauge on SIGTERM', done => {
-      const counter = meter.createUpDownCounter('counter', {
-        description: 'a test description',
-      });
-
-      counter.bind({ key1: 'labelValue1' }).add(20);
-      process.once('SIGTERM', () => {
-        http
-          .get('http://localhost:9464/metrics', res => {
-            res.on('data', chunk => {
-              assert.deepStrictEqual(chunk.toString().split('\n'), [
-                '# HELP counter a test description',
-                '# TYPE counter gauge',
-                'counter{key1="labelValue1"} 20',
-                '',
-              ]);
-              done();
-            });
-          })
-          .on('error', errorHandler(done));
-      });
-      process.kill(process.pid, 'SIGTERM');
     });
   });
 

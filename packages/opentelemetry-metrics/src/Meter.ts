@@ -310,8 +310,8 @@ export class Meter implements api.Meter {
     return this._batcher;
   }
 
-  shutdown(): void {
-    this._controller.shutdown();
+  async shutdown(): Promise<void> {
+    await this._controller.shutdown();
   }
 
   /**
