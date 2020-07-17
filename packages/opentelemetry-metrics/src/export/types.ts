@@ -42,6 +42,15 @@ export interface Distribution {
   sum: number;
 }
 
+export enum AggregatorKind {
+  SUM = ' SUM',
+  MIN_MAX_LAST_SUM_COUNT = 'MIN_MAX_LAST_SUM_COUNT',
+  DISTRIBUTION = 'DISTRIBUTION',
+  HISTOGRAM = 'HISTOGRAM',
+}
+
+export type AggregatorTypes = Sum | LastValue | Distribution | Histogram;
+
 export interface Histogram {
   /**
    * Buckets are implemented using two different array:
@@ -104,14 +113,17 @@ export interface MetricExporter {
  * aggregated values and taking a snapshot of these values upon export.
  */
 export interface Aggregator {
+  /** Kind of aggregator. */
+  kind: AggregatorKind;
+
   /** Updates the current with the new value. */
   update(value: number): void;
 
   /** Returns snapshot of the current point (value with timestamp). */
-  toPoint(): Point;
+  toPoint(): Point<AggregatorTypes>;
 }
 
-export interface Point {
-  value: Sum | LastValue | Distribution | Histogram;
+export interface Point<T> {
+  value: T;
   timestamp: HrTime;
 }

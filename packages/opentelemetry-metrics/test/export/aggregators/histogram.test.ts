@@ -16,7 +16,6 @@
 
 import * as assert from 'assert';
 import { HistogramAggregator } from '../../../src/export/aggregators';
-import { Histogram } from '../../../src';
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {
@@ -28,7 +27,7 @@ describe('HistogramAggregator', () => {
 
     it('should sort boundaries', () => {
       const aggregator = new HistogramAggregator([500, 300, 700]);
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.deepEqual(point.buckets.boundaries, [300, 500, 700]);
     });
 
@@ -43,7 +42,7 @@ describe('HistogramAggregator', () => {
     it('should not update checkpoint', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(150);
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.equal(point.count, 0);
       assert.equal(point.sum, 0);
     });
@@ -52,7 +51,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(150);
       aggregator.reset();
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.equal(point.count, 1);
       assert.equal(point.sum, 150);
       assert.equal(point.buckets.counts[0], 0);
@@ -64,7 +63,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(50);
       aggregator.reset();
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.equal(point.count, 1);
       assert.equal(point.sum, 50);
       assert.equal(point.buckets.counts[0], 1);
@@ -76,7 +75,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       aggregator.update(250);
       aggregator.reset();
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.equal(point.count, 1);
       assert.equal(point.sum, 250);
       assert.equal(point.buckets.counts[0], 0);
@@ -88,11 +87,11 @@ describe('HistogramAggregator', () => {
   describe('.count', () => {
     it('should return last checkpoint count', () => {
       const aggregator = new HistogramAggregator([100]);
-      let point = aggregator.toPoint().value as Histogram;
+      let point = aggregator.toPoint().value;
       assert.equal(point.count, point.count);
       aggregator.update(10);
       aggregator.reset();
-      point = aggregator.toPoint().value as Histogram;
+      point = aggregator.toPoint().value;
       assert.equal(point.count, 1);
       assert.equal(point.count, point.count);
     });
@@ -101,11 +100,11 @@ describe('HistogramAggregator', () => {
   describe('.sum', () => {
     it('should return last checkpoint sum', () => {
       const aggregator = new HistogramAggregator([100]);
-      let point = aggregator.toPoint().value as Histogram;
+      let point = aggregator.toPoint().value;
       assert.equal(point.sum, point.sum);
       aggregator.update(10);
       aggregator.reset();
-      point = aggregator.toPoint().value as Histogram;
+      point = aggregator.toPoint().value;
       assert.equal(point.sum, 10);
     });
   });
@@ -113,7 +112,7 @@ describe('HistogramAggregator', () => {
   describe('.reset()', () => {
     it('should create a empty checkoint by default', () => {
       const aggregator = new HistogramAggregator([100]);
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.deepEqual(point.buckets.boundaries, [100]);
       assert(point.buckets.counts.every(count => count === 0));
       // should contains one bucket for each boundary + one for values outside of the largest boundary
@@ -127,7 +126,7 @@ describe('HistogramAggregator', () => {
       const aggregator = new HistogramAggregator([100]);
       aggregator.update(10);
       aggregator.reset();
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.equal(point.count, 1);
       assert.equal(point.sum, 10);
       assert.deepEqual(point.buckets.boundaries, [100]);
@@ -139,7 +138,7 @@ describe('HistogramAggregator', () => {
   describe('.toPoint()', () => {
     it('should return default checkpoint', () => {
       const aggregator = new HistogramAggregator([100]);
-      const point = aggregator.toPoint().value as Histogram;
+      const point = aggregator.toPoint().value;
       assert.deepEqual(aggregator.toPoint().value, point);
       assert(aggregator.toPoint().timestamp.every(nbr => nbr > 0));
     });
