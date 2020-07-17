@@ -53,11 +53,11 @@
   },
   "devDependencies": {
     "@types/mocha": "7.0.2",
-    "@types/node": "14.0.22",
+    "@types/node": "14.0.23",
     "@types/semver": "7.3.1",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
-    "codecov": "3.7.0",
+    "codecov": "3.7.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.1.0",
@@ -70,10 +70,10 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "sinon": "9.0.2",
-    "ts-loader": "8.0.0",
+    "ts-loader": "8.0.1",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.6",
+    "typescript": "3.9.7",
     "webpack": "4.43.0"
   },
   "dependencies": {
