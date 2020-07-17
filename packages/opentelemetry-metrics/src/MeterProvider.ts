@@ -68,10 +68,6 @@ export class MeterProvider implements api.MeterProvider {
     if (this._config.exporter) {
       this._config.exporter.shutdown();
     }
-    const shutdownPromises: Promise<void>[] = [];
-    this._meters.forEach((meter, _) => {
-      shutdownPromises.push(meter.shutdown());
-    });
-    await Promise.all(shutdownPromises);
+    await Promise.all(this._meters.map(meter => meter.shutdown());
   }
 }
