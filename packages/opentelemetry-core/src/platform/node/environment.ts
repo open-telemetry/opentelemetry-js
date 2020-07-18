@@ -24,7 +24,7 @@ import {
 /**
  * Gets the environment variables
  */
-export function getEnv(): ENVIRONMENT {
+export function getEnv(): Required<ENVIRONMENT> {
   const processEnv = parseEnvironment(process.env as ENVIRONMENT_MAP);
   return Object.assign({}, DEFAULT_ENVIRONMENT, processEnv);
 }
