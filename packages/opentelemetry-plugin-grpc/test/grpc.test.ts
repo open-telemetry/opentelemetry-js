@@ -49,6 +49,7 @@ interface TestRequestResponse {
 type TestGrpcClient = grpc.Client & {
   unaryMethod: any;
   UnaryMethod: any;
+  camelCaseMethod: any;
   clientStreamMethod: any;
   serverStreamMethod: any;
   bidiStreamMethod: any;
@@ -81,6 +82,24 @@ const grpcClient = {
   ): Promise<TestRequestResponse> => {
     return new Promise((resolve, reject) => {
       return client.unaryMethod(
+        request,
+        (err: grpc.ServiceError, response: TestRequestResponse) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(response);
+          }
+        }
+      );
+    });
+  },
+
+  camelCaseMethod: (
+    client: TestGrpcClient,
+    request: TestRequestResponse
+  ): Promise<TestRequestResponse> => {
+    return new Promise((resolve, reject) => {
+      return client.camelCaseMethod(
         request,
         (err: grpc.ServiceError, response: TestRequestResponse) => {
           if (err) {
@@ -220,6 +239,16 @@ function startServer(grpc: GrpcModule, proto: any) {
         : callback(null, { num: call.request.num });
     },
 
+    // This method returns the request
+    camelCaseMethod(
+      call: grpc.ServerUnaryCall<any>,
+      callback: SendUnaryDataCallback
+    ) {
+      call.request.num <= MAX_ERROR_STATUS
+        ? callback(getError('Unary Method Error', call.request.num))
+        : callback(null, { num: call.request.num });
+    },
+
     // This method sum the requests
     clientStreamMethod(
       call: grpc.ServerReadableStream<any>,
@@ -342,6 +371,13 @@ describe('GrpcPlugin', () => {
       description: 'unary call',
       methodName: 'UnaryMethod',
       method: grpcClient.unaryMethod,
+      request: requestList[0],
+      result: requestList[0],
+    },
+    {
+      description: 'camelCase unary call',
+      methodName: 'camelCaseMethod',
+      method: grpcClient.camelCaseMethod,
       request: requestList[0],
       result: requestList[0],
     },
