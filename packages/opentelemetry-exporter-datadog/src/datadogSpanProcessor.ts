@@ -42,9 +42,9 @@ export class DatadogSpanProcessor implements SpanProcessor {
   // private _exporter: SpanExporter;
   private _timer: NodeJS.Timeout | undefined;
   private _traces = new Map();
-  private _traces_spans_started = new Map();
-  private _traces_spans_finished = new Map();
-  private _check_traces_queue: Set<string> = new Set();
+  private _tracesSpansStarted = new Map();
+  private _tracesSpansFinished = new Map();
+  private _checkTracesQueue: Set<string> = new Set();
   public readonly logger: Logger;
 
   constructor(
@@ -89,9 +89,28 @@ export class DatadogSpanProcessor implements SpanProcessor {
       return;
     }
 
-    if (this._allSpansCount(this._traces_spans_started) >= this._maxQueueSize) {
-      this.logger.debug('Max Queue Size reached, dropping span');
-      return;
+    if (this._allSpansCount(this._tracesSpansStarted) >= this._maxQueueSize) {
+      // instead of just dropping all new spans, dd-trace-rb drops a random trace
+      // https://github.com/DataDog/dd-trace-rb/blob/c6fbf2410a60495f1b2d8912bf7ea7dc63422141/lib/ddtrace/buffer.rb#L34-L36
+      // It allows for a more fair usage of the queue when under stress load,
+      // and will create proportional representation of code paths being instrumented at stress time.
+      const traceToDrop = this._fetchUnfinishedTrace(
+        this._traces,
+        this._checkTracesQueue
+      );
+
+      if (traceToDrop === undefined) {
+        this.logger.debug('Max Queue Size reached, dropping span');
+        return;
+      }
+      this.logger.debug(
+        `Max Queue Size reached, dropping trace ${traceToDrop}`
+      );
+      this._traces.delete(traceToDrop);
+      if (this._tracesSpansStarted.has(traceToDrop))
+        this._tracesSpansStarted.delete(traceToDrop);
+      if (this._tracesSpansFinished.has(traceToDrop))
+        this._tracesSpansFinished.delete(traceToDrop);
     }
 
     const traceId = span.spanContext.traceId;
@@ -99,12 +118,12 @@ export class DatadogSpanProcessor implements SpanProcessor {
     if (!this._traces.has(traceId)) {
       this._traces.set(traceId, []);
       // this._traces.get(traceId).set(SPANS_KEY, [])
-      this._traces_spans_started.set(traceId, 0);
-      this._traces_spans_finished.set(traceId, 0);
+      this._tracesSpansStarted.set(traceId, 0);
+      this._tracesSpansFinished.set(traceId, 0);
     }
 
     const trace = this._traces.get(traceId);
-    const traceSpansStarted = this._traces_spans_started.get(traceId);
+    const traceSpansStarted = this._tracesSpansStarted.get(traceId);
 
     if (traceSpansStarted >= this._maxTraceSize) {
       this.logger.debug('Max Trace Size reached, dropping span');
@@ -112,7 +131,7 @@ export class DatadogSpanProcessor implements SpanProcessor {
     }
 
     trace.push(span);
-    this._traces_spans_started.set(traceId, traceSpansStarted + 1);
+    this._tracesSpansStarted.set(traceId, traceSpansStarted + 1);
   }
 
   onEnd(span: ReadableSpan): void {
@@ -126,12 +145,12 @@ export class DatadogSpanProcessor implements SpanProcessor {
       return;
     }
 
-    const traceSpansFinished = this._traces_spans_finished.get(traceId);
+    const traceSpansFinished = this._tracesSpansFinished.get(traceId);
 
-    this._traces_spans_finished.set(traceId, traceSpansFinished + 1);
+    this._tracesSpansFinished.set(traceId, traceSpansFinished + 1);
 
     if (this._isExportable(traceId)) {
-      this._check_traces_queue.add(traceId);
+      this._checkTracesQueue.add(traceId);
       this._maybeStartTimer();
     }
   }
@@ -147,16 +166,16 @@ export class DatadogSpanProcessor implements SpanProcessor {
   /** Send the span data list to exporter */
   private _flush() {
     this._clearTimer();
-    if (this._check_traces_queue.size === 0) return;
+    if (this._checkTracesQueue.size === 0) return;
 
-    this._check_traces_queue.forEach(traceId => {
+    this._checkTracesQueue.forEach(traceId => {
       // check again in case spans have been added
       if (this._isExportable(traceId)) {
         const spans = this._traces.get(traceId);
         this._traces.delete(traceId);
-        this._traces_spans_started.delete(traceId);
-        this._traces_spans_finished.delete(traceId);
-        this._check_traces_queue.delete(traceId);
+        this._tracesSpansStarted.delete(traceId);
+        this._tracesSpansFinished.delete(traceId);
+        this._checkTracesQueue.delete(traceId);
         this._exporter.export(spans, () => {});
       } else {
         this.logger.error(`Trace  ${traceId} incomplete, not exported`);
@@ -190,16 +209,30 @@ export class DatadogSpanProcessor implements SpanProcessor {
 
     if (
       !trace ||
-      !this._traces_spans_started.has(traceId) ||
-      !this._traces_spans_finished.has(traceId)
+      !this._tracesSpansStarted.has(traceId) ||
+      !this._tracesSpansFinished.has(traceId)
     ) {
       return;
     }
 
     return (
-      this._traces_spans_started.get(traceId) -
-        this._traces_spans_finished.get(traceId) <=
+      this._tracesSpansStarted.get(traceId) -
+        this._tracesSpansFinished.get(traceId) <=
       0
     );
+  }
+
+  private _fetchUnfinishedTrace(
+    traces: Map<string, Array<string>>,
+    finshedTraceQueue: Set<string>
+  ): string | undefined {
+    // don't fetch potentially finished trace awaiting export
+    const unfinishedTraces = Array.from(traces.keys()).filter(
+      x => !finshedTraceQueue.has(x)
+    );
+    // grab random unfinished trace id
+    return unfinishedTraces[
+      Math.floor(Math.random() * unfinishedTraces.length)
+    ];
   }
 }
