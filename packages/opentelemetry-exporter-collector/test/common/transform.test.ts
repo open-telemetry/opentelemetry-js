@@ -26,7 +26,6 @@ import {
   multiInstrumentationLibraryTrace,
 } from '../helper';
 import { Resource } from '@opentelemetry/resources';
-
 describe('transform', () => {
   describe('toCollectorAttributes', () => {
     it('should convert attribute string', () => {
@@ -126,7 +125,6 @@ describe('transform', () => {
       });
     });
   });
-
   describe('groupSpansByResourceAndLibrary', () => {
     it('should group by resource', () => {
       const [resource1, resource2] = mockedResources;

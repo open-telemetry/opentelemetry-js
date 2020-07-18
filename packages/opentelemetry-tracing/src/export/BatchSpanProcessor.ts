@@ -44,11 +44,12 @@ export class BatchSpanProcessor implements SpanProcessor {
         : DEFAULT_BUFFER_TIMEOUT_MS;
   }
 
-  forceFlush(): void {
+  forceFlush(cb: () => void = () => {}): void {
     if (this._isShutdown) {
+      setTimeout(cb, 0);
       return;
     }
-    this._flush();
+    this._flush(cb);
   }
 
   // does nothing.
@@ -61,11 +62,12 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._addToBuffer(span);
   }
 
-  shutdown(): void {
+  shutdown(cb: () => void = () => {}): void {
     if (this._isShutdown) {
+      setTimeout(cb, 0);
       return;
     }
-    this.forceFlush();
+    this.forceFlush(cb);
     this._isShutdown = true;
     this._exporter.shutdown();
   }
@@ -80,10 +82,13 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   /** Send the span data list to exporter */
-  private _flush() {
+  private _flush(cb: () => void = () => {}) {
     this._clearTimer();
-    if (this._finishedSpans.length === 0) return;
-    this._exporter.export(this._finishedSpans, () => {});
+    if (this._finishedSpans.length === 0) {
+      setTimeout(cb, 0);
+      return;
+    }
+    this._exporter.export(this._finishedSpans, cb);
     this._finishedSpans = [];
   }
 
