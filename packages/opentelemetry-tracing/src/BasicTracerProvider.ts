@@ -48,7 +48,7 @@ export class BasicTracerProvider implements api.TracerProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      process.once('SIGTERM', this.shutdownActiveProcessor.bind(this));
+      process.once('SIGTERM', this._shutdownActiveProcessor.bind(this));
     }
   }
 
@@ -107,7 +107,7 @@ export class BasicTracerProvider implements api.TracerProvider {
     this.activeSpanProcessor.shutdown(cb);
   }
 
-  private shutdownActiveProcessor() {
+  private _shutdownActiveProcessor() {
     this.activeSpanProcessor.shutdown();
   }
 }

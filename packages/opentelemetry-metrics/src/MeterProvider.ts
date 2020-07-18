@@ -37,7 +37,7 @@ export class MeterProvider implements api.MeterProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      process.once('SIGTERM', this.shutdownAllMeters.bind(this));
+      process.once('SIGTERM', this._shutdownAllMeters.bind(this));
     }
   }
 
@@ -59,7 +59,7 @@ export class MeterProvider implements api.MeterProvider {
   }
 
   shutdown(cb: () => void = () => {}) {
-    this.shutdownAllMeters().then(() => {
+    this._shutdownAllMeters().then(() => {
       setTimeout(cb, 0);
     });
   }
