@@ -17,14 +17,12 @@
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import * as collectorTypes from '../../types';
-
 import { CollectorProtocolNode } from '../../enums';
 import { CollectorExporterConfigNode, ServiceClient } from './types';
-
 import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { DEFAULT_COLLECTOR_URL_GRPC } from './utilWithGrpc';
 
-const DEFAULT_SERVICE_NAME = 'collector-exporter';
-const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
+const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
 const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
 
 /**
