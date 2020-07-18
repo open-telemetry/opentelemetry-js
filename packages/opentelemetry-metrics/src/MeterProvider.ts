@@ -64,7 +64,7 @@ export class MeterProvider implements api.MeterProvider {
     });
   }
 
-  private async shutdownAllMeters() {
+  private async _shutdownAllMeters() {
     if (this._config.exporter) {
       this._config.exporter.shutdown();
     }
