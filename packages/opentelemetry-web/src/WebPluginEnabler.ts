@@ -44,7 +44,7 @@ export class WebPluginEnabler extends PluginEnabler {
    */
   enable(plugins: BasePlugin<unknown>[]) {
     for (const plugin of plugins) {
-      plugin.enable([], this.tracerProvider, this.meterProvider, this.logger);
+      plugin.enable([], this.tracerProvider, this.logger, undefined, this.meterProvider);
     }
   }
 }
