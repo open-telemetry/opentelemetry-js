@@ -135,11 +135,9 @@ export function toSingularPoint(
   timeUnixNano: number;
   value: number;
 } {
-  const pointValue = metric.aggregator.toPoint().value as number;
-
   return {
     labels: toCollectorLabels(metric.labels),
-    value: pointValue,
+    value: metric.aggregator.toPoint().value as number,
     startTimeUnixNano: startTime,
     timeUnixNano: core.hrTimeToNanoseconds(
       metric.aggregator.toPoint().timestamp
