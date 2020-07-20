@@ -49,10 +49,10 @@ describe('CollectorMetricExporter - web', () => {
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    metrics.push(Object.assign({}, mockCounter));
-    metrics.push(Object.assign({}, mockObserver));
-    metrics.push(Object.assign({}, mockHistogram));
-    metrics.push(Object.assign({}, mockValueRecorder));
+    metrics.push(mockCounter);
+    metrics.push(mockObserver);
+    metrics.push(mockHistogram);
+    metrics.push(mockValueRecorder);
 
     metrics[0].aggregator.update(1);
     metrics[1].aggregator.update(10);
@@ -63,7 +63,7 @@ describe('CollectorMetricExporter - web', () => {
   });
 
   afterEach(() => {
-    metrics[0].aggregator.update(-1); // Aggregator is not deep-copied
+    metrics[0].aggregator.update(-1);
     (metrics[2].aggregator as HistogramAggregator).reset();
     navigator.sendBeacon = sendBeacon;
     spyOpen.restore();
