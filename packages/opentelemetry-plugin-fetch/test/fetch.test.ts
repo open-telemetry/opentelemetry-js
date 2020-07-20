@@ -20,7 +20,7 @@ import * as tracing from '@opentelemetry/tracing';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
-  WebPluginManager
+  WebPluginManager,
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -163,7 +163,7 @@ describe('fetch', () => {
       logLevel: core.LogLevel.ERROR,
     });
     _webPluginManager = new WebPluginManager({
-      plugins: [fetchPlugin]
+      plugins: [fetchPlugin],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();

@@ -16,7 +16,7 @@
 import {
   BasePlugin,
   PluginManager,
-  PluginManagerConfig
+  PluginManagerConfig,
 } from '@opentelemetry/core';
 
 /**
@@ -44,7 +44,13 @@ export class WebPluginManager extends PluginManager {
    */
   enable(plugins: BasePlugin<unknown>[]) {
     for (const plugin of plugins) {
-      plugin.enable([], this.tracerProvider, this.logger, undefined, this.meterProvider);
+      plugin.enable(
+        [],
+        this.tracerProvider,
+        this.logger,
+        undefined,
+        this.meterProvider
+      );
     }
   }
 }

@@ -31,7 +31,7 @@ import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
   parseUrl,
-  WebPluginManager
+  WebPluginManager,
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -190,11 +190,11 @@ describe('xhr', () => {
           spyEntries.withArgs('resource').returns(resources);
           xmlHttpRequestPlugin = new XMLHttpRequestPlugin(config);
           webTracerProviderWithZone = new WebTracerProvider({
-            logLevel: LogLevel.ERROR
+            logLevel: LogLevel.ERROR,
           });
           _webPluginManager = new WebPluginManager({
-            plugins: [xmlHttpRequestPlugin]
-          })
+            plugins: [xmlHttpRequestPlugin],
+          });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
@@ -712,11 +712,11 @@ describe('xhr', () => {
           spyEntries.withArgs('resource').returns(resources);
 
           webTracerWithZoneProvider = new WebTracerProvider({
-            logLevel: LogLevel.ERROR
+            logLevel: LogLevel.ERROR,
           });
           _webPluginManager = new WebPluginManager({
-            plugins: [new XMLHttpRequestPlugin()]
-          })
+            plugins: [new XMLHttpRequestPlugin()],
+          });
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           webTracerWithZoneProvider.addSpanProcessor(
