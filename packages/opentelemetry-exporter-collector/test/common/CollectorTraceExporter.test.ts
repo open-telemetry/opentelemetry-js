@@ -18,40 +18,39 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import {
-  CollectorExporterBase,
-  CollectorExporterConfigBase,
-} from '../../src/CollectorExporterBase';
-
+import { CollectorTraceExporterBase } from '../../src/CollectorTraceExporterBase';
+import { CollectorExporterConfigBase } from '../../src/types';
 import { mockedReadableSpan } from '../helper';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorExporter extends CollectorExporterBase<CollectorExporterConfig> {
+class CollectorTraceExporter extends CollectorTraceExporterBase<
+  CollectorExporterConfig
+> {
   onInit() {}
   onShutdown() {}
   sendSpans() {}
-  getDefaultUrl(url: string | undefined) {
-    return url || '';
+  getDefaultUrl(config: CollectorExporterConfig) {
+    return config.url || '';
   }
 }
 
-describe('CollectorExporter - common', () => {
-  let collectorExporter: CollectorExporter;
+describe('CollectorTraceExporter - common', () => {
+  let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfig;
 
   describe('constructor', () => {
     let onInitSpy: any;
 
     beforeEach(() => {
-      onInitSpy = sinon.stub(CollectorExporter.prototype, 'onInit');
+      onInitSpy = sinon.stub(CollectorTraceExporter.prototype, 'onInit');
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
 
     afterEach(() => {
@@ -67,8 +66,8 @@ describe('CollectorExporter - common', () => {
     });
 
     describe('when config contains certain params', () => {
-      it('should set hostName', () => {
-        assert.strictEqual(collectorExporter.hostName, 'foo');
+      it('should set hostname', () => {
+        assert.strictEqual(collectorExporter.hostname, 'foo');
       });
 
       it('should set serviceName', () => {
@@ -86,7 +85,7 @@ describe('CollectorExporter - common', () => {
 
     describe('when config is missing certain params', () => {
       beforeEach(() => {
-        collectorExporter = new CollectorExporter();
+        collectorExporter = new CollectorTraceExporter();
       });
 
       it('should set default serviceName', () => {
@@ -102,8 +101,8 @@ describe('CollectorExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorExporter.prototype, 'sendSpans');
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      spySend = sinon.stub(CollectorTraceExporter.prototype, 'sendSpans');
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
     afterEach(() => {
       spySend.restore();
@@ -141,20 +140,72 @@ describe('CollectorExporter - common', () => {
         assert.strictEqual(spySend.callCount, 0, 'should not call send');
       });
     });
+    describe('when an error occurs', () => {
+      it('should return a Not Retryable Error', done => {
+        const spans: ReadableSpan[] = [];
+        spans.push(Object.assign({}, mockedReadableSpan));
+        spySend.throws({
+          code: 100,
+          details: 'Test error',
+          metadata: {},
+          message: 'Non-retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(spans, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_NOT_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
+          done();
+        }, 500);
+      });
+
+      it('should return a Retryable Error', done => {
+        const spans: ReadableSpan[] = [];
+        spans.push(Object.assign({}, mockedReadableSpan));
+        spySend.throws({
+          code: 600,
+          details: 'Test error',
+          metadata: {},
+          message: 'Retryable',
+          stack: 'Stack',
+        });
+        const callbackSpy = sinon.spy();
+        collectorExporter.export(spans, callbackSpy);
+        setTimeout(() => {
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 1, 'should call send');
+          done();
+        }, 500);
+      });
+    });
   });
 
   describe('shutdown', () => {
     let onShutdownSpy: any;
     beforeEach(() => {
-      onShutdownSpy = sinon.stub(CollectorExporter.prototype, 'onShutdown');
+      onShutdownSpy = sinon.stub(
+        CollectorTraceExporter.prototype,
+        'onShutdown'
+      );
       collectorExporterConfig = {
-        hostName: 'foo',
+        hostname: 'foo',
         logger: new NoopLogger(),
         serviceName: 'bar',
         attributes: {},
         url: 'http://foo.bar.com',
       };
-      collectorExporter = new CollectorExporter(collectorExporterConfig);
+      collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
     afterEach(() => {
       onShutdownSpy.restore();

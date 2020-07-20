@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
-
-/** Basic aggregator which calculates a Sum from individual measurements. */
-export class CounterSumAggregator implements Aggregator {
-  private _current: number = 0;
-  private _lastUpdateTime: HrTime = [0, 0];
-
-  update(value: number): void {
-    this._current += value;
-    this._lastUpdateTime = hrTime();
-  }
-
-  toPoint(): Point {
-    return {
-      value: this._current,
-      timestamp: this._lastUpdateTime,
-    };
-  }
+/**
+ * Collector transport protocol node options
+ * Default is GRPC
+ */
+export enum CollectorProtocolNode {
+  GRPC,
+  HTTP_JSON,
 }

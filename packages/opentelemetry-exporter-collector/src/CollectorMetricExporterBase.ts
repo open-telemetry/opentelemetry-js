@@ -14,64 +14,49 @@
  * limitations under the License.
  */
 
+import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { Attributes, Logger } from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { opentelemetryProto, CollectorExporterError } from './types';
+import { CollectorExporterConfigBase } from './types';
+import { NoopLogger, ExportResult } from '@opentelemetry/core';
+import * as collectorTypes from './types';
+
+const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
 /**
- * Collector Exporter base config
+ * Collector Metric Exporter abstract base class
  */
-export interface CollectorExporterConfigBase {
-  hostName?: string;
-  logger?: Logger;
-  serviceName?: string;
-  attributes?: Attributes;
-  url?: string;
-}
-
-const DEFAULT_SERVICE_NAME = 'collector-exporter';
-
-/**
- * Collector Exporter abstract base class
- */
-export abstract class CollectorExporterBase<
+export abstract class CollectorMetricExporterBase<
   T extends CollectorExporterConfigBase
-> implements SpanExporter {
+> implements MetricExporter {
   public readonly serviceName: string;
   public readonly url: string;
   public readonly logger: Logger;
-  public readonly hostName: string | undefined;
+  public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
+  protected readonly _startTime = new Date().getTime() * 1000000;
   private _isShutdown: boolean = false;
 
   /**
    * @param config
    */
   constructor(config: T = {} as T) {
+    this.logger = config.logger || new NoopLogger();
     this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
     this.url = this.getDefaultUrl(config.url);
-    if (typeof config.hostName === 'string') {
-      this.hostName = config.hostName;
-    }
-
     this.attributes = config.attributes;
-
-    this.logger = config.logger || new NoopLogger();
-
-    this.shutdown = this.shutdown.bind(this);
-
-    // platform dependent
-    this.onInit(config);
+    if (typeof config.hostname === 'string') {
+      this.hostname = config.hostname;
+    }
+    this.onInit();
   }
 
   /**
-   * Export spans.
-   * @param spans
+   * Export metrics
+   * @param metrics
    * @param resultCallback
    */
   export(
-    spans: ReadableSpan[],
+    metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
   ) {
     if (this._isShutdown) {
@@ -79,33 +64,29 @@ export abstract class CollectorExporterBase<
       return;
     }
 
-    this._exportSpans(spans)
+    this._exportMetrics(metrics)
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch(
-        (
-          error: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
-          if (error.message) {
-            this.logger.error(error.message);
-          }
-          if (error.code && error.code < 500) {
-            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-          } else {
-            resultCallback(ExportResult.FAILED_RETRYABLE);
-          }
+      .catch((error: collectorTypes.ExportServiceError) => {
+        if (error.message) {
+          this.logger.error(error.message);
         }
-      );
+        if (error.code && error.code < 500) {
+          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+        } else {
+          resultCallback(ExportResult.FAILED_RETRYABLE);
+        }
+      });
   }
 
-  private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
+  private _exportMetrics(metrics: MetricRecord[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        this.logger.debug('spans to be sent', spans);
-        // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
+        this.logger.debug('metrics to be sent', metrics);
+        // Send metrics to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
         // it will use the appropriate transport layer automatically depends on platform
-        this.sendSpans(spans, resolve, reject);
+        this.sendMetrics(metrics, resolve, reject);
       } catch (e) {
         reject(e);
       }
@@ -127,12 +108,12 @@ export abstract class CollectorExporterBase<
     this.onShutdown();
   }
 
-  abstract onShutdown(): void;
-  abstract onInit(config: T): void;
-  abstract sendSpans(
-    spans: ReadableSpan[],
-    onSuccess: () => void,
-    onError: (error: CollectorExporterError) => void
-  ): void;
   abstract getDefaultUrl(url: string | undefined): string;
+  abstract onInit(): void;
+  abstract onShutdown(): void;
+  abstract sendMetrics(
+    metrics: MetricRecord[],
+    onSuccess: () => void,
+    onError: (error: collectorTypes.CollectorExporterError) => void
+  ): void;
 }

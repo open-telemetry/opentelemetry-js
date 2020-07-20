@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
-import { HrTime } from '@opentelemetry/api';
-import { hrTime } from '@opentelemetry/core';
+import { Sampler, SamplingDecision, SamplingResult } from '@opentelemetry/api';
 
-/** Basic aggregator for Observer which keeps the last recorded value. */
-export class ObserverAggregator implements Aggregator {
-  private _current: number = 0;
-  private _lastUpdateTime: HrTime = [0, 0];
-
-  update(value: number): void {
-    this._current = value;
-    this._lastUpdateTime = hrTime();
+/** Sampler that samples all traces. */
+export class AlwaysOnSampler implements Sampler {
+  shouldSample(): SamplingResult {
+    return {
+      decision: SamplingDecision.RECORD_AND_SAMPLED,
+    };
   }
 
-  toPoint(): Point {
-    return {
-      value: this._current,
-      timestamp: this._lastUpdateTime,
-    };
+  toString(): string {
+    return `AlwaysOnSampler`;
   }
 }

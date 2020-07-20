@@ -16,8 +16,12 @@
 
 import { CorrelationContext } from '../correlation_context/CorrelationContext';
 import { SpanContext } from '../trace/span_context';
-import { ObserverResult } from './ObserverResult';
-import { BoundCounter, BoundValueRecorder } from './BoundInstrument';
+import {
+  BoundBaseObserver,
+  BoundCounter,
+  BoundValueRecorder,
+} from './BoundInstrument';
+import { Logger } from '../common/Logger';
 
 /**
  * Options needed for metric creation
@@ -58,6 +62,18 @@ export interface MetricOptions {
    * @default {@link ValueType.DOUBLE}
    */
   valueType?: ValueType;
+
+  /**
+   * User provided logger.
+   */
+  logger?: Logger;
+}
+
+export interface BatchMetricOptions extends MetricOptions {
+  /**
+   * Indicates how long the batch metric should wait to update before cancel
+   */
+  maxTimeoutUpdateMS?: number;
 }
 
 /** The Type of value. It describes how the data is reported. */
@@ -148,15 +164,26 @@ export interface ValueRecorder extends UnboundMetric<BoundValueRecorder> {
 }
 
 /** Base interface for the Observer metrics. */
-export interface Observer extends Metric {
-  /**
-   * Sets a callback where user can observe value for certain labels. The
-   * observers are called periodically to retrieve the value.
-   * @param callback a function that will be called once to set observers
-   *     for values
-   */
-  setCallback(callback: (observerResult: ObserverResult) => void): void;
+export interface BaseObserver extends UnboundMetric<BoundBaseObserver> {
+  observation: (
+    value: number
+  ) => {
+    value: number;
+    observer: BaseObserver;
+  };
 }
+
+/** Base interface for the ValueObserver metrics. */
+export type ValueObserver = BaseObserver;
+
+/** Base interface for the UpDownSumObserver metrics. */
+export type UpDownSumObserver = BaseObserver;
+
+/** Base interface for the SumObserver metrics. */
+export type SumObserver = BaseObserver;
+
+/** Base interface for the Batch Observer metrics. */
+export type BatchObserver = Metric;
 
 /**
  * key-value pairs passed by the user.

@@ -55,10 +55,10 @@
     "@opentelemetry/context-base": "^0.9.0"
   },
   "devDependencies": {
-    "@types/mocha": "7.0.2",
-    "@types/node": "14.0.14",
+    "@types/mocha": "8.0.0",
+    "@types/node": "14.0.23",
     "@types/webpack-env": "1.15.2",
-    "codecov": "3.7.0",
+    "codecov": "3.7.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.1.0",
@@ -70,10 +70,10 @@
     "linkinator": "2.1.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
-    "ts-loader": "7.0.5",
+    "ts-loader": "8.0.1",
     "ts-mocha": "7.0.0",
-    "typedoc": "0.17.7",
-    "typescript": "3.9.5",
+    "typedoc": "0.17.8",
+    "typescript": "3.9.7",
     "webpack": "4.43.0"
   }
 }

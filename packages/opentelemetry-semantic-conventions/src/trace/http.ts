@@ -25,6 +25,7 @@ export const HttpAttribute = {
   HTTP_SERVER_NAME: 'http.server_name',
   HTTP_CLIENT_IP: 'http.client_ip',
   HTTP_SCHEME: 'http.scheme',
+  HTTP_RESPONSE_CONTENT_LENGTH: 'http.response_content_length',
 
   // NOT ON OFFICIAL SPEC
   HTTP_ERROR_NAME: 'http.error_name',
