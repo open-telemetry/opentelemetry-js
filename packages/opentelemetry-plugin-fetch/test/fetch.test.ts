@@ -20,6 +20,7 @@ import * as tracing from '@opentelemetry/tracing';
 import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
+  WebPluginManager
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -90,6 +91,8 @@ describe('fetch', () => {
   let lastResponse: any | undefined;
   let webTracerWithZone: api.Tracer;
   let webTracerProviderWithZone: WebTracerProvider;
+  // @ts-ignore: Unused variable
+  let _webPluginManager: WebPluginManager;
   let dummySpanExporter: DummySpanExporter;
   let exportSpy: any;
   let clearResourceTimingsSpy: any;
@@ -158,7 +161,9 @@ describe('fetch', () => {
     fetchPlugin = new FetchPlugin(config);
     webTracerProviderWithZone = new WebTracerProvider({
       logLevel: core.LogLevel.ERROR,
-      plugins: [fetchPlugin],
+    });
+    _webPluginManager = new WebPluginManager({
+      plugins: [fetchPlugin]
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');
     dummySpanExporter = new DummySpanExporter();

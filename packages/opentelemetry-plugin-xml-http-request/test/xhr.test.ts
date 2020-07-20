@@ -31,6 +31,7 @@ import {
   PerformanceTimingNames as PTN,
   WebTracerProvider,
   parseUrl,
+  WebPluginManager
 } from '@opentelemetry/web';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -147,6 +148,8 @@ describe('xhr', () => {
       describe('when request is successful', () => {
         let webTracerWithZone: api.Tracer;
         let webTracerProviderWithZone: WebTracerProvider;
+        // @ts-ignore: Unused variable
+        let _webPluginManager: WebPluginManager;
         let dummySpanExporter: DummySpanExporter;
         let exportSpy: any;
         let clearResourceTimingsSpy: any;
@@ -187,9 +190,11 @@ describe('xhr', () => {
           spyEntries.withArgs('resource').returns(resources);
           xmlHttpRequestPlugin = new XMLHttpRequestPlugin(config);
           webTracerProviderWithZone = new WebTracerProvider({
-            logLevel: LogLevel.ERROR,
-            plugins: [xmlHttpRequestPlugin],
+            logLevel: LogLevel.ERROR
           });
+          _webPluginManager = new WebPluginManager({
+            plugins: [xmlHttpRequestPlugin]
+          })
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
@@ -673,6 +678,8 @@ describe('xhr', () => {
 
       describe('when request is NOT successful', () => {
         let webTracerWithZoneProvider: WebTracerProvider;
+        // @ts-ignore: Unused variable
+        let _webPluginManager: WebPluginManager;
         let webTracerWithZone: api.Tracer;
         let dummySpanExporter: DummySpanExporter;
         let exportSpy: any;
@@ -705,9 +712,11 @@ describe('xhr', () => {
           spyEntries.withArgs('resource').returns(resources);
 
           webTracerWithZoneProvider = new WebTracerProvider({
-            logLevel: LogLevel.ERROR,
-            plugins: [new XMLHttpRequestPlugin()],
+            logLevel: LogLevel.ERROR
           });
+          _webPluginManager = new WebPluginManager({
+            plugins: [new XMLHttpRequestPlugin()]
+          })
           dummySpanExporter = new DummySpanExporter();
           exportSpy = sinon.stub(dummySpanExporter, 'export');
           webTracerWithZoneProvider.addSpanProcessor(
