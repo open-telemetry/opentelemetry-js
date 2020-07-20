@@ -81,40 +81,41 @@ describe('NodeTracerProvider', () => {
       assert.ok(provider instanceof NodeTracerProvider);
     });
 
-    it('should load a merge of user configured and default plugins and implictly enable non-default plugins', () => {
-      provider = new NodeTracerProvider({
-        logger: new NoopLogger(),
-        // plugins: {
-        //   'simple-module': {
-        //     path: '@opentelemetry/plugin-simple-module',
-        //   },
-        //   'supported-module': {
-        //     path: '@opentelemetry/plugin-supported-module',
-        //     enhancedDatabaseReporting: false,
-        //     ignoreMethods: [],
-        //     ignoreUrls: [],
-        //   },
-        //   'random-module': {
-        //     enabled: false,
-        //     path: '@opentelemetry/random-module',
-        //   },
-        //   http: {
-        //     path: '@opentelemetry/plugin-http-module',
-        //   },
-        // },
-      });
-      // const plugins = provider['_pluginLoader']['_plugins'];
-      const plugins = [];
-      assert.strictEqual(plugins.length, 0);
-      require('simple-module');
-      assert.strictEqual(plugins.length, 1);
-      require('supported-module');
-      assert.strictEqual(plugins.length, 2);
-      require('random-module');
-      assert.strictEqual(plugins.length, 2);
-      require('http');
-      assert.strictEqual(plugins.length, 3);
-    });
+    // TODO: create the same test for NodePluginManager
+    // it('should load a merge of user configured and default plugins and implictly enable non-default plugins', () => {
+    //   provider = new NodeTracerProvider({
+    //     logger: new NoopLogger(),
+    //     // plugins: {
+    //     //   'simple-module': {
+    //     //     path: '@opentelemetry/plugin-simple-module',
+    //     //   },
+    //     //   'supported-module': {
+    //     //     path: '@opentelemetry/plugin-supported-module',
+    //     //     enhancedDatabaseReporting: false,
+    //     //     ignoreMethods: [],
+    //     //     ignoreUrls: [],
+    //     //   },
+    //     //   'random-module': {
+    //     //     enabled: false,
+    //     //     path: '@opentelemetry/random-module',
+    //     //   },
+    //     //   http: {
+    //     //     path: '@opentelemetry/plugin-http-module',
+    //     //   },
+    //     // },
+    //   });
+    //   // const plugins = provider['_pluginLoader']['_plugins'];
+    //   const plugins = [];
+    //   assert.strictEqual(plugins.length, 0);
+    //   require('simple-module');
+    //   assert.strictEqual(plugins.length, 1);
+    //   require('supported-module');
+    //   assert.strictEqual(plugins.length, 2);
+    //   require('random-module');
+    //   assert.strictEqual(plugins.length, 2);
+    //   require('http');
+    //   assert.strictEqual(plugins.length, 3);
+    // });
 
     it('should construct an instance with default attributes', () => {
       provider = new NodeTracerProvider({
