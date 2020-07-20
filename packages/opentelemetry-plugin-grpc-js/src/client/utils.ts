@@ -70,7 +70,7 @@ export function getPatchedClientMethods(
     plugin._logger.debug('patch all client methods');
     return function clientMethodTrace(this: grpcJs.Client) {
       const name = `grpc.${original.path.replace('/', '')}`;
-      const args = Array.prototype.slice.call(arguments);
+      const args = [...arguments];
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });

@@ -556,10 +556,7 @@ export const runTests = (
     const insertError = (
       request: TestRequestResponse | TestRequestResponse[]
     ) => (code: number) =>
-      request instanceof Array
-        ? request.splice(0, 0, { num: code }) &&
-          request.slice(0, request.length)
-        : { num: code };
+      request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
       method: typeof methodList[0],
@@ -573,7 +570,7 @@ export const runTests = (
 
         const errRequest =
           method.request instanceof Array
-            ? method.request.slice(0, method.request.length)
+            ? [...method.request]
             : method.request;
         const args = [client, insertError(errRequest)(errorCode)];
 
@@ -614,7 +611,7 @@ export const runTests = (
 
           const errRequest =
             method.request instanceof Array
-              ? method.request.slice(0, method.request.length)
+              ? [...method.request]
               : method.request;
           const args = [client, insertError(errRequest)(errorCode)];
 
