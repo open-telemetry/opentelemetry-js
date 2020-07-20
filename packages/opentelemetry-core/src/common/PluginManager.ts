@@ -24,9 +24,9 @@ import { LogLevel } from './types';
 import { ConsoleLogger } from './ConsoleLogger';
 
 /**
- * PluginEnablerConfig provides an interface for the config being passed to a PluginEnabler
+ * PluginManagerConfig provides an interface for the config being passed to a PluginEnabler
  */
-export interface PluginEnablerConfig {
+export interface PluginManagerConfig {
   /**
    * Tracer provider for the PluginEnabler
    */
@@ -48,12 +48,12 @@ export interface PluginEnablerConfig {
   logLevel?: LogLevel;
 }
 
-export class PluginEnabler {
+export class PluginManager {
   readonly logger: Logger;
   readonly meterProvider: MeterProvider;
   readonly tracerProvider: TracerProvider;
 
-  constructor(config: PluginEnablerConfig) {
+  constructor(config: PluginManagerConfig) {
     this.logger =
       config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
     this.tracerProvider = config.tracerProvider ?? new NoopTracerProvider();

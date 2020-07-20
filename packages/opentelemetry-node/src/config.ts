@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PluginEnablerConfig } from '@opentelemetry/core';
+import { PluginManagerConfig } from '@opentelemetry/core';
 import { Plugins } from './instrumentation/PluginLoader';
 
 /**
- * NodePluginEnablerConfig provides an interface for passing plugins to the NodePluginEnabler
+ * NodePluginManagerConfig provides an interface for passing plugins to the NodePluginEnabler
  */
-export interface NodePluginEnablerConfig extends PluginEnablerConfig {
+export interface NodePluginManagerConfig extends PluginManagerConfig {
   plugins?: Plugins;
 }
 

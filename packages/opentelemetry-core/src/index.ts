@@ -18,7 +18,7 @@ export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
 export * from './common/time';
 export * from './common/types';
-export * from './common/PluginEnabler';
+export * from './common/PluginManager';
 export * from './ExportResult';
 export * from './version';
 export * from './context/context';

@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PluginEnabler } from '@opentelemetry/core';
-import { NodePluginEnablerConfig } from './config';
+import { PluginManager } from '@opentelemetry/core';
+import { NodePluginManagerConfig } from './config';
 import { DEFAULT_INSTRUMENTATION_PLUGINS } from './config';
 import { PluginLoader, Plugins } from './instrumentation/PluginLoader';
 
-export class NodePluginEnabler extends PluginEnabler {
+export class NodePluginManager extends PluginManager {
   private readonly _pluginLoader: PluginLoader;
 
-  constructor(config: NodePluginEnablerConfig) {
+  constructor(config: NodePluginManagerConfig) {
     super(config);
 
     this._pluginLoader = new PluginLoader(
