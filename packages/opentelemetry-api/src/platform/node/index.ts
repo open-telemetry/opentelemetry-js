@@ -15,3 +15,4 @@
  */
 
 export * from './globalThis';
+export * from './IdGenerator';

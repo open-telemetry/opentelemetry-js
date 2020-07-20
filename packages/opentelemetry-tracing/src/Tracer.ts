@@ -22,8 +22,7 @@ import {
   InstrumentationLibrary,
   isValid,
   NoRecordingSpan,
-  randomSpanId,
-  randomTraceId,
+  RandomIdGenerator,
   setActiveSpan,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -70,12 +69,13 @@ export class Tracer implements api.Tracer {
     context = api.context.active()
   ): api.Span {
     const parentContext = getParent(options, context);
-    const spanId = randomSpanId();
+    const IdGenerator = new RandomIdGenerator();
+    const spanId = IdGenerator.GenerateSpanId();
     let traceId;
     let traceState;
     if (!parentContext || !isValid(parentContext)) {
       // New root span.
-      traceId = randomTraceId();
+      traceId = IdGenerator.GenerateTraceId();
     } else {
       // New child span.
       traceId = parentContext.traceId;
