@@ -699,8 +699,12 @@ export function ensureCounterIsCorrect(
       name: 'test-counter',
       description: 'sample counter description',
       unit: '1',
-      type: 2,
-      temporality: 3,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .MONOTONIC_INT64,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .CUMULATIVE,
     },
     int64DataPoints: [
       {
@@ -722,8 +726,12 @@ export function ensureDoubleCounterIsCorrect(
       name: 'test-counter',
       description: 'sample counter description',
       unit: '1',
-      type: 4,
-      temporality: 3,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .MONOTONIC_DOUBLE,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .CUMULATIVE,
     },
     doubleDataPoints: [
       {
@@ -745,8 +753,12 @@ export function ensureObserverIsCorrect(
       name: 'test-observer',
       description: 'sample observer description',
       unit: '2',
-      type: 6,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .SUMMARY,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
     summaryDataPoints: [
       {
@@ -776,8 +788,12 @@ export function ensureValueRecorderIsCorrect(
       name: 'test-recorder',
       description: 'sample recorder description',
       unit: '3',
-      type: 6,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .SUMMARY,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
     summaryDataPoints: [
       {
@@ -804,8 +820,12 @@ export function ensureHistogramIsCorrect(
       name: 'test-hist',
       description: 'sample observer description',
       unit: '2',
-      type: 5,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .HISTOGRAM,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
     histogramDataPoints: [
       {
