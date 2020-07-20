@@ -17,13 +17,11 @@
 import {
   NOOP_TRACER,
   NoopTracerProvider,
-  NoopMeterProvider,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { BasePlugin, NoopLogger } from '../../../src';
 
 const tracerProvider = new NoopTracerProvider();
-const meterProvider = new NoopMeterProvider();
 const logger = new NoopLogger();
 describe('BasePlugin', () => {
   describe('enable', () => {
@@ -33,7 +31,6 @@ describe('BasePlugin', () => {
       const patch = plugin.enable(
         moduleExports,
         tracerProvider,
-        meterProvider,
         logger
       );
 

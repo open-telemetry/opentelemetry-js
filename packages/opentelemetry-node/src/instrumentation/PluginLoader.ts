@@ -194,9 +194,9 @@ export class PluginLoader {
           return plugin.enable(
             exports,
             this.tracerProvider,
-            this.meterProvider,
             this.logger,
-            config
+            config,
+            this.meterProvider
           );
         } catch (e) {
           this.logger.error(

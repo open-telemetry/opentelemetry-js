@@ -52,9 +52,9 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   abstract enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    meterProvider: MeterProvider,
     logger: Logger,
-    config?: PluginConfig
+    config?: PluginConfig,
+    meterProvider?: MeterProvider
   ): T;
 
   protected abstract patch(): T;

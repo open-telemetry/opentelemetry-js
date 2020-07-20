@@ -30,12 +30,12 @@ export interface PluginEnablerConfig {
   /**
    * Tracer provider for the PluginEnabler
    */
-  tracerProvider: TracerProvider;
+  tracerProvider?: TracerProvider;
 
   /**
    * Meter Provider for the PluginEnabler
    */
-  meterProvider: MeterProvider;
+  meterProvider?: MeterProvider;
 
   /**
    * Logger for PluginEnabler

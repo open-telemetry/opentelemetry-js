@@ -45,9 +45,9 @@ export interface Plugin<T = any> {
   enable(
     moduleExports: T,
     TracerProvider: TracerProvider,
-    MeterProvider: MeterProvider,
     logger: Logger,
-    config?: PluginConfig
+    config?: PluginConfig,
+    MeterProvider?: MeterProvider
   ): T;
 
   /** Method to disable the instrumentation  */

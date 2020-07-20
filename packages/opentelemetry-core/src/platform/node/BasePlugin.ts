@@ -22,6 +22,7 @@ import {
   PluginInternalFilesVersion,
   TracerProvider,
   MeterProvider,
+  NoopMeterProvider
 } from '@opentelemetry/api';
 import * as semver from 'semver';
 import * as path from 'path';
@@ -33,15 +34,21 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
   enable(
     moduleExports: T,
     tracerProvider: TracerProvider,
-    meterProvider: MeterProvider,
     logger: Logger,
-    config?: PluginConfig
+    config?: PluginConfig,
+    meterProvider?: MeterProvider
   ): T {
     this._moduleExports = moduleExports;
     this._tracer = tracerProvider.getTracer(
       this._tracerName,
       this._tracerVersion
     );
+    if (meterProvider) {
+      this._meter = meterProvider.getMeter(this._tracerName, this._tracerVersion);
+    }
+    else {
+      this._meter = new NoopMeterProvider().getMeter(); // TODO: use global meter provider
+    }
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
     if (config) this._config = config;
