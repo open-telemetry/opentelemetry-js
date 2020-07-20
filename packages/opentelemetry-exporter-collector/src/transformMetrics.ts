@@ -154,15 +154,14 @@ export function toHistogramPoint(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.HistogramDataPoint {
-  const histValue = metric.aggregator.toPoint().value as Histogram;
+  const histPoint = metric.aggregator.toPoint();
+  const histValue = histPoint.value as Histogram;
   return {
     labels: toCollectorLabels(metric.labels),
     sum: histValue.sum,
     count: histValue.count,
     startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(
-      metric.aggregator.toPoint().timestamp
-    ),
+    timeUnixNano: core.hrTimeToNanoseconds(histPoint.timestamp),
     buckets: histValue.buckets.counts.map(count => {
       return { count };
     }),
@@ -179,15 +178,14 @@ export function toSummaryPoint(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.SummaryDataPoint {
-  const distValue = metric.aggregator.toPoint().value as Distribution;
+  const summaryPoint = metric.aggregator.toPoint();
+  const distValue = summaryPoint.value as Distribution;
   return {
     labels: toCollectorLabels(metric.labels),
     sum: distValue.sum,
     count: distValue.count,
     startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(
-      metric.aggregator.toPoint().timestamp
-    ),
+    timeUnixNano: core.hrTimeToNanoseconds(summaryPoint.timestamp),
     percentileValues: [
       { percentile: 0, value: distValue.min },
       { percentile: 100, value: distValue.max },
