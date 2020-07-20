@@ -58,8 +58,8 @@ export abstract class CollectorExporterBrowserBase<
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ) {
-    const exportTraceServiceRequest = this.convert(items);
-    const body = JSON.stringify(exportTraceServiceRequest);
+    const serviceRequest = this.convert(items);
+    const body = JSON.stringify(serviceRequest);
 
     if (this._useXHR) {
       sendWithXhr(
