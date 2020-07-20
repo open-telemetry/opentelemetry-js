@@ -72,6 +72,7 @@ type ServerDuplexStream =
 type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
   unaryMethod: any;
   UnaryMethod: any;
+  camelCaseMethod: any;
   clientStreamMethod: any;
   serverStreamMethod: any;
   bidiStreamMethod: any;
@@ -130,6 +131,24 @@ export const runTests = (
     ): Promise<TestRequestResponse> => {
       return new Promise((resolve, reject) => {
         return client.UnaryMethod(
+          request,
+          (err: ServiceError, response: TestRequestResponse) => {
+            if (err) {
+              reject(err);
+            } else {
+              resolve(response);
+            }
+          }
+        );
+      });
+    },
+
+    camelCaseMethod: (
+      client: TestGrpcClient,
+      request: TestRequestResponse
+    ): Promise<TestRequestResponse> => {
+      return new Promise((resolve, reject) => {
+        return client.camelCaseMethod(
           request,
           (err: ServiceError, response: TestRequestResponse) => {
             if (err) {
@@ -249,11 +268,28 @@ export const runTests = (
       // This method returns the request
       unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
-          ? callback(getError('Unary Method Error', call.request.num) as any)
+          ? callback(
+              getError(
+                'Unary Method Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
           : callback(null, { num: call.request.num });
       },
 
-      // This method sum the requests
+      // This method returns the request
+      camelCaseMethod(call: ServerUnaryCall, callback: RequestCallback) {
+        call.request.num <= MAX_ERROR_STATUS
+          ? callback(
+              getError(
+                'Unary Method Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
+          : callback(null, { num: call.request.num });
+      },
+
+      // This method sums the requests
       clientStreamMethod(
         call: ServerReadableStream,
         callback: RequestCallback
@@ -379,6 +415,13 @@ export const runTests = (
         description: 'Unary call',
         methodName: 'UnaryMethod',
         method: grpcClient.UnaryMethod,
+        request: requestList[0],
+        result: requestList[0],
+      },
+      {
+        description: 'camelCase unary call',
+        methodName: 'camelCaseMethod',
+        method: grpcClient.camelCaseMethod,
         request: requestList[0],
         result: requestList[0],
       },
