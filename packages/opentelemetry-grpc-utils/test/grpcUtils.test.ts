@@ -568,11 +568,7 @@ export const runTests = (
         const expectEmpty = memoryExporter.getFinishedSpans();
         assert.strictEqual(expectEmpty.length, 0);
 
-        const errRequest =
-          method.request instanceof Array
-            ? [...method.request]
-            : method.request;
-        const args = [client, insertError(errRequest)(errorCode)];
+        const args = [client, insertError(method.request)(errorCode)];
 
         await (method.method as any)
           .apply({}, args)
@@ -609,11 +605,7 @@ export const runTests = (
           }
           assert.deepStrictEqual(rootSpan, span);
 
-          const errRequest =
-            method.request instanceof Array
-              ? [...method.request]
-              : method.request;
-          const args = [client, insertError(errRequest)(errorCode)];
+          const args = [client, insertError(method.request)(errorCode)];
 
           await (method.method as any)
             .apply({}, args)
