@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { LogLevel, ExportResult } from '@opentelemetry/core';
+import { LogLevel } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { Batcher } from './export/Batcher';

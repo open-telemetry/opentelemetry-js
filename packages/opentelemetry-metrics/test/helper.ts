@@ -41,8 +41,10 @@ export class TestController implements Controller {
 
   collect(): Promise<MetricRecord[]> {
     if (this.collector === undefined) {
-      throw new Error('expect the controller to be registered with a MetricsCollector');
+      throw new Error(
+        'expect the controller to be registered with a MetricsCollector'
+      );
     }
-    return this.collector.collect()
+    return this.collector.collect();
   }
 }
