@@ -24,8 +24,6 @@ import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { removeProtocol } from './util';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
-export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-
 export function initWithGrpc<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   config: CollectorExporterConfigNode

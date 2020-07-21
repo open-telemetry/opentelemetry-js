@@ -174,7 +174,6 @@ const testCollectorMetricExporter = (params: TestParams) =>
         assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
       });
       it('should warn about metadata when using json', () => {
-
         const metadata = new grpc.Metadata();
         metadata.set('k', 'v');
         const logger = new ConsoleLogger(LogLevel.DEBUG);
