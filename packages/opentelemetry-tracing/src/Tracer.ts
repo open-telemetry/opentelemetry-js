@@ -25,6 +25,7 @@ import {
   randomSpanId,
   randomTraceId,
   setActiveSpan,
+  getSuppressInstrumentation
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -69,6 +70,12 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
+    const suppressInstrumentation = getSuppressInstrumentation(context)
+    if (suppressInstrumentation) {
+      this.logger.debug('Instrumentation suppressed, returning NoOp Span');
+      return api.NOOP_SPAN;
+    }
+
     const parentContext = getParent(options, context);
     const spanId = randomSpanId();
     let traceId;
@@ -81,6 +88,7 @@ export class Tracer implements api.Tracer {
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
     }
+
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
     const links = options.links ?? [];
     const attributes = { ...this._defaultAttributes, ...options.attributes };
