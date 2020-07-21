@@ -163,6 +163,7 @@ describe('fetch', () => {
       logLevel: core.LogLevel.ERROR,
     });
     _webPluginManager = new WebPluginManager({
+      tracerProvider: webTracerProviderWithZone,
       plugins: [fetchPlugin],
     });
     webTracerWithZone = webTracerProviderWithZone.getTracer('fetch-test');

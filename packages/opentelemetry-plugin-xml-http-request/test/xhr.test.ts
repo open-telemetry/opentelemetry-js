@@ -193,6 +193,7 @@ describe('xhr', () => {
             logLevel: LogLevel.ERROR,
           });
           _webPluginManager = new WebPluginManager({
+            tracerProvider: webTracerProviderWithZone,
             plugins: [xmlHttpRequestPlugin],
           });
           webTracerWithZone = webTracerProviderWithZone.getTracer('xhr-test');
@@ -715,6 +716,7 @@ describe('xhr', () => {
             logLevel: LogLevel.ERROR,
           });
           _webPluginManager = new WebPluginManager({
+            tracerProvider: webTracerWithZoneProvider,
             plugins: [new XMLHttpRequestPlugin()],
           });
           dummySpanExporter = new DummySpanExporter();
