@@ -35,7 +35,7 @@ const ENVIRONMENT_NUMBERS: Partial<keyof ENVIRONMENT>[] = [
 /**
  * Default environment variables
  */
-export const DEFAULT_ENVIRONMENT: ENVIRONMENT = {
+export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_NO_PATCH_MODULES: '',
   OTEL_LOG_LEVEL: LogLevel.ERROR,
   OTEL_SAMPLING_PROBABILITY: 1,

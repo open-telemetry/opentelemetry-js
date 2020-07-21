@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export * from './histogram';
+export * from './Histogram';
 export * from './MinMaxLastSumCount';
 export * from './Sum';
