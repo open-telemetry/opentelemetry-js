@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-import { ReadableSpan } from '@opentelemetry/tracing';
 import * as path from 'path';
 import { Type } from 'protobufjs';
 import * as protobufjs from 'protobufjs';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
 import * as collectorTypes from '../../types';
-import { CollectorTraceExporter } from './CollectorTraceExporter';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
@@ -34,8 +32,8 @@ export function getExportTraceServiceRequestProto(): Type | undefined {
   return ExportTraceServiceRequestProto;
 }
 
-export function onInitWithJsonProto(
-  _collector: CollectorTraceExporter,
+export function initWithJsonProto<ExportItem, ServiceRequest>(
+  _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   _config: CollectorExporterConfigNode
 ): void {
   const dir = path.resolve(__dirname, 'protos');
@@ -54,47 +52,17 @@ export function onInitWithJsonProto(
   );
 }
 
-/**
- * Send spans using proto over http
- * @param collector
- * @param spans
- * @param onSuccess
- * @param onError
- */
-export function sendSpansUsingJsonProto(
-  collector: CollectorTraceExporter,
-  spans: ReadableSpan[],
+export function sendWithJsonProto<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
+  objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-    spans,
-    collector
-  );
+  const serviceRequest = collector.convert(objects);
 
-  const message = ExportTraceServiceRequestProto?.create(
-    exportTraceServiceRequest
-  );
-
-  // function check(obj: any) {
-  //   const AnyValue = proto?.lookupType('AnyValue');
-  //   const aMessage = AnyValue.create(obj);
-  //   const aData = AnyValue.decode(AnyValue.encode(aMessage).finish());
-  //   return aData.toJSON();
-  // }
+  const message = ExportTraceServiceRequestProto?.create(serviceRequest);
   if (message) {
-    // console.log(check({stringValue: 'bartek', key: 'foo', value: 'stringValue'}));
-    // console.log(check({key: 'bartek'}));
-    // console.log(check({key: 'test', stringValue: 'bartek'}));
-    // console.log(check({key: 'test', type: 0, stringValue: 'bartek'}));
-    // console.log(check({key: 'test', type: 'STRING', stringValue: 'bartek'}));
-    // console.log(check({key: 'test', value: {stringValue: 'bartek'}}));
-    // console.log(check({key: 'test', value: {stringValue: 'bartek', type: 0}}));
-
     const body = ExportTraceServiceRequestProto?.encode(message).finish();
-    // const data = ExportTraceServiceRequestProto?.decode(body as Uint8Array);
-    // const json = data?.toJSON();
-    // console.log(json);
     if (body) {
       sendDataUsingHttp(
         collector,
@@ -104,5 +72,9 @@ export function sendSpansUsingJsonProto(
         onError
       );
     }
+  } else {
+    onError({
+      message: 'No proto'
+    })
   }
 }

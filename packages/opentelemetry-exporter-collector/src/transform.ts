@@ -24,7 +24,7 @@ import {
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { CollectorTraceExporterBase } from './CollectorTraceExporterBase';
+import { CollectorExporterBase } from './CollectorExporterBase';
 import {
   COLLECTOR_SPAN_KIND_MAPPING,
   opentelemetryProto,
@@ -230,7 +230,11 @@ export function toCollectorTraceState(
  */
 export function toCollectorExportTraceServiceRequest<T extends CollectorExporterConfigBase>(
   spans: ReadableSpan[],
-  collectorTraceExporterBase: CollectorTraceExporterBase<T>
+  collectorTraceExporterBase: CollectorExporterBase<
+    T,
+    ReadableSpan,
+    opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  >
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
   const groupedSpans: Map<Resource,
     Map<core.InstrumentationLibrary, ReadableSpan[]>> = groupSpansByResourceAndLibrary(
