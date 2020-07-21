@@ -28,6 +28,7 @@ import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { toCollectorResource } from './transform';
 import { CollectorExporterBase } from './CollectorExporterBase';
+import { HrTime } from '@opentelemetry/api';
 
 /**
  * Converts labels
@@ -70,7 +71,6 @@ export function toCollectorType(
     return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
   }
 
-  // @TODO #1294: Add Summary once implemented
   return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
 }
 
@@ -154,18 +154,20 @@ export function toHistogramPoint(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.HistogramDataPoint {
-  const histPoint = metric.aggregator.toPoint();
-  const histValue = histPoint.value as Histogram;
+  const { value, timestamp } = metric.aggregator.toPoint() as {
+    value: Histogram;
+    timestamp: HrTime;
+  };
   return {
     labels: toCollectorLabels(metric.labels),
-    sum: histValue.sum,
-    count: histValue.count,
+    sum: value.sum,
+    count: value.count,
     startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(histPoint.timestamp),
-    buckets: histValue.buckets.counts.map(count => {
+    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
+    buckets: value.buckets.counts.map(count => {
       return { count };
     }),
-    explicitBounds: histValue.buckets.boundaries,
+    explicitBounds: value.buckets.boundaries,
   };
 }
 
@@ -178,17 +180,20 @@ export function toSummaryPoint(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.SummaryDataPoint {
-  const summaryPoint = metric.aggregator.toPoint();
-  const distValue = summaryPoint.value as Distribution;
+  const { value, timestamp } = metric.aggregator.toPoint() as {
+    value: Distribution;
+    timestamp: HrTime;
+  };
+
   return {
     labels: toCollectorLabels(metric.labels),
-    sum: distValue.sum,
-    count: distValue.count,
+    sum: value.sum,
+    count: value.count,
     startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(summaryPoint.timestamp),
+    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
     percentileValues: [
-      { percentile: 0, value: distValue.min },
-      { percentile: 100, value: distValue.max },
+      { percentile: 0, value: value.min },
+      { percentile: 100, value: value.max },
     ],
   };
 }
