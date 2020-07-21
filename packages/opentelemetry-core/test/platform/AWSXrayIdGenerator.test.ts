@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import { RandomIdGenerator } from '../../src/platform';
+import { AWSXrayIdGenerator } from '../../src/platform';
 
-const IdGenerator = new RandomIdGenerator();
-const IdGeneratorWithParameters = new RandomIdGenerator(8, 16);
+const IdGenerator = new AWSXrayIdGenerator();
 
-describe('IdGeneratorConstructor', () => {
-  it('Default provides 16-byte TraceId and 8-byte SpanId', () => {
-    assert.equal(
-      IdGenerator.GenerateTraceId().length,
-      IdGeneratorWithParameters.GenerateTraceId().length
-    );
-    assert.equal(
-      IdGenerator.GenerateSpanId().length,
-      IdGeneratorWithParameters.GenerateSpanId().length
-    );
-  });
-});
-
-describe('randomTraceId', () => {
+describe('AWSXrayTraceId', () => {
   let TraceId1: string, TraceId2: string;
+  let PrevTime: number, CurrTime: number, NextTime: number;
   beforeEach(() => {
+    PrevTime = Math.floor(Date.now() / 1000);
     TraceId1 = IdGenerator.GenerateTraceId();
+    CurrTime = parseInt(TraceId1.substring(0, 8), 16);
+    NextTime = Math.floor(Date.now() / 1000);
+    console.log(TraceId1.length);
     TraceId2 = IdGenerator.GenerateTraceId();
   });
 
@@ -47,15 +38,20 @@ describe('randomTraceId', () => {
   it('returns different ids on each call', () => {
     assert.notDeepStrictEqual(TraceId1, TraceId2);
   });
+
+  it('using current time to encode trace id', () => {
+      assert.ok(CurrTime >= PrevTime);
+      assert.ok(CurrTime <= NextTime);
+  })
 });
 
-describe('randomSpanId', () => {
+describe('AWSXraySpanId', () => {
   let SpanId1: string, SpanId2: string;
   beforeEach(() => {
     SpanId1 = IdGenerator.GenerateSpanId();
     SpanId2 = IdGenerator.GenerateSpanId();
   });
-  
+
   it('returns 16 character hex strings', () => {
     assert.ok(SpanId1.match(/[a-f0-9]{16}/));
     assert.ok(!SpanId1.match(/^0+$/));
