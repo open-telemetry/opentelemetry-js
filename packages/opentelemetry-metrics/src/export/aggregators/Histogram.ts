@@ -23,9 +23,8 @@ import { hrTime } from '@opentelemetry/core';
  * and provides the total sum and count of all observations.
  */
 export class HistogramAggregator implements Aggregator {
-  private _lastCheckpoint: Histogram;
-  private _currentCheckpoint: Histogram;
-  private _lastCheckpointTime: HrTime;
+  private _current: Histogram;
+  private _lastUpdateTime: HrTime;
   private readonly _boundaries: number[];
 
   constructor(boundaries: number[]) {
@@ -35,36 +34,29 @@ export class HistogramAggregator implements Aggregator {
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
     this._boundaries = boundaries.sort();
-    this._lastCheckpoint = this._newEmptyCheckpoint();
-    this._lastCheckpointTime = hrTime();
-    this._currentCheckpoint = this._newEmptyCheckpoint();
+    this._current = this._newEmptyCheckpoint();
+    this._lastUpdateTime = hrTime();
   }
 
   update(value: number): void {
-    this._currentCheckpoint.count += 1;
-    this._currentCheckpoint.sum += value;
+    this._current.count += 1;
+    this._current.sum += value;
 
     for (let i = 0; i < this._boundaries.length; i++) {
       if (value < this._boundaries[i]) {
-        this._currentCheckpoint.buckets.counts[i] += 1;
+        this._current.buckets.counts[i] += 1;
         return;
       }
     }
 
     // value is above all observed boundaries
-    this._currentCheckpoint.buckets.counts[this._boundaries.length] += 1;
-  }
-
-  reset(): void {
-    this._lastCheckpointTime = hrTime();
-    this._lastCheckpoint = this._currentCheckpoint;
-    this._currentCheckpoint = this._newEmptyCheckpoint();
+    this._current.buckets.counts[this._boundaries.length] += 1;
   }
 
   toPoint(): Point {
     return {
-      value: this._lastCheckpoint,
-      timestamp: this._lastCheckpointTime,
+      value: this._current,
+      timestamp: this._lastUpdateTime,
     };
   }
 
