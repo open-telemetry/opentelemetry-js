@@ -41,6 +41,7 @@ export class Tracer implements api.Tracer {
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   readonly logger: api.Logger;
+  readonly idGenerator: api.IdGenerator;
 
   /**
    * Constructs a new Tracer instance.
@@ -57,6 +58,7 @@ export class Tracer implements api.Tracer {
     this.resource = _tracerProvider.resource;
     this.instrumentationLibrary = instrumentationLibrary;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
+    this.idGenerator = config.idGenerator || new RandomIdGenerator();
   }
 
   /**
@@ -69,13 +71,12 @@ export class Tracer implements api.Tracer {
     context = api.context.active()
   ): api.Span {
     const parentContext = getParent(options, context);
-    const IdGenerator = new RandomIdGenerator();
-    const spanId = IdGenerator.GenerateSpanId();
+    const spanId = this.idGenerator.GenerateSpanId();
     let traceId;
     let traceState;
     if (!parentContext || !isValid(parentContext)) {
       // New root span.
-      traceId = IdGenerator.GenerateTraceId();
+      traceId = this.idGenerator.GenerateTraceId();
     } else {
       // New child span.
       traceId = parentContext.traceId;

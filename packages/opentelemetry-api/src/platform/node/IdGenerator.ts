@@ -21,8 +21,8 @@
  */
 
 export interface IdGenerator {
-  // Generate Trace ID which is default to be 16 bytes
+  /** Generate Trace ID which is default to be 16 bytes */
   GenerateTraceId(): string;
-  // Generate Span ID which is default to be 8 bytes
+  /** Generate Span ID which is default to be 8 bytes */
   GenerateSpanId(): string;
 }
