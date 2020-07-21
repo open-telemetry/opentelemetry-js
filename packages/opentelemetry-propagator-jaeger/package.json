@@ -48,7 +48,7 @@
     "@types/node": "12.12.47",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
-    "codecov": "3.7.0",
+    "codecov": "3.7.1",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "karma": "5.1.0",
