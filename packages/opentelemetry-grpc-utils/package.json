@@ -1,14 +1,13 @@
 {
-  "name": "@opentelemetry/plugin-grpc-js",
-  "private": true,
+  "name": "@opentelemetry/grpc-utils",
   "version": "0.9.0",
-  "description": "OpenTelemetry @grpc/grpc-js automatic instrumentation package.",
+  "private": true,
+  "description": "OpenTelemetry grpc plugin utility functions.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json test/**/*.test.ts",
-    "test:deubg": "ts-mocha --inspect-brk -p tsconfig.json test/**/*.test.ts",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
     "lint": "eslint . --ext .ts",
@@ -22,7 +21,6 @@
   "keywords": [
     "opentelemetry",
     "grpc",
-    "grpc-js",
     "nodejs",
     "tracing",
     "profiling",
@@ -35,7 +33,6 @@
   },
   "files": [
     "build/src/**/*.js",
-    "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
     "doc",
     "LICENSE",
@@ -46,31 +43,33 @@
   },
   "devDependencies": {
     "@grpc/grpc-js": "1.1.2",
+    "@grpc/proto-loader": "0.5.4",
     "@opentelemetry/context-async-hooks": "^0.9.0",
     "@opentelemetry/context-base": "^0.9.0",
-    "@opentelemetry/grpc-utils": "^0.9.0",
     "@opentelemetry/node": "^0.9.0",
     "@opentelemetry/tracing": "^0.9.0",
-    "@types/mocha": "8.0.0",
-    "@types/node": "14.0.23",
-    "@types/semver": "7.3.1",
+    "@types/mocha": "7.0.2",
+    "@types/node": "14.0.13",
+    "@types/semver": "7.2.0",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "9.0.4",
-    "codecov": "3.7.1",
+    "codecov": "3.7.0",
+    "grpc": "1.24.3",
     "gts": "2.0.2",
     "mocha": "7.2.0",
+    "node-pre-gyp": "0.15.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "semver": "7.3.2",
     "sinon": "9.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.7"
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.9.0",
     "@opentelemetry/core": "^0.9.0",
     "@opentelemetry/semantic-conventions": "^0.9.0",
-    "shimmer": "1.2.1"
+    "shimmer": "^1.2.1"
   }
 }
