@@ -23,7 +23,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord, HistogramAggregator } from '@opentelemetry/metrics';
+import { MetricRecord } from '@opentelemetry/metrics';
 import {
   mockCounter,
   mockObserver,
@@ -146,14 +146,12 @@ const testCollectorMetricExporter = (params: TestParams) =>
       metrics[1].aggregator.update(10);
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
-      (metrics[2].aggregator as HistogramAggregator).reset();
       metrics[3].aggregator.update(5);
       done();
     });
 
     afterEach(() => {
       metrics[0].aggregator.update(-1); // Aggregator is not deep-copied
-      (metrics[2].aggregator as HistogramAggregator).reset();
       exportedData = undefined;
       reqMetadata = undefined;
     });

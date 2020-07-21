@@ -19,7 +19,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord, HistogramAggregator } from '@opentelemetry/metrics';
+import { MetricRecord } from '@opentelemetry/metrics';
 import {
   mockCounter,
   mockObserver,
@@ -58,13 +58,11 @@ describe('CollectorMetricExporter - web', () => {
     metrics[1].aggregator.update(10);
     metrics[2].aggregator.update(7);
     metrics[2].aggregator.update(14);
-    (metrics[2].aggregator as HistogramAggregator).reset();
     metrics[3].aggregator.update(5);
   });
 
   afterEach(() => {
     metrics[0].aggregator.update(-1);
-    (metrics[2].aggregator as HistogramAggregator).reset();
     navigator.sendBeacon = sendBeacon;
     spyOpen.restore();
     spySend.restore();
