@@ -22,9 +22,6 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
-export const DEFAULT_COLLECTOR_URL_JSON_PROTO =
-  'http://localhost:55681/v1/trace';
-
 let ExportTraceServiceRequestProto: Type | undefined;
 let proto: any;
 
@@ -74,7 +71,7 @@ export function sendWithJsonProto<ExportItem, ServiceRequest>(
     }
   } else {
     onError({
-      message: 'No proto'
-    })
+      message: 'No proto',
+    });
   }
 }

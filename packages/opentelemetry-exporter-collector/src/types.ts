@@ -227,25 +227,25 @@ export namespace opentelemetryProto {
   export namespace common.v1 {
     export interface KeyValue {
       key: string;
-      value: AnyValue
+      value: AnyValue;
     }
 
     export type ArrayValue = {
       values: AnyValue[];
-    }
+    };
 
     export interface KeyValueList {
       values: KeyValue[];
     }
 
     export type AnyValue = {
-      stringValue?: string,
-      boolValue?: boolean,
-      intValue?: number,
-      doubleValue?: number,
-      arrayValue?: ArrayValue,
-      kvlistValue?: KeyValueList,
-    }
+      stringValue?: string;
+      boolValue?: boolean;
+      intValue?: number;
+      doubleValue?: number;
+      arrayValue?: ArrayValue;
+      kvlistValue?: KeyValueList;
+    };
 
     export interface InstrumentationLibrary {
       name: string;

@@ -51,7 +51,7 @@ export function toCollectorArrayValue(
   values: unknown[]
 ): opentelemetryProto.common.v1.ArrayValue {
   return {
-    values: values.map(value => toCollectorAnyValue(value))
+    values: values.map(value => toCollectorAnyValue(value)),
   };
 }
 
@@ -63,7 +63,7 @@ export function toCollectorKeyValueList(
   attributes: Attributes
 ): opentelemetryProto.common.v1.KeyValueList {
   return {
-    values: toCollectorAttributes(attributes)
+    values: toCollectorAttributes(attributes),
   };
 }
 
@@ -95,7 +95,6 @@ export function toCollectorAnyValue(
   } else if (typeof value === 'boolean') {
     anyValue.boolValue = value;
   } else if (typeof value === 'number') {
-
     // all numbers will be treated as double
     anyValue.doubleValue = value;
   } else if (Array.isArray(value)) {
@@ -228,7 +227,9 @@ export function toCollectorTraceState(
  * @param spans spans
  * @param collectorExporterBase
  */
-export function toCollectorExportTraceServiceRequest<T extends CollectorExporterConfigBase>(
+export function toCollectorExportTraceServiceRequest<
+  T extends CollectorExporterConfigBase
+>(
   spans: ReadableSpan[],
   collectorTraceExporterBase: CollectorExporterBase<
     T,
@@ -236,9 +237,10 @@ export function toCollectorExportTraceServiceRequest<T extends CollectorExporter
     opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
 ): opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
-  const groupedSpans: Map<Resource,
-    Map<core.InstrumentationLibrary, ReadableSpan[]>> = groupSpansByResourceAndLibrary(
-    spans);
+  const groupedSpans: Map<
+    Resource,
+    Map<core.InstrumentationLibrary, ReadableSpan[]>
+  > = groupSpansByResourceAndLibrary(spans);
 
   const additionalAttributes = Object.assign(
     {},

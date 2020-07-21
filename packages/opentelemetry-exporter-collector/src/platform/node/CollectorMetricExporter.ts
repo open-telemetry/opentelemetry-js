@@ -21,10 +21,10 @@ import { CollectorExporterConfigNode } from './types';
 import { CollectorProtocolNode } from '../../enums';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
-import { DEFAULT_COLLECTOR_URL_GRPC } from './utilWithGrpc';
-import { DEFAULT_COLLECTOR_URL_JSON } from './utilWithJson';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
+const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
+const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node

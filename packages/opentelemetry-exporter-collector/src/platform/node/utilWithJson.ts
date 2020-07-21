@@ -19,8 +19,6 @@ import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/trace';
-
 export function initWithJson<ExportItem, ServiceRequest>(
   _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   _config: CollectorExporterConfigNode
