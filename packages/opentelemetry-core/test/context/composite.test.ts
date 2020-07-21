@@ -48,9 +48,9 @@ describe('Composite Propagator', () => {
   let spanId: string;
 
   beforeEach(() => {
-    const IdGenerator = new RandomIdGenerator();
-    traceId = IdGenerator.generateTraceId();
-    spanId = IdGenerator.generateSpanId();
+    const idGenerator = new RandomIdGenerator();
+    traceId = idGenerator.generateTraceId();
+    spanId = idGenerator.generateSpanId();
   });
 
   describe('inject', () => {

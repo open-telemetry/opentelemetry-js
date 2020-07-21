@@ -16,48 +16,48 @@
 import * as assert from 'assert';
 import { AWSXrayIdGenerator } from '../../src/platform';
 
-const IdGenerator = new AWSXrayIdGenerator();
+const idGenerator = new AWSXrayIdGenerator();
 
 describe('AWSXrayTraceId', () => {
-  let TraceId1: string, TraceId2: string;
-  let PrevTime: number, CurrTime: number, NextTime: number;
+  let traceId1: string, traceId2: string;
+  let prevTime: number, currTime: number, nextTime: number;
   beforeEach(() => {
-    PrevTime = Math.floor(Date.now() / 1000);
-    TraceId1 = IdGenerator.generateTraceId();
-    CurrTime = parseInt(TraceId1.substring(0, 8), 16);
-    NextTime = Math.floor(Date.now() / 1000);
-    console.log(TraceId1.length);
-    TraceId2 = IdGenerator.generateTraceId();
+    prevTime = Math.floor(Date.now() / 1000);
+    traceId1 = idGenerator.generateTraceId();
+    currTime = parseInt(traceId1.substring(0, 8), 16);
+    nextTime = Math.floor(Date.now() / 1000);
+    console.log(traceId1.length);
+    traceId2 = idGenerator.generateTraceId();
   });
 
   it('returns 32 character hex strings', () => {
-    assert.ok(TraceId1.match(/[a-f0-9]{32}/));
-    assert.ok(!TraceId1.match(/^0+$/));
+    assert.ok(traceId1.match(/[a-f0-9]{32}/));
+    assert.ok(!traceId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    assert.notDeepStrictEqual(TraceId1, TraceId2);
+    assert.notDeepStrictEqual(traceId1, traceId2);
   });
 
   it('using current time to encode trace id', () => {
-    assert.ok(CurrTime >= PrevTime);
-    assert.ok(CurrTime <= NextTime);
+    assert.ok(currTime >= prevTime);
+    assert.ok(currTime <= nextTime);
   });
 });
 
 describe('AWSXraySpanId', () => {
-  let SpanId1: string, SpanId2: string;
+  let spanId1: string, spanId2: string;
   beforeEach(() => {
-    SpanId1 = IdGenerator.generateSpanId();
-    SpanId2 = IdGenerator.generateSpanId();
+    spanId1 = idGenerator.generateSpanId();
+    spanId2 = idGenerator.generateSpanId();
   });
 
   it('returns 16 character hex strings', () => {
-    assert.ok(SpanId1.match(/[a-f0-9]{16}/));
-    assert.ok(!SpanId1.match(/^0+$/));
+    assert.ok(spanId1.match(/[a-f0-9]{16}/));
+    assert.ok(!spanId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    assert.notDeepStrictEqual(SpanId1, SpanId2);
+    assert.notDeepStrictEqual(spanId1, spanId2);
   });
 });

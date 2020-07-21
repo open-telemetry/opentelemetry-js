@@ -16,38 +16,38 @@
 import * as assert from 'assert';
 import { RandomIdGenerator } from '../../src/platform';
 
-const IdGenerator = new RandomIdGenerator();
+const idGenerator = new RandomIdGenerator();
 
 describe('randomTraceId', () => {
-  let TraceId1: string, TraceId2: string;
+  let traceId1: string, traceId2: string;
   beforeEach(() => {
-    TraceId1 = IdGenerator.generateTraceId();
-    TraceId2 = IdGenerator.generateTraceId();
+    traceId1 = idGenerator.generateTraceId();
+    traceId2 = idGenerator.generateTraceId();
   });
 
   it('returns 32 character hex strings', () => {
-    assert.ok(TraceId1.match(/[a-f0-9]{32}/));
-    assert.ok(!TraceId1.match(/^0+$/));
+    assert.ok(traceId1.match(/[a-f0-9]{32}/));
+    assert.ok(!traceId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    assert.notDeepStrictEqual(TraceId1, TraceId2);
+    assert.notDeepStrictEqual(traceId1, traceId2);
   });
 });
 
 describe('randomSpanId', () => {
-  let SpanId1: string, SpanId2: string;
+  let spanId1: string, spanId2: string;
   beforeEach(() => {
-    SpanId1 = IdGenerator.generateSpanId();
-    SpanId2 = IdGenerator.generateSpanId();
+    spanId1 = idGenerator.generateSpanId();
+    spanId2 = idGenerator.generateSpanId();
   });
 
   it('returns 16 character hex strings', () => {
-    assert.ok(SpanId1.match(/[a-f0-9]{16}/));
-    assert.ok(!SpanId1.match(/^0+$/));
+    assert.ok(spanId1.match(/[a-f0-9]{16}/));
+    assert.ok(!spanId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    assert.notDeepStrictEqual(SpanId1, SpanId2);
+    assert.notDeepStrictEqual(spanId1, spanId2);
   });
 });
