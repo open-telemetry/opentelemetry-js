@@ -38,6 +38,10 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
+
 const traceIdArr = [
   31,
   16,
@@ -113,7 +117,7 @@ export const mockValueRecorder: MetricRecord = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export const mockHistogram: MetricRecord = {
+export const mockHistogram: Mutable<MetricRecord> = {
   descriptor: {
     name: 'test-hist',
     description: 'sample observer description',
