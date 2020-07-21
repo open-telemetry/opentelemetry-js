@@ -14,45 +14,31 @@
  * limitations under the License.
  */
 
-import { ReadableSpan } from '@opentelemetry/tracing';
 import * as collectorTypes from '../../types';
-import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
 import { sendDataUsingHttp } from './util';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
+export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/metrics';
 
-export function onInitWithJson(
-  _collector: CollectorTraceExporter,
+export function initWithJson<ExportItem, ServiceRequest>(
+  _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   _config: CollectorExporterConfigNode
 ): void {
   // nothing to be done for json yet
 }
 
-/**
- * Send spans using json over http
- * @param collector
- * @param spans
- * @param onSuccess
- * @param onError
- */
-export function sendSpansUsingJson(
-  collector: CollectorTraceExporter,
-  spans: ReadableSpan[],
+export function sendWithJson<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
+  objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-    spans,
-    collector
-  );
+  const serviceRequest = collector.convert(objects);
 
-  const body = JSON.stringify(exportTraceServiceRequest);
-
-  return sendDataUsingHttp(
+  sendDataUsingHttp(
     collector,
-    body,
+    JSON.stringify(serviceRequest),
     'application/json',
     onSuccess,
     onError

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { CollectorMetricExporterBase } from './CollectorMetricExporterBase';
 import {
   MetricRecord,
   MetricKind,
@@ -28,6 +27,7 @@ import * as api from '@opentelemetry/api';
 import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { toCollectorResource } from './transform';
+import { CollectorExporterBase } from './CollectorExporterBase';
 
 /**
  * Converts labels
@@ -220,7 +220,11 @@ export function toCollectorExportMetricServiceRequest<
 >(
   metrics: MetricRecord[],
   startTime: number,
-  collectorMetricExporterBase: CollectorMetricExporterBase<T>
+  collectorExporterBase: CollectorExporterBase<
+    T,
+    MetricRecord,
+    opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
+  >
 ): opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
   const groupedMetrics: Map<
     Resource,
@@ -228,9 +232,9 @@ export function toCollectorExportMetricServiceRequest<
   > = groupMetricsByResourceAndLibrary(metrics);
   const additionalAttributes = Object.assign(
     {},
-    collectorMetricExporterBase.attributes,
+    collectorExporterBase.attributes,
     {
-      'service.name': collectorMetricExporterBase.serviceName,
+      'service.name': collectorExporterBase.serviceName,
     }
   );
   return {

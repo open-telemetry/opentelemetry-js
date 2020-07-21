@@ -17,7 +17,7 @@ import * as url from 'url';
 import * as http from 'http';
 import * as https from 'https';
 import * as collectorTypes from '../../types';
-import { CollectorTraceExporter } from './CollectorTraceExporter';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
 export function removeProtocol(url: string): string {
   return url.replace(/^https?:\/\//, '');
@@ -31,8 +31,8 @@ export function removeProtocol(url: string): string {
  * @param onSuccess
  * @param onError
  */
-export function sendDataUsingHttp(
-  collector: CollectorTraceExporter,
+export function sendDataUsingHttp<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   data: string | Buffer,
   contentType: string,
   onSuccess: () => void,
