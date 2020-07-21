@@ -21,8 +21,11 @@ const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 const TIME_BYTES = 4;
 
+/** IdGenerator that generates trace IDs conforming to AWS X-Ray format. 
+ * https://docs.aws.amazon.com/xray/latest/devguide/xray-api-sendingdata.html#xray-api-traceids
+ */
 export class AWSXrayIdGenerator implements api.IdGenerator {
-  
+
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits. The first 4 bytes correspond to the current
