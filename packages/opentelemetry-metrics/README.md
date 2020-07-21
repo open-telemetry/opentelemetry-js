@@ -197,7 +197,7 @@ function getRandomValue() {
 Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
 
 ```js
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider, PushController } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -209,10 +209,12 @@ const exporter = new PrometheusExporter(
   },
 );
 
-const meter = new MeterProvider({
+const meterProvider = new MeterProvider();
+meterProvider.addController(new PushController({
   exporter,
   interval: 3000,
-}).getMeter('example-observer');
+}));
+const meter = meterProvider.getMeter('example-observer');
 
 const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
   description: 'CPU',

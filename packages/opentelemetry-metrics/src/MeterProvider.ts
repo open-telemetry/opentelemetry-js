@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
+import { ConsoleLogger } from '@opentelemetry/core';
+import { Meter } from './Meter';
+import { MetricRecord } from './export/types';
+import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { Resource } from '@opentelemetry/resources';
-import { Meter } from '.';
-import { DEFAULT_CONFIG, MeterConfig } from './types';
+import { MeterConfig, DEFAULT_CONFIG } from './types';
+import { Controller } from './export/controllers';
 
 /**
  * This class represents a meter provider which platform libraries can extend
@@ -26,15 +29,24 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
 export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
+  private readonly _batcher: Batcher;
   readonly resource: Resource;
   readonly logger: api.Logger;
 
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
     this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this._batcher = config.batcher ?? new UngroupedBatcher();
     this._config = Object.assign({}, config, {
       logger: this.logger,
       resource: this.resource,
+      batcher: this._batcher,
+    });
+  }
+
+  addController(controller: Controller) {
+    controller.registerMetricsCollector({
+      collect: () => this._collect(),
     });
   }
 
@@ -48,10 +60,28 @@ export class MeterProvider implements api.MeterProvider {
     if (!this._meters.has(key)) {
       this._meters.set(
         key,
-        new Meter({ name, version }, config || this._config)
+        new Meter(
+          { name, version },
+          {
+            ...this._config,
+            ...config,
+          }
+        )
       );
     }
 
     return this._meters.get(key)!;
+  }
+
+  /**
+   * implementation of `MetricsCollector.collect`.
+   *
+   * @returns A promise resolved with collected {@link MetricRecord}s.
+   */
+  private async _collect(): Promise<MetricRecord[]> {
+    await Promise.all(
+      Array.from(this._meters.values()).map(meter => meter.collect())
+    );
+    return this._batcher.checkPointSet();
   }
 }

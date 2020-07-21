@@ -28,8 +28,6 @@ import { ValueObserverMetric } from './ValueObserverMetric';
 import { SumObserverMetric } from './SumObserverMetric';
 import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
-import { PushController } from './export/Controller';
-import { NoopExporter } from './export/NoopExporter';
 
 /**
  * Meter is an implementation of the {@link Meter} interface.
@@ -52,10 +50,6 @@ export class Meter implements api.Meter {
     this._batcher = config.batcher ?? new UngroupedBatcher();
     this._resource = config.resource || Resource.createTelemetrySDKResource();
     this._instrumentationLibrary = instrumentationLibrary;
-    // start the push controller
-    const exporter = config.exporter || new NoopExporter();
-    const interval = config.interval;
-    new PushController(this, exporter, interval);
   }
 
   /**

@@ -1,6 +1,6 @@
 'use strict';
 
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider, PushController } = require('@opentelemetry/metrics');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
 const exporter = new PrometheusExporter(
@@ -14,10 +14,12 @@ const exporter = new PrometheusExporter(
   },
 );
 
-const meter = new MeterProvider({
+const meterProvider = new MeterProvider();
+meterProvider.addController({
   exporter,
-  interval: 1000,
-}).getMeter('example-prometheus');
+  interval: 2000,
+});
+const meter = meterProvider.getMeter('example-prometheus');
 
 const requestCounter = meter.createCounter('requests', {
   description: 'Example of a Counter',

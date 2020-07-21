@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-export * from './BoundInstrument';
-export * from './CounterMetric';
-export * from './ValueRecorderMetric';
-export * from './Meter';
-export * from './MeterProvider';
-export * from './Metric';
-export * from './ValueObserverMetric';
-export * from './export/aggregators';
-export * from './export/controllers';
-export * from './export/Batcher';
-export * from './export/ConsoleMetricExporter';
-export * from './export/types';
-export * from './UpDownCounterMetric';
+import { Logger } from '@opentelemetry/api';
+import { MetricsCollector } from '../../types';
+import { MetricExporter } from '../types';
+
+export interface PushControllerConfig {
+  /** User provided logger. */
+  logger?: Logger;
+  /** Metric collect interval */
+  interval?: number;
+  /** Metric Exporter */
+  exporter?: MetricExporter;
+}
+
+export interface Controller {
+  registerMetricsCollector(metricCollector: MetricsCollector): void;
+}

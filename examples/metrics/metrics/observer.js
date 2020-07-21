@@ -15,10 +15,12 @@ const exporter = new PrometheusExporter(
   },
 );
 
-const meter = new MeterProvider({
+const meterProvider = new MeterProvider();
+meterProvider.addController({
   exporter,
   interval: 2000,
-}).getMeter('example-observer');
+});
+const meter = meterProvider.getMeter('example-observer');
 
 meter.createValueObserver('cpu_core_usage', {
   description: 'Example of a sync value observer with callback',

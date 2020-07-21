@@ -22,7 +22,9 @@ export class NoopExporter implements MetricExporter {
   export(
     metrics: MetricRecord[],
     resultCallback: (result: ExportResult) => void
-  ): void {}
+  ): void {
+    resultCallback(ExportResult.SUCCESS);
+  }
 
   // By default does nothing
   shutdown(): void {}

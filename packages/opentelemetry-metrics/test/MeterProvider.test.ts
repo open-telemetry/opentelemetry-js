@@ -17,6 +17,7 @@
 import * as assert from 'assert';
 import { MeterProvider, Meter, CounterMetric } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
+import { TestController } from './helper';
 
 describe('MeterProvider', () => {
   describe('constructor', () => {
@@ -71,6 +72,28 @@ describe('MeterProvider', () => {
       const meter3 = provider.getMeter('meter2', 'ver2');
       const meter4 = provider.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
+    });
+  });
+
+  describe('addController', () => {
+    it('should add controller', () => {
+      const provider = new MeterProvider();
+      const controller = new TestController();
+      provider.addController(controller);
+      assert(controller.collector);
+    });
+
+    it('should collect metric records on controller proactively collecting', async () => {
+      const provider = new MeterProvider();
+      const meter = provider.getMeter('test');
+      const controller = new TestController();
+      provider.addController(controller);
+
+      const counter = meter.createCounter('name') as CounterMetric;
+      counter.add(10, {});
+      const [record1] = await controller.collect();
+
+      assert.strictEqual(record1.aggregator.toPoint().value, 10);
     });
   });
 });

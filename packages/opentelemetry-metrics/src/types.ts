@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { LogLevel } from '@opentelemetry/core';
+import { LogLevel, ExportResult } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
-import { MetricExporter } from './export/types';
 import { Resource } from '@opentelemetry/resources';
 import { Batcher } from './export/Batcher';
+import { MetricRecord } from './export/types';
 
 /** MeterConfig provides an interface for configuring a Meter. */
 export interface MeterConfig {
@@ -27,12 +27,6 @@ export interface MeterConfig {
 
   /** level of logger. */
   logLevel?: LogLevel;
-
-  /** Metric exporter. */
-  exporter?: MetricExporter;
-
-  /** Metric collect interval */
-  interval?: number;
 
   /** Resource associated with metric telemetry */
   resource?: Resource;
@@ -54,3 +48,9 @@ export const DEFAULT_METRIC_OPTIONS = {
   unit: '1',
   valueType: api.ValueType.DOUBLE,
 };
+
+/** Represents an metrics collection interface. */
+export interface MetricsCollector {
+  /** Collect metrics registered with the metrics collector. */
+  collect(): Promise<MetricRecord[]>;
+}

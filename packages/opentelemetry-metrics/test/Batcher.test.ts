@@ -28,7 +28,6 @@ describe('Batcher', () => {
     beforeEach(() => {
       meter = new MeterProvider({
         logger: new NoopLogger(),
-        interval: 10000,
       }).getMeter('test-meter');
       counter = meter.createCounter('ungrouped-batcher-test');
       fooCounter = counter.bind({ key: 'foo' });
