@@ -129,7 +129,7 @@ export class NodeSDK {
 
   /** Manually add a resource */
   public addResource(resource: Resource) {
-    this._resource.merge(resource);
+    this._resource = this._resource.merge(resource);
   }
 
   /**
