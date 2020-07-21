@@ -17,20 +17,31 @@
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorMetricExporterBase } from '../../src/CollectorMetricExporterBase';
+import { CollectorExporterBase } from '../../src/CollectorExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
 import { MetricRecord } from '@opentelemetry/metrics';
 import { mockCounter, mockObserver } from '../helper';
+import * as collectorTypes from '../../src/types';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorMetricExporter extends CollectorMetricExporterBase<
-  CollectorExporterConfig
+class CollectorMetricExporter extends CollectorExporterBase<
+  CollectorExporterConfig,
+  MetricRecord,
+  collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 > {
   onInit() {}
   onShutdown() {}
-  sendMetrics() {}
-  getDefaultUrl(url: string) {
-    return url || '';
+  send() {}
+  getDefaultUrl(config: CollectorExporterConfig) {
+    return config.url || '';
+  }
+  getDefaultServiceName(config: CollectorExporterConfig): string {
+    return config.serviceName || 'collector-metric-exporter';
+  }
+  convert(
+    metrics: MetricRecord[]
+  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+    return { resourceMetrics: [] };
   }
 }
 
@@ -107,7 +118,7 @@ describe('CollectorMetricExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorMetricExporter.prototype, 'sendMetrics');
+      spySend = sinon.stub(CollectorMetricExporter.prototype, 'send');
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
     });
     afterEach(() => {
