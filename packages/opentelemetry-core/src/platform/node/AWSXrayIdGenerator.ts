@@ -22,25 +22,22 @@ const TRACE_ID_BYTES = 16;
 const TIME_BYTES = 4;
 
 export class AWSXrayIdGenerator implements api.IdGenerator {
-  private SpanIdBytes: number = SPAN_ID_BYTES;
-  private TraceIdBytes: number = TRACE_ID_BYTES;
-
+  
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
-   * characters corresponding to 128 bits.
-   * And in AWS Xray Exporter, the first 4 bytes originate from the current
-   * time (unit: second)
+   * characters corresponding to 128 bits. The first 4 bytes correspond to the current
+   * time, in seconds, as per X-Ray trace ID format.
    */
-  GenerateTraceId(): string {
-    var nowSec = Math.floor(Date.now() / 1000).toString(16);
-    return nowSec + crypto.randomBytes(this.TraceIdBytes - TIME_BYTES).toString('hex');
+  generateTraceId(): string {
+    const nowSec = Math.floor(Date.now() / 1000).toString(16);
+    return nowSec + crypto.randomBytes(TRACE_ID_BYTES - TIME_BYTES).toString('hex');
   }
 
   /**
    * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
    * characters corresponding to 64 bits.
    */
-  GenerateSpanId(): string {
-    return crypto.randomBytes(this.SpanIdBytes).toString('hex');
+  generateSpanId(): string {
+    return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
   }
 }

@@ -21,32 +21,20 @@ const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
 export class RandomIdGenerator implements api.IdGenerator {
-  private SpanIdBytes: number = SPAN_ID_BYTES;
-  private TraceIdBytes: number = TRACE_ID_BYTES;
-
-  // In case if user would like to adjust the length of ID
-  constructor(Span_Id_Bytes?: number, Trace_Id_Bytes?: number) {
-    if (Span_Id_Bytes) {
-      this.SpanIdBytes = Span_Id_Bytes;
-    }
-    if (Trace_Id_Bytes) {
-      this.TraceIdBytes = Trace_Id_Bytes;
-    }
-  }
-
+  
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits.
    */
-  GenerateTraceId(): string {
-    return crypto.randomBytes(this.TraceIdBytes).toString('hex');
+  generateTraceId(): string {
+    return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
   }
 
   /**
    * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
    * characters corresponding to 64 bits.
    */
-  GenerateSpanId(): string {
-    return crypto.randomBytes(this.SpanIdBytes).toString('hex');
+  generateSpanId(): string {
+    return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
   }
 }

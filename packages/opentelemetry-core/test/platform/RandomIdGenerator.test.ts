@@ -17,26 +17,12 @@ import * as assert from 'assert';
 import { RandomIdGenerator } from '../../src/platform';
 
 const IdGenerator = new RandomIdGenerator();
-const IdGeneratorWithParameters = new RandomIdGenerator(8, 16);
-
-describe('IdGeneratorConstructor', () => {
-  it('Default provides 16-byte TraceId and 8-byte SpanId', () => {
-    assert.equal(
-      IdGenerator.GenerateTraceId().length,
-      IdGeneratorWithParameters.GenerateTraceId().length
-    );
-    assert.equal(
-      IdGenerator.GenerateSpanId().length,
-      IdGeneratorWithParameters.GenerateSpanId().length
-    );
-  });
-});
 
 describe('randomTraceId', () => {
   let TraceId1: string, TraceId2: string;
   beforeEach(() => {
-    TraceId1 = IdGenerator.GenerateTraceId();
-    TraceId2 = IdGenerator.GenerateTraceId();
+    TraceId1 = IdGenerator.generateTraceId();
+    TraceId2 = IdGenerator.generateTraceId();
   });
 
   it('returns 32 character hex strings', () => {
@@ -52,10 +38,10 @@ describe('randomTraceId', () => {
 describe('randomSpanId', () => {
   let SpanId1: string, SpanId2: string;
   beforeEach(() => {
-    SpanId1 = IdGenerator.GenerateSpanId();
-    SpanId2 = IdGenerator.GenerateSpanId();
+    SpanId1 = IdGenerator.generateSpanId();
+    SpanId2 = IdGenerator.generateSpanId();
   });
-  
+
   it('returns 16 character hex strings', () => {
     assert.ok(SpanId1.match(/[a-f0-9]{16}/));
     assert.ok(!SpanId1.match(/^0+$/));

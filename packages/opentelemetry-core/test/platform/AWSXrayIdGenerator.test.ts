@@ -23,11 +23,11 @@ describe('AWSXrayTraceId', () => {
   let PrevTime: number, CurrTime: number, NextTime: number;
   beforeEach(() => {
     PrevTime = Math.floor(Date.now() / 1000);
-    TraceId1 = IdGenerator.GenerateTraceId();
+    TraceId1 = IdGenerator.generateTraceId();
     CurrTime = parseInt(TraceId1.substring(0, 8), 16);
     NextTime = Math.floor(Date.now() / 1000);
     console.log(TraceId1.length);
-    TraceId2 = IdGenerator.GenerateTraceId();
+    TraceId2 = IdGenerator.generateTraceId();
   });
 
   it('returns 32 character hex strings', () => {
@@ -40,16 +40,16 @@ describe('AWSXrayTraceId', () => {
   });
 
   it('using current time to encode trace id', () => {
-      assert.ok(CurrTime >= PrevTime);
-      assert.ok(CurrTime <= NextTime);
-  })
+    assert.ok(CurrTime >= PrevTime);
+    assert.ok(CurrTime <= NextTime);
+  });
 });
 
 describe('AWSXraySpanId', () => {
   let SpanId1: string, SpanId2: string;
   beforeEach(() => {
-    SpanId1 = IdGenerator.GenerateSpanId();
-    SpanId2 = IdGenerator.GenerateSpanId();
+    SpanId1 = IdGenerator.generateSpanId();
+    SpanId2 = IdGenerator.generateSpanId();
   });
 
   it('returns 16 character hex strings', () => {

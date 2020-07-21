@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-/**
- * IdGenerator provides an interface for generating Trace Id and Span Id
- *
- * The prototype IdGenerator generates random 16-byte trace ID and 8-byte span ID
- */
-
+/** IdGenerator provides an interface for generating Trace Id and Span Id */
 export interface IdGenerator {
-  /** Generate Trace ID which is default to be 16 bytes */
-  GenerateTraceId(): string;
-  /** Generate Span ID which is default to be 8 bytes */
-  GenerateSpanId(): string;
+  /** Returns a trace ID composed of 32 lowercase hex characters. */
+  generateTraceId(): string;
+  /** Returns a span ID composed of 16 lowercase hex characters. */
+  generateSpanId(): string;
 }

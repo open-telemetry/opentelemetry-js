@@ -54,7 +54,10 @@ export interface TracerConfig {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
 
-  /** Id Generator configuration */
+  /**
+   * Generator of trace and span IDs 
+   * The prototype IdGenerator generates random 16-byte trace ID and 8-byte span ID
+   */
   idGenerator?: IdGenerator;
 }
 
