@@ -44,6 +44,10 @@ export class MeterProvider implements api.MeterProvider {
     });
   }
 
+  /**
+   * Adds a new {@link Controller} to this meter provider.
+   * @param controller the new Controller to be added.
+   */
   addController(controller: Controller) {
     controller.registerMetricsCollector({
       collect: () => this._collect(),
