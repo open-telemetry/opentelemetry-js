@@ -18,33 +18,25 @@ import * as url from 'url';
 import * as http from 'http';
 import * as https from 'https';
 
-import { ReadableSpan } from '@opentelemetry/tracing';
 import * as collectorTypes from '../../types';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorTraceExporter } from './CollectorTraceExporter';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
 
-export const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
-
-export function onInitWithJson(
-  _collector: CollectorTraceExporter,
+export function initWithJson<ExportItem, ServiceRequest>(
+  _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   _config: CollectorExporterConfigNode
 ): void {
   // nothing to be done for json yet
 }
 
-export function sendSpansUsingJson(
-  collector: CollectorTraceExporter,
-  spans: ReadableSpan[],
+export function sendWithJson<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
+  objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-    spans,
-    collector
-  );
-
-  const body = JSON.stringify(exportTraceServiceRequest);
+  const serviceRequest = collector.convert(objects);
+  const body = JSON.stringify(serviceRequest);
   const parsedUrl = new url.URL(collector.url);
 
   const options = {

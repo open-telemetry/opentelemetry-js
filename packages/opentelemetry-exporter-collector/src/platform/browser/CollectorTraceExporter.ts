@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import { CollectorTraceExporterBase } from '../../CollectorTraceExporterBase';
-import { ReadableSpan } from '@opentelemetry/tracing';
+import { CollectorExporterBase } from '../../CollectorExporterBase';
+import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
 import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
@@ -23,13 +23,18 @@ import { sendWithBeacon, sendWithXhr } from './util';
 import { parseHeaders } from '../../util';
 
 const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
+const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
 
 /**
  * Collector Trace Exporter for Web
  */
-export class CollectorTraceExporter extends CollectorTraceExporterBase<
-  CollectorExporterConfigBrowser
-> {
+export class CollectorTraceExporter
+  extends CollectorExporterBase<
+    CollectorExporterConfigBrowser,
+    ReadableSpan,
+    collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+  >
+  implements SpanExporter {
   DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
@@ -59,15 +64,22 @@ export class CollectorTraceExporter extends CollectorTraceExporterBase<
     return config.url || DEFAULT_COLLECTOR_URL;
   }
 
-  sendSpans(
+  getDefaultServiceName(config: CollectorExporterConfigBrowser): string {
+    return config.serviceName || DEFAULT_SERVICE_NAME;
+  }
+
+  convert(
+    spans: ReadableSpan[]
+  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+    return toCollectorExportTraceServiceRequest(spans, this);
+  }
+
+  send(
     spans: ReadableSpan[],
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ) {
-    const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-      spans,
-      this
-    );
+    const exportTraceServiceRequest = this.convert(spans);
     const body = JSON.stringify(exportTraceServiceRequest);
 
     if (this._useXHR) {

@@ -31,11 +31,7 @@ import {
   ensureValueRecorderIsCorrect,
   mockValueRecorder,
 } from '../helper';
-import {
-  HistogramAggregator,
-  MetricRecord,
-  SumAggregator,
-} from '@opentelemetry/metrics';
+import { MetricRecord, SumAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 describe('transformMetrics', () => {
@@ -72,7 +68,6 @@ describe('transformMetrics', () => {
       // Histogram
       histogram.aggregator.update(7);
       histogram.aggregator.update(14);
-      (histogram.aggregator as HistogramAggregator).reset();
 
       // ValueRecorder
       recorder.aggregator.update(5);

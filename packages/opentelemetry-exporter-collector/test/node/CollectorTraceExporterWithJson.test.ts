@@ -44,7 +44,7 @@ const mockResError = {
   statusCode: 400,
 };
 
-describe('CollectorExporter - node with json over http', () => {
+describe('CollectorTraceExporter - node with json over http', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: CollectorExporterConfigNode;
   let spyRequest: sinon.SinonSpy;

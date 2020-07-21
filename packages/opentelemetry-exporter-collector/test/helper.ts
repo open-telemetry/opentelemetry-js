@@ -841,6 +841,115 @@ export function ensureHistogramIsCorrect(
   });
 }
 
+export function ensureExportedCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-counter',
+    description: 'sample counter description',
+    unit: '1',
+    type: 'MONOTONIC_INT64',
+    temporality: 'CUMULATIVE',
+  });
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.int64DataPoints);
+  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.int64DataPoints[0].value, '1');
+  assert.deepStrictEqual(
+    metric.int64DataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-observer',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'SUMMARY',
+    temporality: 'DELTA',
+  });
+
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 9);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '2');
+  assert.deepStrictEqual(
+    metric.summaryDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 3 },
+    { percentile: 100, value: 6 },
+  ]);
+}
+
+export function ensureExportedHistogramIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-hist',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'HISTOGRAM',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.histogramDataPoints);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].count, '2');
+  assert.deepStrictEqual(metric.histogramDataPoints[0].sum, 21);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].buckets, [
+    { count: '1', exemplar: null },
+    { count: '1', exemplar: null },
+    { count: '0', exemplar: null },
+  ]);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].explicitBounds, [
+    10,
+    20,
+  ]);
+  assert.deepStrictEqual(
+    metric.histogramDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedValueRecorderIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-recorder',
+    description: 'sample recorder description',
+    unit: '3',
+    type: 'SUMMARY',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
+  assert.deepStrictEqual(
+    metric.summaryDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 5 },
+    { percentile: 100, value: 5 },
+  ]);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '1');
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 5);
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {
@@ -920,7 +1029,11 @@ export function ensureExportMetricsServiceRequestIsSet(
   json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(resourceMetrics.length, 2, 'resourceMetrics is missing');
+  assert.strictEqual(
+    resourceMetrics.length,
+    4,
+    'resourceMetrics is the incorrect length'
+  );
 
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
