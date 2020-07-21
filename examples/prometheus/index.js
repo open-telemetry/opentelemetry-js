@@ -15,10 +15,10 @@ const exporter = new PrometheusExporter(
 );
 
 const meterProvider = new MeterProvider();
-meterProvider.addController({
+meterProvider.addController(new PushController({
   exporter,
   interval: 2000,
-});
+}));
 const meter = meterProvider.getMeter('example-prometheus');
 
 const requestCounter = meter.createCounter('requests', {
