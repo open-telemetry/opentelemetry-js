@@ -15,13 +15,12 @@
  */
 
 import * as crypto from 'crypto';
-import {IdGenerator} from '../../trace/IdGenerator';
+import { IdGenerator } from '../../trace/IdGenerator';
 
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
 export class RandomIdGenerator implements IdGenerator {
-  
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits.

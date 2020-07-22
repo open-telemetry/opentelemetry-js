@@ -13,19 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {IdGenerator} from '../../trace/IdGenerator';
+import { IdGenerator } from '../../trace/IdGenerator';
 
 declare type WindowWithMsCrypto = Window & {
-    msCrypto?: Crypto;
+  msCrypto?: Crypto;
 };
 const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
-  
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 const randomBytesArray = new Uint8Array(TRACE_ID_BYTES);
 
 export class RandomIdGenerator implements IdGenerator {
-  
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits.
@@ -53,7 +51,7 @@ export class RandomIdGenerator implements IdGenerator {
     const chars: number[] = new Array(byteArray.length * 2);
     const alpha = 'a'.charCodeAt(0) - 10;
     const digit = '0'.charCodeAt(0);
-  
+
     let p = 0;
     for (let i = 0; i < byteArray.length; i++) {
       let nibble = (byteArray[i] >>> 4) & 0xf;
@@ -61,7 +59,6 @@ export class RandomIdGenerator implements IdGenerator {
       nibble = byteArray[i] & 0xf;
       chars[p++] = nibble > 9 ? nibble + alpha : nibble + digit;
     }
-  
     return String.fromCharCode.apply(null, chars);
   }
 }
