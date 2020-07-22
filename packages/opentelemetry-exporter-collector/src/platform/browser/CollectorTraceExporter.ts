@@ -48,7 +48,6 @@ export class CollectorTraceExporter
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
-    this._useXHR = true;
     if (this._useXHR) {
       this._headers = {
         ...parseHeaders(config.headers, this.logger),

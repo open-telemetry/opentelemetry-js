@@ -20,10 +20,9 @@ import * as protobufjs from 'protobufjs';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
-import { sendDataUsingHttp } from './util';
+import { sendWithHttp } from './util';
 
 let ExportTraceServiceRequestProto: Type | undefined;
-let proto: any;
 
 export function getExportTraceServiceRequestProto(): Type | undefined {
   return ExportTraceServiceRequestProto;
@@ -38,7 +37,7 @@ export function initWithJsonProto<ExportItem, ServiceRequest>(
   root.resolvePath = function (origin, target) {
     return `${dir}/${target}`;
   };
-  proto = root.loadSync([
+  const proto = root.loadSync([
     'opentelemetry/proto/common/v1/common.proto',
     'opentelemetry/proto/resource/v1/resource.proto',
     'opentelemetry/proto/trace/v1/trace.proto',
@@ -61,7 +60,7 @@ export function sendWithJsonProto<ExportItem, ServiceRequest>(
   if (message) {
     const body = ExportTraceServiceRequestProto?.encode(message).finish();
     if (body) {
-      sendDataUsingHttp(
+      sendWithHttp(
         collector,
         Buffer.from(body),
         'application/x-protobuf',

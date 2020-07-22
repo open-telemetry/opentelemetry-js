@@ -14,10 +14,4 @@
  * limitations under the License.
  */
 
-import { runTests } from '@opentelemetry/grpc-utils/test';
-import { plugin, GrpcPlugin } from '../src/grpc';
-import * as grpc from 'grpc';
-
-describe(`#${GrpcPlugin.component}`, () => {
-  runTests(plugin, GrpcPlugin.component, grpc, 12345);
-});
+export * from './patchServer';

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { MeterProvider } from '../..';
 import { Logger } from '../../common/Logger';
 import { TracerProvider } from '../tracer_provider';
 
@@ -43,7 +42,7 @@ export interface Plugin<T = any> {
    */
   enable(
     moduleExports: T,
-    TracerProvider: Providers,
+    TracerProvider: TracerProvider,
     logger: Logger,
     config?: PluginConfig
   ): T;
@@ -51,12 +50,6 @@ export interface Plugin<T = any> {
   /** Method to disable the instrumentation  */
   disable(): void;
 }
-
-export interface BothProviders {
-  tracer: TracerProvider;
-  meter: MeterProvider;
-}
-export type Providers = BothProviders | TracerProvider;
 
 export interface PluginConfig {
   /**
