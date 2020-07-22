@@ -17,8 +17,8 @@ import {
   Logger,
   TracerProvider,
   MeterProvider,
-  NoopTracerProvider,
-  NoopMeterProvider,
+  trace,
+  metrics,
 } from '@opentelemetry/api';
 import { LogLevel } from './types';
 import { ConsoleLogger } from './ConsoleLogger';
@@ -56,7 +56,7 @@ export class PluginManager {
   constructor(config: PluginManagerConfig) {
     this.logger =
       config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
-    this.tracerProvider = config.tracerProvider ?? new NoopTracerProvider();
-    this.meterProvider = config.meterProvider ?? new NoopMeterProvider();
+    this.tracerProvider = config.tracerProvider ?? trace.getTracerProvider();
+    this.meterProvider = config.meterProvider ?? metrics.getMeterProvider();
   }
 }
