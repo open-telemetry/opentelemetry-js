@@ -113,14 +113,13 @@ export class SpanContextShim extends opentracing.SpanContext {
   }
 
   getBaggageItem(key: string): string | undefined {
-    return this._correlationContext[key]?.value
+    return this._correlationContext[key]?.value;
   }
 
   setBaggageItem(key: string, value: string) {
-    this._correlationContext = Object.assign(
-      { [key]: { value } },
-      this._correlationContext
-    );
+    this._correlationContext = Object.assign({}, this._correlationContext, {
+      [key]: { value },
+    });
   }
 }
 
@@ -151,8 +150,8 @@ export class TracerShim extends opentracing.Tracer {
 
     let correlationContext: api.CorrelationContext = {};
     if (options.childOf instanceof SpanShim) {
-       const shimContext = options.childOf.context() as SpanContextShim;
-       correlationContext = shimContext.getCorrelationContext();
+      const shimContext = options.childOf.context() as SpanContextShim;
+      correlationContext = shimContext.getCorrelationContext();
     }
 
     if (options.tags) {
@@ -167,7 +166,7 @@ export class TracerShim extends opentracing.Tracer {
     format: string,
     carrier: unknown
   ): void {
-    const spanContextShim:SpanContextShim = spanContext as SpanContextShim
+    const spanContextShim: SpanContextShim = spanContext as SpanContextShim;
     const oTelSpanContext: api.SpanContext = spanContextShim.getSpanContext();
     const oTelSpanCorrelationContext: api.CorrelationContext = spanContextShim.getCorrelationContext();
 

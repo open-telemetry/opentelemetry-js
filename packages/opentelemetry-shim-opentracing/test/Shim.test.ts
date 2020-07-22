@@ -202,8 +202,24 @@ describe('OpenTracing Shim', () => {
       assert.equal('item', childSpan.getBaggageItem('baggage'));
       assert.equal('item2', childSpan.getBaggageItem('key2'));
 
-      // Parent shouldn't have the childr baggage item.
+      // Parent shouldn't have the child baggage item.
       assert.equal(span.getBaggageItem('key2'), undefined);
+    });
+
+    it('can set and retrieve baggage with same key', () => {
+      span.setBaggageItem('key1', 'value1');
+      const value = span.getBaggageItem('key1');
+      assert.equal('value1', value);
+
+      const childSpan = shimTracer.startSpan('child-span1', {
+        childOf: span,
+      });
+      childSpan.setBaggageItem('key2', 'value2');
+      childSpan.setBaggageItem('key1', 'value3');
+
+      // child should have parent baggage items.
+      assert.equal('value3', childSpan.getBaggageItem('key1'));
+      assert.equal('value2', childSpan.getBaggageItem('key2'));
     });
   });
 });
