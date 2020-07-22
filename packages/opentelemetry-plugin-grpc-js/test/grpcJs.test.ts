@@ -15,9 +15,9 @@
  */
 
 import { runTests } from '@opentelemetry/grpc-utils/test';
-import { plugin, GrpcPlugin } from '../src/grpc';
-import * as grpc from 'grpc';
+import { plugin, GrpcJsPlugin } from '../src/grpcJs';
+import * as grpc from '@grpc/grpc-js';
 
-describe(`#${GrpcPlugin.component}`, () => {
-  runTests(plugin, GrpcPlugin.component, grpc, 12345);
+describe(`#${GrpcJsPlugin.component}`, () => {
+  runTests(plugin, GrpcJsPlugin.component, grpc, 12346);
 });
