@@ -13,12 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import * as crypto from 'crypto';
 import {IdGenerator} from '../../trace/IdGenerator';
 
+declare type WindowWithMsCrypto = Window & {
+    msCrypto?: Crypto;
+};
+const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
+  
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
+const randomBytesArray = new Uint8Array(TRACE_ID_BYTES);
 
 export class RandomIdGenerator implements IdGenerator {
   
@@ -27,7 +31,8 @@ export class RandomIdGenerator implements IdGenerator {
    * characters corresponding to 128 bits.
    */
   generateTraceId(): string {
-    return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
+    cryptoLib.getRandomValues(randomBytesArray);
+    return this.toHex(randomBytesArray.slice(0, TRACE_ID_BYTES));
   }
 
   /**
@@ -35,6 +40,28 @@ export class RandomIdGenerator implements IdGenerator {
    * characters corresponding to 64 bits.
    */
   generateSpanId(): string {
-    return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
+    cryptoLib.getRandomValues(randomBytesArray);
+    return this.toHex(randomBytesArray.slice(0, SPAN_ID_BYTES));
+  }
+
+  /**
+   * Get the hex string representation of a byte array
+   *
+   * @param byteArray
+   */
+  private toHex(byteArray: Uint8Array) {
+    const chars: number[] = new Array(byteArray.length * 2);
+    const alpha = 'a'.charCodeAt(0) - 10;
+    const digit = '0'.charCodeAt(0);
+  
+    let p = 0;
+    for (let i = 0; i < byteArray.length; i++) {
+      let nibble = (byteArray[i] >>> 4) & 0xf;
+      chars[p++] = nibble > 9 ? nibble + alpha : nibble + digit;
+      nibble = byteArray[i] & 0xf;
+      chars[p++] = nibble > 9 ? nibble + alpha : nibble + digit;
+    }
+  
+    return String.fromCharCode.apply(null, chars);
   }
 }

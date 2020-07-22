@@ -19,9 +19,8 @@ import {
   HttpTextPropagator,
   Logger,
   Sampler,
-  IdGenerator,
 } from '@opentelemetry/api';
-import { LogLevel } from '@opentelemetry/core';
+import { LogLevel, IdGenerator } from '@opentelemetry/core';
 import { ContextManager } from '@opentelemetry/context-base';
 import { Resource } from '@opentelemetry/resources';
 

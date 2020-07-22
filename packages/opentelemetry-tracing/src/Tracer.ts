@@ -22,6 +22,7 @@ import {
   InstrumentationLibrary,
   isValid,
   NoRecordingSpan,
+  IdGenerator,
   RandomIdGenerator,
   setActiveSpan,
 } from '@opentelemetry/core';
@@ -41,7 +42,7 @@ export class Tracer implements api.Tracer {
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   readonly logger: api.Logger;
-  readonly idGenerator: api.IdGenerator;
+  readonly idGenerator: IdGenerator;
 
   /**
    * Constructs a new Tracer instance.
