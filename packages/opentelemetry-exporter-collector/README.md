@@ -121,7 +121,7 @@ const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {
     foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+  }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
 const provider = new BasicTracerProvider();
@@ -144,7 +144,7 @@ const collectorOptions = {
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {
     foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+  }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
 const provider = new BasicTracerProvider();
