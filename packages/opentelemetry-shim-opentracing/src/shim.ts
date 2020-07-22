@@ -152,6 +152,8 @@ export class TracerShim extends opentracing.Tracer {
     if (options.childOf instanceof SpanShim) {
       const shimContext = options.childOf.context() as SpanContextShim;
       correlationContext = shimContext.getCorrelationContext();
+    } else if (options.childOf instanceof SpanContextShim) {
+      correlationContext = options.childOf.getCorrelationContext();
     }
 
     if (options.tags) {
@@ -201,9 +203,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         const context: api.Context = api.propagation.extract(carrier);
         const spanContext = getExtractedSpanContext(context);
-        const correlationContext = getCorrelationContext(
-          api.propagation.extract(carrier)
-        );
+        const correlationContext = getCorrelationContext(context);
 
         if (!spanContext) {
           return null;

@@ -22,6 +22,8 @@ import {
   INVALID_SPAN_CONTEXT,
   timeInputToHrTime,
   HttpTraceContext,
+  CompositePropagator,
+  HttpCorrelationContext,
 } from '@opentelemetry/core';
 import { propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
@@ -32,7 +34,11 @@ describe('OpenTracing Shim', () => {
     provider.getTracer('default')
   );
   opentracing.initGlobalTracer(shimTracer);
-  propagation.setGlobalPropagator(new HttpTraceContext());
+  const compositePropagator = new CompositePropagator({
+    propagators: [new HttpTraceContext(), new HttpCorrelationContext()],
+  });
+
+  propagation.setGlobalPropagator(compositePropagator);
 
   describe('TracerShim', () => {
     let span: opentracing.Span;
@@ -85,6 +91,25 @@ describe('OpenTracing Shim', () => {
         /* shimTracer.inject(context, opentracing.FORMAT_BINARY, carrier); */
         /* const extractedContext = shimTracer.extract(opentracing.FORMAT_BINARY, { buffer: new Uint8Array(carrier)}); */
         /* assert.strictEqual(context.toSpanId(), extractedContext.toSpanId()) */
+      });
+
+      it('injects/extracts a span with baggage', () => {
+        const carrier: { [key: string]: unknown } = {};
+        span.setBaggageItem('baggage1', 'value1');
+        span.setBaggageItem('baggage2', 'value2');
+        shimTracer.inject(span, opentracing.FORMAT_HTTP_HEADERS, carrier);
+        const extractedContext = shimTracer.extract(
+          opentracing.FORMAT_HTTP_HEADERS,
+          carrier
+        ) as SpanContextShim;
+        const childSpan = shimTracer.startSpan('other-span', {
+          childOf: extractedContext,
+        }) as SpanShim;
+        assert.ok(extractedContext !== null);
+        assert.strictEqual(context.toTraceId(), extractedContext!.toTraceId());
+        assert.strictEqual(context.toSpanId(), extractedContext!.toSpanId());
+        assert.strictEqual(childSpan.getBaggageItem('baggage1'), 'value1');
+        assert.strictEqual(childSpan.getBaggageItem('baggage2'), 'value2');
       });
     });
 
