@@ -15,13 +15,15 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
+import { ServiceClientType } from '../../types';
 import * as collectorTypes from '../../types';
-import { CollectorExporterConfigNode, ServiceClient } from './types';
+import { CollectorExporterConfigNode } from './types';
 import { CollectorProtocolNode } from '../../enums';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
-import { DEFAULT_COLLECTOR_URL_GRPC } from './utilWithGrpc';
+
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
+const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/metrics';
 
 /**
@@ -58,11 +60,8 @@ export class CollectorMetricExporter
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 
-  getServiceClient(packageObject: any, serverAddress: string): ServiceClient {
-    return new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
-      serverAddress,
-      this.credentials
-    );
+  getServiceClientType() {
+    return ServiceClientType.METRICS;
   }
 
   getServiceProtoPath(): string {

@@ -502,6 +502,57 @@ export function ensureEventsAreCorrect(
   );
 }
 
+export function ensureProtoEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'fetchStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165435513088',
+        name: 'requestStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165436923136',
+        name: 'responseStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165438688000',
+        name: 'responseEnd',
+        droppedAttributesCount: 0,
+      },
+    ],
+    'events are incorrect'
+  );
+}
+
 export function ensureAttributesAreCorrect(
   attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
 ) {
@@ -511,6 +562,22 @@ export function ensureAttributesAreCorrect(
       {
         key: 'component',
         type: 0,
+        stringValue: 'document-load',
+      },
+    ],
+    'attributes are incorrect'
+  );
+}
+
+export function ensureProtoAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 'STRING',
         stringValue: 'document-load',
       },
     ],
@@ -531,6 +598,29 @@ export function ensureLinksAreCorrect(
           {
             key: 'component',
             type: 0,
+            stringValue: 'document-load',
+          },
+        ],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'links are incorrect'
+  );
+}
+
+export function ensureProtoLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        traceId: traceIdBase64,
+        spanId: parentIdBase64,
+        attributes: [
+          {
+            key: 'component',
+            type: 'STRING',
             stringValue: 'document-load',
           },
         ],
@@ -584,6 +674,47 @@ export function ensureSpanIsCorrect(
   assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
+}
+
+export function ensureProtoSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureProtoAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureProtoEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureProtoLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    parentIdBase64,
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    '1574120165429803008',
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    '1574120165438688000',
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(span.status, { code: 'Ok' }, 'status is wrong');
 }
 
 export function ensureExportedSpanIsCorrect(

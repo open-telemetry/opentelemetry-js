@@ -1,5 +1,11 @@
 receivers:
-  otlp: {}
+  otlp:
+    {}
+# keep it when upgrading to version 0.5+
+#    protocols:
+#      grpc:
+#      http:
+#        endpoint: localhost:55680
 
 exporters:
   zipkin:

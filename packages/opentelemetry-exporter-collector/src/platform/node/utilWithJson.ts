@@ -14,13 +14,10 @@
  * limitations under the License.
  */
 
-import * as url from 'url';
-import * as http from 'http';
-import * as https from 'https';
-
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
+import { sendDataUsingHttp } from './util';
 
 export function initWithJson<ExportItem, ServiceRequest>(
   _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
@@ -36,41 +33,12 @@ export function sendWithJson<ExportItem, ServiceRequest>(
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
   const serviceRequest = collector.convert(objects);
-  const body = JSON.stringify(serviceRequest);
-  const parsedUrl = new url.URL(collector.url);
 
-  const options = {
-    hostname: parsedUrl.hostname,
-    port: parsedUrl.port,
-    path: parsedUrl.pathname,
-    method: 'POST',
-    headers: {
-      'Content-Length': Buffer.byteLength(body),
-      'Content-Type': 'application/json',
-      ...collector.headers,
-    },
-  };
-
-  const request = parsedUrl.protocol === 'http:' ? http.request : https.request;
-  const req = request(options, (res: http.IncomingMessage) => {
-    if (res.statusCode && res.statusCode < 299) {
-      collector.logger.debug(`statusCode: ${res.statusCode}`);
-      onSuccess();
-    } else {
-      collector.logger.error(`statusCode: ${res.statusCode}`);
-      onError({
-        code: res.statusCode,
-        message: res.statusMessage,
-      });
-    }
-  });
-
-  req.on('error', (error: Error) => {
-    collector.logger.error('error', error.message);
-    onError({
-      message: error.message,
-    });
-  });
-  req.write(body);
-  req.end();
+  sendDataUsingHttp(
+    collector,
+    JSON.stringify(serviceRequest),
+    'application/json',
+    onSuccess,
+    onError
+  );
 }
