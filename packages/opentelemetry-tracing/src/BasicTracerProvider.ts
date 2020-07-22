@@ -20,6 +20,7 @@ import {
   HttpTraceContext,
   HttpCorrelationContext,
   CompositePropagator,
+  onGlobalShutdown,
 } from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
@@ -48,7 +49,7 @@ export class BasicTracerProvider implements api.TracerProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      process.once('SIGTERM', this._shutdownActiveProcessor.bind(this));
+      onGlobalShutdown(this._shutdownActiveProcessor.bind(this));
     }
   }
 

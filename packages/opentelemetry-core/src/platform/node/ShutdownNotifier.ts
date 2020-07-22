@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export function afterGlobalShutdown(): void {
+  process.removeAllListeners('SIGTERM');
+}
 
-export * from './BasePlugin';
-export * from './environment';
-export * from './hex-to-base64';
-export * from './id';
-export * from './performance';
-export * from './sdk-info';
-export * from './timer-util';
-export * from './ShutdownNotifier';
+export function onGlobalShutdown(cb: () => void): void {
+  process.once('SIGTERM', cb);
+}
+
+export function globalShutdownTestHelper(cb: () => void): void {
+  onGlobalShutdown(cb);
+  process.kill(process.pid, 'SIGTERM');
+}

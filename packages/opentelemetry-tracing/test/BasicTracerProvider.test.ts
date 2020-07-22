@@ -24,6 +24,8 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
+  globalShutdownTestHelper,
+  afterGlobalShutdown,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -36,7 +38,7 @@ describe('BasicTracerProvider', () => {
   });
 
   afterEach(() => {
-    process.removeAllListeners('SIGTERM');
+    afterGlobalShutdown();
   });
 
   describe('constructor', () => {
@@ -395,11 +397,10 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      process.once('SIGTERM', () => {
+      globalShutdownTestHelper(() => {
         sinon.assert.calledOnce(shutdownStub);
         sandbox.restore();
       });
-      process.kill(process.pid, 'SIGTERM');
     });
 
     it('should not trigger shutdown if graceful shutdown is turned off', () => {
@@ -411,11 +412,10 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      process.once('SIGTERM', () => {
+      globalShutdownTestHelper(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });
-      process.kill(process.pid, 'SIGTERM');
     });
   });
 });

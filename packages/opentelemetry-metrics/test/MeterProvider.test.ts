@@ -17,11 +17,15 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  globalShutdownTestHelper,
+  afterGlobalShutdown,
+} from '@opentelemetry/core';
 
 describe('MeterProvider', () => {
   afterEach(() => {
-    process.removeAllListeners('SIGTERM');
+    afterGlobalShutdown();
   });
 
   describe('constructor', () => {
@@ -91,12 +95,11 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
-      process.once('SIGTERM', () => {
+      globalShutdownTestHelper(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
         sandbox.restore();
       });
-      process.kill(process.pid, 'SIGTERM');
     });
 
     it('should not trigger shutdown if graceful shutdown is turned off', () => {
@@ -108,11 +111,10 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
-      process.once('SIGTERM', () => {
+      globalShutdownTestHelper(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });
-      process.kill(process.pid, 'SIGTERM');
     });
   });
 });

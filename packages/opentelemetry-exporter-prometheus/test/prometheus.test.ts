@@ -16,6 +16,10 @@
 
 import { HrTime, ObserverResult } from '@opentelemetry/api';
 import {
+  afterGlobalShutdown,
+  globalShutdownTestHelper,
+} from '@opentelemetry/core';
+import {
   CounterMetric,
   SumAggregator,
   Meter,
@@ -197,7 +201,7 @@ describe('PrometheusExporter', () => {
     });
 
     afterEach(done => {
-      process.removeAllListeners('SIGTERM');
+      afterGlobalShutdown();
       exporter.shutdown(done);
     });
 
@@ -332,7 +336,8 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       counter.bind({ counterKey1: 'labelValue3' }).add(30);
-      process.once('SIGTERM', () => {
+
+      globalShutdownTestHelper(() => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -353,7 +358,6 @@ describe('PrometheusExporter', () => {
           })
           .on('error', errorHandler(done));
       });
-      process.kill(process.pid, 'SIGTERM');
     });
 
     it('should export multiple labels on manual shutdown', done => {

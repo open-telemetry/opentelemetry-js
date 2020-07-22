@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+export function afterGlobalShutdown(cb: () => void = () => {}): void {
+  window.removeEventListener('unload', cb);
+}
 
-export * from './BasePlugin';
-export * from './environment';
-export * from './hex-to-base64';
-export * from './id';
-export * from './performance';
-export * from './sdk-info';
-export * from './timer-util';
-export * from './ShutdownNotifier';
+export function onGlobalShutdown(cb: () => void): void {
+  window.addEventListener('unload', () => {
+    afterGlobalShutdown(cb);
+  });
+}
+
+export function globalShutdownTestHelper(cb: () => void): void {
+  onGlobalShutdown(cb);
+  window.close();
+}

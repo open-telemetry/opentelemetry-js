@@ -21,3 +21,4 @@ export * from './id';
 export * from './performance';
 export * from './sdk-info';
 export * from './timer-util';
+export * from './ShutdownNotifier';
