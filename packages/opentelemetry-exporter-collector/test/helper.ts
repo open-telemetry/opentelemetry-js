@@ -625,22 +625,6 @@ export function ensureProtoAttributesAreCorrect(
   );
 }
 
-export function ensureProtoAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
-) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
-      },
-    ],
-    'attributes are incorrect'
-  );
-}
-
 export function ensureLinksAreCorrect(
   attributes: opentelemetryProto.trace.v1.Span.Link[]
 ) {
@@ -680,29 +664,6 @@ export function ensureProtoLinksAreCorrect(
             value: {
               stringValue: 'document-load',
             },
-          },
-        ],
-        droppedAttributesCount: 0,
-      },
-    ],
-    'links are incorrect'
-  );
-}
-
-export function ensureProtoLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[]
-) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        traceId: traceIdBase64,
-        spanId: parentIdBase64,
-        attributes: [
-          {
-            key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
           },
         ],
         droppedAttributesCount: 0,
