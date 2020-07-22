@@ -1,0 +1,44 @@
+{
+  "name": "grpc-js-example",
+  "private": true,
+  "version": "0.8.3",
+  "description": "Example of @grpc/grpc-js integration with OpenTelemetry",
+  "main": "index.js",
+  "scripts": {
+    "zipkin:server": "cross-env EXPORTER=zipkin node ./server.js",
+    "zipkin:client": "cross-env EXPORTER=zipkin node ./client.js",
+    "jaeger:server": "cross-env EXPORTER=jaeger node ./server.js",
+    "jaeger:client": "cross-env EXPORTER=jaeger node ./client.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "keywords": [
+    "opentelemetry",
+    "grpc",
+    "tracing"
+  ],
+  "engines": {
+    "node": ">=8"
+  },
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.0.5",
+    "@opentelemetry/api": "^0.8.3",
+    "@opentelemetry/exporter-jaeger": "^0.8.3",
+    "@opentelemetry/exporter-zipkin": "^0.8.3",
+    "@opentelemetry/node": "^0.8.3",
+    "@opentelemetry/plugin-grpc-js": "^0.8.3",
+    "@opentelemetry/tracing": "^0.8.3",
+    "google-protobuf": "^3.9.2"
+  },
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "devDependencies": {
+    "cross-env": "^6.0.0"
+  }
+}
