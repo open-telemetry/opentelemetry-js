@@ -113,8 +113,7 @@ export class SpanContextShim extends opentracing.SpanContext {
   }
 
   getBaggageItem(key: string): string | undefined {
-    const entry: api.EntryValue = this._correlationContext[key];
-    return entry === undefined ? undefined : entry.value;
+    return this._correlationContext[key]?.value
   }
 
   setBaggageItem(key: string, value: string) {
@@ -151,11 +150,9 @@ export class TracerShim extends opentracing.Tracer {
     );
 
     let correlationContext: api.CorrelationContext = {};
-    if (options.childOf) {
-      if (options.childOf instanceof SpanShim) {
-        const shimContext = options.childOf.context() as SpanContextShim;
-        correlationContext = shimContext.getCorrelationContext();
-      }
+    if (options.childOf instanceof SpanShim) {
+       const shimContext = options.childOf.context() as SpanContextShim;
+       correlationContext = shimContext.getCorrelationContext();
     }
 
     if (options.tags) {
@@ -170,8 +167,9 @@ export class TracerShim extends opentracing.Tracer {
     format: string,
     carrier: unknown
   ): void {
-    const oTelSpanContext: api.SpanContext = (spanContext as SpanContextShim).getSpanContext();
-    const oTelSpanCorrelationContext: api.CorrelationContext = (spanContext as SpanContextShim).getCorrelationContext();
+    const spanContextShim:SpanContextShim = spanContext as SpanContextShim
+    const oTelSpanContext: api.SpanContext = spanContextShim.getSpanContext();
+    const oTelSpanCorrelationContext: api.CorrelationContext = spanContextShim.getCorrelationContext();
 
     if (!carrier || typeof carrier !== 'object') return;
     switch (format) {
@@ -230,7 +228,7 @@ export class TracerShim extends opentracing.Tracer {
  * SpanShim wraps an {@link types.Span} and implements the OpenTracing Span API
  * around it.
  *
- *  */
+ **/
 export class SpanShim extends opentracing.Span {
   // _span is the original OpenTelemetry span that we are wrapping with
   // an opentracing interface.
