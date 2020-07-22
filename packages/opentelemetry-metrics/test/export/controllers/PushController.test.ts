@@ -61,4 +61,32 @@ describe('PushController', () => {
       controller.shutdown();
     });
   });
+
+  describe('shutdown', () => {
+    it('should shutdown with the exporter', () => {
+      const exporter = new TestExporter();
+      const controller = new PushController({ interval: 1000, exporter });
+
+      const spy = sinon.spy(exporter, 'shutdown');
+      controller.shutdown();
+      assert(spy.called);
+    });
+
+    it('should throw on registering with metric collector if already shutdown', () => {
+      const meterProvider = new MeterProvider();
+      const exporter = new TestExporter();
+      const controller = new PushController({ interval: 1000, exporter });
+      controller.shutdown();
+
+      assert.throws(
+        () => {
+          meterProvider.addController(controller);
+        },
+        {
+          message:
+            'A shutdown PushController been registered with new MetricController.',
+        }
+      );
+    });
+  });
 });

@@ -34,6 +34,7 @@ export class PushController {
   private _logger: Logger;
   private _interval: number;
   private _exporter: MetricExporter;
+  private _shutdown = false;
 
   constructor(config?: PushControllerConfig) {
     this._logger = config?.logger ?? new NoopLogger();
@@ -42,6 +43,11 @@ export class PushController {
   }
 
   registerMetricsCollector(metricCollector: MetricsCollector) {
+    if (this._shutdown) {
+      throw new Error(
+        'A shutdown PushController been registered with new MetricController.'
+      );
+    }
     if (this._timer) {
       clearInterval(this._timer);
     }
@@ -71,6 +77,9 @@ export class PushController {
   shutdown() {
     if (this._timer) {
       clearInterval(this._timer);
+      this._timer = undefined;
     }
+    this._exporter.shutdown();
+    this._shutdown = true;
   }
 }

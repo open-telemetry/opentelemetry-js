@@ -50,7 +50,7 @@ export class MeterProvider implements api.MeterProvider {
    */
   addController(controller: Controller) {
     controller.registerMetricsCollector({
-      collect: () => this._collect(),
+      collect: this._collect,
     });
   }
 
@@ -78,14 +78,14 @@ export class MeterProvider implements api.MeterProvider {
   }
 
   /**
-   * implementation of `MetricsCollector.collect`.
+   * `this` bound implementation of `MetricsCollector.collect`.
    *
    * @returns A promise resolved with collected {@link MetricRecord}s.
    */
-  private async _collect(): Promise<MetricRecord[]> {
+  private _collect: () => Promise<MetricRecord[]> = async () => {
     await Promise.all(
       Array.from(this._meters.values()).map(meter => meter.collect())
     );
     return this._batcher.checkPointSet();
-  }
+  };
 }
