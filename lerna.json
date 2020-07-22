@@ -2,8 +2,6 @@
   "lerna": "3.13.4",
   "npmClient": "npm",
   "packages": [
-    "examples/collector-exporter-node",
-    "examples/tracer-web",
     "benchmark/*",
     "metapackages/*",
     "packages/*"
