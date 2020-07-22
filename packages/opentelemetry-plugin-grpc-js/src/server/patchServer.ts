@@ -29,6 +29,7 @@ import {
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
+import { containsOtelMetadata } from '../utils';
 
 type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
@@ -71,6 +72,16 @@ export function patchServer(
             callback: SendUnaryDataCallback<unknown>
           ) {
             const self = this;
+
+            if (containsOtelMetadata(call.metadata)) {
+              return handleUntracedServerFunction.call(
+                self,
+                type,
+                originalFunc,
+                call,
+                callback
+              );
+            }
 
             const spanName = `grpc.${name.replace('/', '')}`;
             const spanOptions: SpanOptions = {
@@ -148,6 +159,31 @@ function handleServerFunction<RequestType, ResponseType>(
           | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
           | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
       );
+    default:
+      break;
+  }
+}
+
+/**
+ * Does not patch any callbacks or EventEmitters to omit tracing on requests
+ * that should not be traced.
+ */
+function handleUntracedServerFunction<RequestType, ResponseType>(
+  this: unknown,
+  type: string,
+  originalFunc: HandleCall<RequestType, ResponseType>,
+  call: ServerCallWithMeta<RequestType, ResponseType>,
+  callback: SendUnaryDataCallback<unknown>
+): void {
+  switch (type) {
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
+      return (originalFunc as Function).call({}, call, callback);
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
+      return (originalFunc as Function).call({}, call);
     default:
       break;
   }

@@ -66,6 +66,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     '^1.7': { client: 'src/client.js' },
   };
   protected readonly _basedir = basedir;
+  static readonly _otRequestHeader = 'x-opentelemetry-outgoing-request';
 
   protected patch(): typeof grpcTypes {
     this._logger.debug(
@@ -154,7 +155,22 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               callback: SendUnaryDataCallback
             ) {
               const self = this;
-
+              if (plugin._containsOtelMetadata(call.metadata)) {
+                switch (type) {
+                  case 'unary':
+                  case 'client_stream':
+                    return (originalFunc as Function).call(
+                      self,
+                      call,
+                      callback
+                    );
+                  case 'server_stream':
+                  case 'bidi':
+                    return (originalFunc as Function).call(self, call);
+                  default:
+                    return originalResult;
+                }
+              }
               const spanName = `grpc.${name.replace('/', '')}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
@@ -355,11 +371,21 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
+        const metadata = plugin._getMetadata(original, args);
+        if (plugin._containsOtelMetadata(metadata)) {
+          return original.apply(this, args);
+        }
         const span = plugin._tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
         return plugin._tracer.withSpan(span, () =>
-          plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(span)
+          plugin._makeGrpcClientRemoteCall(
+            original,
+            args,
+            metadata,
+            this,
+            plugin
+          )(span)
         );
       };
     };
@@ -371,6 +397,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
     args: any[],
+    metadata: grpcTypes.Metadata,
     self: grpcTypes.Client,
     plugin: GrpcPlugin
   ) {
@@ -415,7 +442,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return original.apply(self, args);
       }
 
-      const metadata = this._getMetadata(original, args);
       // if unary or clientStream
       if (!original.responseStream) {
         const callbackFuncIndex = findIndex(args, arg => {
@@ -523,6 +549,15 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       metadata = args[metadataIndex];
     }
     return metadata;
+  }
+
+  /**
+   * This function returns true if the metadata contains
+   * the opentelemetry outgoing request header.
+   */
+
+  private _containsOtelMetadata(metadata: grpcTypes.Metadata): boolean {
+    return metadata.get(GrpcPlugin._otRequestHeader).length > 0;
   }
 }
 

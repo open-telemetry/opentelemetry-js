@@ -29,6 +29,7 @@ import {
   grpcStatusCodeToSpanStatus,
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
+  containsOtelMetadata,
 } from '../utils';
 import { EventEmitter } from 'events';
 
@@ -71,11 +72,15 @@ export function getPatchedClientMethods(
     return function clientMethodTrace(this: grpcJs.Client) {
       const name = `grpc.${original.path.replace('/', '')}`;
       const args = [...arguments];
+      const metadata = getMetadata.call(plugin, original, args);
+      if (containsOtelMetadata(metadata)) {
+        return original.apply(this, args);
+      }
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });
       return plugin.tracer.withSpan(span, () =>
-        makeGrpcClientRemoteCall(original, args, this, plugin)(span)
+        makeGrpcClientRemoteCall(original, args, metadata, this, plugin)(span)
       );
     };
   };
@@ -88,6 +93,7 @@ export function getPatchedClientMethods(
 export function makeGrpcClientRemoteCall(
   original: GrpcClientFunc,
   args: unknown[],
+  metadata: grpcJs.Metadata,
   self: grpcJs.Client,
   plugin: GrpcJsPlugin
 ): (span: Span) => EventEmitter {
@@ -127,7 +133,6 @@ export function makeGrpcClientRemoteCall(
   }
 
   return (span: Span) => {
-    const metadata = getMetadata.call(plugin, original, args);
     // if unary or clientStream
     if (!original.responseStream) {
       const callbackFuncIndex = args.findIndex(arg => {
