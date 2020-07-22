@@ -19,16 +19,15 @@ import type { api, core, metrics, node, resources, tracing } from '.';
 
 export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
-
+  contextManager: ContextManager;
   defaultAttributes: api.Attributes;
+  httpTextPropagator: api.HttpTextPropagator;
   logger: api.Logger;
   logLevel: core.LogLevel;
-  contextManager: ContextManager;
   metricBatcher: metrics.Batcher;
   metricExporter: metrics.MetricExporter;
   metricInterval: number;
   plugins: node.Plugins;
-  httpTextPropagator: api.HttpTextPropagator;
   resource: resources.Resource;
   sampler: api.Sampler;
   spanProcessor: tracing.SpanProcessor;

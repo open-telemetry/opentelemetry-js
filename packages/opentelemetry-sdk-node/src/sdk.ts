@@ -45,7 +45,7 @@ export class NodeSDK {
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
-      const tracerProviderConfig = {} as NodeTracerConfig;
+      const tracerProviderConfig: NodeTracerConfig = {};
 
       if (configuration.defaultAttributes) {
         tracerProviderConfig.defaultAttributes =
@@ -122,7 +122,7 @@ export class NodeSDK {
     this._meterProviderConfig = config;
   }
 
-  /** Detect resource attributes from the execution environment */
+  /** Detect resource attributes */
   public async detectResources() {
     this.addResource(await detectResources());
   }

@@ -45,10 +45,12 @@ describe('Node SDK', () => {
   });
 
   describe('Basic Registration', () => {
-    it('should not register any unconfigured SDK components', () => {
-      const sdk = new NodeSDK();
+    it('should not register any unconfigured SDK components', async () => {
+      const sdk = new NodeSDK({
+        autoDetectResources: false,
+      });
 
-      sdk.start();
+      await sdk.start();
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
@@ -59,12 +61,13 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
     });
 
-    it('should register a tracer provider if an exporter is provided', () => {
+    it('should register a tracer provider if an exporter is provided', async () => {
       const sdk = new NodeSDK({
         traceExporter: new ConsoleSpanExporter(),
+        autoDetectResources: false,
       });
 
-      sdk.start();
+      await sdk.start();
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
@@ -77,15 +80,16 @@ describe('Node SDK', () => {
       assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
     });
 
-    it('should register a tracer provider if a span processor is provided', () => {
+    it('should register a tracer provider if a span processor is provided', async () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor(exporter);
 
       const sdk = new NodeSDK({
         spanProcessor,
+        autoDetectResources: false,
       });
 
-      sdk.start();
+      await sdk.start();
 
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
@@ -98,14 +102,15 @@ describe('Node SDK', () => {
       assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
     });
 
-    it('should register a meter provider if an exporter is provided', () => {
+    it('should register a meter provider if an exporter is provided', async () => {
       const exporter = new ConsoleMetricExporter();
 
       const sdk = new NodeSDK({
         metricExporter: exporter,
+        autoDetectResources: false,
       });
 
-      sdk.start();
+      await sdk.start();
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
@@ -130,15 +135,16 @@ describe('Node SDK', () => {
         traceExporter.reset();
       });
 
-      it('should apply global attributes to every span', () => {
+      it('should apply global attributes to every span', async () => {
         const sdk = new NodeSDK({
           spanProcessor,
           defaultAttributes: {
             'default.attribute': 'test',
           },
+          autoDetectResources: false,
         });
 
-        sdk.start();
+        await sdk.start();
         const tracer = api.trace.getTracer('test');
 
         assert(tracer instanceof tracing.Tracer);
