@@ -18,8 +18,6 @@ services:
   # Zipkin
   zipkin-all-in-one:
     image: openzipkin/zipkin:latest
-    networks:
-      - otelcol
     ports:
       - "9411:9411"
 
