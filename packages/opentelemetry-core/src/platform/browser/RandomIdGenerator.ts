@@ -15,7 +15,7 @@
  */
 import { IdGenerator } from '../../trace/IdGenerator';
 
-declare type WindowWithMsCrypto = Window & {
+type WindowWithMsCrypto = Window & {
   msCrypto?: Crypto;
 };
 const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
