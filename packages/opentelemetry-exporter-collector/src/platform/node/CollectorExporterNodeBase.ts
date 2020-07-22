@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
+import { Metadata } from 'grpc';
 import { CollectorExporterBase } from '../../CollectorExporterBase';
+import { ServiceClientType } from '../../types';
 import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { ServiceClient } from './types';
-import * as grpc from 'grpc';
 import { CollectorProtocolNode } from '../../enums';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
-import { sendWithJson, initWithJson } from './utilWithJson';
-import { sendUsingGrpc, initWithGrpc } from './utilWithGrpc';
+import { initWithJson, sendWithJson } from './utilWithJson';
+import { initWithGrpc, sendWithGrpc } from './utilWithGrpc';
+import { initWithJsonProto, sendWithJsonProto } from './utilWithJsonProto';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
@@ -40,10 +42,9 @@ export abstract class CollectorExporterNodeBase<
   DEFAULT_HEADERS: Record<string, string> = {
     [collectorTypes.OT_REQUEST_HEADER]: '1',
   };
-  grpcQueue: GRPCQueueItem<ExportItem>[];
+  grpcQueue: GRPCQueueItem<ExportItem>[] = [];
+  metadata?: Metadata;
   serviceClient?: ServiceClient = undefined;
-  credentials: grpc.ChannelCredentials;
-  metadata?: grpc.Metadata;
   headers: Record<string, string>;
   protected readonly _protocol: CollectorProtocolNode;
 
@@ -53,30 +54,35 @@ export abstract class CollectorExporterNodeBase<
       typeof config.protocolNode !== 'undefined'
         ? config.protocolNode
         : CollectorProtocolNode.GRPC;
-    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
-      this.logger.debug('CollectorExporter - using json over http');
-      if (config.metadata) {
-        this.logger.warn('Metadata cannot be set when using json');
-      }
-    } else {
+    if (this._protocol === CollectorProtocolNode.GRPC) {
       this.logger.debug('CollectorExporter - using grpc');
       if (config.headers) {
         this.logger.warn('Headers cannot be set when using grpc');
       }
+    } else {
+      if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+        this.logger.debug('CollectorExporter - using json over http');
+      } else {
+        this.logger.debug('CollectorExporter - using proto over http');
+      }
+      if (config.metadata) {
+        this.logger.warn('Metadata cannot be set when using http');
+      }
     }
-    this.grpcQueue = [];
-    this.credentials = config.credentials || grpc.credentials.createInsecure();
-    this.metadata = config.metadata;
     this.headers =
       parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
+    this.metadata = config.metadata;
   }
 
   onInit(config: CollectorExporterConfigNode): void {
     this._isShutdown = false;
+
     if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
       initWithJson(this, config);
+    } else if (config.protocolNode === CollectorProtocolNode.HTTP_PROTO) {
+      initWithJsonProto(this, config);
     } else {
-      initWithGrpc(this);
+      initWithGrpc(this, config);
     }
   }
 
@@ -91,8 +97,10 @@ export abstract class CollectorExporterNodeBase<
     }
     if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
       sendWithJson(this, objects, onSuccess, onError);
+    } else if (this._protocol === CollectorProtocolNode.HTTP_PROTO) {
+      sendWithJsonProto(this, objects, onSuccess, onError);
     } else {
-      sendUsingGrpc(this, objects, onSuccess, onError);
+      sendWithGrpc(this, objects, onSuccess, onError);
     }
   }
 
@@ -108,8 +116,5 @@ export abstract class CollectorExporterNodeBase<
   }
 
   abstract getServiceProtoPath(): string;
-  abstract getServiceClient(
-    packageObject: any,
-    serverAddress: string
-  ): ServiceClient;
+  abstract getServiceClientType(): ServiceClientType;
 }

@@ -146,14 +146,14 @@ const testCollectorMetricExporter = (params: TestParams) =>
       metrics[1].aggregator.update(10);
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
-      (metrics[2].aggregator as HistogramAggregator).reset();
       metrics[3].aggregator.update(5);
       done();
     });
 
     afterEach(() => {
-      metrics[0].aggregator.update(-1); // Aggregator is not deep-copied
-      (metrics[2].aggregator as HistogramAggregator).reset();
+      // Aggregator is not deep-copied
+      metrics[0].aggregator.update(-1);
+      mockHistogram.aggregator = new HistogramAggregator([10, 20]);
       exportedData = undefined;
       reqMetadata = undefined;
     });
@@ -186,7 +186,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
           protocolNode: CollectorProtocolNode.HTTP_JSON,
         });
         const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'Metadata cannot be set when using json');
+        assert.strictEqual(args[0], 'Metadata cannot be set when using http');
       });
     });
 

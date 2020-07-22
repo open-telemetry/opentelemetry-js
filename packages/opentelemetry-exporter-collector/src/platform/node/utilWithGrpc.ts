@@ -17,18 +17,22 @@
 import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
 import * as path from 'path';
+import { ServiceClientType } from '../../types';
 import * as collectorTypes from '../../types';
 
-import { GRPCQueueItem } from './types';
+import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { removeProtocol } from './util';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
-export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-
 export function initWithGrpc<ExportItem, ServiceRequest>(
-  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
+  config: CollectorExporterConfigNode
 ): void {
+  collector.grpcQueue = [];
   const serverAddress = removeProtocol(collector.url);
+  const credentials: grpc.ChannelCredentials =
+    config.credentials || grpc.credentials.createInsecure();
+
   const includeDirs = [path.resolve(__dirname, 'protos')];
 
   protoLoader
@@ -42,10 +46,19 @@ export function initWithGrpc<ExportItem, ServiceRequest>(
     })
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
-      collector.serviceClient = collector.getServiceClient(
-        packageObject,
-        serverAddress
-      );
+
+      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
+        collector.serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+          serverAddress,
+          credentials
+        );
+      } else {
+        collector.serviceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
+          serverAddress,
+          credentials
+        );
+      }
+
       if (collector.grpcQueue.length > 0) {
         const queue = collector.grpcQueue.splice(0);
         queue.forEach((item: GRPCQueueItem<ExportItem>) => {
@@ -55,7 +68,7 @@ export function initWithGrpc<ExportItem, ServiceRequest>(
     });
 }
 
-export function sendUsingGrpc<ExportItem, ServiceRequest>(
+export function sendWithGrpc<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   onSuccess: () => void,
