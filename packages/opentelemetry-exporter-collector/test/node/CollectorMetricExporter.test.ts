@@ -186,7 +186,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
           protocolNode: CollectorProtocolNode.HTTP_JSON,
         });
         const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'Metadata cannot be set when using json');
+        assert.strictEqual(args[0], 'Metadata cannot be set when using http');
       });
     });
 

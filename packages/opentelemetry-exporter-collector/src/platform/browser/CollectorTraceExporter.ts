@@ -22,8 +22,8 @@ import * as collectorTypes from '../../types';
 import { sendWithBeacon, sendWithXhr } from './util';
 import { parseHeaders } from '../../util';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
 
 /**
  * Collector Trace Exporter for Web
