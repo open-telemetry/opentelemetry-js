@@ -172,6 +172,7 @@ export namespace opentelemetryProto {
         PRODUCER,
         CONSUMER,
       }
+
       export type TraceState = string | undefined;
     }
 
@@ -294,3 +295,8 @@ export const COLLECTOR_SPAN_KIND_MAPPING = {
   [SpanKind.PRODUCER]: opentelemetryProto.trace.v1.Span.SpanKind.PRODUCER,
   [SpanKind.CONSUMER]: opentelemetryProto.trace.v1.Span.SpanKind.CONSUMER,
 };
+
+export enum ServiceClientType {
+  SPANS,
+  METRICS,
+}
