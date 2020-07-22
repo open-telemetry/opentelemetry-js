@@ -398,49 +398,87 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.KeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-    ],
-    'exported attributes are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+            value: 'stringValue',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  }
 }
 
 export function ensureExportedLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[]
+  attributes: opentelemetryProto.trace.v1.Span.Link[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        attributes: [
-          {
-            key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
-            intValue: '0',
-            doubleValue: 0,
-            boolValue: false,
-          },
-        ],
-        traceId: Buffer.from(traceIdArr),
-        spanId: Buffer.from(parentIdArr),
-        traceState: '',
-        droppedAttributesCount: 0,
-      },
-    ],
-    'exported links are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+                value: 'stringValue',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  }
 }
 
 export function ensureEventsAreCorrect(
@@ -561,7 +599,9 @@ export function ensureAttributesAreCorrect(
     [
       {
         key: 'component',
-        stringValue: 'document-load',
+        value: {
+          stringValue: 'document-load',
+        },
       },
     ],
     'attributes are incorrect'
@@ -576,8 +616,9 @@ export function ensureProtoAttributesAreCorrect(
     [
       {
         key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
+        value: {
+          stringValue: 'document-load',
+        },
       },
     ],
     'attributes are incorrect'
@@ -596,7 +637,9 @@ export function ensureLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            stringValue: 'document-load',
+            value: {
+              stringValue: 'document-load',
+            },
           },
         ],
         droppedAttributesCount: 0,
@@ -618,8 +661,9 @@ export function ensureProtoLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
+            value: {
+              stringValue: 'document-load',
+            },
           },
         ],
         droppedAttributesCount: 0,
@@ -716,16 +760,17 @@ export function ensureProtoSpanIsCorrect(
 }
 
 export function ensureExportedSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
+  span: collectorTypes.opentelemetryProto.trace.v1.Span,
+  usingGRPC = false
 ) {
   if (span.attributes) {
-    ensureExportedAttributesAreCorrect(span.attributes);
+    ensureExportedAttributesAreCorrect(span.attributes, usingGRPC);
   }
   if (span.events) {
     ensureExportedEventsAreCorrect(span.events);
   }
   if (span.links) {
-    ensureExportedLinksAreCorrect(span.links);
+    ensureExportedLinksAreCorrect(span.links, usingGRPC);
   }
   assert.deepStrictEqual(
     span.traceId,
@@ -776,16 +821,27 @@ export function ensureWebResourceIsCorrect(
     attributes: [
       {
         key: 'service.name',
-        stringValue: 'bar',
+        value: {
+          stringValue: 'bar',
+        },
       },
       {
         key: 'service',
-        stringValue: 'ui',
+        value: {
+          stringValue: 'ui',
+        },
       },
-      { key: 'version', doubleValue: 1 },
+      {
+        key: 'version',
+        value: {
+          doubleValue: 1,
+        },
+      },
       {
         key: 'cost',
-        doubleValue: 112.12,
+        value: {
+          doubleValue: 112.12,
+        },
       },
     ],
     droppedAttributesCount: 0,
@@ -986,45 +1042,74 @@ export function ensureExportedValueRecorderIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+  resource: collectorTypes.opentelemetryProto.resource.v1.Resource,
+  usingGRPC = true
 ) {
-  assert.deepStrictEqual(resource, {
-    attributes: [
-      {
-        key: 'service.name',
-        type: 'STRING',
-        stringValue: 'basic-service',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'service',
-        type: 'STRING',
-        stringValue: 'ui',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'version',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 1,
-        boolValue: false,
-      },
-      {
-        key: 'cost',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 112.12,
-        boolValue: false,
-      },
-    ],
-    droppedAttributesCount: 0,
-  });
+  if (usingGRPC) {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+            value: 'doubleValue',
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+            value: 'doubleValue',
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  } else {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  }
 }
 
 export function ensureExportTraceServiceRequestIsSet(
