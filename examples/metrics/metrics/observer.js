@@ -1,6 +1,6 @@
 'use strict';
 
-const { MeterProvider } = require('@opentelemetry/metrics');
+const { MeterProvider, PushController } = require('@opentelemetry/metrics');
 const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
 const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
 
@@ -16,7 +16,7 @@ const exporter = new PrometheusExporter(
 );
 
 const meterProvider = new MeterProvider();
-meterProvider.addController({
+meterProvider.addController(new PushController{
   exporter,
   interval: 2000,
 });
