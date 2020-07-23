@@ -51,6 +51,18 @@ export interface SpanContext {
    */
   traceFlags: TraceFlags;
   /**
+   * Debug flag to propagate.
+   *
+   * This flag only seems relevant to b3. According to the b3 spec,
+   * Debug is encoded as X-B3-Flags: 1. Absent or any other value can be ignored.
+   * Debug is a production troubleshooting aid used in tools like curl or chrome debug.
+   * Debug is an emphasized accept decision that implies accept (or setting traceFlags to accept),
+   * additionally reporting Span.debug = true for each span in the trace. Adding this
+   * to the span context because the b3 spec says when this flag is set properly,
+   * do not send the sampled header as well.
+   */
+  debug?: boolean;
+  /**
    * Tracing-system-specific info to propagate.
    *
    * The tracestate field value is a `list` as defined below. The `list` is a

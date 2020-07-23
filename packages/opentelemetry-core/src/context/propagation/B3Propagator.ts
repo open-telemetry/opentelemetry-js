@@ -26,6 +26,8 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
+export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
+export const X_B3_FLAGS = 'x-b3-flags';
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
@@ -53,10 +55,18 @@ export class B3Propagator implements HttpTextPropagator {
     ) {
       setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
       setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
-
+      // According to the B3 spec, if the debug flag is set,
+      // the sampled flag shouldn't be propagated as well.
+      if (spanContext.debug) {
+        setter(
+          carrier,
+          X_B3_FLAGS,
+          '1'
+        );
+      } 
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
-      if (spanContext.traceFlags !== undefined) {
+      else if (spanContext.traceFlags !== undefined) {
         setter(
           carrier,
           X_B3_SAMPLED,
@@ -72,6 +82,7 @@ export class B3Propagator implements HttpTextPropagator {
     const traceIdHeader = getter(carrier, X_B3_TRACE_ID);
     const spanIdHeader = getter(carrier, X_B3_SPAN_ID);
     const sampledHeader = getter(carrier, X_B3_SAMPLED);
+    const flagsHeader = getter(carrier, X_B3_FLAGS);
 
     const traceIdHeaderValue = Array.isArray(traceIdHeader)
       ? traceIdHeader[0]
@@ -81,6 +92,10 @@ export class B3Propagator implements HttpTextPropagator {
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
+
+    const debugHeaderValue = Array.isArray(flagsHeader) ? flagsHeader[0] : flagsHeader;
+    const debug = isNaN(Number(debugHeaderValue)) ? false : debugHeaderValue === "1";
+    const traceFlagsOrDebug = Number(debug) || Number(options);
 
     if (typeof traceIdHeaderValue !== 'string' || typeof spanId !== 'string') {
       return context;
@@ -93,7 +108,9 @@ export class B3Propagator implements HttpTextPropagator {
         traceId,
         spanId,
         isRemote: true,
-        traceFlags: isNaN(Number(options)) ? TraceFlags.NONE : Number(options),
+        // Set traceFlags as 1 if debug is 1
+        traceFlags:  traceFlagsOrDebug || TraceFlags.NONE ,
+        debug,
       });
     }
     return context;
