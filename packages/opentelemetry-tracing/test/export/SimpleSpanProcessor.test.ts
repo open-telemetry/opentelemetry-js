@@ -19,7 +19,7 @@ import {
   Span,
   BasicTracerProvider,
   InMemorySpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
 } from '../../src';
 import { SpanContext, SpanKind, TraceFlags, context } from '@opentelemetry/api';
 import { TestTracingSpanExporter } from './TestTracingSpanExporter';
@@ -102,7 +102,7 @@ describe('SimpleSpanProcessor', () => {
 
   describe('onEnd', () => {
     beforeEach(() => {
-      const contextManager = new TestStackContextManager().enable()
+      const contextManager = new TestStackContextManager().enable();
       context.setGlobalContextManager(contextManager);
     });
 
@@ -111,7 +111,7 @@ describe('SimpleSpanProcessor', () => {
     });
 
     it('should prevent instrumentation prior to export', () => {
-      const testTracingExporter = new TestTracingSpanExporter()
+      const testTracingExporter = new TestTracingSpanExporter();
       const processor = new SimpleSpanProcessor(testTracingExporter);
 
       const spanContext: SpanContext = {
@@ -128,8 +128,8 @@ describe('SimpleSpanProcessor', () => {
 
       processor.onEnd(span);
 
-      const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans()
-      assert.equal(exporterCreatedSpans.length, 0)
+      const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+      assert.equal(exporterCreatedSpans.length, 0);
     });
   });
 });

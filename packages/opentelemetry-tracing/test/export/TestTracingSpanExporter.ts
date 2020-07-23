@@ -19,7 +19,7 @@ import {
   SpanExporter,
   ReadableSpan,
   Tracer,
-  SpanProcessor
+  SpanProcessor,
 } from '../../src';
 import { ExportResult, NoopLogger, AlwaysOnSampler } from '@opentelemetry/core';
 
@@ -42,12 +42,12 @@ export class TestTracingSpanExporter implements SpanExporter {
       forceFlush: () => {},
       onStart: () => {},
       shutdown: () => {},
-      onEnd: (span) => {
+      onEnd: span => {
         this._exporterCreatedSpans.push(span);
-      }
-    }
+      },
+    };
 
-    tracerProvider.addSpanProcessor(spanProcessor)
+    tracerProvider.addSpanProcessor(spanProcessor);
 
     this._tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
@@ -66,7 +66,7 @@ export class TestTracingSpanExporter implements SpanExporter {
 
     // Simulates an instrumented exporter by creating a span on the tracer.
     const createdSpan = this._tracer.startSpan('exporter-created-span');
-    createdSpan.end()
+    createdSpan.end();
 
     this._processedSpans.push(...spans);
     return resultCallback(ExportResult.SUCCESS);

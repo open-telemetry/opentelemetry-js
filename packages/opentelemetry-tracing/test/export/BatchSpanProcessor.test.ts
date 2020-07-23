@@ -233,7 +233,7 @@ describe('BatchSpanProcessor', () => {
 
     describe('flushing spans with exporter triggering instrumentation', () => {
       beforeEach(() => {
-        const contextManager = new TestStackContextManager().enable()
+        const contextManager = new TestStackContextManager().enable();
         context.setGlobalContextManager(contextManager);
       });
 
@@ -241,8 +241,8 @@ describe('BatchSpanProcessor', () => {
         context.disable();
       });
 
-      it('should prevent instrumentation prior to export', (done) => {
-        const testTracingExporter = new TestTracingSpanExporter()
+      it('should prevent instrumentation prior to export', done => {
+        const testTracingExporter = new TestTracingSpanExporter();
         const processor = new BatchSpanProcessor(testTracingExporter);
 
         const span = createSampledSpan('test');
@@ -250,8 +250,8 @@ describe('BatchSpanProcessor', () => {
         processor.onEnd(span);
 
         processor.forceFlush(() => {
-          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans()
-          assert.equal(exporterCreatedSpans.length, 0)
+          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          assert.equal(exporterCreatedSpans.length, 0);
 
           done();
         });

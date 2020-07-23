@@ -15,14 +15,20 @@
  */
 
 import * as assert from 'assert';
-import { NoopSpan, Sampler, SamplingDecision, Context, NOOP_SPAN } from '@opentelemetry/api';
+import {
+  NoopSpan,
+  Sampler,
+  SamplingDecision,
+  Context,
+  NOOP_SPAN,
+} from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
   InstrumentationLibrary,
   NoopLogger,
   AlwaysOnSampler,
   AlwaysOffSampler,
-  setSuppressInstrumentation
+  setSuppressInstrumentation,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {
@@ -96,19 +102,19 @@ describe('Tracer', () => {
     assert.strictEqual(lib.version, '0.0.1');
   });
 
-  it('should return cached no-op span when suppressInstrumentation true', (done) => {
+  it('should return cached no-op span when suppressInstrumentation true', done => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
       { sampler: new TestSampler() },
       tracerProvider
     );
 
-    const context = setSuppressInstrumentation(Context.ROOT_CONTEXT, true)
+    const context = setSuppressInstrumentation(Context.ROOT_CONTEXT, true);
     const span = tracer.startSpan('span3', undefined, context);
 
     assert.equal(span, NOOP_SPAN);
     span.end();
 
-    done()
+    done();
   });
 });

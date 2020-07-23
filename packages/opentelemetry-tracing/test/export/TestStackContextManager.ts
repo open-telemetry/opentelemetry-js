@@ -26,21 +26,25 @@ export class TestStackContextManager implements ContextManager {
   private _contextStack: Context[] = [];
 
   active(): Context {
-    return this._contextStack[this._contextStack.length - 1] ?? Context.ROOT_CONTEXT;
+    return (
+      this._contextStack[this._contextStack.length - 1] ?? Context.ROOT_CONTEXT
+    );
   }
 
-  with<T extends (...args: unknown[]) => ReturnType<T>>(context: Context, fn: T): ReturnType<T> {
+  with<T extends (...args: unknown[]) => ReturnType<T>>(
+    context: Context,
+    fn: T
+  ): ReturnType<T> {
     this._contextStack.push(context);
     try {
       return fn();
-    }
-    finally {
+    } finally {
       this._contextStack.pop();
     }
   }
 
   bind<T>(target: T, context?: Context): T {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 
   enable(): this {

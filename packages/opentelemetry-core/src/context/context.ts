@@ -91,7 +91,7 @@ export function getParentSpanContext(
  */
 export const SUPPRESS_INSTRUMENTATION_KEY = Context.createKey(
   'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
-)
+);
 
 /**
  * Set whether or not instrumentation should be suppressed beyond
@@ -100,8 +100,11 @@ export const SUPPRESS_INSTRUMENTATION_KEY = Context.createKey(
  * @param context context to set the suppress instrumentation value on.
  * @param shouldSuppress value to set.
  */
-export function setSuppressInstrumentation(context: Context, shouldSuppress: boolean): Context {
-  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, shouldSuppress)
+export function setSuppressInstrumentation(
+  context: Context,
+  shouldSuppress: boolean
+): Context {
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, shouldSuppress);
 }
 
 /**
@@ -110,7 +113,9 @@ export function setSuppressInstrumentation(context: Context, shouldSuppress: boo
  *
  * @param context context check for the suppress instrumentation value.
  */
-export function getSuppressInstrumentation(context: Context): boolean | undefined {
-  const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY) as boolean
-  return value
+export function getSuppressInstrumentation(
+  context: Context
+): boolean | undefined {
+  const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY) as boolean;
+  return value;
 }

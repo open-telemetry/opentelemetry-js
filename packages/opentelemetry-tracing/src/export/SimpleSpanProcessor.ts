@@ -18,7 +18,7 @@ import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
 import { context } from '@opentelemetry/api';
-import { setSuppressInstrumentation } from '@opentelemetry/core'
+import { setSuppressInstrumentation } from '@opentelemetry/core';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -46,7 +46,7 @@ export class SimpleSpanProcessor implements SpanProcessor {
     // prevent downstream exporter calls from generating spans
     context.with(setSuppressInstrumentation(context.active(), true), () => {
       this._exporter.export([span], () => {});
-    })
+    });
   }
 
   shutdown(cb: () => void = () => {}): void {
