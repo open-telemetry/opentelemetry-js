@@ -23,7 +23,11 @@ import {
   Span,
   SpanProcessor,
 } from '../src';
-import { _globalShutdownTestHelper } from '@opentelemetry/core';
+import {
+  notifyOnGlobalShutdown,
+  _invokeGlobalShutdown,
+  _removeAllGlobalShutdownListeners,
+} from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
@@ -40,7 +44,7 @@ class TestProcessor implements SpanProcessor {
 
 describe('MultiSpanProcessor', () => {
   afterEach(() => {
-    _globalShutdownTestHelper(() => {}, true);
+    _removeAllGlobalShutdownListeners();
   });
 
   it('should handle empty span processor', () => {
@@ -105,10 +109,11 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
 
-    _globalShutdownTestHelper(() => {
+    notifyOnGlobalShutdown(() => {
       assert.strictEqual(processor1.spans.length, 0);
       assert.strictEqual(processor1.spans.length, processor2.spans.length);
     });
+    _invokeGlobalShutdown();
   });
 
   it('should export spans on manual shutdown from two span processor', () => {
