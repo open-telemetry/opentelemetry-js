@@ -14,22 +14,17 @@
  * limitations under the License.
  */
 
-export function handleGlobalShutdown(cb: () => void) {
+export function notifyOnGlobalShutdown(cb: () => void) {
   process.once('SIGTERM', cb);
   return function removeCallbackFromGlobalShutdown() {
     process.removeListener('SIGTERM', cb);
-    cb();
   };
 }
 
-export function _globalShutdownTestHelper(
-  cb: () => void,
-  removeListeners = false
-) {
-  if (removeListeners) {
-    process.removeAllListeners('SIGTERM');
-  } else {
-    handleGlobalShutdown(cb);
-    process.kill(process.pid, 'SIGTERM');
-  }
+export function _invokeGlobalShutdown() {
+  process.kill(process.pid, 'SIGTERM');
+}
+
+export function _removeAllGlobalShutdownListeners() {
+  process.removeAllListeners('SIGTERM');
 }

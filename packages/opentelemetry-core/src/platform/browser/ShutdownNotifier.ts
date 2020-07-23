@@ -14,21 +14,17 @@
  * limitations under the License.
  */
 
-export function handleGlobalShutdown(cb: () => void) {
+export function notifyOnGlobalShutdown(cb: () => void) {
   window.addEventListener('unload', cb, { once: true });
   return function removeCallbackFromGlobalShutdown() {
-    window.removeEventListener('unload', cb);
+    window.removeEventListener('unload', cb, false);
   };
 }
 
-export function _globalShutdownTestHelper(
-  cb: () => void,
-  removeListener = false
-) {
-  if (removeListener) {
-    window.removeEventListener('unload', cb);
-  } else {
-    handleGlobalShutdown(cb);
-    window.close();
-  }
+export function _invokeGlobalShutdown() {
+  window.close();
+}
+
+export function _removeAllGlobalShutdownListeners() {
+    window.removeEventListener
 }
