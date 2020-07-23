@@ -24,8 +24,7 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
-  globalShutdownTestHelper,
-  afterGlobalShutdown,
+  _globalShutdownTestHelper,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -38,7 +37,7 @@ describe('BasicTracerProvider', () => {
   });
 
   afterEach(() => {
-    afterGlobalShutdown();
+    _globalShutdownTestHelper(() => {}, true);
   });
 
   describe('constructor', () => {
@@ -397,7 +396,7 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      globalShutdownTestHelper(() => {
+      _globalShutdownTestHelper(() => {
         sinon.assert.calledOnce(shutdownStub);
         sandbox.restore();
       });
@@ -412,7 +411,7 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      globalShutdownTestHelper(() => {
+      _globalShutdownTestHelper(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });

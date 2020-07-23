@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function afterGlobalShutdown(): void {
-  process.removeAllListeners('SIGTERM');
-}
 
-export function onGlobalShutdown(cb: () => void): void {
+export function handleGlobalShutdown(cb: () => void) {
   process.once('SIGTERM', cb);
+  return function removeCallbackFromGlobalShutdown(removecb: () => void) {
+    process.removeListener('SIGTERM', cb);
+    removecb();
+  };
 }
 
-export function globalShutdownTestHelper(cb: () => void): void {
-  onGlobalShutdown(cb);
-  process.kill(process.pid, 'SIGTERM');
+export function _globalShutdownTestHelper(
+  cb: () => void,
+  removeListeners = false
+) {
+  if (removeListeners) {
+    process.removeAllListeners('SIGTERM');
+  } else {
+    handleGlobalShutdown(cb);
+    process.kill(process.pid, 'SIGTERM');
+  }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger, onGlobalShutdown } from '@opentelemetry/core';
+import { ConsoleLogger, handleGlobalShutdown } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
@@ -37,7 +37,7 @@ export class MeterProvider implements api.MeterProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      onGlobalShutdown(this._shutdownAllMeters.bind(this));
+      handleGlobalShutdown(this._shutdownAllMeters.bind(this));
     }
   }
 

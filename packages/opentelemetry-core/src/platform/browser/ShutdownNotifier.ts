@@ -13,15 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function afterGlobalShutdown(cb: () => void): void {
-  window.removeEventListener('unload', cb);
+
+export function handleGlobalShutdown(cb: () => void) {
+  window.addEventListener('unload', cb, { once: true });
+  return function removeCallbackFromGlobalShutdown(removecb: () => void) {
+    window.removeEventListener('unload', removecb);
+  };
 }
 
-export function onGlobalShutdown(cb: () => void): void {
-  window.addEventListener('unload', cb, {once: true});
-}
-
-export function globalShutdownTestHelper(cb: () => void): void {
-  onGlobalShutdown(cb);
-  window.close();
+export function _globalShutdownTestHelper(
+  cb: () => void,
+  removeListener = false
+) {
+  if (removeListener) {
+    window.removeEventListener('unload', cb);
+  } else {
+    handleGlobalShutdown(cb);
+    window.close();
+  }
 }

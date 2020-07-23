@@ -17,15 +17,11 @@
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
-import {
-  NoopLogger,
-  globalShutdownTestHelper,
-  afterGlobalShutdown,
-} from '@opentelemetry/core';
+import { NoopLogger, _globalShutdownTestHelper } from '@opentelemetry/core';
 
 describe('MeterProvider', () => {
   afterEach(() => {
-    afterGlobalShutdown();
+    _globalShutdownTestHelper(() => {}, true);
   });
 
   describe('constructor', () => {
@@ -95,7 +91,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
-      globalShutdownTestHelper(() => {
+      _globalShutdownTestHelper(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
         sandbox.restore();
@@ -111,7 +107,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
-      globalShutdownTestHelper(() => {
+      _globalShutdownTestHelper(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });
