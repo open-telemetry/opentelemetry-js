@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "@opentelemetry/plugin-grpc": "^0.9.0",
+        "@opentelemetry/plugin-grpc-js": "^0.9.0",
         "@opentelemetry/plugin-http": "^0.9.0",
         "@opentelemetry/plugin-https": "^0.9.0"
     }
