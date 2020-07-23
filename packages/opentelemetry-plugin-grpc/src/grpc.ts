@@ -42,6 +42,8 @@ import {
   findIndex,
   _grpcStatusCodeToCanonicalCode,
   _grpcStatusCodeToSpanStatus,
+  _methodIsIgnored,
+  _containsOtelMetadata,
 } from './utils';
 import { VERSION } from './version';
 
@@ -66,7 +68,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     '^1.7': { client: 'src/client.js' },
   };
   protected readonly _basedir = basedir;
-  static readonly _otRequestHeader = 'x-opentelemetry-outgoing-request';
 
   protected patch(): typeof grpcTypes {
     this._logger.debug(
@@ -155,7 +156,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               callback: SendUnaryDataCallback
             ) {
               const self = this;
-              if (plugin._containsOtelMetadata(call.metadata)) {
+              if (plugin._shouldNotTraceServerCall(call, name)) {
                 switch (type) {
                   case 'unary':
                   case 'client_stream':
@@ -226,6 +227,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return originalResult;
       };
     };
+  }
+
+  /**
+   * Returns true if the server call should not be traced.
+   */
+  private _shouldNotTraceServerCall(
+    call: ServerCallWithMeta,
+    name: string
+  ): boolean {
+    return (
+      _containsOtelMetadata(call.metadata) ||
+      _methodIsIgnored(name, this._config.ignoreMethods)
+    );
   }
 
   private _clientStreamAndUnaryHandler<RequestType, ResponseType>(
@@ -349,18 +363,19 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
     // For a method defined in .proto as "UnaryMethod"
     Object.entries(methods).forEach(([name, { originalName }]) => {
-      methodList.push(name); // adds camel case method name: "unaryMethod"
-      if (
-        originalName &&
-        // eslint-disable-next-line no-prototype-builtins
-        client.prototype.hasOwnProperty(originalName) &&
-        name !== originalName // do not add duplicates
-      ) {
-        // adds original method name: "UnaryMethod",
-        methodList.push(originalName);
+      if (!_methodIsIgnored(name, this._config.ignoreMethods)) {
+        methodList.push(name); // adds camel case method name: "unaryMethod"
+        if (
+          originalName &&
+          // eslint-disable-next-line no-prototype-builtins
+          client.prototype.hasOwnProperty(originalName) &&
+          name !== originalName // do not add duplicates
+        ) {
+          // adds original method name: "UnaryMethod",
+          methodList.push(originalName);
+        }
       }
     });
-
     return methodList;
   }
 
@@ -372,7 +387,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = plugin._getMetadata(original, args);
-        if (plugin._containsOtelMetadata(metadata)) {
+        if (_containsOtelMetadata(metadata)) {
           return original.apply(this, args);
         }
         const span = plugin._tracer.startSpan(name, {
@@ -549,15 +564,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       metadata = args[metadataIndex];
     }
     return metadata;
-  }
-
-  /**
-   * This function returns true if the metadata contains
-   * the opentelemetry outgoing request header.
-   */
-
-  private _containsOtelMetadata(metadata: grpcTypes.Metadata): boolean {
-    return metadata.get(GrpcPlugin._otRequestHeader).length > 0;
   }
 }
 

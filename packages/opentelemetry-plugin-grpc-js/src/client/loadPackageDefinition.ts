@@ -58,7 +58,7 @@ function _patchLoadedPackage(
     if (typeof service === 'function') {
       shimmer.massWrap<typeof service.prototype, string>(
         service.prototype,
-        getMethodsToWrap(service, service.service),
+        getMethodsToWrap.call(this, service, service.service),
         getPatchedClientMethods.call(this)
       );
     } else if (typeof service.format !== 'string') {

@@ -29,7 +29,7 @@ import {
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
-import { containsOtelMetadata } from '../utils';
+import { containsOtelMetadata, methodIsIgnored } from '../utils';
 
 type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
@@ -73,9 +73,8 @@ export function patchServer(
           ) {
             const self = this;
 
-            if (containsOtelMetadata(call.metadata)) {
-              return handleUntracedServerFunction.call(
-                self,
+            if (shouldNotTraceServerCall.call(plugin, call.metadata, name)) {
+              return handleUntracedServerFunction(
                 type,
                 originalFunc,
                 call,
@@ -120,6 +119,20 @@ export function patchServer(
       return originalRegisterResult;
     } as typeof grpcJs.Server.prototype.register;
   };
+}
+
+/**
+ * Returns true if the server call should not be traced.
+ */
+function shouldNotTraceServerCall(
+  this: GrpcJsPlugin,
+  metadata: grpcJs.Metadata,
+  methodName: string
+): boolean {
+  return (
+    containsOtelMetadata(metadata) ||
+    methodIsIgnored(methodName, this._config.ignoreMethods)
+  );
 }
 
 /**
@@ -169,7 +182,6 @@ function handleServerFunction<RequestType, ResponseType>(
  * that should not be traced.
  */
 function handleUntracedServerFunction<RequestType, ResponseType>(
-  this: unknown,
   type: string,
   originalFunc: HandleCall<RequestType, ResponseType>,
   call: ServerCallWithMeta<RequestType, ResponseType>,

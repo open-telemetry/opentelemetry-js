@@ -16,6 +16,7 @@
 
 import * as grpcModule from 'grpc';
 import * as events from 'events';
+import { PluginConfig } from '@opentelemetry/api';
 
 export type grpc = typeof grpcModule;
 
@@ -27,7 +28,7 @@ export type SendUnaryDataCallback = (
 ) => void;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GrpcPluginOptions {}
+export interface GrpcPluginOptions extends PluginConfig {}
 
 interface GrpcStatus {
   code: number;

@@ -17,6 +17,8 @@
 import { CanonicalCode, Status } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 
+const _otRequestHeader = 'x-opentelemetry-outgoing-request';
+
 // Equivalent to lodash _.findIndex
 export const findIndex: <T>(args: T[], fn: (arg: T) => boolean) => number = (
   args,
@@ -47,4 +49,33 @@ export const _grpcStatusCodeToCanonicalCode = (
 
 export const _grpcStatusCodeToSpanStatus = (status: number): Status => {
   return { code: status };
+};
+
+/**
+ * Returns true if the metadata contains
+ * the opentelemetry outgoing request header.
+ */
+export const _containsOtelMetadata = (
+  metadata: grpcTypes.Metadata
+): boolean => {
+  return metadata.get(_otRequestHeader).length > 0;
+};
+
+/**
+ * Returns true if the current plugin configuration
+ * ignores the given method.
+ */
+export const _methodIsIgnored = (
+  methodName: string,
+  ignoredMethods?: string[]
+): boolean => {
+  if (!ignoredMethods) {
+    return false;
+  }
+  for (const pattern of ignoredMethods) {
+    if (new RegExp(pattern).test(methodName)) {
+      return true;
+    }
+  }
+  return false;
 };

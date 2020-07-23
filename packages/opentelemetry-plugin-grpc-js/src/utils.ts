@@ -51,9 +51,28 @@ export const grpcStatusCodeToSpanStatus = (status: number): Status => {
 };
 
 /**
- * This function returns true if the metadata contains
+ * Returns true if the metadata contains
  * the opentelemetry outgoing request header.
  */
 export const containsOtelMetadata = (metadata: grpcTypes.Metadata): boolean => {
   return metadata.get(OTEL_OUTGOING_REQUEST_KEY).length > 0;
-}
+};
+
+/**
+ * Returns true if the current plugin configuration
+ * ignores the given method.
+ */
+export const methodIsIgnored = (
+  methodName: string,
+  ignoredMethods?: string[]
+): boolean => {
+  if (!ignoredMethods) {
+    return false;
+  }
+  for (const pattern of ignoredMethods) {
+    if (new RegExp(pattern).test(methodName)) {
+      return true;
+    }
+  }
+  return false;
+};

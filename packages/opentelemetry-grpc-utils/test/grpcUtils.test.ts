@@ -68,9 +68,7 @@ type ServerWriteableStream =
 type ServerDuplexStream =
   | grpcNapi.ServerDuplexStream<any, any>
   | grpcJs.ServerDuplexStream<any, any>;
-type Metadata =
-  | grpcNapi.Metadata
-  | grpcJs.Metadata;
+type Metadata = grpcNapi.Metadata | grpcJs.Metadata;
 
 type TestGrpcClient = (typeof grpcJs | typeof grpcNapi)['Client'] & {
   unaryMethod: any;
@@ -741,7 +739,7 @@ export const runTests = (
       });
     });
 
-    describe('Test filtering methods', () => {
+    describe('Test filtering requests using metadata', () => {
       const logger = new NoopLogger();
       const provider = new NodeTracerProvider({ logger });
       provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
@@ -775,7 +773,6 @@ export const runTests = (
         const metadata = new grpc.Metadata();
         metadata.set('x-opentelemetry-outgoing-request', '1');
         describe(`Test should not create spans for grpc remote method ${method.description} when metadata has otel header`, () => {
-
           before(() => {
             method.metadata = metadata;
           });
@@ -785,6 +782,53 @@ export const runTests = (
           });
 
           runTest(method, provider, false);
+        });
+      });
+    });
+
+    describe('Test filtering requests using options', () => {
+      const logger = new NoopLogger();
+      const provider = new NodeTracerProvider({ logger });
+      const checkSpans: { [key: string]: boolean } = {
+        unaryMethod: false,
+        UnaryMethod: false,
+        camelCaseMethod: false,
+        ClientStreamMethod: true,
+        ServerStreamMethod: true,
+        BidiStreamMethod: false,
+      };
+      provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+      beforeEach(() => {
+        memoryExporter.reset();
+      });
+
+      before(async () => {
+        const config = {
+          ignoreMethods: ['UnaryMethod', 'camelCaseMethod', 'BidiStreamMethod'],
+        };
+        const patchedGrpc = plugin.enable(grpc, provider, logger, config);
+
+        const packageDefinition = await protoLoader.load(PROTO_PATH, options);
+        const proto = patchedGrpc.loadPackageDefinition(packageDefinition)
+          .pkg_test;
+
+        server = await startServer(patchedGrpc, proto);
+        client = createClient(patchedGrpc, proto);
+      });
+
+      after(done => {
+        client.close();
+        server.tryShutdown(() => {
+          plugin.disable();
+          done();
+        });
+      });
+
+      methodList.map(method => {
+        describe(`Test should ${
+          checkSpans[method.methodName] ? '' : 'not '
+        }create spans for grpc remote method ${method.methodName}`, () => {
+          runTest(method, provider, checkSpans[method.methodName]);
         });
       });
     });

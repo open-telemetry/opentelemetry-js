@@ -30,6 +30,7 @@ import {
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
   containsOtelMetadata,
+  methodIsIgnored,
 } from '../utils';
 import { EventEmitter } from 'events';
 
@@ -38,6 +39,7 @@ import { EventEmitter } from 'events';
  * with both possible casings e.g. "TestMethod" & "testMethod"
  */
 export function getMethodsToWrap(
+  this: GrpcJsPlugin,
   client: typeof grpcJs.Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
@@ -45,15 +47,17 @@ export function getMethodsToWrap(
 
   // For a method defined in .proto as "UnaryMethod"
   Object.entries(methods).forEach(([name, { originalName }]) => {
-    methodList.push(name); // adds camel case method name: "unaryMethod"
-    if (
-      originalName &&
-      // eslint-disable-next-line no-prototype-builtins
-      client.prototype.hasOwnProperty(originalName) &&
-      name !== originalName // do not add duplicates
-    ) {
-      // adds original method name: "UnaryMethod",
-      methodList.push(originalName);
+    if (!methodIsIgnored(name, this._config.ignoreMethods)) {
+      methodList.push(name); // adds camel case method name: "unaryMethod"
+      if (
+        originalName &&
+        // eslint-disable-next-line no-prototype-builtins
+        client.prototype.hasOwnProperty(originalName) &&
+        name !== originalName // do not add duplicates
+      ) {
+        // adds original method name: "UnaryMethod",
+        methodList.push(originalName);
+      }
     }
   });
 
