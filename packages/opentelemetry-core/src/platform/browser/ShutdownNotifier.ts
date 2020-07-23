@@ -25,6 +25,4 @@ export function _invokeGlobalShutdown() {
   window.close();
 }
 
-export function _removeAllGlobalShutdownListeners() {
-    window.removeEventListener
-}
+export function _removeAllGlobalShutdownListeners() {}
