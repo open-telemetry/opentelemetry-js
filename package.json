@@ -62,5 +62,10 @@
     "hooks": {
       "commit-msg": "commitlint -E HUSKY_GIT_PARAMS"
     }
+  },
+  "dependencies": {
+    "@opentelemetry/context-async-hooks": "^0.9.0",
+    "@opentelemetry/context-base": "^0.9.0",
+    "@opentelemetry/semantic-conventions": "^0.9.0"
   }
 }
