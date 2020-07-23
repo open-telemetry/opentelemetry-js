@@ -238,11 +238,11 @@ export class SpanShim extends opentracing.Span {
   constructor(
     tracerShim: TracerShim,
     span: api.Span,
-    correlationalCtx: api.CorrelationContext
+    correlationContext: api.CorrelationContext
   ) {
     super();
     this._span = span;
-    this._contextShim = new SpanContextShim(span.context(), correlationalCtx);
+    this._contextShim = new SpanContextShim(span.context(), correlationContext);
     this._tracerShim = tracerShim;
   }
 
