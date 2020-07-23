@@ -81,7 +81,7 @@ export class Tracer implements api.Tracer {
     }
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
     const links = options.links ?? [];
-    const attributes = { ...options.attributes };
+    const attributes = options.attributes ?? {};
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       parentContext,

@@ -102,7 +102,7 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    it('should construct an instance with default attributes', () => {
+    it('should construct an instance of BasicTracerProvider', () => {
       const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
     });
@@ -137,7 +137,7 @@ describe('BasicTracerProvider', () => {
       span.end();
     });
 
-    it('should start a span with defaultAttributes and spanoptions->attributes', () => {
+    it('should start a span with given attributes', () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
@@ -299,12 +299,6 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should set default attributes on span', () => {
-      const tracer = new BasicTracerProvider().getTracer('default');
-      const span = tracer.startSpan('my-span') as Span;
-      assert.ok(span instanceof Span);
     });
 
     it('should assign a resource', () => {
