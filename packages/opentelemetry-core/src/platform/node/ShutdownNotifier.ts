@@ -16,9 +16,9 @@
 
 export function handleGlobalShutdown(cb: () => void) {
   process.once('SIGTERM', cb);
-  return function removeCallbackFromGlobalShutdown(removecb: () => void) {
+  return function removeCallbackFromGlobalShutdown() {
     process.removeListener('SIGTERM', cb);
-    removecb();
+    cb();
   };
 }
 

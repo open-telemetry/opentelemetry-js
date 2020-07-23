@@ -16,8 +16,8 @@
 
 export function handleGlobalShutdown(cb: () => void) {
   window.addEventListener('unload', cb, { once: true });
-  return function removeCallbackFromGlobalShutdown(removecb: () => void) {
-    window.removeEventListener('unload', removecb);
+  return function removeCallbackFromGlobalShutdown() {
+    window.removeEventListener('unload', cb);
   };
 }
 
