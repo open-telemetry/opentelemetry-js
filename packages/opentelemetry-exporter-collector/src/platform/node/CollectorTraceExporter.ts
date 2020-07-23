@@ -15,15 +15,17 @@
  */
 
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
+import { ServiceClientType } from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import * as collectorTypes from '../../types';
 import { CollectorProtocolNode } from '../../enums';
-import { CollectorExporterConfigNode, ServiceClient } from './types';
+import { CollectorExporterConfigNode } from './types';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { DEFAULT_COLLECTOR_URL_GRPC } from './utilWithGrpc';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
+const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
 const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL_JSON_PROTO = 'http://localhost:55680/v1/trace';
 
 /**
  * Collector Trace Exporter for Node
@@ -42,9 +44,13 @@ export class CollectorTraceExporter
 
   getDefaultUrl(config: CollectorExporterConfigNode): string {
     if (!config.url) {
-      return config.protocolNode === CollectorProtocolNode.HTTP_JSON
-        ? DEFAULT_COLLECTOR_URL_JSON
-        : DEFAULT_COLLECTOR_URL_GRPC;
+      if (config.protocolNode === CollectorProtocolNode.HTTP_JSON) {
+        return DEFAULT_COLLECTOR_URL_JSON;
+      } else if (config.protocolNode === CollectorProtocolNode.HTTP_PROTO) {
+        return DEFAULT_COLLECTOR_URL_JSON_PROTO;
+      } else {
+        return DEFAULT_COLLECTOR_URL_GRPC;
+      }
     }
     return config.url;
   }
@@ -53,11 +59,8 @@ export class CollectorTraceExporter
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 
-  getServiceClient(packageObject: any, serverAddress: string): ServiceClient {
-    return new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-      serverAddress,
-      this.credentials
-    );
+  getServiceClientType() {
+    return ServiceClientType.SPANS;
   }
 
   getServiceProtoPath(): string {
