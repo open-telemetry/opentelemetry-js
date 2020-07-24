@@ -26,9 +26,14 @@ import {
 import {
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
+
+function _cleanupGlobalShutdownListeners() {
+  if (typeof window === 'undefined') {
+    process.removeAllListeners('SIGTERM');
+  }
+}
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];

@@ -21,8 +21,13 @@ import {
   NoopLogger,
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
+
+function _cleanupGlobalShutdownListeners() {
+  if (typeof window === 'undefined') {
+    process.removeAllListeners('SIGTERM');
+  }
+}
 
 describe('MeterProvider', () => {
   afterEach(() => {

@@ -18,7 +18,6 @@ import { HrTime, ObserverResult } from '@opentelemetry/api';
 import {
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 import {
   CounterMetric,
@@ -30,6 +29,12 @@ import {
 import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
+
+function _cleanupGlobalShutdownListeners() {
+  if (typeof window === 'undefined') {
+    process.removeAllListeners('SIGTERM');
+  }
+}
 
 const mockedHrTime: HrTime = [1586347902211, 0];
 const mockedTimeMS = 1586347902211000;

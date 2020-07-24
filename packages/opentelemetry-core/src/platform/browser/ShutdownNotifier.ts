@@ -24,5 +24,3 @@ export function notifyOnGlobalShutdown(cb: () => void) {
 export function _invokeGlobalShutdown() {
   window.close();
 }
-
-export function _cleanupGlobalShutdownListeners() {}

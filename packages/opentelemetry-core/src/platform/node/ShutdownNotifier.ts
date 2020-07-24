@@ -24,7 +24,3 @@ export function notifyOnGlobalShutdown(cb: () => void) {
 export function _invokeGlobalShutdown() {
   process.kill(process.pid, 'SIGTERM');
 }
-
-export function _cleanupGlobalShutdownListeners() {
-  process.removeAllListeners('SIGTERM');
-}
