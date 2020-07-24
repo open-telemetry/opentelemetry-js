@@ -35,9 +35,6 @@ export class CollectorTraceExporter
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
-  DEFAULT_HEADERS: Record<string, string> = {
-    [collectorTypes.OT_REQUEST_HEADER]: '1',
-  };
   private _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -49,10 +46,7 @@ export class CollectorTraceExporter
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
     if (this._useXHR) {
-      this._headers = {
-        ...parseHeaders(config.headers, this.logger),
-        ...this.DEFAULT_HEADERS,
-      };
+      this._headers = parseHeaders(config.headers, this.logger);
     } else {
       this._headers = {};
     }
