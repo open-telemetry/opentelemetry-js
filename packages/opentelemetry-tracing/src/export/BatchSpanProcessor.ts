@@ -15,7 +15,7 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { unrefTimer, setSuppressInstrumentation } from '@opentelemetry/core';
+import { unrefTimer, suppressInstrumentation } from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -91,7 +91,7 @@ export class BatchSpanProcessor implements SpanProcessor {
     }
 
     // prevent downstream exporter calls from generating spans
-    context.with(setSuppressInstrumentation(context.active(), true), () => {
+    context.with(suppressInstrumentation(context.active()), () => {
       this._exporter.export(this._finishedSpans, cb);
     });
 

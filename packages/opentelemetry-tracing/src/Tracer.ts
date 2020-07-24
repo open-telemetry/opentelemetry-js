@@ -25,7 +25,7 @@ import {
   randomSpanId,
   randomTraceId,
   setActiveSpan,
-  getSuppressInstrumentation,
+  isInstrumentationSuppressed,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -70,8 +70,7 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    const suppressInstrumentation = getSuppressInstrumentation(context);
-    if (suppressInstrumentation) {
+    if (isInstrumentationSuppressed(context)) {
       this.logger.debug('Instrumentation suppressed, returning NoOp Span');
       return api.NOOP_SPAN;
     }

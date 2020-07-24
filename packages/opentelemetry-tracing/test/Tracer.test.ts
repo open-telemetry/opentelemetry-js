@@ -28,7 +28,7 @@ import {
   NoopLogger,
   AlwaysOnSampler,
   AlwaysOffSampler,
-  setSuppressInstrumentation,
+  suppressInstrumentation,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {
@@ -109,7 +109,7 @@ describe('Tracer', () => {
       tracerProvider
     );
 
-    const context = setSuppressInstrumentation(Context.ROOT_CONTEXT, true);
+    const context = suppressInstrumentation(Context.ROOT_CONTEXT);
     const span = tracer.startSpan('span3', undefined, context);
 
     assert.equal(span, NOOP_SPAN);

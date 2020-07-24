@@ -18,16 +18,28 @@ import * as assert from 'assert';
 
 import {
   SUPPRESS_INSTRUMENTATION_KEY,
-  setSuppressInstrumentation,
-  getSuppressInstrumentation,
+  suppressInstrumentation,
+  isInstrumentationSuppressed,
 } from '../../src/context/context';
 import { Context } from '@opentelemetry/api';
 
 describe('Context Helpers', () => {
-  describe('setSuppressInstrumentation', () => {
-    it('should set suppress instrumentation value', () => {
+  describe('suppressInstrumentation', () => {
+    it ('should set suppress to true by default', () => {
       const expectedValue = true;
-      const context = setSuppressInstrumentation(
+      const context = suppressInstrumentation(
+        Context.ROOT_CONTEXT
+      );
+
+      const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
+      const boolValue = value as boolean;
+
+      assert.equal(boolValue, expectedValue);
+    })
+
+    it('should set suppress instrumentation value', () => {
+      const expectedValue = false;
+      const context = suppressInstrumentation(
         Context.ROOT_CONTEXT,
         expectedValue
       );
@@ -39,41 +51,39 @@ describe('Context Helpers', () => {
     });
   });
 
-  describe('getSuppressInstrumentation', () => {
+  describe('isInstrumentationSuppressed', () => {
     it('should get value as bool', () => {
-      const expectedValue = false;
+      const expectedValue = true;
       const context = Context.ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
         expectedValue
       );
 
-      const value = getSuppressInstrumentation(context);
+      const value = isInstrumentationSuppressed(context);
 
       assert.equal(value, expectedValue);
     });
 
-    it('should handle null values', () => {
-      const expectedValue = null;
+    it('should return false if set to null', () => {
       const context = Context.ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
-        expectedValue
+        null
       );
 
-      const value = getSuppressInstrumentation(context);
+      const value = isInstrumentationSuppressed(context);
 
-      assert.equal(value, expectedValue);
+      assert.equal(value, false);
     });
 
-    it('should handle undefined values', () => {
-      const expectedValue = undefined;
+    it('should return false if set to undefined', () => {
       const context = Context.ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
-        expectedValue
+        undefined
       );
 
-      const value = getSuppressInstrumentation(context);
+      const value = isInstrumentationSuppressed(context);
 
-      assert.equal(value, expectedValue);
+      assert.equal(value, false);
     });
   });
 });

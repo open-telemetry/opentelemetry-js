@@ -26,6 +26,13 @@ export const ACTIVE_SPAN_KEY = Context.createKey(
 const EXTRACTED_SPAN_CONTEXT_KEY = Context.createKey(
   'OpenTelemetry Context Key EXTRACTED_SPAN_CONTEXT'
 );
+/**
+ * Shared key for indicating if instrumentation should be suppressed beyond
+ * this current scope.
+ */
+export const SUPPRESS_INSTRUMENTATION_KEY = Context.createKey(
+  'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
+);
 
 /**
  * Return the active span if one exists
@@ -86,25 +93,17 @@ export function getParentSpanContext(
 }
 
 /**
- * Shared key for indicating if instrumentation should be suppressed beyond
- * this current scope.
- */
-export const SUPPRESS_INSTRUMENTATION_KEY = Context.createKey(
-  'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
-);
-
-/**
  * Set whether or not instrumentation should be suppressed beyond
  * this current scope.
  *
  * @param context context to set the suppress instrumentation value on.
  * @param shouldSuppress value to set.
  */
-export function setSuppressInstrumentation(
+export function suppressInstrumentation(
   context: Context,
-  shouldSuppress: boolean
+  suppress = true
 ): Context {
-  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, shouldSuppress);
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, suppress);
 }
 
 /**
@@ -113,9 +112,9 @@ export function setSuppressInstrumentation(
  *
  * @param context context check for the suppress instrumentation value.
  */
-export function getSuppressInstrumentation(
+export function isInstrumentationSuppressed(
   context: Context
-): boolean | undefined {
+): boolean {
   const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY) as boolean;
-  return value;
+  return !!value;
 }
