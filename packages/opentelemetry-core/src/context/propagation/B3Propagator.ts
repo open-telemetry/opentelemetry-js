@@ -48,22 +48,23 @@ export class B3Propagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
-
     if (
       isValidTraceId(spanContext.traceId) &&
       isValidSpanId(spanContext.spanId)
     ) {
+      const parentSpanExists = !!spanContext.parentSpanId;
+      if (parentSpanExists) {
+        if (isValidTraceId(spanContext.parentSpanId || ''))
+          setter(carrier, X_B3_PARENT_SPAN_ID, spanContext.parentSpanId);
+        else return;
+      }
       setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
       setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
       // According to the B3 spec, if the debug flag is set,
       // the sampled flag shouldn't be propagated as well.
       if (spanContext.debug) {
-        setter(
-          carrier,
-          X_B3_FLAGS,
-          '1'
-        );
-      } 
+        setter(carrier, X_B3_FLAGS, '1');
+      }
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
       else if (spanContext.traceFlags !== undefined) {
@@ -81,6 +82,7 @@ export class B3Propagator implements HttpTextPropagator {
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
     const traceIdHeader = getter(carrier, X_B3_TRACE_ID);
     const spanIdHeader = getter(carrier, X_B3_SPAN_ID);
+    const parentSpanIdHeader = getter(carrier, X_B3_PARENT_SPAN_ID);
     const sampledHeader = getter(carrier, X_B3_SAMPLED);
     const flagsHeader = getter(carrier, X_B3_FLAGS);
 
@@ -88,16 +90,27 @@ export class B3Propagator implements HttpTextPropagator {
       ? traceIdHeader[0]
       : traceIdHeader;
     const spanId = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
+    const parentSpanId = Array.isArray(parentSpanIdHeader)
+      ? parentSpanIdHeader[0]
+      : parentSpanIdHeader;
 
     const options = Array.isArray(sampledHeader)
       ? sampledHeader[0]
       : sampledHeader;
 
-    const debugHeaderValue = Array.isArray(flagsHeader) ? flagsHeader[0] : flagsHeader;
-    const debug = isNaN(Number(debugHeaderValue)) ? false : debugHeaderValue === "1";
+    const debugHeaderValue = Array.isArray(flagsHeader)
+      ? flagsHeader[0]
+      : flagsHeader;
+    const debug = isNaN(Number(debugHeaderValue))
+      ? false
+      : debugHeaderValue === '1';
     const traceFlagsOrDebug = Number(debug) || Number(options);
 
-    if (typeof traceIdHeaderValue !== 'string' || typeof spanId !== 'string') {
+    if (
+      typeof traceIdHeaderValue !== 'string' ||
+      typeof spanId !== 'string' ||
+      (typeof parentSpanIdHeader === 'string' && !isValidSpanId(parentSpanId))
+    ) {
       return context;
     }
 
@@ -109,8 +122,9 @@ export class B3Propagator implements HttpTextPropagator {
         spanId,
         isRemote: true,
         // Set traceFlags as 1 if debug is 1
-        traceFlags:  traceFlagsOrDebug || TraceFlags.NONE ,
+        traceFlags: traceFlagsOrDebug || TraceFlags.NONE,
         debug,
+        parentSpanId,
       });
     }
     return context;

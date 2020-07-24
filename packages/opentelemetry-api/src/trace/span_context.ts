@@ -53,7 +53,7 @@ export interface SpanContext {
   /**
    * Debug flag to propagate.
    *
-   * This flag only seems relevant to b3. According to the b3 spec,
+   * This flag is relevant to b3. According to the b3 spec,
    * Debug is encoded as X-B3-Flags: 1. Absent or any other value can be ignored.
    * Debug is a production troubleshooting aid used in tools like curl or chrome debug.
    * Debug is an emphasized accept decision that implies accept (or setting traceFlags to accept),
@@ -62,6 +62,13 @@ export interface SpanContext {
    * do not send the sampled header as well.
    */
   debug?: boolean;
+  /**
+   *
+   * The ID of the parent span propagated by b3. Encoded as a 16
+   * lowercase hex characters corresponding to 64 bits.
+   * May be present on a child span and must be absent on the root span
+   */
+  parentSpanId?: string;
   /**
    * Tracing-system-specific info to propagate.
    *
