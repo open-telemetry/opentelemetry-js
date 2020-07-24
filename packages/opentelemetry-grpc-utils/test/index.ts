@@ -13,12 +13,4 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-export enum AttributeNames {
-  COMPONENT = 'component',
-  GRPC_KIND = 'grpc.kind', // SERVER or CLIENT
-  GRPC_METHOD = 'grpc.method',
-  GRPC_STATUS_CODE = 'grpc.status_code',
-  GRPC_ERROR_NAME = 'grpc.error_name',
-  GRPC_ERROR_MESSAGE = 'grpc.error_message',
-}
+export * from './grpcUtils.test';
