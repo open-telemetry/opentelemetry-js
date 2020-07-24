@@ -16,7 +16,7 @@
 
 import {
   BasicTracerProvider,
-  SpanExporter,
+  InMemorySpanExporter,
   ReadableSpan,
   Tracer,
   SpanProcessor,
@@ -27,13 +27,13 @@ import { ExportResult, NoopLogger, AlwaysOnSampler } from '@opentelemetry/core';
  * A test-only span exporter that naively simulates triggering instrumentation
  * (creating new spans) during export.
  */
-export class TestTracingSpanExporter implements SpanExporter {
-  private _processedSpans: ReadableSpan[] = [];
+export class TestTracingSpanExporter extends InMemorySpanExporter {
   private _exporterCreatedSpans: ReadableSpan[] = [];
-  private _stopped = false;
   private _tracer: Tracer;
 
   constructor() {
+    super()
+
     const tracerProvider = new BasicTracerProvider({
       logger: new NoopLogger(),
     });
@@ -60,34 +60,26 @@ export class TestTracingSpanExporter implements SpanExporter {
     spans: ReadableSpan[],
     resultCallback: (result: ExportResult) => void
   ): void {
-    if (this._stopped) {
-      return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+    if (!this._stopped) {
+      // Simulates an instrumented exporter by creating a span on the tracer.
+      const createdSpan = this._tracer.startSpan('exporter-created-span');
+      createdSpan.end();
     }
 
-    // Simulates an instrumented exporter by creating a span on the tracer.
-    const createdSpan = this._tracer.startSpan('exporter-created-span');
-    createdSpan.end();
-
-    this._processedSpans.push(...spans);
-    return resultCallback(ExportResult.SUCCESS);
+    super.export(spans, resultCallback)
   }
 
   shutdown(): void {
-    this._stopped = true;
-    this._processedSpans = [];
+    super.shutdown()
     this._exporterCreatedSpans = [];
   }
 
   reset() {
-    this._processedSpans = [];
+    super.reset()
     this._exporterCreatedSpans = [];
   }
 
   getExporterCreatedSpans(): ReadableSpan[] {
     return this._exporterCreatedSpans;
-  }
-
-  getProcessedSpans(): ReadableSpan[] {
-    return this._processedSpans;
   }
 }

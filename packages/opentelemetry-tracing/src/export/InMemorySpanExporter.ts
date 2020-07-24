@@ -25,7 +25,7 @@ import { ExportResult } from '@opentelemetry/core';
  */
 export class InMemorySpanExporter implements SpanExporter {
   private _finishedSpans: ReadableSpan[] = [];
-  private _stopped = false;
+  protected _stopped = false;
 
   export(
     spans: ReadableSpan[],
@@ -33,7 +33,8 @@ export class InMemorySpanExporter implements SpanExporter {
   ): void {
     if (this._stopped) return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
     this._finishedSpans.push(...spans);
-    return resultCallback(ExportResult.SUCCESS);
+
+    setTimeout(() => resultCallback(ExportResult.SUCCESS), 0)
   }
 
   shutdown(): void {
