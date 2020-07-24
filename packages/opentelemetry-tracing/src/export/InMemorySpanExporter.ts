@@ -34,7 +34,7 @@ export class InMemorySpanExporter implements SpanExporter {
     if (this._stopped) return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
     this._finishedSpans.push(...spans);
 
-    setTimeout(() => resultCallback(ExportResult.SUCCESS), 0)
+    setTimeout(() => resultCallback(ExportResult.SUCCESS), 0);
   }
 
   shutdown(): void {

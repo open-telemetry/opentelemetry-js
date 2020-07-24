@@ -32,7 +32,7 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
   private _tracer: Tracer;
 
   constructor() {
-    super()
+    super();
 
     const tracerProvider = new BasicTracerProvider({
       logger: new NoopLogger(),
@@ -66,16 +66,16 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
       createdSpan.end();
     }
 
-    super.export(spans, resultCallback)
+    super.export(spans, resultCallback);
   }
 
   shutdown(): void {
-    super.shutdown()
+    super.shutdown();
     this._exporterCreatedSpans = [];
   }
 
   reset() {
-    super.reset()
+    super.reset();
     this._exporterCreatedSpans = [];
   }
 

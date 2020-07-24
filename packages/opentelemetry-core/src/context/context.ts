@@ -112,9 +112,7 @@ export function suppressInstrumentation(
  *
  * @param context context check for the suppress instrumentation value.
  */
-export function isInstrumentationSuppressed(
-  context: Context
-): boolean {
+export function isInstrumentationSuppressed(context: Context): boolean {
   const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY) as boolean;
   return !!value;
 }

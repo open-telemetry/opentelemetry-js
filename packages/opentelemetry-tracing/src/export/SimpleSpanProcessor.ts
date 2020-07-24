@@ -18,7 +18,7 @@ import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
 import { context } from '@opentelemetry/api';
-import { suppressInstrumentation } from '@opentelemetry/core'
+import { suppressInstrumentation } from '@opentelemetry/core';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
