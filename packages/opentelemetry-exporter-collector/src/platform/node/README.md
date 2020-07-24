@@ -43,4 +43,4 @@ the latest sha when this guide was written is `b54688569186e0b862bf7462a983ccf2c
     git commit -am "chore: updating submodule for opentelemetry-proto"
     ```
 
-9. If you look now at git log you will notice that the folder `protos` has been changed and it will show what was the previous sha and what is current one
+9. If you look now at git log you will notice that the folder `protos` has been changed and it will show what was the previous sha and what is current one.

@@ -38,6 +38,10 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
+type Mutable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
+
 const traceIdArr = [
   31,
   16,
@@ -113,7 +117,7 @@ export const mockValueRecorder: MetricRecord = {
   instrumentationLibrary: { name: 'default', version: '0.0.1' },
 };
 
-export const mockHistogram: MetricRecord = {
+export const mockHistogram: Mutable<MetricRecord> = {
   descriptor: {
     name: 'test-hist',
     description: 'sample observer description',
@@ -498,6 +502,57 @@ export function ensureEventsAreCorrect(
   );
 }
 
+export function ensureProtoEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'fetchStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165435513088',
+        name: 'requestStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165436923136',
+        name: 'responseStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165438688000',
+        name: 'responseEnd',
+        droppedAttributesCount: 0,
+      },
+    ],
+    'events are incorrect'
+  );
+}
+
 export function ensureAttributesAreCorrect(
   attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
 ) {
@@ -507,6 +562,22 @@ export function ensureAttributesAreCorrect(
       {
         key: 'component',
         type: 0,
+        stringValue: 'document-load',
+      },
+    ],
+    'attributes are incorrect'
+  );
+}
+
+export function ensureProtoAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        type: 'STRING',
         stringValue: 'document-load',
       },
     ],
@@ -527,6 +598,29 @@ export function ensureLinksAreCorrect(
           {
             key: 'component',
             type: 0,
+            stringValue: 'document-load',
+          },
+        ],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'links are incorrect'
+  );
+}
+
+export function ensureProtoLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        traceId: traceIdBase64,
+        spanId: parentIdBase64,
+        attributes: [
+          {
+            key: 'component',
+            type: 'STRING',
             stringValue: 'document-load',
           },
         ],
@@ -580,6 +674,47 @@ export function ensureSpanIsCorrect(
   assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
+}
+
+export function ensureProtoSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span
+) {
+  if (span.attributes) {
+    ensureProtoAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureProtoEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureProtoLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    parentIdBase64,
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    '1574120165429803008',
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    '1574120165438688000',
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(span.status, { code: 'Ok' }, 'status is wrong');
 }
 
 export function ensureExportedSpanIsCorrect(
@@ -757,6 +892,104 @@ export function ensureHistogramIsCorrect(
   });
 }
 
+export function ensureExportedCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-counter',
+    description: 'sample counter description',
+    unit: '1',
+    type: 'MONOTONIC_INT64',
+    temporality: 'CUMULATIVE',
+  });
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.int64DataPoints);
+  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.int64DataPoints[0].value, '1');
+  assert.deepStrictEqual(
+    metric.int64DataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedObserverIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-observer',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'DOUBLE',
+    temporality: 'DELTA',
+  });
+
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.ok(metric.doubleDataPoints);
+  assert.deepStrictEqual(metric.doubleDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.doubleDataPoints[0].value, 10);
+  assert.deepStrictEqual(
+    metric.doubleDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedHistogramIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-hist',
+    description: 'sample observer description',
+    unit: '2',
+    type: 'HISTOGRAM',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.int64DataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.histogramDataPoints);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].count, '2');
+  assert.deepStrictEqual(metric.histogramDataPoints[0].sum, 21);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].buckets, [
+    { count: '1', exemplar: null },
+    { count: '1', exemplar: null },
+    { count: '0', exemplar: null },
+  ]);
+  assert.deepStrictEqual(metric.histogramDataPoints[0].explicitBounds, [
+    10,
+    20,
+  ]);
+  assert.deepStrictEqual(
+    metric.histogramDataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
+export function ensureExportedValueRecorderIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+) {
+  assert.deepStrictEqual(metric.metricDescriptor, {
+    name: 'test-recorder',
+    description: 'sample recorder description',
+    unit: '3',
+    type: 'INT64',
+    temporality: 'DELTA',
+  });
+  assert.deepStrictEqual(metric.histogramDataPoints, []);
+  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
+  assert.ok(metric.int64DataPoints);
+  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.deepStrictEqual(
+    metric.int64DataPoints[0].startTimeUnixNano,
+    '1592602232694000128'
+  );
+}
+
 export function ensureResourceIsCorrect(
   resource: collectorTypes.opentelemetryProto.resource.v1.Resource
 ) {
@@ -836,7 +1069,11 @@ export function ensureExportMetricsServiceRequestIsSet(
   json: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
 ) {
   const resourceMetrics = json.resourceMetrics;
-  assert.strictEqual(resourceMetrics.length, 2, 'resourceMetrics is missing');
+  assert.strictEqual(
+    resourceMetrics.length,
+    4,
+    'resourceMetrics is the incorrect length'
+  );
 
   const resource = resourceMetrics[0].resource;
   assert.strictEqual(!!resource, true, 'resource is missing');
