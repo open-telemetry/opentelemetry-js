@@ -25,6 +25,6 @@ export function _invokeGlobalShutdown() {
   process.kill(process.pid, 'SIGTERM');
 }
 
-export function _removeAllGlobalShutdownListeners() {
+export function _cleanupGlobalShutdownListeners() {
   process.removeAllListeners('SIGTERM');
 }

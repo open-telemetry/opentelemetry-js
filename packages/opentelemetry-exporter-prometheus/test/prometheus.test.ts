@@ -18,7 +18,7 @@ import { HrTime, ObserverResult } from '@opentelemetry/api';
 import {
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _removeAllGlobalShutdownListeners,
+  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 import {
   CounterMetric,
@@ -202,7 +202,7 @@ describe('PrometheusExporter', () => {
     });
 
     afterEach(done => {
-      _removeAllGlobalShutdownListeners();
+      _cleanupGlobalShutdownListeners();
       exporter.shutdown(done);
     });
 

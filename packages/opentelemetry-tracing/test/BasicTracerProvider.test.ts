@@ -26,7 +26,7 @@ import {
   TraceState,
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _removeAllGlobalShutdownListeners,
+  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -34,12 +34,16 @@ import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
+  let sandbox: sinon.SinonSandbox;
+
   beforeEach(() => {
     context.disable();
+    sandbox = sinon.createSandbox();
   });
 
   afterEach(() => {
-    _removeAllGlobalShutdownListeners();
+    sandbox.restore();
+    _cleanupGlobalShutdownListeners();
   });
 
   describe('constructor', () => {
@@ -393,14 +397,12 @@ describe('BasicTracerProvider', () => {
   describe('.shutdown()', () => {
     it('should trigger shutdown when SIGTERM is recieved', () => {
       const tracerProvider = new BasicTracerProvider();
-      const sandbox = sinon.createSandbox();
       const shutdownStub = sandbox.stub(
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
       notifyOnGlobalShutdown(() => {
         sinon.assert.calledOnce(shutdownStub);
-        sandbox.restore();
       });
       _invokeGlobalShutdown();
     });
@@ -416,7 +418,6 @@ describe('BasicTracerProvider', () => {
       );
       notifyOnGlobalShutdown(() => {
         sinon.assert.notCalled(shutdownStub);
-        sandbox.restore();
       });
       _invokeGlobalShutdown();
     });

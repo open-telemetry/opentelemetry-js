@@ -21,12 +21,12 @@ import {
   NoopLogger,
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _removeAllGlobalShutdownListeners,
+  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 
 describe('MeterProvider', () => {
   afterEach(() => {
-    _removeAllGlobalShutdownListeners();
+    _cleanupGlobalShutdownListeners();
   });
 
   describe('constructor', () => {

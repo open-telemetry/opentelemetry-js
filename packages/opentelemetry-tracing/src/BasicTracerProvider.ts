@@ -38,6 +38,7 @@ export class BasicTracerProvider implements api.TracerProvider {
   private readonly _tracers: Map<string, Tracer> = new Map();
 
   activeSpanProcessor = new NoopSpanProcessor();
+  removeGlobalShutdownListener = () => {};
   readonly logger: api.Logger;
   readonly resource: Resource;
 
@@ -49,7 +50,9 @@ export class BasicTracerProvider implements api.TracerProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      notifyOnGlobalShutdown(this._shutdownActiveProcessor.bind(this));
+      this.removeGlobalShutdownListener = notifyOnGlobalShutdown(
+        this._shutdownActiveProcessor.bind(this)
+      );
     }
   }
 

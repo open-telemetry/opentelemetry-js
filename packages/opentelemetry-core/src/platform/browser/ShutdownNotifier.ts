@@ -25,4 +25,4 @@ export function _invokeGlobalShutdown() {
   window.close();
 }
 
-export function _removeAllGlobalShutdownListeners() {}
+export function _cleanupGlobalShutdownListeners() {}

@@ -26,7 +26,7 @@ import {
 import {
   notifyOnGlobalShutdown,
   _invokeGlobalShutdown,
-  _removeAllGlobalShutdownListeners,
+  _cleanupGlobalShutdownListeners,
 } from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
@@ -44,7 +44,7 @@ class TestProcessor implements SpanProcessor {
 
 describe('MultiSpanProcessor', () => {
   afterEach(() => {
-    _removeAllGlobalShutdownListeners();
+    _cleanupGlobalShutdownListeners();
   });
 
   it('should handle empty span processor', () => {
