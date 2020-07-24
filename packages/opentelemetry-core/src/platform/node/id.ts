@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-import * as crypto from 'crypto';
-
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
@@ -23,14 +21,20 @@ const TRACE_ID_BYTES = 16;
  * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
  * characters corresponding to 128 bits.
  */
-export function randomTraceId(): string {
-  return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
-}
+export const randomTraceId = getIdGenerator(TRACE_ID_BYTES);
 
 /**
  * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
  * characters corresponding to 64 bits.
  */
-export function randomSpanId(): string {
-  return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
+export const randomSpanId = getIdGenerator(SPAN_ID_BYTES);
+
+const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
+function getIdGenerator(bytes: number): () => string {
+  return function generateId() {
+    for (let i = 0; i < bytes; i++) {
+      SHARED_BUFFER[i] = Math.floor(Math.random() * 256);
+    }
+    return SHARED_BUFFER.slice(0, bytes).toString('hex');
+  };
 }
