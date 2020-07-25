@@ -28,6 +28,8 @@ export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
 export const X_B3_FLAGS = 'x-b3-flags';
+export const PARENT_SPAN_ID_KEY = Context.createKey(X_B3_PARENT_SPAN_ID);
+export const DEBUG_FLAG_KEY = Context.createKey(X_B3_FLAGS);
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
@@ -48,22 +50,23 @@ export class B3Propagator implements HttpTextPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
+    const parentSpanId = context.getValue(PARENT_SPAN_ID_KEY);
     if (
       isValidTraceId(spanContext.traceId) &&
       isValidSpanId(spanContext.spanId)
     ) {
-      const parentSpanExists = !!spanContext.parentSpanId;
-      if (parentSpanExists) {
-        if (isValidTraceId(spanContext.parentSpanId || ''))
-          setter(carrier, X_B3_PARENT_SPAN_ID, spanContext.parentSpanId);
+      if (parentSpanId) {
+        if (isValidTraceId(parentSpanId as string))
+          setter(carrier, X_B3_PARENT_SPAN_ID, parentSpanId);
         else return;
       }
+      const debug = context.getValue(DEBUG_FLAG_KEY);
       setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
       setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
       // According to the B3 spec, if the debug flag is set,
       // the sampled flag shouldn't be propagated as well.
-      if (spanContext.debug) {
-        setter(carrier, X_B3_FLAGS, '1');
+      if (debug === '1') {
+        setter(carrier, X_B3_FLAGS, debug);
       }
       // We set the header only if there is an existing sampling decision.
       // Otherwise we will omit it => Absent.
@@ -101,9 +104,7 @@ export class B3Propagator implements HttpTextPropagator {
     const debugHeaderValue = Array.isArray(flagsHeader)
       ? flagsHeader[0]
       : flagsHeader;
-    const debug = isNaN(Number(debugHeaderValue))
-      ? false
-      : debugHeaderValue === '1';
+    const debug = debugHeaderValue === '1';
     const traceFlagsOrDebug = Number(debug) || Number(options);
 
     if (
@@ -114,6 +115,9 @@ export class B3Propagator implements HttpTextPropagator {
       return context;
     }
 
+    context = context.setValue(PARENT_SPAN_ID_KEY, parentSpanId);
+    context = context.setValue(DEBUG_FLAG_KEY, debug ? '1' : undefined);
+
     const traceId = traceIdHeaderValue.padStart(32, '0');
 
     if (isValidTraceId(traceId) && isValidSpanId(spanId)) {
@@ -123,8 +127,6 @@ export class B3Propagator implements HttpTextPropagator {
         isRemote: true,
         // Set traceFlags as 1 if debug is 1
         traceFlags: traceFlagsOrDebug || TraceFlags.NONE,
-        debug,
-        parentSpanId,
       });
     }
     return context;
