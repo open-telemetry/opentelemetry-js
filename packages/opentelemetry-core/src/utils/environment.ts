@@ -149,7 +149,7 @@ export function mockEnvironment(values: ENVIRONMENT_MAP) {
 }
 
 /**
- * Removes mocked environment ussed for tests.
+ * Removes mocked environment used for tests.
  */
 export function removeMockEnvironment() {
   if (typeof process !== 'undefined') {
