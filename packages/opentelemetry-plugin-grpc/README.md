@@ -32,6 +32,9 @@ const provider = new NodeTracerProvider({
       enabled: true,
       // You may use a package name or absolute path to the file.
       path: '@opentelemetry/plugin-grpc',
+      ignoreMethods: [
+        // Case-insensitive list of method names to exclude from tracing
+      ]
     }
   }
 });
