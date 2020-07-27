@@ -46,6 +46,10 @@ function isValidSpanId(spanId: string): boolean {
   return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
 }
 
+function parseHeader(header: unknown) {
+  return Array.isArray(header) ? header[0] : header;
+}
+
 /**
  * Propagator for the B3 HTTP header format.
  * Based on: https://github.com/openzipkin/b3-propagation
@@ -60,9 +64,11 @@ export class B3Propagator implements HttpTextPropagator {
       isValidSpanId(spanContext.spanId)
     ) {
       if (parentSpanId) {
-        if (isValidTraceId(parentSpanId as string))
+        if (isValidTraceId(parentSpanId as string)) {
           setter(carrier, X_B3_PARENT_SPAN_ID, parentSpanId);
-        else return;
+        } else {
+          return;
+        }
       }
       const debug = context.getValue(DEBUG_FLAG_KEY);
       setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
@@ -92,21 +98,11 @@ export class B3Propagator implements HttpTextPropagator {
     const sampledHeader = getter(carrier, X_B3_SAMPLED);
     const flagsHeader = getter(carrier, X_B3_FLAGS);
 
-    const traceIdHeaderValue = Array.isArray(traceIdHeader)
-      ? traceIdHeader[0]
-      : traceIdHeader;
-    const spanId = Array.isArray(spanIdHeader) ? spanIdHeader[0] : spanIdHeader;
-    const parentSpanId = Array.isArray(parentSpanIdHeader)
-      ? parentSpanIdHeader[0]
-      : parentSpanIdHeader;
-
-    const options = Array.isArray(sampledHeader)
-      ? sampledHeader[0]
-      : sampledHeader;
-
-    const debugHeaderValue = Array.isArray(flagsHeader)
-      ? flagsHeader[0]
-      : flagsHeader;
+    const traceIdHeaderValue = parseHeader(traceIdHeader);
+    const spanId = parseHeader(spanIdHeader);
+    const parentSpanId = parseHeader(parentSpanIdHeader);
+    const options = parseHeader(sampledHeader);
+    const debugHeaderValue = parseHeader(flagsHeader);
     const debug = debugHeaderValue === '1';
     const traceFlagsOrDebug = Number(debug) || Number(options);
 
