@@ -32,13 +32,12 @@ export class CollectorTraceExporter
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
-    
   convert(
     spans: ReadableSpan[]
   ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
     return toCollectorExportTraceServiceRequest(spans, this);
   }
-  
+
   getDefaultUrl(config: CollectorExporterConfigBrowser) {
     return config.url || DEFAULT_COLLECTOR_URL;
   }
