@@ -28,8 +28,12 @@ export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
 export const X_B3_FLAGS = 'x-b3-flags';
-export const PARENT_SPAN_ID_KEY = Context.createKey(X_B3_PARENT_SPAN_ID);
-export const DEBUG_FLAG_KEY = Context.createKey(X_B3_FLAGS);
+export const PARENT_SPAN_ID_KEY = Context.createKey(
+  'OpenTelemetry Context Key B3 Parent Span Id'
+);
+export const DEBUG_FLAG_KEY = Context.createKey(
+  'OpenTelemetry Context Key B3 Debug Flag'
+);
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
@@ -67,10 +71,9 @@ export class B3Propagator implements HttpTextPropagator {
       // the sampled flag shouldn't be propagated as well.
       if (debug === '1') {
         setter(carrier, X_B3_FLAGS, debug);
-      }
-      // We set the header only if there is an existing sampling decision.
-      // Otherwise we will omit it => Absent.
-      else if (spanContext.traceFlags !== undefined) {
+      } else if (spanContext.traceFlags !== undefined) {
+        // We set the header only if there is an existing sampling decision.
+        // Otherwise we will omit it => Absent.
         setter(
           carrier,
           X_B3_SAMPLED,
