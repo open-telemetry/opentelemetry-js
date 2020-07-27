@@ -119,13 +119,8 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    it('should construct an instance with default attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: {
-          region: 'eu-west',
-          asg: 'my-asg',
-        },
-      });
+    it('should construct an instance of BasicTracerProvider', () => {
+      const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
     });
   });
@@ -159,23 +154,12 @@ describe('BasicTracerProvider', () => {
       span.end();
     });
 
-    it('should start a span with defaultAttributes and spanoptions->attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: { foo: 'bar' },
-      }).getTracer('default');
+    it('should start a span with given attributes', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
       assert.deepStrictEqual(span.attributes, { bar: 'bar', foo: 'foo' });
-      span.end();
-    });
-
-    it('should start a span with defaultAttributes and undefined spanoptions->attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: { foo: 'bar' },
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', {}) as Span;
-      assert.deepStrictEqual(span.attributes, { foo: 'bar' });
       span.end();
     });
 
@@ -332,19 +316,6 @@ describe('BasicTracerProvider', () => {
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should set default attributes on span', () => {
-      const defaultAttributes = {
-        foo: 'bar',
-      };
-      const tracer = new BasicTracerProvider({
-        defaultAttributes,
-      }).getTracer('default');
-
-      const span = tracer.startSpan('my-span') as Span;
-      assert.ok(span instanceof Span);
-      assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
 
     it('should assign a resource', () => {

@@ -30,7 +30,6 @@ export const DEFAULT_MAX_LINKS_PER_SPAN = 32;
  * used to extend the default value.
  */
 export const DEFAULT_CONFIG = {
-  defaultAttributes: {},
   logLevel: LogLevel.INFO,
   sampler: new AlwaysOnSampler(),
   traceParams: {
