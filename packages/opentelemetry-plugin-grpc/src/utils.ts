@@ -17,6 +17,9 @@
 import { CanonicalCode, Status } from '@opentelemetry/api';
 import * as grpcTypes from 'grpc'; // For types only
 
+/**
+ * Metadata key used to denote an outgoing opentelemetry request.
+ */
 const _otRequestHeader = 'x-opentelemetry-outgoing-request';
 
 // Equivalent to lodash _.findIndex
