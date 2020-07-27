@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
-export { NodeTracerConfig } from './config';
-export { Plugins } from './instrumentation/PluginLoader';
-export * from './NodeTracerProvider';
+export * as api from '@opentelemetry/api';
+export * as contextBase from '@opentelemetry/context-base';
+export * as core from '@opentelemetry/core';
+export * as metrics from '@opentelemetry/metrics';
+export * as node from '@opentelemetry/node';
+export * as resources from '@opentelemetry/resources';
+export * as tracing from '@opentelemetry/tracing';
+export * from './sdk';
+export * from './types';
