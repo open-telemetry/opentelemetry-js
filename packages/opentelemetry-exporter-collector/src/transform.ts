@@ -30,47 +30,79 @@ import {
   opentelemetryProto,
   CollectorExporterConfigBase,
 } from './types';
-import ValueType = opentelemetryProto.common.v1.ValueType;
 
 /**
- * Converts attributes
+ * Converts attributes to KeyValue array
  * @param attributes
  */
 export function toCollectorAttributes(
   attributes: Attributes
-): opentelemetryProto.common.v1.AttributeKeyValue[] {
+): opentelemetryProto.common.v1.KeyValue[] {
   return Object.keys(attributes).map(key => {
     return toCollectorAttributeKeyValue(key, attributes[key]);
   });
 }
 
 /**
- * Converts key and value to AttributeKeyValue
+ * Converts array of unknown value to ArrayValue
+ * @param values
+ */
+export function toCollectorArrayValue(
+  values: unknown[]
+): opentelemetryProto.common.v1.ArrayValue {
+  return {
+    values: values.map(value => toCollectorAnyValue(value)),
+  };
+}
+
+/**
+ * Converts attributes to KeyValueList
+ * @param attributes
+ */
+export function toCollectorKeyValueList(
+  attributes: Attributes
+): opentelemetryProto.common.v1.KeyValueList {
+  return {
+    values: toCollectorAttributes(attributes),
+  };
+}
+
+/**
+ * Converts key and unknown value to KeyValue
  * @param value event value
  */
 export function toCollectorAttributeKeyValue(
   key: string,
   value: unknown
-): opentelemetryProto.common.v1.AttributeKeyValue {
-  let aType: opentelemetryProto.common.v1.ValueType = ValueType.STRING;
-  const AttributeKeyValue: opentelemetryProto.common.v1.AttributeKeyValue = {
+): opentelemetryProto.common.v1.KeyValue {
+  const anyValue = toCollectorAnyValue(value);
+  return {
     key,
-    type: 0,
+    value: anyValue,
   };
+}
+
+/**
+ * Converts unknown value to AnyValue
+ * @param value
+ */
+export function toCollectorAnyValue(
+  value: unknown
+): opentelemetryProto.common.v1.AnyValue {
+  const anyValue: opentelemetryProto.common.v1.AnyValue = {};
   if (typeof value === 'string') {
-    AttributeKeyValue.stringValue = value;
+    anyValue.stringValue = value;
   } else if (typeof value === 'boolean') {
-    aType = ValueType.BOOL;
-    AttributeKeyValue.boolValue = value;
+    anyValue.boolValue = value;
   } else if (typeof value === 'number') {
     // all numbers will be treated as double
-    aType = ValueType.DOUBLE;
-    AttributeKeyValue.doubleValue = value;
+    anyValue.doubleValue = value;
+  } else if (Array.isArray(value)) {
+    anyValue.arrayValue = toCollectorArrayValue(value);
+  } else if (value) {
+    anyValue.kvlistValue = toCollectorKeyValueList(value as Attributes);
   }
-
-  AttributeKeyValue.type = aType;
-
-  return AttributeKeyValue;
+  return anyValue;
 }
 
 /**
