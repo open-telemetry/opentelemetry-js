@@ -129,9 +129,13 @@ function shouldNotTraceServerCall(
   metadata: grpcJs.Metadata,
   methodName: string
 ): boolean {
+  const parsedName = methodName.split('/');
   return (
     containsOtelMetadata(metadata) ||
-    methodIsIgnored(methodName, this._config.ignoreMethods)
+    methodIsIgnored(
+      parsedName[parsedName.length - 1] || methodName,
+      this._config.ignoreMethods
+    )
   );
 }
 

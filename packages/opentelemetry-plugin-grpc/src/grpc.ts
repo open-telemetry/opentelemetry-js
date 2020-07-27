@@ -236,9 +236,13 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     call: ServerCallWithMeta,
     name: string
   ): boolean {
+    const parsedName = name.split('/');
     return (
       _containsOtelMetadata(call.metadata) ||
-      _methodIsIgnored(name, this._config.ignoreMethods)
+      _methodIsIgnored(
+        parsedName[parsedName.length - 1] || name,
+        this._config.ignoreMethods
+      )
     );
   }
 

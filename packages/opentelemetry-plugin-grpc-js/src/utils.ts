@@ -70,7 +70,7 @@ export const methodIsIgnored = (
     return false;
   }
   for (const pattern of ignoredMethods) {
-    if (new RegExp(pattern).test(methodName)) {
+    if (new RegExp(`^${pattern}$`, 'i').test(methodName)) {
       return true;
     }
   }
