@@ -121,43 +121,5 @@ describe('Node SDK', () => {
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });
-
-    describe('Tracing Options', () => {
-      let traceExporter: InMemorySpanExporter;
-      let spanProcessor: SimpleSpanProcessor;
-
-      beforeEach(() => {
-        traceExporter = new InMemorySpanExporter();
-        spanProcessor = new SimpleSpanProcessor(traceExporter);
-      });
-
-      afterEach(() => {
-        traceExporter.reset();
-      });
-
-      it('should apply global attributes to every span', async () => {
-        const sdk = new NodeSDK({
-          spanProcessor,
-          defaultAttributes: {
-            'default.attribute': 'test',
-          },
-          autoDetectResources: false,
-        });
-
-        await sdk.start();
-        const tracer = api.trace.getTracer('test');
-
-        assert(tracer instanceof tracing.Tracer);
-
-        const provider = tracer['_tracerProvider'];
-
-        assert(provider instanceof NodeTracerProvider);
-
-        const span = api.trace.getTracer('test').startSpan('test');
-
-        assert(span instanceof tracing.Span);
-        assert.strictEqual(span.attributes['default.attribute'], 'test');
-      });
-    });
   });
 });

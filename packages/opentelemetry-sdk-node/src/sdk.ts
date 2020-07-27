@@ -47,10 +47,6 @@ export class NodeSDK {
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig: NodeTracerConfig = {};
 
-      if (configuration.defaultAttributes) {
-        tracerProviderConfig.defaultAttributes =
-          configuration.defaultAttributes;
-      }
       if (typeof configuration.logLevel === 'number') {
         tracerProviderConfig.logLevel = configuration.logLevel;
       }
