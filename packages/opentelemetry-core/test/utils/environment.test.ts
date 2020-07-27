@@ -42,12 +42,12 @@ describe('environment', () => {
       mockEnvironment({
         FOO: '1',
         OTEL_NO_PATCH_MODULES: 'a,b,c',
-        OTEL_LOG_LEVEL: 'WARN',
+        OTEL_LOG_LEVEL: 'ERROR',
         OTEL_SAMPLING_PROBABILITY: '0.5',
       });
       const env = getEnv();
       assert.strictEqual(env.OTEL_NO_PATCH_MODULES, 'a,b,c');
-      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.WARN);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.ERROR);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
     });
 
@@ -69,6 +69,19 @@ describe('environment', () => {
           `Variable '${key}' doesn't match`
         );
       });
+    });
+  });
+
+  describe('mockEnvironment', () => {
+    it('should remove a mock environment', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'DEBUG',
+        OTEL_SAMPLING_PROBABILITY: 0.5,
+      });
+      removeMockEnvironment();
+      const env = getEnv();
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.INFO);
+      assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 1);
     });
   });
 });
