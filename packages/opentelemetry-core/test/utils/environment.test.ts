@@ -18,12 +18,45 @@ import { getEnv } from '../../src/platform';
 import {
   DEFAULT_ENVIRONMENT,
   ENVIRONMENT,
-  removeMockEnvironment,
-  mockEnvironment,
+  ENVIRONMENT_MAP,
 } from '../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { LogLevel } from '../../src';
+
+let lastMock: ENVIRONMENT_MAP = {};
+
+/**
+ * Mocks environment used for tests.
+ */
+export function mockEnvironment(values: ENVIRONMENT_MAP) {
+  lastMock = values;
+  if (typeof process !== 'undefined') {
+    Object.keys(values).forEach(key => {
+      process.env[key] = String(values[key]);
+    });
+  } else {
+    Object.keys(values).forEach(key => {
+      ((window as unknown) as ENVIRONMENT_MAP)[key] = String(values[key]);
+    });
+  }
+}
+
+/**
+ * Removes mocked environment used for tests.
+ */
+export function removeMockEnvironment() {
+  if (typeof process !== 'undefined') {
+    Object.keys(lastMock).forEach(key => {
+      delete process.env[key];
+    });
+  } else {
+    Object.keys(lastMock).forEach(key => {
+      delete ((window as unknown) as ENVIRONMENT_MAP)[key];
+    });
+  }
+  lastMock = {};
+}
 
 describe('environment', () => {
   let sandbox: sinon.SinonSandbox;

@@ -18,9 +18,9 @@ import * as assert from 'assert';
 import { ConsoleLogger } from '../../src/common/ConsoleLogger';
 import { LogLevel } from '../../src/common/types';
 import {
-  removeMockEnvironment,
   mockEnvironment,
-} from '../../src/utils/environment';
+  removeMockEnvironment,
+} from '../utils/environment.test';
 
 describe('ConsoleLogger', () => {
   const origDebug = console.debug;
