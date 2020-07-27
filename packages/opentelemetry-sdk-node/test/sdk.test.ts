@@ -21,7 +21,7 @@ import {
   NoopMeterProvider,
   NoopTracerProvider,
   propagation,
-  trace
+  trace,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
@@ -30,7 +30,7 @@ import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   ConsoleSpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NodeSDK } from '../src';
