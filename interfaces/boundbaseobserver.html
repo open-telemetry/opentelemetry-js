@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ValueType | OpenTelemetry API for JavaScript</title>
+	<title>BoundBaseObserver | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="valuetype.html">ValueType</a>
+					<a href="boundbaseobserver.html">BoundBaseObserver</a>
 				</li>
 			</ul>
-			<h1>Enumeration ValueType</h1>
+			<h1>Interface BoundBaseObserver</h1>
 		</div>
 	</div>
 </header>
@@ -69,45 +69,61 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>The Type of value. It describes how the data is reported.</p>
+						<p>An Instrument for Base Observer</p>
 					</div>
 				</div>
+			</section>
+			<section class="tsd-panel tsd-hierarchy">
+				<h3>Hierarchy</h3>
+				<ul class="tsd-hierarchy">
+					<li>
+						<span class="target">BoundBaseObserver</span>
+					</li>
+				</ul>
+			</section>
+			<section class="tsd-panel">
+				<h3>Implemented by</h3>
+				<ul class="tsd-hierarchy">
+					<li><a href="../classes/noopboundbaseobserver.html" class="tsd-signature-type">NoopBoundBaseObserver</a></li>
+				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
 				<h2>Index</h2>
 				<section class="tsd-panel tsd-index-panel">
 					<div class="tsd-index-content">
 						<section class="tsd-index-section tsd-is-external">
-							<h3>Enumeration members</h3>
+							<h3>Methods</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="valuetype.html#double" class="tsd-kind-icon">DOUBLE</a></li>
-								<li class="tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external"><a href="valuetype.html#int" class="tsd-kind-icon">INT</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="boundbaseobserver.html#update" class="tsd-kind-icon">update</a></li>
 							</ul>
 						</section>
 					</div>
 				</section>
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
-				<h2>Enumeration members</h2>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="double" class="tsd-anchor"></a>
-					<h3>DOUBLE</h3>
-					<div class="tsd-signature tsd-kind-icon">DOUBLE<span class="tsd-signature-symbol">:</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Metric.ts#L82">src/metrics/Metric.ts:82</a></li>
-						</ul>
-					</aside>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-					<a name="int" class="tsd-anchor"></a>
-					<h3>INT</h3>
-					<div class="tsd-signature tsd-kind-icon">INT<span class="tsd-signature-symbol">:</span></div>
-					<aside class="tsd-sources">
-						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Metric.ts#L81">src/metrics/Metric.ts:81</a></li>
-						</ul>
-					</aside>
+				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="update" class="tsd-anchor"></a>
+					<h3>update</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">update<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/BoundInstrument.ts#L50">src/metrics/BoundInstrument.ts:50</a></li>
+								</ul>
+							</aside>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
 				</section>
 			</section>
 		</div>
@@ -123,14 +139,11 @@
 				<ul class="before-current">
 				</ul>
 				<ul class="current">
-					<li class="current tsd-kind-enum tsd-is-external">
-						<a href="valuetype.html" class="tsd-kind-icon">Value<wbr>Type</a>
+					<li class="current tsd-kind-interface tsd-is-external">
+						<a href="boundbaseobserver.html" class="tsd-kind-icon">Bound<wbr>Base<wbr>Observer</a>
 						<ul>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="valuetype.html#double" class="tsd-kind-icon">DOUBLE</a>
-							</li>
-							<li class=" tsd-kind-enum-member tsd-parent-kind-enum tsd-is-external">
-								<a href="valuetype.html#int" class="tsd-kind-icon">INT</a>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="boundbaseobserver.html#update" class="tsd-kind-icon">update</a>
 							</li>
 						</ul>
 					</li>

@@ -278,6 +278,15 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/metricsapi.html" class="tsd-kind-icon">MetricsAPI</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/noopbaseobservermetric.html" class="tsd-kind-icon">Noop<wbr>Base<wbr>Observer<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/noopbatchobservermetric.html" class="tsd-kind-icon">Noop<wbr>Batch<wbr>Observer<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/noopboundbaseobserver.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Base<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopboundcounter.html" class="tsd-kind-icon">Noop<wbr>Bound<wbr>Counter</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -299,9 +308,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/noopmetric.html" class="tsd-kind-icon">Noop<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noopobservermetric.html" class="tsd-kind-icon">Noop<wbr>Observer<wbr>Metric</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -321,6 +327,18 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/attributes.html" class="tsd-kind-icon">Attributes</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/baseobserver.html" class="tsd-kind-icon">Base<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/batchmetricoptions.html" class="tsd-kind-icon">Batch<wbr>Metric<wbr>Options</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/batchobserverresult.html" class="tsd-kind-icon">Batch<wbr>Observer<wbr>Result</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/boundbaseobserver.html" class="tsd-kind-icon">Bound<wbr>Base<wbr>Observer</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/boundcounter.html" class="tsd-kind-icon">Bound<wbr>Counter</a>
@@ -359,13 +377,10 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/metric.html" class="tsd-kind-icon">Metric</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/metricobservable.html" class="tsd-kind-icon">Metric<wbr>Observable</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/metricoptions.html" class="tsd-kind-icon">Metric<wbr>Options</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/observer.html" class="tsd-kind-icon">Observer</a>
+						<a href="interfaces/observation.html" class="tsd-kind-icon">Observation</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/observerresult.html" class="tsd-kind-icon">Observer<wbr>Result</a>
@@ -421,6 +436,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/valuerecorder.html" class="tsd-kind-icon">Value<wbr>Recorder</a>
 					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#batchobserver" class="tsd-kind-icon">Batch<wbr>Observer</a>
+					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
 					</li>
@@ -446,7 +464,16 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#setterfunction" class="tsd-kind-icon">Setter<wbr>Function</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#sumobserver" class="tsd-kind-icon">Sum<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#timeinput" class="tsd-kind-icon">Time<wbr>Input</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#updownsumobserver" class="tsd-kind-icon">Up<wbr>Down<wbr>Sum<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#valueobserver" class="tsd-kind-icon">Value<wbr>Observer</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#api_backwards_compatibility_version" class="tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</a>
@@ -470,6 +497,12 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#invalid_trace_id" class="tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_batch_observer_metric" class="tsd-kind-icon">NOOP_<wbr>BATCH_<wbr>OBSERVER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_bound_base_observer" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>BASE_<wbr>OBSERVER</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_bound_counter" class="tsd-kind-icon">NOOP_<wbr>BOUND_<wbr>COUNTER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -491,16 +524,22 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#noop_meter_provider" class="tsd-kind-icon">NOOP_<wbr>METER_<wbr>PROVIDER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_observer_metric" class="tsd-kind-icon">NOOP_<wbr>OBSERVER_<wbr>METRIC</a>
+						<a href="globals.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_span" class="tsd-kind-icon">NOOP_<wbr>SPAN</a>
+						<a href="globals.html#noop_sum_observer_metric" class="tsd-kind-icon">NOOP_<wbr>SUM_<wbr>OBSERVER_<wbr>METRIC</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_tracer_provider" class="tsd-kind-icon">NOOP_<wbr>TRACER_<wbr>PROVIDER</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_up_down_sum_observer_metric" class="tsd-kind-icon">NOOP_<wbr>UP_<wbr>DOWN_<wbr>SUM_<wbr>OBSERVER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_value_observer_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>OBSERVER_<wbr>METRIC</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a>
@@ -558,6 +597,5 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 </footer>
 <div class="overlay"></div>
 <script src="assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

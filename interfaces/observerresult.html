@@ -69,7 +69,7 @@
 			<section class="tsd-panel tsd-comment">
 				<div class="tsd-comment tsd-typography">
 					<div class="lead">
-						<p>Interface that is being used in function setCallback for Observer Metric</p>
+						<p>Interface that is being used in callback function for Observer Metric</p>
 					</div>
 				</div>
 			</section>
@@ -100,19 +100,19 @@
 					<a name="observe" class="tsd-anchor"></a>
 					<h3>observe</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">observe<span class="tsd-signature-symbol">(</span>callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol"> | </span><a href="metricobservable.html" class="tsd-signature-type">MetricObservable</a>, labels<span class="tsd-signature-symbol">: </span><a href="../globals.html#labels" class="tsd-signature-type">Labels</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">observe<span class="tsd-signature-symbol">(</span>value<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">number</span>, labels<span class="tsd-signature-symbol">: </span><a href="../globals.html#labels" class="tsd-signature-type">Labels</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/ObserverResult.ts#L24">src/metrics/ObserverResult.ts:24</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/ObserverResult.ts#L23">src/metrics/ObserverResult.ts:23</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
-									<h5>callback: <span class="tsd-signature-type">Function</span><span class="tsd-signature-symbol"> | </span><a href="metricobservable.html" class="tsd-signature-type">MetricObservable</a></h5>
+									<h5>value: <span class="tsd-signature-type">number</span></h5>
 								</li>
 								<li>
 									<h5>labels: <a href="../globals.html#labels" class="tsd-signature-type">Labels</a></h5>
@@ -160,6 +160,5 @@
 </footer>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

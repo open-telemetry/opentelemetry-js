@@ -101,9 +101,10 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createbatchobserver" class="tsd-kind-icon">create<wbr>Batch<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-class tsd-is-external"><a href="noopmeter.html#createvaluerecorder" class="tsd-kind-icon">create<wbr>Value<wbr>Recorder</a></li>
 							</ul>
 						</section>
@@ -122,7 +123,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L36">src/metrics/NoopMeter.ts:36</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L43">src/metrics/NoopMeter.ts:43</a></li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <a href="noopmeter.html" class="tsd-signature-type">NoopMeter</a></h4>
@@ -132,6 +133,61 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="createbatchobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Batch<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Batch<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L92">src/metrics/NoopMeter.ts:92</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns constant noop batch observer.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the batch observer callback</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>batchObserverResult: <a href="../interfaces/batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a name="createcounter" class="tsd-anchor"></a>
 					<h3>create<wbr>Counter</h3>
@@ -143,7 +199,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/meter.html">Meter</a>.<a href="../interfaces/meter.html#createcounter">createCounter</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L53">src/metrics/NoopMeter.ts:53</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L60">src/metrics/NoopMeter.ts:60</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -168,41 +224,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
-					<a name="createobserver" class="tsd-anchor"></a>
-					<h3>create<wbr>Observer</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../interfaces/observer.html" class="tsd-signature-type">Observer</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<p>Implementation of <a href="../interfaces/meter.html">Meter</a>.<a href="../interfaces/meter.html#createobserver">createObserver</a></p>
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L71">src/metrics/NoopMeter.ts:71</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Returns constant noop observer.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the name of the metric.</p>
-									</div>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="../interfaces/observer.html" class="tsd-signature-type">Observer</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a name="createupdowncounter" class="tsd-anchor"></a>
 					<h3>create<wbr>UpDown<wbr>Counter</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
@@ -213,7 +234,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/meter.html">Meter</a>.<a href="../interfaces/meter.html#createupdowncounter">createUpDownCounter</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L62">src/metrics/NoopMeter.ts:62</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L69">src/metrics/NoopMeter.ts:69</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -238,6 +259,43 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
+					<a name="createvalueobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Value<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Value<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="../interfaces/metricoptions.html" class="tsd-signature-type">MetricOptions</a>, callback<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#valueobserver" class="tsd-signature-type">ValueObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L79">src/metrics/NoopMeter.ts:79</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Returns constant noop value observer.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="../interfaces/metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> callback: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="../interfaces/observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#valueobserver" class="tsd-signature-type">ValueObserver</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-class tsd-is-external">
 					<a name="createvaluerecorder" class="tsd-anchor"></a>
 					<h3>create<wbr>Value<wbr>Recorder</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class tsd-is-external">
@@ -248,7 +306,7 @@
 							<aside class="tsd-sources">
 								<p>Implementation of <a href="../interfaces/meter.html">Meter</a>.<a href="../interfaces/meter.html#createvaluerecorder">createValueRecorder</a></p>
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L44">src/metrics/NoopMeter.ts:44</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/NoopMeter.ts#L51">src/metrics/NoopMeter.ts:51</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -293,13 +351,16 @@
 								<a href="noopmeter.html#constructor" class="tsd-kind-icon">constructor</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
+								<a href="noopmeter.html#createbatchobserver" class="tsd-kind-icon">create<wbr>Batch<wbr>Observer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="noopmeter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="noopmeter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a>
+								<a href="noopmeter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
-								<a href="noopmeter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a>
+								<a href="noopmeter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-class tsd-is-external">
 								<a href="noopmeter.html#createvaluerecorder" class="tsd-kind-icon">create<wbr>Value<wbr>Recorder</a>
@@ -322,6 +383,5 @@
 </footer>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>

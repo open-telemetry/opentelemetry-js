@@ -97,9 +97,10 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Methods</h3>
 							<ul class="tsd-index-list">
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createbatchobserver" class="tsd-kind-icon">create<wbr>Batch<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a></li>
-								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="meter.html#createvaluerecorder" class="tsd-kind-icon">create<wbr>Value<wbr>Recorder</a></li>
 							</ul>
 						</section>
@@ -108,6 +109,65 @@
 			</section>
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Methods</h2>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="createbatchobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Batch<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Batch<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span>, options<span class="tsd-signature-symbol">?: </span><a href="batchmetricoptions.html" class="tsd-signature-type">BatchMetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Meter.ts#L91">src/metrics/Meter.ts:91</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new <code>BatchObserver</code> metric, can be used to update many metrics
+									at the same time and when operations needs to be async</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5>callback: <span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the batch observer callback</p>
+									</div>
+									<ul class="tsd-parameters">
+										<li class="tsd-parameter-signature">
+											<ul class="tsd-signatures tsd-kind-type-literal">
+												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span>batchObserverResult<span class="tsd-signature-symbol">: </span><a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+											</ul>
+											<ul class="tsd-descriptions">
+												<li class="tsd-description">
+													<h4 class="tsd-parameters-title">Parameters</h4>
+													<ul class="tsd-parameters">
+														<li>
+															<h5>batchObserverResult: <a href="batchobserverresult.html" class="tsd-signature-type">BatchObserverResult</a></h5>
+														</li>
+													</ul>
+													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+												</li>
+											</ul>
+										</li>
+									</ul>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="batchmetricoptions.html" class="tsd-signature-type">BatchMetricOptions</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#batchobserver" class="tsd-signature-type">BatchObserver</a></h4>
+						</li>
+					</ul>
+				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createcounter" class="tsd-anchor"></a>
 					<h3>create<wbr>Counter</h3>
@@ -118,7 +178,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/Meter.ts#L47">src/metrics/Meter.ts:47</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Meter.ts#L51">src/metrics/Meter.ts:51</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -145,40 +205,6 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-					<a name="createobserver" class="tsd-anchor"></a>
-					<h3>create<wbr>Observer</h3>
-					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-						<li class="tsd-signature tsd-kind-icon">create<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="observer.html" class="tsd-signature-type">Observer</a></li>
-					</ul>
-					<ul class="tsd-descriptions">
-						<li class="tsd-description">
-							<aside class="tsd-sources">
-								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/Meter.ts#L73">src/metrics/Meter.ts:73</a></li>
-								</ul>
-							</aside>
-							<div class="tsd-comment tsd-typography">
-								<div class="lead">
-									<p>Creates a new <code>Observer</code> metric.</p>
-								</div>
-							</div>
-							<h4 class="tsd-parameters-title">Parameters</h4>
-							<ul class="tsd-parameters">
-								<li>
-									<h5>name: <span class="tsd-signature-type">string</span></h5>
-									<div class="tsd-comment tsd-typography">
-										<p>the name of the metric.</p>
-									</div>
-								</li>
-								<li>
-									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
-								</li>
-							</ul>
-							<h4 class="tsd-returns-title">Returns <a href="observer.html" class="tsd-signature-type">Observer</a></h4>
-						</li>
-					</ul>
-				</section>
-				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createupdowncounter" class="tsd-anchor"></a>
 					<h3>create<wbr>UpDown<wbr>Counter</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
@@ -188,7 +214,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/Meter.ts#L66">src/metrics/Meter.ts:66</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Meter.ts#L70">src/metrics/Meter.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -224,6 +250,43 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="createvalueobserver" class="tsd-anchor"></a>
+					<h3>create<wbr>Value<wbr>Observer</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">create<wbr>Value<wbr>Observer<span class="tsd-signature-symbol">(</span>name<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, options<span class="tsd-signature-symbol">?: </span><a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a>, callback<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><a href="../globals.html#valueobserver" class="tsd-signature-type">ValueObserver</a></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Meter.ts#L78">src/metrics/Meter.ts:78</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Creates a new <code>ValueObserver</code> metric.</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>name: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the name of the metric.</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> options: <a href="metricoptions.html" class="tsd-signature-type">MetricOptions</a></h5>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> callback: <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">(</span>observerResult<span class="tsd-signature-symbol">: </span><a href="observerresult.html" class="tsd-signature-type">ObserverResult</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <a href="../globals.html#valueobserver" class="tsd-signature-type">ValueObserver</a></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="createvaluerecorder" class="tsd-anchor"></a>
 					<h3>create<wbr>Value<wbr>Recorder</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
@@ -233,7 +296,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/904245f/packages/opentelemetry-api/src/metrics/Meter.ts#L38">src/metrics/Meter.ts:38</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/ab62a4d/packages/opentelemetry-api/src/metrics/Meter.ts#L42">src/metrics/Meter.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -275,13 +338,16 @@
 						<a href="meter.html" class="tsd-kind-icon">Meter</a>
 						<ul>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="meter.html#createbatchobserver" class="tsd-kind-icon">create<wbr>Batch<wbr>Observer</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createcounter" class="tsd-kind-icon">create<wbr>Counter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-								<a href="meter.html#createobserver" class="tsd-kind-icon">create<wbr>Observer</a>
+								<a href="meter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
-								<a href="meter.html#createupdowncounter" class="tsd-kind-icon">create<wbr>UpDown<wbr>Counter</a>
+								<a href="meter.html#createvalueobserver" class="tsd-kind-icon">create<wbr>Value<wbr>Observer</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="meter.html#createvaluerecorder" class="tsd-kind-icon">create<wbr>Value<wbr>Recorder</a>
@@ -304,6 +370,5 @@
 </footer>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
-<script>if (location.protocol == 'file:') document.write('<script src="../assets/js/search.js"><' + '/script>');</script>
 </body>
 </html>
