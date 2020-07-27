@@ -3,7 +3,7 @@ name: Backwards Compatability
 on: [push, pull_request]
 
 jobs:
-  build:
+  types/node:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,6 +25,9 @@ jobs:
           npm install --only=dev --ignore-scripts
           npx lerna bootstrap --no-ci --ignore-scripts -- --only=dev
 
-      - name:
+      - name: Install and Build API Dependencies
+        run: npx lerna bootstrap --no-ci --scope backcompat-* --include-filtered-dependencies
+
+      - name: types/node
         run: |
           npm run test:backcompat

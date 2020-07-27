@@ -1,5 +1,5 @@
 {
-  "name": "node12",
+  "name": "backcompat-node12",
   "version": "1.0.0",
   "private": true,
   "description": "Backwards compatability app for node8 types and the OpenTelemetry Node.js SDK",
