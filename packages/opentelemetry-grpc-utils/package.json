@@ -70,6 +70,6 @@
     "@opentelemetry/api": "^0.9.0",
     "@opentelemetry/core": "^0.9.0",
     "@opentelemetry/semantic-conventions": "^0.9.0",
-    "shimmer": "^1.2.1"
+    "shimmer": "1.2.1"
   }
 }
