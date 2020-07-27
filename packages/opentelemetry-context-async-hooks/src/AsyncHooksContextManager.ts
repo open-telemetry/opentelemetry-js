@@ -20,8 +20,8 @@ import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextMan
 
 export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
-  private _contexts: Map<number, Context | undefined> = new Map();
-  private _stack: Array<Context | undefined> = [];
+  private _contexts: Map<number, Context> = new Map();
+  private _stack: Array<Context> = [];
 
   constructor() {
     super();
