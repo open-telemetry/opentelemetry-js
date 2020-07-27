@@ -21,7 +21,7 @@ import { PluginLoader, Plugins } from './instrumentation/PluginLoader';
 export class NodePluginManager extends PluginManager {
   private readonly _pluginLoader: PluginLoader;
 
-  constructor(config: NodePluginManagerConfig) {
+  constructor(config: NodePluginManagerConfig = {}) {
     super(config);
 
     this._pluginLoader = new PluginLoader(

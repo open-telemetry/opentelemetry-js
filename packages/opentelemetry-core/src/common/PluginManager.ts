@@ -53,7 +53,7 @@ export class PluginManager {
   readonly meterProvider: MeterProvider;
   readonly tracerProvider: TracerProvider;
 
-  constructor(config: PluginManagerConfig) {
+  constructor(config: PluginManagerConfig = {}) {
     this.logger =
       config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
     this.tracerProvider = config.tracerProvider ?? trace.getTracerProvider();
