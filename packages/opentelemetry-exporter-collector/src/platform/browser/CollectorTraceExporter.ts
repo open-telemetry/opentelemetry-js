@@ -21,7 +21,7 @@ import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Web

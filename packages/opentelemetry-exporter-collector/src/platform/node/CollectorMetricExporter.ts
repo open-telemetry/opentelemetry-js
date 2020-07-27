@@ -24,7 +24,7 @@ import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/metrics';
+const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node

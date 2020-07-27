@@ -31,18 +31,21 @@ export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > {
-  DEFAULT_HEADERS: Record<string, string> = {
-    [collectorTypes.OT_REQUEST_HEADER]: '1',
-  };
   protected _headers: Record<string, string>;
   protected _useXHR: boolean = false;
 
+  /**
+   * @param config
+   */
   constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
-    this._headers =
-      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
+    if (this._useXHR) {
+      this._headers = parseHeaders(config.headers, this.logger);
+    } else {
+      this._headers = {};
+    }
   }
 
   onInit(): void {

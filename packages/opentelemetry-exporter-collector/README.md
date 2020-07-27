@@ -24,7 +24,7 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 
 const collectorOptions = {
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {}, //an optional object containing custom headers to be sent with each request
 };
 
@@ -118,10 +118,33 @@ const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/e
 const collectorOptions = {
   protocolNode: CollectorTransportNode.HTTP_JSON,
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {
     foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+  }, //an optional object containing custom headers to be sent with each request will only work with http
+};
+
+const provider = new BasicTracerProvider();
+const exporter = new CollectorExporter(collectorOptions);
+provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+
+provider.register();
+
+```
+
+## Usage in Node - PROTO over http
+
+```js
+const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
+const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
+
+const collectorOptions = {
+  protocolNode: CollectorTransportNode.HTTP_PROTO,
+  serviceName: 'basic-service',
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
+  headers: {
+    foo: 'bar'
+  }, //an optional object containing custom headers to be sent with each request will only work with http
 };
 
 const provider = new BasicTracerProvider();

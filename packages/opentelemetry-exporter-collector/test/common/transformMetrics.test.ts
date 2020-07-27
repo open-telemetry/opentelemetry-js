@@ -30,6 +30,7 @@ import {
   mockValueRecorder,
 } from '../helper';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { HistogramAggregator } from '@opentelemetry/metrics';
 describe('transformMetrics', () => {
   describe('toCollectorMetric', () => {
     beforeEach(() => {
@@ -49,6 +50,7 @@ describe('transformMetrics', () => {
 
     afterEach(() => {
       mockCounter.aggregator.update(-1); // Reset counter
+      mockHistogram.aggregator = new HistogramAggregator([10, 20]);
     });
     it('should convert metric', () => {
       ensureCounterIsCorrect(

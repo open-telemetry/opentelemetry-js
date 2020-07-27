@@ -169,7 +169,7 @@ describe('CollectorTraceExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter['url'],
-          'http://localhost:55680/v1/trace'
+          'http://localhost:55681/v1/trace'
         );
         done();
       });
