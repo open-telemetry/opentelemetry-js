@@ -28,7 +28,6 @@ export interface ENVIRONMENT {
 }
 
 const ENVIRONMENT_NUMBERS: Partial<keyof ENVIRONMENT>[] = [
-  'OTEL_LOG_LEVEL',
   'OTEL_SAMPLING_PROBABILITY',
 ];
 
@@ -37,7 +36,7 @@ const ENVIRONMENT_NUMBERS: Partial<keyof ENVIRONMENT>[] = [
  */
 export const DEFAULT_ENVIRONMENT: Required<ENVIRONMENT> = {
   OTEL_NO_PATCH_MODULES: '',
-  OTEL_LOG_LEVEL: LogLevel.ERROR,
+  OTEL_LOG_LEVEL: LogLevel.INFO,
   OTEL_SAMPLING_PROBABILITY: 1,
 };
 
@@ -65,6 +64,41 @@ function parseNumber(
 }
 
 /**
+ * Environmentally sets log level if valid log level string is provided
+ * @param key
+ * @param environment
+ * @param values
+ */
+function setLogLevelFromEnv(
+  key: keyof ENVIRONMENT,
+  environment: ENVIRONMENT_MAP | ENVIRONMENT,
+  values: ENVIRONMENT_MAP
+) {
+  const value = values[key];
+  switch (typeof value === 'string' ? value.toUpperCase() : value) {
+    case 'DEBUG':
+      environment[key] = LogLevel.DEBUG;
+      break;
+
+    case 'INFO':
+      environment[key] = LogLevel.INFO;
+      break;
+
+    case 'WARN':
+      environment[key] = LogLevel.WARN;
+      break;
+
+    case 'ERROR':
+      environment[key] = LogLevel.ERROR;
+      break;
+
+    default:
+      // do nothing
+      break;
+  }
+}
+
+/**
  * Parses environment values
  * @param values
  */
@@ -79,7 +113,7 @@ export function parseEnvironment(values: ENVIRONMENT_MAP): ENVIRONMENT {
         break;
 
       case 'OTEL_LOG_LEVEL':
-        parseNumber(key, environment, values, LogLevel.ERROR, LogLevel.DEBUG);
+        setLogLevelFromEnv(key, environment, values);
         break;
 
       default:
