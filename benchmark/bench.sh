@@ -6,4 +6,4 @@ git config user.name "benchmarkbot"
 git add .
 git status
 git commit -m "[skip ci]Update Benchmarks"
-git push
+git push --set-upstream origin benchmarks
