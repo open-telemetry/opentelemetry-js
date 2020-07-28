@@ -39,6 +39,7 @@
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
   "devDependencies": {
-    "cross-env": "^6.0.0"
+    "cross-env": "^6.0.0",
+    "grpc-tools": "^1.9.1"
   }
 }
