@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+## 0.10.1
+
+### :bug: (Bug Fix)
+
+* `opentelemetry-plugin-grpc-js`
+  * [#1358](https://github.com/open-telemetry/opentelemetry-js/pull/1358) fix: add missing grpc-js index ([@dyladan](https://github.com/dyladan))
+
+### Committers: 1
+
+* Daniel Dyla ([@dyladan](https://github.com/dyladan))
+
 ## 0.10.0
 
 ### :boom: Breaking Change
