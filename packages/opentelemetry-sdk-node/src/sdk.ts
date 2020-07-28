@@ -16,7 +16,12 @@
 
 import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
-import { MeterConfig, MeterProvider, Controller, PushController } from '@opentelemetry/metrics';
+import {
+  MeterConfig,
+  MeterProvider,
+  Controller,
+  PushController,
+} from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
@@ -89,10 +94,12 @@ export class NodeSDK {
         meterConfig.logger = configuration.logger;
       }
 
-      const controller = configuration.metricController ?? new PushController({
-        exporter: configuration.metricExporter,
-        interval: configuration.metricInterval,
-      });
+      const controller =
+        configuration.metricController ??
+        new PushController({
+          exporter: configuration.metricExporter,
+          interval: configuration.metricInterval,
+        });
 
       this.configureMeterProvider(meterConfig, controller);
     }

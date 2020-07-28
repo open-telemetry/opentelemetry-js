@@ -26,7 +26,11 @@ import {
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider, PushController } from '@opentelemetry/metrics';
+import {
+  ConsoleMetricExporter,
+  MeterProvider,
+  PushController,
+} from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   ConsoleSpanExporter,
