@@ -29,7 +29,7 @@ const setups = [
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
   const tracer = setup.provider.getTracer("benchmark");
-  const suite = benchmark(20)
+  const suite = benchmark(setup.name, 20)
     .add('#startSpan', function () {
       const span = tracer.startSpan('op');
       span.end();

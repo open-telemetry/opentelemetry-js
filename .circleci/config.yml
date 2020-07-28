@@ -3,7 +3,6 @@ version: 2
 node_test_env: &node_test_env
   NPM_CONFIG_UNSAFE_PERM: true
 
-
 cache_1: &cache_1
   key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
   paths:
@@ -73,6 +72,9 @@ node_unit_tests: &node_unit_tests
     - run:
         name: report coverage
         command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run codecov; fi
+    - run:
+        name: Benchmarks
+        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run bench "$CIRCLE_SHA1"; fi
 
 browsers_unit_tests: &browsers_unit_tests
   resource_class: large
@@ -149,4 +151,3 @@ workflows:
       - node12
       - node14
       - node12-browsers
-

@@ -28,7 +28,7 @@ const setups = [
 for (const setup of setups) {
   console.log(`Beginning ${setup.name} Benchmark...`);
   const propagator = setup.propagator;
-  const suite = benchmark(100)
+  const suite = benchmark(setup.name, 100)
     .add('#Inject', function () {
       propagator.inject(
         opentelemetry.setExtractedSpanContext(Context.ROOT_CONTEXT, {
