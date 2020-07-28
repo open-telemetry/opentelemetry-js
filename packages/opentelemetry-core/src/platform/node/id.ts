@@ -35,6 +35,6 @@ function getIdGenerator(bytes: number): () => string {
     for (let i = 0; i < bytes; i++) {
       SHARED_BUFFER[i] = Math.floor(Math.random() * 256);
     }
-    return SHARED_BUFFER.slice(0, bytes).toString('hex');
+    return SHARED_BUFFER.toString('hex', 0, bytes);
   };
 }
