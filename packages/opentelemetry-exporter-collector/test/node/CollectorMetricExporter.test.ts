@@ -219,7 +219,7 @@ const testCollectorMetricExporter = (params: TestParams) =>
               "resource doesn't exist"
             );
             if (resource) {
-              ensureResourceIsCorrect(resource);
+              ensureResourceIsCorrect(resource, true);
             }
           }
           if (params.metadata && reqMetadata) {
