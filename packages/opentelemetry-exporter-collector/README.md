@@ -6,7 +6,7 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url].
+This module provides exporter for web and node to be used with [opentelemetry-collector][opentelemetry-collector-url] ver. **0.6.0**
 
 ## Installation
 
@@ -145,29 +145,6 @@ const collectorOptions = {
   headers: {
     foo: 'bar'
   }, //an optional object containing custom headers to be sent with each request will only work with http
-};
-
-const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-
-provider.register();
-
-```
-
-## Usage in Node - PROTO over http
-
-```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
-
-const collectorOptions = {
-  protocolNode: CollectorTransportNode.HTTP_PROTO,
-  serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
-  headers: {
-    foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with json over http
 };
 
 const provider = new BasicTracerProvider();
