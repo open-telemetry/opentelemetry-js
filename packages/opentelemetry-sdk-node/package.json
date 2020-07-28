@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/sdk-node",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "OpenTelemetry SDK for Node.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -42,16 +42,16 @@
     "access": "public"
   },
   "dependencies": {
-    "@opentelemetry/api": "0.10.0",
-    "@opentelemetry/context-base": "0.10.0",
-    "@opentelemetry/core": "0.10.0",
-    "@opentelemetry/metrics": "0.10.0",
-    "@opentelemetry/node": "0.10.0",
-    "@opentelemetry/resources": "0.10.0",
-    "@opentelemetry/tracing": "0.10.0"
+    "@opentelemetry/api": "^0.10.1",
+    "@opentelemetry/context-base": "^0.10.1",
+    "@opentelemetry/core": "^0.10.1",
+    "@opentelemetry/metrics": "^0.10.1",
+    "@opentelemetry/node": "^0.10.1",
+    "@opentelemetry/resources": "^0.10.1",
+    "@opentelemetry/tracing": "^0.10.1"
   },
   "devDependencies": {
-    "@opentelemetry/context-async-hooks": "0.10.0",
+    "@opentelemetry/context-async-hooks": "^0.10.1",
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.13",
     "codecov": "3.7.0",
