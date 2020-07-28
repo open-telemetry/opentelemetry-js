@@ -114,16 +114,6 @@ describe('NodeTracerProvider', () => {
       require('http');
       assert.strictEqual(plugins.length, 3);
     });
-
-    it('should construct an instance with default attributes', () => {
-      provider = new NodeTracerProvider({
-        defaultAttributes: {
-          region: 'eu-west',
-          asg: 'my-asg',
-        },
-      });
-      assert.ok(provider instanceof NodeTracerProvider);
-    });
   });
 
   describe('.startSpan()', () => {
@@ -193,19 +183,6 @@ describe('NodeTracerProvider', () => {
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should set default attributes on span', () => {
-      const defaultAttributes = {
-        foo: 'bar',
-      };
-      provider = new NodeTracerProvider({
-        defaultAttributes,
-      });
-
-      const span = provider.getTracer('default').startSpan('my-span') as Span;
-      assert.ok(span instanceof Span);
-      assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
 
     it('should assign resource to span', () => {
