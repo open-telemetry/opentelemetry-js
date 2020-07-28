@@ -33,7 +33,9 @@ const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
 function getIdGenerator(bytes: number): () => string {
   return function generateId() {
     for (let i = 0; i < bytes / 4; i++) {
-      SHARED_BUFFER.writeUInt32BE(Math.random() * 2 ** 32, i * 4);
+      // unsigned right shift drops decimal part of the number
+      // it is required because if a number between 2**32 and 2**32 - 1 is generated, an out of range error is thrown by writeUInt32BE
+      SHARED_BUFFER.writeUInt32BE((Math.random() * 2 ** 32) >>> 0, i * 4);
     }
 
     // If buffer is all 0, set the last byte to 1 to guarantee a valid w3c id is generated
