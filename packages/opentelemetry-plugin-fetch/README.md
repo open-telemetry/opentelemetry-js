@@ -19,11 +19,13 @@ npm install --save @opentelemetry/plugin-fetch
 ```js
 'use strict';
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
-import { WebTracerProvider } from '@opentelemetry/web';
+import { WebTracerProvider, WebPluginManager } from '@opentelemetry/web';
 import { FetchPlugin } from '@opentelemetry/plugin-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 
-const provider = new WebTracerProvider({
+const provider = new WebTracerProvider();
+const pluginManager = new WebPluginManager({
+  tracerProvider: provider,
   plugins: [
     new FetchPlugin(),
   ],

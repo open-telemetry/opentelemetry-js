@@ -24,9 +24,11 @@ OpenTelemetry HTTP Instrumentation allows the user to automatically collect trac
 To load a specific plugin (HTTP in this case), specify it in the Node Tracer's configuration.
 
 ```js
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider, NodePluginManager } = require('@opentelemetry/node');
 
-const provider = new NodeTracerProvider({
+const provider = new NodeTracerProvider();
+const pluginManager = new NodePluginManager({
+  tracerProvider: provider,
   plugins: {
     http: {
       enabled: true,
@@ -41,9 +43,12 @@ const provider = new NodeTracerProvider({
 To load all of the [supported plugins](https://github.com/open-telemetry/opentelemetry-js#plugins), use below approach. Each plugin is only loaded when the module that it patches is loaded; in other words, there is no computational overhead for listing plugins for unused modules.
 
 ```js
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider, NodePluginManager } = require('@opentelemetry/node');
 
 const provider = new NodeTracerProvider();
+const pluginManager = new NodePluginManager({
+  tracerProvider: provider
+});
 ```
 
 See [examples/http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) for a short example.

@@ -24,9 +24,11 @@ OpenTelemetry HTTPS Instrumentation allows the user to automatically collect tra
 To load a specific plugin (HTTPS in this case), specify it in the Node Tracer's configuration.
 
 ```js
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider, NodePluginManager } = require('@opentelemetry/node');
 
-const provider = new NodeTracerProvider({
+const provider = new NodeTracerProvider();
+const pluginManager = new NodePluginManager({
+  tracerProvider: provider,
   plugins: {
     https: {
       enabled: true,
@@ -44,6 +46,9 @@ To load all of the [supported plugins](https://github.com/open-telemetry/opentel
 const { NodeTracerProvider } = require('@opentelemetry/node');
 
 const provider = new NodeTracerProvider();
+const pluginManager = new NodePluginManager({
+  tracerProvider: provider
+});
 ```
 
 See [examples/https](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/https) for a short example.

@@ -13,13 +13,13 @@ For manual instrumentation see the
 
 ## How auto instrumentation works
 
-This package exposes a `NodeTracerProvider` that will automatically hook into the module loader of Node.js.
+This package exposes a `NodePluginManager` that will automatically hook into the module loader of Node.js.
 
-For this to work, please make sure that `NodeTracerProvider` is initialized before any other module of your application, (like `http` or `express`) is loaded.
+For this to work, please make sure that `NodPluginManager` is initialized before any other module of your application, (like `http` or `express`) is loaded.
 
-OpenTelemetry comes with a growing number of instrumentation plugins for well know modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
+OpenTelemetry comes with a growing number of instrumentation plugins for well known modules (see [supported modules](https://github.com/open-telemetry/opentelemetry-js#plugins)) and an API to create custom plugins (see [the plugin developer guide](https://github.com/open-telemetry/opentelemetry-js/blob/master/doc/plugin-guide.md)).
 
-Whenever a module is loaded `NodeTracerProvider` will check if a matching instrumentation plugin has been installed.
+Whenever a module is loaded `NodePluginManager` will check if a matching instrumentation plugin has been installed.
 
 > **Please note:** This module does *not* bundle any plugins. They need to be installed separately.
 
@@ -52,16 +52,19 @@ npm install --save @opentelemetry/plugin-https
 
 ## Usage
 
-The following code will configure the `NodeTracerProvider` to instrument `http`
+The following code will configure the `NodeTracerProvider` and `NodePluginManager` to instrument `http`
 (and any other installed [supported
 modules](https://github.com/open-telemetry/opentelemetry-js#plugins))
 using `@opentelemetry/plugin-http`.
 
 ```js
-const { NodeTracerProvider } = require('@opentelemetry/node');
+const { NodeTracerProvider, NodePluginManager } = require('@opentelemetry/node');
 
-// Create and configure NodeTracerProvider
+// Create and configure NodeTracerProvider and NodePluginManager
 const provider = new NodeTracerProvider();
+const pluginManager = new NodePluginManager({
+  tracerProvider: provider
+});
 
 // Initialize the provider
 provider.register()
@@ -85,7 +88,7 @@ In the following example:
 - all default plugins are still loaded if installed.
 
 ```js
-const provider = new NodeTracerProvider({
+const pluginManager = new NodePluginManager({
   plugins: {
     express: {
       enabled: false,
