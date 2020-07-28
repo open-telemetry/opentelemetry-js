@@ -68,7 +68,7 @@ node_unit_tests: &node_unit_tests
         <<: *cache_2
     - run:
         name: Benchmarks
-        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run bench "$CIRCLE_SHA1"; fi
+        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run bench "$CIRCLE_SHA1"; sh ./benchmark/bench.sh; fi
     - run:
         name: Unit tests
         command: npm run test
