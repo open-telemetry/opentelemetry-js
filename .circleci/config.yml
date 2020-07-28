@@ -67,14 +67,15 @@ node_unit_tests: &node_unit_tests
     - save_cache:
         <<: *cache_2
     - run:
+        name: Benchmarks
+        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run bench "$CIRCLE_SHA1"; fi
+    - run:
         name: Unit tests
         command: npm run test
     - run:
         name: report coverage
         command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run codecov; fi
-    - run:
-        name: Benchmarks
-        command: if [ "${CIRCLE_NODE_VERSION}" = "v12" ]; then npm run bench "$CIRCLE_SHA1"; fi
+    
 
 browsers_unit_tests: &browsers_unit_tests
   resource_class: large
