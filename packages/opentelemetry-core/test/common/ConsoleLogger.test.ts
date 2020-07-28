@@ -17,6 +17,10 @@
 import * as assert from 'assert';
 import { ConsoleLogger } from '../../src/common/ConsoleLogger';
 import { LogLevel } from '../../src/common/types';
+import {
+  mockEnvironment,
+  removeMockEnvironment,
+} from '../utils/environment.test';
 
 describe('ConsoleLogger', () => {
   const origDebug = console.debug;
@@ -54,6 +58,7 @@ describe('ConsoleLogger', () => {
     console.info = origInfo;
     console.warn = origWarn;
     console.error = origError;
+    removeMockEnvironment();
   });
 
   describe('constructor', () => {
@@ -65,6 +70,8 @@ describe('ConsoleLogger', () => {
       assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
       consoleLogger.info('info called %s', 'param1');
       assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.strictEqual(debugCalledArgs, undefined);
     });
 
     it('should log with debug', () => {
@@ -113,6 +120,36 @@ describe('ConsoleLogger', () => {
       assert.strictEqual(infoCalledArgs, null);
       consoleLogger.debug('debug called %s', 'param1');
       assert.strictEqual(debugCalledArgs, null);
+    });
+
+    it('should log with environmentally set level ', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'WARN',
+      });
+      const consoleLogger = new ConsoleLogger();
+      consoleLogger.error('error called');
+      assert.deepStrictEqual(errorCalledArgs, ['error called']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.deepStrictEqual(infoCalledArgs, null);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.deepStrictEqual(debugCalledArgs, null);
+    });
+
+    it('should log with default log level if environmentally set level is invalid', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'INVALID_VALUE',
+      });
+      const consoleLogger = new ConsoleLogger();
+      consoleLogger.error('error called');
+      assert.deepStrictEqual(errorCalledArgs, ['error called']);
+      consoleLogger.warn('warn called %s', 'param1');
+      assert.deepStrictEqual(warnCalledArgs, ['warn called %s', 'param1']);
+      consoleLogger.info('info called %s', 'param1');
+      assert.deepStrictEqual(infoCalledArgs, ['info called %s', 'param1']);
+      consoleLogger.debug('debug called %s', 'param1');
+      assert.deepStrictEqual(debugCalledArgs, null);
     });
   });
 });

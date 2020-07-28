@@ -23,7 +23,7 @@ import { sendWithBeacon, sendWithXhr } from './util';
 import { parseHeaders } from '../../util';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Web
@@ -35,9 +35,6 @@ export class CollectorTraceExporter
     collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
   >
   implements SpanExporter {
-  DEFAULT_HEADERS: Record<string, string> = {
-    [collectorTypes.OT_REQUEST_HEADER]: '1',
-  };
   private _headers: Record<string, string>;
   private _useXHR: boolean = false;
 
@@ -46,10 +43,13 @@ export class CollectorTraceExporter
    */
   constructor(config: CollectorExporterConfigBrowser = {}) {
     super(config);
-    this._headers =
-      parseHeaders(config.headers, this.logger) || this.DEFAULT_HEADERS;
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';
+    if (this._useXHR) {
+      this._headers = parseHeaders(config.headers, this.logger);
+    } else {
+      this._headers = {};
+    }
   }
 
   onInit(): void {
