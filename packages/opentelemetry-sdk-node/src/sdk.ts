@@ -16,7 +16,7 @@
 
 import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
-import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
+import { MeterConfig, MeterProvider, Controller, PushController } from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
@@ -31,6 +31,7 @@ export class NodeSDK {
     httpTextPropagator?: HttpTextPropagator;
   };
   private _meterProviderConfig?: MeterConfig;
+  private _controller?: Controller;
 
   private _resource: Resource;
 
@@ -75,17 +76,11 @@ export class NodeSDK {
       );
     }
 
-    if (configuration.metricExporter) {
+    if (configuration.metricController || configuration.metricExporter) {
       const meterConfig: MeterConfig = {};
 
       if (configuration.metricBatcher) {
         meterConfig.batcher = configuration.metricBatcher;
-      }
-      if (configuration.metricExporter) {
-        meterConfig.exporter = configuration.metricExporter;
-      }
-      if (typeof configuration.metricInterval === 'number') {
-        meterConfig.interval = configuration.metricInterval;
       }
       if (typeof configuration.logLevel === 'number') {
         meterConfig.logLevel = configuration.logLevel;
@@ -94,7 +89,12 @@ export class NodeSDK {
         meterConfig.logger = configuration.logger;
       }
 
-      this.configureMeterProvider(meterConfig);
+      const controller = configuration.metricController ?? new PushController({
+        exporter: configuration.metricExporter,
+        interval: configuration.metricInterval,
+      });
+
+      this.configureMeterProvider(meterConfig, controller);
     }
   }
 
@@ -114,8 +114,9 @@ export class NodeSDK {
   }
 
   /** Set configurations needed to register a MeterProvider */
-  public configureMeterProvider(config: MeterConfig) {
+  public configureMeterProvider(config: MeterConfig, controller: Controller) {
     this._meterProviderConfig = config;
+    this._controller = controller;
   }
 
   /** Detect resource attributes */
@@ -154,6 +155,9 @@ export class NodeSDK {
         ...this._meterProviderConfig,
         resource: this._resource,
       });
+      if (this._controller) {
+        meterProvider.addController(this._controller);
+      }
 
       metrics.setGlobalMeterProvider(meterProvider);
     }

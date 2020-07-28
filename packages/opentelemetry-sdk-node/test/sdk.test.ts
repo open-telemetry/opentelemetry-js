@@ -26,7 +26,7 @@ import {
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
-import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
+import { ConsoleMetricExporter, MeterProvider, PushController } from '@opentelemetry/metrics';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   ConsoleSpanExporter,
@@ -117,6 +117,21 @@ describe('Node SDK', () => {
       );
 
       assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+    });
+
+    it('should register a meter provider if a controller is provided', async () => {
+      const controller = new PushController({
+        exporter: new ConsoleMetricExporter(),
+      });
+
+      const sdk = new NodeSDK({
+        metricController: controller,
+        autoDetectResources: false,
+      });
+
+      await sdk.start();
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });

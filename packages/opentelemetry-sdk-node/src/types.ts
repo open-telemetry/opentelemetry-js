@@ -26,6 +26,7 @@ export interface NodeSDKConfiguration {
   logLevel: core.LogLevel;
   metricBatcher: metrics.Batcher;
   metricExporter: metrics.MetricExporter;
+  metricController: metrics.Controller;
   metricInterval: number;
   plugins: node.Plugins;
   resource: resources.Resource;
