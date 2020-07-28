@@ -32,8 +32,8 @@ export const randomSpanId = getIdGenerator(SPAN_ID_BYTES);
 const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
 function getIdGenerator(bytes: number): () => string {
   return function generateId() {
-    for (let i = 0; i < bytes; i++) {
-      SHARED_BUFFER[i] = Math.floor(Math.random() * 256);
+    for (let i = 0; i < (bytes / 4); i++) {
+      SHARED_BUFFER.writeUInt32BE((Math.random() * 2**32) >>> 0, i * 4)
     }
     return SHARED_BUFFER.toString('hex', 0, bytes);
   };
