@@ -10,6 +10,7 @@ This example will export spans data simultaneously using [Exporter Collector](ht
 # from this directory
 npm install
 ```
+
 How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) please check
 [Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus)
 
