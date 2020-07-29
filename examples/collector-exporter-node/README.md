@@ -10,8 +10,6 @@ This example will export spans data simultaneously using [Exporter Collector](ht
 # from this directory
 npm install
 ```
-How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) please check
-[Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus)
 
 ## Run the Application
 
@@ -34,7 +32,9 @@ How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_s
 
 ### Prometheus UI
 
-If you are using the default configurations, the prometheus client will be available at <http://localhost:9090>
+The prometheus client will be available at <http://localhost:9090>.
+
+Note: It may take some time for the application metrics to appear on the Prometheus dashboard.
 
 <p align="center"><img src="../prometheus/images/prom-counter.png?raw=true"/></p>
 <p align="center"><img src="../prometheus/images/prom-updowncounter.png?raw=true"/></p>
