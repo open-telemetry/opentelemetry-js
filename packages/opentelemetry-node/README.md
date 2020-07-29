@@ -112,7 +112,7 @@ For example, `OTEL_NO_PATCH_MODULES=pg,https` will disable the postgres plugin a
 
 ## Examples
 
-See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) using node-sdk.
+See how to automatically instrument [http](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/http) and [gRPC](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc) / [grpc-js](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/grpc-js) using node-sdk.
 
 ## Useful links
 

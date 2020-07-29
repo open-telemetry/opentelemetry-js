@@ -21,6 +21,11 @@ import {
   DEFAULT_MAX_LINKS_PER_SPAN,
 } from './config';
 import { TracerConfig } from './types';
+import {
+  ParentOrElseSampler,
+  ProbabilitySampler,
+  getEnv,
+} from '@opentelemetry/core';
 
 /**
  * Function to merge Default configuration (as specified in './config') with
@@ -28,7 +33,20 @@ import { TracerConfig } from './types';
  */
 export function mergeConfig(userConfig: TracerConfig) {
   const traceParams = userConfig.traceParams;
-  const target = Object.assign({}, DEFAULT_CONFIG, userConfig);
+  const otelSamplingProbability = getEnv().OTEL_SAMPLING_PROBABILITY;
+
+  const target = Object.assign(
+    DEFAULT_CONFIG,
+    // use default AlwaysOnSampler if otelSamplingProbability is 1
+    otelSamplingProbability !== undefined && otelSamplingProbability < 1
+      ? {
+          sampler: new ParentOrElseSampler(
+            new ProbabilitySampler(otelSamplingProbability)
+          ),
+        }
+      : {},
+    userConfig
+  );
 
   // the user-provided value will be used to extend the default value.
   if (traceParams) {

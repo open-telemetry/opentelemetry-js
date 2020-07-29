@@ -118,7 +118,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       });
     });
 
-    it('should successfully send the spans', done => {
+    it('should successfully send metrics', done => {
       collectorExporter.export(metrics, () => {});
 
       setTimeout(() => {
@@ -213,7 +213,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
       setTimeout(() => {
         assert.strictEqual(
           collectorExporter['url'],
-          'http://localhost:55680/v1/metrics'
+          'http://localhost:55681/v1/metrics'
         );
         done();
       });

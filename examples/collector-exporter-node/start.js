@@ -1,15 +1,18 @@
 'use strict';
 
 const opentelemetry = require('@opentelemetry/api');
+// const { ConsoleLogger,  LogLevel} = require('@opentelemetry/core');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
 const { CollectorTraceExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
 
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
+  // logger: new ConsoleLogger(LogLevel.DEBUG),
   // headers: {
   //   foo: 'bar'
   // },
-  protocolNode: CollectorProtocolNode.HTTP_JSON,
+  protocolNode: CollectorProtocolNode.HTTP_PROTO,
+  // protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();
@@ -46,6 +49,14 @@ function doWork(parent) {
   }
   // Set attributes to the span.
   span.setAttribute('key', 'value');
+
+  span.setAttribute('mapAndArrayValue', [
+    0, 1, 2.25, 'otel', {
+      foo: 'bar',
+      baz: 'json',
+      array: [1, 2, 'boom'],
+    },
+  ]);
 
   // Annotate our span to capture metadata about our operation
   span.addEvent('invoking doWork');

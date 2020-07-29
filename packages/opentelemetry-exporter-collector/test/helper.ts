@@ -422,49 +422,87 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-    ],
-    'exported attributes are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+            value: 'stringValue',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  }
 }
 
 export function ensureExportedLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[]
+  attributes: opentelemetryProto.trace.v1.Span.Link[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        attributes: [
-          {
-            key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
-            intValue: '0',
-            doubleValue: 0,
-            boolValue: false,
-          },
-        ],
-        traceId: Buffer.from(traceIdArr),
-        spanId: Buffer.from(parentIdArr),
-        traceState: '',
-        droppedAttributesCount: 0,
-      },
-    ],
-    'exported links are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+                value: 'stringValue',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  }
 }
 
 export function ensureEventsAreCorrect(
@@ -526,16 +564,85 @@ export function ensureEventsAreCorrect(
   );
 }
 
+export function ensureProtoEventsAreCorrect(
+  events: opentelemetryProto.trace.v1.Span.Event[]
+) {
+  assert.deepStrictEqual(
+    events,
+    [
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'fetchStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'domainLookupEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165429803008',
+        name: 'connectEnd',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165435513088',
+        name: 'requestStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165436923136',
+        name: 'responseStart',
+        droppedAttributesCount: 0,
+      },
+      {
+        timeUnixNano: '1574120165438688000',
+        name: 'responseEnd',
+        droppedAttributesCount: 0,
+      },
+    ],
+    'events are incorrect'
+  );
+}
+
 export function ensureAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
         key: 'component',
-        type: 0,
-        stringValue: 'document-load',
+        value: {
+          stringValue: 'document-load',
+        },
+      },
+    ],
+    'attributes are incorrect'
+  );
+}
+
+export function ensureProtoAttributesAreCorrect(
+  attributes: opentelemetryProto.common.v1.KeyValue[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        key: 'component',
+        value: {
+          stringValue: 'document-load',
+        },
       },
     ],
     'attributes are incorrect'
@@ -554,8 +661,33 @@ export function ensureLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            type: 0,
-            stringValue: 'document-load',
+            value: {
+              stringValue: 'document-load',
+            },
+          },
+        ],
+        droppedAttributesCount: 0,
+      },
+    ],
+    'links are incorrect'
+  );
+}
+
+export function ensureProtoLinksAreCorrect(
+  attributes: opentelemetryProto.trace.v1.Span.Link[]
+) {
+  assert.deepStrictEqual(
+    attributes,
+    [
+      {
+        traceId: traceIdBase64,
+        spanId: parentIdBase64,
+        attributes: [
+          {
+            key: 'component',
+            value: {
+              stringValue: 'document-load',
+            },
           },
         ],
         droppedAttributesCount: 0,
@@ -610,17 +742,59 @@ export function ensureSpanIsCorrect(
   assert.deepStrictEqual(span.status, { code: 0 }, 'status is wrong');
 }
 
-export function ensureExportedSpanIsCorrect(
+export function ensureProtoSpanIsCorrect(
   span: collectorTypes.opentelemetryProto.trace.v1.Span
 ) {
   if (span.attributes) {
-    ensureExportedAttributesAreCorrect(span.attributes);
+    ensureProtoAttributesAreCorrect(span.attributes);
+  }
+  if (span.events) {
+    ensureProtoEventsAreCorrect(span.events);
+  }
+  if (span.links) {
+    ensureProtoLinksAreCorrect(span.links);
+  }
+  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(
+    span.parentSpanId,
+    parentIdBase64,
+    'parentIdArr is wrong'
+  );
+  assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
+  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(
+    span.startTimeUnixNano,
+    '1574120165429803008',
+    'startTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.endTimeUnixNano,
+    '1574120165438688000',
+    'endTimeUnixNano is wrong'
+  );
+  assert.strictEqual(
+    span.droppedAttributesCount,
+    0,
+    'droppedAttributesCount is wrong'
+  );
+  assert.strictEqual(span.droppedEventsCount, 0, 'droppedEventsCount is wrong');
+  assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
+  assert.deepStrictEqual(span.status, { code: 'Ok' }, 'status is wrong');
+}
+
+export function ensureExportedSpanIsCorrect(
+  span: collectorTypes.opentelemetryProto.trace.v1.Span,
+  usingGRPC = false
+) {
+  if (span.attributes) {
+    ensureExportedAttributesAreCorrect(span.attributes, usingGRPC);
   }
   if (span.events) {
     ensureExportedEventsAreCorrect(span.events);
   }
   if (span.links) {
-    ensureExportedLinksAreCorrect(span.links);
+    ensureExportedLinksAreCorrect(span.links, usingGRPC);
   }
   assert.deepStrictEqual(
     span.traceId,
@@ -671,19 +845,27 @@ export function ensureWebResourceIsCorrect(
     attributes: [
       {
         key: 'service.name',
-        type: 0,
-        stringValue: 'bar',
+        value: {
+          stringValue: 'bar',
+        },
       },
       {
         key: 'service',
-        type: 0,
-        stringValue: 'ui',
+        value: {
+          stringValue: 'ui',
+        },
       },
-      { key: 'version', type: 2, doubleValue: 1 },
+      {
+        key: 'version',
+        value: {
+          doubleValue: 1,
+        },
+      },
       {
         key: 'cost',
-        type: 2,
-        doubleValue: 112.12,
+        value: {
+          doubleValue: 112.12,
+        },
       },
     ],
     droppedAttributesCount: 0,
@@ -951,45 +1133,74 @@ export function ensureExportedValueRecorderIsCorrect(
 }
 
 export function ensureResourceIsCorrect(
-  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+  resource: collectorTypes.opentelemetryProto.resource.v1.Resource,
+  usingGRPC = true
 ) {
-  assert.deepStrictEqual(resource, {
-    attributes: [
-      {
-        key: 'service.name',
-        type: 'STRING',
-        stringValue: 'basic-service',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'service',
-        type: 'STRING',
-        stringValue: 'ui',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'version',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 1,
-        boolValue: false,
-      },
-      {
-        key: 'cost',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 112.12,
-        boolValue: false,
-      },
-    ],
-    droppedAttributesCount: 0,
-  });
+  if (usingGRPC) {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+            value: 'doubleValue',
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+            value: 'doubleValue',
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  } else {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  }
 }
 
 export function ensureExportTraceServiceRequestIsSet(

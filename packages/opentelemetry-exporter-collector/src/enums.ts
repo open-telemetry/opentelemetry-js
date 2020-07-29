@@ -21,4 +21,5 @@
 export enum CollectorProtocolNode {
   GRPC,
   HTTP_JSON,
+  HTTP_PROTO,
 }
