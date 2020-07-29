@@ -41,6 +41,7 @@ import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
+import { ValueType } from '@opentelemetry/api';
 
 describe('Meter', () => {
   let meter: Meter;
@@ -374,6 +375,63 @@ describe('Meter', () => {
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
         assert.strictEqual(boundCounter, boundCounter1);
       });
+
+      it('should trunk non-integer values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.INT,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+        {
+          boundCounter.add(-1.1);
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+
+          assert.strictEqual(record1.aggregator.toPoint().value, -1);
+        }
+
+        {
+          // disable type checking...
+          (boundCounter.add as any)(undefined);
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+
+          assert.strictEqual(record1.aggregator.toPoint().value, -1);
+        }
+
+        {
+          // disable type checking...
+          (boundCounter.add as any)({});
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+
+          assert.strictEqual(record1.aggregator.toPoint().value, -1);
+        }
+      });
+
+      it('should ignore non-number values for DOUBLE valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        {
+          // disable type checking...
+          (boundCounter.add as any)(undefined);
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+
+          assert.strictEqual(record1.aggregator.toPoint().value, 0);
+        }
+
+        {
+          // disable type checking...
+          (boundCounter.add as any)({});
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+
+          assert.strictEqual(record1.aggregator.toPoint().value, 0);
+        }
+      });
     });
 
     describe('.unbind()', () => {
@@ -650,6 +708,45 @@ describe('Meter', () => {
           }
         );
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
+      });
+
+      it('should ignore non-number values', async () => {
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+        {
+          // disable type checking...
+          (boundValueRecorder.record as any)(undefined);
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+          assert.deepStrictEqual(
+            record1.aggregator.toPoint().value as Distribution,
+            {
+              count: 0,
+              last: 0,
+              max: -Infinity,
+              min: Infinity,
+              sum: 0,
+            }
+          );
+        }
+        {
+          // disable type checking...
+          (boundValueRecorder.record as any)({});
+          await meter.collect();
+          const [record1] = meter.getBatcher().checkPointSet();
+          assert.deepStrictEqual(
+            record1.aggregator.toPoint().value as Distribution,
+            {
+              count: 0,
+              last: 0,
+              max: -Infinity,
+              min: Infinity,
+              sum: 0,
+            }
+          );
+        }
       });
     });
 

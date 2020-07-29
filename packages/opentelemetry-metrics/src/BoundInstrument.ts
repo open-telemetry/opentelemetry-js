@@ -38,6 +38,14 @@ export class BaseBoundInstrument {
 
   update(value: number): void {
     if (this._disabled) return;
+    if (typeof value !== 'number') {
+      this._logger.error(
+        `Metric cannot accept a non-number value for ${Object.values(
+          this._labels
+        )}.`
+      );
+      return;
+    }
 
     if (this._valueType === api.ValueType.INT && !Number.isInteger(value)) {
       this._logger.warn(
