@@ -19,6 +19,7 @@ import {
   NoopTracerProvider,
   SpanKind,
   propagation,
+  PluginConfig,
 } from '@opentelemetry/api';
 import { NoopLogger, HttpTraceContext, BasePlugin } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
@@ -804,9 +805,18 @@ export const runTests = (
 
       before(async () => {
         const config = {
-          ignoreMethods: ['UnaryMethod', 'camelCaseMethod', 'BidiStreamMethod'],
+          ignoreRpcMethods: [
+            'UnaryMethod',
+            new RegExp(/^camel.*Method$/),
+            (str: string) => str === 'BidiStreamMethod',
+          ],
         };
-        const patchedGrpc = plugin.enable(grpc, provider, logger, config);
+        const patchedGrpc = plugin.enable(
+          grpc,
+          provider,
+          logger,
+          config as PluginConfig
+        );
 
         const packageDefinition = await protoLoader.load(PROTO_PATH, options);
         const proto = patchedGrpc.loadPackageDefinition(packageDefinition)

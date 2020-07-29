@@ -47,7 +47,11 @@ export function getMethodsToWrap(
 
   // For a method defined in .proto as "UnaryMethod"
   Object.entries(methods).forEach(([name, { originalName }]) => {
-    if (!methodIsIgnored(name, this._config.ignoreMethods)) {
+    if (
+      !methodIsIgnored(name, this._config.ignoreRpcMethods, (e: Error) =>
+        this._logger.error(`caught ignoreRpcMethods error: ${e.message}`)
+      )
+    ) {
       methodList.push(name); // adds camel case method name: "unaryMethod"
       if (
         originalName &&

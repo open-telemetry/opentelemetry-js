@@ -21,6 +21,7 @@ import { patchClient, patchLoadPackageDefinition } from './client';
 import { patchServer } from './server';
 import { VERSION } from './version';
 import { Tracer, Logger } from '@opentelemetry/api';
+import { GrpcPluginOptions } from './types';
 
 /**
  * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
@@ -30,6 +31,8 @@ export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   static readonly component = '@grpc/grpc-js';
 
   readonly supportedVersions = ['1.*'];
+
+  protected _config!: GrpcPluginOptions;
 
   constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-grpc-js', VERSION);

@@ -16,6 +16,7 @@
 
 import { CanonicalCode, Status } from '@opentelemetry/api';
 import type * as grpcTypes from '@grpc/grpc-js'; // For types only
+import { IgnoreMatcher } from './types';
 
 /**
  * Symbol to include on grpc call if it has already emitted an error event.
@@ -59,20 +60,53 @@ export const containsOtelMetadata = (metadata: grpcTypes.Metadata): boolean => {
 };
 
 /**
+ * Returns true if methodName matches pattern
+ * @param methodName the name of the method
+ * @param pattern Match pattern
+ */
+const satisfiesPattern = (
+  methodName: string,
+  pattern: IgnoreMatcher
+): boolean => {
+  if (typeof pattern === 'string') {
+    return pattern.toLowerCase() === methodName.toLowerCase();
+  } else if (pattern instanceof RegExp) {
+    return pattern.test(methodName);
+  } else if (typeof pattern === 'function') {
+    return pattern(methodName);
+  } else {
+    throw new TypeError('Pattern is in unsupported datatype');
+  }
+};
+
+/**
  * Returns true if the current plugin configuration
  * ignores the given method.
+ * @param methodName the name of the method
+ * @param ignoredMethods a list of matching patterns
+ * @param onException an error handler for matching exceptions
  */
 export const methodIsIgnored = (
   methodName: string,
-  ignoredMethods?: string[]
+  ignoredMethods?: IgnoreMatcher[],
+  onException?: (e: Error) => void
 ): boolean => {
   if (!ignoredMethods) {
+    // No ignored rpc methods
     return false;
   }
-  for (const pattern of ignoredMethods) {
-    if (new RegExp(`^${pattern}$`, 'i').test(methodName)) {
-      return true;
+
+  try {
+    for (const pattern of ignoredMethods) {
+      if (satisfiesPattern(methodName, pattern)) {
+        return true;
+      }
+    }
+  } catch (e) {
+    if (onException) {
+      onException(e);
     }
   }
+
   return false;
 };

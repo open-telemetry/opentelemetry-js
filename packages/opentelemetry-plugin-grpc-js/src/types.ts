@@ -17,6 +17,16 @@
 import type * as grpcJs from '@grpc/grpc-js';
 import type { EventEmitter } from 'events';
 import type { CALL_SPAN_ENDED } from './utils';
+import { PluginConfig } from '@opentelemetry/api';
+
+export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
+
+export interface GrpcPluginOptions extends PluginConfig {
+  /* Omits tracing on any RPC methods that match any of
+   * the IgnoreMatchers in the ignoreRpcMethods list
+   */
+  ignoreRpcMethods?: IgnoreMatcher[];
+}
 
 /**
  * Server Unary callback type
