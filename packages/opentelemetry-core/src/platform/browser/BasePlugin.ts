@@ -20,7 +20,7 @@ import {
   PluginConfig,
   TracerProvider,
   MeterProvider,
-  NoopMeterProvider,
+  metrics,
 } from '@opentelemetry/api';
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
@@ -45,7 +45,7 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
         this._tracerVersion
       );
     } else {
-      this._meter = new NoopMeterProvider().getMeter(); // TODO: use global meter provider
+      this._meter = metrics.getMeterProvider().getMeter(this._tracerName, this._tracerVersion);
     }
     this._logger = logger;
     if (config) this._config = config;
