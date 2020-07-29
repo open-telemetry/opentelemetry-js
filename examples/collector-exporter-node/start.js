@@ -3,7 +3,7 @@
 const opentelemetry = require('@opentelemetry/api');
 // const { ConsoleLogger,  LogLevel} = require('@opentelemetry/core');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorTraceExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter, CollectorMetricExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
 
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
@@ -13,6 +13,10 @@ const exporter = new CollectorTraceExporter({
   // },
   protocolNode: CollectorProtocolNode.HTTP_PROTO,
   // protocolNode: CollectorProtocolNode.HTTP_JSON,
+});
+
+const metricExporter = new CollectorMetricExporter({
+  serviceName: 'basic-metric-service',
 });
 
 const provider = new BasicTracerProvider();
@@ -64,3 +68,23 @@ function doWork(parent) {
   // end span
   span.end();
 }
+
+const meter = new MeterProvider({
+  exporter: metricExporter,
+  interval: 1000,
+}).getMeter('example-prometheus');
+
+const requestCounter = meter.createCounter('requests', {
+  description: 'Example of a Counter',
+});
+
+const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
+  description: 'Example of a UpDownCounter',
+});
+
+const labels = { pid: process.pid, environment: 'staging' };
+
+setInterval(() => {
+  requestCounter.bind(labels).add(1);
+  upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+}, 1000);

@@ -10,6 +10,8 @@ This example will export spans data simultaneously using [Exporter Collector](ht
 # from this directory
 npm install
 ```
+How to setup [Prometheus](https://prometheus.io/docs/prometheus/latest/getting_started/) please check
+[Setup Prometheus](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-prometheus)
 
 ## Run the Application
 
@@ -29,6 +31,13 @@ npm install
 
 3. Open page at <http://localhost:9411/zipkin/> -  you should be able to see the spans in zipkin
 ![Screenshot of the running example](images/spans.png)
+
+### Prometheus UI
+
+If you are using the default configurations, the prometheus client will be available at <http://localhost:9090>
+
+<p align="center"><img src="../prometheus/images/prom-counter.png?raw=true"/></p>
+<p align="center"><img src="../prometheus/images/prom-updowncounter.png?raw=true"/></p>
 
 ## Useful links
 
