@@ -49,7 +49,9 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
         this._tracerVersion
       );
     } else {
-      this._meter = metrics.getMeterProvider().getMeter(this._tracerName, this._tracerVersion);
+      this._meter = metrics
+        .getMeterProvider()
+        .getMeter(this._tracerName, this._tracerVersion);
     }
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
