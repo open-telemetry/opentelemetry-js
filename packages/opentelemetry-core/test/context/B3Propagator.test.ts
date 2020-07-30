@@ -287,6 +287,71 @@ describe('B3Propagator', () => {
       assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
     });
+    it('should extract context of a span from carrier when debug flag is invalidly set as false', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_FLAGS] = 'false';
+      carrier[X_B3_SAMPLED] = '0';
+      const context = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        defaultGetter
+      );
+      const extractedSpanContext = getExtractedSpanContext(context);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
+    });
+
+    it('should extract context of a span from carrier when debug flag is invalidly set as true', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_FLAGS] = 'true';
+      carrier[X_B3_SAMPLED] = '0';
+      const context = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        defaultGetter
+      );
+      const extractedSpanContext = getExtractedSpanContext(context);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
+    });
+
+    it('should extract context of a span from carrier when debug flag is invalidly set as 2', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_FLAGS] = '3';
+      carrier[X_B3_SAMPLED] = '0';
+      const context = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        defaultGetter
+      );
+      const extractedSpanContext = getExtractedSpanContext(context);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
+    });
 
     it('should extract context of a span from carrier with a parent span id', () => {
       carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
@@ -308,6 +373,29 @@ describe('B3Propagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       });
       assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(PARENT_SPAN_ID_KEY), 'f4592dc481026a8c');
+    });
+
+    it('should extract context of a span from carrier with a parent span id and debug set', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
+      carrier[X_B3_FLAGS] = '1';
+      carrier[X_B3_SAMPLED] = '0';
+      const context = b3Propagator.extract(
+        Context.ROOT_CONTEXT,
+        carrier,
+        defaultGetter
+      );
+      const extractedSpanContext = getExtractedSpanContext(context);
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+      assert.equal(context.getValue(DEBUG_FLAG_KEY), '1');
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), 'f4592dc481026a8c');
     });
 
@@ -339,6 +427,16 @@ describe('B3Propagator', () => {
       assert.deepStrictEqual(context, undefined);
     });
 
+    it('should return undefined when parentSpanId is a trace id', () => {
+      carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+      carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+      carrier[X_B3_PARENT_SPAN_ID] = '0af7651916cd43dd8448eb211c80319d';
+      const context = getExtractedSpanContext(
+        b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      );
+      assert.deepStrictEqual(context, undefined);
+    });
+
     it('returns undefined if b3 header is missing', () => {
       const context = getExtractedSpanContext(
         b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
@@ -357,7 +455,7 @@ describe('B3Propagator', () => {
     it('extracts b3 from list of header', () => {
       carrier[X_B3_TRACE_ID] = ['0af7651916cd43dd8448eb211c80319c'];
       carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-      carrier[X_B3_SAMPLED] = '01';
+      carrier[X_B3_SAMPLED] = '1';
       const context = b3Propagator.extract(
         Context.ROOT_CONTEXT,
         carrier,

@@ -37,6 +37,7 @@ export const DEBUG_FLAG_KEY = Context.createKey(
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
 const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
 const INVALID_ID_REGEX = /^0+$/i;
+const VALID_SAMPLED_VALUES = [true, 'true', '1'];
 
 function isValidTraceId(traceId: string): boolean {
   return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
@@ -64,7 +65,7 @@ export class B3Propagator implements HttpTextPropagator {
       isValidSpanId(spanContext.spanId)
     ) {
       if (parentSpanId) {
-        if (isValidTraceId(parentSpanId as string)) {
+        if (isValidSpanId(parentSpanId as string)) {
           setter(carrier, X_B3_PARENT_SPAN_ID, parentSpanId);
         } else {
           return;
@@ -104,7 +105,9 @@ export class B3Propagator implements HttpTextPropagator {
     const options = parseHeader(sampledHeader);
     const debugHeaderValue = parseHeader(flagsHeader);
     const debug = debugHeaderValue === '1';
-    const traceFlagsOrDebug = Number(debug) || Number(options);
+    const isSampled = VALID_SAMPLED_VALUES.includes(options);
+    const traceFlags =
+      debug || isSampled ? TraceFlags.SAMPLED : TraceFlags.NONE;
 
     if (
       typeof traceIdHeaderValue !== 'string' ||
@@ -124,8 +127,7 @@ export class B3Propagator implements HttpTextPropagator {
         traceId,
         spanId,
         isRemote: true,
-        // Set traceFlags as 1 if debug is 1
-        traceFlags: traceFlagsOrDebug || TraceFlags.NONE,
+        traceFlags,
       });
     }
     return context;
