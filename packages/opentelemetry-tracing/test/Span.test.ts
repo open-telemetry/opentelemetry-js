@@ -409,7 +409,7 @@ describe('Span', () => {
           error = e;
         }
       });
-      it('should record an exception when type is "Error"', () => {
+      it('should record an exception', () => {
         const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
         assert.strictEqual(span.events.length, 0);
         span.recordException(error);
