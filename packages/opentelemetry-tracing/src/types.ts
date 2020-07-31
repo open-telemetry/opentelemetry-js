@@ -15,7 +15,8 @@
  */
 
 import { HttpTextPropagator, Logger, Sampler } from '@opentelemetry/api';
-import { LogLevel } from '@opentelemetry/core';
+import { LogLevel, IdGenerator } from '@opentelemetry/core';
+
 import { ContextManager } from '@opentelemetry/context-base';
 import { Resource } from '@opentelemetry/resources';
 
@@ -41,6 +42,12 @@ export interface TracerConfig {
 
   /** Resource associated with trace telemetry  */
   resource?: Resource;
+
+  /**
+   * Generator of trace and span IDs
+   * The default idGenerator generates random ids
+   */
+  idGenerator?: IdGenerator;
 }
 
 /**
