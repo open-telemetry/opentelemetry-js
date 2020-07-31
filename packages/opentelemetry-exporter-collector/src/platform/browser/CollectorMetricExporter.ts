@@ -32,6 +32,7 @@ export class CollectorMetricExporter
     collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
   implements MetricExporter {
+  // Converts time to nanoseconds
   private readonly _startTime = new Date().getTime() * 1000000;
 
   convert(
