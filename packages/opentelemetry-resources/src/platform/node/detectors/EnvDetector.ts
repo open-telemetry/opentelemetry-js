@@ -16,6 +16,7 @@
 
 import { Resource } from '../../../Resource';
 import { Detector, ResourceLabels } from '../../../types';
+import { ResourceDetectionConfigWithLogger } from '../../../config';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
@@ -45,16 +46,24 @@ class EnvDetector implements Detector {
    * Returns a {@link Resource} populated with labels from the
    * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
    * to conform to the Detector interface.
+   *
+   * @param config The resource detection config with a required logger
    */
-  async detect(): Promise<Resource> {
+  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
       const labelString = process.env.OTEL_RESOURCE_LABELS;
-      if (!labelString) return Resource.empty();
+      if (!labelString) {
+        config.logger.debug(
+          'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+        );
+        return Resource.empty();
+      }
       const labels = this._parseResourceLabels(
         process.env.OTEL_RESOURCE_LABELS
       );
       return new Resource(labels);
-    } catch {
+    } catch (e) {
+      config.logger.debug(`EnvDetector failed: ${e.message}`);
       return Resource.empty();
     }
   }

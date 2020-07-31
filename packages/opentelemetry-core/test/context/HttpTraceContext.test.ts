@@ -98,6 +98,36 @@ describe('HttpTraceContext', () => {
       });
     });
 
+    it('should extract context of a sampled span from carrier using a future version', () => {
+      carrier[TRACE_PARENT_HEADER] =
+        'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
+      const extractedSpanContext = getExtractedSpanContext(
+        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      );
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
+    it('should extract context of a sampled span from carrier using a future version and future fields', () => {
+      carrier[TRACE_PARENT_HEADER] =
+        'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01-what-the-future-will-be-like';
+      const extractedSpanContext = getExtractedSpanContext(
+        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      );
+
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
     it('returns null if traceparent header is missing', () => {
       assert.deepStrictEqual(
         getExtractedSpanContext(
@@ -173,8 +203,6 @@ describe('HttpTraceContext', () => {
 
       const testCases: Record<string, string> = {
         invalidParts_tooShort: '00-ffffffffffffffffffffffffffffffff',
-        invalidParts_tooLong:
-          '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff-00-01',
 
         invalidVersion_notHex:
           '0x-ffffffffffffffffffffffffffffffff-ffffffffffffffff-00',
@@ -201,6 +229,10 @@ describe('HttpTraceContext', () => {
           '00-ffffffffffffffffffffffffffffffff-ffffffff-01',
         invalidSpanId_tooLong:
           '00-ffffffffffffffffffffffffffffffff-ffffffffffffffff0000-01',
+        invalidFutureVersion:
+          'ff-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
+        invalidFutureFieldAfterFlag:
+          'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01.what-the-future-will-not-be-like',
       };
 
       Object.getOwnPropertyNames(testCases).forEach(testCase => {

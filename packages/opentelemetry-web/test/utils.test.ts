@@ -137,8 +137,10 @@ describe('utils', () => {
   describe('addSpanNetworkEvents', () => {
     it('should add all network events to span', () => {
       const addEventSpy = sinon.spy();
+      const setAttributeSpy = sinon.spy();
       const span = ({
         addEvent: addEventSpy,
+        setAttribute: setAttributeSpy,
       } as unknown) as tracing.Span;
       const entries = {
         [PTN.FETCH_START]: 123,
@@ -150,6 +152,7 @@ describe('utils', () => {
         [PTN.REQUEST_START]: 123,
         [PTN.RESPONSE_START]: 123,
         [PTN.RESPONSE_END]: 123,
+        [PTN.ENCODED_BODY_SIZE]: 123,
       } as PerformanceEntries;
 
       assert.strictEqual(addEventSpy.callCount, 0);
@@ -157,6 +160,7 @@ describe('utils', () => {
       addSpanNetworkEvents(span, entries);
 
       assert.strictEqual(addEventSpy.callCount, 9);
+      assert.strictEqual(setAttributeSpy.callCount, 1);
     });
   });
   describe('addSpanNetworkEvent', () => {

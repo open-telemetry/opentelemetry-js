@@ -26,6 +26,7 @@ import {
   timeInputToHrTime,
   urlMatches,
 } from '@opentelemetry/core';
+import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 
 /**
  * Helper function to be able to use enum as typed key in type and in interface when using forEach
@@ -81,6 +82,12 @@ export function addSpanNetworkEvents(
   addSpanNetworkEvent(span, PTN.REQUEST_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_START, resource);
   addSpanNetworkEvent(span, PTN.RESPONSE_END, resource);
+  if (resource[PTN.ENCODED_BODY_SIZE]) {
+    span.setAttribute(
+      HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH,
+      resource[PTN.ENCODED_BODY_SIZE]
+    );
+  }
 }
 
 /**

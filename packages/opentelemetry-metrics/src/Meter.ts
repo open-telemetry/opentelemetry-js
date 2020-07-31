@@ -17,20 +17,16 @@
 import * as api from '@opentelemetry/api';
 import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
-import {
-  Metric,
-  CounterMetric,
-  ValueRecorderMetric,
-  ObserverMetric,
-} from './Metric';
-import {
-  MetricOptions,
-  DEFAULT_METRIC_OPTIONS,
-  DEFAULT_CONFIG,
-  MeterConfig,
-} from './types';
+import { CounterMetric } from './CounterMetric';
+import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
+import { ValueRecorderMetric } from './ValueRecorderMetric';
+import { Metric } from './Metric';
+import { ValueObserverMetric } from './ValueObserverMetric';
+import { SumObserverMetric } from './SumObserverMetric';
+import { DEFAULT_METRIC_OPTIONS, DEFAULT_CONFIG, MeterConfig } from './types';
 import { Batcher, UngroupedBatcher } from './export/Batcher';
 import { PushController } from './export/Controller';
 import { NoopExporter } from './export/NoopExporter';
@@ -77,7 +73,7 @@ export class Meter implements api.Meter {
       );
       return api.NOOP_VALUE_RECORDER_METRIC;
     }
-    const opt: MetricOptions = {
+    const opt: api.MetricOptions = {
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       absolute: true, // value recorders are defined as absolute by default
@@ -109,7 +105,7 @@ export class Meter implements api.Meter {
       );
       return api.NOOP_COUNTER_METRIC;
     }
-    const opt: MetricOptions = {
+    const opt: api.MetricOptions = {
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
@@ -145,9 +141,9 @@ export class Meter implements api.Meter {
       );
       return api.NOOP_COUNTER_METRIC;
     }
-    const opt: MetricOptions = {
-      logger: this._logger,
+    const opt: api.MetricOptions = {
       ...DEFAULT_METRIC_OPTIONS,
+      logger: this._logger,
       ...options,
     };
     const upDownCounter = new UpDownCounterMetric(
@@ -162,31 +158,133 @@ export class Meter implements api.Meter {
   }
 
   /**
-   * Creates a new observer metric.
+   * Creates a new `ValueObserver` metric.
    * @param name the name of the metric.
    * @param [options] the metric options.
+   * @param [callback] the value observer callback
    */
-  createObserver(name: string, options?: api.MetricOptions): api.Observer {
+  createValueObserver(
+    name: string,
+    options: api.MetricOptions = {},
+    callback?: (observerResult: api.ObserverResult) => unknown
+  ): api.ValueObserver {
     if (!this._isValidName(name)) {
       this._logger.warn(
         `Invalid metric name ${name}. Defaulting to noop metric implementation.`
       );
-      return api.NOOP_OBSERVER_METRIC;
+      return api.NOOP_VALUE_OBSERVER_METRIC;
     }
-    const opt: MetricOptions = {
+    const opt: api.MetricOptions = {
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
       ...options,
     };
-    const observer = new ObserverMetric(
+    const valueObserver = new ValueObserverMetric(
       name,
       opt,
       this._batcher,
       this._resource,
-      this._instrumentationLibrary
+      this._instrumentationLibrary,
+      callback
     );
-    this._registerMetric(name, observer);
-    return observer;
+    this._registerMetric(name, valueObserver);
+    return valueObserver;
+  }
+
+  createSumObserver(
+    name: string,
+    options: api.MetricOptions = {},
+    callback?: (observerResult: api.ObserverResult) => unknown
+  ): api.SumObserver {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_SUM_OBSERVER_METRIC;
+    }
+    const opt: api.MetricOptions = {
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const sumObserver = new SumObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource,
+      this._instrumentationLibrary,
+      callback
+    );
+    this._registerMetric(name, sumObserver);
+    return sumObserver;
+  }
+
+  /**
+   * Creates a new `UpDownSumObserver` metric.
+   * @param name the name of the metric.
+   * @param [options] the metric options.
+   * @param [callback] the value observer callback
+   */
+  createUpDownSumObserver(
+    name: string,
+    options: api.MetricOptions = {},
+    callback?: (observerResult: api.ObserverResult) => unknown
+  ): api.UpDownSumObserver {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_UP_DOWN_SUM_OBSERVER_METRIC;
+    }
+    const opt: api.MetricOptions = {
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const upDownSumObserver = new UpDownSumObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource,
+      this._instrumentationLibrary,
+      callback
+    );
+    this._registerMetric(name, upDownSumObserver);
+    return upDownSumObserver;
+  }
+
+  /**
+   * Creates a new batch observer metric.
+   * @param name the name of the metric.
+   * @param callback the batch observer callback
+   * @param [options] the metric batch options.
+   */
+  createBatchObserver(
+    name: string,
+    callback: (observerResult: api.BatchObserverResult) => void,
+    options: api.BatchMetricOptions = {}
+  ): api.BatchObserver {
+    if (!this._isValidName(name)) {
+      this._logger.warn(
+        `Invalid metric name ${name}. Defaulting to noop metric implementation.`
+      );
+      return api.NOOP_BATCH_OBSERVER_METRIC;
+    }
+    const opt: api.BatchMetricOptions = {
+      logger: this._logger,
+      ...DEFAULT_METRIC_OPTIONS,
+      ...options,
+    };
+    const batchObserver = new BatchObserverMetric(
+      name,
+      opt,
+      this._batcher,
+      this._resource,
+      this._instrumentationLibrary,
+      callback
+    );
+    this._registerMetric(name, batchObserver);
+    return batchObserver;
   }
 
   /**
@@ -196,10 +294,13 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  collect() {
-    Array.from(this._metrics.values()).forEach(metric => {
-      metric.getMetricRecord().forEach(record => {
-        this._batcher.process(record);
+  async collect(): Promise<void> {
+    const metrics = Array.from(this._metrics.values()).map(metric => {
+      return metric.getMetricRecord();
+    });
+    await Promise.all(metrics).then(records => {
+      records.forEach(metrics => {
+        metrics.forEach(metric => this._batcher.process(metric));
       });
     });
   }

@@ -16,43 +16,35 @@
 
 import { Attributes, Logger } from '@opentelemetry/api';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { opentelemetryProto, CollectorExporterError } from './types';
-
-/**
- * Collector Exporter base config
- */
-export interface CollectorExporterConfigBase {
-  hostName?: string;
-  logger?: Logger;
-  serviceName?: string;
-  attributes?: Attributes;
-  url?: string;
-}
-
-const DEFAULT_SERVICE_NAME = 'collector-exporter';
+import {
+  CollectorExporterError,
+  CollectorExporterConfigBase,
+  ExportServiceError,
+} from './types';
 
 /**
  * Collector Exporter abstract base class
  */
 export abstract class CollectorExporterBase<
-  T extends CollectorExporterConfigBase
-> implements SpanExporter {
+  T extends CollectorExporterConfigBase,
+  ExportItem,
+  ServiceRequest
+> {
   public readonly serviceName: string;
   public readonly url: string;
   public readonly logger: Logger;
-  public readonly hostName: string | undefined;
+  public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
-  private _isShutdown: boolean = false;
+  protected _isShutdown: boolean = false;
 
   /**
    * @param config
    */
   constructor(config: T = {} as T) {
-    this.serviceName = config.serviceName || DEFAULT_SERVICE_NAME;
-    this.url = this.getDefaultUrl(config.url);
-    if (typeof config.hostName === 'string') {
-      this.hostName = config.hostName;
+    this.serviceName = this.getDefaultServiceName(config);
+    this.url = this.getDefaultUrl(config);
+    if (typeof config.hostname === 'string') {
+      this.hostname = config.hostname;
     }
 
     this.attributes = config.attributes;
@@ -66,46 +58,37 @@ export abstract class CollectorExporterBase<
   }
 
   /**
-   * Export spans.
-   * @param spans
+   * Export items.
+   * @param items
    * @param resultCallback
    */
-  export(
-    spans: ReadableSpan[],
-    resultCallback: (result: ExportResult) => void
-  ) {
+  export(items: ExportItem[], resultCallback: (result: ExportResult) => void) {
     if (this._isShutdown) {
       resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
       return;
     }
 
-    this._exportSpans(spans)
+    this._export(items)
       .then(() => {
         resultCallback(ExportResult.SUCCESS);
       })
-      .catch(
-        (
-          error: opentelemetryProto.collector.trace.v1.ExportTraceServiceError
-        ) => {
-          if (error.message) {
-            this.logger.error(error.message);
-          }
-          if (error.code && error.code < 500) {
-            resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
-          } else {
-            resultCallback(ExportResult.FAILED_RETRYABLE);
-          }
+      .catch((error: ExportServiceError) => {
+        if (error.message) {
+          this.logger.error(error.message);
         }
-      );
+        if (error.code && error.code < 500) {
+          resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
+        } else {
+          resultCallback(ExportResult.FAILED_RETRYABLE);
+        }
+      });
   }
 
-  private _exportSpans(spans: ReadableSpan[]): Promise<unknown> {
+  private _export(items: ExportItem[]): Promise<unknown> {
     return new Promise((resolve, reject) => {
       try {
-        this.logger.debug('spans to be sent', spans);
-        // Send spans to [opentelemetry collector]{@link https://github.com/open-telemetry/opentelemetry-collector}
-        // it will use the appropriate transport layer automatically depends on platform
-        this.sendSpans(spans, resolve, reject);
+        this.logger.debug('items to be sent', items);
+        this.send(items, resolve, reject);
       } catch (e) {
         reject(e);
       }
@@ -129,10 +112,12 @@ export abstract class CollectorExporterBase<
 
   abstract onShutdown(): void;
   abstract onInit(config: T): void;
-  abstract sendSpans(
-    spans: ReadableSpan[],
+  abstract send(
+    items: ExportItem[],
     onSuccess: () => void,
     onError: (error: CollectorExporterError) => void
   ): void;
-  abstract getDefaultUrl(url: string | undefined): string;
+  abstract getDefaultUrl(config: T): string;
+  abstract getDefaultServiceName(config: T): string;
+  abstract convert(objects: ExportItem[]): ServiceRequest;
 }

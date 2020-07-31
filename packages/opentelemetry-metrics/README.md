@@ -74,37 +74,173 @@ boundCounter.add(Math.random() > 0.5 ? 1 : -1);
 
 ```
 
-### Observable
+### Value Observer
 
-Choose this kind of metric when only last value is important without worry about aggregation
+Choose this kind of metric when only last value is important without worry about aggregation.
+The callback can be sync or async.
 
 ```js
-const { MeterProvider, MetricObservable } = require('@opentelemetry/metrics');
+const { MeterProvider } = require('@opentelemetry/metrics');
 
-// Initialize the Meter to capture measurements in various ways.
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-const observer = meter.createObserver('metric_name', {
-  description: 'Example of a observer'
+
+// async callback - for operation that needs to wait for value
+meter.createValueObserver('your_metric_name', {
+  description: 'Example of an async observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
 });
 
-function getCpuUsage() {
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(()=> {
+      resolve(Math.random());
+    }, 100);
+  });
+}
+
+// sync callback in case you don't need to wait for value
+meter.createValueObserver('your_metric_name', {
+  description: 'Example of a sync observer with callback',
+}, (observerResult) => {
+  observerResult.observe(getRandomValue(), { label: '1' });
+  observerResult.observe(getRandomValue(), { label: '2' });
+});
+
+function getRandomValue() {
+  return Math.random();
+}
+```
+
+### UpDownSumObserver
+
+Choose this kind of metric when sum is important and you want to capture any value that starts at zero and rises or falls throughout the process lifetime.
+The callback can be sync or async.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+// async callback - for operation that needs to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
+  description: 'Example of an async observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(()=> {
+      resolve(Math.random());
+    }, 100);
+  });
+}
+
+// sync callback in case you don't need to wait for value
+meter.createUpDownSumObserver('your_metric_name', {
+  description: 'Example of a sync observer with callback',
+}, (observerResult) => {
+  observerResult.observe(getRandomValue(), { label: '1' });
+});
+
+function getRandomValue() {
   return Math.random();
 }
 
-const metricObservable = new MetricObservable();
+```
 
-observer.setCallback((observerResult) => {
-  // synchronous callback
-  observerResult.observe(getCpuUsage, { pid: process.pid, core: '1' });
-  // asynchronous callback
-  observerResult.observe(metricObservable, { pid: process.pid, core: '2' });
+### Sum Observer
+
+Choose this kind of metric when collecting a sum that never decreases.
+The callback can be sync or async.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+
+const meter = new MeterProvider().getMeter('your-meter-name');
+
+// async callback in case you need to wait for values
+meter.createSumObserver('example_metric', {
+  description: 'Example of an async sum observer with callback',
+}, async (observerResult) => {
+  const value = await getAsyncValue();
+  observerResult.observe(value, { label: '1' });
 });
 
-// simulate asynchronous operation
-setInterval(()=> {
-  metricObservable.next(getCpuUsage());
-}, 2000)
+function getAsyncValue() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(Math.random());
+    }, 100)
+  });
+}
+
+// sync callback in case you don't need to wait for values
+meter.createSumObserver('example_metric', {
+  description: 'Example of a sync sum observer with callback',
+}, (observerResult) => {
+  const value = getRandomValue();
+  observerResult.observe(value, { label: '1' });
+});
+
+function getRandomValue() {
+  return Math.random();
+}
+```
+
+### Batch Observer
+
+Choose this kind of metric when you need to update multiple observers with the results of a single async calculation.
+
+```js
+const { MeterProvider } = require('@opentelemetry/metrics');
+const { PrometheusExporter } = require('@opentelemetry/exporter-prometheus');
+
+const exporter = new PrometheusExporter(
+  {
+    startServer: true,
+  },
+  () => {
+    console.log('prometheus scrape endpoint: http://localhost:9464/metrics');
+  },
+);
+
+const meter = new MeterProvider({
+  exporter,
+  interval: 3000,
+}).getMeter('example-observer');
+
+const cpuUsageMetric = meter.createValueObserver('cpu_usage_per_app', {
+  description: 'CPU',
+});
+
+const MemUsageMetric = meter.createValueObserver('mem_usage_per_app', {
+  description: 'Memory',
+});
+
+meter.createBatchObserver('metric_batch_observer', (observerBatchResult) => {
+  getSomeAsyncMetrics().then(metrics => {
+    observerBatchResult.observe({ app: 'myApp' }, [
+      cpuUsageMetric.observation(metrics.value1),
+      MemUsageMetric.observation(metrics.value2)
+    ]);
+  });
+});
+
+function getSomeAsyncMetrics() {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve({
+        value1: Math.random(),
+        value2: Math.random(),
+      });
+    }, 100)
+  });
+}
 
 ```
 
