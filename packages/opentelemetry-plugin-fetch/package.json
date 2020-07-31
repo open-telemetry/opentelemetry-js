@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-fetch",
-  "version": "0.10.0",
+  "version": "0.10.1",
   "description": "OpenTelemetry fetch automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -45,8 +45,8 @@
   },
   "devDependencies": {
     "@babel/core": "7.10.5",
-    "@opentelemetry/context-zone": "^0.10.0",
-    "@opentelemetry/tracing": "^0.10.0",
+    "@opentelemetry/context-zone": "^0.10.1",
+    "@opentelemetry/tracing": "^0.10.1",
     "@types/mocha": "8.0.0",
     "@types/node": "14.0.25",
     "@types/shimmer": "1.0.1",
@@ -75,9 +75,9 @@
     "webpack-merge": "5.0.9"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.0",
-    "@opentelemetry/core": "^0.10.0",
-    "@opentelemetry/web": "^0.10.0",
+    "@opentelemetry/api": "^0.10.1",
+    "@opentelemetry/core": "^0.10.1",
+    "@opentelemetry/web": "^0.10.1",
     "shimmer": "^1.2.1"
   }
 }
