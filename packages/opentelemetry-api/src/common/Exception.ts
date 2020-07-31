@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './rpc';
+/**
+ * Defines Exception.
+ *
+ * Error or string
+ */
+export type Exception = Partial<Error> | string;
