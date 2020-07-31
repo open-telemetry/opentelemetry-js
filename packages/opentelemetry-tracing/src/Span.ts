@@ -207,6 +207,8 @@ export class Span implements api.Span, ReadableSpan {
       attributes[ExceptionAttribute.MESSAGE]
     ) {
       this.addEvent(ExceptionEventName, attributes as api.Attributes, time);
+    } else {
+      this._logger.error(`Failed to record an exception ${exception}`);
     }
   }
 
