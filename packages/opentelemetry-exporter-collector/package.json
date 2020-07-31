@@ -54,9 +54,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.10.5",
+    "@babel/core": "7.11.0",
     "@types/mocha": "8.0.0",
-    "@types/node": "14.0.25",
+    "@types/node": "14.0.27",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
     "babel-loader": "8.1.0",
@@ -64,7 +64,7 @@
     "cpx": "1.5.0",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
-    "karma": "5.1.0",
+    "karma": "5.1.1",
     "karma-chrome-launcher": "3.1.0",
     "karma-coverage-istanbul-reporter": "3.0.3",
     "karma-mocha": "2.0.1",
@@ -78,7 +78,7 @@
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7",
-    "webpack": "4.44.0",
+    "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
     "webpack-merge": "5.0.9"
   },
