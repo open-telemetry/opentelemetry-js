@@ -15,8 +15,6 @@ const exporter = new CollectorTraceExporter({
   // protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
-
-
 const provider = new BasicTracerProvider();
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
