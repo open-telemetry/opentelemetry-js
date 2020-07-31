@@ -432,7 +432,7 @@ describe('Span', () => {
     });
 
     describe('when time is provided', () => {
-      it('should record an error with provided time', () => {
+      it('should record an exception with provided time', () => {
         const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
         assert.strictEqual(span.events.length, 0);
         span.recordException('boom', [0, 123]);
