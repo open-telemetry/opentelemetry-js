@@ -18,6 +18,6 @@ export const ExceptionAttribute = {
   MESSAGE: 'exception.message',
   STACKTRACE: 'exception.stacktrace',
   TYPE: 'exception.type',
-}
+};
 
 export const ExceptionEventName = 'exception';
