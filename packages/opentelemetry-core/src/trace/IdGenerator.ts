@@ -14,23 +14,10 @@
  * limitations under the License.
  */
 
-import * as crypto from 'crypto';
-
-const SPAN_ID_BYTES = 8;
-const TRACE_ID_BYTES = 16;
-
-/**
- * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
- * characters corresponding to 128 bits.
- */
-export function randomTraceId(): string {
-  return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
-}
-
-/**
- * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
- * characters corresponding to 64 bits.
- */
-export function randomSpanId(): string {
-  return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
+/** IdGenerator provides an interface for generating Trace Id and Span Id */
+export interface IdGenerator {
+  /** Returns a trace ID composed of 32 lowercase hex characters. */
+  generateTraceId(): string;
+  /** Returns a span ID composed of 16 lowercase hex characters. */
+  generateSpanId(): string;
 }
