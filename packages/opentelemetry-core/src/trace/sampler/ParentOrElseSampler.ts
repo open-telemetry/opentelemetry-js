@@ -41,7 +41,7 @@ export class ParentOrElseSampler implements Sampler {
     links: Link[]
   ): SamplingResult {
     // Respect the parent sampling decision if there is one
-    if (parentContext && parentContext.traceFlags !== undefined) {
+    if (parentContext) {
       return {
         decision:
           (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED

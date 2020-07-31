@@ -31,7 +31,7 @@ export class ProbabilitySampler implements Sampler {
   shouldSample(parentContext?: SpanContext): SamplingResult {
     // Respect the parent sampling decision if there is one.
     // TODO(#1284): add an option to ignore parent regarding to spec.
-    if (parentContext && parentContext.traceFlags !== undefined) {
+    if (parentContext) {
       return {
         decision:
           (TraceFlags.SAMPLED & parentContext.traceFlags) === TraceFlags.SAMPLED
