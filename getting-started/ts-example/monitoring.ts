@@ -1,6 +1,7 @@
 import { MeterProvider } from '@opentelemetry/metrics';
 import { Counter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
+import { RequestHandler } from "express";
 
 const exporter = new PrometheusExporter(
   {
@@ -24,7 +25,7 @@ const requestCount: Counter = meter.createCounter("requests", {
 
 const handles = new Map();
 
-export const countAllRequests = () => {
+export const countAllRequests = (): RequestHandler => {
   return (req, res, next) => {
     if (!handles.has(req.path)) {
       const labels = { route: req.path };
