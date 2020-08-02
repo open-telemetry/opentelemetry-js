@@ -1,5 +1,5 @@
 import { MeterProvider } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/api';
+import { Counter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
 const exporter = new PrometheusExporter(
@@ -18,7 +18,7 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('example-ts');
 
-const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
+const requestCount: Counter = meter.createCounter("requests", {
   description: "Count all incoming requests"
 });
 
