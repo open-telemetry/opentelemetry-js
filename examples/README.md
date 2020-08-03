@@ -11,7 +11,7 @@ use the latest and greatest features, and best practices.
 |Name | Description | Complexity Level |
 ------------- | ------------- | ------------ |
 |[basic-tracer-node](basic-tracer-node/) | Basic use of Tracing in Node.js application | Beginner |
-|[tracer-node](tracer-node/) | Basic use of Tracing in Web application | Beginner |
+|[tracer-web](tracer-web/) | Basic use of Tracing in Web application | Beginner |
 |[prometheus](prometheus/) | Basic Metric use with Prometheus (`@opentelemetry/exporter-prometheus`) Exporter | Beginner |
 |[http](http/)   | HTTP Instrumentation to automatically collect trace data and export them to the backend of choice | Intermediate |
 |[https](https/) | HTTPS Instrumentation to automatically collect trace data and export them to the backend of choice | Intermediate |

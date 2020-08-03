@@ -183,6 +183,7 @@ OpenTelemetry can collect tracing data automatically using plugins. Vendors/User
 ##### Core
 
 - [@opentelemetry/plugin-grpc][otel-plugin-grpc]
+- [@opentelemetry/plugin-grpc-js][otel-plugin-grpc-js]
 - [@opentelemetry/plugin-http][otel-plugin-http]
 - [@opentelemetry/plugin-https][otel-plugin-https]
 
@@ -242,6 +243,7 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [otel-plugin-fetch]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-fetch
 [otel-plugin-grpc]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc
+[otel-plugin-grpc-js]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-grpc-js
 [otel-plugin-http]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-http
 [otel-plugin-https]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-https
 [otel-plugin-xml-http-request]: https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-xml-http-request

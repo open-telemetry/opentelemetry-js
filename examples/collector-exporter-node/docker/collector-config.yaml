@@ -1,9 +1,15 @@
 receivers:
-  otlp: {}
+  otlp:
+    protocols:
+      grpc:
+      http:
+        cors_allowed_origins:
+        - http://*
+        - https://*
 
 exporters:
   zipkin:
-    url: "http://zipkin-all-in-one:9411/api/v2/spans"
+    endpoint: "http://zipkin-all-in-one:9411/api/v2/spans"
 
 processors:
   batch:
