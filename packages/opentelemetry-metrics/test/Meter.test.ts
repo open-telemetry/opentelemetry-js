@@ -400,8 +400,8 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // disable type checking...
-            (boundCounter.add as any)(val);
+            // @ts-expect-error
+            boundCounter.add(val);
             await meter.collect();
             const [record1] = meter.getBatcher().checkPointSet();
 
@@ -418,8 +418,8 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // disable type checking...
-            (boundCounter.add as any)(val);
+            // @ts-expect-error
+            boundCounter.add(val);
             await meter.collect();
             const [record1] = meter.getBatcher().checkPointSet();
 
@@ -713,8 +713,8 @@ describe('Meter', () => {
 
         await Promise.all(
           nonNumberValues.map(async val => {
-            // disable type checking...
-            (boundValueRecorder.record as any)(undefined);
+            // @ts-expect-error
+            boundValueRecorder.record(undefined);
             await meter.collect();
             const [record1] = meter.getBatcher().checkPointSet();
 
