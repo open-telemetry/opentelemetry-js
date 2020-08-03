@@ -31,8 +31,8 @@ export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > {
-  _headers: Record<string, string>;
-  _useXHR: boolean = false;
+  private _headers: Record<string, string>;
+  private _useXHR: boolean = false;
 
   /**
    * @param config
