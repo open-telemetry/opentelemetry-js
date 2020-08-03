@@ -29,12 +29,6 @@ import {
 } from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
-function _cleanupGlobalShutdownListeners() {
-  if (typeof window === 'undefined') {
-    process.removeAllListeners('SIGTERM');
-  }
-}
-
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
   onStart(span: Span): void {}
@@ -48,8 +42,12 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
+  let removeEvent: Function | undefined;
   afterEach(() => {
-    _cleanupGlobalShutdownListeners();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   it('should handle empty span processor', () => {
@@ -114,7 +112,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
 
-    notifyOnGlobalShutdown(() => {
+    removeEvent = notifyOnGlobalShutdown(() => {
       assert.strictEqual(processor1.spans.length, 0);
       assert.strictEqual(processor1.spans.length, processor2.spans.length);
     });

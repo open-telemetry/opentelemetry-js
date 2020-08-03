@@ -23,15 +23,13 @@ import {
   _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 
-function _cleanupGlobalShutdownListeners() {
-  if (typeof window === 'undefined') {
-    process.removeAllListeners('SIGTERM');
-  }
-}
-
 describe('MeterProvider', () => {
+  let removeEvent: Function | undefined;
   afterEach(() => {
-    _cleanupGlobalShutdownListeners();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   describe('constructor', () => {
@@ -62,12 +60,15 @@ describe('MeterProvider', () => {
       assert.strictEqual(counter.resource, meterProvider.resource);
     });
 
-    it('should return the meter with default version without a version option', () => {
-      const provider = new MeterProvider();
-      const meter1 = provider.getMeter('default');
-      const meter2 = provider.getMeter('default', '*');
-      assert.deepEqual(meter1, meter2);
-    });
+    it(
+      'should return the meter with default version without a version option',
+      () => {
+        const provider = new MeterProvider();
+        const meter1 = provider.getMeter('default');
+        const meter2 = provider.getMeter('default', '*');
+        assert.deepEqual(meter1, meter2);
+      }
+    );
 
     it('should return the same Meter instance with same name & version', () => {
       const provider = new MeterProvider();
@@ -76,17 +77,20 @@ describe('MeterProvider', () => {
       assert.deepEqual(meter1, meter2);
     });
 
-    it('should return different Meter instance with different name or version', () => {
-      const provider = new MeterProvider();
+    it(
+      'should return different Meter instance with different name or version',
+      () => {
+        const provider = new MeterProvider();
 
-      const meter1 = provider.getMeter('meter1', 'ver1');
-      const meter2 = provider.getMeter('meter1');
-      assert.notEqual(meter1, meter2);
+        const meter1 = provider.getMeter('meter1', 'ver1');
+        const meter2 = provider.getMeter('meter1');
+        assert.notEqual(meter1, meter2);
 
-      const meter3 = provider.getMeter('meter2', 'ver2');
-      const meter4 = provider.getMeter('meter3', 'ver2');
-      assert.notEqual(meter3, meter4);
-    });
+        const meter3 = provider.getMeter('meter2', 'ver2');
+        const meter4 = provider.getMeter('meter3', 'ver2');
+        assert.notEqual(meter3, meter4);
+      }
+    );
   });
 
   describe('shutdown()', () => {
@@ -104,7 +108,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
         sandbox.restore();
@@ -122,7 +126,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });

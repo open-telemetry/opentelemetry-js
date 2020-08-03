@@ -32,14 +32,9 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
-function _cleanupGlobalShutdownListeners() {
-  if (typeof window === 'undefined') {
-    process.removeAllListeners('SIGTERM');
-  }
-}
-
 describe('BasicTracerProvider', () => {
   let sandbox: sinon.SinonSandbox;
+  let removeEvent: Function | undefined;
 
   beforeEach(() => {
     context.disable();
@@ -48,7 +43,10 @@ describe('BasicTracerProvider', () => {
 
   afterEach(() => {
     sandbox.restore();
-    _cleanupGlobalShutdownListeners();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   describe('constructor', () => {
@@ -377,7 +375,7 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.calledOnce(shutdownStub);
       });
       _invokeGlobalShutdown();
@@ -392,7 +390,7 @@ describe('BasicTracerProvider', () => {
         tracerProvider.getActiveSpanProcessor(),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.notCalled(shutdownStub);
       });
       _invokeGlobalShutdown();

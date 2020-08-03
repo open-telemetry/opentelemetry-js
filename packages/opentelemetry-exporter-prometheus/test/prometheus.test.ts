@@ -30,17 +30,12 @@ import * as assert from 'assert';
 import * as http from 'http';
 import { PrometheusExporter } from '../src';
 
-function _cleanupGlobalShutdownListeners() {
-  if (typeof window === 'undefined') {
-    process.removeAllListeners('SIGTERM');
-  }
-}
-
 const mockedHrTime: HrTime = [1586347902211, 0];
 const mockedTimeMS = 1586347902211000;
 
 describe('PrometheusExporter', () => {
   let toPoint: () => Point;
+  let removeEvent: Function | undefined;
   before(() => {
     toPoint = SumAggregator.prototype.toPoint;
     SumAggregator.prototype.toPoint = function (): Point {
@@ -210,8 +205,11 @@ describe('PrometheusExporter', () => {
     });
 
     afterEach(done => {
-      _cleanupGlobalShutdownListeners();
       exporter.shutdown(done);
+      if (removeEvent) {
+        removeEvent();
+        removeEvent = undefined;
+      }
     });
 
     it('should export a count aggregation', done => {
@@ -346,7 +344,7 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       counter.bind({ counterKey1: 'labelValue3' }).add(30);
 
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
