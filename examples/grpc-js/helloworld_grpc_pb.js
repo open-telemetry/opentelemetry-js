@@ -18,7 +18,7 @@
 
 'use strict';
 
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 const helloworld_pb = require('./helloworld_pb.js');
 
 function serialize_HelloReply(arg) {
