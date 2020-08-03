@@ -714,7 +714,7 @@ describe('Meter', () => {
         await Promise.all(
           nonNumberValues.map(async val => {
             // @ts-expect-error
-            boundValueRecorder.record(undefined);
+            boundValueRecorder.record(val);
             await meter.collect();
             const [record1] = meter.getBatcher().checkPointSet();
 
