@@ -43,6 +43,8 @@ import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
 import { ValueType } from '@opentelemetry/api';
 
+const nonNumberValues = [undefined, Symbol('123'), {}];
+
 describe('Meter', () => {
   let meter: Meter;
   const keya = 'keya';
@@ -376,7 +378,7 @@ describe('Meter', () => {
         assert.strictEqual(boundCounter, boundCounter1);
       });
 
-      it('should trunk non-integer values for INT valueType', async () => {
+      it('should truncate non-integer values for INT valueType', async () => {
         const upDownCounter = meter.createUpDownCounter('name', {
           valueType: ValueType.INT,
         });
@@ -388,24 +390,24 @@ describe('Meter', () => {
 
           assert.strictEqual(record1.aggregator.toPoint().value, -1);
         }
+      });
 
-        {
-          // disable type checking...
-          (boundCounter.add as any)(undefined);
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
+      it('should ignore non-number values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
 
-          assert.strictEqual(record1.aggregator.toPoint().value, -1);
-        }
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // disable type checking...
+            (boundCounter.add as any)(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
 
-        {
-          // disable type checking...
-          (boundCounter.add as any)({});
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-
-          assert.strictEqual(record1.aggregator.toPoint().value, -1);
-        }
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
       });
 
       it('should ignore non-number values for DOUBLE valueType', async () => {
@@ -414,23 +416,16 @@ describe('Meter', () => {
         });
         const boundCounter = upDownCounter.bind(labels);
 
-        {
-          // disable type checking...
-          (boundCounter.add as any)(undefined);
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // disable type checking...
+            (boundCounter.add as any)(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
 
-          assert.strictEqual(record1.aggregator.toPoint().value, 0);
-        }
-
-        {
-          // disable type checking...
-          (boundCounter.add as any)({});
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-
-          assert.strictEqual(record1.aggregator.toPoint().value, 0);
-        }
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
       });
     });
 
@@ -715,38 +710,26 @@ describe('Meter', () => {
           'name'
         ) as ValueRecorderMetric;
         const boundValueRecorder = valueRecorder.bind(labels);
-        {
-          // disable type checking...
-          (boundValueRecorder.record as any)(undefined);
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-          assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 0,
-              last: 0,
-              max: -Infinity,
-              min: Infinity,
-              sum: 0,
-            }
-          );
-        }
-        {
-          // disable type checking...
-          (boundValueRecorder.record as any)({});
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-          assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 0,
-              last: 0,
-              max: -Infinity,
-              min: Infinity,
-              sum: 0,
-            }
-          );
-        }
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // disable type checking...
+            (boundValueRecorder.record as any)(undefined);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.deepStrictEqual(
+              record1.aggregator.toPoint().value as Distribution,
+              {
+                count: 0,
+                last: 0,
+                max: -Infinity,
+                min: Infinity,
+                sum: 0,
+              }
+            );
+          })
+        );
       });
     });
 
