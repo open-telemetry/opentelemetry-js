@@ -44,7 +44,7 @@ describe('PrometheusExporter', () => {
   });
   describe('constructor', () => {
     it('should construct an exporter', () => {
-      const exporter = new PrometheusExporter();
+      const exporter = new PrometheusExporter({ startServer: false });
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
     });
@@ -67,17 +67,13 @@ describe('PrometheusExporter', () => {
         }
       );
     });
-
-    it('should not start the server by default', () => {
-      const exporter = new PrometheusExporter();
-      assert.ok(exporter['_server']!.listening === false);
-    });
   });
 
   describe('server', () => {
     it('it should start on startServer() and call the callback', done => {
       const exporter = new PrometheusExporter({
         port: 9722,
+        startServer: false,
       });
       exporter.startServer(() => {
         exporter.shutdown(() => {
@@ -89,7 +85,7 @@ describe('PrometheusExporter', () => {
     it('it should listen on the default port and default endpoint', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter();
+      const exporter = new PrometheusExporter({ startServer: false });
 
       exporter.startServer(() => {
         const url = `http://localhost:${port}${endpoint}`;
@@ -109,6 +105,7 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter({
         port,
         endpoint,
+        startServer: false,
       });
 
       exporter.startServer(() => {
@@ -129,6 +126,7 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter({
         port,
         endpoint,
+        startServer: false,
       });
 
       exporter.startServer(() => {
@@ -139,6 +137,7 @@ describe('PrometheusExporter', () => {
             const exporter2 = new PrometheusExporter({
               port,
               endpoint: `/${endpoint}`,
+              startServer: false,
             });
 
             exporter2.startServer(() => {
@@ -161,6 +160,7 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter({
         port,
         endpoint,
+        startServer: false,
       });
       exporter.startServer(() => {
         const url = `http://localhost:${port}/invalid`;
@@ -175,7 +175,7 @@ describe('PrometheusExporter', () => {
     });
 
     it('should call a provided callback regardless of if the server is running', done => {
-      const exporter = new PrometheusExporter();
+      const exporter = new PrometheusExporter({ startServer: false });
       exporter.shutdown(() => {
         return done();
       });
@@ -187,7 +187,7 @@ describe('PrometheusExporter', () => {
     let meter: Meter;
 
     beforeEach(done => {
-      exporter = new PrometheusExporter();
+      exporter = new PrometheusExporter({ startServer: false });
       meter = new MeterProvider().getMeter('test-prometheus');
       exporter.startServer(done);
     });
@@ -441,6 +441,7 @@ describe('PrometheusExporter', () => {
     it('should use a configured name prefix', done => {
       exporter = new PrometheusExporter({
         prefix: 'test_prefix',
+        startServer: false,
       });
 
       exporter.startServer(async () => {
@@ -470,6 +471,7 @@ describe('PrometheusExporter', () => {
     it('should use a configured port', done => {
       exporter = new PrometheusExporter({
         port: 8080,
+        startServer: false,
       });
 
       exporter.startServer(async () => {
@@ -499,6 +501,7 @@ describe('PrometheusExporter', () => {
     it('should use a configured endpoint', done => {
       exporter = new PrometheusExporter({
         endpoint: '/test',
+        startServer: false,
       });
 
       exporter.startServer(async () => {

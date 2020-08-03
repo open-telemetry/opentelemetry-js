@@ -59,7 +59,7 @@ export class PrometheusExporter implements MetricExporter {
    * @param config Exporter configuration
    * @param callback Callback to be called after a server was started
    */
-  constructor(config: ExporterConfig = {}, callback?: () => void) {
+  constructor(config: ExporterConfig, callback?: () => void) {
     this._logger = config.logger || new NoopLogger();
     this._port = config.port || PrometheusExporter.DEFAULT_OPTIONS.port;
     this._prefix = config.prefix || PrometheusExporter.DEFAULT_OPTIONS.prefix;
@@ -69,9 +69,12 @@ export class PrometheusExporter implements MetricExporter {
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
     ).replace(/^([^/])/, '/$1');
 
-    if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
+    if (config.startServer) {
       this.startServer(callback);
     } else if (callback) {
+      this._logger.info(
+        'Prometheus exporter server is not started. The server can be started with the first construction parameter of PrometheusExporter to be `true`.'
+      );
       callback();
     }
   }
