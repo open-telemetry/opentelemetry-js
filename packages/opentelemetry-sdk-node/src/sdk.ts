@@ -17,20 +17,24 @@
 import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
-import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
+import { NodeTracerProvider, NodePluginManagerConfig, NodePluginManager } from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
-import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
+import { BatchSpanProcessor, SpanProcessor, TracerConfig } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
   private _tracerProviderConfig?: {
-    tracerConfig: NodeTracerConfig;
+    tracerConfig: TracerConfig;
     spanProcessor: SpanProcessor;
     contextManager?: ContextManager;
     httpTextPropagator?: HttpTextPropagator;
   };
   private _meterProviderConfig?: MeterConfig;
+
+  private _pluginManagerConfig!: NodePluginManagerConfig;
+
+  private _pluginManager!: NodePluginManager;
 
   private _resource: Resource;
 
@@ -45,16 +49,13 @@ export class NodeSDK {
     this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
-      const tracerProviderConfig: NodeTracerConfig = {};
+      const tracerProviderConfig: TracerConfig = {};
 
       if (typeof configuration.logLevel === 'number') {
         tracerProviderConfig.logLevel = configuration.logLevel;
       }
       if (configuration.logger) {
         tracerProviderConfig.logger = configuration.logger;
-      }
-      if (configuration.plugins) {
-        tracerProviderConfig.plugins = configuration.plugins;
       }
       if (configuration.sampler) {
         tracerProviderConfig.sampler = configuration.sampler;
@@ -96,11 +97,24 @@ export class NodeSDK {
 
       this.configureMeterProvider(meterConfig);
     }
+
+    const pluginManagerConfig: NodePluginManagerConfig = {};
+    if (configuration.plugins) {
+      pluginManagerConfig.plugins = configuration.plugins;
+    }
+    if (configuration.logger) {
+      pluginManagerConfig.logger = configuration.logger;
+    }
+    if (configuration.logLevel) {
+      pluginManagerConfig.logLevel = configuration.logLevel;
+    }
+
+    this.configurePluginManager(pluginManagerConfig);
   }
 
   /** Set configurations required to register a NodeTracerProvider */
   public configureTracerProvider(
-    tracerConfig: NodeTracerConfig,
+    tracerConfig: TracerConfig,
     spanProcessor: SpanProcessor,
     contextManager?: ContextManager,
     httpTextPropagator?: HttpTextPropagator
@@ -118,6 +132,11 @@ export class NodeSDK {
     this._meterProviderConfig = config;
   }
 
+  /** Set configurations needed for NodePluginManager */
+  public configurePluginManager(config: NodePluginManagerConfig) {
+    this._pluginManagerConfig = config;
+  }
+
   /** Detect resource attributes */
   public async detectResources() {
     this.addResource(await detectResources());
@@ -131,7 +150,7 @@ export class NodeSDK {
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start() {
+  public async start(): Promise<NodePluginManager> {
     if (this._autoDetectResources) {
       await this.detectResources();
     }
@@ -157,5 +176,8 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
+    
+    this._pluginManager = new NodePluginManager(this._pluginManagerConfig);
+    return this._pluginManager;
   }
 }
