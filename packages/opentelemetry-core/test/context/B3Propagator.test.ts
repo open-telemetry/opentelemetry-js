@@ -183,186 +183,202 @@ describe('B3Propagator', () => {
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
     });
 
-    describe('when sampled flag is set', () => {
-      it('should extract context of a sampled span from carrier', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_SAMPLED] = '1';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+    describe('when sampled flag is valid', () => {
+      describe('AND sampled flag is 1', () => {
+        it('should extract context of a sampled span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_SAMPLED] = '1';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
 
-      it('should extract context of a sampled span from carrier when sampled is mentioned as boolean true flag', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_SAMPLED] = true;
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND sampled flag is true', () => {
+        it('should extract context of a sampled span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_SAMPLED] = true;
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
 
-      it('should extract context of a sampled span from carrier when sampled is mentioned as boolean false flag', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_SAMPLED] = false;
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND sampled flag is false', () => {
+        it('should extract context of a sampled span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_SAMPLED] = false;
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.NONE,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
     });
 
     describe('when debug flag is valid', () => {
-      it('should extract context of a debug span from carrier when debug flag is valid', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_FLAGS] = '1';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug flag is 1', () => {
+        it('should extract context of a debug span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_FLAGS] = '1';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.strictEqual(context.getValue(DEBUG_FLAG_KEY), '1');
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.strictEqual(context.getValue(DEBUG_FLAG_KEY), '1');
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
     });
 
     describe('when debug flag is invalid', () => {
-      it('should extract context of a span from carrier when debug flag is invalidly set as 0', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_FLAGS] = '0';
-        carrier[X_B3_SAMPLED] = '1';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug flag is 0', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_FLAGS] = '0';
+          carrier[X_B3_SAMPLED] = '1';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
 
-      it('should extract context of a span from carrier when debug flag is invalidly set as false', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_FLAGS] = 'false';
-        carrier[X_B3_SAMPLED] = '0';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug flag is false', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_FLAGS] = 'false';
+          carrier[X_B3_SAMPLED] = '0';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.NONE,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
 
-      it('should extract context of a span from carrier when debug flag is invalidly set as true', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_FLAGS] = 'true';
-        carrier[X_B3_SAMPLED] = '0';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug flag is true', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_FLAGS] = 'true';
+          carrier[X_B3_SAMPLED] = '0';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.NONE,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
 
-      it('should extract context of a span from carrier when debug flag is invalidly set as 2', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_FLAGS] = '3';
-        carrier[X_B3_SAMPLED] = '0';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug flag is 2', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_FLAGS] = '3';
+          carrier[X_B3_SAMPLED] = '0';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.NONE,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
       });
     });
 
-    describe('when parent span id is set', () => {
-      it('should extract context of a span from carrier with a parent span id', () => {
+    describe('when parent span id is valid', () => {
+      it('should extract context of a span from carrier', () => {
         carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
         carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
         carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
@@ -385,102 +401,112 @@ describe('B3Propagator', () => {
         assert.equal(context.getValue(PARENT_SPAN_ID_KEY), 'f4592dc481026a8c');
       });
 
-      it('should extract context of a span from carrier with a parent span id and debug set', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
-        carrier[X_B3_FLAGS] = '1';
-        carrier[X_B3_SAMPLED] = '0';
-        const context = b3Propagator.extract(
-          Context.ROOT_CONTEXT,
-          carrier,
-          defaultGetter
-        );
-        const extractedSpanContext = getExtractedSpanContext(context);
+      describe('AND debug is 1', () => {
+        it('should extract context of a span from carrier', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = 'f4592dc481026a8c';
+          carrier[X_B3_FLAGS] = '1';
+          carrier[X_B3_SAMPLED] = '0';
+          const context = b3Propagator.extract(
+            Context.ROOT_CONTEXT,
+            carrier,
+            defaultGetter
+          );
+          const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(extractedSpanContext, {
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
+          assert.equal(context.getValue(DEBUG_FLAG_KEY), '1');
+          assert.equal(
+            context.getValue(PARENT_SPAN_ID_KEY),
+            'f4592dc481026a8c'
+          );
         });
-        assert.equal(context.getValue(DEBUG_FLAG_KEY), '1');
-        assert.equal(context.getValue(PARENT_SPAN_ID_KEY), 'f4592dc481026a8c');
       });
     });
 
     describe('when headers are invalid', () => {
-      it('should return undefined when traceId is undefined', () => {
-        carrier[X_B3_TRACE_ID] = undefined;
-        carrier[X_B3_SPAN_ID] = undefined;
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND traceId is undefined', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = undefined;
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('should return undefined when spanId is undefined', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = undefined;
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND spanId is undefined', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = undefined;
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('should return undefined when parentSpanId is invalid', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_PARENT_SPAN_ID] = 'invalid';
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND parentSpanId is invalid', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = 'invalid';
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('should return undefined when parentSpanId is a trace id', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_PARENT_SPAN_ID] = '0af7651916cd43dd8448eb211c80319d';
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND parentSpanId is a trace id', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_PARENT_SPAN_ID] = '0af7651916cd43dd8448eb211c80319d';
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('should return undefined when parentSpanId is a trace id', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_PARENT_SPAN_ID] = '0af7651916cd43dd8448eb211c80319d';
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND sample is 2', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          carrier[X_B3_SAMPLED] = '2';
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('should return undefined when sample is invalid', () => {
-        carrier[X_B3_TRACE_ID] = '0af7651916cd43dd8448eb211c80319c';
-        carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
-        carrier[X_B3_SAMPLED] = '2';
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND b3 header is missing', () => {
+        it('should return undefined', () => {
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
 
-      it('returns undefined if b3 header is missing', () => {
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
-      });
-
-      it('returns undefined if b3 header is invalid', () => {
-        carrier[X_B3_TRACE_ID] = 'invalid!';
-        const context = getExtractedSpanContext(
-          b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
-        );
-        assert.deepStrictEqual(context, undefined);
+      describe('AND trace id is invalid', () => {
+        it('should return undefined', () => {
+          carrier[X_B3_TRACE_ID] = 'invalid!';
+          carrier[X_B3_SPAN_ID] = 'b7ad6b7169203331';
+          const context = getExtractedSpanContext(
+            b3Propagator.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+          );
+          assert.deepStrictEqual(context, undefined);
+        });
       });
     });
 
