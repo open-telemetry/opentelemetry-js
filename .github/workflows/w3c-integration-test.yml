@@ -1,0 +1,21 @@
+name: Run w3c tests on push
+
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install and Build 🔧
+        run: |
+          npm install --ignore-scripts
+          #npx lerna bootstrap --scope={propagation-tests,@opentelemetry-api} --include-dependencies
+          #npx lerna link ----force-local
+
+      - name: Run W3C Test harness
+        run: |
+          chmod 755 ./scripts/tracecontext-integration-test.sh
+          ./scripts/tracecontext-integration-test.sh
