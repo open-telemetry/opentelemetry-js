@@ -43,7 +43,27 @@ import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
 import { ValueType } from '@opentelemetry/api';
 
-const nonNumberValues = [undefined, Symbol('123'), {}];
+const nonNumberValues = [
+  // type undefined
+  undefined,
+  // type null
+  null,
+  // type function
+  function () {},
+  // type boolean
+  true,
+  false,
+  // type string
+  '1',
+  // type bigint
+  // TODO: should metric instruments support bigint?
+  // @ts-ignore
+  1n,
+  // type object
+  {},
+  // type symbol
+  // symbols cannot be cast to number, early errors will be thrown.
+];
 
 describe('Meter', () => {
   let meter: Meter;
