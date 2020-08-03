@@ -71,11 +71,11 @@ export class PrometheusExporter implements MetricExporter {
 
     if (config.startServer) {
       this.startServer(callback);
-    } else if (callback) {
-      this._logger.info(
+    } else {
+      this._logger.debug(
         'Prometheus exporter server is not started. The server can be started with the first construction parameter of PrometheusExporter to be `true`.'
       );
-      callback();
+      callback?.();
     }
   }
 
