@@ -17,9 +17,17 @@
 import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
-import { NodeTracerProvider, NodePluginManagerConfig, NodePluginManager } from '@opentelemetry/node';
+import {
+  NodeTracerProvider,
+  NodePluginManagerConfig,
+  NodePluginManager,
+} from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
-import { BatchSpanProcessor, SpanProcessor, TracerConfig } from '@opentelemetry/tracing';
+import {
+  BatchSpanProcessor,
+  SpanProcessor,
+  TracerConfig,
+} from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
@@ -176,7 +184,7 @@ export class NodeSDK {
 
       metrics.setGlobalMeterProvider(meterProvider);
     }
-    
+
     this._pluginManager = new NodePluginManager(this._pluginManagerConfig);
     return this._pluginManager;
   }
