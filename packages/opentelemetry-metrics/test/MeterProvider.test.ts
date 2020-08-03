@@ -91,7 +91,10 @@ describe('MeterProvider', () => {
 
   describe('shutdown()', () => {
     it('should call shutdown when SIGTERM is received', () => {
-      const meterProvider = new MeterProvider();
+      const meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
+        gracefulShutdown: true,
+      });
       const sandbox = sinon.createSandbox();
       const shutdownStub1 = sandbox.stub(
         meterProvider.getMeter('meter1'),
@@ -111,6 +114,7 @@ describe('MeterProvider', () => {
 
     it('should not trigger shutdown if graceful shutdown is turned off', () => {
       const meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
         gracefulShutdown: false,
       });
       const sandbox = sinon.createSandbox();

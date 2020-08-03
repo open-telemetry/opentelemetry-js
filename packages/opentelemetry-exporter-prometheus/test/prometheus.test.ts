@@ -199,7 +199,10 @@ describe('PrometheusExporter', () => {
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meterProvider = new MeterProvider();
+      meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
+        gracefulShutdown: true,
+      });
       meter = meterProvider.getMeter('test-prometheus', '1', {
         exporter: exporter,
       });
