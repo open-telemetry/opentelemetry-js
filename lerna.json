@@ -6,7 +6,7 @@
     "metapackages/*",
     "packages/*"
   ],
-  "version": "0.10.1",
+  "version": "0.10.2",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {
