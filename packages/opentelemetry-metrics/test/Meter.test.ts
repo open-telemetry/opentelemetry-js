@@ -383,13 +383,13 @@ describe('Meter', () => {
           valueType: ValueType.INT,
         });
         const boundCounter = upDownCounter.bind(labels);
-        {
-          boundCounter.add(-1.1);
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
 
-          assert.strictEqual(record1.aggregator.toPoint().value, -1);
-        }
+        [-1.1, 2.2].forEach(val => {
+          boundCounter.add(val);
+        });
+        await meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 1);
       });
 
       it('should ignore non-number values for INT valueType', async () => {
