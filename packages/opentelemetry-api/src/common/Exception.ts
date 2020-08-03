@@ -14,9 +14,21 @@
  * limitations under the License.
  */
 
+interface ExceptionWithType {
+  message?: string;
+  name: string;
+  stack?: string;
+}
+
+interface ExceptionWithMessage {
+  message: string;
+  name?: string;
+  stack?: string;
+}
+
 /**
  * Defines Exception.
  *
- * Error or string
+ * string or an object with one of (message or name) and optional stack
  */
-export type Exception = Partial<Error> | string;
+export type Exception = ExceptionWithType | ExceptionWithMessage | string;
