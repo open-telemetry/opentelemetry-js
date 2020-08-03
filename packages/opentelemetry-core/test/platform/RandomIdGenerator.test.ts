@@ -13,36 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import * as assert from 'assert';
-import { randomSpanId, randomTraceId } from '../../src/platform';
+import { RandomIdGenerator } from '../../src/platform';
+
+const idGenerator = new RandomIdGenerator();
 
 describe('randomTraceId', () => {
+  let traceId1: string, traceId2: string;
+  beforeEach(() => {
+    traceId1 = idGenerator.generateTraceId();
+    traceId2 = idGenerator.generateTraceId();
+  });
+
   it('returns 32 character hex strings', () => {
-    const traceId = randomTraceId();
-    assert.ok(traceId.match(/[a-f0-9]{32}/));
-    assert.ok(!traceId.match(/^0+$/));
+    assert.ok(traceId1.match(/[a-f0-9]{32}/));
+    assert.ok(!traceId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    const traceId1 = randomTraceId();
-    const traceId2 = randomTraceId();
-
     assert.notDeepStrictEqual(traceId1, traceId2);
   });
 });
 
 describe('randomSpanId', () => {
+  let spanId1: string, spanId2: string;
+  beforeEach(() => {
+    spanId1 = idGenerator.generateSpanId();
+    spanId2 = idGenerator.generateSpanId();
+  });
+
   it('returns 16 character hex strings', () => {
-    const spanId = randomSpanId();
-    assert.ok(spanId.match(/[a-f0-9]{16}/));
-    assert.ok(!spanId.match(/^0+$/));
+    assert.ok(spanId1.match(/[a-f0-9]{16}/));
+    assert.ok(!spanId1.match(/^0+$/));
   });
 
   it('returns different ids on each call', () => {
-    const spanId1 = randomSpanId();
-    const spanId2 = randomSpanId();
-
     assert.notDeepStrictEqual(spanId1, spanId2);
   });
 });
