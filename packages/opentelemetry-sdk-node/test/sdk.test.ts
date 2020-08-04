@@ -44,49 +44,42 @@ describe('Node SDK', () => {
   });
 
   describe('Basic Registration', () => {
-    it('should not register any unconfigured SDK components', done => {
+    it('should not register any unconfigured SDK components', async () => {
       const sdk = new NodeSDK({
         autoDetectResources: false,
       });
-      setTimeout(async () => {
-        await sdk.start();
 
-        assert.ok(
-          context['_getContextManager']() instanceof NoopContextManager
-        );
-        assert.ok(
-          propagation['_getGlobalPropagator']() instanceof
-            NoopHttpTextPropagator
-        );
+      await sdk.start();
 
-        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
-        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
-        return done();
-      });
+      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
+      assert.ok(
+        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+      );
+
+      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
     });
 
-    it('should register a tracer provider if an exporter is provided', done => {
+    it('should register a tracer provider if an exporter is provided', async () => {
       const sdk = new NodeSDK({
         traceExporter: new ConsoleSpanExporter(),
         autoDetectResources: false,
       });
-      setTimeout(async () => {
-        await sdk.start();
 
-        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      await sdk.start();
 
-        assert.ok(
-          context['_getContextManager']() instanceof AsyncHooksContextManager
-        );
-        assert.ok(
-          propagation['_getGlobalPropagator']() instanceof CompositePropagator
-        );
-        assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
-        return done();
-      });
+      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+
+      assert.ok(
+        context['_getContextManager']() instanceof AsyncHooksContextManager
+      );
+      assert.ok(
+        propagation['_getGlobalPropagator']() instanceof CompositePropagator
+      );
+      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
     });
 
-    it('should register a tracer provider if a span processor is provided', done => {
+    it('should register a tracer provider if a span processor is provided', async () => {
       const exporter = new ConsoleSpanExporter();
       const spanProcessor = new SimpleSpanProcessor(exporter);
 
@@ -95,45 +88,37 @@ describe('Node SDK', () => {
         autoDetectResources: false,
       });
 
-      setTimeout(async () => {
-        await sdk.start();
+      await sdk.start();
 
-        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
-        assert.ok(
-          context['_getContextManager']() instanceof AsyncHooksContextManager
-        );
-        assert.ok(
-          propagation['_getGlobalPropagator']() instanceof CompositePropagator
-        );
-        assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
-        return done();
-      });
+      assert.ok(
+        context['_getContextManager']() instanceof AsyncHooksContextManager
+      );
+      assert.ok(
+        propagation['_getGlobalPropagator']() instanceof CompositePropagator
+      );
+      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
     });
 
-    it('should register a meter provider if an exporter is provided', done => {
+    it('should register a meter provider if an exporter is provided', async () => {
       const exporter = new ConsoleMetricExporter();
 
       const sdk = new NodeSDK({
         metricExporter: exporter,
         autoDetectResources: false,
       });
-      setTimeout(async () => {
-        await sdk.start();
 
-        assert.ok(
-          context['_getContextManager']() instanceof NoopContextManager
-        );
-        assert.ok(
-          propagation['_getGlobalPropagator']() instanceof
-            NoopHttpTextPropagator
-        );
+      await sdk.start();
 
-        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
+      assert.ok(
+        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+      );
 
-        assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
-        return done();
-      });
+      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+
+      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });
   });
 });
