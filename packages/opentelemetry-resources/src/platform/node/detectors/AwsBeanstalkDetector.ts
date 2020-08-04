@@ -19,6 +19,7 @@ import { SERVICE_RESOURCE } from '../../../constants';
 import { Detector } from '../../../types';
 import { ResourceDetectionConfigWithLogger } from '../../../config';
 import * as fs from 'fs';
+import * as util from 'util';
 
 /**
  * The AwsBeanstalkDetector can be used to detect if a process is running in AWS Elastic
@@ -33,7 +34,8 @@ class AwsBeanstalkDetector implements Detector {
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const rawData = await this._getData();
+      const readFile = util.promisify(fs.readFile);
+      const rawData = await readFile(this.BEANSTALK_CONF_PATH, 'utf8');
       const parsedData = JSON.parse(rawData);
 
       return new Resource({
@@ -42,22 +44,10 @@ class AwsBeanstalkDetector implements Detector {
         [SERVICE_RESOURCE.VERSION]: parsedData.version_label,
         [SERVICE_RESOURCE.INSTANCE_ID]: parsedData.deployment_id,
       });
-    } catch (err) {
-      config.logger.debug(`AwsEc2Detector failed: ${err.message}`);
+    } catch (e) {
+      config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
       return Resource.empty();
     }
-  }
-
-  private async _getData(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      fs.readFile(this.BEANSTALK_CONF_PATH, 'utf8', (err, data) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(data);
-        }
-      });
-    });
   }
 }
 
