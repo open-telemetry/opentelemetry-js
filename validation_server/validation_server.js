@@ -63,7 +63,7 @@ app.post("/verify-tracecontext", (req, res) => {
 
           {
             headers,
-            timeout: 5,
+            timeout: 10,
           }
         )
         .finally(() => {
