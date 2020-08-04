@@ -184,12 +184,9 @@ export class Span implements api.Span, ReadableSpan {
 
   recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
     const attributes: api.Attributes = {};
-    if (!exception) {
-      return;
-    }
     if (typeof exception === 'string') {
       attributes[ExceptionAttribute.MESSAGE] = exception;
-    } else {
+    } else if (exception) {
       if (exception.code) {
         attributes[ExceptionAttribute.TYPE] = exception.code;
       } else if (exception.name) {
