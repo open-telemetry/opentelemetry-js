@@ -109,10 +109,7 @@ function getTraceFlags(
   if (debug === '1' || VALID_SAMPLED_VALUES.has(traceFlags)) {
     return TraceFlags.SAMPLED;
   }
-  if (VALID_UNSAMPLED_VALUES.has(traceFlags)) {
-    return TraceFlags.NONE;
-  }
-  if (traceFlags === undefined) {
+  if (traceFlags === undefined || VALID_UNSAMPLED_VALUES.has(traceFlags)) {
     return TraceFlags.NONE;
   }
   // This indicates to isValidSampledValue that this is not valid
