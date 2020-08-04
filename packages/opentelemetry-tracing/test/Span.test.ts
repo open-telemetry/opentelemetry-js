@@ -400,34 +400,39 @@ describe('Span', () => {
       });
     });
 
-    describe('when exception type is "Error"', () => {
-      let error: Exception;
-      beforeEach(() => {
-        try {
-          throw new Error('boom');
-        } catch (e) {
-          error = e;
-        }
-      });
-      it('should record an exception', () => {
-        const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
-        assert.strictEqual(span.events.length, 0);
-        span.recordException(error);
+    const errorsObj = [
+      {
+        description: 'code',
+        obj: { code: 'Error', message: 'boom', stack: 'bar' },
+      },
+      {
+        description: 'name',
+        obj: { name: 'Error', message: 'boom', stack: 'bar' },
+      },
+    ];
+    errorsObj.forEach(errorObj => {
+      describe(`when exception type is an object with ${errorObj.description}`, () => {
+        const error: Exception = errorObj.obj;
+        it('should record an exception', () => {
+          const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+          assert.strictEqual(span.events.length, 0);
+          span.recordException(error);
 
-        const event = span.events[0];
-        assert.ok(event.time[0] > 0);
-        assert.strictEqual(event.name, 'exception');
+          const event = span.events[0];
+          assert.ok(event.time[0] > 0);
+          assert.strictEqual(event.name, 'exception');
 
-        assert.ok(event.attributes);
+          assert.ok(event.attributes);
 
-        const type = event.attributes[ExceptionAttribute.TYPE];
-        const message = event.attributes[ExceptionAttribute.MESSAGE];
-        const stacktrace = String(
-          event.attributes[ExceptionAttribute.STACKTRACE]
-        );
-        assert.strictEqual(type, 'Error');
-        assert.strictEqual(message, 'boom');
-        assert.ok(stacktrace.indexOf('Error: boom') >= 0);
+          const type = event.attributes[ExceptionAttribute.TYPE];
+          const message = event.attributes[ExceptionAttribute.MESSAGE];
+          const stacktrace = String(
+            event.attributes[ExceptionAttribute.STACKTRACE]
+          );
+          assert.strictEqual(type, 'Error');
+          assert.strictEqual(message, 'boom');
+          assert.strictEqual(stacktrace, 'bar');
+        });
       });
     });
 

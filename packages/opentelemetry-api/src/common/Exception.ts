@@ -14,21 +14,34 @@
  * limitations under the License.
  */
 
-interface ExceptionWithType {
+interface ExceptionWithCode {
+  code: string;
+  name?: string;
   message?: string;
-  name: string;
   stack?: string;
 }
 
 interface ExceptionWithMessage {
+  code?: string;
   message: string;
   name?: string;
+  stack?: string;
+}
+
+interface ExceptionWithName {
+  code?: string;
+  message?: string;
+  name: string;
   stack?: string;
 }
 
 /**
  * Defines Exception.
  *
- * string or an object with one of (message or name) and optional stack
+ * string or an object with one of (message or name or code) and optional stack
  */
-export type Exception = ExceptionWithType | ExceptionWithMessage | string;
+export type Exception =
+  | ExceptionWithCode
+  | ExceptionWithMessage
+  | ExceptionWithName
+  | string;
