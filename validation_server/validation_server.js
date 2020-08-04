@@ -16,8 +16,7 @@ const {
 } = require("@opentelemetry/api");
 
 // set global propagator
-const myPropagator = new HttpTraceContext();
-propagation.setGlobalPropagator(myPropagator);
+propagation.setGlobalPropagator(new HttpTraceContext());
 
 // Create a provider for activating and tracking spans
 const tracerProvider = new BasicTracerProvider({});
@@ -37,10 +36,10 @@ app.use(bodyParser.json());
 
 // Mount our demo route
 app.post("/verify-tracecontext", (req, res) => {
-  const context = myPropagator.extract(
-    Context.ROOT_CONTEXT,
+  const context = propagation.extract(
     req.headers,
-    defaultGetter
+    defaultGetter,
+    Context.ROOT_CONTEXT
   );
   const spanContext = getExtractedSpanContext(context);
   Promise.all(
@@ -51,10 +50,10 @@ app.post("/verify-tracecontext", (req, res) => {
         context
       );
       const headers = {};
-      myPropagator.inject(
-        setExtractedSpanContext(context, span.context()),
+      propagation.inject(
         headers,
-        defaultSetter
+        defaultSetter,
+        setExtractedSpanContext(context, span.context())
       );
       return axios
         .post(
