@@ -40,9 +40,9 @@ export class NodeSDK {
   };
   private _meterProviderConfig?: MeterConfig;
 
-  private _pluginManagerConfig!: NodePluginManagerConfig;
+  private _pluginManagerConfig?: NodePluginManagerConfig;
 
-  private _pluginManager!: NodePluginManager;
+  private _pluginManager?: NodePluginManager;
 
   private _resource: Resource;
 
