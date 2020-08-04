@@ -17,3 +17,4 @@
 export { awsEc2Detector } from './AwsEc2Detector';
 export { envDetector } from './EnvDetector';
 export { gcpDetector } from './GcpDetector';
+export { awsEc2DetectorTemp } from './AwsEc2DetectorTemp';
