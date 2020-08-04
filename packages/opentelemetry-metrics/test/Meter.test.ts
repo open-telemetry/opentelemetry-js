@@ -55,15 +55,21 @@ const nonNumberValues = [
   false,
   // type string
   '1',
-  // type bigint
-  // TODO: should metric instruments support bigint?
-  // @ts-ignore
-  1n,
   // type object
   {},
   // type symbol
   // symbols cannot be cast to number, early errors will be thrown.
 ];
+
+if (Number(process.versions.node.match(/^\d+/)) >= 10) {
+  nonNumberValues.push(
+    // type bigint
+    // Preferring BigInt builtin object instead of bigint literal to keep Node.js v8.x working.
+    // TODO: should metric instruments support bigint?
+    // @ts-ignore
+    BigInt(1) // eslint-disable-line node/no-unsupported-features/es-builtins
+  );
+}
 
 describe('Meter', () => {
   let meter: Meter;
