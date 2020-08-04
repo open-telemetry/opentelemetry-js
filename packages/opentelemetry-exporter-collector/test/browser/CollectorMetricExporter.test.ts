@@ -19,7 +19,7 @@ import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord, HistogramAggregator } from '@opentelemetry/metrics';
+import { MetricRecord } from '@opentelemetry/metrics';
 import {
   mockCounter,
   mockObserver,
@@ -49,21 +49,20 @@ describe('CollectorMetricExporter - web', () => {
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    metrics.push(Object.assign({}, mockCounter));
-    metrics.push(Object.assign({}, mockObserver));
-    metrics.push(Object.assign({}, mockHistogram));
-    metrics.push(Object.assign({}, mockValueRecorder));
+    metrics.push(mockCounter());
+    metrics.push(mockObserver());
+    metrics.push(mockHistogram());
+    metrics.push(mockValueRecorder());
 
     metrics[0].aggregator.update(1);
-    metrics[1].aggregator.update(10);
+    metrics[1].aggregator.update(3);
+    metrics[1].aggregator.update(6);
     metrics[2].aggregator.update(7);
     metrics[2].aggregator.update(14);
     metrics[3].aggregator.update(5);
   });
 
   afterEach(() => {
-    metrics[0].aggregator.update(-1);
-    mockHistogram.aggregator = new HistogramAggregator([10, 20]);
     navigator.sendBeacon = sendBeacon;
     spyOpen.restore();
     spySend.restore();
