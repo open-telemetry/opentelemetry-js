@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/context-zone-peer-dep",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "OpenTelemetry Context Zone with peer dependency for zone.js",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -71,7 +71,7 @@
     "zone.js": "0.10.3"
   },
   "dependencies": {
-    "@opentelemetry/context-base": "^0.10.1"
+    "@opentelemetry/context-base": "^0.10.2"
   },
   "peerDependencies": {
     "zone.js": "^0.10.2"
