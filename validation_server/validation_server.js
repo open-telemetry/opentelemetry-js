@@ -1,26 +1,32 @@
 const axios = require("axios");
-const { B3Propagator } = require("@opentelemetry/core");
-const { HttpTraceContext } = require("@opentelemetry/core");
-const { NodeTracerProvider } = require("@opentelemetry/node");
+const {
+  HttpTraceContext,
+  getExtractedSpanContext,
+
+  setExtractedSpanContext,
+} = require("@opentelemetry/core");
+const { BasicTracerProvider } = require("@opentelemetry/tracing");
+const { Context } = require("@opentelemetry/context-base");
 const bodyParser = require("body-parser");
-const opentelemetry = require("@opentelemetry/api");
-
-// Get the args
-const myArgs = process.argv.slice(2);
-
-// Get the propagator type
-const propagatorTypeArg = myArgs[0];
-const myPropagator =
-  propagatorTypeArg === "b3" ? B3Propagator : HttpTraceContext;
+const {
+  defaultGetter,
+  defaultSetter,
+  propagation,
+  trace,
+} = require("@opentelemetry/api");
 
 // set global propagator
-opentelemetry.propagation.setGlobalPropagator(new myPropagator());
+const myPropagator = new HttpTraceContext();
+propagation.setGlobalPropagator(myPropagator);
 
 // Create a provider for activating and tracking spans
-const tracerProvider = new NodeTracerProvider({});
+const tracerProvider = new BasicTracerProvider({});
 
 // Register the tracer
 tracerProvider.register();
+
+// Get a tracer
+const tracer = trace.getTracer("w3c-tests");
 
 // --- Simple Express app setup
 const express = require("express");
@@ -31,18 +37,40 @@ app.use(bodyParser.json());
 
 // Mount our demo route
 app.post("/verify-tracecontext", (req, res) => {
+  const context = myPropagator.extract(
+    Context.ROOT_CONTEXT,
+    req.headers,
+    defaultGetter
+  );
+  const spanContext = getExtractedSpanContext(context);
   Promise.all(
-    req.body.map((action) =>
-      axios.post(
-        action.url,
+    req.body.map((action) => {
+      const span = tracer.startSpan(
+        "propagate-w3c",
+        { parent: spanContext },
+        context
+      );
+      const headers = {};
+      myPropagator.inject(
+        setExtractedSpanContext(context, span.context()),
+        headers,
+        defaultSetter
+      );
+      return axios
+        .post(
+          action.url,
 
-        [...action.arguments],
+          [...action.arguments],
 
-        {
-          timeout: 5,
-        }
-      )
-    )
+          {
+            headers,
+            timeout: 5,
+          }
+        )
+        .finally(() => {
+          span.end();
+        });
+    })
   )
     .then(() => res.send("hello"))
     .catch((err) => res.status(500).send(err));

@@ -12,8 +12,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install --ignore-scripts
-          #npx lerna bootstrap --scope={propagation-tests,@opentelemetry-api} --include-dependencies
-          #npx lerna link ----force-local
+          npx lerna bootstrap --scope={propagation-tests,@opentelemetry-api} --include-dependencies
 
       - name: Run W3C Test harness
         run: |

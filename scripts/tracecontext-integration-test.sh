@@ -1,3 +1,4 @@
+
 #!/bin/sh
 set -e
 # hard-coding the git tag to ensure stable builds.
@@ -9,8 +10,7 @@ git clone https://github.com/w3c/trace-context ./target/trace-context
 cd ./target/trace-context && git checkout $TRACECONTEXT_GIT_TAG && cd -
 pip3 install setuptools;
 pip3 install aiohttp; 
-(cd validation_server; npm i)
-node ./validation_server/validation_server.js w3c 1>&2 &
+node ./validation_server/validation_server.js 1>&2 &
 EXAMPLE_SERVER_PID=$!
 # give the app server a little time to start up. Not adding some sort
 # of delay would cause many of the tracecontext tests to fail being
