@@ -1,4 +1,4 @@
-name: Deploy a canary release on every push to master
+name: Deploy Canary Release
 
 on:
   push:
