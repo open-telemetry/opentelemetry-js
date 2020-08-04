@@ -50,7 +50,7 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should successfully return resource data', async () => {
-    readStub = sandbox.stub(fs, 'readFileSync').returns(JSON.stringify(data));
+    readStub = sandbox.stub(fs, 'readFile').yields(null, JSON.stringify(data));
     sandbox.stub(JSON, 'parse').returns(data);
 
     const resource = await awsBeanstalkDetector.detect({
@@ -69,8 +69,8 @@ describe('BeanstalkResourceDetector', () => {
 
   it('should successfully return resource data with noise', async () => {
     readStub = sandbox
-      .stub(fs, 'readFileSync')
-      .returns(JSON.stringify(noisyData));
+      .stub(fs, 'readFile')
+      .yields(null, JSON.stringify(noisyData));
     sandbox.stub(JSON, 'parse').returns(noisyData);
 
     const resource = await awsBeanstalkDetector.detect({
@@ -88,7 +88,7 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should return empty resource when failing to read file', async () => {
-    readStub = sandbox.stub(fs, 'readFileSync').throws(err);
+    readStub = sandbox.stub(fs, 'readFile').yields(err, null);
 
     const resource = await awsBeanstalkDetector.detect({
       logger: new NoopLogger(),

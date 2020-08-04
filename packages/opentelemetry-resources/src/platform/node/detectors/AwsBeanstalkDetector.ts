@@ -33,7 +33,7 @@ class AwsBeanstalkDetector implements Detector {
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const rawData = fs.readFileSync(this.BEANSTALK_CONF_PATH, 'utf8');
+      const rawData = await this._getData();
       const parsedData = JSON.parse(rawData);
 
       return new Resource({
@@ -42,10 +42,22 @@ class AwsBeanstalkDetector implements Detector {
         [SERVICE_RESOURCE.VERSION]: parsedData.version_label,
         [SERVICE_RESOURCE.INSTANCE_ID]: parsedData.deployment_id,
       });
-    } catch (e) {
-      config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
+    } catch (err) {
+      config.logger.debug(`AwsEc2Detector failed: ${err.message}`);
       return Resource.empty();
     }
+  }
+
+  private async _getData(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      fs.readFile(this.BEANSTALK_CONF_PATH, 'utf8', (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    });
   }
 }
 
