@@ -5,7 +5,7 @@
     "benchmark/*",
     "metapackages/*",
     "packages/*",
-    "propagation-validation-server"
+    "integration-tests/*"
   ],
   "version": "0.10.2",
   "changelog": {

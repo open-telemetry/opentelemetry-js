@@ -15,4 +15,4 @@ jobs:
           npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
 
       - name: Run W3C Test harness
-        run: ./scripts/tracecontext-integration-test.sh
+        run: ./integration-tests/tracecontext-integration-test.sh

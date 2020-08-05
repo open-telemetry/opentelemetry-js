@@ -3,9 +3,10 @@
   "version": "0.10.2",
   "description": "server for w3c tests",
   "main": "validation_server.js",
-  "author": "",
-  "license": "ISC",
   "private": true,
+  "repository": "open-telemetry/opentelemetry-js",
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^0.10.2",
     "@opentelemetry/context-base" : "^0.10.2",
