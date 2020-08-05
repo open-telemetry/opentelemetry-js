@@ -70,8 +70,8 @@ export class PrometheusExporter implements MetricExporter {
 
     if (config.startServer) {
       this.startServer(callback);
-    } else {
-      callback?.();
+    } else if (callback) {
+      process.nextTick(callback);
     }
   }
 
