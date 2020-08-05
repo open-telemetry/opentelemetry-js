@@ -28,6 +28,7 @@ import * as core from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { toCollectorResource } from './transform';
 import { CollectorExporterBase } from './CollectorExporterBase';
+import { HrTime } from '@opentelemetry/api';
 
 /**
  * Converts labels
@@ -60,6 +61,9 @@ export function toCollectorType(
   if (metric.aggregator instanceof HistogramAggregator) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
   }
+  if (metric.aggregator instanceof MinMaxLastSumCountAggregator) {
+    return opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY;
+  }
   if (metric.descriptor.valueType == api.ValueType.INT) {
     return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
   }
@@ -67,7 +71,6 @@ export function toCollectorType(
     return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
   }
 
-  // @TODO #1294: Add Summary once implemented
   return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
 }
 
@@ -132,14 +135,9 @@ export function toSingularPoint(
   timeUnixNano: number;
   value: number;
 } {
-  const pointValue =
-    metric.aggregator instanceof MinMaxLastSumCountAggregator
-      ? (metric.aggregator.toPoint().value as Distribution).last
-      : (metric.aggregator.toPoint().value as number);
-
   return {
     labels: toCollectorLabels(metric.labels),
-    value: pointValue,
+    value: metric.aggregator.toPoint().value as number,
     startTimeUnixNano: startTime,
     timeUnixNano: core.hrTimeToNanoseconds(
       metric.aggregator.toPoint().timestamp
@@ -156,19 +154,47 @@ export function toHistogramPoint(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.HistogramDataPoint {
-  const histValue = metric.aggregator.toPoint().value as Histogram;
+  const { value, timestamp } = metric.aggregator.toPoint() as {
+    value: Histogram;
+    timestamp: HrTime;
+  };
   return {
     labels: toCollectorLabels(metric.labels),
-    sum: histValue.sum,
-    count: histValue.count,
+    sum: value.sum,
+    count: value.count,
     startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(
-      metric.aggregator.toPoint().timestamp
-    ),
-    buckets: histValue.buckets.counts.map(count => {
+    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
+    buckets: value.buckets.counts.map(count => {
       return { count };
     }),
-    explicitBounds: histValue.buckets.boundaries,
+    explicitBounds: value.buckets.boundaries,
+  };
+}
+
+/**
+ * Returns a SummaryPoint to the collector
+ * @param metric
+ * @param startTime
+ */
+export function toSummaryPoint(
+  metric: MetricRecord,
+  startTime: number
+): opentelemetryProto.metrics.v1.SummaryDataPoint {
+  const { value, timestamp } = metric.aggregator.toPoint() as {
+    value: Distribution;
+    timestamp: HrTime;
+  };
+
+  return {
+    labels: toCollectorLabels(metric.labels),
+    sum: value.sum,
+    count: value.count,
+    startTimeUnixNano: startTime,
+    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
+    percentileValues: [
+      { percentile: 0, value: value.min },
+      { percentile: 100, value: value.max },
+    ],
   };
 }
 
@@ -190,6 +216,15 @@ export function toCollectorMetric(
       histogramDataPoints: [toHistogramPoint(metric, startTime)],
     };
   }
+  if (
+    toCollectorType(metric) ===
+    opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY
+  ) {
+    return {
+      metricDescriptor: toCollectorMetricDescriptor(metric),
+      summaryDataPoints: [toSummaryPoint(metric, startTime)],
+    };
+  }
   if (metric.descriptor.valueType == api.ValueType.INT) {
     return {
       metricDescriptor: toCollectorMetricDescriptor(metric),
@@ -201,7 +236,7 @@ export function toCollectorMetric(
       metricDescriptor: toCollectorMetricDescriptor(metric),
       doubleDataPoints: [toSingularPoint(metric, startTime)],
     };
-  } // TODO: Add support for summary points once implemented
+  }
 
   return {
     metricDescriptor: toCollectorMetricDescriptor(metric),
