@@ -1243,7 +1243,7 @@ export function ensureExportMetricsServiceRequestIsSet(
   assert.strictEqual(
     resourceMetrics.length,
     4,
-    'resourceMetrics is the incorrect length'
+    'resourceMetrics has incorrect length'
   );
 
   const resource = resourceMetrics[0].resource;
