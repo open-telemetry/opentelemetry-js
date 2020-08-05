@@ -37,7 +37,6 @@ import { ExporterConfig } from './export/types';
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
     port: 9464,
-    startServer: false,
     endpoint: '/metrics',
     prefix: '',
   };
@@ -72,9 +71,6 @@ export class PrometheusExporter implements MetricExporter {
     if (config.startServer) {
       this.startServer(callback);
     } else {
-      this._logger.debug(
-        'Prometheus exporter server is not started. The server can be started with the first construction parameter of PrometheusExporter to be `true`.'
-      );
       callback?.();
     }
   }
