@@ -4,7 +4,10 @@
   "description": "OpenTelemetry Zipkin Exporter allows the user to send collected traces to Zipkin.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
-  "repository": "open-telemetry/opentelemetry-js",
+  "repository": "open-telemetry/opentelemetry-js",  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
   "scripts": {
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
     "tdd": "npm run test -- --watch-extensions ts --watch",

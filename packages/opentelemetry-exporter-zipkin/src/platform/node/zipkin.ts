@@ -20,14 +20,14 @@ import * as https from 'https';
 import * as url from 'url';
 import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { SpanExporter, ReadableSpan } from '@opentelemetry/tracing';
-import * as zipkinTypes from './types';
+import { SERVICE_RESOURCE } from '@opentelemetry/resources';
+import * as zipkinTypes from './../../types';
 import {
   toZipkinSpan,
   statusCodeTagName,
   statusDescriptionTagName,
-} from './transform';
-import { OT_REQUEST_HEADER } from './utils';
-import { SERVICE_RESOURCE } from '@opentelemetry/resources';
+} from './../../transform';
+import { OT_REQUEST_HEADER } from './../../utils';
 /**
  * Zipkin Exporter
  */
