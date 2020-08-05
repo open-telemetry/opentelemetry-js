@@ -29,13 +29,24 @@ import * as util from 'util';
  * See https://docs.amazonaws.cn/en_us/xray/latest/devguide/xray-guide.pdf
  * for more details about detecting information of Elastic Beanstalk plugins
  */
+
+// for testing purpose, build an object here
+export const cache = { readFileAsync: util.promisify(fs.readFile) };
+
 class AwsBeanstalkDetector implements Detector {
   readonly BEANSTALK_CONF_PATH = '/var/elasticbeanstalk/xray/environment.conf';
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const readFile = util.promisify(fs.readFile);
-      const rawData = await readFile(this.BEANSTALK_CONF_PATH, 'utf8');
+      fs.access(this.BEANSTALK_CONF_PATH, fs.constants.R_OK, err => {
+        if (err) throw err;
+      });
+
+      // const readFileAync = util.promisify(fs.readFile)
+      const rawData = await cache.readFileAsync(
+        this.BEANSTALK_CONF_PATH,
+        'utf8'
+      );
       const parsedData = JSON.parse(rawData);
 
       return new Resource({

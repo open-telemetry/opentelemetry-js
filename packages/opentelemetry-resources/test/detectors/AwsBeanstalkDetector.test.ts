@@ -16,7 +16,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { awsBeanstalkDetector } from '../../src/platform/node/detectors/AwsBeanstalkDetector';
+import {
+  cache,
+  awsBeanstalkDetector,
+} from '../../src/platform/node/detectors/AwsBeanstalkDetector';
 import {
   assertEmptyResource,
   assertServiceResource,
@@ -25,7 +28,7 @@ import { NoopLogger } from '@opentelemetry/core';
 import * as fs from 'fs';
 
 describe('BeanstalkResourceDetector', () => {
-  const err = new Error('failed to load file');
+  const err = new Error('failed to read config file');
   const data = {
     version_label: 'app-5a56-170119_190650-stage-170119_190650',
     deployment_id: '32',
@@ -38,7 +41,7 @@ describe('BeanstalkResourceDetector', () => {
     environment_name: 'scorekeep',
   };
 
-  let readStub;
+  let readStub, fileStub;
   let sandbox: sinon.SinonSandbox;
 
   beforeEach(() => {
@@ -50,13 +53,17 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should successfully return resource data', async () => {
-    readStub = sandbox.stub(fs, 'readFile').yields(null, JSON.stringify(data));
+    fileStub = sandbox.stub(fs, 'access').yields(null);
+    readStub = sandbox
+      .stub(cache, 'readFileAsync')
+      .resolves(JSON.stringify(data));
     sandbox.stub(JSON, 'parse').returns(data);
 
     const resource = await awsBeanstalkDetector.detect({
       logger: new NoopLogger(),
     });
 
+    sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
@@ -68,15 +75,17 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should successfully return resource data with noise', async () => {
+    fileStub = sandbox.stub(fs, 'access').yields(null);
     readStub = sandbox
-      .stub(fs, 'readFile')
-      .yields(null, JSON.stringify(noisyData));
+      .stub(cache, 'readFileAsync')
+      .resolves(JSON.stringify(noisyData));
     sandbox.stub(JSON, 'parse').returns(noisyData);
 
     const resource = await awsBeanstalkDetector.detect({
       logger: new NoopLogger(),
     });
 
+    sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
     assertServiceResource(resource, {
@@ -88,13 +97,31 @@ describe('BeanstalkResourceDetector', () => {
   });
 
   it('should return empty resource when failing to read file', async () => {
-    readStub = sandbox.stub(fs, 'readFile').yields(err, null);
+    fileStub = sandbox.stub(fs, 'access').yields(null);
+    readStub = sandbox.stub(cache, 'readFileAsync').rejects(err);
 
     const resource = await awsBeanstalkDetector.detect({
       logger: new NoopLogger(),
     });
 
+    sandbox.assert.calledOnce(fileStub);
     sandbox.assert.calledOnce(readStub);
+    assert.ok(resource);
+    assertEmptyResource(resource);
+  });
+
+  it('should return empty resource when config file does not exist', async () => {
+    fileStub = sandbox.stub(fs, 'access').yields(err);
+    readStub = sandbox
+      .stub(cache, 'readFileAsync')
+      .resolves(JSON.stringify(data));
+
+    const resource = await awsBeanstalkDetector.detect({
+      logger: new NoopLogger(),
+    });
+
+    sandbox.assert.calledOnce(fileStub);
+    sandbox.assert.notCalled(readStub);
     assert.ok(resource);
     assertEmptyResource(resource);
   });
