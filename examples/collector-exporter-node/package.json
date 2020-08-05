@@ -1,7 +1,7 @@
 {
   "name": "example-collector-exporter-node",
   "private": true,
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "Example of using @opentelemetry/collector-exporter in Node.js",
   "main": "index.js",
   "scripts": {
@@ -27,10 +27,10 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.1",
-    "@opentelemetry/core": "^0.10.1",
-    "@opentelemetry/exporter-collector": "^0.10.1",
-    "@opentelemetry/tracing": "^0.10.1"
+    "@opentelemetry/api": "^0.10.2",
+    "@opentelemetry/core": "^0.10.2",
+    "@opentelemetry/exporter-collector": "^0.10.2",
+    "@opentelemetry/tracing": "^0.10.2"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }

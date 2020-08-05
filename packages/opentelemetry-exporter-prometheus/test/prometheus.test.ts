@@ -21,6 +21,7 @@ import {
   Meter,
   MeterProvider,
   Point,
+  Sum,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -30,10 +31,10 @@ const mockedHrTime: HrTime = [1586347902211, 0];
 const mockedTimeMS = 1586347902211000;
 
 describe('PrometheusExporter', () => {
-  let toPoint: () => Point;
+  let toPoint: () => Point<Sum>;
   before(() => {
     toPoint = SumAggregator.prototype.toPoint;
-    SumAggregator.prototype.toPoint = function (): Point {
+    SumAggregator.prototype.toPoint = function (): Point<Sum> {
       const point = toPoint.apply(this);
       point.timestamp = mockedHrTime;
       return point;
