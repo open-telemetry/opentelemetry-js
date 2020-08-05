@@ -42,8 +42,6 @@ export class NodeSDK {
 
   private _pluginManagerConfig?: NodePluginManagerConfig;
 
-  private _pluginManager?: NodePluginManager;
-
   private _resource: Resource;
 
   private _autoDetectResources: boolean;
@@ -158,7 +156,7 @@ export class NodeSDK {
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start(): Promise<NodePluginManager> {
+  public async start() {
     if (this._autoDetectResources) {
       await this.detectResources();
     }
@@ -185,7 +183,6 @@ export class NodeSDK {
       metrics.setGlobalMeterProvider(meterProvider);
     }
 
-    this._pluginManager = new NodePluginManager(this._pluginManagerConfig);
-    return this._pluginManager;
+    new NodePluginManager(this._pluginManagerConfig);
   }
 }
