@@ -1,12 +1,14 @@
 {
-  "name": "propagation-tests",
-  "version": "1.0.0",
+  "name": "propagation-validation-server",
+  "version": "0.10.2",
   "description": "server for w3c tests",
   "main": "validation_server.js",
   "author": "",
   "license": "ISC",
+  "private": true,
   "dependencies": {
     "@opentelemetry/api": "^0.10.2",
+    "@opentelemetry/context-base" : "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2",
     "axios": "^0.19.2",

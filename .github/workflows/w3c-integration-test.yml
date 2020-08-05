@@ -12,9 +12,7 @@ jobs:
       - name: Install and Build 🔧
         run: |
           npm install --ignore-scripts
-          npx lerna bootstrap --scope={propagation-tests,@opentelemetry-api} --include-dependencies
+          npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
 
       - name: Run W3C Test harness
-        run: |
-          chmod 755 ./scripts/tracecontext-integration-test.sh
-          ./scripts/tracecontext-integration-test.sh
+        run: ./scripts/tracecontext-integration-test.sh
