@@ -49,13 +49,11 @@ describe('unmocked xhr', () => {
     const xhr = new XMLHttpRequest();
     let path = location.pathname;
     path = path.substring(path.lastIndexOf('/') + 1);
-    console.log('request for ' + path);
     xhr.open('GET', path);
     xhr.addEventListener('loadend', () => {
       setTimeout(() => {
         assert.strictEqual(capturer.spans.length, 1);
         const span = capturer.spans[0];
-        console.log(span.attributes);
         // content length comes from the PerformanceTiming resource; this ensures that our
         // matching logic found the right one
         assert.ok(
