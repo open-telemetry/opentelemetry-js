@@ -23,6 +23,7 @@ import {
   TracerProvider,
   MeterProvider,
   PluginInternalFiles,
+  metrics,
 } from '@opentelemetry/api';
 
 /** This class represent the base to patch plugin. */
@@ -38,12 +39,16 @@ export abstract class BaseAbstractPlugin<T> implements Plugin<T> {
   protected _logger!: Logger;
   protected _moduleExports!: T;
   protected _tracer!: Tracer;
-  protected _meter!: Meter;
+  protected _meter: Meter;
 
   constructor(
     protected readonly _tracerName: string,
     protected readonly _tracerVersion?: string
-  ) {}
+  ) {
+    this._meter = metrics
+      .getMeterProvider()
+      .getMeter(this._tracerName, this._tracerVersion);
+  }
 
   disable(): void {
     this.unpatch();

@@ -22,7 +22,6 @@ import {
   PluginInternalFilesVersion,
   TracerProvider,
   MeterProvider,
-  metrics,
 } from '@opentelemetry/api';
 import * as semver from 'semver';
 import * as path from 'path';
@@ -48,10 +47,6 @@ export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
         this._tracerName,
         this._tracerVersion
       );
-    } else {
-      this._meter = metrics
-        .getMeterProvider()
-        .getMeter(this._tracerName, this._tracerVersion);
     }
     this._logger = logger;
     this._internalFilesExports = this._loadInternalFilesExports();
