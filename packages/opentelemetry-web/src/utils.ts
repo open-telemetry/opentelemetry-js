@@ -128,9 +128,9 @@ export function getResource(
   initiatorType?: string
 ): PerformanceResourceTimingInfo {
   // de-relativize the URL before usage (does no harm to absolute URLs)
-  // Also, we mean the browser's URL API and not node's here.
-  // eslint-disable-next-line node/no-unsupported-features/node-builtins
-  spanUrl = new URL(spanUrl, location.href).toString();
+  const a = document.createElement('a');
+  a.href = spanUrl;
+  spanUrl = a.href;
 
   const filteredResources = filterResourcesForSpan(
     spanUrl,

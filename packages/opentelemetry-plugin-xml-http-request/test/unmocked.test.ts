@@ -19,7 +19,7 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import assert = require('assert');
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 
-class SpanCapturer implements SpanProcessor {
+class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
 
   forceFlush(callback: () => void): void {}
@@ -32,14 +32,14 @@ class SpanCapturer implements SpanProcessor {
 }
 
 describe('unmocked xhr', () => {
-  let capturer: SpanCapturer;
+  let testSpans: TestSpanProcessor;
   let provider: WebTracerProvider;
   beforeEach(() => {
     provider = new WebTracerProvider({
       plugins: [new XMLHttpRequestPlugin()],
     });
-    capturer = new SpanCapturer();
-    provider.addSpanProcessor(capturer);
+    testSpans = new TestSpanProcessor();
+    provider.addSpanProcessor(testSpans);
   });
   afterEach(() => {
     // nop
@@ -52,8 +52,8 @@ describe('unmocked xhr', () => {
     xhr.open('GET', path);
     xhr.addEventListener('loadend', () => {
       setTimeout(() => {
-        assert.strictEqual(capturer.spans.length, 1);
-        const span = capturer.spans[0];
+        assert.strictEqual(testSpans.spans.length, 1);
+        const span = testSpans.spans[0];
         // content length comes from the PerformanceTiming resource; this ensures that our
         // matching logic found the right one
         assert.ok(
