@@ -39,11 +39,11 @@ describe('BasePlugin', () => {
       assert.strictEqual(patch, moduleExports);
     });
     it('testing meterProvider in enable method', () => {
-      const testPackage = require('../trace/fixtures/test-package');
+      const moduleExports = { foo: function () {} };
       const plugin = new TestPlugin('foo', '1');
       assert.doesNotThrow(() => {
         plugin.enable(
-          testPackage,
+          moduleExports,
           tracerProvider,
           logger,
           undefined,
