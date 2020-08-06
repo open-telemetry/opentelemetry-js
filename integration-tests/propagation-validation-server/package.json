@@ -9,7 +9,6 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/context-base" : "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2",
     "axios": "^0.19.2",

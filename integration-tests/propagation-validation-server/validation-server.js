@@ -2,12 +2,11 @@ const axios = require("axios");
 const {
   HttpTraceContext,
   getExtractedSpanContext,
-
   setExtractedSpanContext,
 } = require("@opentelemetry/core");
 const { BasicTracerProvider } = require("@opentelemetry/tracing");
-const bodyParser = require("body-parser");
 const { defaultSetter, propagation, trace } = require("@opentelemetry/api");
+const bodyParser = require("body-parser");
 
 // set global propagator
 propagation.setGlobalPropagator(new HttpTraceContext());
