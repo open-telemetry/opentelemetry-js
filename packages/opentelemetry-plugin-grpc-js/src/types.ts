@@ -23,7 +23,7 @@ export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
 
 export interface GrpcPluginOptions extends PluginConfig {
   /* Omits tracing on any gRPC methods that match any of
-   * the IgnoreMatchers in the ignoreRpcMethods list
+   * the IgnoreMatchers in the ignoreGrpcMethods list
    */
   ignoreGrpcMethods?: IgnoreMatcher[];
 }
