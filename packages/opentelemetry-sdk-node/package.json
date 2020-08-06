@@ -54,11 +54,13 @@
     "@opentelemetry/context-async-hooks": "^0.10.2",
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.27",
+    "@types/sinon": "9.0.4",
     "codecov": "3.7.2",
     "gts": "2.0.2",
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
+    "sinon": "9.0.2",
     "ts-loader": "7.0.5",
     "ts-mocha": "7.0.0",
     "typescript": "3.9.7"
