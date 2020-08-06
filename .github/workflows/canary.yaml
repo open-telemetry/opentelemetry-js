@@ -15,6 +15,8 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 14.x
+          registry-url: https://registry.npmjs.org
+          scope: '@opentelemetry'
 
       - name: restore lerna
         uses: actions/cache@master # must use unreleased master to cache multiple paths
