@@ -17,5 +17,4 @@
 export { awsEc2Detector } from './AwsEc2Detector';
 export { envDetector } from './EnvDetector';
 export { gcpDetector } from './GcpDetector';
-export { cache, awsBeanstalkDetector } from './AwsBeanstalkDetector';
-export { awsEcsDetector } from './AwsEcsDetector';
+export { cache, awsEcsDetector } from './AwsEcsDetector';

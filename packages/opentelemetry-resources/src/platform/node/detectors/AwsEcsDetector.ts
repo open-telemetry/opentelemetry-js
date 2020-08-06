@@ -18,38 +18,46 @@ import { Resource } from '../../../Resource';
 import { CONTAINER_RESOURCE } from '../../../constants';
 import { Detector } from '../../../types';
 import { ResourceDetectionConfigWithLogger } from '../../../config';
-import { cache } from './AwsBeanstalkDetector';
+import * as util from 'util';
+import * as fs from 'fs';
+import * as os from 'os';
 
 /**
  * The AwsEcsDetector can be used to detect if a process is running in AWS
  * ECS and return a {@link Resource} populated with data about the ECS
  * plugins of AWS X-Ray. Returns an empty Resource if detection fails.
  */
+export const cache = {
+  readFileAsync: util.promisify(fs.readFile),
+};
 
 class AwsEcsDetector implements Detector {
   readonly CONTAINER_ID_LENGTH = 64;
-  readonly DEFAULT_CGROUP_PATH = "/proc/self/cgroup";
-  readonly ECS_METADATA_KEY_V4 = "ECS_CONTAINER_METADATA_URI_V4";
-  readonly ECS_METADATA_KEY_V3 = "ECS_CONTAINER_METADATA_URI";
+  readonly DEFAULT_CGROUP_PATH = '/proc/self/cgroup';
+  readonly ECS_METADATA_KEY_V4 = 'ECS_CONTAINER_METADATA_URI_V4';
+  readonly ECS_METADATA_KEY_V3 = 'ECS_CONTAINER_METADATA_URI';
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-    if (!process.env.ECS_CONTAINER_METADATA_URI_V4 ||
-        !process.env.ECS_CONTAINER_METADATA_URI) {
+    if (
+      !process.env.ECS_CONTAINER_METADATA_URI_V4 &&
+      !process.env.ECS_CONTAINER_METADATA_URI
+    ) {
       config.logger.debug('AwsEcsDetector failed: Process is not on ECS');
       return Resource.empty();
     }
-    let containerId, hostName;
 
+    let containerId, hostName;
     try {
-      hostName = location.hostname;
+      hostName = os.hostname();
     } catch (e) {
-      config.logger.warn(`AwsEcsDetector failed to read host name: ${e.message}`);
+      config.logger.warn(
+        `AwsEcsDetector failed to read host name: ${e.message}`
+      );
     }
 
-    await this._getContainerId(config)
-     .then(res => {
-       containerId = res;
-     });
+    await this._getContainerId(config).then(res => {
+      containerId = res;
+    });
 
     if (containerId && hostName) {
       return new Resource({
@@ -78,13 +86,18 @@ class AwsEcsDetector implements Detector {
    * The implementation logic is follow OTel-Java:
    * https://github.com/open-telemetry/opentelemetry-java/blob/master/sdk_extensions/aws_v1_support/src/main/java/io/opentelemetry/sdk/extensions/trace/aws/resource/EcsResource.java
    */
-  private async _getContainerId(config: ResourceDetectionConfigWithLogger): Promise<string> {
+  private async _getContainerId(
+    config: ResourceDetectionConfigWithLogger
+  ): Promise<string> {
     try {
-      const rawData = await cache.readFileAsync(this.DEFAULT_CGROUP_PATH, 'utf8');
+      const rawData = await cache.readFileAsync(
+        this.DEFAULT_CGROUP_PATH,
+        'utf8'
+      );
       const splitData = rawData.trim().split('\n');
 
       let res = '';
-      splitData.forEach( str => {
+      splitData.forEach(str => {
         if (str.length > this.CONTAINER_ID_LENGTH) {
           res = str.substring(str.length - this.CONTAINER_ID_LENGTH);
           return;
@@ -92,10 +105,12 @@ class AwsEcsDetector implements Detector {
       });
       return res;
     } catch (e) {
-      config.logger.warn('Cannot find cgroup file for AwsEcsDetector');
+      config.logger.warn(
+        `AwsEcsDetector failed to read container ID: ${e.message}`
+      );
       return '';
     }
-  } 
+  }
 }
 
 export const awsEcsDetector = new AwsEcsDetector();
