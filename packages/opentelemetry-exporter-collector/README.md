@@ -14,7 +14,7 @@ This module provides exporter for web and node to be used with [opentelemetry-co
 npm install --save @opentelemetry/exporter-collector
 ```
 
-## Usage in Web
+## Traces in Web
 
 The CollectorTraceExporter in Web expects the endpoint to end in `/v1/trace`.
 
@@ -36,7 +36,32 @@ provider.register();
 
 ```
 
-## Usage in Node - GRPC
+## Metrics in Web
+
+The CollectorMetricExporter in Web expects the endpoint to end in `/v1/metrics`.
+
+```js
+import { MetricProvider } from '@opentelemetry/metrics';
+import { CollectorMetricExporter } from '@opentelemetry/exporter-collector';
+const collectorOptions = {
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/metrics
+  headers: {}, //an optional object containing custom headers to be sent with each request
+};
+const exporter = new CollectorMetricExporter(collectorOptions);
+
+// Register the exporter
+const meter = new MeterProvider({
+  exporter,
+  interval: 60000,
+}).getMeter('example-meter');
+
+// Now, start recording data
+const counter = meter.createCounter('metric_name');
+counter.add(10, { 'key': 'value' });
+
+```
+
+## Traces in Node - GRPC
 
 The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/trace`.
 
@@ -109,7 +134,7 @@ provider.register();
 
 Note, that this will only work if TLS is also configured on the server.
 
-## Usage in Node - JSON over http
+## Traces in Node - JSON over http
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
@@ -132,7 +157,7 @@ provider.register();
 
 ```
 
-## Usage in Node - PROTO over http
+## Traces in Node - PROTO over http
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
@@ -155,26 +180,28 @@ provider.register();
 
 ```
 
-## Usage in Node - PROTO over http
+## Metrics in Node
+
+The CollectorTraceExporter in Node expects the URL to only be the hostname. It will not work with `/v1/metrics`. All options that work with trace also work with metrics.
 
 ```js
-const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
-
+const { MeterProvider } = require('@opentelemetry/metrics');
+const { CollectorMetricExporter } =  require('@opentelemetry/exporter-collector');
 const collectorOptions = {
-  protocolNode: CollectorTransportNode.HTTP_PROTO,
   serviceName: 'basic-service',
-  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55680/v1/trace
-  headers: {
-    foo: 'bar'
-  }, //an optional object containing custom headers to be sent with each request will only work with json over http
+  url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is localhost:55681
 };
+const exporter = new CollectorMetricExporter(collectorOptions);
 
-const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
-provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+// Register the exporter
+const meter = new MeterProvider({
+  exporter,
+  interval: 60000,
+}).getMeter('example-meter');
 
-provider.register();
+// Now, start recording data
+const counter = meter.createCounter('metric_name');
+counter.add(10, { 'key': 'value' });
 
 ```
 
