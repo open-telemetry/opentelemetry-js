@@ -129,9 +129,10 @@ describe('Node SDK', () => {
         });
         const result = sdk.start();
         assert.ok(result instanceof PromiseSyncCall);
+        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+
         result.then(() => {
-          assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
-          assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
           done();
         });
       });
@@ -145,9 +146,10 @@ describe('Node SDK', () => {
 
         const result = sdk.start();
         assert.ok(result instanceof Promise);
+        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+
         result.then(() => {
-          assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
-          assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
           done();
         });
       });
