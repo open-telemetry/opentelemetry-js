@@ -21,7 +21,7 @@ import {
   NoopTracerProvider,
 } from '@opentelemetry/api';
 import * as assert from 'assert';
-import { PluginManager, getEnv, ConsoleLogger, LogLevel } from '../../src';
+import { PluginManager, ConsoleLogger, LogLevel } from '../../src';
 
 describe('PluginManager', () => {
   beforeEach(() => {
@@ -66,7 +66,7 @@ describe('PluginManager', () => {
   it('should assign logger', () => {
     const logger = new ConsoleLogger(LogLevel.DEBUG);
     const pluginManager = new PluginManager({
-      logger: logger
+      logger: logger,
     });
     assert.ok(pluginManager['logger'] === logger);
   });

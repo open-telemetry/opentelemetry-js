@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { NOOP_TRACER, NoopTracerProvider, NoopMeterProvider } from '@opentelemetry/api';
+import {
+  NOOP_TRACER,
+  NoopTracerProvider,
+  NoopMeterProvider,
+} from '@opentelemetry/api';
 import * as assert from 'assert';
 import { BasePlugin, NoopLogger } from '../../../src';
 
@@ -38,7 +42,13 @@ describe('BasePlugin', () => {
       const testPackage = require('../trace/fixtures/test-package');
       const plugin = new TestPlugin('foo', '1');
       assert.doesNotThrow(() => {
-        plugin.enable(testPackage, tracerProvider, logger, undefined, meterProvider);
+        plugin.enable(
+          testPackage,
+          tracerProvider,
+          logger,
+          undefined,
+          meterProvider
+        );
       });
       assert.ok(plugin['_meter'] !== undefined);
     });

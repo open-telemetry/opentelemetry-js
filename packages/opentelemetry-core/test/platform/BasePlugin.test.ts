@@ -58,7 +58,13 @@ describe('BasePlugin', () => {
       const testPackage = require('../trace/fixtures/test-package');
       const plugin = new TestPlugin();
       assert.doesNotThrow(() => {
-        plugin.enable(testPackage, tracerProvider, logger, undefined, meterProvider);
+        plugin.enable(
+          testPackage,
+          tracerProvider,
+          logger,
+          undefined,
+          meterProvider
+        );
       });
       assert.ok(plugin['_meter'] !== undefined);
     });
