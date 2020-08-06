@@ -6,14 +6,8 @@ const {
   setExtractedSpanContext,
 } = require("@opentelemetry/core");
 const { BasicTracerProvider } = require("@opentelemetry/tracing");
-const { Context } = require("@opentelemetry/context-base");
 const bodyParser = require("body-parser");
-const {
-  defaultGetter,
-  defaultSetter,
-  propagation,
-  trace,
-} = require("@opentelemetry/api");
+const { defaultSetter, propagation, trace } = require("@opentelemetry/api");
 
 // set global propagator
 propagation.setGlobalPropagator(new HttpTraceContext());
@@ -36,11 +30,7 @@ app.use(bodyParser.json());
 
 // Mount our demo route
 app.post("/verify-tracecontext", (req, res) => {
-  const context = propagation.extract(
-    req.headers,
-    defaultGetter,
-    Context.ROOT_CONTEXT
-  );
+  const context = propagation.extract(req.headers);
   const spanContext = getExtractedSpanContext(context);
   Promise.all(
     req.body.map((action) => {
