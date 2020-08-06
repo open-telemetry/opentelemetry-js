@@ -22,6 +22,7 @@ import {
 } from '@opentelemetry/api';
 import { LogLevel } from './types';
 import { ConsoleLogger } from './ConsoleLogger';
+import { getEnv } from '../platform';
 
 /**
  * PluginManagerConfig provides an interface for the config being passed to a PluginEnabler
@@ -55,7 +56,8 @@ export class PluginManager {
 
   constructor(config: PluginManagerConfig = {}) {
     this.logger =
-      config.logger ?? new ConsoleLogger(config.logLevel ?? LogLevel.INFO);
+      config.logger ??
+      new ConsoleLogger(config.logLevel ?? getEnv().OTEL_LOG_LEVEL);
     this.tracerProvider = config.tracerProvider ?? trace.getTracerProvider();
     this.meterProvider = config.meterProvider ?? metrics.getMeterProvider();
   }
