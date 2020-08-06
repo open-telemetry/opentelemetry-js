@@ -81,7 +81,7 @@ const _satisfiesPattern = (
   } else if (typeof pattern === 'function') {
     return pattern(methodName);
   } else {
-    throw new TypeError('Pattern is in unsupported datatype');
+    return false;
   }
 };
 
@@ -94,23 +94,16 @@ const _satisfiesPattern = (
  */
 export const _methodIsIgnored = (
   methodName: string,
-  ignoredMethods?: IgnoreMatcher[],
-  onException?: (e: Error) => void
+  ignoredMethods?: IgnoreMatcher[]
 ): boolean => {
   if (!ignoredMethods) {
-    // No ignored rpc methods
+    // No ignored gRPC methods
     return false;
   }
 
-  try {
-    for (const pattern of ignoredMethods) {
-      if (_satisfiesPattern(methodName, pattern)) {
-        return true;
-      }
-    }
-  } catch (e) {
-    if (onException) {
-      onException(e);
+  for (const pattern of ignoredMethods) {
+    if (_satisfiesPattern(methodName, pattern)) {
+      return true;
     }
   }
 
