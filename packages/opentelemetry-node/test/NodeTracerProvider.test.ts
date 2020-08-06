@@ -56,7 +56,6 @@ describe('NodeTracerProvider', () => {
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
-    // provider.stop(); TODO: call stop on the enabler
     contextManager.disable();
     context.disable();
   });

@@ -33,6 +33,7 @@ describe('NodePluginManager', () => {
   afterEach(() => {
     // clear require cache
     Object.keys(require.cache).forEach(key => delete require.cache[key]);
+    nodePluginManager.stop();
   });
 
   describe('constructor', () => {

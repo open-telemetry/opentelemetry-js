@@ -33,7 +33,6 @@ describe('PluginManager', () => {
     const pluginManager = new PluginManager();
     assert.ok(pluginManager['meterProvider'] instanceof NoopMeterProvider);
     assert.ok(pluginManager['tracerProvider'] instanceof NoopTracerProvider);
-    //   assert.ok(trace.getTracerProvider() === tracerProvider);
   });
 
   it('should use global meter/tracer provider by default', () => {
