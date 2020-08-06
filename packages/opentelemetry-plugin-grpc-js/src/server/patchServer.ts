@@ -134,7 +134,7 @@ function shouldNotTraceServerCall(
     containsOtelMetadata(metadata) ||
     methodIsIgnored(
       parsedName[parsedName.length - 1] || methodName,
-      this._config.ignoreRpcMethods,
+      this._config.ignoreGrpcMethods,
       (e: Error) =>
         this._logger.error(`caught ignoreRpcMethods error: ${e.message}`)
     )

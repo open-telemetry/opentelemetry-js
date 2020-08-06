@@ -241,7 +241,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       _containsOtelMetadata(call.metadata) ||
       _methodIsIgnored(
         parsedName[parsedName.length - 1] || name,
-        this._config.ignoreRpcMethods,
+        this._config.ignoreGrpcMethods,
         (e: Error) =>
           this._logger.error(`caught ignoreRpcMethods error: ${e.message}`)
       )
@@ -370,7 +370,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     // For a method defined in .proto as "UnaryMethod"
     Object.entries(methods).forEach(([name, { originalName }]) => {
       if (
-        !_methodIsIgnored(name, this._config.ignoreRpcMethods, (e: Error) =>
+        !_methodIsIgnored(name, this._config.ignoreGrpcMethods, (e: Error) =>
           this._logger.error(`caught ignoreRpcMethods error, ${e.message}`)
         )
       ) {

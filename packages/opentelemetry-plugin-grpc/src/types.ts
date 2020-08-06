@@ -30,10 +30,10 @@ export type SendUnaryDataCallback = (
 ) => void;
 
 export interface GrpcPluginOptions extends PluginConfig {
-  /* Omits tracing on any RPC methods that match any of
-   * the IgnoreMatchers in the ignoreRpcMethods list
+  /* Omits tracing on any gRPC methods that match any of
+   * the IgnoreMatchers in the ignoreGrpcMethods list
    */
-  ignoreRpcMethods?: IgnoreMatcher[];
+  ignoreGrpcMethods?: IgnoreMatcher[];
 }
 
 interface GrpcStatus {

@@ -805,7 +805,7 @@ export const runTests = (
 
       before(async () => {
         const config = {
-          ignoreRpcMethods: [
+          ignoreGrpcMethods: [
             'UnaryMethod',
             new RegExp(/^camel.*Method$/),
             (str: string) => str === 'BidiStreamMethod',

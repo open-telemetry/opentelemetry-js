@@ -22,10 +22,10 @@ import { PluginConfig } from '@opentelemetry/api';
 export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
 
 export interface GrpcPluginOptions extends PluginConfig {
-  /* Omits tracing on any RPC methods that match any of
+  /* Omits tracing on any gRPC methods that match any of
    * the IgnoreMatchers in the ignoreRpcMethods list
    */
-  ignoreRpcMethods?: IgnoreMatcher[];
+  ignoreGrpcMethods?: IgnoreMatcher[];
 }
 
 /**
