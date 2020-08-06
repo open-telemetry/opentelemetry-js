@@ -34,6 +34,7 @@ import {
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NodeSDK } from '../src';
+import { PromiseSyncCall } from '../src/utils';
 
 describe('Node SDK', () => {
   beforeEach(() => {
@@ -119,6 +120,37 @@ describe('Node SDK', () => {
       assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+    });
+
+    describe('when autoDetectResources=false', () => {
+      it('should work synchronously', done => {
+        const sdk = new NodeSDK({
+          autoDetectResources: false,
+        });
+        const result = sdk.start();
+        assert.ok(result instanceof PromiseSyncCall);
+        result.then(() => {
+          assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+          assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+          done();
+        });
+      });
+    });
+
+    describe('when autoDetectResources=true', () => {
+      it('should work asynchronously', done => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
+
+        const result = sdk.start();
+        assert.ok(result instanceof Promise);
+        result.then(() => {
+          assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+          assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+          done();
+        });
+      });
     });
   });
 });

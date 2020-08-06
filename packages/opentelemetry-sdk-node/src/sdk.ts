@@ -21,6 +21,7 @@ import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
+import { PromiseSyncCall } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -130,12 +131,26 @@ export class NodeSDK {
 
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
+   * SDK can still be used as
+   * @example
+   *
+   *     sdk.start().then(() => {
+   *       // sdk ready and resources loaded (if autoDetectResources === true)
+   *     });
+   *     // sdk ready
+   *
+   *
+   *     await sdk.start();
+   *     // sdk ready and resources loaded (if autoDetectResources === true)
+   *
+   *
+   *     sdk.start(() => {
+   *       // sdk ready and resources loaded (if autoDetectResources === true)
+   *     });
+   *     // sdk ready resources not loaded
+   *
    */
-  public async start() {
-    if (this._autoDetectResources) {
-      await this.detectResources();
-    }
-
+  public start(): Promise<void> | PromiseSyncCall {
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,
@@ -156,6 +171,12 @@ export class NodeSDK {
       });
 
       metrics.setGlobalMeterProvider(meterProvider);
+    }
+
+    if (this._autoDetectResources) {
+      return this.detectResources();
+    } else {
+      return new PromiseSyncCall();
     }
   }
 }

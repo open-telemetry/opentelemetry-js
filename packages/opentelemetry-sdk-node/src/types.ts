@@ -34,3 +34,10 @@ export interface NodeSDKConfiguration {
   traceExporter: tracing.SpanExporter;
   traceParams: tracing.TraceParams;
 }
+
+/**
+ * Interface to mimic the behaviour of Promise but in fully sync way
+ */
+export interface PromiseSync {
+  then(onSuccess?: () => void, onError?: () => void): void;
+}
