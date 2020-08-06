@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-import { NOOP_TRACER, NoopTracerProvider } from '@opentelemetry/api';
+import { NOOP_TRACER, NoopTracerProvider, NoopMeterProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { BasePlugin, NoopLogger } from '../../../src';
 
 const tracerProvider = new NoopTracerProvider();
+const meterProvider = new NoopMeterProvider();
 const logger = new NoopLogger();
 describe('BasePlugin', () => {
   describe('enable', () => {
@@ -32,6 +33,14 @@ describe('BasePlugin', () => {
       assert.strictEqual(plugin['_tracerVersion'], '1');
       assert.strictEqual(plugin['_logger'], logger);
       assert.strictEqual(patch, moduleExports);
+    });
+    it('testing meterProvider in enable method', () => {
+      const testPackage = require('../trace/fixtures/test-package');
+      const plugin = new TestPlugin('foo', '1');
+      assert.doesNotThrow(() => {
+        plugin.enable(testPackage, tracerProvider, logger, undefined, meterProvider);
+      });
+      assert.ok(plugin['_meter'] !== undefined);
     });
   });
 });

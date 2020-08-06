@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-import { NoopTracerProvider } from '@opentelemetry/api';
+import { NoopTracerProvider, NoopMeterProvider } from '@opentelemetry/api';
 import * as assert from 'assert';
 import * as path from 'path';
 import { BasePlugin, NoopLogger } from '../../src';
 import * as types from '../trace/fixtures/test-package/foo/bar/internal';
 
 const tracerProvider = new NoopTracerProvider();
+const meterProvider = new NoopMeterProvider();
 const logger = new NoopLogger();
 describe('BasePlugin', () => {
   describe('internalFilesLoader', () => {
@@ -52,6 +53,14 @@ describe('BasePlugin', () => {
       } else {
         assert.ok(true, 'Internal file loading is not tested in the browser');
       }
+    });
+    it('testing meterProvider in enable method', () => {
+      const testPackage = require('../trace/fixtures/test-package');
+      const plugin = new TestPlugin();
+      assert.doesNotThrow(() => {
+        plugin.enable(testPackage, tracerProvider, logger, undefined, meterProvider);
+      });
+      assert.ok(plugin['_meter'] !== undefined);
     });
   });
 });
