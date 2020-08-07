@@ -258,6 +258,19 @@ describe('HttpTraceContext', () => {
       });
     });
 
+    it('should handle OWS in tracestate list members', () => {
+      carrier[TRACE_PARENT_HEADER] =
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
+      carrier[TRACE_STATE_HEADER] = 'foo=1 \t , \t bar=2, \t baz=3 ';
+      const extractedSpanContext = getExtractedSpanContext(
+        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+      );
+
+      assert.deepStrictEqual(extractedSpanContext!.traceState!.get('foo'), '1');
+      assert.deepStrictEqual(extractedSpanContext!.traceState!.get('bar'), '2');
+      assert.deepStrictEqual(extractedSpanContext!.traceState!.get('baz'), '3');
+    });
+
     it('should fail gracefully on bad responses from getter', () => {
       const ctx1 = httpTraceContext.extract(
         Context.ROOT_CONTEXT,
