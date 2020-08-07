@@ -45,7 +45,7 @@ export interface TracerConfig {
 
   /** Bool for whether or not graceful shutdown is enabled */
   gracefulShutdown?: boolean;
-  
+
   /**
    * Generator of trace and span IDs
    * The default idGenerator generates random ids
