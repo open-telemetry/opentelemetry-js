@@ -65,7 +65,7 @@ describe('BeanstalkResourceDetector', () => {
     assert.ok(resource);
     assertContainerResource(resource, {
       name: 'abcd.test.testing.com',
-      imageTag:
+      id:
         'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
     });
   });
@@ -84,7 +84,7 @@ describe('BeanstalkResourceDetector', () => {
     assert.ok(resource);
     assertContainerResource(resource, {
       name: 'abcd.test.testing.com',
-      imageTag:
+      id:
         'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
     });
   });
@@ -152,7 +152,7 @@ describe('BeanstalkResourceDetector', () => {
     sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
     assertContainerResource(resource, {
-      imageTag:
+      id:
         'bcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm',
     });
   });

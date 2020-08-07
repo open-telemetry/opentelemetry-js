@@ -62,11 +62,11 @@ class AwsEcsDetector implements Detector {
     if (containerId && hostName) {
       return new Resource({
         [CONTAINER_RESOURCE.NAME]: hostName,
-        [CONTAINER_RESOURCE.IMAGE_TAG]: containerId,
+        [CONTAINER_RESOURCE.ID]: containerId,
       });
     } else if (!hostName && containerId) {
       return new Resource({
-        [CONTAINER_RESOURCE.IMAGE_TAG]: containerId,
+        [CONTAINER_RESOURCE.ID]: containerId,
       });
     } else if (hostName && !containerId) {
       return new Resource({
