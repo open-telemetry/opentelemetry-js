@@ -83,10 +83,7 @@ export const assertContainerResource = (
       validations.name
     );
   if (validations.id)
-    assert.strictEqual(
-      resource.labels[CONTAINER_RESOURCE.ID],
-      validations.id
-    );
+    assert.strictEqual(resource.labels[CONTAINER_RESOURCE.ID], validations.id);
   if (validations.imageName)
     assert.strictEqual(
       resource.labels[CONTAINER_RESOURCE.IMAGE_NAME],
