@@ -27,8 +27,13 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
-const VALID_TRACE_PARENT_REGEX = /^(?!ff)[\da-f]{2}-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})(-|$)/;
+
 const VERSION = '00';
+
+const VERSION_REGEX = /^(?!ff)[\da-f]{2}$/;
+const TRACE_ID_REGEX = /^(?![0]{32})[\da-f]{32}$/;
+const PARENT_ID_REGEX = /^(?![0]{16})[\da-f]{16}$/;
+const FLAGS_REGEX = /^[\da-f]{2}$/;
 
 /**
  * Parses information from the [traceparent] span tag and converts it into {@link SpanContext}
@@ -41,19 +46,30 @@ const VERSION = '00';
  *     For more information see {@link https://www.w3.org/TR/trace-context/}
  */
 export function parseTraceParent(traceParent: string): SpanContext | null {
-  const match = traceParent.match(VALID_TRACE_PARENT_REGEX);
-  if (
-    !match ||
-    match[1] === '00000000000000000000000000000000' ||
-    match[2] === '0000000000000000'
-  ) {
+  const trimmed = traceParent.trim();
+  const traceParentParts = trimmed.split('-');
+
+  // Version 00 only allows the specific 4 fields.
+  // For future versions, we can grab just the parts (4 fields) we support.
+  if (traceParentParts[0] === VERSION && traceParentParts.length !== 4) {
+    return null;
+  }
+
+  const [version, traceId, parentId, flags] = traceParentParts;
+  const isValidParent =
+    VERSION_REGEX.test(version) &&
+    TRACE_ID_REGEX.test(traceId) &&
+    PARENT_ID_REGEX.test(parentId) &&
+    FLAGS_REGEX.test(flags);
+
+  if (!isValidParent) {
     return null;
   }
 
   return {
-    traceId: match[1],
-    spanId: match[2],
-    traceFlags: parseInt(match[3], 16),
+    traceId: traceId,
+    spanId: parentId,
+    traceFlags: parseInt(flags, 16),
   };
 }
 

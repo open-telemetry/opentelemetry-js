@@ -147,6 +147,19 @@ describe('HttpTraceContext', () => {
       );
     });
 
+    it('should return null if matching version but extra fields (invalid)', () => {
+      // Version 00 (our current) consists of {version}-{traceId}-{parentId}-{flags}
+      carrier[TRACE_PARENT_HEADER] =
+        '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01-extra';
+
+      assert.deepStrictEqual(
+        getExtractedSpanContext(
+          httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        ),
+        undefined
+      );
+    });
+
     it('extracts traceparent from list of header', () => {
       carrier[TRACE_PARENT_HEADER] = [
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
