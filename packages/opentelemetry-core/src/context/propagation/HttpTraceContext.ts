@@ -29,6 +29,7 @@ export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
 
 const VERSION = '00';
+const VERSION_PART_COUNT = 4; // Version 00 only allows the specific 4 fields.
 
 const VERSION_REGEX = /^(?!ff)[\da-f]{2}$/;
 const TRACE_ID_REGEX = /^(?![0]{32})[\da-f]{32}$/;
@@ -49,9 +50,12 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
   const trimmed = traceParent.trim();
   const traceParentParts = trimmed.split('-');
 
-  // Version 00 only allows the specific 4 fields.
-  // For future versions, we can grab just the parts (4 fields) we support.
-  if (traceParentParts[0] === VERSION && traceParentParts.length !== 4) {
+  // Current version must be structured correctly.
+  // For future versions, we can grab just the parts we do support.
+  if (
+    traceParentParts[0] === VERSION &&
+    traceParentParts.length !== VERSION_PART_COUNT
+  ) {
     return null;
   }
 
