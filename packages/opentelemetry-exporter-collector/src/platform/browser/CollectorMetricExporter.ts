@@ -14,31 +14,38 @@
  * limitations under the License.
  */
 
-import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
-import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorExporterConfigBrowser } from './types';
+import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
 import * as collectorTypes from '../../types';
+import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
+import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
+import { CollectorExporterConfigBrowser } from './types';
 
-const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/trace';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/metrics';
+const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
 /**
- * Collector Trace Exporter for Web
+ * Collector Metric Exporter for Web
  */
-export class CollectorTraceExporter
+export class CollectorMetricExporter
   extends CollectorExporterBrowserBase<
-    ReadableSpan,
-    collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
+    MetricRecord,
+    collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
-  implements SpanExporter {
+  implements MetricExporter {
+  // Converts time to nanoseconds
+  private readonly _startTime = new Date().getTime() * 1000000;
+
   convert(
-    spans: ReadableSpan[]
-  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
-    return toCollectorExportTraceServiceRequest(spans, this);
+    metrics: MetricRecord[]
+  ): collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest {
+    return toCollectorExportMetricServiceRequest(
+      metrics,
+      this._startTime,
+      this
+    );
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBrowser) {
+  getDefaultUrl(config: CollectorExporterConfigBrowser): string {
     return config.url || DEFAULT_COLLECTOR_URL;
   }
 
