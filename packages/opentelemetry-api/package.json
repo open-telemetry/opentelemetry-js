@@ -55,7 +55,7 @@
     "@opentelemetry/context-base": "^0.10.2"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.0",
+    "@types/mocha": "8.0.1",
     "@types/node": "14.0.27",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.2",
@@ -70,9 +70,9 @@
     "linkinator": "2.1.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
-    "ts-loader": "8.0.1",
+    "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
-    "typedoc": "0.17.8",
+    "typedoc": "0.18.0",
     "typescript": "3.9.7",
     "webpack": "4.44.1"
   }
