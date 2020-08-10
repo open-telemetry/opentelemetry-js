@@ -82,15 +82,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
       if (this.resource instanceof Promise) {
         this.resource.then(resource => {
           this.resource = resource;
-          resolve(
-            Array.from(this._instruments.values()).map(instrument => ({
-              descriptor: this._descriptor,
-              labels: instrument.getLabels(),
-              aggregator: instrument.getAggregator(),
-              resource: this.resource,
-              instrumentationLibrary: this.instrumentationLibrary,
-            }))
-          );
+          this.getMetricRecord().then(resolve);
         });
       } else {
         resolve(
