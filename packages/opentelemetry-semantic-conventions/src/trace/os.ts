@@ -20,6 +20,7 @@
  * In case of virtualized environments, this is the operating system as it
  * is observed by the process, i.e., the virtualized guest rather than the
  * underlying host.
+ * https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/resource/semantic_conventions/os.md
  */
 export const OperatingSystem = {
   /**
