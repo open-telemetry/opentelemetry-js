@@ -29,7 +29,7 @@ export class Context {
 
   /** Get a key to uniquely identify a context value */
   public static createKey(description: string) {
-    return Symbol(description);
+    return Symbol.for(description);
   }
 
   /**
