@@ -62,7 +62,6 @@ sdk.start();
 
 Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;
 
-
 ### contextManager
 
 Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemetry-context-async-hooks/README.md)
