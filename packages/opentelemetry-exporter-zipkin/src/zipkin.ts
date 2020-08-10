@@ -27,7 +27,7 @@ import {
   statusDescriptionTagName,
 } from './transform';
 import { OT_REQUEST_HEADER } from './utils';
-import { SERVICE_RESOURCE } from '@opentelemetry/resources';
+import { Resource, SERVICE_RESOURCE } from '@opentelemetry/resources';
 /**
  * Zipkin Exporter
  */
@@ -73,7 +73,7 @@ export class ZipkinExporter implements SpanExporter {
   ) {
     if (typeof this._serviceName !== 'string') {
       this._serviceName = String(
-        spans[0].resource.labels[SERVICE_RESOURCE.NAME] ||
+        (spans[0].resource as Resource).labels[SERVICE_RESOURCE.NAME] ||
           this.DEFAULT_SERVICE_NAME
       );
     }
