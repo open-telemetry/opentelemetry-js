@@ -14,7 +14,7 @@ propagation.setGlobalPropagator(new HttpTraceContext());
 context.setGlobalContextManager(new AsyncHooksContextManager());
 
 // Create a provider for activating and tracking spans
-const tracerProvider = new BasicTracerProvider({});
+const tracerProvider = new BasicTracerProvider();
 
 // Register the tracer
 tracerProvider.register();
