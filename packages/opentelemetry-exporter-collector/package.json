@@ -54,8 +54,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.11.0",
-    "@types/mocha": "8.0.0",
+    "@babel/core": "7.11.1",
+    "@types/mocha": "8.0.1",
     "@types/node": "14.0.27",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
@@ -74,13 +74,13 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "sinon": "9.0.2",
-    "ts-loader": "8.0.1",
+    "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7",
     "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
-    "webpack-merge": "5.0.9"
+    "webpack-merge": "5.1.1"
   },
   "dependencies": {
     "@grpc/proto-loader": "^0.5.4",
