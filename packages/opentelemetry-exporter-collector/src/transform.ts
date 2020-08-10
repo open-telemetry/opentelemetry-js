@@ -265,10 +265,10 @@ export function groupSpansByResourceAndLibrary(
 ): Map<Resource, Map<core.InstrumentationLibrary, ReadableSpan[]>> {
   return spans.reduce((spanMap, span) => {
     //group by resource
-    let resourceSpans = spanMap.get(span.resource);
+    let resourceSpans = spanMap.get(span.resource as Resource);
     if (!resourceSpans) {
       resourceSpans = new Map<core.InstrumentationLibrary, ReadableSpan[]>();
-      spanMap.set(span.resource, resourceSpans);
+      spanMap.set(span.resource as Resource, resourceSpans);
     }
     //group by instrumentation library
     let libSpans = resourceSpans.get(span.instrumentationLibrary);
