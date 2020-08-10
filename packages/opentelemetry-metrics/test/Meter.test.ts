@@ -114,6 +114,27 @@ describe('Meter', () => {
       assert.ok(record.resource instanceof Resource);
     });
 
+    it('should pipe through promise resource', async () => {
+      const promise: Promise<Resource> = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(new Resource({ foo: 'bar' }));
+        }, 1);
+      });
+      meter = new MeterProvider({
+        logger: new NoopLogger(),
+        resource: promise,
+      }).getMeter('test-meter');
+
+      const counter = meter.createCounter('name') as CounterMetric;
+      assert.ok(counter.resource instanceof Promise);
+
+      counter.add(1, { foo: 'bar' });
+
+      const [record] = await counter.getMetricRecord();
+      assert.ok(record.resource instanceof Resource);
+      assert.deepStrictEqual(record.resource.labels, { foo: 'bar' });
+    });
+
     it('should pipe through instrumentation library', async () => {
       const counter = meter.createCounter('name') as CounterMetric;
       assert.ok(counter.instrumentationLibrary);
@@ -712,12 +733,14 @@ describe('Meter', () => {
 
     it('should set callback and observe value ', async () => {
       let counter = 0;
+
       function getValue() {
         if (++counter % 2 == 0) {
           return -1;
         }
         return 3;
       }
+
       const sumObserver = meter.createSumObserver(
         'name',
         {
@@ -931,6 +954,7 @@ describe('Meter', () => {
 
     it('should set callback and observe value ', async () => {
       let counter = 0;
+
       function getValue() {
         counter++;
         if (counter % 2 === 0) {
@@ -938,6 +962,7 @@ describe('Meter', () => {
         }
         return 3;
       }
+
       const upDownSumObserver = meter.createUpDownSumObserver(
         'name',
         {
@@ -1340,6 +1365,7 @@ class CustomBatcher extends Batcher {
   process(record: MetricRecord): void {
     throw new Error('process method not implemented.');
   }
+
   aggregatorFor(metricKind: MetricDescriptor): Aggregator {
     throw new Error('aggregatorFor method not implemented.');
   }

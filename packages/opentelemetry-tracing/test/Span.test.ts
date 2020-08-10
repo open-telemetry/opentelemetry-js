@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
+import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import {
   SpanKind,
   CanonicalCode,
@@ -22,7 +24,14 @@ import {
   SpanContext,
   LinkContext,
 } from '@opentelemetry/api';
-import { BasicTracerProvider, Span } from '../src';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  ReadableSpan,
+  SimpleSpanProcessor,
+  Span,
+  Tracer,
+} from '../src';
 import {
   hrTime,
   hrTimeToNanoseconds,
@@ -34,19 +43,28 @@ import {
 const performanceTimeOrigin = hrTime();
 
 describe('Span', () => {
-  const tracer = new BasicTracerProvider({
-    logger: new NoopLogger(),
-  }).getTracer('default');
-  const name = 'span1';
-  const spanContext: SpanContext = {
-    traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-    spanId: '6e0c63257de34c92',
-    traceFlags: TraceFlags.SAMPLED,
-  };
-  const linkContext: LinkContext = {
-    traceId: 'e4cda95b652f4a1592b449d5929fda1b',
-    spanId: '7e0c63257de34c92',
-  };
+  let name: string;
+  let spanContext: SpanContext;
+  let tracer: Tracer;
+  let linkContext: LinkContext;
+  let provider: BasicTracerProvider;
+
+  beforeEach(() => {
+    name = 'span1';
+    provider = new BasicTracerProvider({
+      logger: new NoopLogger(),
+    });
+    tracer = provider.getTracer('default');
+    spanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.SAMPLED,
+    };
+    linkContext = {
+      traceId: 'e4cda95b652f4a1592b449d5929fda1b',
+      spanId: '7e0c63257de34c92',
+    };
+  });
 
   it('should create a Span instance', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
@@ -356,5 +374,39 @@ describe('Span', () => {
     assert.strictEqual(span.ended, false);
     span.end();
     assert.strictEqual(span.ended, true);
+  });
+  describe('when resource is a promise', () => {
+    it('should have ended', () => {
+      const promise: Promise<Resource> = new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(new Resource({ foo: 'bar' }));
+        }, 1);
+      });
+      provider = new BasicTracerProvider({
+        logger: new NoopLogger(),
+        resource: promise,
+      });
+
+      tracer = provider.getTracer('default');
+
+      const exporter = new InMemorySpanExporter();
+      provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+      const spy = sinon.stub(exporter, 'export');
+
+      const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
+
+      assert.strictEqual(span.ended, false);
+      span.end();
+      assert.strictEqual(span.ended, true);
+      assert.strictEqual(spy.args.length, 0);
+
+      setTimeout(() => {
+        const exportedSpan = (spy.args[0][0][0] as unknown) as ReadableSpan;
+        assert.deepStrictEqual(exportedSpan.spanContext, span.context());
+        assert.deepStrictEqual((exportedSpan.resource as Resource).labels, {
+          foo: 'bar',
+        });
+      }, 10);
+    });
   });
 });

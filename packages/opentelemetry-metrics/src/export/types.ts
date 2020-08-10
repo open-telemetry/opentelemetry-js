@@ -84,7 +84,7 @@ export interface MetricRecord {
   readonly descriptor: MetricDescriptor;
   readonly labels: Labels;
   readonly aggregator: Aggregator;
-  readonly resource: Resource;
+  readonly resource: Resource | Promise<Resource>;
   readonly instrumentationLibrary: InstrumentationLibrary;
 }
 

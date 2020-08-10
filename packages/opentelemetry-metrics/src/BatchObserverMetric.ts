@@ -36,7 +36,7 @@ export class BatchObserverMetric extends Metric<BoundObserver>
     name: string,
     options: api.BatchMetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource,
+    resource: Resource | Promise<Resource>,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.BatchObserverResult) => void
   ) {

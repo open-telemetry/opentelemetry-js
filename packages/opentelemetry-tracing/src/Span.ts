@@ -41,7 +41,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly links: api.Link[] = [];
   readonly events: api.TimedEvent[] = [];
   readonly startTime: api.HrTime;
-  readonly resource: Resource;
+  resource: Resource | Promise<Resource>;
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.Status = {
@@ -169,6 +169,14 @@ export class Span implements api.Span, ReadableSpan {
         this.startTime,
         this.endTime
       );
+    }
+
+    if (this.resource instanceof Promise) {
+      this.resource.then(resource => {
+        this.resource = resource;
+        this._spanProcessor.onEnd(this);
+      });
+      return;
     }
 
     this._spanProcessor.onEnd(this);

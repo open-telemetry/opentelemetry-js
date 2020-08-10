@@ -34,7 +34,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
-    readonly resource: Resource,
+    public resource: Resource | Promise<Resource>,
     readonly instrumentationLibrary: InstrumentationLibrary
   ) {
     this._disabled = !!_options.disabled;
@@ -79,15 +79,30 @@ export abstract class Metric<T extends BaseBoundInstrument>
 
   getMetricRecord(): Promise<MetricRecord[]> {
     return new Promise(resolve => {
-      resolve(
-        Array.from(this._instruments.values()).map(instrument => ({
-          descriptor: this._descriptor,
-          labels: instrument.getLabels(),
-          aggregator: instrument.getAggregator(),
-          resource: this.resource,
-          instrumentationLibrary: this.instrumentationLibrary,
-        }))
-      );
+      if (this.resource instanceof Promise) {
+        this.resource.then(resource => {
+          this.resource = resource;
+          resolve(
+            Array.from(this._instruments.values()).map(instrument => ({
+              descriptor: this._descriptor,
+              labels: instrument.getLabels(),
+              aggregator: instrument.getAggregator(),
+              resource: this.resource,
+              instrumentationLibrary: this.instrumentationLibrary,
+            }))
+          );
+        });
+      } else {
+        resolve(
+          Array.from(this._instruments.values()).map(instrument => ({
+            descriptor: this._descriptor,
+            labels: instrument.getLabels(),
+            aggregator: instrument.getAggregator(),
+            resource: this.resource,
+            instrumentationLibrary: this.instrumentationLibrary,
+          }))
+        );
+      }
     });
   }
 

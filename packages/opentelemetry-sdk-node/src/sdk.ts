@@ -21,7 +21,6 @@ import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
 import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
-import { PromiseSyncCall } from './utils';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -33,17 +32,13 @@ export class NodeSDK {
   };
   private _meterProviderConfig?: MeterConfig;
 
-  private _resource: Resource;
-
-  private _autoDetectResources: boolean;
+  private _resource: Resource | Promise<Resource>;
 
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
-
-    this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig: NodeTracerConfig = {};
@@ -120,13 +115,18 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources() {
-    this.addResource(await detectResources());
+  private _detectResources(): Promise<Resource> {
+    return new Promise<Resource>((resolve, reject) => {
+      detectResources().then(resource => {
+        this.addResource(resource);
+        resolve(this._resource);
+      }, reject);
+    });
   }
 
   /** Manually add a resource */
   public addResource(resource: Resource) {
-    this._resource = this._resource.merge(resource);
+    this._resource = (this._resource as Resource).merge(resource);
   }
 
   /**
@@ -150,11 +150,11 @@ export class NodeSDK {
    *     // sdk ready resources not loaded
    *
    */
-  public start(): Promise<void> | PromiseSyncCall {
+  public start(): void {
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,
-        resource: this._resource,
+        resource: this._detectResources(),
       });
 
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
@@ -167,16 +167,10 @@ export class NodeSDK {
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         ...this._meterProviderConfig,
-        resource: this._resource,
+        resource: this._detectResources(),
       });
 
       metrics.setGlobalMeterProvider(meterProvider);
-    }
-
-    if (this._autoDetectResources) {
-      return this.detectResources();
-    } else {
-      return new PromiseSyncCall();
     }
   }
 }

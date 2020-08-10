@@ -35,7 +35,7 @@ export interface MeterConfig {
   interval?: number;
 
   /** Resource associated with metric telemetry */
-  resource?: Resource;
+  resource?: Resource | Promise<Resource>;
 
   /** Metric batcher. */
   batcher?: Batcher;

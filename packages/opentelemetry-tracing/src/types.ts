@@ -41,7 +41,7 @@ export interface TracerConfig {
   traceParams?: TraceParams;
 
   /** Resource associated with trace telemetry  */
-  resource?: Resource;
+  resource?: Resource | Promise<Resource>;
 
   /**
    * Generator of trace and span IDs
