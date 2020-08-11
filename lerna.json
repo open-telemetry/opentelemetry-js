@@ -4,7 +4,8 @@
   "packages": [
     "benchmark/*",
     "metapackages/*",
-    "packages/*"
+    "packages/*",
+    "integration-tests/*"
   ],
   "version": "0.10.2",
   "changelog": {
