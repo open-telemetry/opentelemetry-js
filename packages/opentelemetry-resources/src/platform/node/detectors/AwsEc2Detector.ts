@@ -126,7 +126,7 @@ class AwsEc2Detector implements Detector {
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private async _fetchString(options: Record<string, any>): Promise<string> {
+  private async _fetchString(options: http.RequestOptions): Promise<string> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
