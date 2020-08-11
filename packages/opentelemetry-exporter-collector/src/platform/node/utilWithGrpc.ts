@@ -17,31 +17,26 @@
 import * as protoLoader from '@grpc/proto-loader';
 import * as grpc from 'grpc';
 import * as path from 'path';
+import { ServiceClientType } from '../../types';
 import * as collectorTypes from '../../types';
 
-import { ReadableSpan } from '@opentelemetry/tracing';
-import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorTraceExporter } from './CollectorTraceExporter';
-import { CollectorExporterConfigNode, GRPCSpanQueueItem } from './types';
+import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
 import { removeProtocol } from './util';
+import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
-export const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-
-export function onInitWithGrpc(
-  collector: CollectorTraceExporter,
+export function initWithGrpc<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   config: CollectorExporterConfigNode
 ): void {
-  collector.grpcSpansQueue = [];
+  collector.grpcQueue = [];
   const serverAddress = removeProtocol(collector.url);
   const credentials: grpc.ChannelCredentials =
     config.credentials || grpc.credentials.createInsecure();
 
-  const traceServiceProtoPath =
-    'opentelemetry/proto/collector/trace/v1/trace_service.proto';
   const includeDirs = [path.resolve(__dirname, 'protos')];
 
   protoLoader
-    .load(traceServiceProtoPath, {
+    .load(collector.getServiceProtoPath(), {
       keepCase: false,
       longs: String,
       enums: String,
@@ -51,49 +46,53 @@ export function onInitWithGrpc(
     })
     .then(packageDefinition => {
       const packageObject: any = grpc.loadPackageDefinition(packageDefinition);
-      collector.traceServiceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
-        serverAddress,
-        credentials
-      );
-      if (collector.grpcSpansQueue.length > 0) {
-        const queue = collector.grpcSpansQueue.splice(0);
-        queue.forEach((item: GRPCSpanQueueItem) => {
-          collector.sendSpans(item.spans, item.onSuccess, item.onError);
+
+      if (collector.getServiceClientType() === ServiceClientType.SPANS) {
+        collector.serviceClient = new packageObject.opentelemetry.proto.collector.trace.v1.TraceService(
+          serverAddress,
+          credentials
+        );
+      } else {
+        collector.serviceClient = new packageObject.opentelemetry.proto.collector.metrics.v1.MetricsService(
+          serverAddress,
+          credentials
+        );
+      }
+
+      if (collector.grpcQueue.length > 0) {
+        const queue = collector.grpcQueue.splice(0);
+        queue.forEach((item: GRPCQueueItem<ExportItem>) => {
+          collector.send(item.objects, item.onSuccess, item.onError);
         });
       }
     });
 }
 
-export function sendSpansUsingGrpc(
-  collector: CollectorTraceExporter,
-  spans: ReadableSpan[],
+export function sendWithGrpc<ExportItem, ServiceRequest>(
+  collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
+  objects: ExportItem[],
   onSuccess: () => void,
   onError: (error: collectorTypes.CollectorExporterError) => void
 ): void {
-  if (collector.traceServiceClient) {
-    const exportTraceServiceRequest = toCollectorExportTraceServiceRequest(
-      spans,
-      collector
-    );
-    collector.traceServiceClient.export(
-      exportTraceServiceRequest,
+  if (collector.serviceClient) {
+    const serviceRequest = collector.convert(objects);
+
+    collector.serviceClient.export(
+      serviceRequest,
       collector.metadata,
       (err: collectorTypes.ExportServiceError) => {
         if (err) {
-          collector.logger.error(
-            'exportTraceServiceRequest',
-            exportTraceServiceRequest
-          );
+          collector.logger.error('Service request', serviceRequest);
           onError(err);
         } else {
-          collector.logger.debug('spans sent');
+          collector.logger.debug('Objects sent');
           onSuccess();
         }
       }
     );
   } else {
-    collector.grpcSpansQueue.push({
-      spans,
+    collector.grpcQueue.push({
+      objects,
       onSuccess,
       onError,
     });

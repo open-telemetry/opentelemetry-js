@@ -22,10 +22,14 @@ import {
 } from '../../src/utils/environment';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
+import { LogLevel } from '../../src';
 
 let lastMock: ENVIRONMENT_MAP = {};
 
-function mockEnvironment(values: ENVIRONMENT_MAP) {
+/**
+ * Mocks environment used for tests.
+ */
+export function mockEnvironment(values: ENVIRONMENT_MAP) {
   lastMock = values;
   if (typeof process !== 'undefined') {
     Object.keys(values).forEach(key => {
@@ -38,7 +42,10 @@ function mockEnvironment(values: ENVIRONMENT_MAP) {
   }
 }
 
-function removeMockEnvironment() {
+/**
+ * Removes mocked environment used for tests.
+ */
+export function removeMockEnvironment() {
   if (typeof process !== 'undefined') {
     Object.keys(lastMock).forEach(key => {
       delete process.env[key];
@@ -68,13 +75,21 @@ describe('environment', () => {
       mockEnvironment({
         FOO: '1',
         OTEL_NO_PATCH_MODULES: 'a,b,c',
-        OTEL_LOG_LEVEL: '1',
+        OTEL_LOG_LEVEL: 'ERROR',
         OTEL_SAMPLING_PROBABILITY: '0.5',
       });
       const env = getEnv();
       assert.strictEqual(env.OTEL_NO_PATCH_MODULES, 'a,b,c');
-      assert.strictEqual(env.OTEL_LOG_LEVEL, 1);
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.ERROR);
       assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 0.5);
+    });
+
+    it('should parse OTEL_LOG_LEVEL despite casing', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'waRn',
+      });
+      const env = getEnv();
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.WARN);
     });
 
     it('should parse environment variables and use defaults', () => {
@@ -87,6 +102,19 @@ describe('environment', () => {
           `Variable '${key}' doesn't match`
         );
       });
+    });
+  });
+
+  describe('mockEnvironment', () => {
+    it('should remove a mock environment', () => {
+      mockEnvironment({
+        OTEL_LOG_LEVEL: 'DEBUG',
+        OTEL_SAMPLING_PROBABILITY: 0.5,
+      });
+      removeMockEnvironment();
+      const env = getEnv();
+      assert.strictEqual(env.OTEL_LOG_LEVEL, LogLevel.INFO);
+      assert.strictEqual(env.OTEL_SAMPLING_PROBABILITY, 1);
     });
   });
 });
