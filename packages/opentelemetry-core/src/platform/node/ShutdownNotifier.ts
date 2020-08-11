@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export function notifyOnGlobalShutdown(cb: () => void) {
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
   process.once('SIGTERM', cb);
   return function removeCallbackFromGlobalShutdown() {
     process.removeListener('SIGTERM', cb);

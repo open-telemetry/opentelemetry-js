@@ -38,20 +38,19 @@ export class PushController extends Controller {
     unrefTimer(this._timer);
   }
 
-  async shutdown() {
+  async shutdown(): Promise<void> {
     await this._collect();
   }
 
   private async _collect() {
-    await this._meter.collect().then(() => {
-      this._exporter.export(
-        this._meter.getBatcher().checkPointSet(),
-        result => {
-          if (result !== ExportResult.SUCCESS) {
-            // @todo: log error
-          }
+    await this._meter.collect();
+    await this._exporter.export(
+      this._meter.getBatcher().checkPointSet(),
+      result => {
+        if (result !== ExportResult.SUCCESS) {
+          // @todo: log error
         }
-      );
-    });
+      }
+    );
   }
 }

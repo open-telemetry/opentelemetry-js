@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-export function notifyOnGlobalShutdown(cb: () => void) {
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
   window.addEventListener('unload', cb, { once: true });
   return function removeCallbackFromGlobalShutdown() {
     window.removeEventListener('unload', cb, false);

@@ -58,7 +58,7 @@ export class MeterProvider implements api.MeterProvider {
     return this._meters.get(key)!;
   }
 
-  shutdown(cb: () => void = () => {}) {
+  shutdown(cb: () => void = () => {}): void {
     this._shutdownAllMeters().then(() => {
       setTimeout(cb, 0);
     });
