@@ -36,12 +36,6 @@ class AwsEc2Detector implements Detector {
   readonly AWS_INSTANCE_IDENTITY_DOCUMENT_PATH =
     '/latest/dynamic/instance-identity/document';
   readonly AWS_INSTANCE_HOST_DOCUMENT_PATH = '/latest/meta-data/hostname';
-  readonly AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
-    'http://169.254.169.254/latest/dynamic/instance-identity/document';
-  readonly AWS_INSTANCE_TOKEN_DOCUMENT_URI =
-    'http://169.254.169.254/latest/api/token';
-  readonly AWS_INSTANCE_HOST_DOCUMENT_URI =
-    'http://169.254.169.254/latest/meta-data/hostname';
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
