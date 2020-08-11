@@ -506,7 +506,6 @@ describe('PrometheusExporter', () => {
 
     beforeEach(() => {
       meter = new MeterProvider().getMeter('test-prometheus');
-      process.removeAllListeners('SIGTERM');
       counter = meter.createCounter('counter') as CounterMetric;
       counter.bind({ key1: 'labelValue1' }).add(10);
     });
