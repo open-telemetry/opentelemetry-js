@@ -26,6 +26,7 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
 export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
+  private _cleanNotifyOnGlobalShutdown: Function | undefined;
   readonly resource: Resource;
   readonly logger: api.Logger;
 
@@ -37,7 +38,9 @@ export class MeterProvider implements api.MeterProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      notifyOnGlobalShutdown(this._shutdownAllMeters.bind(this));
+      this._cleanNotifyOnGlobalShutdown = notifyOnGlobalShutdown(
+        this._shutdownAllMeters.bind(this)
+      );
     }
   }
 
@@ -62,6 +65,10 @@ export class MeterProvider implements api.MeterProvider {
     this._shutdownAllMeters().then(() => {
       setTimeout(cb, 0);
     });
+    if (this._cleanNotifyOnGlobalShutdown) {
+      this._cleanNotifyOnGlobalShutdown();
+      this._cleanNotifyOnGlobalShutdown = undefined;
+    }
   }
 
   private async _shutdownAllMeters() {

@@ -23,15 +23,13 @@ import {
   _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 
-function _cleanupGlobalShutdownListeners() {
-  if (typeof window === 'undefined') {
-    process.removeAllListeners('SIGTERM');
-  }
-}
-
 describe('MeterProvider', () => {
+  let removeEvent: Function | undefined;
   afterEach(() => {
-    _cleanupGlobalShutdownListeners();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   describe('constructor', () => {
@@ -104,7 +102,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
         sandbox.restore();
@@ -122,7 +120,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
-      notifyOnGlobalShutdown(() => {
+      removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.notCalled(shutdownStub);
         sandbox.restore();
       });
