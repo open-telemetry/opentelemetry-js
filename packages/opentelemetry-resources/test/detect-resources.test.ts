@@ -46,6 +46,8 @@ const AWS_HOST = awsEc2Detector.HTTP_HEADER + awsEc2Detector.AWS_IDMS_ENDPOINT;
 const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
 const AWS_IDENTITY_PATH = awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH;
 const AWS_HOST_PATH = awsEc2Detector.AWS_INSTANCE_HOST_DOCUMENT_PATH;
+const AWS_METADATA_TTL_HEADER = awsEc2Detector.AWS_METADATA_TTL_HEADER;
+const AWS_METADATA_TOKEN_HEADER = awsEc2Detector.AWS_METADATA_TOKEN_HEADER;
 
 const mockedTokenResponse = 'my-token';
 const mockedIdentityResponse = {
@@ -93,7 +95,7 @@ describe('detectResources', async () => {
       const awsScope = nock(AWS_HOST)
         .persist()
         .put(AWS_TOKEN_PATH)
-        .matchHeader('X-aws-ec2-metadata-token-ttl-seconds', '60')
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
         .replyWithError({ code: 'ENOTFOUND' });
       const resource: Resource = await detectResources();
       awsScope.done();
@@ -128,13 +130,13 @@ describe('detectResources', async () => {
       const awsScope = nock(AWS_HOST)
         .persist()
         .put(AWS_TOKEN_PATH)
-        .matchHeader('X-aws-ec2-metadata-token-ttl-seconds', '60')
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
         .reply(200, () => mockedTokenResponse)
         .get(AWS_IDENTITY_PATH)
-        .matchHeader('X-aws-ec2-metadata-token', mockedTokenResponse)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
         .reply(200, () => mockedIdentityResponse)
         .get(AWS_HOST_PATH)
-        .matchHeader('X-aws-ec2-metadata-token', mockedTokenResponse)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
         .reply(200, () => mockedHostResponse);
       const resource: Resource = await detectResources();
       gcpSecondaryScope.done();

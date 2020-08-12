@@ -36,6 +36,8 @@ class AwsEc2Detector implements Detector {
   readonly AWS_INSTANCE_IDENTITY_DOCUMENT_PATH =
     '/latest/dynamic/instance-identity/document';
   readonly AWS_INSTANCE_HOST_DOCUMENT_PATH = '/latest/meta-data/hostname';
+  readonly AWS_METADATA_TTL_HEADER = 'X-aws-ec2-metadata-token-ttl-seconds';
+  readonly AWS_METADATA_TOKEN_HEADER = 'X-aws-ec2-metadata-token';
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
@@ -81,7 +83,7 @@ class AwsEc2Detector implements Detector {
       method: 'PUT',
       timeout: 1000,
       headers: {
-        'X-aws-ec2-metadata-token-ttl-seconds': '60',
+        [this.AWS_METADATA_TTL_HEADER]: '60',
       },
     };
     return await this._fetchString(options);
@@ -94,7 +96,7 @@ class AwsEc2Detector implements Detector {
       method: 'GET',
       timeout: 1000,
       headers: {
-        'X-aws-ec2-metadata-token': token,
+        [this.AWS_METADATA_TOKEN_HEADER]: token,
       },
     };
     const identity = await this._fetchString(options);
@@ -108,7 +110,7 @@ class AwsEc2Detector implements Detector {
       method: 'GET',
       timeout: 1000,
       headers: {
-        'X-aws-ec2-metadata-token': token,
+        [this.AWS_METADATA_TOKEN_HEADER]: token,
       },
     };
     return await this._fetchString(options);
