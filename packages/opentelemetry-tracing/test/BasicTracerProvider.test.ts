@@ -381,6 +381,16 @@ describe('BasicTracerProvider', () => {
       _invokeGlobalShutdown();
     });
 
+    it('should trigger shutdown when manually invoked', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      tracerProvider.shutdown();
+      sinon.assert.calledOnce(shutdownStub);
+    });
+
     it('should not trigger shutdown if graceful shutdown is turned off', () => {
       const tracerProvider = new BasicTracerProvider({
         gracefulShutdown: false,

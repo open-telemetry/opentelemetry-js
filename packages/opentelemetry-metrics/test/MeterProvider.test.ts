@@ -25,6 +25,12 @@ import {
 
 describe('MeterProvider', () => {
   let removeEvent: Function | undefined;
+  let sandbox: sinon.SinonSandbox;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+  });
+
   afterEach(() => {
     if (removeEvent) {
       removeEvent();
@@ -93,7 +99,6 @@ describe('MeterProvider', () => {
         interval: Math.pow(2, 31) - 1,
         gracefulShutdown: true,
       });
-      const sandbox = sinon.createSandbox();
       const shutdownStub1 = sandbox.stub(
         meterProvider.getMeter('meter1'),
         'shutdown'
@@ -105,9 +110,28 @@ describe('MeterProvider', () => {
       removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
-        sandbox.restore();
       });
       _invokeGlobalShutdown();
+    });
+
+    it('should call shutdown when manually invoked', () => {
+      const meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
+        gracefulShutdown: true,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub1 = sandbox.stub(
+        meterProvider.getMeter('meter1'),
+        'shutdown'
+      );
+      const shutdownStub2 = sandbox.stub(
+        meterProvider.getMeter('meter2'),
+        'shutdown'
+      );
+      meterProvider.shutdown(() => {
+        sinon.assert.calledOnce(shutdownStub1);
+        sinon.assert.calledOnce(shutdownStub2);
+      });
     });
 
     it('should not trigger shutdown if graceful shutdown is turned off', () => {
@@ -115,14 +139,12 @@ describe('MeterProvider', () => {
         interval: Math.pow(2, 31) - 1,
         gracefulShutdown: false,
       });
-      const sandbox = sinon.createSandbox();
       const shutdownStub = sandbox.stub(
         meterProvider.getMeter('meter1'),
         'shutdown'
       );
       removeEvent = notifyOnGlobalShutdown(() => {
         sinon.assert.notCalled(shutdownStub);
-        sandbox.restore();
       });
       _invokeGlobalShutdown();
     });
