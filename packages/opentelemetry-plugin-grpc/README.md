@@ -54,7 +54,7 @@ gRPC plugin accepts the following configuration:
 
 | Options | Type | Description |
 | ------- | ---- | ----------- |
-| [`ignoreRpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-grpc/src/types.ts#L32) | `IgnoreMatcher[]` | gRPC plugin will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function. |
+| [`ignoreGrpcMethods`](https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-grpc/src/types.ts#L32) | `IgnoreMatcher[]` | gRPC plugin will not trace any methods that match anything in this list. You may pass a string (case-insensitive match), a `RegExp` object, or a filter function. |
 
 ## Useful links
 
