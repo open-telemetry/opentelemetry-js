@@ -40,7 +40,7 @@ const mockedIdentityResponse = {
 };
 const mockedHostResponse = 'my-hostname';
 
-describe('awsEc2DetectorTemp', () => {
+describe('awsEc2Detector', () => {
   beforeEach(() => {
     nock.disableNetConnect();
     nock.cleanAll();
