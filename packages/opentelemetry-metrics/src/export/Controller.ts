@@ -42,12 +42,20 @@ export class PushController extends Controller {
     await this._collect();
   }
 
-  private async _collect() {
+  private async _collect(): Promise<void> {
     await this._meter.collect();
-    this._exporter.export(this._meter.getBatcher().checkPointSet(), result => {
-      if (result !== ExportResult.SUCCESS) {
-        // @todo: log error
-      }
+    return new Promise((resolve, reject) => {
+      this._exporter.export(
+        this._meter.getBatcher().checkPointSet(),
+        result => {
+          if (result === ExportResult.SUCCESS) {
+            resolve();
+          } else {
+            // @todo log error
+            reject();
+          }
+        }
+      );
     });
   }
 }
