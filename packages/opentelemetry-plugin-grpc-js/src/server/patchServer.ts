@@ -18,7 +18,11 @@ import type * as grpcJs from '@grpc/grpc-js';
 import type { HandleCall } from '@grpc/grpc-js/build/src/server-call';
 import { GrpcJsPlugin } from '../grpcJs';
 import * as shimmer from 'shimmer';
-import { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
+import {
+  ServerCallWithMeta,
+  SendUnaryDataCallback,
+  IgnoreMatcher,
+} from '../types';
 import {
   context,
   SpanOptions,
@@ -42,6 +46,7 @@ export function patchServer(
 ): (originalRegister: ServerRegisterFunction) => ServerRegisterFunction {
   return (originalRegister: ServerRegisterFunction) => {
     const plugin = this;
+    const config = this._config;
 
     plugin.logger.debug('patched gRPC server');
     return function register<RequestType, ResponseType>(
@@ -73,7 +78,13 @@ export function patchServer(
           ) {
             const self = this;
 
-            if (shouldNotTraceServerCall.call(plugin, call.metadata, name)) {
+            if (
+              shouldNotTraceServerCall(
+                call.metadata,
+                name,
+                config.ignoreGrpcMethods
+              )
+            ) {
               return handleUntracedServerFunction(
                 type,
                 originalFunc,
@@ -125,16 +136,16 @@ export function patchServer(
  * Returns true if the server call should not be traced.
  */
 function shouldNotTraceServerCall(
-  this: GrpcJsPlugin,
   metadata: grpcJs.Metadata,
-  methodName: string
+  methodName: string,
+  ignoreGrpcMethods?: IgnoreMatcher[]
 ): boolean {
   const parsedName = methodName.split('/');
   return (
     containsOtelMetadata(metadata) ||
     methodIsIgnored(
       parsedName[parsedName.length - 1] || methodName,
-      this._config.ignoreGrpcMethods
+      ignoreGrpcMethods
     )
   );
 }
