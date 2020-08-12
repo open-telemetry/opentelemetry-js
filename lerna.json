@@ -4,9 +4,10 @@
   "packages": [
     "benchmark/*",
     "metapackages/*",
-    "packages/*"
+    "packages/*",
+    "integration-tests/*"
   ],
-  "version": "0.9.0",
+  "version": "0.10.2",
   "changelog": {
     "repo": "open-telemetry/opentelemetry-js",
     "labels": {

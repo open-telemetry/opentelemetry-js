@@ -187,14 +187,14 @@ const testCollectorExporter = (params: TestParams) =>
           if (exportedData) {
             spans = exportedData.instrumentationLibrarySpans[0].spans;
             resource = exportedData.resource;
-            ensureExportedSpanIsCorrect(spans[0]);
+            ensureExportedSpanIsCorrect(spans[0], true);
 
             assert.ok(
               typeof resource !== 'undefined',
               "resource doesn't exist"
             );
             if (resource) {
-              ensureResourceIsCorrect(resource);
+              ensureResourceIsCorrect(resource, true);
             }
           }
           if (params.metadata && reqMetadata) {

@@ -24,7 +24,7 @@ import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/metrics';
+const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node
@@ -35,6 +35,7 @@ export class CollectorMetricExporter
     collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest
   >
   implements MetricExporter {
+  // Converts time to nanoseconds
   protected readonly _startTime = new Date().getTime() * 1000000;
 
   convert(

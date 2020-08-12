@@ -17,7 +17,7 @@
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
-import { sendDataUsingHttp } from './util';
+import { sendWithHttp } from './util';
 
 export function initWithJson<ExportItem, ServiceRequest>(
   _collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
@@ -34,7 +34,7 @@ export function sendWithJson<ExportItem, ServiceRequest>(
 ): void {
   const serviceRequest = collector.convert(objects);
 
-  sendDataUsingHttp(
+  sendWithHttp(
     collector,
     JSON.stringify(serviceRequest),
     'application/json',
