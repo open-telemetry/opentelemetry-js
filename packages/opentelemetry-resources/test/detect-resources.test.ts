@@ -58,14 +58,14 @@ const mockedAwsResponse = {
 describe('detectResources', async () => {
   beforeEach(() => {
     nock.disableNetConnect();
-    process.env.OTEL_RESOURCE_LABELS =
+    process.env.OTEL_RESOURCE_ATTRIBUTES =
       'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
   });
 
   afterEach(() => {
     nock.cleanAll();
     nock.enableNetConnect();
-    delete process.env.OTEL_RESOURCE_LABELS;
+    delete process.env.OTEL_RESOURCE_ATTRIBUTES;
   });
 
   describe('in GCP environment', () => {
@@ -224,7 +224,7 @@ describe('detectResources', async () => {
 
     describe('with missing environemnt variable', () => {
       beforeEach(() => {
-        delete process.env.OTEL_RESOURCE_LABELS;
+        delete process.env.OTEL_RESOURCE_ATTRIBUTES;
       });
 
       it('prints correct error messages when EnvDetector has no env variable', async () => {
@@ -241,7 +241,7 @@ describe('detectResources', async () => {
         assert.ok(
           callArgsContains(
             mockedLoggerMethod,
-            'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+            'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
           )
         );
       });
@@ -249,7 +249,7 @@ describe('detectResources', async () => {
 
     describe('with a faulty environment variable', () => {
       beforeEach(() => {
-        process.env.OTEL_RESOURCE_LABELS = 'bad=~label';
+        process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~label';
       });
 
       it('prints correct error messages when EnvDetector has an invalid variable', async () => {

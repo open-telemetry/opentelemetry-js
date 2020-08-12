@@ -20,16 +20,16 @@ import { ResourceDetectionConfigWithLogger } from '../../../config';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
- * from the OTEL_RESOURCE_LABELS environment variable.
+ * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
 class EnvDetector implements Detector {
   // Type, label keys, and label values should not exceed 256 characters.
   private readonly _MAX_LENGTH = 255;
 
-  // OTEL_RESOURCE_LABELS is a comma-separated list of labels.
+  // OTEL_RESOURCE_ATTRIBUTES is a comma-separated list of labels.
   private readonly _COMMA_SEPARATOR = ',';
 
-  // OTEL_RESOURCE_LABELS contains key value pair separated by '='.
+  // OTEL_RESOURCE_ATTRIBUTES contains key value pair separated by '='.
   private readonly _LABEL_KEY_VALUE_SPLITTER = '=';
 
   private readonly _ERROR_MESSAGE_INVALID_CHARS =
@@ -44,22 +44,22 @@ class EnvDetector implements Detector {
 
   /**
    * Returns a {@link Resource} populated with labels from the
-   * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
+   * OTEL_RESOURCE_ATTRIBUTES environment variable. Note this is an async function
    * to conform to the Detector interface.
    *
    * @param config The resource detection config with a required logger
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const labelString = process.env.OTEL_RESOURCE_LABELS;
+      const labelString = process.env.OTEL_RESOURCE_ATTRIBUTES;
       if (!labelString) {
         config.logger.debug(
-          'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+          'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
         );
         return Resource.empty();
       }
       const labels = this._parseResourceLabels(
-        process.env.OTEL_RESOURCE_LABELS
+        process.env.OTEL_RESOURCE_ATTRIBUTES
       );
       return new Resource(labels);
     } catch (e) {
@@ -69,9 +69,9 @@ class EnvDetector implements Detector {
   }
 
   /**
-   * Creates a label map from the OTEL_RESOURCE_LABELS environment variable.
+   * Creates a label map from the OTEL_RESOURCE_ATTRIBUTES environment variable.
    *
-   * OTEL_RESOURCE_LABELS: A comma-separated list of labels describing the
+   * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of labels describing the
    * source in more detail, e.g. “key1=val1,key2=val2”. Domain names and paths
    * are accepted as label keys. Values may be quoted or unquoted in general. If
    * a value contains whitespaces, =, or " characters, it must always be quoted.
