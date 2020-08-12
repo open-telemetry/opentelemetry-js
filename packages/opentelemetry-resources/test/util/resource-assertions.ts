@@ -30,7 +30,7 @@ import {
  * Test utility method to validate a cloud resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertCloudResource = (
   resource: Resource,
@@ -44,28 +44,31 @@ export const assertCloudResource = (
   assertHasOneLabel(CLOUD_RESOURCE, resource);
   if (validations.provider)
     assert.strictEqual(
-      resource.labels[CLOUD_RESOURCE.PROVIDER],
+      resource.attributes[CLOUD_RESOURCE.PROVIDER],
       validations.provider
     );
   if (validations.accountId)
     assert.strictEqual(
-      resource.labels[CLOUD_RESOURCE.ACCOUNT_ID],
+      resource.attributes[CLOUD_RESOURCE.ACCOUNT_ID],
       validations.accountId
     );
   if (validations.region)
     assert.strictEqual(
-      resource.labels[CLOUD_RESOURCE.REGION],
+      resource.attributes[CLOUD_RESOURCE.REGION],
       validations.region
     );
   if (validations.zone)
-    assert.strictEqual(resource.labels[CLOUD_RESOURCE.ZONE], validations.zone);
+    assert.strictEqual(
+      resource.attributes[CLOUD_RESOURCE.ZONE],
+      validations.zone
+    );
 };
 
 /**
  * Test utility method to validate a container resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertContainerResource = (
   resource: Resource,
@@ -78,17 +81,17 @@ export const assertContainerResource = (
   assertHasOneLabel(CONTAINER_RESOURCE, resource);
   if (validations.name)
     assert.strictEqual(
-      resource.labels[CONTAINER_RESOURCE.NAME],
+      resource.attributes[CONTAINER_RESOURCE.NAME],
       validations.name
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.labels[CONTAINER_RESOURCE.IMAGE_NAME],
+      resource.attributes[CONTAINER_RESOURCE.IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageTag)
     assert.strictEqual(
-      resource.labels[CONTAINER_RESOURCE.IMAGE_TAG],
+      resource.attributes[CONTAINER_RESOURCE.IMAGE_TAG],
       validations.imageTag
     );
 };
@@ -97,7 +100,7 @@ export const assertContainerResource = (
  * Test utility method to validate a host resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertHostResource = (
   resource: Resource,
@@ -114,31 +117,34 @@ export const assertHostResource = (
   assertHasOneLabel(HOST_RESOURCE, resource);
   if (validations.hostName)
     assert.strictEqual(
-      resource.labels[HOST_RESOURCE.HOSTNAME],
+      resource.attributes[HOST_RESOURCE.HOSTNAME],
       validations.hostName
     );
   if (validations.id)
-    assert.strictEqual(resource.labels[HOST_RESOURCE.ID], validations.id);
+    assert.strictEqual(resource.attributes[HOST_RESOURCE.ID], validations.id);
   if (validations.name)
-    assert.strictEqual(resource.labels[HOST_RESOURCE.NAME], validations.name);
+    assert.strictEqual(
+      resource.attributes[HOST_RESOURCE.NAME],
+      validations.name
+    );
   if (validations.hostType)
     assert.strictEqual(
-      resource.labels[HOST_RESOURCE.TYPE],
+      resource.attributes[HOST_RESOURCE.TYPE],
       validations.hostType
     );
   if (validations.imageName)
     assert.strictEqual(
-      resource.labels[HOST_RESOURCE.IMAGE_NAME],
+      resource.attributes[HOST_RESOURCE.IMAGE_NAME],
       validations.imageName
     );
   if (validations.imageId)
     assert.strictEqual(
-      resource.labels[HOST_RESOURCE.IMAGE_ID],
+      resource.attributes[HOST_RESOURCE.IMAGE_ID],
       validations.imageId
     );
   if (validations.imageVersion)
     assert.strictEqual(
-      resource.labels[HOST_RESOURCE.IMAGE_VERSION],
+      resource.attributes[HOST_RESOURCE.IMAGE_VERSION],
       validations.imageVersion
     );
 };
@@ -147,7 +153,7 @@ export const assertHostResource = (
  * Test utility method to validate a K8s resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertK8sResource = (
   resource: Resource,
@@ -161,22 +167,22 @@ export const assertK8sResource = (
   assertHasOneLabel(K8S_RESOURCE, resource);
   if (validations.clusterName)
     assert.strictEqual(
-      resource.labels[K8S_RESOURCE.CLUSTER_NAME],
+      resource.attributes[K8S_RESOURCE.CLUSTER_NAME],
       validations.clusterName
     );
   if (validations.namespaceName)
     assert.strictEqual(
-      resource.labels[K8S_RESOURCE.NAMESPACE_NAME],
+      resource.attributes[K8S_RESOURCE.NAMESPACE_NAME],
       validations.namespaceName
     );
   if (validations.podName)
     assert.strictEqual(
-      resource.labels[K8S_RESOURCE.POD_NAME],
+      resource.attributes[K8S_RESOURCE.POD_NAME],
       validations.podName
     );
   if (validations.deploymentName)
     assert.strictEqual(
-      resource.labels[K8S_RESOURCE.DEPLOYMENT_NAME],
+      resource.attributes[K8S_RESOURCE.DEPLOYMENT_NAME],
       validations.deploymentName
     );
 };
@@ -185,7 +191,7 @@ export const assertK8sResource = (
  * Test utility method to validate a telemetry sdk resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertTelemetrySDKResource = (
   resource: Resource,
@@ -204,17 +210,17 @@ export const assertTelemetrySDKResource = (
 
   if (validations.name)
     assert.strictEqual(
-      resource.labels[TELEMETRY_SDK_RESOURCE.NAME],
+      resource.attributes[TELEMETRY_SDK_RESOURCE.NAME],
       validations.name
     );
   if (validations.language)
     assert.strictEqual(
-      resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+      resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
       validations.language
     );
   if (validations.version)
     assert.strictEqual(
-      resource.labels[TELEMETRY_SDK_RESOURCE.VERSION],
+      resource.attributes[TELEMETRY_SDK_RESOURCE.VERSION],
       validations.version
     );
 };
@@ -223,7 +229,7 @@ export const assertTelemetrySDKResource = (
  * Test utility method to validate a service resource
  *
  * @param resource the Resource to validate
- * @param validations validations for the resource labels
+ * @param validations validations for the resource attributes
  */
 export const assertServiceResource = (
   resource: Resource,
@@ -234,19 +240,22 @@ export const assertServiceResource = (
     version?: string;
   }
 ) => {
-  assert.strictEqual(resource.labels[SERVICE_RESOURCE.NAME], validations.name);
   assert.strictEqual(
-    resource.labels[SERVICE_RESOURCE.INSTANCE_ID],
+    resource.attributes[SERVICE_RESOURCE.NAME],
+    validations.name
+  );
+  assert.strictEqual(
+    resource.attributes[SERVICE_RESOURCE.INSTANCE_ID],
     validations.instanceId
   );
   if (validations.namespace)
     assert.strictEqual(
-      resource.labels[SERVICE_RESOURCE.NAMESPACE],
+      resource.attributes[SERVICE_RESOURCE.NAMESPACE],
       validations.namespace
     );
   if (validations.version)
     assert.strictEqual(
-      resource.labels[SERVICE_RESOURCE.VERSION],
+      resource.attributes[SERVICE_RESOURCE.VERSION],
       validations.version
     );
 };
@@ -257,7 +266,7 @@ export const assertServiceResource = (
  * @param resource the Resource to validate
  */
 export const assertEmptyResource = (resource: Resource) => {
-  assert.strictEqual(Object.keys(resource.labels).length, 0);
+  assert.strictEqual(Object.keys(resource.attributes).length, 0);
 };
 
 const assertHasOneLabel = (
@@ -266,12 +275,12 @@ const assertHasOneLabel = (
 ): void => {
   const hasOne = Object.values(constants).reduce(
     // eslint-disable-next-line no-prototype-builtins
-    (found, key) => found || resource.labels.hasOwnProperty(key),
+    (found, key) => found || resource.attributes.hasOwnProperty(key),
     false
   );
   assert.ok(
     hasOne,
-    'Resource must have one of the following labels: ' +
+    'Resource must have one of the following attributes: ' +
       Object.values(constants).join(', ')
   );
 };

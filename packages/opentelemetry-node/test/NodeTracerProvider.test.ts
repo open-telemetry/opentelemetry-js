@@ -193,7 +193,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
       assert.equal(
-        span.resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+        span.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
         'nodejs'
       );
     });

@@ -64,10 +64,10 @@ export function spanToThrift(span: ReadableSpan): ThriftSpan {
   if (span.kind !== undefined) {
     tags.push({ key: 'span.kind', value: SpanKind[span.kind] });
   }
-  Object.keys(span.resource.labels).forEach(name =>
+  Object.keys(span.resource.attributes).forEach(name =>
     tags.push({
       key: name,
-      value: toTagValue(span.resource.labels[name]),
+      value: toTagValue(span.resource.attributes[name]),
     })
   );
 
