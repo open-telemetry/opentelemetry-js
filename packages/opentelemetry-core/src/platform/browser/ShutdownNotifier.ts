@@ -14,6 +14,9 @@
  * limitations under the License.
  */
 
+/**
+ * Adds an event listener to trigger a callback when an unload event in the window is detected
+ */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
   window.addEventListener('unload', cb, { once: true });
   return function removeCallbackFromGlobalShutdown() {
@@ -21,6 +24,9 @@ export function notifyOnGlobalShutdown(cb: () => void): () => void {
   };
 }
 
+/**
+ * Warning: meant for internal use only! Closes the current window, triggering the unload event
+ */
 export function _invokeGlobalShutdown() {
   window.close();
 }

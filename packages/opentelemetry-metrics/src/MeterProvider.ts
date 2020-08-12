@@ -75,7 +75,7 @@ export class MeterProvider implements api.MeterProvider {
     if (this._config.exporter) {
       this._config.exporter.shutdown();
     }
-    await Promise.all(
+    return Promise.all(
       Array.from(this._meters, ([_, meter]) => meter.shutdown())
     );
   }
