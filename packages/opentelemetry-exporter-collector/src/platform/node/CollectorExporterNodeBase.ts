@@ -95,13 +95,32 @@ export abstract class CollectorExporterNodeBase<
       this.logger.debug('Shutdown already started. Cannot send objects');
       return;
     }
-    if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
-      sendWithJson(this, objects, onSuccess, onError);
-    } else if (this._protocol === CollectorProtocolNode.HTTP_PROTO) {
-      sendWithJsonProto(this, objects, onSuccess, onError);
-    } else {
-      sendWithGrpc(this, objects, onSuccess, onError);
-    }
+
+    const promise = new Promise(resolve => {
+      const _onSuccess = (): void => {
+        onSuccess();
+        _onFinish();
+      };
+      const _onError = (error: collectorTypes.CollectorExporterError): void => {
+        onError(error);
+        _onFinish();
+      };
+      const _onFinish = () => {
+        const index = this._sendingPromises.indexOf(promise);
+        this._sendingPromises.splice(index, 1);
+        resolve();
+      };
+
+      if (this._protocol === CollectorProtocolNode.HTTP_JSON) {
+        sendWithJson(this, objects, _onSuccess, _onError);
+      } else if (this._protocol === CollectorProtocolNode.HTTP_PROTO) {
+        sendWithJsonProto(this, objects, _onSuccess, _onError);
+      } else {
+        sendWithGrpc(this, objects, _onSuccess, _onError);
+      }
+    });
+
+    this._sendingPromises.push(promise);
   }
 
   onShutdown(): void {
@@ -116,5 +135,6 @@ export abstract class CollectorExporterNodeBase<
   }
 
   abstract getServiceProtoPath(): string;
+
   abstract getServiceClientType(): ServiceClientType;
 }

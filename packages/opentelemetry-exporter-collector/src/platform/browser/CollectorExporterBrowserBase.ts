@@ -61,20 +61,41 @@ export abstract class CollectorExporterBrowserBase<
     onSuccess: () => void,
     onError: (error: collectorTypes.CollectorExporterError) => void
   ) {
+    if (this._isShutdown) {
+      this.logger.debug('Shutdown already started. Cannot send objects');
+      return;
+    }
     const serviceRequest = this.convert(items);
     const body = JSON.stringify(serviceRequest);
 
-    if (this._useXHR) {
-      sendWithXhr(
-        body,
-        this.url,
-        this._headers,
-        this.logger,
-        onSuccess,
-        onError
-      );
-    } else {
-      sendWithBeacon(body, this.url, this.logger, onSuccess, onError);
-    }
+    const promise = new Promise(resolve => {
+      const _onSuccess = (): void => {
+        onSuccess();
+        _onFinish();
+      };
+      const _onError = (error: collectorTypes.CollectorExporterError): void => {
+        onError(error);
+        _onFinish();
+      };
+      const _onFinish = () => {
+        const index = this._sendingPromises.indexOf(promise);
+        this._sendingPromises.splice(index, 1);
+        resolve();
+      };
+
+      if (this._useXHR) {
+        sendWithXhr(
+          body,
+          this.url,
+          this._headers,
+          this.logger,
+          _onSuccess,
+          _onError
+        );
+      } else {
+        sendWithBeacon(body, this.url, this.logger, _onSuccess, _onError);
+      }
+    });
+    this._sendingPromises.push(promise);
   }
 }

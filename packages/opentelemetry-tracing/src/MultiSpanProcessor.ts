@@ -24,16 +24,17 @@ import { ReadableSpan } from './export/ReadableSpan';
 export class MultiSpanProcessor implements SpanProcessor {
   constructor(private readonly _spanProcessors: SpanProcessor[]) {}
 
-  forceFlush(cb: () => void = () => {}): void {
-    let finished = 0;
-    const total = this._spanProcessors.length;
+  forceFlush(): Promise<void> {
+    const promises: Promise<void>[] = [];
+
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.forceFlush(() => {
-        if (++finished === total) {
-          cb();
-        }
-      });
+      promises.push(spanProcessor.forceFlush());
     }
+    return new Promise((resolve, reject) => {
+      Promise.all(promises).then(() => {
+        resolve();
+      }, reject);
+    });
   }
 
   onStart(span: ReadableSpan): void {
@@ -48,15 +49,16 @@ export class MultiSpanProcessor implements SpanProcessor {
     }
   }
 
-  shutdown(cb: () => void = () => {}): void {
-    let finished = 0;
-    const total = this._spanProcessors.length;
+  shutdown(): Promise<void> {
+    const promises: Promise<void>[] = [];
+
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.shutdown(() => {
-        if (++finished === total) {
-          cb();
-        }
-      });
+      promises.push(spanProcessor.shutdown());
     }
+    return new Promise((resolve, reject) => {
+      Promise.all(promises).then(() => {
+        resolve();
+      }, reject);
+    });
   }
 }

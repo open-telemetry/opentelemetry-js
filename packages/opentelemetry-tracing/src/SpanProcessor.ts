@@ -24,7 +24,7 @@ export interface SpanProcessor {
   /**
    * Forces to export all finished spans
    */
-  forceFlush(callback: () => void): void;
+  forceFlush(): Promise<void>;
 
   /**
    * Called when a {@link ReadableSpan} is started, if the `span.isRecording()`
@@ -44,5 +44,5 @@ export interface SpanProcessor {
    * Shuts down the processor. Called when SDK is shut down. This is an
    * opportunity for processor to do any cleanup required.
    */
-  shutdown(callback: () => void): void;
+  shutdown(): Promise<void>;
 }

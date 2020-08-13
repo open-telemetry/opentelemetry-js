@@ -107,15 +107,15 @@ export class BasicTracerProvider implements api.TracerProvider {
     }
   }
 
-  shutdown(cb: () => void = () => {}) {
-    this.activeSpanProcessor.shutdown(cb);
+  shutdown() {
     if (this._cleanNotifyOnGlobalShutdown) {
       this._cleanNotifyOnGlobalShutdown();
       this._cleanNotifyOnGlobalShutdown = undefined;
     }
+    return this.activeSpanProcessor.shutdown();
   }
 
   private _shutdownActiveProcessor() {
-    this.activeSpanProcessor.shutdown();
+    return this.activeSpanProcessor.shutdown();
   }
 }

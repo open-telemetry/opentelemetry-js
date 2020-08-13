@@ -108,8 +108,10 @@ describe('MeterProvider', () => {
         'shutdown'
       );
       removeEvent = notifyOnGlobalShutdown(() => {
-        sinon.assert.calledOnce(shutdownStub1);
-        sinon.assert.calledOnce(shutdownStub2);
+        setImmediate(() => {
+          sinon.assert.calledOnce(shutdownStub1);
+          sinon.assert.calledOnce(shutdownStub2);
+        });
       });
       _invokeGlobalShutdown();
     });
@@ -128,7 +130,7 @@ describe('MeterProvider', () => {
         meterProvider.getMeter('meter2'),
         'shutdown'
       );
-      meterProvider.shutdown(() => {
+      meterProvider.shutdown().then(() => {
         sinon.assert.calledOnce(shutdownStub1);
         sinon.assert.calledOnce(shutdownStub2);
       });

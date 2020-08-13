@@ -1,4 +1,4 @@
-{
+  {
   "name": "@opentelemetry/metrics",
   "version": "0.10.2",
   "description": "OpenTelemetry metrics SDK",

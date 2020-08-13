@@ -25,5 +25,7 @@ export class NoopExporter implements MetricExporter {
   ): void {}
 
   // By default does nothing
-  shutdown(): void {}
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
 }

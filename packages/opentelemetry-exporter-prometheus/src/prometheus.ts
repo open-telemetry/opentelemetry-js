@@ -108,12 +108,14 @@ export class PrometheusExporter implements MetricExporter {
 
   /**
    * Shuts down the export server and clears the registry
-   *
-   * @param cb called when server is stopped
    */
-  shutdown(cb?: () => void) {
+  shutdown(): Promise<void> {
     this._registry.clear();
-    this.stopServer(cb);
+    return new Promise(resolve => {
+      this.stopServer(() => {
+        resolve();
+      });
+    });
   }
 
   /**

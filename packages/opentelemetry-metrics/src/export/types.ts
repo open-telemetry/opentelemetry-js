@@ -107,7 +107,7 @@ export interface MetricExporter {
   ): void;
 
   /** Stops the exporter. */
-  shutdown(): void;
+  shutdown(): Promise<void>;
 }
 
 /**
