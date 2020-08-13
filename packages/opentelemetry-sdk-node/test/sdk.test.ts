@@ -37,7 +37,7 @@ import {
 import * as assert from 'assert';
 import { NodeSDK } from '../src';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
-import * as Sinon from 'Sinon';
+import * as Sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 
