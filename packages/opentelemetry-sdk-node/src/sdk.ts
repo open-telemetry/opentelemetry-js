@@ -22,6 +22,7 @@ import { detectResources, Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 
+const MAX_RESOURCE_WAIT_TIME_MS = 2000;
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
   private _tracerProviderConfig?: {
@@ -32,7 +33,7 @@ export class NodeSDK {
   };
   private _meterProviderConfig?: MeterConfig;
 
-  private _resource: Resource | Promise<Resource>;
+  private _resource: Resource;
 
   /**
    * Create a new NodeJS SDK instance
@@ -116,45 +117,50 @@ export class NodeSDK {
 
   /** Detect resource attributes */
   private _detectResources(): Promise<Resource> {
-    return new Promise<Resource>((resolve, reject) => {
-      detectResources().then(resource => {
-        this.addResource(resource);
-        resolve(this._resource);
-      }, reject);
+    return new Promise<Resource>(resolve => {
+      let resolved = false;
+      setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve(this._resource);
+        }
+      }, MAX_RESOURCE_WAIT_TIME_MS);
+      detectResources().then(
+        resource => {
+          if (!resolved) {
+            resolved = true;
+            this.addResource(resource);
+            resolve(this._resource);
+          }
+        },
+        () => {
+          if (!resolved) {
+            resolved = true;
+            resolve(this._resource);
+          }
+        }
+      );
     });
   }
 
   /** Manually add a resource */
   public addResource(resource: Resource) {
-    this._resource = (this._resource as Resource).merge(resource);
+    this._resource = this._resource.merge(resource);
   }
 
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
-   * SDK can still be used as
+   * SDK can be used as
    * @example
    *
-   *     sdk.start().then(() => {
-   *       // sdk ready and resources loaded (if autoDetectResources === true)
-   *     });
+   *     sdk.start();
    *     // sdk ready
-   *
-   *
-   *     await sdk.start();
-   *     // sdk ready and resources loaded (if autoDetectResources === true)
-   *
-   *
-   *     sdk.start(() => {
-   *       // sdk ready and resources loaded (if autoDetectResources === true)
-   *     });
-   *     // sdk ready resources not loaded
-   *
    */
   public start(): void {
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,
-        resource: this._detectResources(),
+        resource: (this._detectResources() as unknown) as Resource,
       });
 
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
@@ -167,7 +173,7 @@ export class NodeSDK {
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         ...this._meterProviderConfig,
-        resource: this._detectResources(),
+        resource: (this._detectResources() as unknown) as Resource,
       });
 
       metrics.setGlobalMeterProvider(meterProvider);

@@ -37,95 +37,106 @@ import { NodeSDK } from '../src';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
 import * as Sinon from 'sinon';
 
-describe('Node SDK', () => {
-  before(() => {
-    // Disable attempted load of default plugins
-    Sinon.replace(NodeConfig, 'DEFAULT_INSTRUMENTATION_PLUGINS', {});
-  });
-
-  beforeEach(() => {
-    context.disable();
-    trace.disable();
-    propagation.disable();
-    metrics.disable();
-  });
-
-  describe('Basic Registration', () => {
-    it('should not register any unconfigured SDK components', async () => {
-      const sdk = new NodeSDK({
-        autoDetectResources: false,
-      });
-
-      await sdk.start();
-
-      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
-      );
-
-      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+[true, false].forEach(autoDetectResources => {
+  describe(`Node SDK autoDetectResources = "${autoDetectResources}"`, () => {
+    before(() => {
+      // Disable attempted load of default plugins
+      Sinon.replace(NodeConfig, 'DEFAULT_INSTRUMENTATION_PLUGINS', {});
+    });
+    after(() => {
+      Sinon.restore();
     });
 
-    it('should register a tracer provider if an exporter is provided', async () => {
-      const sdk = new NodeSDK({
-        traceExporter: new ConsoleSpanExporter(),
-        autoDetectResources: false,
-      });
-
-      await sdk.start();
-
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
-
-      assert.ok(
-        context['_getContextManager']() instanceof AsyncHooksContextManager
-      );
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof CompositePropagator
-      );
-      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
+    beforeEach(() => {
+      context.disable();
+      trace.disable();
+      propagation.disable();
+      metrics.disable();
     });
 
-    it('should register a tracer provider if a span processor is provided', async () => {
-      const exporter = new ConsoleSpanExporter();
-      const spanProcessor = new SimpleSpanProcessor(exporter);
+    describe('Basic Registration', () => {
+      it('should not register any unconfigured SDK components', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources,
+        });
 
-      const sdk = new NodeSDK({
-        spanProcessor,
-        autoDetectResources: false,
+        sdk.start();
+
+        assert.ok(
+          context['_getContextManager']() instanceof NoopContextManager
+        );
+        assert.ok(
+          propagation['_getGlobalPropagator']() instanceof
+            NoopHttpTextPropagator
+        );
+
+        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
       });
 
-      await sdk.start();
+      it('should register a tracer provider if an exporter is provided', async () => {
+        const sdk = new NodeSDK({
+          traceExporter: new ConsoleSpanExporter(),
+          autoDetectResources,
+        });
 
-      assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+        sdk.start();
 
-      assert.ok(
-        context['_getContextManager']() instanceof AsyncHooksContextManager
-      );
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof CompositePropagator
-      );
-      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
-    });
+        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
-    it('should register a meter provider if an exporter is provided', async () => {
-      const exporter = new ConsoleMetricExporter();
-
-      const sdk = new NodeSDK({
-        metricExporter: exporter,
-        autoDetectResources: false,
+        assert.ok(
+          context['_getContextManager']() instanceof AsyncHooksContextManager
+        );
+        assert.ok(
+          propagation['_getGlobalPropagator']() instanceof CompositePropagator
+        );
+        assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
       });
 
-      await sdk.start();
+      it('should register a tracer provider if a span processor is provided', async () => {
+        const exporter = new ConsoleSpanExporter();
+        const spanProcessor = new SimpleSpanProcessor(exporter);
 
-      assert.ok(context['_getContextManager']() instanceof NoopContextManager);
-      assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
-      );
+        const sdk = new NodeSDK({
+          spanProcessor,
+          autoDetectResources,
+        });
 
-      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+        sdk.start();
 
-      assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+        assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
+
+        assert.ok(
+          context['_getContextManager']() instanceof AsyncHooksContextManager
+        );
+        assert.ok(
+          propagation['_getGlobalPropagator']() instanceof CompositePropagator
+        );
+        assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
+      });
+
+      it('should register a meter provider if an exporter is provided', async () => {
+        const exporter = new ConsoleMetricExporter();
+
+        const sdk = new NodeSDK({
+          metricExporter: exporter,
+          autoDetectResources,
+        });
+
+        sdk.start();
+
+        assert.ok(
+          context['_getContextManager']() instanceof NoopContextManager
+        );
+        assert.ok(
+          propagation['_getGlobalPropagator']() instanceof
+            NoopHttpTextPropagator
+        );
+
+        assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+
+        assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
+      });
     });
   });
 });

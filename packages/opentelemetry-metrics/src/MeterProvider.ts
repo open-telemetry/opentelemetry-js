@@ -26,7 +26,7 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
 export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
-  readonly resource: Resource | Promise<Resource>;
+  readonly resource: Resource;
   readonly logger: api.Logger;
 
   constructor(config: MeterConfig = DEFAULT_CONFIG) {

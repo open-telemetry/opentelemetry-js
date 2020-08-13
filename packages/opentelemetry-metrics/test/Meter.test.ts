@@ -122,7 +122,7 @@ describe('Meter', () => {
       });
       meter = new MeterProvider({
         logger: new NoopLogger(),
-        resource: promise,
+        resource: (promise as unknown) as Resource,
       }).getMeter('test-meter');
 
       const counter = meter.createCounter('name') as CounterMetric;

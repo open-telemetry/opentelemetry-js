@@ -38,7 +38,7 @@ export class Meter implements api.Meter {
   private readonly _logger: api.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
-  private readonly _resource: Resource | Promise<Resource>;
+  private readonly _resource: Resource;
   private readonly _instrumentationLibrary: InstrumentationLibrary;
 
   /**

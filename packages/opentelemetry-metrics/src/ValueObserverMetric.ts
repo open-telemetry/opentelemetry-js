@@ -27,7 +27,7 @@ export class ValueObserverMetric extends BaseObserverMetric
     name: string,
     options: api.MetricOptions,
     batcher: Batcher,
-    resource: Resource | Promise<Resource>,
+    resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown
   ) {

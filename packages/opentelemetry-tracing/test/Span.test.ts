@@ -384,7 +384,7 @@ describe('Span', () => {
       });
       provider = new BasicTracerProvider({
         logger: new NoopLogger(),
-        resource: promise,
+        resource: (promise as unknown) as Resource,
       });
 
       tracer = provider.getTracer('default');
@@ -403,7 +403,7 @@ describe('Span', () => {
       setTimeout(() => {
         const exportedSpan = (spy.args[0][0][0] as unknown) as ReadableSpan;
         assert.deepStrictEqual(exportedSpan.spanContext, span.context());
-        assert.deepStrictEqual((exportedSpan.resource as Resource).labels, {
+        assert.deepStrictEqual(exportedSpan.resource.labels, {
           foo: 'bar',
         });
       }, 10);

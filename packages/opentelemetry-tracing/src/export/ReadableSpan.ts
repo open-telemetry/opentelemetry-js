@@ -39,6 +39,6 @@ export interface ReadableSpan {
   readonly events: TimedEvent[];
   readonly duration: HrTime;
   readonly ended: boolean;
-  readonly resource: Resource | Promise<Resource>;
+  readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
 }

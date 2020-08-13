@@ -291,10 +291,10 @@ export function groupMetricsByResourceAndLibrary(
 ): Map<Resource, Map<core.InstrumentationLibrary, MetricRecord[]>> {
   return metrics.reduce((metricMap, metric) => {
     //group by resource
-    let resourceMetrics = metricMap.get(metric.resource as Resource);
+    let resourceMetrics = metricMap.get(metric.resource);
     if (!resourceMetrics) {
       resourceMetrics = new Map<core.InstrumentationLibrary, MetricRecord[]>();
-      metricMap.set(metric.resource as Resource, resourceMetrics);
+      metricMap.set(metric.resource, resourceMetrics);
     }
     //group by instrumentation library
     let libMetrics = resourceMetrics.get(metric.instrumentationLibrary);

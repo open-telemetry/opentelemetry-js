@@ -38,7 +38,7 @@ export class BasicTracerProvider implements api.TracerProvider {
 
   activeSpanProcessor = new NoopSpanProcessor();
   readonly logger: api.Logger;
-  readonly resource: Resource | Promise<Resource>;
+  readonly resource: Resource;
 
   constructor(config: TracerConfig = DEFAULT_CONFIG) {
     this.logger = config.logger ?? new ConsoleLogger(config.logLevel);

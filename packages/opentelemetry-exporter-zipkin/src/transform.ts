@@ -56,7 +56,7 @@ export function toZipkinSpan(
       span.status,
       statusCodeTagName,
       statusDescriptionTagName,
-      span.resource as Resource
+      span.resource
     ),
     annotations: span.events.length
       ? _toZipkinAnnotations(span.events)

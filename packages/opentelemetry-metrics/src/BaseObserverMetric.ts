@@ -36,7 +36,7 @@ export abstract class BaseObserverMetric extends Metric<BoundObserver>
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource | Promise<Resource>,
+    resource: Resource,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown

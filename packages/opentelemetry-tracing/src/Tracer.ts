@@ -39,7 +39,7 @@ export class Tracer implements api.Tracer {
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
   private readonly _idGenerator: IdGenerator;
-  public resource: Resource | Promise<Resource>;
+  public resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   readonly logger: api.Logger;
 

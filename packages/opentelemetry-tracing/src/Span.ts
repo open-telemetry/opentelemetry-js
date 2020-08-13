@@ -41,7 +41,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly links: api.Link[] = [];
   readonly events: api.TimedEvent[] = [];
   readonly startTime: api.HrTime;
-  resource: Resource | Promise<Resource>;
+  resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.Status = {

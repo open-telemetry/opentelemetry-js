@@ -34,7 +34,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
-    public resource: Resource | Promise<Resource>,
+    public resource: Resource,
     readonly instrumentationLibrary: InstrumentationLibrary
   ) {
     this._disabled = !!_options.disabled;
