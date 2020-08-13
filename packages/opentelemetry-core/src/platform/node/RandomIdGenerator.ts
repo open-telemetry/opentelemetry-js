@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
+import { IdGenerator } from '../../trace/IdGenerator';
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
 
-/**
- * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
- * characters corresponding to 128 bits.
- */
-export const randomTraceId = getIdGenerator(TRACE_ID_BYTES);
+export class RandomIdGenerator implements IdGenerator {
+  /**
+   * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
+   * characters corresponding to 128 bits.
+   */
+  generateTraceId = getIdGenerator(TRACE_ID_BYTES);
 
-/**
- * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
- * characters corresponding to 64 bits.
- */
-export const randomSpanId = getIdGenerator(SPAN_ID_BYTES);
+  /**
+   * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
+   * characters corresponding to 64 bits.
+   */
+  generateSpanId = getIdGenerator(SPAN_ID_BYTES);
+}
 
 const SHARED_BUFFER = Buffer.allocUnsafe(TRACE_ID_BYTES);
 function getIdGenerator(bytes: number): () => string {

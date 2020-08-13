@@ -25,8 +25,7 @@ import * as assert from 'assert';
 import {
   CompositePropagator,
   HttpTraceContext,
-  randomSpanId,
-  randomTraceId,
+  RandomIdGenerator,
 } from '../../src';
 import {
   getExtractedSpanContext,
@@ -49,8 +48,9 @@ describe('Composite Propagator', () => {
   let spanId: string;
 
   beforeEach(() => {
-    traceId = randomTraceId();
-    spanId = randomSpanId();
+    const idGenerator = new RandomIdGenerator();
+    traceId = idGenerator.generateTraceId();
+    spanId = idGenerator.generateSpanId();
   });
 
   describe('inject', () => {

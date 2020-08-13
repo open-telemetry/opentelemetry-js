@@ -2,7 +2,7 @@
 
 const tracer = require('./tracer')(('example-grpc-server'));
 // eslint-disable-next-line import/order
-const grpc = require('grpc');
+const grpc = require('@grpc/grpc-js');
 
 const messages = require('./helloworld_pb');
 const services = require('./helloworld_grpc_pb');
@@ -14,9 +14,10 @@ function startServer() {
   // Creates a server
   const server = new grpc.Server();
   server.addService(services.GreeterService, { sayHello });
-  server.bind(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure());
-  console.log(`binding server on 0.0.0.0:${PORT}`);
-  server.start();
+  server.bindAsync(`0.0.0.0:${PORT}`, grpc.ServerCredentials.createInsecure(), () => {
+    console.log(`binding server on 0.0.0.0:${PORT}`);
+    server.start();
+  });
 }
 
 function sayHello(call, callback) {

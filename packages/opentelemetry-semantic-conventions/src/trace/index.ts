@@ -18,3 +18,4 @@ export * from './general';
 export * from './rpc';
 export * from './http';
 export * from './database';
+export * from './os';
