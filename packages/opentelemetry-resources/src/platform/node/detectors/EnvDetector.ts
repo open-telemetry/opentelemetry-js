@@ -19,7 +19,7 @@ import {
   Resource,
   ResourceDetectionConfigWithLogger,
   ResourceLabels,
-} from '@opentelemetry/resources';
+} from '../../../';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource

@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import { envDetector } from '../../src';
+import { envDetector, K8S_RESOURCE, Resource } from '../../src';
+import { assertK8sResource, assertEmptyResource } from '../util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
-import { Resource, K8S_RESOURCE } from '@opentelemetry/resources';
-import {
-  assertK8sResource,
-  assertEmptyResource,
-} from '@opentelemetry/resources/test/util/resource-assertions';
 
 describe('envDetector()', () => {
   describe('with valid env', () => {
