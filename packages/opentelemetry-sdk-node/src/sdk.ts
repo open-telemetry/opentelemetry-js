@@ -35,11 +35,15 @@ export class NodeSDK {
 
   private _resource: Resource;
 
+  private _autoDetectResources: boolean;
+
   /**
    * Create a new NodeJS SDK instance
    */
   public constructor(configuration: Partial<NodeSDKConfiguration> = {}) {
     this._resource = configuration.resource ?? new Resource({});
+
+    this._autoDetectResources = configuration.autoDetectResources ?? true;
 
     if (configuration.spanProcessor || configuration.traceExporter) {
       const tracerProviderConfig: NodeTracerConfig = {};
@@ -117,6 +121,9 @@ export class NodeSDK {
 
   /** Detect resource attributes */
   private _detectResources(): Promise<Resource> {
+    if (!this._autoDetectResources) {
+      return Promise.resolve(this._resource);
+    }
     return new Promise<Resource>(resolve => {
       let resolved = false;
       setTimeout(() => {

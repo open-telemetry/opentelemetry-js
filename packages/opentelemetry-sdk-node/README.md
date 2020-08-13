@@ -62,6 +62,10 @@ sdk.start();
 
 Below is a full list of configuration options which may be passed into the `NodeSDK` constructor;
 
+### autoDetectResources
+
+Detect resources automatically from the environment using the default resource detectors. Default `true`.
+
 ### contextManager
 
 Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemetry-context-async-hooks/README.md)
