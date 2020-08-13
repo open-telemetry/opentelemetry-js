@@ -74,8 +74,6 @@ const logResources = (logger: Logger, resources: Array<Resource>) => {
         sorted: true,
         compact: false,
       });
-      const detectorName = resource.detectedBy;
-      logger.debug(`${detectorName} found resource.`);
       logger.debug(resourceDebugString);
     }
   });

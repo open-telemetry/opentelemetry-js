@@ -50,11 +50,6 @@ export class Resource {
      * TODO: Consider to add check/validation on labels.
      */
     readonly labels: ResourceLabels,
-
-    /**
-     * Name of the resource detector that detected this resource
-     */
-    readonly detectedBy: string = 'Unknown detector'
   ) {}
 
   /**

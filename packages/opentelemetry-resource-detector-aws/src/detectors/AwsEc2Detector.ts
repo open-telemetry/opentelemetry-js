@@ -53,7 +53,7 @@ class AwsEc2Detector implements Detector {
         region,
         availabilityZone,
       } = await this._awsMetadataAccessor();
-      return new Resource(
+      const resource = new Resource(
         {
           [CLOUD_RESOURCE.PROVIDER]: 'aws',
           [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
@@ -62,8 +62,9 @@ class AwsEc2Detector implements Detector {
           [HOST_RESOURCE.ID]: instanceId,
           [HOST_RESOURCE.TYPE]: instanceType,
         },
-        this.constructor.name
       );
+      config.logger.debug(`${this.constructor.name} found resource.`);
+      return resource;
     } catch (e) {
       config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
       return Resource.empty();

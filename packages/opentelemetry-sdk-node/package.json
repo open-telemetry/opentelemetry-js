@@ -51,7 +51,6 @@
     "@opentelemetry/tracing": "^0.10.2",
     "@opentelemetry/resource-detector-aws": "^0.10.2",
     "@opentelemetry/resource-detector-gcp": "^0.10.2",
-    "@opentelemetry/resource-detector-env": "^0.10.2",
     "nock": "12.0.3"
   },
   "devDependencies": {

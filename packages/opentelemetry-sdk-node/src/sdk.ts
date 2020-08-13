@@ -22,12 +22,12 @@ import {
   detectResources,
   Resource,
   ResourceDetectionConfig,
+  envDetector,
 } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
-import { envDetector } from '@opentelemetry/resource-detector-env';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
