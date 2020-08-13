@@ -63,7 +63,7 @@ class GcpDetector implements Detector {
     if (process.env.KUBERNETES_SERVICE_HOST)
       this._addK8sLabels(labels, clusterName);
 
-    return new Resource(labels);
+    return new Resource(labels, this.constructor.name);
   }
 
   /** Add resource labels for K8s */

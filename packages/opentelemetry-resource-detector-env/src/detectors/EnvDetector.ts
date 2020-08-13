@@ -64,7 +64,7 @@ class EnvDetector implements Detector {
       const labels = this._parseResourceLabels(
         process.env.OTEL_RESOURCE_LABELS
       );
-      return new Resource(labels);
+      return new Resource(labels, this.constructor.name);
     } catch (e) {
       config.logger.debug(`EnvDetector failed: ${e.message}`);
       return Resource.empty();

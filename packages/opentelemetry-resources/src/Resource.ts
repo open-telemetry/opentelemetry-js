@@ -54,7 +54,7 @@ export class Resource {
     /**
      * Name of the resource detector that detected this resource
      */
-    readonly detector: string = 'Unknown detector'
+    readonly detectedBy: string = 'Unknown detector'
   ) {}
 
   /**

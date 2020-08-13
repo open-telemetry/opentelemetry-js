@@ -39,7 +39,7 @@ import { NodeSDK } from '../src';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
 import * as Sinon from 'sinon';
 import sinon = require('sinon');
-import { Resource, detectResources } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 
 import {
@@ -55,6 +55,7 @@ import {
   SECONDARY_HOST_ADDRESS,
   resetIsAvailableCache,
 } from 'gcp-metadata';
+import { resetIsAvailableCache as otherResetIsAvailableCache } from '@opentelemetry/resource-detector-gcp/node_modules/gcp-metadata';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
@@ -170,6 +171,10 @@ describe('Node SDK', () => {
   });
 
   describe('detectResources', async () => {
+    const sdk = new NodeSDK({
+      autoDetectResources: true,
+    });
+
     beforeEach(() => {
       nock.disableNetConnect();
       process.env.OTEL_RESOURCE_LABELS =
@@ -177,16 +182,15 @@ describe('Node SDK', () => {
     });
 
     afterEach(() => {
+      sdk['_resource'] = Resource.empty();
+      resetIsAvailableCache();
+      otherResetIsAvailableCache();
       nock.cleanAll();
       nock.enableNetConnect();
       delete process.env.OTEL_RESOURCE_LABELS;
     });
 
     describe('in GCP environment', () => {
-      after(() => {
-        resetIsAvailableCache();
-      });
-
       it('returns a merged resource', async () => {
         const gcpScope = nock(HOST_ADDRESS)
           .get(INSTANCE_PATH)
@@ -205,7 +209,9 @@ describe('Node SDK', () => {
         const awsScope = nock(AWS_HOST)
           .get(AWS_PATH)
           .replyWithError({ code: 'ENOTFOUND' });
-        const resource: Resource = await detectResources();
+        await sdk.detectResources();
+        const resource: Resource = sdk['_resource'];
+
         awsScope.done();
         gcpSecondaryScope.done();
         gcpScope.done();
@@ -238,7 +244,10 @@ describe('Node SDK', () => {
         const awsScope = nock(AWS_HOST)
           .get(AWS_PATH)
           .reply(200, () => mockedAwsResponse);
-        const resource: Resource = await detectResources();
+
+        await sdk.detectResources();
+        const resource: Resource = sdk['_resource'];
+
         gcpSecondaryScope.done();
         gcpScope.done();
         awsScope.done();
@@ -265,7 +274,9 @@ describe('Node SDK', () => {
     describe('with a buggy detector', () => {
       it('returns a merged resource', async () => {
         const stub = sinon.stub(awsEc2Detector, 'detect').throws();
-        const resource: Resource = await detectResources();
+
+        await sdk.detectResources();
+        const resource: Resource = sdk['_resource'];
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -275,6 +286,115 @@ describe('Node SDK', () => {
         });
 
         stub.restore();
+      });
+    });
+
+    describe('with a debug logger', () => {
+      // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
+      // Needed because of race condition with parallel detectors.
+      const callArgsContains = (
+        mockedFunction: sinon.SinonSpy,
+        arg: any
+      ): boolean => {
+        return mockedFunction.getCalls().some(call => {
+          return call.args.some(callarg => arg === callarg);
+        });
+      };
+      const callArgsMatches = (
+        mockedFunction: sinon.SinonSpy,
+        regex: RegExp
+      ): boolean => {
+        return mockedFunction.getCalls().some(call => {
+          return regex.test(call.args.toString());
+        });
+      };
+
+      it('prints detected resources and debug messages to the logger', async () => {
+        // This test depends on the env detector to be functioning as intended
+        const mockedLoggerMethod = sinon.fake();
+        await sdk.detectResources({
+          logger: {
+            debug: mockedLoggerMethod,
+            info: sinon.fake(),
+            warn: sinon.fake(),
+            error: sinon.fake(),
+          },
+        });
+
+        // Test for AWS and GCP Detector failure
+        assert.ok(
+          callArgsContains(
+            mockedLoggerMethod,
+            'GcpDetector failed: GCP Metadata unavailable.'
+          )
+        );
+        assert.ok(
+          callArgsContains(
+            mockedLoggerMethod,
+            'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/dynamic/instance-identity/document"'
+          )
+        );
+        // Test that the Env Detector successfully found its resource and populated it with the right values.
+        assert.ok(
+          callArgsContains(mockedLoggerMethod, 'EnvDetector found resource.')
+        );
+        // Regex formatting accounts for whitespace variations in util.inspect output over different node versions
+        assert.ok(
+          callArgsMatches(
+            mockedLoggerMethod,
+            /{\s+'service\.instance\.id':\s+'627cc493',\s+'service\.name':\s+'my-service',\s+'service\.namespace':\s+'default',\s+'service\.version':\s+'0\.0\.1'\s+}\s*/
+          )
+        );
+      });
+
+      describe('with missing environemnt variable', () => {
+        beforeEach(() => {
+          delete process.env.OTEL_RESOURCE_LABELS;
+        });
+
+        it('prints correct error messages when EnvDetector has no env variable', async () => {
+          const mockedLoggerMethod = sinon.fake();
+          await sdk.detectResources({
+            logger: {
+              debug: mockedLoggerMethod,
+              info: sinon.fake(),
+              warn: sinon.fake(),
+              error: sinon.fake(),
+            },
+          });
+
+          assert.ok(
+            callArgsContains(
+              mockedLoggerMethod,
+              'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+            )
+          );
+        });
+      });
+
+      describe('with a faulty environment variable', () => {
+        beforeEach(() => {
+          process.env.OTEL_RESOURCE_LABELS = 'bad=~label';
+        });
+
+        it('prints correct error messages when EnvDetector has an invalid variable', async () => {
+          const mockedLoggerMethod = sinon.fake();
+          await sdk.detectResources({
+            logger: {
+              debug: mockedLoggerMethod,
+              info: sinon.fake(),
+              warn: sinon.fake(),
+              error: sinon.fake(),
+            },
+          });
+
+          assert.ok(
+            callArgsContains(
+              mockedLoggerMethod,
+              'EnvDetector failed: Label value should be a ASCII string with a length not exceed 255 characters.'
+            )
+          );
+        });
       });
     });
   });
