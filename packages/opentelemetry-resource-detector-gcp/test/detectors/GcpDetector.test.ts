@@ -23,16 +23,16 @@ import {
   resetIsAvailableCache,
 } from 'gcp-metadata';
 import * as nock from 'nock';
-import { Resource } from '../../src';
-import { gcpDetector } from '../../src/platform/node/detectors';
+import { gcpDetector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,
   assertK8sResource,
   assertContainerResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,

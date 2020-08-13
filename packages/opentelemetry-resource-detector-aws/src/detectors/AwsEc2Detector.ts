@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import {
+  Detector,
+  Resource,
+  CLOUD_RESOURCE,
+  HOST_RESOURCE,
+} from '@opentelemetry/resources';
 import * as http from 'http';
-import { Resource } from '../../../Resource';
-import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
-import { Detector } from '../../../types';
-import { ResourceDetectionConfigWithLogger } from '../../../config';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2
@@ -42,7 +44,7 @@ class AwsEc2Detector implements Detector {
    *
    * @param config The resource detection config with a required logger
    */
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+  async detect(config: any): Promise<Resource> {
     try {
       const {
         accountId,

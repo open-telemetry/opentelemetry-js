@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
-import type { Detector } from './types';
+import { Detector, Resource, CLOUD_RESOURCE, HOST_RESOURCE } from '../../src';
 
-/**
- * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
- */
-export interface ResourceDetectionConfig {
-  /** Optional Logger. */
-  logger?: Logger;
-  detectors?: Array<Detector>;
+class SampleDetector implements Detector {
+  async detect(): Promise<Resource> {
+    return new Resource({
+      [CLOUD_RESOURCE.PROVIDER]: 'provider',
+      [CLOUD_RESOURCE.ACCOUNT_ID]: 'accountId',
+      [CLOUD_RESOURCE.REGION]: 'region',
+      [CLOUD_RESOURCE.ZONE]: 'zone',
+      [HOST_RESOURCE.ID]: 'instanceId',
+      [HOST_RESOURCE.TYPE]: 'instanceType',
+    });
+  }
 }
 
-/**
- * ResourceDetectionConfigWithLogger provides an interface for interacting with
- * {@link ResourceDetectionConfig} instances that must have a logger defined.
- */
-export interface ResourceDetectionConfigWithLogger
-  extends ResourceDetectionConfig {
-  /** Required Logger */
-  logger: Logger;
-}
+export const sampleDetector = new SampleDetector();

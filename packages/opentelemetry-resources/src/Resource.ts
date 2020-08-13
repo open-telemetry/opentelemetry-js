@@ -49,7 +49,12 @@ export class Resource {
      * about the entity as numbers, strings or booleans
      * TODO: Consider to add check/validation on labels.
      */
-    readonly labels: ResourceLabels
+    readonly labels: ResourceLabels,
+
+    /**
+     * Name of the resource detector that detected this resource
+     */
+    readonly detector: string = 'Unknown detector'
   ) {}
 
   /**

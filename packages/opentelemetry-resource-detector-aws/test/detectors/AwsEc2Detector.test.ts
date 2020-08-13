@@ -17,8 +17,8 @@
 import * as nock from 'nock';
 import * as assert from 'assert';
 import { URL } from 'url';
-import { Resource } from '../../src';
-import { awsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
+import { Resource } from '@opentelemetry/resources';
+import { awsEc2Detector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,

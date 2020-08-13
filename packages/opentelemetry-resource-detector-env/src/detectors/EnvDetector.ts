@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-import { Resource } from '../../../Resource';
-import { Detector, ResourceLabels } from '../../../types';
-import { ResourceDetectionConfigWithLogger } from '../../../config';
+import {
+  Detector,
+  Resource,
+  ResourceDetectionConfigWithLogger,
+  ResourceLabels,
+} from '@opentelemetry/resources';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource

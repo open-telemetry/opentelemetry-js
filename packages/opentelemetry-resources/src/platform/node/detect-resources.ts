@@ -15,8 +15,6 @@
  */
 
 import { Resource } from '../../Resource';
-import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
-import { Detector } from '../../types';
 import {
   ResourceDetectionConfig,
   ResourceDetectionConfigWithLogger,
@@ -24,8 +22,6 @@ import {
 import { Logger } from '@opentelemetry/api';
 import * as util from 'util';
 import { NoopLogger } from '@opentelemetry/core';
-
-const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
 /**
  * Runs all resource detectors and returns the results merged into a single
@@ -39,12 +35,12 @@ export const detectResources = async (
   const internalConfig: ResourceDetectionConfigWithLogger = Object.assign(
     {
       logger: new NoopLogger(),
-    },
+    } as ResourceDetectionConfigWithLogger,
     config
   );
 
   const resources: Array<Resource> = await Promise.all(
-    DETECTORS.map(d => {
+    (internalConfig.detectors || []).map(d => {
       try {
         return d.detect(internalConfig);
       } catch {
@@ -69,7 +65,7 @@ export const detectResources = async (
  * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
  */
 const logResources = (logger: Logger, resources: Array<Resource>) => {
-  resources.forEach((resource, index) => {
+  resources.forEach(resource => {
     // Print only populated resources
     if (Object.keys(resource.labels).length > 0) {
       const resourceDebugString = util.inspect(resource.labels, {
@@ -78,9 +74,7 @@ const logResources = (logger: Logger, resources: Array<Resource>) => {
         sorted: true,
         compact: false,
       });
-      const detectorName = DETECTORS[index].constructor
-        ? DETECTORS[index].constructor.name
-        : 'Unknown detector';
+      const detectorName = resource.detector;
       logger.debug(`${detectorName} found resource.`);
       logger.debug(resourceDebugString);
     }
