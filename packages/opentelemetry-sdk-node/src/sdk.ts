@@ -18,7 +18,11 @@ import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
-import { detectResources, Resource, ResourceDetectionConfig } from '@opentelemetry/resources';
+import {
+  detectResources,
+  Resource,
+  ResourceDetectionConfig,
+} from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';

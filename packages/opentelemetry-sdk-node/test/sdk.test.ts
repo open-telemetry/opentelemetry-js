@@ -15,6 +15,7 @@
  */
 
 import * as nock from 'nock';
+import { URL } from 'url';
 import {
   context,
   metrics,
