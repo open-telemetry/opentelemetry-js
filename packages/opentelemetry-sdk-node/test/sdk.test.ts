@@ -37,8 +37,7 @@ import {
 import * as assert from 'assert';
 import { NodeSDK } from '../src';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
-import * as Sinon from 'sinon';
-import sinon = require('sinon');
+import * as Sinon from 'Sinon';
 import { Resource } from '@opentelemetry/resources';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 
@@ -273,7 +272,7 @@ describe('Node SDK', () => {
 
     describe('with a buggy detector', () => {
       it('returns a merged resource', async () => {
-        const stub = sinon.stub(awsEc2Detector, 'detect').throws();
+        const stub = Sinon.stub(awsEc2Detector, 'detect').throws();
 
         await sdk.detectResources();
         const resource: Resource = sdk['_resource'];
@@ -293,7 +292,7 @@ describe('Node SDK', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         arg: any
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -301,7 +300,7 @@ describe('Node SDK', () => {
         });
       };
       const callArgsMatches = (
-        mockedFunction: sinon.SinonSpy,
+        mockedFunction: Sinon.SinonSpy,
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -311,13 +310,13 @@ describe('Node SDK', () => {
 
       it('prints detected resources and debug messages to the logger', async () => {
         // This test depends on the env detector to be functioning as intended
-        const mockedLoggerMethod = sinon.fake();
+        const mockedLoggerMethod = Sinon.fake();
         await sdk.detectResources({
           logger: {
             debug: mockedLoggerMethod,
-            info: sinon.fake(),
-            warn: sinon.fake(),
-            error: sinon.fake(),
+            info: Sinon.fake(),
+            warn: Sinon.fake(),
+            error: Sinon.fake(),
           },
         });
 
@@ -353,13 +352,13 @@ describe('Node SDK', () => {
         });
 
         it('prints correct error messages when EnvDetector has no env variable', async () => {
-          const mockedLoggerMethod = sinon.fake();
+          const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
             logger: {
               debug: mockedLoggerMethod,
-              info: sinon.fake(),
-              warn: sinon.fake(),
-              error: sinon.fake(),
+              info: Sinon.fake(),
+              warn: Sinon.fake(),
+              error: Sinon.fake(),
             },
           });
 
@@ -378,13 +377,13 @@ describe('Node SDK', () => {
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {
-          const mockedLoggerMethod = sinon.fake();
+          const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
             logger: {
               debug: mockedLoggerMethod,
-              info: sinon.fake(),
-              warn: sinon.fake(),
-              error: sinon.fake(),
+              info: Sinon.fake(),
+              warn: Sinon.fake(),
+              error: Sinon.fake(),
             },
           });
 
