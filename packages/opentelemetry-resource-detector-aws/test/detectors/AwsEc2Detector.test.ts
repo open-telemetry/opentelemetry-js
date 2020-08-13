@@ -23,7 +23,7 @@ import {
   assertCloudResource,
   assertHostResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
 const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(

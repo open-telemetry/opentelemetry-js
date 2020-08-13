@@ -20,7 +20,7 @@ import { Resource, K8S_RESOURCE } from '@opentelemetry/resources';
 import {
   assertK8sResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '@opentelemetry/resources/test/util/resource-assertions';
 
 describe('envDetector()', () => {
   describe('with valid env', () => {
