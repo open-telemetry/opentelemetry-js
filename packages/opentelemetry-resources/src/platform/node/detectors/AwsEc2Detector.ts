@@ -31,7 +31,6 @@ class AwsEc2Detector implements Detector {
    * for documentation about the AWS instance identity document
    * and standard of IDMSv2.
    */
-  readonly HTTP_HEADER = 'http://';
   readonly AWS_IDMS_ENDPOINT = '169.254.169.254';
   readonly AWS_INSTANCE_TOKEN_DOCUMENT_PATH = '/latest/api/token';
   readonly AWS_INSTANCE_IDENTITY_DOCUMENT_PATH =

@@ -25,7 +25,7 @@ import {
 } from '../util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
-const AWS_HOST = awsEc2Detector.HTTP_HEADER + awsEc2Detector.AWS_IDMS_ENDPOINT;
+const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
 const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
 const AWS_IDENTITY_PATH = awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH;
 const AWS_HOST_PATH = awsEc2Detector.AWS_INSTANCE_HOST_DOCUMENT_PATH;
