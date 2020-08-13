@@ -38,6 +38,7 @@ class AwsEc2Detector implements Detector {
   readonly AWS_INSTANCE_HOST_DOCUMENT_PATH = '/latest/meta-data/hostname';
   readonly AWS_METADATA_TTL_HEADER = 'X-aws-ec2-metadata-token-ttl-seconds';
   readonly AWS_METADATA_TOKEN_HEADER = 'X-aws-ec2-metadata-token';
+  readonly MILLISECOND_TIME_OUT = 1000;
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
@@ -81,7 +82,7 @@ class AwsEc2Detector implements Detector {
       host: this.AWS_IDMS_ENDPOINT,
       path: this.AWS_INSTANCE_TOKEN_DOCUMENT_PATH,
       method: 'PUT',
-      timeout: 1000,
+      timeout: this.MILLISECOND_TIME_OUT,
       headers: {
         [this.AWS_METADATA_TTL_HEADER]: '60',
       },
@@ -94,7 +95,7 @@ class AwsEc2Detector implements Detector {
       host: this.AWS_IDMS_ENDPOINT,
       path: this.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH,
       method: 'GET',
-      timeout: 1000,
+      timeout: this.MILLISECOND_TIME_OUT,
       headers: {
         [this.AWS_METADATA_TOKEN_HEADER]: token,
       },
@@ -108,7 +109,7 @@ class AwsEc2Detector implements Detector {
       host: this.AWS_IDMS_ENDPOINT,
       path: this.AWS_INSTANCE_HOST_DOCUMENT_PATH,
       method: 'GET',
-      timeout: 1000,
+      timeout: this.MILLISECOND_TIME_OUT,
       headers: {
         [this.AWS_METADATA_TOKEN_HEADER]: token,
       },
