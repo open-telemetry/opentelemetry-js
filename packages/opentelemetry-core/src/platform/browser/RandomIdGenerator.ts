@@ -15,50 +15,36 @@
  */
 import { IdGenerator } from '../../trace/IdGenerator';
 
-type WindowWithMsCrypto = Window & {
-  msCrypto?: Crypto;
-};
-const cryptoLib = window.crypto || (window as WindowWithMsCrypto).msCrypto;
 const SPAN_ID_BYTES = 8;
 const TRACE_ID_BYTES = 16;
-const randomBytesArray = new Uint8Array(TRACE_ID_BYTES);
 
 export class RandomIdGenerator implements IdGenerator {
   /**
    * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
    * characters corresponding to 128 bits.
    */
-  generateTraceId(): string {
-    cryptoLib.getRandomValues(randomBytesArray);
-    return this.toHex(randomBytesArray.slice(0, TRACE_ID_BYTES));
-  }
+  generateTraceId = getIdGenerator(TRACE_ID_BYTES);
 
   /**
    * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
    * characters corresponding to 64 bits.
    */
-  generateSpanId(): string {
-    cryptoLib.getRandomValues(randomBytesArray);
-    return this.toHex(randomBytesArray.slice(0, SPAN_ID_BYTES));
-  }
+  generateSpanId = getIdGenerator(SPAN_ID_BYTES);
+}
 
-  /**
-   * Get the hex string representation of a byte array
-   *
-   * @param byteArray
-   */
-  private toHex(byteArray: Uint8Array) {
-    const chars: number[] = new Array(byteArray.length * 2);
-    const alpha = 'a'.charCodeAt(0) - 10;
-    const digit = '0'.charCodeAt(0);
-
-    let p = 0;
-    for (let i = 0; i < byteArray.length; i++) {
-      let nibble = (byteArray[i] >>> 4) & 0xf;
-      chars[p++] = nibble > 9 ? nibble + alpha : nibble + digit;
-      nibble = byteArray[i] & 0xf;
-      chars[p++] = nibble > 9 ? nibble + alpha : nibble + digit;
+const SHARED_CHAR_CODES_ARRAY = Array(32);
+function getIdGenerator(bytes: number): () => string {
+  return function generateId() {
+    for (let i = 0; i < bytes * 2; i++) {
+      SHARED_CHAR_CODES_ARRAY[i] = Math.floor(Math.random() * 16) + 48;
+      // valid hex characters in the range 48-57 and 97-102
+      if (SHARED_CHAR_CODES_ARRAY[i] >= 58) {
+        SHARED_CHAR_CODES_ARRAY[i] += 39;
+      }
     }
-    return String.fromCharCode.apply(null, chars);
-  }
+    return String.fromCharCode.apply(
+      null,
+      SHARED_CHAR_CODES_ARRAY.slice(0, bytes * 2)
+    );
+  };
 }
