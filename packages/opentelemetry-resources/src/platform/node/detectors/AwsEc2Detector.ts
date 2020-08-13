@@ -28,7 +28,8 @@ import { ResourceDetectionConfigWithLogger } from '../../../config';
 class AwsEc2Detector implements Detector {
   /**
    * See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.html
-   * for documentation about the AWS instance identity document endpoint.
+   * for documentation about the AWS instance identity document
+   * and standard of IDMSv2.
    */
   readonly HTTP_HEADER = 'http://';
   readonly AWS_IDMS_ENDPOINT = '169.254.169.254';
