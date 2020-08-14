@@ -47,7 +47,7 @@
     "@babel/core": "7.11.1",
     "@opentelemetry/context-zone": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2",
-    "@types/mocha": "8.0.1",
+    "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "7.5.2",
