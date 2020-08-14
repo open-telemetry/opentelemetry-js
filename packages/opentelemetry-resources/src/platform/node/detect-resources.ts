@@ -40,10 +40,13 @@ export const detectResources = async (
   );
 
   const resources: Array<Resource> = await Promise.all(
-    (internalConfig.detectors || []).map(d => {
+    (internalConfig.detectors || []).map(async (d) => {
       try {
-        return d.detect(internalConfig);
-      } catch {
+        const resource = await d.detect(internalConfig);
+        config.logger?.debug(`${d.constructor.name} found resource.`, resource);
+        return resource;
+      } catch (e) {
+        config.logger?.debug(`${d.constructor.name} failed: ${e.message}`);
         return Resource.empty();
       }
     })

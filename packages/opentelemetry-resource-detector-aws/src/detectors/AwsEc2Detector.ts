@@ -45,31 +45,24 @@ class AwsEc2Detector implements Detector {
    *
    * @param config The resource detection config with a required logger
    */
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-    try {
-      const {
-        accountId,
-        instanceId,
-        instanceType,
-        region,
-        availabilityZone,
-      } = await this._awsMetadataAccessor();
-      const resource = new Resource(
-        {
-          [CLOUD_RESOURCE.PROVIDER]: 'aws',
-          [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
-          [CLOUD_RESOURCE.REGION]: region,
-          [CLOUD_RESOURCE.ZONE]: availabilityZone,
-          [HOST_RESOURCE.ID]: instanceId,
-          [HOST_RESOURCE.TYPE]: instanceType,
-        },
-      );
-      config.logger.debug(`${this.constructor.name} found resource.`);
-      return resource;
-    } catch (e) {
-      config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
-      return Resource.empty();
-    }
+  async detect(_config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+    const {
+      accountId,
+      instanceId,
+      instanceType,
+      region,
+      availabilityZone,
+    } = await this._awsMetadataAccessor();
+    return new Resource(
+      {
+        [CLOUD_RESOURCE.PROVIDER]: 'aws',
+        [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
+        [CLOUD_RESOURCE.REGION]: region,
+        [CLOUD_RESOURCE.ZONE]: availabilityZone,
+        [HOST_RESOURCE.ID]: instanceId,
+        [HOST_RESOURCE.TYPE]: instanceType,
+      },
+    );
   }
 
   /**

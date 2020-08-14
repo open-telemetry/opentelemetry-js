@@ -40,7 +40,7 @@ import * as NodeConfig from '@opentelemetry/node/build/src/config';
 import * as Sinon from 'sinon';
 import { Resource } from '@opentelemetry/resources';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
-
+import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
 import {
   assertServiceResource,
   assertCloudResource,
@@ -52,9 +52,7 @@ import {
   HEADER_VALUE,
   HOST_ADDRESS,
   SECONDARY_HOST_ADDRESS,
-  resetIsAvailableCache,
 } from 'gcp-metadata';
-import { resetIsAvailableCache as otherResetIsAvailableCache } from '@opentelemetry/resource-detector-gcp/node_modules/gcp-metadata';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
@@ -183,7 +181,6 @@ describe('Node SDK', () => {
     afterEach(() => {
       sdk['_resource'] = Resource.empty();
       resetIsAvailableCache();
-      otherResetIsAvailableCache();
       nock.cleanAll();
       nock.enableNetConnect();
       delete process.env.OTEL_RESOURCE_LABELS;

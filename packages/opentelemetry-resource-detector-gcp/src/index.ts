@@ -15,3 +15,6 @@
  */
 
 export * from './detectors';
+
+// Internal - used for tests only
+export { resetIsAvailableCache } from 'gcp-metadata';
