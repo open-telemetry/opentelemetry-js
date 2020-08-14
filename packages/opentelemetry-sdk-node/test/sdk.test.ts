@@ -38,7 +38,6 @@ import * as assert from 'assert';
 import { NodeSDK } from '../src';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
 import * as Sinon from 'sinon';
-import { Resource } from '@opentelemetry/resources';
 import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
 import { resetIsAvailableCache } from '@opentelemetry/resource-detector-gcp';
 import {
@@ -167,27 +166,29 @@ describe('Node SDK', () => {
     });
   });
 
-  describe('detectResources', async () => {
-    const sdk = new NodeSDK({
-      autoDetectResources: true,
-    });
 
+  describe('detectResources', async () => {
     beforeEach(() => {
       nock.disableNetConnect();
-      process.env.OTEL_RESOURCE_LABELS =
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
         'service.instance.id=627cc493,service.name=my-service,service.namespace=default,service.version=0.0.1';
     });
 
     afterEach(() => {
-      sdk['_resource'] = Resource.empty();
-      resetIsAvailableCache();
       nock.cleanAll();
       nock.enableNetConnect();
-      delete process.env.OTEL_RESOURCE_LABELS;
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
     describe('in GCP environment', () => {
+      after(() => {
+        resetIsAvailableCache();
+      });
+
       it('returns a merged resource', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
         const gcpScope = nock(HOST_ADDRESS)
           .get(INSTANCE_PATH)
           .reply(200, {}, HEADERS)
@@ -206,7 +207,7 @@ describe('Node SDK', () => {
           .get(AWS_PATH)
           .replyWithError({ code: 'ENOTFOUND' });
         await sdk.detectResources();
-        const resource: Resource = sdk['_resource'];
+        const resource = sdk["_resource"];
 
         awsScope.done();
         gcpSecondaryScope.done();
@@ -229,6 +230,9 @@ describe('Node SDK', () => {
 
     describe('in AWS environment', () => {
       it('returns a merged resource', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
         const gcpScope = nock(HOST_ADDRESS).get(INSTANCE_PATH).replyWithError({
           code: 'ENOTFOUND',
         });
@@ -240,10 +244,8 @@ describe('Node SDK', () => {
         const awsScope = nock(AWS_HOST)
           .get(AWS_PATH)
           .reply(200, () => mockedAwsResponse);
-
         await sdk.detectResources();
-        const resource: Resource = sdk['_resource'];
-
+        const resource = sdk["_resource"];
         gcpSecondaryScope.done();
         gcpScope.done();
         awsScope.done();
@@ -269,10 +271,12 @@ describe('Node SDK', () => {
 
     describe('with a buggy detector', () => {
       it('returns a merged resource', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
         const stub = Sinon.stub(awsEc2Detector, 'detect').throws();
-
         await sdk.detectResources();
-        const resource: Resource = sdk['_resource'];
+        const resource = sdk["_resource"];
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -289,7 +293,7 @@ describe('Node SDK', () => {
       // Local functions to test if a mocked method is ever called with a specific argument or regex matching for an argument.
       // Needed because of race condition with parallel detectors.
       const callArgsContains = (
-        mockedFunction: Sinon.SinonSpy,
+        mockedFunction: sinon.SinonSpy,
         arg: any
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -297,7 +301,7 @@ describe('Node SDK', () => {
         });
       };
       const callArgsMatches = (
-        mockedFunction: Sinon.SinonSpy,
+        mockedFunction: sinon.SinonSpy,
         regex: RegExp
       ): boolean => {
         return mockedFunction.getCalls().some(call => {
@@ -306,6 +310,9 @@ describe('Node SDK', () => {
       };
 
       it('prints detected resources and debug messages to the logger', async () => {
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
         // This test depends on the env detector to be functioning as intended
         const mockedLoggerMethod = Sinon.fake();
         await sdk.detectResources({
@@ -345,10 +352,13 @@ describe('Node SDK', () => {
 
       describe('with missing environemnt variable', () => {
         beforeEach(() => {
-          delete process.env.OTEL_RESOURCE_LABELS;
+          delete process.env.OTEL_RESOURCE_ATTRIBUTES;
         });
 
         it('prints correct error messages when EnvDetector has no env variable', async () => {
+          const sdk = new NodeSDK({
+            autoDetectResources: true,
+          });
           const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
             logger: {
@@ -362,7 +372,7 @@ describe('Node SDK', () => {
           assert.ok(
             callArgsContains(
               mockedLoggerMethod,
-              'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+              'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
             )
           );
         });
@@ -370,10 +380,13 @@ describe('Node SDK', () => {
 
       describe('with a faulty environment variable', () => {
         beforeEach(() => {
-          process.env.OTEL_RESOURCE_LABELS = 'bad=~label';
+          process.env.OTEL_RESOURCE_ATTRIBUTES = 'bad=~attribute';
         });
 
         it('prints correct error messages when EnvDetector has an invalid variable', async () => {
+          const sdk = new NodeSDK({
+            autoDetectResources: true,
+          });
           const mockedLoggerMethod = Sinon.fake();
           await sdk.detectResources({
             logger: {
@@ -387,7 +400,7 @@ describe('Node SDK', () => {
           assert.ok(
             callArgsContains(
               mockedLoggerMethod,
-              'EnvDetector failed: Label value should be a ASCII string with a length not exceed 255 characters.'
+              'EnvDetector failed: Attribute value should be a ASCII string with a length not exceed 255 characters.'
             )
           );
         });
