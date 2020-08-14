@@ -55,7 +55,7 @@ export interface Histogram {
   /**
    * Buckets are implemented using two different arrays:
    *  - boundaries: contains every finite bucket boundary, which are inclusive lower bounds
-   *  - counts contains event counts for each bucket
+   *  - counts: contains event counts for each bucket
    *
    * Note that we'll always have n+1 buckets, where n is the number of boundaries.
    * This is because we need to count events that are below the lowest boundary.
