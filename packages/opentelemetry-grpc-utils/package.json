@@ -50,7 +50,7 @@
     "@opentelemetry/tracing": "^0.10.2",
     "@types/mocha": "7.0.2",
     "@types/node": "14.0.27",
-    "@types/semver": "7.3.1",
+    "@types/semver": "7.3.2",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "9.0.4",
     "codecov": "3.7.2",
@@ -61,7 +61,7 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "semver": "7.3.2",
-    "sinon": "9.0.2",
+    "sinon": "9.0.3",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7"
