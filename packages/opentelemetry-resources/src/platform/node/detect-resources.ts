@@ -35,7 +35,7 @@ export const detectResources = async (
   const internalConfig: ResourceDetectionConfigWithLogger = Object.assign(
     {
       logger: new NoopLogger(),
-    } as ResourceDetectionConfigWithLogger,
+    },
     config
   );
 
