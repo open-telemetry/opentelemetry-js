@@ -20,7 +20,7 @@ import {
   Detector,
   ResourceDetectionConfigWithLogger,
   Resource,
-  ResourceLabels,
+  ResourceAttributes,
   CLOUD_RESOURCE,
   HOST_RESOURCE,
   K8S_RESOURCE,
@@ -36,7 +36,7 @@ class GcpDetector implements Detector {
   /**
    * Attempts to connect and obtain instance configuration data from the GCP metadata service.
    * If the connection is succesful it returns a promise containing a {@link Resource}
-   * populated with instance metadata as labels. Returns a promise containing an
+   * populated with instance metadata. Returns a promise containing an
    * empty {@link Resource} if the connection or parsing of the metadata fails.
    *
    * @param config The resource detection config with a required logger
@@ -54,25 +54,27 @@ class GcpDetector implements Detector {
       this._getClusterName(),
     ]);
 
-    const labels: ResourceLabels = {};
-    labels[CLOUD_RESOURCE.ACCOUNT_ID] = projectId;
-    labels[HOST_RESOURCE.ID] = instanceId;
-    labels[CLOUD_RESOURCE.ZONE] = zoneId;
-    labels[CLOUD_RESOURCE.PROVIDER] = 'gcp';
+    const attributes: ResourceAttributes = {};
+    attributes[CLOUD_RESOURCE.ACCOUNT_ID] = projectId;
+    attributes[HOST_RESOURCE.ID] = instanceId;
+    attributes[CLOUD_RESOURCE.ZONE] = zoneId;
+    attributes[CLOUD_RESOURCE.PROVIDER] = 'gcp';
 
-    if (process.env.KUBERNETES_SERVICE_HOST) {
-      this._addK8sLabels(labels, clusterName);
-    }
+    if (process.env.KUBERNETES_SERVICE_HOST)
+      this._addK8sAttributes(attributes, clusterName);
 
-    return new Resource(labels);
+    return new Resource(attributes);
   }
 
-  /** Add resource labels for K8s */
-  private _addK8sLabels(labels: ResourceLabels, clusterName: string): void {
-    labels[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
-    labels[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';
-    labels[K8S_RESOURCE.POD_NAME] = process.env.HOSTNAME || os.hostname();
-    labels[CONTAINER_RESOURCE.NAME] = process.env.CONTAINER_NAME || '';
+  /** Add resource attributes for K8s */
+  private _addK8sAttributes(
+    attributes: ResourceAttributes,
+    clusterName: string
+  ): void {
+    attributes[K8S_RESOURCE.CLUSTER_NAME] = clusterName;
+    attributes[K8S_RESOURCE.NAMESPACE_NAME] = process.env.NAMESPACE || '';
+    attributes[K8S_RESOURCE.POD_NAME] = process.env.HOSTNAME || os.hostname();
+    attributes[CONTAINER_RESOURCE.NAME] = process.env.CONTAINER_NAME || '';
   }
 
   /** Gets project id from GCP project metadata. */

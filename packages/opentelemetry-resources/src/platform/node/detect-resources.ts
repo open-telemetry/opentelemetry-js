@@ -70,8 +70,8 @@ export const detectResources = async (
 const logResources = (logger: Logger, resources: Array<Resource>) => {
   resources.forEach(resource => {
     // Print only populated resources
-    if (Object.keys(resource.labels).length > 0) {
-      const resourceDebugString = util.inspect(resource.labels, {
+    if (Object.keys(resource.attributes).length > 0) {
+      const resourceDebugString = util.inspect(resource.attributes, {
         depth: 2,
         breakLength: Infinity,
         sorted: true,

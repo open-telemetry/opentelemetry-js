@@ -52,9 +52,9 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.1",
+    "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
-    "@types/semver": "7.3.1",
+    "@types/semver": "7.3.2",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.2",
@@ -69,7 +69,7 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.2",
+    "sinon": "9.0.3",
     "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",

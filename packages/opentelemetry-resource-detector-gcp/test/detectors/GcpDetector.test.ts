@@ -95,7 +95,7 @@ describe('gcpDetector', () => {
       assertHostResource(resource, { id: '4520031799277582000' });
     });
 
-    it('should populate K8s labels resource when KUBERNETES_SERVICE_HOST is set', async () => {
+    it('should populate K8s attributes when KUBERNETES_SERVICE_HOST is set', async () => {
       process.env.KUBERNETES_SERVICE_HOST = 'my-host';
       process.env.NAMESPACE = 'my-namespace';
       process.env.HOSTNAME = 'my-hostname';

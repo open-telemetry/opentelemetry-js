@@ -40,7 +40,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.1",
+    "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "codecov": "3.7.2",
     "gts": "2.0.2",
