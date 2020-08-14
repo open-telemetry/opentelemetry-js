@@ -498,7 +498,7 @@ describe('PrometheusExporter', () => {
       });
     });
 
-    it('should export a ValueRecorder as a guage', done => {
+    it('should export a ValueRecorder as a gauge', done => {
       const valueRecorder = meter.createValueRecorder('value_recorder', {
         description: 'a test description',
       });
