@@ -56,7 +56,7 @@ import {
 
 export class CustomBatcher extends UngroupedBatcher {
   aggregatorFor (metricDescriptor: MetricDescriptor) {
-    if (metricDescriptor.labels === 'metricToBeAveraged') {
+    if (metricDescriptor.name === 'requests') {
       return new AverageAggregator(10);
     }
     // this is exactly what the "UngroupedBatcher" does, we will re-use it
