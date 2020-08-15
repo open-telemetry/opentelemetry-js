@@ -17,8 +17,8 @@
 import { Resource } from './Resource';
 import { ResourceDetectionConfigWithLogger } from './config';
 
-/** Interface for Resource labels  */
-export interface ResourceLabels {
+/** Interface for Resource attributes  */
+export interface ResourceAttributes {
   [key: string]: number | string | boolean;
 }
 
