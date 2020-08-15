@@ -15,7 +15,10 @@
  */
 
 import { envDetector, K8S_RESOURCE, Resource } from '../../src';
-import { assertK8sResource, assertEmptyResource } from '../util/resource-assertions';
+import {
+  assertK8sResource,
+  assertEmptyResource,
+} from '../util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('envDetector()', () => {

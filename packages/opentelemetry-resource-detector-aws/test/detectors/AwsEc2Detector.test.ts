@@ -22,7 +22,6 @@ import { awsEc2Detector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,
-  assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -69,21 +68,6 @@ describe('awsEc2Detector', () => {
         id: 'my-instance-id',
         hostType: 'my-instance-type',
       });
-    });
-  });
-
-  describe('with failing request', () => {
-    it('should return empty resource', async () => {
-      const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
-        code: 'ENOTFOUND',
-      });
-      const resource: Resource = await awsEc2Detector.detect({
-        logger: new NoopLogger(),
-      });
-      scope.done();
-
-      assert.ok(resource);
-      assertEmptyResource(resource);
     });
   });
 });

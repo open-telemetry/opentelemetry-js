@@ -106,10 +106,10 @@ class EnvDetector implements Detector {
       key = key.trim();
       value = value.trim().split('^"|"$').join('');
       if (!this._isValidAndNotEmpty(key)) {
-        throw new Error(`Label key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+        throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
       }
       if (!this._isValid(value)) {
-        throw new Error(`Label value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
+        throw new Error(`Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
       }
       attributes[key] = value;
     }

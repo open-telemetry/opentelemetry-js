@@ -128,8 +128,8 @@ export class NodeSDK {
   /** Detect resource attributes */
   public async detectResources(config?: ResourceDetectionConfig) {
     const internalConfig: ResourceDetectionConfig = {
-      ...config,
       detectors: [awsEc2Detector, gcpDetector, envDetector],
+      ...config,
     };
 
     this.addResource(await detectResources(internalConfig));

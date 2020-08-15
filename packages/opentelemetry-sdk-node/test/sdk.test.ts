@@ -52,6 +52,7 @@ import {
   HOST_ADDRESS,
   SECONDARY_HOST_ADDRESS,
 } from 'gcp-metadata';
+import { Resource } from '@opentelemetry/resources';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
@@ -166,7 +167,6 @@ describe('Node SDK', () => {
     });
   });
 
-
   describe('detectResources', async () => {
     beforeEach(() => {
       nock.disableNetConnect();
@@ -207,7 +207,7 @@ describe('Node SDK', () => {
           .get(AWS_PATH)
           .replyWithError({ code: 'ENOTFOUND' });
         await sdk.detectResources();
-        const resource = sdk["_resource"];
+        const resource = sdk['_resource'];
 
         awsScope.done();
         gcpSecondaryScope.done();
@@ -245,7 +245,7 @@ describe('Node SDK', () => {
           .get(AWS_PATH)
           .reply(200, () => mockedAwsResponse);
         await sdk.detectResources();
-        const resource = sdk["_resource"];
+        const resource = sdk['_resource'];
         gcpSecondaryScope.done();
         gcpScope.done();
         awsScope.done();
@@ -267,6 +267,23 @@ describe('Node SDK', () => {
           version: '0.0.1',
         });
       });
+
+      it('should return empty resource', async () => {
+        const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
+          code: 'ENOTFOUND',
+        });
+        const sdk = new NodeSDK({
+          autoDetectResources: true,
+        });
+        await sdk.detectResources({
+          detectors: [awsEc2Detector],
+        });
+        const resource: Resource = sdk['_resource'];
+        scope.done();
+
+        assert.ok(resource);
+        assert.deepStrictEqual(resource, Resource.createTelemetrySDKResource());
+      });
     });
 
     describe('with a buggy detector', () => {
@@ -276,7 +293,7 @@ describe('Node SDK', () => {
         });
         const stub = Sinon.stub(awsEc2Detector, 'detect').throws();
         await sdk.detectResources();
-        const resource = sdk["_resource"];
+        const resource = sdk['_resource'];
 
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -350,7 +367,7 @@ describe('Node SDK', () => {
         );
       });
 
-      describe('with missing environemnt variable', () => {
+      describe('with missing environment variable', () => {
         beforeEach(() => {
           delete process.env.OTEL_RESOURCE_ATTRIBUTES;
         });
