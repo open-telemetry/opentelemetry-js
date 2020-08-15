@@ -40,7 +40,7 @@ export interface MeterConfig {
   /** Metric batcher. */
   batcher?: Batcher;
 
-  /** Bool for whether or not graceful shutdown is enabled */
+  /** Bool for whether or not graceful shutdown is enabled. If disabled metrics will not be exported when SIGTERM is recieved */
   gracefulShutdown?: boolean;
 }
 
