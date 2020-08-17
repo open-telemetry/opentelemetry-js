@@ -183,7 +183,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, 1);
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
 
-    tracerProvider.shutdown(() => {
+    tracerProvider.shutdown().then(() => {
       assert.strictEqual(processor1.spans.length, 0);
       assert.strictEqual(processor1.spans.length, processor2.spans.length);
     });
