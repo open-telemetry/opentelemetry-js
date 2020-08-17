@@ -56,7 +56,7 @@ import {
 
 export class CustomBatcher extends UngroupedBatcher {
   aggregatorFor (metricDescriptor: MetricDescriptor) {
-    if (metricDescriptor.labels === 'metricToBeAveraged') {
+    if (metricDescriptor.name === 'requests') {
       return new AverageAggregator(10);
     }
     // this is exactly what the "UngroupedBatcher" does, we will re-use it
@@ -138,7 +138,7 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('example-custom-batcher');
 
-const requestsLatency = meter.createMeasure('requests', {
+const requestsLatency = meter.createValueRecorder('requests', {
   monotonic: true,
   description: 'Average latency'
 });

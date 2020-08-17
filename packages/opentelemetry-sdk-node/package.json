@@ -60,7 +60,7 @@
     "istanbul-instrumenter-loader": "3.0.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
-    "sinon": "9.0.2",
+    "sinon": "9.0.3",
     "ts-loader": "7.0.5",
     "ts-mocha": "7.0.0",
     "typescript": "3.9.7"
