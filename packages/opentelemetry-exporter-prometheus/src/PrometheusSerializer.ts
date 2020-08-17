@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { MetricRecord, AggregatorKind } from '@opentelemetry/metrics';
+import {
+  MetricRecord,
+  AggregatorKind,
+  Distribution,
+} from '@opentelemetry/metrics';
 import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
@@ -183,60 +187,36 @@ export class PrometheusSerializer {
       case AggregatorKind.DISTRIBUTION: {
         const { value, timestamp: hrtime } = record.aggregator.toPoint();
         const timestamp = hrTimeToMilliseconds(hrtime);
-        results += stringify(
-          name + '_min',
-          record.labels,
-          value.min,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
-        results += stringify(
-          name + '_max',
-          record.labels,
-          value.max,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
-        results += stringify(
-          name + '_count',
-          record.labels,
-          value.count,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
-        results += stringify(
-          name + '_last',
-          record.labels,
-          value.last,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
-        results += stringify(
-          name + '_sum',
-          record.labels,
-          value.sum,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
+        for (const key of [
+          'min',
+          'max',
+          'count',
+          'last',
+          'sum',
+        ] as (keyof Distribution)[]) {
+          results += stringify(
+            name + '_' + key,
+            record.labels,
+            value[key],
+            this._appendTimestamp ? timestamp : undefined,
+            undefined
+          );
+        }
         break;
       }
       case AggregatorKind.HISTOGRAM: {
         const { value, timestamp: hrtime } = record.aggregator.toPoint();
         const timestamp = hrTimeToMilliseconds(hrtime);
-        results += stringify(
-          name + '_count',
-          record.labels,
-          value.count,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
-        results += stringify(
-          name + '_sum',
-          record.labels,
-          value.sum,
-          this._appendTimestamp ? timestamp : undefined,
-          undefined
-        );
+        /** Histogram["bucket"] is not typed with `number` */
+        for (const key of ['count', 'sum'] as ('count' | 'sum')[]) {
+          results += stringify(
+            name + '_' + key,
+            record.labels,
+            value[key],
+            this._appendTimestamp ? timestamp : undefined,
+            undefined
+          );
+        }
         for (const [idx, val] of value.buckets.counts.entries()) {
           const upperBound = value.buckets.boundaries[idx];
           results += stringify(
