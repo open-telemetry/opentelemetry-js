@@ -159,8 +159,6 @@ describe('PrometheusSerializer', () => {
           description: 'foobar',
         }) as ValueRecorderMetric;
         recorder.bind(labels).record(5);
-        // TODO(#1292);
-        batcher.aggregators.forEach(it => it.reset());
 
         const records = await recorder.getMetricRecord();
         const record = records[0];
@@ -189,8 +187,6 @@ describe('PrometheusSerializer', () => {
           description: 'foobar',
         }) as ValueRecorderMetric;
         recorder.bind(labels).record(5);
-        // TODO(#1292);
-        batcher.aggregators.forEach(it => it.reset());
 
         const records = await recorder.getMetricRecord();
         const record = records[0];
@@ -323,8 +319,6 @@ describe('PrometheusSerializer', () => {
         }) as ValueRecorderMetric;
         recorder.bind({ val: '1' }).record(5);
         recorder.bind({ val: '2' }).record(5);
-        // TODO(#1292);
-        batcher.aggregators.forEach(it => it.reset());
 
         const records = await recorder.getMetricRecord();
         const labelBatcher = new PrometheusLabelsBatcher();
