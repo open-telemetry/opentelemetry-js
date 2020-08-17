@@ -114,16 +114,6 @@ describe('NodeTracerProvider', () => {
       require('http');
       assert.strictEqual(plugins.length, 3);
     });
-
-    it('should construct an instance with default attributes', () => {
-      provider = new NodeTracerProvider({
-        defaultAttributes: {
-          region: 'eu-west',
-          asg: 'my-asg',
-        },
-      });
-      assert.ok(provider instanceof NodeTracerProvider);
-    });
   });
 
   describe('.startSpan()', () => {
@@ -195,19 +185,6 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should set default attributes on span', () => {
-      const defaultAttributes = {
-        foo: 'bar',
-      };
-      provider = new NodeTracerProvider({
-        defaultAttributes,
-      });
-
-      const span = provider.getTracer('default').startSpan('my-span') as Span;
-      assert.ok(span instanceof Span);
-      assert.deepStrictEqual(span.attributes, defaultAttributes);
-    });
-
     it('should assign resource to span', () => {
       provider = new NodeTracerProvider({
         logger: new NoopLogger(),
@@ -216,7 +193,7 @@ describe('NodeTracerProvider', () => {
       assert.ok(span);
       assert.ok(span.resource instanceof Resource);
       assert.equal(
-        span.resource.labels[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+        span.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
         'nodejs'
       );
     });

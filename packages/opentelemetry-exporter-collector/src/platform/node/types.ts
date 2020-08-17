@@ -15,7 +15,6 @@
  */
 
 import * as grpc from 'grpc';
-import { ReadableSpan } from '@opentelemetry/tracing';
 import { CollectorProtocolNode } from '../../enums';
 import {
   CollectorExporterError,
@@ -23,11 +22,11 @@ import {
 } from '../../types';
 
 /**
- * Queue item to be used to save temporary spans in case the GRPC service
- * hasn't been fully initialised yet
+ * Queue item to be used to save temporary spans/metrics in case the GRPC service
+ * hasn't been fully initialized yet
  */
-export interface GRPCSpanQueueItem {
-  spans: ReadableSpan[];
+export interface GRPCQueueItem<ExportedItem> {
+  objects: ExportedItem[];
   onSuccess: () => void;
   onError: (error: CollectorExporterError) => void;
 }

@@ -14,11 +14,13 @@
  * limitations under the License.
  */
 
+import type * as grpcJs from '@grpc/grpc-js';
 import { BasePlugin } from '@opentelemetry/core';
+import * as shimmer from 'shimmer';
+import { patchClient, patchLoadPackageDefinition } from './client';
+import { patchServer } from './server';
 import { VERSION } from './version';
-import * as path from 'path';
-
-import * as grpcJs from '@grpc/grpc-js';
+import { Tracer, Logger } from '@opentelemetry/api';
 
 /**
  * @grpc/grpc-js gRPC instrumentation plugin for Opentelemetry
@@ -26,20 +28,74 @@ import * as grpcJs from '@grpc/grpc-js';
  */
 export class GrpcJsPlugin extends BasePlugin<typeof grpcJs> {
   static readonly component = '@grpc/grpc-js';
+
   readonly supportedVersions = ['1.*'];
 
-  constructor(readonly moduleName: string, readonly version: string) {
+  constructor(readonly moduleName: string) {
     super('@opentelemetry/plugin-grpc-js', VERSION);
   }
 
-  protected patch(): typeof grpcJs {
-    throw new Error('Method not implemented.');
+  /**
+   * @internal
+   * Public reference to the protected BasePlugin `_tracer` instance to be used by this
+   * plugin's external helper functions
+   */
+  get tracer(): Tracer {
+    return this._tracer;
   }
+
+  /**
+   * @internal
+   * Public reference to the protected BasePlugin `_logger` instance to be used by this
+   * plugin's external helper functions
+   */
+  get logger(): Logger {
+    return this._logger;
+  }
+
+  protected patch(): typeof grpcJs {
+    // Patch Server methods
+    shimmer.wrap(
+      this._moduleExports.Server.prototype,
+      'register',
+      patchServer.call(this)
+    );
+
+    // Patch Client methods
+    shimmer.wrap(
+      this._moduleExports,
+      'makeClientConstructor',
+      patchClient.call(this)
+    );
+    shimmer.wrap(
+      this._moduleExports,
+      'makeGenericClientConstructor',
+      patchClient.call(this)
+    );
+    shimmer.wrap(
+      this._moduleExports,
+      'loadPackageDefinition',
+      patchLoadPackageDefinition.call(this)
+    );
+
+    return this._moduleExports;
+  }
+
   protected unpatch(): void {
-    throw new Error('Method not implemented.');
+    this._logger.debug(
+      'removing patch to %s@%s',
+      this.moduleName,
+      this.version
+    );
+
+    // Unpatch server
+    shimmer.unwrap(this._moduleExports.Server.prototype, 'register');
+
+    // Unpatch client
+    shimmer.unwrap(this._moduleExports, 'makeClientConstructor');
+    shimmer.unwrap(this._moduleExports, 'makeGenericClientConstructor');
+    shimmer.unwrap(this._moduleExports, 'loadPackageDefinition');
   }
 }
 
-const basedir = path.dirname(require.resolve(GrpcJsPlugin.component));
-const version = require(path.join(basedir, 'package.json')).version;
-export const plugin = new GrpcJsPlugin(GrpcJsPlugin.component, version);
+export const plugin = new GrpcJsPlugin(GrpcJsPlugin.component);

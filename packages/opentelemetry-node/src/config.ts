@@ -29,6 +29,7 @@ export interface NodeTracerConfig extends TracerConfig {
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   mongodb: { enabled: true, path: '@opentelemetry/plugin-mongodb' },
   grpc: { enabled: true, path: '@opentelemetry/plugin-grpc' },
+  '@grpc/grpc-js': { enabled: true, path: '@opentelemetry/plugin-grpc-js' },
   http: { enabled: true, path: '@opentelemetry/plugin-http' },
   https: { enabled: true, path: '@opentelemetry/plugin-https' },
   mysql: { enabled: true, path: '@opentelemetry/plugin-mysql' },

@@ -33,7 +33,7 @@ describe('transform', () => {
         foo: 'bar',
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        { key: 'foo', type: 0, stringValue: 'bar' },
+        { key: 'foo', value: { stringValue: 'bar' } },
       ]);
     });
 
@@ -42,7 +42,7 @@ describe('transform', () => {
         foo: 13,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        { key: 'foo', type: 2, doubleValue: 13 },
+        { key: 'foo', value: { doubleValue: 13 } },
       ]);
     });
 
@@ -51,7 +51,7 @@ describe('transform', () => {
         foo: true,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        { key: 'foo', type: 3, boolValue: true },
+        { key: 'foo', value: { boolValue: true } },
       ]);
     });
 
@@ -60,7 +60,63 @@ describe('transform', () => {
         foo: 1.34,
       };
       assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        { key: 'foo', type: 2, doubleValue: 1.34 },
+        { key: 'foo', value: { doubleValue: 1.34 } },
+      ]);
+    });
+    it('should convert attribute mixed with maps and array', () => {
+      const attributes: Attributes = {
+        foo: [
+          0,
+          1,
+          2.25,
+          'otel',
+          {
+            foo: 'bar',
+            baz: 'json',
+            array: [1, 2, 'boom'],
+          },
+        ],
+      };
+      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
+        {
+          key: 'foo',
+          value: {
+            arrayValue: {
+              values: [
+                { doubleValue: 0 },
+                { doubleValue: 1 },
+                { doubleValue: 2.25 },
+                { stringValue: 'otel' },
+                {
+                  kvlistValue: {
+                    values: [
+                      {
+                        key: 'foo',
+                        value: { stringValue: 'bar' },
+                      },
+                      {
+                        key: 'baz',
+                        value: { stringValue: 'json' },
+                      },
+                      {
+                        key: 'array',
+                        value: {
+                          arrayValue: {
+                            values: [
+                              { doubleValue: 1 },
+                              { doubleValue: 2 },
+                              { stringValue: 'boom' },
+                            ],
+                          },
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
       ]);
     });
   });
@@ -79,13 +135,13 @@ describe('transform', () => {
         {
           timeUnixNano: 123000000123,
           name: 'foo',
-          attributes: [{ key: 'a', type: 0, stringValue: 'b' }],
+          attributes: [{ key: 'a', value: { stringValue: 'b' } }],
           droppedAttributesCount: 0,
         },
         {
           timeUnixNano: 321000000321,
           name: 'foo2',
-          attributes: [{ key: 'c', type: 0, stringValue: 'd' }],
+          attributes: [{ key: 'c', value: { stringValue: 'd' } }],
           droppedAttributesCount: 0,
         },
       ]);
@@ -111,15 +167,13 @@ describe('transform', () => {
         attributes: [
           {
             key: 'service',
-            type: 0,
-            stringValue: 'ui',
+            value: { stringValue: 'ui' },
           },
           {
             key: 'version',
-            type: 2,
-            doubleValue: 1,
+            value: { doubleValue: 1 },
           },
-          { key: 'success', type: 3, boolValue: true },
+          { key: 'success', value: { boolValue: true } },
         ],
         droppedAttributesCount: 0,
       });

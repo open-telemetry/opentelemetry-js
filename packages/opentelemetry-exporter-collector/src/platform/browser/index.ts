@@ -15,3 +15,4 @@
  */
 
 export * from './CollectorTraceExporter';
+export * from './CollectorMetricExporter';

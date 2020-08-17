@@ -18,19 +18,31 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorTraceExporterBase } from '../../src/CollectorTraceExporterBase';
+import { CollectorExporterBase } from '../../src/CollectorExporterBase';
 import { CollectorExporterConfigBase } from '../../src/types';
 import { mockedReadableSpan } from '../helper';
+import * as collectorTypes from '../../src/types';
 
 type CollectorExporterConfig = CollectorExporterConfigBase;
-class CollectorTraceExporter extends CollectorTraceExporterBase<
-  CollectorExporterConfig
+class CollectorTraceExporter extends CollectorExporterBase<
+  CollectorExporterConfig,
+  ReadableSpan,
+  collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest
 > {
   onInit() {}
   onShutdown() {}
-  sendSpans() {}
-  getDefaultUrl(config: CollectorExporterConfig) {
+  send() {}
+  getDefaultUrl(config: CollectorExporterConfig): string {
     return config.url || '';
+  }
+  getDefaultServiceName(config: CollectorExporterConfig): string {
+    return config.serviceName || 'collector-exporter';
+  }
+
+  convert(
+    spans: ReadableSpan[]
+  ): collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest {
+    return { resourceSpans: [] };
   }
 }
 
@@ -101,7 +113,7 @@ describe('CollectorTraceExporter - common', () => {
   describe('export', () => {
     let spySend: any;
     beforeEach(() => {
-      spySend = sinon.stub(CollectorTraceExporter.prototype, 'sendSpans');
+      spySend = sinon.stub(CollectorTraceExporter.prototype, 'send');
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
     });
     afterEach(() => {
