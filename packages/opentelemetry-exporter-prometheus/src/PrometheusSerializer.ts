@@ -19,7 +19,7 @@ import { Labels } from '@opentelemetry/api';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
 
 function escapeString(str: string) {
-  return str.replace(/\n/g, '\\n').replace(/\\(?!n)/g, '\\\\');
+  return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
 }
 
 function escapeLabelValue(str: string) {

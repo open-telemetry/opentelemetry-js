@@ -427,6 +427,43 @@ describe('PrometheusSerializer', () => {
           );
         }
       });
+
+      it('should escape backslash (\\), double-quote ("), and line feed (\\n) in label values', async () => {
+        const serializer = new PrometheusSerializer();
+
+        const meter = new MeterProvider({
+          batcher: new ExactBatcher(SumAggregator),
+        }).getMeter('test');
+        const counter = meter.createCounter('test') as CounterMetric;
+        counter
+          .bind(({
+            backslash: '\u005c', // \ => \\ (\u005c\u005c)
+            doubleQuote: '\u0022', // " => \" (\u005c\u0022)
+            lineFeed: '\u000a', // ↵ => \n (\u005c\u006e)
+            backslashN: '\u005c\u006e', // \n => \\n (\u005c\u005c\u006e)
+            backslashDoubleQuote: '\u005c\u0022', // \" => \\\" (\u005c\u005c\u005c\u0022)
+            backslashLineFeed: '\u005c\u000a', // \↵ => \\\n (\u005c\u005c\u005c\u006e)
+          } as unknown) as Labels)
+          .add(1);
+        const records = await counter.getMetricRecord();
+        const record = records[0];
+
+        const result = serializer.serializeRecord(
+          record.descriptor.name,
+          record
+        );
+        assert.strictEqual(
+          result,
+          'test{' +
+            'backslash="\u005c\u005c",' +
+            'doubleQuote="\u005c\u0022",' +
+            'lineFeed="\u005c\u006e",' +
+            'backslashN="\u005c\u005c\u006e",' +
+            'backslashDoubleQuote="\u005c\u005c\u005c\u0022",' +
+            'backslashLineFeed="\u005c\u005c\u005c\u006e"' +
+            `} 1 ${mockedHrTimeMs}\n`
+        );
+      });
     });
   });
 });
