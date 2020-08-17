@@ -138,7 +138,7 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('example-custom-batcher');
 
-const requestsLatency = meter.createMeasure('requests', {
+const requestsLatency = meter.createValueRecorder('requests', {
   monotonic: true,
   description: 'Average latency'
 });
