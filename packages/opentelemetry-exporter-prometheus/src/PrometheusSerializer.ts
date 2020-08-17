@@ -124,7 +124,7 @@ function stringify(
   }
 
   return `${metricName} ${valueString(value)}${
-    timestamp != null ? ' ' + String(timestamp) : ''
+    timestamp !== undefined ? ' ' + String(timestamp) : ''
   }\n`;
 }
 
