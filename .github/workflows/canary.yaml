@@ -3,7 +3,7 @@ name: Deploy Canary Release
 on:
   push:
     branches:
-      - master
+      - canary-test
 
 jobs:
   build-and-test:
@@ -11,6 +11,8 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       - name: Set up Node.js
         uses: actions/setup-node@master
         with:
@@ -38,3 +40,6 @@ jobs:
         run: npx lerna publish --canary --dist-tag canary --preid canary --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Push tag to github
+        run: git push --tags
