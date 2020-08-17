@@ -3,7 +3,7 @@ name: Deploy Canary Release
 on:
   push:
     branches:
-      - canary-test
+      - master
 
 jobs:
   build-and-test:
@@ -12,6 +12,7 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
         with:
+          # Fetch all history (needed for lerna / semantic release to correctly version)
           fetch-depth: 0
       # pulls all tags (needed for lerna / semantic release to correctly version)
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
@@ -39,9 +40,9 @@ jobs:
           npx lerna bootstrap --no-ci
 
       - name: Publish
-        run: npx lerna publish --canary --dist-tag canary --preid canary --yes
+        run: npx lerna publish --canary --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-      - name: Push tag to github
-        run: git push --tags
+      # Push new version tag to github
+      - run: git push --tags
