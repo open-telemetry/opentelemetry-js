@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-import { Resource } from './Resource';
-import { ResourceDetectionConfigWithLogger } from './config';
-
-/** Interface for Resource attributes  */
-export interface ResourceAttributes {
-  [key: string]: number | string | boolean;
+/**
+ * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
+ */
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
+  process.once('SIGTERM', cb);
+  return function removeCallbackFromGlobalShutdown() {
+    process.removeListener('SIGTERM', cb);
+  };
 }
 
 /**
- * Interface for a Resource Detector. In order to detect resources in parallel
- * a detector returns a Promise containing a Resource.
+ * Warning: meant for internal use only! Sends a SIGTERM to the current process
  */
-export interface Detector {
-  detect(config: ResourceDetectionConfigWithLogger): Promise<Resource>;
+export function _invokeGlobalShutdown() {
+  process.kill(process.pid, 'SIGTERM');
 }

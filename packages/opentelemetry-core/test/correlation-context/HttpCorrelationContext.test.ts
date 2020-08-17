@@ -152,19 +152,49 @@ describe('HttpCorrelationContext', () => {
   });
 
   it('should gracefully handle an invalid header', () => {
-    const testCases: Record<string, string> = {
-      invalidNoKeyValuePair: '289371298nekjh2939299283jbk2b',
-      invalidDoubleEqual: 'key1==value;key2=value2',
-      invalidWrongKeyValueFormat: 'key1:value;key2=value2',
-      invalidDoubleSemicolon: 'key1:value;;key2=value2',
+    const testCases: Record<
+      string,
+      {
+        header: string;
+        correlationContext: CorrelationContext | undefined;
+      }
+    > = {
+      invalidNoKeyValuePair: {
+        header: '289371298nekjh2939299283jbk2b',
+        correlationContext: undefined,
+      },
+      invalidDoubleEqual: {
+        header: 'key1==value;key2=value2',
+        correlationContext: undefined,
+      },
+      invalidWrongKeyValueFormat: {
+        header: 'key1:value;key2=value2',
+        correlationContext: undefined,
+      },
+      invalidDoubleSemicolon: {
+        header: 'key1:value;;key2=value2',
+        correlationContext: undefined,
+      },
+      mixInvalidAndValidKeys: {
+        header: 'key1==value,key2=value2',
+        correlationContext: {
+          key2: {
+            value: 'value2',
+          },
+        },
+      },
     };
     Object.getOwnPropertyNames(testCases).forEach(testCase => {
-      carrier[CORRELATION_CONTEXT_HEADER] = testCases[testCase];
+      carrier[CORRELATION_CONTEXT_HEADER] = testCases[testCase].header;
 
       const extractedSpanContext = getCorrelationContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
-      assert.deepStrictEqual(extractedSpanContext, undefined, testCase);
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        testCases[testCase].correlationContext,
+        testCase
+      );
     });
   });
 });

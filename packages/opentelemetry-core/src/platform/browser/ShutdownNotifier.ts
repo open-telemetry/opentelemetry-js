@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-import { Resource } from './Resource';
-import { ResourceDetectionConfigWithLogger } from './config';
-
-/** Interface for Resource attributes  */
-export interface ResourceAttributes {
-  [key: string]: number | string | boolean;
+/**
+ * Adds an event listener to trigger a callback when an unload event in the window is detected
+ */
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
+  window.addEventListener('unload', cb, { once: true });
+  return function removeCallbackFromGlobalShutdown() {
+    window.removeEventListener('unload', cb, false);
+  };
 }
 
 /**
- * Interface for a Resource Detector. In order to detect resources in parallel
- * a detector returns a Promise containing a Resource.
+ * Warning: meant for internal use only! Closes the current window, triggering the unload event
  */
-export interface Detector {
-  detect(config: ResourceDetectionConfigWithLogger): Promise<Resource>;
+export function _invokeGlobalShutdown() {
+  window.close();
 }
