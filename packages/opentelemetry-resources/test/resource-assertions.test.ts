@@ -39,7 +39,7 @@ describe('assertCloudResource', () => {
     assertCloudResource(resource, {});
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [CLOUD_RESOURCE.PROVIDER]: 'gcp',
       [CLOUD_RESOURCE.ACCOUNT_ID]: 'opentelemetry',
@@ -63,7 +63,7 @@ describe('assertContainerResource', () => {
     assertContainerResource(resource, {});
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [CONTAINER_RESOURCE.NAME]: 'opentelemetry-autoconf',
       [CONTAINER_RESOURCE.IMAGE_NAME]: 'gcr.io/opentelemetry/operator',
@@ -85,7 +85,7 @@ describe('assertHostResource', () => {
     assertHostResource(resource, {});
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [HOST_RESOURCE.HOSTNAME]: 'opentelemetry-test-hostname',
       [HOST_RESOURCE.ID]: 'opentelemetry-test-id',
@@ -116,7 +116,7 @@ describe('assertK8sResource', () => {
     assertK8sResource(resource, {});
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [K8S_RESOURCE.CLUSTER_NAME]: 'opentelemetry-cluster',
       [K8S_RESOURCE.NAMESPACE_NAME]: 'default',
@@ -142,7 +142,7 @@ describe('assertTelemetrySDKResource', () => {
     assertTelemetrySDKResource(resource, {});
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [TELEMETRY_SDK_RESOURCE.NAME]: 'opentelemetry',
       [TELEMETRY_SDK_RESOURCE.LANGUAGE]: 'nodejs',
@@ -157,7 +157,7 @@ describe('assertTelemetrySDKResource', () => {
 });
 
 describe('assertServiceResource', () => {
-  it('validates required labels', () => {
+  it('validates required attributes', () => {
     const resource = new Resource({
       [SERVICE_RESOURCE.NAME]: 'shoppingcart',
       [SERVICE_RESOURCE.INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
@@ -168,7 +168,7 @@ describe('assertServiceResource', () => {
     });
   });
 
-  it('validates optional labels', () => {
+  it('validates optional attributes', () => {
     const resource = new Resource({
       [SERVICE_RESOURCE.NAME]: 'shoppingcart',
       [SERVICE_RESOURCE.INSTANCE_ID]: '627cc493-f310-47de-96bd-71410b7dec09',
