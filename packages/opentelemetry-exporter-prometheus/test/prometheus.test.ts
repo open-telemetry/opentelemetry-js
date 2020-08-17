@@ -417,6 +417,122 @@ describe('PrometheusExporter', () => {
         });
       });
     });
+
+    it('should export a SumObserver as a counter', done => {
+      function getValue() {
+        return 20;
+      }
+
+      meter.createSumObserver(
+        'sum_observer',
+        {
+          description: 'a test description',
+        },
+        (observerResult: ObserverResult) => {
+          observerResult.observe(getValue(), {
+            key1: 'labelValue1',
+          });
+        }
+      );
+
+      meter.collect().then(() => {
+        exporter.export(meter.getBatcher().checkPointSet(), () => {
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.deepStrictEqual(lines, [
+                  '# HELP sum_observer a test description',
+                  '# TYPE sum_observer counter',
+                  `sum_observer{key1="labelValue1"} 20 ${mockedTimeMS}`,
+                  '',
+                ]);
+              });
+
+              done();
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+
+    it('should export a UpDownSumObserver as a gauge', done => {
+      function getValue() {
+        return 20;
+      }
+
+      meter.createUpDownSumObserver(
+        'updown_observer',
+        {
+          description: 'a test description',
+        },
+        (observerResult: ObserverResult) => {
+          observerResult.observe(getValue(), {
+            key1: 'labelValue1',
+          });
+        }
+      );
+
+      meter.collect().then(() => {
+        exporter.export(meter.getBatcher().checkPointSet(), () => {
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.deepStrictEqual(lines, [
+                  '# HELP updown_observer a test description',
+                  '# TYPE updown_observer gauge',
+                  'updown_observer{key1="labelValue1"} 20',
+                  '',
+                ]);
+              });
+
+              done();
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
+
+    it('should export a ValueRecorder as a gauge', done => {
+      const valueRecorder = meter.createValueRecorder('value_recorder', {
+        description: 'a test description',
+      });
+
+      valueRecorder.bind({ key1: 'labelValue1' }).record(20);
+
+      meter.collect().then(() => {
+        exporter.export(meter.getBatcher().checkPointSet(), () => {
+          http
+            .get('http://localhost:9464/metrics', res => {
+              res.on('data', chunk => {
+                const body = chunk.toString();
+                const lines = body.split('\n');
+
+                assert.strictEqual(
+                  lines[0],
+                  '# HELP value_recorder a test description'
+                );
+                assert.strictEqual(lines[1], '# TYPE value_recorder gauge');
+
+                const line3 = lines[2].split(' ');
+                assert.strictEqual(
+                  line3[0],
+                  'value_recorder{key1="labelValue1"}'
+                );
+                assert.equal(line3[1], 20);
+
+                done();
+              });
+            })
+            .on('error', errorHandler(done));
+        });
+      });
+    });
   });
 
   describe('configuration', () => {
