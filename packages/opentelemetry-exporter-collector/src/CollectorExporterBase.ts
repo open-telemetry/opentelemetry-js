@@ -36,6 +36,8 @@ export abstract class CollectorExporterBase<
   public readonly hostname: string | undefined;
   public readonly attributes?: Attributes;
   protected _isShutdown: boolean = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  protected _sendingPromises: Promise<unknown>[] = [];
 
   /**
    * @param config
@@ -98,16 +100,29 @@ export abstract class CollectorExporterBase<
   /**
    * Shutdown the exporter.
    */
-  shutdown(): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
       this.logger.debug('shutdown already started');
-      return;
+      return this._shuttingDownPromise;
     }
     this._isShutdown = true;
     this.logger.debug('shutdown started');
-
-    // platform dependent
-    this.onShutdown();
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this.onShutdown();
+        })
+        .then(() => {
+          return Promise.all(this._sendingPromises);
+        })
+        .then(() => {
+          resolve();
+        })
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   abstract onShutdown(): void;

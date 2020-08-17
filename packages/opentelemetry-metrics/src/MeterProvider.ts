@@ -27,6 +27,8 @@ export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
   private _cleanNotifyOnGlobalShutdown: Function | undefined;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  private _isShutdown = false;
   readonly resource: Resource;
   readonly logger: api.Logger;
 
@@ -38,9 +40,9 @@ export class MeterProvider implements api.MeterProvider {
       resource: this.resource,
     });
     if (this._config.gracefulShutdown) {
-      this._cleanNotifyOnGlobalShutdown = notifyOnGlobalShutdown(
-        this._shutdownAllMeters.bind(this)
-      );
+      this._cleanNotifyOnGlobalShutdown = notifyOnGlobalShutdown(() => {
+        this._shutdownAllMeters().catch();
+      });
     }
   }
 
@@ -61,22 +63,38 @@ export class MeterProvider implements api.MeterProvider {
     return this._meters.get(key)!;
   }
 
-  shutdown(cb: () => void = () => {}): void {
-    this._shutdownAllMeters().then(() => {
-      setTimeout(cb, 0);
-    });
+  shutdown(): Promise<void> {
     if (this._cleanNotifyOnGlobalShutdown) {
       this._cleanNotifyOnGlobalShutdown();
       this._cleanNotifyOnGlobalShutdown = undefined;
     }
+    return this._shutdownAllMeters();
   }
 
-  private _shutdownAllMeters() {
-    if (this._config.exporter) {
-      this._config.exporter.shutdown();
+  private _shutdownAllMeters(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
     }
-    return Promise.all(
-      Array.from(this._meters, ([_, meter]) => meter.shutdown())
-    );
+    this._isShutdown = true;
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return Promise.all(
+            Array.from(this._meters, ([_, meter]) => meter.shutdown())
+          );
+        })
+        .then(() => {
+          if (this._config.exporter) {
+            return this._config.exporter.shutdown();
+          }
+          return;
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

@@ -41,6 +41,8 @@ export class Meter implements api.Meter {
   private readonly _resource: Resource;
   private readonly _instrumentationLibrary: InstrumentationLibrary;
   private readonly _controller: PushController;
+  private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
   /**
    * Constructs a new Meter instance.
@@ -295,11 +297,11 @@ export class Meter implements api.Meter {
    * each aggregator belonging to the metrics that were created with this
    * meter instance.
    */
-  async collect(): Promise<void> {
+  collect(): Promise<void> {
     const metrics = Array.from(this._metrics.values()).map(metric => {
       return metric.getMetricRecord();
     });
-    await Promise.all(metrics).then(records => {
+    return Promise.all(metrics).then(records => {
       records.forEach(metrics => {
         metrics.forEach(metric => this._batcher.process(metric));
       });
@@ -310,8 +312,23 @@ export class Meter implements api.Meter {
     return this._batcher;
   }
 
-  async shutdown(): Promise<void> {
-    await this._controller.shutdown();
+  shutdown(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
+    }
+    this._isShutdown = true;
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._controller.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   /**

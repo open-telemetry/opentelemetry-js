@@ -40,7 +40,9 @@ import { XMLHttpRequestPlugin } from '../src/xhr';
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
 
-  shutdown() {}
+  shutdown() {
+    return Promise.resolve();
+  }
 }
 
 const XHR_TIMEOUT = 2000;

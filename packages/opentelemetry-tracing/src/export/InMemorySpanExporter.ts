@@ -36,9 +36,10 @@ export class InMemorySpanExporter implements SpanExporter {
     return resultCallback(ExportResult.SUCCESS);
   }
 
-  shutdown(): void {
+  shutdown(): Promise<void> {
     this._stopped = true;
     this._finishedSpans = [];
+    return Promise.resolve();
   }
 
   reset() {

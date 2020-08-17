@@ -35,7 +35,7 @@ describe('SimpleSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
-    it('should handle span started and ended when SAMPLED', () => {
+    it('should handle span started and ended when SAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -54,11 +54,11 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should handle span started and ended when UNSAMPLED', () => {
+    it('should handle span started and ended when UNSAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -77,21 +77,21 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
     describe('force flush', () => {
       it('should call an async callback when flushing is complete', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           done();
         });
       });
 
       it('should call an async callback when shutdown is complete', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.shutdown(() => {
+        processor.shutdown().then(() => {
           done();
         });
       });

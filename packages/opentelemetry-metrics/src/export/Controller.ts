@@ -38,8 +38,8 @@ export class PushController extends Controller {
     unrefTimer(this._timer);
   }
 
-  async shutdown(): Promise<void> {
-    await this._collect();
+  shutdown(): Promise<void> {
+    return this._collect();
   }
 
   private async _collect(): Promise<void> {

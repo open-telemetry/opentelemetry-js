@@ -66,7 +66,7 @@ describe('PrometheusExporter', () => {
           const url = `http://localhost:${port}${endpoint}`;
           http.get(url, (res: any) => {
             assert.strictEqual(res.statusCode, 200);
-            exporter.shutdown(() => {
+            exporter.shutdown().then(() => {
               return done();
             });
           });
@@ -86,7 +86,7 @@ describe('PrometheusExporter', () => {
         port: 9722,
       });
       exporter.startServer(() => {
-        exporter.shutdown(() => {
+        exporter.shutdown().then(() => {
           return done();
         });
       });
@@ -101,7 +101,7 @@ describe('PrometheusExporter', () => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown(() => {
+          exporter.shutdown().then(() => {
             return done();
           });
         });
@@ -121,7 +121,7 @@ describe('PrometheusExporter', () => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown(() => {
+          exporter.shutdown().then(() => {
             return done();
           });
         });
@@ -141,7 +141,7 @@ describe('PrometheusExporter', () => {
         const url = `http://localhost:${port}/metric`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown(() => {
+          exporter.shutdown().then(() => {
             const exporter2 = new PrometheusExporter({
               port,
               endpoint: `/${endpoint}`,
@@ -173,7 +173,7 @@ describe('PrometheusExporter', () => {
 
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 404);
-          exporter.shutdown(() => {
+          exporter.shutdown().then(() => {
             return done();
           });
         });
@@ -182,7 +182,7 @@ describe('PrometheusExporter', () => {
 
     it('should call a provided callback regardless of if the server is running', done => {
       const exporter = new PrometheusExporter();
-      exporter.shutdown(() => {
+      exporter.shutdown().then(() => {
         return done();
       });
     });
@@ -206,7 +206,7 @@ describe('PrometheusExporter', () => {
     });
 
     afterEach(done => {
-      exporter.shutdown(done);
+      exporter.shutdown().then(done);
       if (removeEvent) {
         removeEvent();
         removeEvent = undefined;
@@ -377,7 +377,71 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       counter.bind({ counterKey1: 'labelValue3' }).add(30);
-      meterProvider.shutdown(() => {
+      meterProvider.shutdown().then(() => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+    });
+
+    it('should export multiple labels on graceful shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+
+      removeEvent = notifyOnGlobalShutdown(() => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+      _invokeGlobalShutdown();
+    });
+
+    it('should export multiple labels on manual shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      meterProvider.shutdown().then(() => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {
@@ -628,7 +692,7 @@ describe('PrometheusExporter', () => {
 
     afterEach(done => {
       if (exporter) {
-        exporter.shutdown(done);
+        exporter.shutdown().then(done);
         exporter = undefined;
       } else {
         done();
