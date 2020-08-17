@@ -26,12 +26,12 @@ import { NoopLogger } from '@opentelemetry/core';
 describe('envDetector()', () => {
   describe('with valid env', () => {
     before(() => {
-      process.env.OTEL_RESOURCE_LABELS =
+      process.env.OTEL_RESOURCE_ATTRIBUTES =
         'k8s.pod.name="pod-xyz-123",k8s.cluster.name="c1",k8s.namespace.name="default"';
     });
 
     after(() => {
-      delete process.env.OTEL_RESOURCE_LABELS;
+      delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
     it('should return resource information from environment variable', async () => {

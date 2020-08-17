@@ -20,15 +20,31 @@ npm install
     npm run docker:start
     ```
 
-2. Run app
+2. Run tracing app
 
     ```shell script
     # from this directory
-    npm start
+    npm start:tracing
     ```
 
-3. Open page at <http://localhost:9411/zipkin/> -  you should be able to see the spans in zipkin
+3. Run metrics app
+
+    ```shell script
+    # from this directory
+    npm start:metrics
+    ```
+
+4. Open page at <http://localhost:9411/zipkin/> -  you should be able to see the spans in zipkin
 ![Screenshot of the running example](images/spans.png)
+
+### Prometheus UI
+
+The prometheus client will be available at <http://localhost:9090>.
+
+Note: It may take some time for the application metrics to appear on the Prometheus dashboard.
+
+<p align="center"><img src="../prometheus/images/prom-counter.png?raw=true"/></p>
+<p align="center"><img src="../prometheus/images/prom-updowncounter.png?raw=true"/></p>
 
 ## Useful links
 

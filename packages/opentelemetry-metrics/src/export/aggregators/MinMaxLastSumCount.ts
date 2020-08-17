@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point } from '../types';
+import { Point, AggregatorKind, DistributionAggregatorType } from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 import { Distribution } from '../types';
@@ -22,7 +22,9 @@ import { Distribution } from '../types';
 /**
  * Basic aggregator keeping all raw values (events, sum, max, last and min).
  */
-export class MinMaxLastSumCountAggregator implements Aggregator {
+export class MinMaxLastSumCountAggregator
+  implements DistributionAggregatorType {
+  public kind: AggregatorKind.DISTRIBUTION = AggregatorKind.DISTRIBUTION;
   private _distribution: Distribution;
   private _lastUpdateTime: HrTime = [0, 0];
 
@@ -45,7 +47,7 @@ export class MinMaxLastSumCountAggregator implements Aggregator {
     this._lastUpdateTime = hrTime();
   }
 
-  toPoint(): Point {
+  toPoint(): Point<Distribution> {
     return {
       value: this._distribution,
       timestamp: this._lastUpdateTime,
