@@ -36,7 +36,7 @@ export class PrometheusLabelsBatcher {
   process(record: MetricRecord) {
     const name = record.descriptor.name;
     let item = this._batchMap.get(name);
-    if (item == null) {
+    if (item === undefined) {
       item = {
         descriptor: record.descriptor,
         aggregatorKind: record.aggregator.kind,

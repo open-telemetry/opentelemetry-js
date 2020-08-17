@@ -20,13 +20,6 @@ import {
   MetricRecord,
 } from '@opentelemetry/metrics';
 
-export type PrometheusExportType =
-  | 'counter'
-  | 'gauge'
-  | 'histogram'
-  | 'summary'
-  | 'untyped';
-
 export interface PrometheusCheckpoint {
   descriptor: MetricDescriptor;
   aggregatorKind: AggregatorKind;

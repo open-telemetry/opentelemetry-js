@@ -14,9 +14,16 @@
  * limitations under the License.
  */
 import { MetricRecord, AggregatorKind } from '@opentelemetry/metrics';
-import { PrometheusExportType, PrometheusCheckpoint } from './types';
+import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api';
 import { hrTimeToMilliseconds } from '@opentelemetry/core';
+
+type PrometheusDataTypeLiteral =
+  | 'counter'
+  | 'gauge'
+  | 'histogram'
+  | 'summary'
+  | 'untyped';
 
 function escapeString(str: string) {
   return str.replace(/\\/g, '\\\\').replace(/\n/g, '\\n');
@@ -68,7 +75,7 @@ function valueString(value: number) {
 
 function aggregatorKindToPrometheusType(
   kind: AggregatorKind
-): PrometheusExportType {
+): PrometheusDataTypeLiteral {
   switch (kind) {
     case AggregatorKind.SUM:
       return 'counter';
@@ -238,7 +245,7 @@ export class PrometheusSerializer {
             val,
             this._appendTimestamp ? timestamp : undefined,
             {
-              le: upperBound == null ? '+Inf' : String(upperBound),
+              le: upperBound === undefined ? '+Inf' : String(upperBound),
             }
           );
         }
