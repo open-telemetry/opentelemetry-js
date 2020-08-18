@@ -21,7 +21,6 @@ import { awsEc2Detector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,
-  assertEmptyResource,
 } from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
