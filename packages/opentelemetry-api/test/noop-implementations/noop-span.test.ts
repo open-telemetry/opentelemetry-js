@@ -20,6 +20,7 @@ import {
   INVALID_SPAN_ID,
   INVALID_TRACE_ID,
   NoopSpan,
+  SpanContext,
   TraceFlags,
 } from '../../src';
 
@@ -44,11 +45,11 @@ describe('NoopSpan', () => {
     span.updateName('my-span');
 
     assert.ok(!span.isRecording());
-    assert.deepStrictEqual(span.context(), {
+    assert.deepStrictEqual(span.context(), new SpanContext({
       traceId: INVALID_TRACE_ID,
       spanId: INVALID_SPAN_ID,
       traceFlags: TraceFlags.NONE,
-    });
+    }));
     span.end();
   });
 });

@@ -93,7 +93,7 @@ export class SpanContext {
   /**
    * A function that determines whether the span context is valid
    */
-  isValid?(): boolean {
+  isValid(): boolean {
     return this.traceId !== INVALID_TRACEID && this.spanId !== INVALID_SPANID;
   }
 }

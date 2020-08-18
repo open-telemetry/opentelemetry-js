@@ -20,7 +20,7 @@ import { ExportResult, NoopLogger } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
-import { TraceFlags } from '@opentelemetry/api';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { OT_REQUEST_HEADER } from '../src/utils';
 import * as nock from 'nock';
@@ -125,11 +125,11 @@ describe('JaegerExporter', () => {
     });
 
     it('should send spans to Jaeger backend and return with Success', () => {
-      const spanContext = {
+      const spanContext = new SpanContext({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
-      };
+      });
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
         kind: api.SpanKind.CLIENT,
@@ -178,11 +178,11 @@ describe('JaegerExporter', () => {
         exporter['_sender']._httpOptions.headers[OT_REQUEST_HEADER],
         1
       );
-      const spanContext = {
+      const spanContext = new SpanContext({
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
-      };
+      });
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
         kind: api.SpanKind.CLIENT,

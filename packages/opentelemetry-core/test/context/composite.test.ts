@@ -60,12 +60,12 @@ describe('Composite Propagator', () => {
 
     beforeEach(() => {
       carrier = {};
-      spanContext = {
+      spanContext = new SpanContext({
         spanId,
         traceId,
         traceFlags: 1,
         traceState: new TraceState('foo=bar'),
-      };
+      });
       ctxWithSpanContext = setExtractedSpanContext(
         Context.ROOT_CONTEXT,
         spanContext

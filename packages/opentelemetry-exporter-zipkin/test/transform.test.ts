@@ -38,11 +38,11 @@ const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');
 const parentId = '5c1c63257de34c67';
-const spanContext: api.SpanContext = {
+const spanContext: api.SpanContext = new api.SpanContext({
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
   spanId: '6e0c63257de34c92',
   traceFlags: api.TraceFlags.SAMPLED,
-};
+});
 
 const DUMMY_RESOURCE = new Resource({
   service: 'ui',

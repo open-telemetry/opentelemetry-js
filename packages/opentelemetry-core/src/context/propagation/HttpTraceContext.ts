@@ -70,11 +70,11 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
     return null;
   }
 
-  return {
+  return new SpanContext({
     traceId: traceId,
     spanId: parentId,
     traceFlags: parseInt(flags, 16),
-  };
+  });
 }
 
 /**

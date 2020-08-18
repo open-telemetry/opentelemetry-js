@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { TraceFlags, ValueType } from '@opentelemetry/api';
+import { SpanContext, TraceFlags, ValueType } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -166,11 +166,11 @@ const parentIdBase64 = 'eKiRUJiGQ4g=';
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
   kind: 0,
-  spanContext: {
+  spanContext: new SpanContext({
     traceId: '1f1008dc8e270e85c40a0d7c3939b278',
     spanId: '5e107261f64fa53e',
     traceFlags: TraceFlags.SAMPLED,
-  },
+  }),
   parentSpanId: '78a8915098864388',
   startTime: [1574120165, 429803070],
   endTime: [1574120165, 438688070],
@@ -237,11 +237,11 @@ export const basicTrace: ReadableSpan[] = [
   {
     name: 'span1',
     kind: 0,
-    spanContext: {
+    spanContext: new SpanContext({
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '5e107261f64fa53e',
       traceFlags: TraceFlags.SAMPLED,
-    },
+    }),
     parentSpanId: '78a8915098864388',
     startTime: [1574120165, 429803070],
     endTime: [1574120165, 438688070],
@@ -257,11 +257,11 @@ export const basicTrace: ReadableSpan[] = [
   {
     name: 'span2',
     kind: 0,
-    spanContext: {
+    spanContext: new SpanContext({
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: 'f64fa53e5e107261',
       traceFlags: TraceFlags.SAMPLED,
-    },
+    }),
     parentSpanId: '78a8915098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],
@@ -277,11 +277,11 @@ export const basicTrace: ReadableSpan[] = [
   {
     name: 'span3',
     kind: 0,
-    spanContext: {
+    spanContext: new SpanContext({
       traceId: '1f1008dc8e270e85c40a0d7c3939b278',
       spanId: '07261f64fa53e5e1',
       traceFlags: TraceFlags.SAMPLED,
-    },
+    }),
     parentSpanId: 'a891578098864388',
     startTime: [1575120165, 439803070],
     endTime: [1575120165, 448688070],

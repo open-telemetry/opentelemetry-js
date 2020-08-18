@@ -18,11 +18,11 @@ import { SpanContext, TraceFlags } from '@opentelemetry/api';
 
 export const INVALID_SPANID = '0';
 export const INVALID_TRACEID = '0';
-export const INVALID_SPAN_CONTEXT: SpanContext = {
+export const INVALID_SPAN_CONTEXT: SpanContext = new SpanContext({
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
   traceFlags: TraceFlags.NONE,
-};
+});
 
 /**
  * Returns true if this {@link SpanContext} is valid.

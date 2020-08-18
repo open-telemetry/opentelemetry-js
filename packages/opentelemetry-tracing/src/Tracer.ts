@@ -98,7 +98,7 @@ export class Tracer implements api.Tracer {
       samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
         ? api.TraceFlags.SAMPLED
         : api.TraceFlags.NONE;
-    const spanContext = { traceId, spanId, traceFlags, traceState };
+    const spanContext = new api.SpanContext({ traceId, spanId, traceFlags, traceState });
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       this.logger.debug('Recording is off, starting no recording span');
       return new NoRecordingSpan(spanContext);

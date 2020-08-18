@@ -23,11 +23,11 @@ import { TraceFlags } from './trace_flags';
 
 export const INVALID_TRACE_ID = '0';
 export const INVALID_SPAN_ID = '0';
-const INVALID_SPAN_CONTEXT: SpanContext = {
+const INVALID_SPAN_CONTEXT: SpanContext = new SpanContext({
   traceId: INVALID_TRACE_ID,
   spanId: INVALID_SPAN_ID,
   traceFlags: TraceFlags.NONE,
-};
+});
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span
