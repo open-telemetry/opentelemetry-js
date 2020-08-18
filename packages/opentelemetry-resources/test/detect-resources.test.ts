@@ -17,7 +17,6 @@
 import * as nock from 'nock';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
-import { URL } from 'url';
 import { Resource, detectResources } from '../src';
 import { awsEc2Detector } from '../src/platform/node/detectors';
 import {
@@ -43,17 +42,22 @@ const PROJECT_ID_PATH = BASE_PATH + '/project/project-id';
 const ZONE_PATH = BASE_PATH + '/instance/zone';
 const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
 
-const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
-  awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
-);
+const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
+const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
+const AWS_IDENTITY_PATH = awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH;
+const AWS_HOST_PATH = awsEc2Detector.AWS_INSTANCE_HOST_DOCUMENT_PATH;
+const AWS_METADATA_TTL_HEADER = awsEc2Detector.AWS_METADATA_TTL_HEADER;
+const AWS_METADATA_TOKEN_HEADER = awsEc2Detector.AWS_METADATA_TOKEN_HEADER;
 
-const mockedAwsResponse = {
+const mockedTokenResponse = 'my-token';
+const mockedIdentityResponse = {
   instanceId: 'my-instance-id',
   instanceType: 'my-instance-type',
   accountId: 'my-account-id',
   region: 'my-region',
   availabilityZone: 'my-zone',
 };
+const mockedHostResponse = 'my-hostname';
 
 describe('detectResources', async () => {
   beforeEach(() => {
@@ -89,7 +93,9 @@ describe('detectResources', async () => {
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS);
       const awsScope = nock(AWS_HOST)
-        .get(AWS_PATH)
+        .persist()
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
         .replyWithError({ code: 'ENOTFOUND' });
       const resource: Resource = await detectResources();
       awsScope.done();
@@ -122,8 +128,16 @@ describe('detectResources', async () => {
           code: 'ENOTFOUND',
         });
       const awsScope = nock(AWS_HOST)
-        .get(AWS_PATH)
-        .reply(200, () => mockedAwsResponse);
+        .persist()
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+        .reply(200, () => mockedTokenResponse)
+        .get(AWS_IDENTITY_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedIdentityResponse)
+        .get(AWS_HOST_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedHostResponse);
       const resource: Resource = await detectResources();
       gcpSecondaryScope.done();
       gcpScope.done();
@@ -138,6 +152,8 @@ describe('detectResources', async () => {
       assertHostResource(resource, {
         id: 'my-instance-id',
         hostType: 'my-instance-type',
+        name: 'my-hostname',
+        hostName: 'my-hostname',
       });
       assertServiceResource(resource, {
         instanceId: '627cc493',
@@ -206,7 +222,7 @@ describe('detectResources', async () => {
       assert.ok(
         callArgsContains(
           mockedLoggerMethod,
-          'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/dynamic/instance-identity/document"'
+          'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/api/token"'
         )
       );
       // Test that the Env Detector successfully found its resource and populated it with the right values.

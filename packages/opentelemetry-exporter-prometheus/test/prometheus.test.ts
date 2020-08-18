@@ -16,6 +16,10 @@
 
 import { HrTime, ObserverResult } from '@opentelemetry/api';
 import {
+  notifyOnGlobalShutdown,
+  _invokeGlobalShutdown,
+} from '@opentelemetry/core';
+import {
   CounterMetric,
   SumAggregator,
   Meter,
@@ -32,6 +36,7 @@ const mockedTimeMS = 1586347902211000;
 
 describe('PrometheusExporter', () => {
   let toPoint: () => Point<Sum>;
+  let removeEvent: Function | undefined;
   before(() => {
     toPoint = SumAggregator.prototype.toPoint;
     SumAggregator.prototype.toPoint = function (): Point<Sum> {
@@ -185,16 +190,27 @@ describe('PrometheusExporter', () => {
 
   describe('export', () => {
     let exporter: PrometheusExporter;
+    let meterProvider: MeterProvider;
     let meter: Meter;
 
     beforeEach(done => {
       exporter = new PrometheusExporter();
-      meter = new MeterProvider().getMeter('test-prometheus');
+      meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
+        gracefulShutdown: true,
+      });
+      meter = meterProvider.getMeter('test-prometheus', '1', {
+        exporter: exporter,
+      });
       exporter.startServer(done);
     });
 
     afterEach(done => {
       exporter.shutdown(done);
+      if (removeEvent) {
+        removeEvent();
+        removeEvent = undefined;
+      }
     });
 
     it('should export a count aggregation', done => {
@@ -317,6 +333,70 @@ describe('PrometheusExporter', () => {
             })
             .on('error', errorHandler(done));
         });
+      });
+    });
+
+    it('should export multiple labels on graceful shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+
+      removeEvent = notifyOnGlobalShutdown(() => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
+      });
+      _invokeGlobalShutdown();
+    });
+
+    it('should export multiple labels on manual shutdown', done => {
+      const counter = meter.createCounter('counter', {
+        description: 'a test description',
+      }) as CounterMetric;
+
+      counter.bind({ counterKey1: 'labelValue1' }).add(10);
+      counter.bind({ counterKey1: 'labelValue2' }).add(20);
+      counter.bind({ counterKey1: 'labelValue3' }).add(30);
+      meterProvider.shutdown(() => {
+        http
+          .get('http://localhost:9464/metrics', res => {
+            res.on('data', chunk => {
+              const body = chunk.toString();
+              const lines = body.split('\n');
+
+              assert.deepStrictEqual(lines, [
+                '# HELP counter a test description',
+                '# TYPE counter counter',
+                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                '',
+              ]);
+
+              done();
+            });
+          })
+          .on('error', errorHandler(done));
       });
     });
 
