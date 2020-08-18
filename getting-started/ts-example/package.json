@@ -10,8 +10,8 @@
   "author": "OpenTelemetry Authors",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/express": "^4.17.7",
-    "@types/node": "^14.0.27",
+    "@types/express": "4.17.7",
+    "@types/node": "14.0.27",
     "ts-node": "8.10.2"
   },
   "dependencies": {

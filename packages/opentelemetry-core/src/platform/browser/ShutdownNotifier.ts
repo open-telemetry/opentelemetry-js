@@ -14,8 +14,19 @@
  * limitations under the License.
  */
 
-export * from './general';
-export * from './rpc';
-export * from './http';
-export * from './database';
-export * from './os';
+/**
+ * Adds an event listener to trigger a callback when an unload event in the window is detected
+ */
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
+  window.addEventListener('unload', cb, { once: true });
+  return function removeCallbackFromGlobalShutdown() {
+    window.removeEventListener('unload', cb, false);
+  };
+}
+
+/**
+ * Warning: meant for internal use only! Closes the current window, triggering the unload event
+ */
+export function _invokeGlobalShutdown() {
+  window.close();
+}

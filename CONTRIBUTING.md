@@ -86,12 +86,13 @@ The `opentelemetry-js` project is written in TypeScript.
   - Maintainers may close, block, or put on hold pull requests even if they have strictly met these requirements.
 - No “changes requested” reviews.
 - No unresolved conversations.
-- 4 approvals, including the approvals of both maintainers
-  - A pull request opened by an approver may be merged with only 3 reviews.
+- 3 approvals, including the approvals of at least 2 maintainers
+  - A pull request opened by an approver may be merged with only 2 reviews.
   - Small (simple typo, URL, update docs, or grammatical fix) or high-priority changes may be merged more quickly or with fewer reviewers at the discretion of the maintainers. This is typically indicated with the express label.
 - For plugins, exporters, and propagators approval of the original code module author is preferred but not required.
 - New or changed functionality is tested by unit tests.
 - New or changed functionality is documented.
+- Substantial changes should not be merged within 24 hours of opening in order to allow reviewers from all time zones to have a chance to review.
 
 ### Generating API documentation
 

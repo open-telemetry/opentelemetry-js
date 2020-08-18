@@ -34,8 +34,15 @@ import {
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import { NodeSDK } from '../src';
+import * as NodeConfig from '@opentelemetry/node/build/src/config';
+import * as Sinon from 'sinon';
 
 describe('Node SDK', () => {
+  before(() => {
+    // Disable attempted load of default plugins
+    Sinon.replace(NodeConfig, 'DEFAULT_INSTRUMENTATION_PLUGINS', {});
+  });
+
   beforeEach(() => {
     context.disable();
     trace.disable();

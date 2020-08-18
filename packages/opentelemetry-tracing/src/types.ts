@@ -43,6 +43,9 @@ export interface TracerConfig {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
 
+  /** Bool for whether or not graceful shutdown is enabled. If disabled spans will not be exported when SIGTERM is recieved */
+  gracefulShutdown?: boolean;
+
   /**
    * Generator of trace and span IDs
    * The default idGenerator generates random ids
