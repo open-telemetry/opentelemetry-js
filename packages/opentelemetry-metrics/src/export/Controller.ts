@@ -39,6 +39,7 @@ export class PushController extends Controller {
   }
 
   async shutdown(): Promise<void> {
+    clearInterval(this._timer);
     await this._collect();
   }
 
