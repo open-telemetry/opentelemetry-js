@@ -24,14 +24,29 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
+  notifyOnGlobalShutdown,
+  _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
+  let sandbox: sinon.SinonSandbox;
+  let removeEvent: Function | undefined;
+
   beforeEach(() => {
     context.disable();
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   describe('constructor', () => {
@@ -350,6 +365,45 @@ describe('BasicTracerProvider', () => {
     it('should return a Resource', () => {
       const tracerProvider = new BasicTracerProvider();
       assert.ok(tracerProvider.resource instanceof Resource);
+    });
+  });
+
+  describe('.shutdown()', () => {
+    it('should trigger shutdown when SIGTERM is recieved', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      removeEvent = notifyOnGlobalShutdown(() => {
+        sinon.assert.calledOnce(shutdownStub);
+      });
+      _invokeGlobalShutdown();
+    });
+
+    it('should trigger shutdown when manually invoked', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      tracerProvider.shutdown();
+      sinon.assert.calledOnce(shutdownStub);
+    });
+
+    it('should not trigger shutdown if graceful shutdown is turned off', () => {
+      const tracerProvider = new BasicTracerProvider({
+        gracefulShutdown: false,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      removeEvent = notifyOnGlobalShutdown(() => {
+        sinon.assert.notCalled(shutdownStub);
+      });
+      _invokeGlobalShutdown();
     });
   });
 });
