@@ -15,7 +15,6 @@
  */
 
 import * as nock from 'nock';
-import { URL } from 'url';
 import {
   context,
   metrics,
@@ -63,17 +62,22 @@ const PROJECT_ID_PATH = BASE_PATH + '/project/project-id';
 const ZONE_PATH = BASE_PATH + '/instance/zone';
 const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
 
-const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
-  awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
-);
+const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
+const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
+const AWS_IDENTITY_PATH = awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH;
+const AWS_HOST_PATH = awsEc2Detector.AWS_INSTANCE_HOST_DOCUMENT_PATH;
+const AWS_METADATA_TTL_HEADER = awsEc2Detector.AWS_METADATA_TTL_HEADER;
+const AWS_METADATA_TOKEN_HEADER = awsEc2Detector.AWS_METADATA_TOKEN_HEADER;
 
-const mockedAwsResponse = {
+const mockedTokenResponse = 'my-token';
+const mockedIdentityResponse = {
   instanceId: 'my-instance-id',
   instanceType: 'my-instance-type',
   accountId: 'my-account-id',
   region: 'my-region',
   availabilityZone: 'my-zone',
 };
+const mockedHostResponse = 'my-hostname';
 
 describe('Node SDK', () => {
   before(() => {
@@ -204,7 +208,9 @@ describe('Node SDK', () => {
           .get(INSTANCE_PATH)
           .reply(200, {}, HEADERS);
         const awsScope = nock(AWS_HOST)
-          .get(AWS_PATH)
+          .persist()
+          .put(AWS_TOKEN_PATH)
+          .matchHeader(AWS_METADATA_TTL_HEADER, '60')
           .replyWithError({ code: 'ENOTFOUND' });
         await sdk.detectResources();
         const resource = sdk['_resource'];
@@ -242,10 +248,18 @@ describe('Node SDK', () => {
             code: 'ENOTFOUND',
           });
         const awsScope = nock(AWS_HOST)
-          .get(AWS_PATH)
-          .reply(200, () => mockedAwsResponse);
+          .persist()
+          .put(AWS_TOKEN_PATH)
+          .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+          .reply(200, () => mockedTokenResponse)
+          .get(AWS_IDENTITY_PATH)
+          .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+          .reply(200, () => mockedIdentityResponse)
+          .get(AWS_HOST_PATH)
+          .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+          .reply(200, () => mockedHostResponse);
         await sdk.detectResources();
-        const resource = sdk['_resource'];
+        const resource: Resource = sdk['_resource'];
         gcpSecondaryScope.done();
         gcpScope.done();
         awsScope.done();
@@ -259,6 +273,8 @@ describe('Node SDK', () => {
         assertHostResource(resource, {
           id: 'my-instance-id',
           hostType: 'my-instance-type',
+          name: 'my-hostname',
+          hostName: 'my-hostname',
         });
         assertServiceResource(resource, {
           instanceId: '627cc493',
@@ -267,9 +283,11 @@ describe('Node SDK', () => {
           version: '0.0.1',
         });
       });
+    });
 
+    describe('in no environment', () => {
       it('should return empty resource', async () => {
-        const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
+        const scope = nock(AWS_HOST).put(AWS_TOKEN_PATH).replyWithError({
           code: 'ENOTFOUND',
         });
         const sdk = new NodeSDK({
@@ -279,10 +297,10 @@ describe('Node SDK', () => {
           detectors: [awsEc2Detector],
         });
         const resource: Resource = sdk['_resource'];
-        scope.done();
-
         assert.ok(resource);
         assert.deepStrictEqual(resource, Resource.createTelemetrySDKResource());
+
+        scope.done();
       });
     });
 
@@ -351,7 +369,7 @@ describe('Node SDK', () => {
         assert.ok(
           callArgsContains(
             mockedLoggerMethod,
-            'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/dynamic/instance-identity/document"'
+            'AwsEc2Detector failed: Nock: Disallowed net connect for "169.254.169.254:80/latest/api/token"'
           )
         );
         // Test that the Env Detector successfully found its resource and populated it with the right values.
