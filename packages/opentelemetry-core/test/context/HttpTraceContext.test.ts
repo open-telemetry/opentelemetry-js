@@ -90,12 +90,15 @@ describe('HttpTraceContext', () => {
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
-      assert.deepStrictEqual(extractedSpanContext, new SpanContext({
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
-      }));
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        new SpanContext({
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        })
+      );
     });
 
     it('should extract context of a sampled span from carrier using a future version', () => {
@@ -105,12 +108,15 @@ describe('HttpTraceContext', () => {
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
-      assert.deepStrictEqual(extractedSpanContext, new SpanContext({
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
-      }));
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        new SpanContext({
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        })
+      );
     });
 
     it('should extract context of a sampled span from carrier using a future version and future fields', () => {
@@ -120,12 +126,15 @@ describe('HttpTraceContext', () => {
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
 
-      assert.deepStrictEqual(extractedSpanContext, new SpanContext({
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
-      }));
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        new SpanContext({
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        })
+      );
     });
 
     it('returns null if traceparent header is missing', () => {
@@ -167,12 +176,15 @@ describe('HttpTraceContext', () => {
       const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
-      assert.deepStrictEqual(extractedSpanContext, new SpanContext({
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
-      }));
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        new SpanContext({
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        })
+      );
     });
 
     it('extracts tracestate from header', () => {
@@ -200,13 +212,16 @@ describe('HttpTraceContext', () => {
       const extractedSpanContext = getExtractedSpanContext(
         httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
       );
-      assert.deepStrictEqual(extractedSpanContext, new SpanContext({
-        spanId: 'b7ad6b7169203331',
-        traceId: '0af7651916cd43dd8448eb211c80319c',
-        isRemote: true,
-        traceFlags: TraceFlags.SAMPLED,
-        traceState: new TraceState('foo=bar,baz=qux,quux=quuz'),
-      }));
+      assert.deepStrictEqual(
+        extractedSpanContext,
+        new SpanContext({
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+          traceState: new TraceState('foo=bar,baz=qux,quux=quuz'),
+        })
+      );
     });
 
     it('should gracefully handle an invalid traceparent header', () => {

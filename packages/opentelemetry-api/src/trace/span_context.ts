@@ -17,9 +17,6 @@
 import { TraceFlags } from './trace_flags';
 import { TraceState } from './trace_state';
 
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
-
 /**
  * A SpanContext represents the portion of a {@link Span} which must be
  * serialized and propagated along side of a {@link CorrelationContext}.
@@ -97,3 +94,11 @@ export class SpanContext {
     return this.traceId !== INVALID_TRACEID && this.spanId !== INVALID_SPANID;
   }
 }
+
+export const INVALID_SPANID = '0';
+export const INVALID_TRACEID = '0';
+export const INVALID_SPAN_CONTEXT: SpanContext = new SpanContext({
+  traceId: INVALID_TRACEID,
+  spanId: INVALID_SPANID,
+  traceFlags: TraceFlags.NONE,
+});

@@ -23,6 +23,8 @@ import api, {
   SpanOptions,
   Span,
   SpanContext,
+  INVALID_TRACEID,
+  INVALID_SPANID,
   context,
   trace,
   propagation,
@@ -36,6 +38,44 @@ describe('API', () => {
     const tracer = api.trace.getTracerProvider();
     assert.ok(tracer);
     assert.strictEqual(typeof tracer, 'object');
+  });
+
+  describe('SpanContext', () => {
+    it('should return true for valid spancontext', () => {
+      const spanContext = new SpanContext({
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.ok(spanContext.isValid());
+    });
+
+    it('should return false when traceId is invalid', () => {
+      const spanContext = new SpanContext({
+        traceId: INVALID_TRACEID,
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.ok(!spanContext.isValid());
+    });
+
+    it('should return false when spanId is invalid', () => {
+      const spanContext = new SpanContext({
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: INVALID_SPANID,
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.ok(!spanContext.isValid());
+    });
+
+    it('should return false when traceId & spanId is invalid', () => {
+      const spanContext = new SpanContext({
+        traceId: INVALID_TRACEID,
+        spanId: INVALID_SPANID,
+        traceFlags: TraceFlags.NONE,
+      });
+      assert.ok(!spanContext.isValid());
+    });
   });
 
   describe('GlobalTracerProvider', () => {

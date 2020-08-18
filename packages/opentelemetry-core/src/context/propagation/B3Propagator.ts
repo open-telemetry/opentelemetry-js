@@ -172,12 +172,15 @@ export class B3Propagator implements HttpTextPropagator {
     ) {
       context = context.setValue(PARENT_SPAN_ID_KEY, parentSpanId);
       context = context.setValue(DEBUG_FLAG_KEY, debug);
-      return setExtractedSpanContext(context, new SpanContext({
-        traceId,
-        spanId,
-        isRemote: true,
-        traceFlags,
-      }));
+      return setExtractedSpanContext(
+        context,
+        new SpanContext({
+          traceId,
+          spanId,
+          isRemote: true,
+          traceFlags,
+        })
+      );
     }
     return context;
   }

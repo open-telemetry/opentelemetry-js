@@ -17,8 +17,8 @@
 import * as assert from 'assert';
 import {
   CanonicalCode,
-  INVALID_SPAN_ID,
-  INVALID_TRACE_ID,
+  INVALID_SPANID,
+  INVALID_TRACEID,
   NoopSpan,
   SpanContext,
   TraceFlags,
@@ -45,11 +45,14 @@ describe('NoopSpan', () => {
     span.updateName('my-span');
 
     assert.ok(!span.isRecording());
-    assert.deepStrictEqual(span.context(), new SpanContext({
-      traceId: INVALID_TRACE_ID,
-      spanId: INVALID_SPAN_ID,
-      traceFlags: TraceFlags.NONE,
-    }));
+    assert.deepStrictEqual(
+      span.context(),
+      new SpanContext({
+        traceId: INVALID_TRACEID,
+        spanId: INVALID_SPANID,
+        traceFlags: TraceFlags.NONE,
+      })
+    );
     span.end();
   });
 });
