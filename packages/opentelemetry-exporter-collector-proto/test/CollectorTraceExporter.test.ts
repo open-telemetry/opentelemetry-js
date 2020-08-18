@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
+import { collectorTypes } from '@opentelemetry/exporter-collector';
+
 import * as core from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorProtocolNode } from '../../src/enums';
-import { CollectorTraceExporter } from '../../src/platform/node';
-import { CollectorExporterConfigNode } from '../../src/platform/node/types';
-import * as collectorTypes from '../../src/types';
+import { CollectorTraceExporter } from '../src';
+import { getExportRequestProto } from '../src/util';
 
 import {
   ensureExportTraceServiceRequestIsSet,
-  ensureSpanIsCorrect,
+  ensureProtoSpanIsCorrect,
   mockedReadableSpan,
-} from '../helper';
+} from './helper';
 
 const fakeRequest = {
   end: function () {},
@@ -44,9 +44,9 @@ const mockResError = {
   statusCode: 400,
 };
 
-describe('CollectorTraceExporter - node with json over http', () => {
+describe('CollectorExporter - node with proto over http', () => {
   let collectorExporter: CollectorTraceExporter;
-  let collectorExporterConfig: CollectorExporterConfigNode;
+  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
@@ -58,7 +58,6 @@ describe('CollectorTraceExporter - node with json over http', () => {
         headers: {
           foo: 'bar',
         },
-        protocolNode: CollectorProtocolNode.HTTP_JSON,
         hostname: 'foo',
         logger: new core.NoopLogger(),
         serviceName: 'bar',
@@ -104,14 +103,14 @@ describe('CollectorTraceExporter - node with json over http', () => {
 
       setTimeout(() => {
         const writeArgs = spyWrite.args[0];
-        const json = JSON.parse(
-          writeArgs[0]
-        ) as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
+        const ExportTraceServiceRequestProto = getExportRequestProto();
+        const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
+        const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.trace.v1.ExportTraceServiceRequest;
         const span1 =
           json.resourceSpans[0].instrumentationLibrarySpans[0].spans[0];
         assert.ok(typeof span1 !== 'undefined', "span doesn't exist");
         if (span1) {
-          ensureSpanIsCorrect(span1);
+          ensureProtoSpanIsCorrect(span1);
         }
 
         ensureExportTraceServiceRequestIsSet(json);
@@ -158,29 +157,6 @@ describe('CollectorTraceExporter - node with json over http', () => {
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });
-      });
-    });
-  });
-  describe('CollectorTraceExporter - node (getDefaultUrl)', () => {
-    it('should default to localhost', done => {
-      const collectorExporter = new CollectorTraceExporter({
-        protocolNode: CollectorProtocolNode.HTTP_JSON,
-      });
-      setTimeout(() => {
-        assert.strictEqual(
-          collectorExporter['url'],
-          'http://localhost:55681/v1/trace'
-        );
-        done();
-      });
-    });
-
-    it('should keep the URL if included', done => {
-      const url = 'http://foo.bar.com';
-      const collectorExporter = new CollectorTraceExporter({ url });
-      setTimeout(() => {
-        assert.strictEqual(collectorExporter['url'], url);
-        done();
       });
     });
   });
