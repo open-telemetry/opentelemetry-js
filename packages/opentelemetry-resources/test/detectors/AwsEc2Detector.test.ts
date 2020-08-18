@@ -16,7 +16,6 @@
 
 import * as nock from 'nock';
 import * as assert from 'assert';
-import { URL } from 'url';
 import { Resource } from '../../src';
 import { awsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
 import {
@@ -26,36 +25,51 @@ import {
 } from '../util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
-const { origin: AWS_HOST, pathname: AWS_PATH } = new URL(
-  awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_URI
-);
+const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
+const AWS_TOKEN_PATH = awsEc2Detector.AWS_INSTANCE_TOKEN_DOCUMENT_PATH;
+const AWS_IDENTITY_PATH = awsEc2Detector.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH;
+const AWS_HOST_PATH = awsEc2Detector.AWS_INSTANCE_HOST_DOCUMENT_PATH;
+const AWS_METADATA_TTL_HEADER = awsEc2Detector.AWS_METADATA_TTL_HEADER;
+const AWS_METADATA_TOKEN_HEADER = awsEc2Detector.AWS_METADATA_TOKEN_HEADER;
 
-const mockedAwsResponse = {
+const mockedTokenResponse = 'my-token';
+const mockedIdentityResponse = {
   instanceId: 'my-instance-id',
   instanceType: 'my-instance-type',
   accountId: 'my-account-id',
   region: 'my-region',
   availabilityZone: 'my-zone',
 };
+const mockedHostResponse = 'my-hostname';
 
 describe('awsEc2Detector', () => {
-  before(() => {
+  beforeEach(() => {
     nock.disableNetConnect();
     nock.cleanAll();
   });
 
-  after(() => {
+  afterEach(() => {
     nock.enableNetConnect();
   });
 
   describe('with successful request', () => {
     it('should return aws_ec2_instance resource', async () => {
       const scope = nock(AWS_HOST)
-        .get(AWS_PATH)
-        .reply(200, () => mockedAwsResponse);
+        .persist()
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+        .reply(200, () => mockedTokenResponse)
+        .get(AWS_IDENTITY_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedIdentityResponse)
+        .get(AWS_HOST_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedHostResponse);
+
       const resource: Resource = await awsEc2Detector.detect({
         logger: new NoopLogger(),
       });
+
       scope.done();
 
       assert.ok(resource);
@@ -68,18 +82,72 @@ describe('awsEc2Detector', () => {
       assertHostResource(resource, {
         id: 'my-instance-id',
         hostType: 'my-instance-type',
+        name: 'my-hostname',
+        hostName: 'my-hostname',
       });
     });
   });
 
-  describe('with failing request', () => {
-    it('should return empty resource', async () => {
-      const scope = nock(AWS_HOST).get(AWS_PATH).replyWithError({
-        code: 'ENOTFOUND',
-      });
+  describe('with unsuccessful request', () => {
+    it('should return empty resource when receiving error response code', async () => {
+      const scope = nock(AWS_HOST)
+        .persist()
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+        .reply(200, () => mockedTokenResponse)
+        .get(AWS_IDENTITY_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedIdentityResponse)
+        .get(AWS_HOST_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(404, () => new Error('NOT FOUND'));
+
       const resource: Resource = await awsEc2Detector.detect({
         logger: new NoopLogger(),
       });
+
+      scope.done();
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
+    });
+
+    it('should return empty resource when timeout', async () => {
+      const scope = nock(AWS_HOST)
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+        .reply(200, () => mockedTokenResponse)
+        .get(AWS_IDENTITY_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .reply(200, () => mockedIdentityResponse)
+        .get(AWS_HOST_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .delayConnection(2000)
+        .reply(200, () => mockedHostResponse);
+
+      const resource: Resource = await awsEc2Detector.detect({
+        logger: new NoopLogger(),
+      });
+
+      scope.done();
+
+      assert.ok(resource);
+      assertEmptyResource(resource);
+    });
+
+    it('should return empty resource when replied Error', async () => {
+      const scope = nock(AWS_HOST)
+        .put(AWS_TOKEN_PATH)
+        .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+        .reply(200, () => mockedTokenResponse)
+        .get(AWS_IDENTITY_PATH)
+        .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
+        .replyWithError('NOT FOUND');
+
+      const resource: Resource = await awsEc2Detector.detect({
+        logger: new NoopLogger(),
+      });
+
       scope.done();
 
       assert.ok(resource);

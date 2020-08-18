@@ -28,10 +28,17 @@ import { ResourceDetectionConfigWithLogger } from '../../../config';
 class AwsEc2Detector implements Detector {
   /**
    * See https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-identity-documents.html
-   * for documentation about the AWS instance identity document endpoint.
+   * for documentation about the AWS instance identity document
+   * and standard of IMDSv2.
    */
-  readonly AWS_INSTANCE_IDENTITY_DOCUMENT_URI =
-    'http://169.254.169.254/latest/dynamic/instance-identity/document';
+  readonly AWS_IDMS_ENDPOINT = '169.254.169.254';
+  readonly AWS_INSTANCE_TOKEN_DOCUMENT_PATH = '/latest/api/token';
+  readonly AWS_INSTANCE_IDENTITY_DOCUMENT_PATH =
+    '/latest/dynamic/instance-identity/document';
+  readonly AWS_INSTANCE_HOST_DOCUMENT_PATH = '/latest/meta-data/hostname';
+  readonly AWS_METADATA_TTL_HEADER = 'X-aws-ec2-metadata-token-ttl-seconds';
+  readonly AWS_METADATA_TOKEN_HEADER = 'X-aws-ec2-metadata-token';
+  readonly MILLISECOND_TIME_OUT = 1000;
 
   /**
    * Attempts to connect and obtain an AWS instance Identity document. If the
@@ -44,13 +51,16 @@ class AwsEc2Detector implements Detector {
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
+      const token = await this._fetchToken();
       const {
         accountId,
         instanceId,
         instanceType,
         region,
         availabilityZone,
-      } = await this._awsMetadataAccessor();
+      } = await this._fetchIdentity(token);
+      const hostname = await this._fetchHost(token);
+
       return new Resource({
         [CLOUD_RESOURCE.PROVIDER]: 'aws',
         [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
@@ -58,6 +68,8 @@ class AwsEc2Detector implements Detector {
         [CLOUD_RESOURCE.ZONE]: availabilityZone,
         [HOST_RESOURCE.ID]: instanceId,
         [HOST_RESOURCE.TYPE]: instanceType,
+        [HOST_RESOURCE.NAME]: hostname,
+        [HOST_RESOURCE.HOSTNAME]: hostname,
       });
     } catch (e) {
       config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
@@ -65,20 +77,60 @@ class AwsEc2Detector implements Detector {
     }
   }
 
+  private async _fetchToken(): Promise<string> {
+    const options = {
+      host: this.AWS_IDMS_ENDPOINT,
+      path: this.AWS_INSTANCE_TOKEN_DOCUMENT_PATH,
+      method: 'PUT',
+      timeout: this.MILLISECOND_TIME_OUT,
+      headers: {
+        [this.AWS_METADATA_TTL_HEADER]: '60',
+      },
+    };
+    return await this._fetchString(options);
+  }
+
+  private async _fetchIdentity(token: string): Promise<any> {
+    const options = {
+      host: this.AWS_IDMS_ENDPOINT,
+      path: this.AWS_INSTANCE_IDENTITY_DOCUMENT_PATH,
+      method: 'GET',
+      timeout: this.MILLISECOND_TIME_OUT,
+      headers: {
+        [this.AWS_METADATA_TOKEN_HEADER]: token,
+      },
+    };
+    const identity = await this._fetchString(options);
+    return JSON.parse(identity);
+  }
+
+  private async _fetchHost(token: string): Promise<string> {
+    const options = {
+      host: this.AWS_IDMS_ENDPOINT,
+      path: this.AWS_INSTANCE_HOST_DOCUMENT_PATH,
+      method: 'GET',
+      timeout: this.MILLISECOND_TIME_OUT,
+      headers: {
+        [this.AWS_METADATA_TOKEN_HEADER]: token,
+      },
+    };
+    return await this._fetchString(options);
+  }
+
   /**
-   * Establishes an HTTP connection to AWS instance identity document url.
+   * Establishes an HTTP connection to AWS instance document url.
    * If the application is running on an EC2 instance, we should be able
    * to get back a valid JSON document. Parses that document and stores
    * the identity properties in a local map.
    */
-  private async _awsMetadataAccessor<T>(): Promise<T> {
+  private async _fetchString(options: http.RequestOptions): Promise<string> {
     return new Promise((resolve, reject) => {
       const timeoutId = setTimeout(() => {
         req.abort();
         reject(new Error('EC2 metadata api request timed out.'));
       }, 1000);
 
-      const req = http.get(this.AWS_INSTANCE_IDENTITY_DOCUMENT_URI, res => {
+      const req = http.request(options, res => {
         clearTimeout(timeoutId);
         const { statusCode } = res;
         res.setEncoding('utf8');
@@ -87,7 +139,7 @@ class AwsEc2Detector implements Detector {
         res.on('end', () => {
           if (statusCode && statusCode >= 200 && statusCode < 300) {
             try {
-              resolve(JSON.parse(rawData));
+              resolve(rawData);
             } catch (e) {
               reject(e);
             }
@@ -102,6 +154,7 @@ class AwsEc2Detector implements Detector {
         clearTimeout(timeoutId);
         reject(err);
       });
+      req.end();
     });
   }
 }
