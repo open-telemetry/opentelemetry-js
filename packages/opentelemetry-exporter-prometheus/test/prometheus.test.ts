@@ -85,7 +85,7 @@ describe('PrometheusExporter', () => {
       const exporter = new PrometheusExporter({
         port: 9722,
       });
-      exporter.startServer(() => {
+      exporter.startServer().then(() => {
         exporter.shutdown().then(() => {
           return done();
         });
@@ -97,7 +97,7 @@ describe('PrometheusExporter', () => {
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
       const exporter = new PrometheusExporter();
 
-      exporter.startServer(() => {
+      exporter.startServer().then(() => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
@@ -117,7 +117,7 @@ describe('PrometheusExporter', () => {
         endpoint,
       });
 
-      exporter.startServer(() => {
+      exporter.startServer().then(() => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
@@ -137,7 +137,7 @@ describe('PrometheusExporter', () => {
         endpoint,
       });
 
-      exporter.startServer(() => {
+      exporter.startServer().then(() => {
         const url = `http://localhost:${port}/metric`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
@@ -147,11 +147,11 @@ describe('PrometheusExporter', () => {
               endpoint: `/${endpoint}`,
             });
 
-            exporter2.startServer(() => {
+            exporter2.startServer().then(() => {
               const url = `http://localhost:${port}/metric`;
               http.get(url, (res: any) => {
                 assert.strictEqual(res.statusCode, 200);
-                exporter2.stopServer(() => {
+                exporter2.stopServer().then(() => {
                   return done();
                 });
               });
@@ -168,7 +168,7 @@ describe('PrometheusExporter', () => {
         port,
         endpoint,
       });
-      exporter.startServer(() => {
+      exporter.startServer().then(() => {
         const url = `http://localhost:${port}/invalid`;
 
         http.get(url, (res: any) => {
@@ -202,7 +202,7 @@ describe('PrometheusExporter', () => {
       meter = meterProvider.getMeter('test-prometheus', '1', {
         exporter: exporter,
       });
-      exporter.startServer(done);
+      exporter.startServer().then(done);
     });
 
     afterEach(done => {
@@ -704,7 +704,7 @@ describe('PrometheusExporter', () => {
         prefix: 'test_prefix',
       });
 
-      exporter.startServer(async () => {
+      exporter.startServer().then(async () => {
         await meter.collect();
         exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
@@ -733,7 +733,7 @@ describe('PrometheusExporter', () => {
         port: 8080,
       });
 
-      exporter.startServer(async () => {
+      exporter.startServer().then(async () => {
         await meter.collect();
         exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
@@ -762,7 +762,7 @@ describe('PrometheusExporter', () => {
         endpoint: '/test',
       });
 
-      exporter.startServer(async () => {
+      exporter.startServer().then(async () => {
         await meter.collect();
         exporter!.export(meter.getBatcher().checkPointSet(), () => {
           http
