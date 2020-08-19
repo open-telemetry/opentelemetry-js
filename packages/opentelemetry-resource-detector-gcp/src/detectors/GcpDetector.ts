@@ -16,15 +16,16 @@
 
 import * as os from 'os';
 import * as gcpMetadata from 'gcp-metadata';
-import { Resource } from '../../../Resource';
-import { Detector, ResourceAttributes } from '../../../types';
 import {
+  Detector,
+  ResourceDetectionConfigWithLogger,
+  Resource,
+  ResourceAttributes,
   CLOUD_RESOURCE,
   HOST_RESOURCE,
   K8S_RESOURCE,
   CONTAINER_RESOURCE,
-} from '../../../constants';
-import { ResourceDetectionConfigWithLogger } from '../../../config';
+} from '@opentelemetry/resources';
 
 /**
  * The GcpDetector can be used to detect if a process is running in the Google
