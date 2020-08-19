@@ -12,6 +12,8 @@ Installing it will also install all plugins.
 
 In addition to all [node core plugins][otel-plugins-node-core], the following plugins will be installed by this package:
 
+- [@opentelemetry/hapi-instrumentation][otel-hapi-instrumentation]
+- [@opentelemetry/koa-instrumentation][otel-koa-instrumentation]
 - [@opentelemetry/plugin-express][otel-plugin-express]
 - [@opentelemetry/plugin-ioredis][otel-plugin-ioredis]
 - [@opentelemetry/plugin-mongodb][otel-plugin-mongodb]
@@ -43,6 +45,8 @@ Apache 2.0 - See [LICENSE][license-url] for more information.
 
 [otel-plugins-node-core]: https://www.npmjs.com/package/@opentelemetry/plugins-node-core
 
+[otel-hapi-instrumentation]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-hapi-instrumentation
+[otel-koa-instrumentation]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-koa-instrumentation
 [otel-plugin-dns]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-dns
 [otel-plugin-express]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-express
 [otel-plugin-ioredis]: https://github.com/open-telemetry/opentelemetry-js-contrib/tree/master/plugins/node/opentelemetry-plugin-ioredis
