@@ -74,6 +74,7 @@ export const assertContainerResource = (
   resource: Resource,
   validations: {
     name?: string;
+    id?: string;
     imageName?: string;
     imageTag?: string;
   }
@@ -83,6 +84,11 @@ export const assertContainerResource = (
     assert.strictEqual(
       resource.attributes[CONTAINER_RESOURCE.NAME],
       validations.name
+    );
+  if (validations.id)
+    assert.strictEqual(
+      resource.attributes[CONTAINER_RESOURCE.ID],
+      validations.id
     );
   if (validations.imageName)
     assert.strictEqual(

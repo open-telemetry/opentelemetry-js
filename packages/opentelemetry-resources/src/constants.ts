@@ -35,6 +35,9 @@ export const CONTAINER_RESOURCE = {
   /** The container name. */
   NAME: 'container.name',
 
+  /** The container id. */
+  ID: 'container.id',
+
   /** The name of the image the container was built on. */
   IMAGE_NAME: 'container.image.name',
 
