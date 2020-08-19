@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
+import {
+  Detector,
+  Resource,
+  CLOUD_RESOURCE,
+  HOST_RESOURCE,
+  ResourceDetectionConfigWithLogger,
+} from '@opentelemetry/resources';
 import * as http from 'http';
-import { Resource } from '../../../Resource';
-import { CLOUD_RESOURCE, HOST_RESOURCE } from '../../../constants';
-import { Detector } from '../../../types';
-import { ResourceDetectionConfigWithLogger } from '../../../config';
 
 /**
  * The AwsEc2Detector can be used to detect if a process is running in AWS EC2
@@ -47,34 +50,29 @@ class AwsEc2Detector implements Detector {
    * empty {@link Resource} if the connection or parsing of the identity
    * document fails.
    *
-   * @param config The resource detection config with a required logger
+   * @param config (unused) The resource detection config with a required logger
    */
-  async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-    try {
-      const token = await this._fetchToken();
-      const {
-        accountId,
-        instanceId,
-        instanceType,
-        region,
-        availabilityZone,
-      } = await this._fetchIdentity(token);
-      const hostname = await this._fetchHost(token);
+  async detect(_config: ResourceDetectionConfigWithLogger): Promise<Resource> {
+    const token = await this._fetchToken();
+    const {
+      accountId,
+      instanceId,
+      instanceType,
+      region,
+      availabilityZone,
+    } = await this._fetchIdentity(token);
+    const hostname = await this._fetchHost(token);
 
-      return new Resource({
-        [CLOUD_RESOURCE.PROVIDER]: 'aws',
-        [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
-        [CLOUD_RESOURCE.REGION]: region,
-        [CLOUD_RESOURCE.ZONE]: availabilityZone,
-        [HOST_RESOURCE.ID]: instanceId,
-        [HOST_RESOURCE.TYPE]: instanceType,
-        [HOST_RESOURCE.NAME]: hostname,
-        [HOST_RESOURCE.HOSTNAME]: hostname,
-      });
-    } catch (e) {
-      config.logger.debug(`AwsEc2Detector failed: ${e.message}`);
-      return Resource.empty();
-    }
+    return new Resource({
+      [CLOUD_RESOURCE.PROVIDER]: 'aws',
+      [CLOUD_RESOURCE.ACCOUNT_ID]: accountId,
+      [CLOUD_RESOURCE.REGION]: region,
+      [CLOUD_RESOURCE.ZONE]: availabilityZone,
+      [HOST_RESOURCE.ID]: instanceId,
+      [HOST_RESOURCE.TYPE]: instanceType,
+      [HOST_RESOURCE.NAME]: hostname,
+      [HOST_RESOURCE.HOSTNAME]: hostname,
+    });
   }
 
   private async _fetchToken(): Promise<string> {
