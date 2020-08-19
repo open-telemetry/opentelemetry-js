@@ -16,8 +16,6 @@
         "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
     },
     "dependencies": {
-        "@opentelemetry/hapi-instrumentation": "0.9.0",
-        "@opentelemetry/koa-instrumentation": "0.9.0",
         "@opentelemetry/plugin-express": "0.9.0",
         "@opentelemetry/plugin-ioredis": "0.9.0",
         "@opentelemetry/plugin-mongodb": "0.9.0",
