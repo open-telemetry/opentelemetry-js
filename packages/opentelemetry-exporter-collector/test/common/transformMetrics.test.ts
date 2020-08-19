@@ -17,57 +17,90 @@ import * as assert from 'assert';
 import * as transform from '../../src/transformMetrics';
 import {
   mockCounter,
+  mockDoubleCounter,
   mockObserver,
   mockedResources,
   mockedInstrumentationLibraries,
   multiResourceMetrics,
   multiInstrumentationLibraryMetrics,
   ensureCounterIsCorrect,
+  ensureDoubleCounterIsCorrect,
   ensureObserverIsCorrect,
   mockHistogram,
   ensureHistogramIsCorrect,
   ensureValueRecorderIsCorrect,
   mockValueRecorder,
 } from '../helper';
+import { MetricRecord, SumAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 describe('transformMetrics', () => {
   describe('toCollectorMetric', () => {
+    const counter: MetricRecord = mockCounter();
+    const doubleCounter: MetricRecord = mockDoubleCounter();
+    const observer: MetricRecord = mockObserver();
+    const histogram: MetricRecord = mockHistogram();
+    const recorder: MetricRecord = mockValueRecorder();
+    const invalidMetric: MetricRecord = {
+      descriptor: {
+        name: 'name',
+        description: 'description',
+        unit: 'unit',
+        metricKind: 8, // Not a valid metricKind
+        valueType: 2, // Not double or int
+      },
+      labels: {},
+      aggregator: new SumAggregator(),
+      resource: new Resource({}),
+      instrumentationLibrary: { name: 'x', version: 'y' },
+    };
     beforeEach(() => {
       // Counter
-      mockCounter.aggregator.update(1);
+      counter.aggregator.update(1);
+
+      // Double Counter
+      doubleCounter.aggregator.update(8);
 
       // Observer
-      mockObserver.aggregator.update(10);
+      observer.aggregator.update(3);
+      observer.aggregator.update(6);
 
       // Histogram
-      mockHistogram.aggregator.update(7);
-      mockHistogram.aggregator.update(14);
+      histogram.aggregator.update(7);
+      histogram.aggregator.update(14);
 
       // ValueRecorder
-      mockValueRecorder.aggregator.update(5);
-    });
-
-    afterEach(() => {
-      mockCounter.aggregator.update(-1); // Reset counter
+      recorder.aggregator.update(5);
     });
     it('should convert metric', () => {
       ensureCounterIsCorrect(
-        transform.toCollectorMetric(mockCounter, 1592602232694000000),
-        hrTimeToNanoseconds(mockCounter.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(counter, 1592602232694000000),
+        hrTimeToNanoseconds(counter.aggregator.toPoint().timestamp)
       );
       ensureObserverIsCorrect(
-        transform.toCollectorMetric(mockObserver, 1592602232694000000),
-        hrTimeToNanoseconds(mockObserver.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(observer, 1592602232694000000),
+        hrTimeToNanoseconds(observer.aggregator.toPoint().timestamp)
       );
       ensureHistogramIsCorrect(
-        transform.toCollectorMetric(mockHistogram, 1592602232694000000),
-        hrTimeToNanoseconds(mockHistogram.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(histogram, 1592602232694000000),
+        hrTimeToNanoseconds(histogram.aggregator.toPoint().timestamp)
       );
 
       ensureValueRecorderIsCorrect(
-        transform.toCollectorMetric(mockValueRecorder, 1592602232694000000),
-        hrTimeToNanoseconds(mockValueRecorder.aggregator.toPoint().timestamp)
+        transform.toCollectorMetric(recorder, 1592602232694000000),
+        hrTimeToNanoseconds(recorder.aggregator.toPoint().timestamp)
       );
+
+      ensureDoubleCounterIsCorrect(
+        transform.toCollectorMetric(doubleCounter, 1592602232694000000),
+        hrTimeToNanoseconds(doubleCounter.aggregator.toPoint().timestamp)
+      );
+
+      const emptyMetric = transform.toCollectorMetric(
+        invalidMetric,
+        1592602232694000000
+      );
+      assert.deepStrictEqual(emptyMetric.int64DataPoints, []);
     });
   });
   describe('toCollectorMetricDescriptor', () => {

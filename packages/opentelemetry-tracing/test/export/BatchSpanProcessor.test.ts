@@ -214,7 +214,6 @@ describe('BatchSpanProcessor', () => {
       it('should call an async callback when shutdown is complete', done => {
         let exportedSpans = 0;
         sinon.stub(exporter, 'export').callsFake((spans, callback) => {
-          console.log('uh, export?');
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;
             callback(ExportResult.SUCCESS);

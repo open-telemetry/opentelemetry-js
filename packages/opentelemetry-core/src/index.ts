@@ -35,5 +35,6 @@ export * from './trace/sampler/ParentOrElseSampler';
 export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/spancontext-utils';
 export * from './trace/TraceState';
+export * from './trace/IdGenerator';
 export * from './utils/url';
 export * from './utils/wrap';
