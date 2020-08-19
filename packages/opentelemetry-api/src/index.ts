@@ -39,6 +39,8 @@ export * from './trace/link';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
+export * from './trace/ProxyTracer';
+export * from './trace/ProxyTracerProvider';
 export * from './trace/Sampler';
 export * from './trace/SamplingResult';
 export * from './trace/span_context';
