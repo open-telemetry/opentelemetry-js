@@ -46,6 +46,7 @@ export const HTTP_STATUS_SPECIAL_CASES: SpecialHttpStatusCodeMapping = {
   403: CanonicalCode.PERMISSION_DENIED,
   404: CanonicalCode.NOT_FOUND,
   429: CanonicalCode.RESOURCE_EXHAUSTED,
+  499: CanonicalCode.CANCELLED,
   501: CanonicalCode.UNIMPLEMENTED,
   503: CanonicalCode.UNAVAILABLE,
   504: CanonicalCode.DEADLINE_EXCEEDED,

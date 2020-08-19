@@ -16,7 +16,7 @@
 
 import { SDK_INFO } from '@opentelemetry/core';
 import { TELEMETRY_SDK_RESOURCE } from './constants';
-import { ResourceLabels } from './types';
+import { ResourceAttributes } from './types';
 
 /**
  * A Resource describes the entity for which a signals (metrics or trace) are
@@ -45,11 +45,11 @@ export class Resource {
 
   constructor(
     /**
-     * A dictionary of labels with string keys and values that provide information
-     * about the entity as numbers, strings or booleans
-     * TODO: Consider to add check/validation on labels.
+     * A dictionary of attributes with string keys and values that provide
+     * information about the entity as numbers, strings or booleans
+     * TODO: Consider to add check/validation on attributes.
      */
-    readonly labels: ResourceLabels
+    readonly attributes: ResourceAttributes
   ) {}
 
   /**
@@ -61,10 +61,14 @@ export class Resource {
    * @returns the newly merged Resource.
    */
   merge(other: Resource | null): Resource {
-    if (!other || !Object.keys(other.labels).length) return this;
+    if (!other || !Object.keys(other.attributes).length) return this;
 
-    // Labels from resource overwrite labels from other resource.
-    const mergedLabels = Object.assign({}, other.labels, this.labels);
-    return new Resource(mergedLabels);
+    // Attributes from resource overwrite attributes from other resource.
+    const mergedAttributes = Object.assign(
+      {},
+      other.attributes,
+      this.attributes
+    );
+    return new Resource(mergedAttributes);
   }
 }
