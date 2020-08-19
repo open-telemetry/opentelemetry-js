@@ -14,24 +14,4 @@
  * limitations under the License.
  */
 
-import { Logger } from '@opentelemetry/api';
-import type { Detector } from './types';
-
-/**
- * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
- */
-export interface ResourceDetectionConfig {
-  /** Optional Logger. */
-  logger?: Logger;
-  detectors?: Array<Detector>;
-}
-
-/**
- * ResourceDetectionConfigWithLogger provides an interface for interacting with
- * {@link ResourceDetectionConfig} instances that must have a logger defined.
- */
-export interface ResourceDetectionConfigWithLogger
-  extends ResourceDetectionConfig {
-  /** Required Logger */
-  logger: Logger;
-}
+export * from './GcpDetector';

@@ -16,13 +16,12 @@
 
 import * as nock from 'nock';
 import * as assert from 'assert';
-import { Resource } from '../../src';
-import { awsEc2Detector } from '../../src/platform/node/detectors/AwsEc2Detector';
+import { Resource } from '@opentelemetry/resources';
+import { awsEc2Detector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,
-  assertEmptyResource,
-} from '../util/resource-assertions';
+} from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
 
 const AWS_HOST = 'http://' + awsEc2Detector.AWS_IDMS_ENDPOINT;
@@ -89,7 +88,8 @@ describe('awsEc2Detector', () => {
   });
 
   describe('with unsuccessful request', () => {
-    it('should return empty resource when receiving error response code', async () => {
+    it('should throw when receiving error response code', async () => {
+      const expectedError = new Error('Failed to load page, status code: 404');
       const scope = nock(AWS_HOST)
         .persist()
         .put(AWS_TOKEN_PATH)
@@ -100,19 +100,22 @@ describe('awsEc2Detector', () => {
         .reply(200, () => mockedIdentityResponse)
         .get(AWS_HOST_PATH)
         .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
-        .reply(404, () => new Error('NOT FOUND'));
+        .reply(404, () => new Error());
 
-      const resource: Resource = await awsEc2Detector.detect({
-        logger: new NoopLogger(),
-      });
+      try {
+        await awsEc2Detector.detect({
+          logger: new NoopLogger(),
+        });
+        assert.ok(false, 'Expected to throw');
+      } catch (err) {
+        assert.deepStrictEqual(err, expectedError);
+      }
 
       scope.done();
-
-      assert.ok(resource);
-      assertEmptyResource(resource);
     });
 
-    it('should return empty resource when timeout', async () => {
+    it('should throw when timed out', async () => {
+      const expectedError = new Error('EC2 metadata api request timed out.');
       const scope = nock(AWS_HOST)
         .put(AWS_TOKEN_PATH)
         .matchHeader(AWS_METADATA_TTL_HEADER, '60')
@@ -125,33 +128,38 @@ describe('awsEc2Detector', () => {
         .delayConnection(2000)
         .reply(200, () => mockedHostResponse);
 
-      const resource: Resource = await awsEc2Detector.detect({
-        logger: new NoopLogger(),
-      });
+      try {
+        await awsEc2Detector.detect({
+          logger: new NoopLogger(),
+        });
+        assert.ok(false, 'Expected to throw');
+      } catch (err) {
+        assert.deepStrictEqual(err, expectedError);
+      }
 
       scope.done();
-
-      assert.ok(resource);
-      assertEmptyResource(resource);
     });
 
-    it('should return empty resource when replied Error', async () => {
+    it('should throw when replied with an Error', async () => {
+      const expectedError = new Error('NOT FOUND');
       const scope = nock(AWS_HOST)
         .put(AWS_TOKEN_PATH)
         .matchHeader(AWS_METADATA_TTL_HEADER, '60')
         .reply(200, () => mockedTokenResponse)
         .get(AWS_IDENTITY_PATH)
         .matchHeader(AWS_METADATA_TOKEN_HEADER, mockedTokenResponse)
-        .replyWithError('NOT FOUND');
+        .replyWithError(expectedError.message);
 
-      const resource: Resource = await awsEc2Detector.detect({
-        logger: new NoopLogger(),
-      });
+      try {
+        await awsEc2Detector.detect({
+          logger: new NoopLogger(),
+        });
+        assert.ok(false, 'Expected to throw');
+      } catch (err) {
+        assert.deepStrictEqual(err, expectedError);
+      }
 
       scope.done();
-
-      assert.ok(resource);
-      assertEmptyResource(resource);
     });
   });
 });
