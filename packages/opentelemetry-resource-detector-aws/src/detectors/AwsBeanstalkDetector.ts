@@ -37,10 +37,10 @@ const DEFAULT_BEANSTALK_CONF_PATH =
 const WIN_OS_BEANSTALK_CONF_PATH =
   'C:\\Program Files\\Amazon\\XRay\\environment.conf';
 
-class AwsBeanstalkDetector implements Detector {
+export class AwsBeanstalkDetector implements Detector {
   BEANSTALK_CONF_PATH: string;
-  readonly readFileAsync = util.promisify(fs.readFile);
-  readonly fileAccessAsync = util.promisify(fs.access);
+  private static readFileAsync = util.promisify(fs.readFile);
+  private static fileAccessAsync = util.promisify(fs.access);
 
   constructor() {
     if (process.platform === 'win32') {
@@ -52,9 +52,12 @@ class AwsBeanstalkDetector implements Detector {
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      await this.fileAccessAsync(this.BEANSTALK_CONF_PATH, fs.constants.R_OK);
+      await AwsBeanstalkDetector.fileAccessAsync(
+        this.BEANSTALK_CONF_PATH,
+        fs.constants.R_OK
+      );
 
-      const rawData = await this.readFileAsync(
+      const rawData = await AwsBeanstalkDetector.readFileAsync(
         this.BEANSTALK_CONF_PATH,
         'utf8'
       );
