@@ -43,25 +43,10 @@ export class AwsEcsDetector implements Detector {
       return Resource.empty();
     }
 
-    let hostName, containerId;
-    try {
-      hostName = os.hostname();
-    } catch (e) {
-      config.logger.warn(
-        `AwsEcsDetector failed to read host name: ${e.message}`
-      );
-    }
-    try {
-      const rawData = await AwsEcsDetector.readFileAsync(
-        this.DEFAULT_CGROUP_PATH,
-        'utf8'
-      );
-      containerId = this._getContainerId(rawData);
-    } catch (e) {
-      config.logger.warn(
-        `AwsEcsDetector failed to read container ID: ${e.message}`
-      );
-    }
+    const [hostName, containerId] = await Promise.all([
+      this._getHostName(config),
+      this._getContainerId(config),
+    ]);
 
     return !hostName && !containerId
       ? Resource.empty()
@@ -70,6 +55,23 @@ export class AwsEcsDetector implements Detector {
           [CONTAINER_RESOURCE.ID]: containerId || '',
         });
   }
+
+  private _getHostName(
+    config: ResourceDetectionConfigWithLogger
+  ): Promise<string | undefined> {
+    return new Promise(resolve => {
+      try {
+        const hostName = os.hostname();
+        resolve(hostName);
+      } catch (e) {
+        config.logger.warn(
+          `AwsEcsDetector failed to read container ID: ${e.message}`
+        );
+        resolve(undefined);
+      }
+    });
+  }
+
   /**
    * Read container ID from cgroup file
    * In ECS, even if we fail to find target file
@@ -77,15 +79,28 @@ export class AwsEcsDetector implements Detector {
    * we do not throw an error but throw warning message
    * and then return null string
    */
-  private _getContainerId(rawData: string): string {
-    const splitData = rawData.trim().split('\n');
+  private async _getContainerId(
+    config: ResourceDetectionConfigWithLogger
+  ): Promise<string | undefined> {
+    return new Promise(resolve => {
+      AwsEcsDetector.readFileAsync(this.DEFAULT_CGROUP_PATH, 'utf8')
+        .then(rawData => {
+          const splitData = rawData.trim().split('\n');
 
-    for (const str of splitData) {
-      if (str.length > this.CONTAINER_ID_LENGTH) {
-        return str.substring(str.length - this.CONTAINER_ID_LENGTH);
-      }
-    }
-    return '';
+          for (const str of splitData) {
+            if (str.length > this.CONTAINER_ID_LENGTH) {
+              resolve(str.substring(str.length - this.CONTAINER_ID_LENGTH));
+            }
+          }
+          resolve(undefined);
+        })
+        .catch(e => {
+          config.logger.warn(
+            `AwsEcsDetector failed to read container ID: ${e.message}`
+          );
+          resolve(undefined);
+        });
+    });
   }
 }
 
