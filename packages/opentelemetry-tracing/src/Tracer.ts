@@ -71,7 +71,7 @@ export class Tracer implements api.Tracer {
     context = api.context.active()
   ): api.Span {
     if (isInstrumentationSuppressed(context)) {
-      this.logger.debug('Instrumentation suppressed, returning NoOp Span');
+      this.logger.debug('Instrumentation suppressed, returning Noop Span');
       return api.NOOP_SPAN;
     }
 

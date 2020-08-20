@@ -62,26 +62,30 @@ describe('Context Helpers', () => {
       assert.equal(value, expectedValue);
     });
 
-    it('should return false if set to null', () => {
+    describe('when suppress instrumentation set to null', () => {
       const context = Context.ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
         null
       );
 
-      const value = isInstrumentationSuppressed(context);
+      it('should return false', () => {
+        const value = isInstrumentationSuppressed(context);
 
-      assert.equal(value, false);
+        assert.equal(value, false);
+      });
     });
 
-    it('should return false if set to undefined', () => {
+    describe('when suppress instrumentation set to undefined', () => {
       const context = Context.ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
         undefined
       );
 
-      const value = isInstrumentationSuppressed(context);
+      it('should return false', () => {
+        const value = isInstrumentationSuppressed(context);
 
-      assert.equal(value, false);
+        assert.equal(value, false);
+      });
     });
   });
 });

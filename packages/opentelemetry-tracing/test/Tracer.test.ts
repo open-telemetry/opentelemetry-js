@@ -118,20 +118,23 @@ describe('Tracer', () => {
     assert.strictEqual(lib.version, '0.0.1');
   });
 
-  it('should return cached no-op span when suppressInstrumentation true', done => {
-    const tracer = new Tracer(
-      { name: 'default', version: '0.0.1' },
-      { sampler: new TestSampler() },
-      tracerProvider
-    );
-
+  describe('when suppressInstrumentation true', () => {
     const context = suppressInstrumentation(Context.ROOT_CONTEXT);
-    const span = tracer.startSpan('span3', undefined, context);
 
-    assert.equal(span, NOOP_SPAN);
-    span.end();
+    it('should return cached no-op span ', done => {
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        { sampler: new TestSampler() },
+        tracerProvider
+      );
 
-    done();
+      const span = tracer.startSpan('span3', undefined, context);
+
+      assert.equal(span, NOOP_SPAN);
+      span.end();
+
+      done();
+    });
   });
 
   if (typeof process !== 'undefined' && process.release.name === 'node') {
