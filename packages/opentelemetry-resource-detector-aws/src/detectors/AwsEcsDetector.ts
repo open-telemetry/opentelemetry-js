@@ -29,10 +29,10 @@ import * as os from 'os';
  * ECS and return a {@link Resource} populated with data about the ECS
  * plugins of AWS X-Ray. Returns an empty Resource if detection fails.
  */
-class AwsEcsDetector implements Detector {
+export class AwsEcsDetector implements Detector {
   readonly CONTAINER_ID_LENGTH = 64;
   readonly DEFAULT_CGROUP_PATH = '/proc/self/cgroup';
-  readonly readFileAsync = util.promisify(fs.readFile);
+  private static readFileAsync = util.promisify(fs.readFile);
 
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     if (
@@ -52,7 +52,7 @@ class AwsEcsDetector implements Detector {
       );
     }
     try {
-      const rawData = await this.readFileAsync(
+      const rawData = await AwsEcsDetector.readFileAsync(
         this.DEFAULT_CGROUP_PATH,
         'utf8'
       );

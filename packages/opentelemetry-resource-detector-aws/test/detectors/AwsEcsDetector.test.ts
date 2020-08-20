@@ -16,7 +16,10 @@
 
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { awsEcsDetector } from '../../src/detectors/AwsEcsDetector';
+import {
+  awsEcsDetector,
+  AwsEcsDetector,
+} from '../../src/detectors/AwsEcsDetector';
 import {
   assertEmptyResource,
   assertContainerResource,
@@ -53,7 +56,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
@@ -73,7 +76,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI = 'ecs_metadata_v3_uri';
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(noisyCgroupData);
 
     const resource = await awsEcsDetector.detect({
@@ -93,7 +96,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI = 'ecs_metadata_v3_uri';
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(multiValidCgroupData);
 
     const resource = await awsEcsDetector.detect({
@@ -112,7 +115,7 @@ describe('BeanstalkResourceDetector', () => {
   it('should empty resource without environmental variable', async () => {
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
@@ -129,7 +132,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .rejects(errorMsg.fileNotFoundError);
 
     const resource = await awsEcsDetector.detect({
@@ -147,7 +150,9 @@ describe('BeanstalkResourceDetector', () => {
   it('should return resource only with hostname attribute when cgroup file does not contain valid container ID', async () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
     hostStub = sandbox.stub(os, 'hostname').returns(hostNameData);
-    readStub = sandbox.stub(awsEcsDetector, 'readFileAsync').resolves('');
+    readStub = sandbox
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
+      .resolves('');
 
     const resource = await awsEcsDetector.detect({
       logger: new NoopLogger(),
@@ -165,7 +170,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
     hostStub = sandbox.stub(os, 'hostname').throws(errorMsg.hostNameError);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
 
     const resource = await awsEcsDetector.detect({
@@ -184,7 +189,7 @@ describe('BeanstalkResourceDetector', () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
     hostStub = sandbox.stub(os, 'hostname').throws(errorMsg.hostNameError);
     readStub = sandbox
-      .stub(awsEcsDetector, 'readFileAsync')
+      .stub(AwsEcsDetector, 'readFileAsync' as any)
       .rejects(errorMsg.fileNotFoundError);
 
     const resource = await awsEcsDetector.detect({
