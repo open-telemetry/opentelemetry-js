@@ -1,0 +1,18 @@
+name: Run w3c tests on push
+
+on: [push]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+
+      - name: Install and Build 🔧
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --scope=propagation-validation-server --include-dependencies
+
+      - name: Run W3C Test harness
+        run: ./integration-tests/tracecontext-integration-test.sh

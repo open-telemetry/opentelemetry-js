@@ -24,8 +24,8 @@ import { toCollectorExportTraceServiceRequest } from '../../transform';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
 const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55680/v1/trace';
-const DEFAULT_COLLECTOR_URL_JSON_PROTO = 'http://localhost:55680/v1/trace';
+const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/trace';
+const DEFAULT_COLLECTOR_URL_JSON_PROTO = 'http://localhost:55681/v1/trace';
 
 /**
  * Collector Trace Exporter for Node

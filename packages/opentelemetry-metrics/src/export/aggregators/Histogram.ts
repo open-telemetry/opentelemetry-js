@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Aggregator, Point, Histogram } from '../types';
+import {
+  HistogramAggregatorType,
+  Point,
+  Histogram,
+  AggregatorKind,
+} from '../types';
 import { HrTime } from '@opentelemetry/api';
 import { hrTime } from '@opentelemetry/core';
 
@@ -22,7 +27,8 @@ import { hrTime } from '@opentelemetry/core';
  * Basic aggregator which observes events and counts them in pre-defined buckets
  * and provides the total sum and count of all observations.
  */
-export class HistogramAggregator implements Aggregator {
+export class HistogramAggregator implements HistogramAggregatorType {
+  public kind: AggregatorKind.HISTOGRAM = AggregatorKind.HISTOGRAM;
   private _current: Histogram;
   private _lastUpdateTime: HrTime;
   private readonly _boundaries: number[];
@@ -53,7 +59,7 @@ export class HistogramAggregator implements Aggregator {
     this._current.buckets.counts[this._boundaries.length] += 1;
   }
 
-  toPoint(): Point {
+  toPoint(): Point<Histogram> {
     return {
       value: this._current,
       timestamp: this._lastUpdateTime,

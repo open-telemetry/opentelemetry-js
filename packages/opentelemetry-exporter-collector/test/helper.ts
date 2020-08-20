@@ -38,10 +38,6 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-type Mutable<T> = {
-  -readonly [P in keyof T]: T[P];
-};
-
 const traceIdArr = [
   31,
   16,
@@ -63,77 +59,105 @@ const traceIdArr = [
 const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
 const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
 
-export const mockCounter: MetricRecord = {
-  descriptor: {
-    name: 'test-counter',
-    description: 'sample counter description',
-    unit: '1',
-    metricKind: MetricKind.COUNTER,
-    valueType: ValueType.INT,
-  },
-  labels: {},
-  aggregator: new SumAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockCounter(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      metricKind: MetricKind.COUNTER,
+      valueType: ValueType.INT,
+    },
+    labels: {},
+    aggregator: new SumAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockObserver: MetricRecord = {
-  descriptor: {
-    name: 'test-observer',
-    description: 'sample observer description',
-    unit: '2',
-    metricKind: MetricKind.VALUE_OBSERVER,
-    valueType: ValueType.DOUBLE,
-  },
-  labels: {},
-  aggregator: new MinMaxLastSumCountAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockDoubleCounter(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      metricKind: MetricKind.COUNTER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new SumAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockValueRecorder: MetricRecord = {
-  descriptor: {
-    name: 'test-recorder',
-    description: 'sample recorder description',
-    unit: '3',
-    metricKind: MetricKind.VALUE_RECORDER,
-    valueType: ValueType.INT,
-  },
-  labels: {},
-  aggregator: new MinMaxLastSumCountAggregator(),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockObserver(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-observer',
+      description: 'sample observer description',
+      unit: '2',
+      metricKind: MetricKind.VALUE_OBSERVER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new MinMaxLastSumCountAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
-export const mockHistogram: Mutable<MetricRecord> = {
-  descriptor: {
-    name: 'test-hist',
-    description: 'sample observer description',
-    unit: '2',
-    metricKind: MetricKind.VALUE_OBSERVER,
-    valueType: ValueType.DOUBLE,
-  },
-  labels: {},
-  aggregator: new HistogramAggregator([10, 20]),
-  resource: new Resource({
-    service: 'ui',
-    version: 1,
-    cost: 112.12,
-  }),
-  instrumentationLibrary: { name: 'default', version: '0.0.1' },
-};
+export function mockValueRecorder(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-recorder',
+      description: 'sample recorder description',
+      unit: '3',
+      metricKind: MetricKind.VALUE_RECORDER,
+      valueType: ValueType.INT,
+    },
+    labels: {},
+    aggregator: new MinMaxLastSumCountAggregator(),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
+
+export function mockHistogram(): MetricRecord {
+  return {
+    descriptor: {
+      name: 'test-hist',
+      description: 'sample observer description',
+      unit: '2',
+      metricKind: MetricKind.VALUE_OBSERVER,
+      valueType: ValueType.DOUBLE,
+    },
+    labels: {},
+    aggregator: new HistogramAggregator([10, 20]),
+    resource: new Resource({
+      service: 'ui',
+      version: 1,
+      cost: 112.12,
+    }),
+    instrumentationLibrary: { name: 'default', version: '0.0.1' },
+  };
+}
 
 const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
 const spanIdBase64 = 'XhByYfZPpT4=';
@@ -289,17 +313,17 @@ export const multiResourceTrace: ReadableSpan[] = [
 
 export const multiResourceMetrics: MetricRecord[] = [
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockObserver,
+    ...mockObserver(),
     resource: mockedResources[1],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
@@ -307,17 +331,17 @@ export const multiResourceMetrics: MetricRecord[] = [
 
 export const multiInstrumentationLibraryMetrics: MetricRecord[] = [
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
   {
-    ...mockObserver,
+    ...mockObserver(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[1],
   },
   {
-    ...mockCounter,
+    ...mockCounter(),
     resource: mockedResources[0],
     instrumentationLibrary: mockedInstrumentationLibraries[0],
   },
@@ -398,49 +422,87 @@ export function ensureExportedEventsAreCorrect(
 }
 
 export function ensureExportedAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-    ],
-    'exported attributes are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+            value: 'stringValue',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          key: 'component',
+          value: {
+            stringValue: 'document-load',
+          },
+        },
+      ],
+      'exported attributes are incorrect'
+    );
+  }
 }
 
 export function ensureExportedLinksAreCorrect(
-  attributes: opentelemetryProto.trace.v1.Span.Link[]
+  attributes: opentelemetryProto.trace.v1.Span.Link[],
+  usingGRPC = false
 ) {
-  assert.deepStrictEqual(
-    attributes,
-    [
-      {
-        attributes: [
-          {
-            key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
-            intValue: '0',
-            doubleValue: 0,
-            boolValue: false,
-          },
-        ],
-        traceId: Buffer.from(traceIdArr),
-        spanId: Buffer.from(parentIdArr),
-        traceState: '',
-        droppedAttributesCount: 0,
-      },
-    ],
-    'exported links are incorrect'
-  );
+  if (usingGRPC) {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+                value: 'stringValue',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  } else {
+    assert.deepStrictEqual(
+      attributes,
+      [
+        {
+          attributes: [
+            {
+              key: 'component',
+              value: {
+                stringValue: 'document-load',
+              },
+            },
+          ],
+          traceId: Buffer.from(traceIdArr),
+          spanId: Buffer.from(parentIdArr),
+          traceState: '',
+          droppedAttributesCount: 0,
+        },
+      ],
+      'exported links are incorrect'
+    );
+  }
 }
 
 export function ensureEventsAreCorrect(
@@ -554,15 +616,16 @@ export function ensureProtoEventsAreCorrect(
 }
 
 export function ensureAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
         key: 'component',
-        type: 0,
-        stringValue: 'document-load',
+        value: {
+          stringValue: 'document-load',
+        },
       },
     ],
     'attributes are incorrect'
@@ -570,15 +633,16 @@ export function ensureAttributesAreCorrect(
 }
 
 export function ensureProtoAttributesAreCorrect(
-  attributes: opentelemetryProto.common.v1.AttributeKeyValue[]
+  attributes: opentelemetryProto.common.v1.KeyValue[]
 ) {
   assert.deepStrictEqual(
     attributes,
     [
       {
         key: 'component',
-        type: 'STRING',
-        stringValue: 'document-load',
+        value: {
+          stringValue: 'document-load',
+        },
       },
     ],
     'attributes are incorrect'
@@ -597,8 +661,9 @@ export function ensureLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            type: 0,
-            stringValue: 'document-load',
+            value: {
+              stringValue: 'document-load',
+            },
           },
         ],
         droppedAttributesCount: 0,
@@ -620,8 +685,9 @@ export function ensureProtoLinksAreCorrect(
         attributes: [
           {
             key: 'component',
-            type: 'STRING',
-            stringValue: 'document-load',
+            value: {
+              stringValue: 'document-load',
+            },
           },
         ],
         droppedAttributesCount: 0,
@@ -718,16 +784,17 @@ export function ensureProtoSpanIsCorrect(
 }
 
 export function ensureExportedSpanIsCorrect(
-  span: collectorTypes.opentelemetryProto.trace.v1.Span
+  span: collectorTypes.opentelemetryProto.trace.v1.Span,
+  usingGRPC = false
 ) {
   if (span.attributes) {
-    ensureExportedAttributesAreCorrect(span.attributes);
+    ensureExportedAttributesAreCorrect(span.attributes, usingGRPC);
   }
   if (span.events) {
     ensureExportedEventsAreCorrect(span.events);
   }
   if (span.links) {
-    ensureExportedLinksAreCorrect(span.links);
+    ensureExportedLinksAreCorrect(span.links, usingGRPC);
   }
   assert.deepStrictEqual(
     span.traceId,
@@ -778,19 +845,27 @@ export function ensureWebResourceIsCorrect(
     attributes: [
       {
         key: 'service.name',
-        type: 0,
-        stringValue: 'bar',
+        value: {
+          stringValue: 'bar',
+        },
       },
       {
         key: 'service',
-        type: 0,
-        stringValue: 'ui',
+        value: {
+          stringValue: 'ui',
+        },
       },
-      { key: 'version', type: 2, doubleValue: 1 },
+      {
+        key: 'version',
+        value: {
+          doubleValue: 1,
+        },
+      },
       {
         key: 'cost',
-        type: 2,
-        doubleValue: 112.12,
+        value: {
+          doubleValue: 112.12,
+        },
       },
     ],
     droppedAttributesCount: 0,
@@ -806,13 +881,44 @@ export function ensureCounterIsCorrect(
       name: 'test-counter',
       description: 'sample counter description',
       unit: '1',
-      type: 2,
-      temporality: 3,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .MONOTONIC_INT64,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .CUMULATIVE,
     },
     int64DataPoints: [
       {
         labels: [],
         value: 1,
+        startTimeUnixNano: 1592602232694000000,
+        timeUnixNano: time,
+      },
+    ],
+  });
+}
+
+export function ensureDoubleCounterIsCorrect(
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time: number
+) {
+  assert.deepStrictEqual(metric, {
+    metricDescriptor: {
+      name: 'test-counter',
+      description: 'sample counter description',
+      unit: '1',
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .MONOTONIC_DOUBLE,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .CUMULATIVE,
+    },
+    doubleDataPoints: [
+      {
+        labels: [],
+        value: 8,
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
       },
@@ -829,15 +935,27 @@ export function ensureObserverIsCorrect(
       name: 'test-observer',
       description: 'sample observer description',
       unit: '2',
-      type: 3,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .SUMMARY,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
-    doubleDataPoints: [
+    summaryDataPoints: [
       {
-        labels: [],
-        value: 10,
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
+        count: 2,
+        sum: 9,
+        labels: [],
+        percentileValues: [
+          {
+            percentile: 0,
+            value: 3,
+          },
+          { percentile: 100, value: 6 },
+        ],
       },
     ],
   });
@@ -852,13 +970,22 @@ export function ensureValueRecorderIsCorrect(
       name: 'test-recorder',
       description: 'sample recorder description',
       unit: '3',
-      type: 1,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .SUMMARY,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
-    int64DataPoints: [
+    summaryDataPoints: [
       {
+        count: 1,
+        sum: 5,
         labels: [],
-        value: 5,
+        percentileValues: [
+          { percentile: 0, value: 5 },
+          { percentile: 100, value: 5 },
+        ],
         startTimeUnixNano: 1592602232694000000,
         timeUnixNano: time,
       },
@@ -875,8 +1002,12 @@ export function ensureHistogramIsCorrect(
       name: 'test-hist',
       description: 'sample observer description',
       unit: '2',
-      type: 5,
-      temporality: 2,
+      type:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
+          .HISTOGRAM,
+      temporality:
+        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
+          .DELTA,
     },
     histogramDataPoints: [
       {
@@ -921,20 +1052,25 @@ export function ensureExportedObserverIsCorrect(
     name: 'test-observer',
     description: 'sample observer description',
     unit: '2',
-    type: 'DOUBLE',
+    type: 'SUMMARY',
     temporality: 'DELTA',
   });
 
   assert.deepStrictEqual(metric.int64DataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.doubleDataPoints, []);
   assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.ok(metric.doubleDataPoints);
-  assert.deepStrictEqual(metric.doubleDataPoints[0].labels, []);
-  assert.deepStrictEqual(metric.doubleDataPoints[0].value, 10);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 9);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '2');
   assert.deepStrictEqual(
-    metric.doubleDataPoints[0].startTimeUnixNano,
+    metric.summaryDataPoints[0].startTimeUnixNano,
     '1592602232694000128'
   );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 3 },
+    { percentile: 100, value: 6 },
+  ]);
 }
 
 export function ensureExportedHistogramIsCorrect(
@@ -976,60 +1112,95 @@ export function ensureExportedValueRecorderIsCorrect(
     name: 'test-recorder',
     description: 'sample recorder description',
     unit: '3',
-    type: 'INT64',
+    type: 'SUMMARY',
     temporality: 'DELTA',
   });
   assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
+  assert.deepStrictEqual(metric.int64DataPoints, []);
   assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.ok(metric.int64DataPoints);
-  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
+  assert.ok(metric.summaryDataPoints);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
   assert.deepStrictEqual(
-    metric.int64DataPoints[0].startTimeUnixNano,
+    metric.summaryDataPoints[0].startTimeUnixNano,
     '1592602232694000128'
   );
+  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
+    { percentile: 0, value: 5 },
+    { percentile: 100, value: 5 },
+  ]);
+  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '1');
+  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 5);
 }
 
 export function ensureResourceIsCorrect(
-  resource: collectorTypes.opentelemetryProto.resource.v1.Resource
+  resource: collectorTypes.opentelemetryProto.resource.v1.Resource,
+  usingGRPC = true
 ) {
-  assert.deepStrictEqual(resource, {
-    attributes: [
-      {
-        key: 'service.name',
-        type: 'STRING',
-        stringValue: 'basic-service',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'service',
-        type: 'STRING',
-        stringValue: 'ui',
-        intValue: '0',
-        doubleValue: 0,
-        boolValue: false,
-      },
-      {
-        key: 'version',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 1,
-        boolValue: false,
-      },
-      {
-        key: 'cost',
-        type: 'DOUBLE',
-        stringValue: '',
-        intValue: '0',
-        doubleValue: 112.12,
-        boolValue: false,
-      },
-    ],
-    droppedAttributesCount: 0,
-  });
+  if (usingGRPC) {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+            value: 'stringValue',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+            value: 'doubleValue',
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+            value: 'doubleValue',
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  } else {
+    assert.deepStrictEqual(resource, {
+      attributes: [
+        {
+          key: 'service.name',
+          value: {
+            stringValue: 'basic-service',
+          },
+        },
+        {
+          key: 'service',
+          value: {
+            stringValue: 'ui',
+          },
+        },
+        {
+          key: 'version',
+          value: {
+            doubleValue: 1,
+          },
+        },
+        {
+          key: 'cost',
+          value: {
+            doubleValue: 112.12,
+          },
+        },
+      ],
+      droppedAttributesCount: 0,
+    });
+  }
 }
 
 export function ensureExportTraceServiceRequestIsSet(
@@ -1072,7 +1243,7 @@ export function ensureExportMetricsServiceRequestIsSet(
   assert.strictEqual(
     resourceMetrics.length,
     4,
-    'resourceMetrics is the incorrect length'
+    'resourceMetrics has incorrect length'
   );
 
   const resource = resourceMetrics[0].resource;

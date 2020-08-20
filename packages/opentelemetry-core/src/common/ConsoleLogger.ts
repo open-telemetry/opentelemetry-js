@@ -16,9 +16,10 @@
 
 import { Logger } from '@opentelemetry/api';
 import { LogLevel } from './types';
+import { getEnv } from '../platform';
 
 export class ConsoleLogger implements Logger {
-  constructor(level: LogLevel = LogLevel.INFO) {
+  constructor(level: LogLevel = getEnv().OTEL_LOG_LEVEL) {
     if (level >= LogLevel.DEBUG) {
       this.debug = (...args) => {
         console.debug(...args);

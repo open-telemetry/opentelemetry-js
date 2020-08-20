@@ -20,7 +20,7 @@ import * as protobufjs from 'protobufjs';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { CollectorExporterConfigNode } from './types';
-import { sendDataUsingHttp } from './util';
+import { sendWithHttp } from './util';
 
 let ExportTraceServiceRequestProto: Type | undefined;
 
@@ -60,7 +60,7 @@ export function sendWithJsonProto<ExportItem, ServiceRequest>(
   if (message) {
     const body = ExportTraceServiceRequestProto?.encode(message).finish();
     if (body) {
-      sendDataUsingHttp(
+      sendWithHttp(
         collector,
         Buffer.from(body),
         'application/x-protobuf',

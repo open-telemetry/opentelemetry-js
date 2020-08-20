@@ -22,8 +22,8 @@ import {
   InstrumentationLibrary,
   isValid,
   NoRecordingSpan,
-  randomSpanId,
-  randomTraceId,
+  IdGenerator,
+  RandomIdGenerator,
   setActiveSpan,
   isInstrumentationSuppressed,
 } from '@opentelemetry/core';
@@ -37,9 +37,9 @@ import { mergeConfig } from './utility';
  * This class represents a basic tracer.
  */
 export class Tracer implements api.Tracer {
-  private readonly _defaultAttributes: api.Attributes;
   private readonly _sampler: api.Sampler;
   private readonly _traceParams: TraceParams;
+  private readonly _idGenerator: IdGenerator;
   readonly resource: Resource;
   readonly instrumentationLibrary: InstrumentationLibrary;
   readonly logger: api.Logger;
@@ -53,9 +53,9 @@ export class Tracer implements api.Tracer {
     private _tracerProvider: BasicTracerProvider
   ) {
     const localConfig = mergeConfig(config);
-    this._defaultAttributes = localConfig.defaultAttributes;
     this._sampler = localConfig.sampler;
     this._traceParams = localConfig.traceParams;
+    this._idGenerator = config.idGenerator || new RandomIdGenerator();
     this.resource = _tracerProvider.resource;
     this.instrumentationLibrary = instrumentationLibrary;
     this.logger = config.logger || new ConsoleLogger(config.logLevel);
@@ -76,12 +76,12 @@ export class Tracer implements api.Tracer {
     }
 
     const parentContext = getParent(options, context);
-    const spanId = randomSpanId();
+    const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
     if (!parentContext || !isValid(parentContext)) {
       // New root span.
-      traceId = randomTraceId();
+      traceId = this._idGenerator.generateTraceId();
     } else {
       // New child span.
       traceId = parentContext.traceId;
@@ -90,7 +90,7 @@ export class Tracer implements api.Tracer {
 
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
     const links = options.links ?? [];
-    const attributes = { ...this._defaultAttributes, ...options.attributes };
+    const attributes = options.attributes ?? {};
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       parentContext,

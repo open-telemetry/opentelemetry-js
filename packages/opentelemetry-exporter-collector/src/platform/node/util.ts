@@ -31,7 +31,7 @@ export function removeProtocol(url: string): string {
  * @param onSuccess
  * @param onError
  */
-export function sendDataUsingHttp<ExportItem, ServiceRequest>(
+export function sendWithHttp<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   data: string | Buffer,
   contentType: string,

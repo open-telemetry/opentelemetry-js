@@ -14,23 +14,19 @@
  * limitations under the License.
  */
 
-import * as crypto from 'crypto';
-
-const SPAN_ID_BYTES = 8;
-const TRACE_ID_BYTES = 16;
-
 /**
- * Returns a random 16-byte trace ID formatted/encoded as a 32 lowercase hex
- * characters corresponding to 128 bits.
+ * Adds an event listener to trigger a callback when an unload event in the window is detected
  */
-export function randomTraceId(): string {
-  return crypto.randomBytes(TRACE_ID_BYTES).toString('hex');
+export function notifyOnGlobalShutdown(cb: () => void): () => void {
+  window.addEventListener('unload', cb, { once: true });
+  return function removeCallbackFromGlobalShutdown() {
+    window.removeEventListener('unload', cb, false);
+  };
 }
 
 /**
- * Returns a random 8-byte span ID formatted/encoded as a 16 lowercase hex
- * characters corresponding to 64 bits.
+ * Warning: meant for internal use only! Closes the current window, triggering the unload event
  */
-export function randomSpanId(): string {
-  return crypto.randomBytes(SPAN_ID_BYTES).toString('hex');
+export function _invokeGlobalShutdown() {
+  window.close();
 }
