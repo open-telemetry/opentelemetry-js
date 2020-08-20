@@ -18,7 +18,11 @@ import type * as grpcJs from '@grpc/grpc-js';
 import type { HandleCall } from '@grpc/grpc-js/build/src/server-call';
 import { GrpcJsPlugin } from '../grpcJs';
 import * as shimmer from 'shimmer';
-import { ServerCallWithMeta, SendUnaryDataCallback } from '../types';
+import {
+  ServerCallWithMeta,
+  SendUnaryDataCallback,
+  IgnoreMatcher,
+} from '../types';
 import {
   context,
   SpanOptions,
@@ -29,6 +33,7 @@ import {
 import { RpcAttribute } from '@opentelemetry/semantic-conventions';
 import { clientStreamAndUnaryHandler } from './clientStreamAndUnary';
 import { serverStreamAndBidiHandler } from './serverStreamAndBidi';
+import { containsOtelMetadata, methodIsIgnored } from '../utils';
 
 type ServerRegisterFunction = typeof grpcJs.Server.prototype.register;
 
@@ -41,6 +46,7 @@ export function patchServer(
 ): (originalRegister: ServerRegisterFunction) => ServerRegisterFunction {
   return (originalRegister: ServerRegisterFunction) => {
     const plugin = this;
+    const config = this._config;
 
     plugin.logger.debug('patched gRPC server');
     return function register<RequestType, ResponseType>(
@@ -71,6 +77,21 @@ export function patchServer(
             callback: SendUnaryDataCallback<unknown>
           ) {
             const self = this;
+
+            if (
+              shouldNotTraceServerCall(
+                call.metadata,
+                name,
+                config.ignoreGrpcMethods
+              )
+            ) {
+              return handleUntracedServerFunction(
+                type,
+                originalFunc,
+                call,
+                callback
+              );
+            }
 
             const spanName = `grpc.${name.replace('/', '')}`;
             const spanOptions: SpanOptions = {
@@ -112,6 +133,24 @@ export function patchServer(
 }
 
 /**
+ * Returns true if the server call should not be traced.
+ */
+function shouldNotTraceServerCall(
+  metadata: grpcJs.Metadata,
+  methodName: string,
+  ignoreGrpcMethods?: IgnoreMatcher[]
+): boolean {
+  const parsedName = methodName.split('/');
+  return (
+    containsOtelMetadata(metadata) ||
+    methodIsIgnored(
+      parsedName[parsedName.length - 1] || methodName,
+      ignoreGrpcMethods
+    )
+  );
+}
+
+/**
  * Patch callback or EventEmitter provided by `originalFunc` and set appropriate `span`
  * properties based on its result.
  */
@@ -148,6 +187,30 @@ function handleServerFunction<RequestType, ResponseType>(
           | grpcJs.handleBidiStreamingCall<RequestType, ResponseType>
           | grpcJs.handleServerStreamingCall<RequestType, ResponseType>
       );
+    default:
+      break;
+  }
+}
+
+/**
+ * Does not patch any callbacks or EventEmitters to omit tracing on requests
+ * that should not be traced.
+ */
+function handleUntracedServerFunction<RequestType, ResponseType>(
+  type: string,
+  originalFunc: HandleCall<RequestType, ResponseType>,
+  call: ServerCallWithMeta<RequestType, ResponseType>,
+  callback: SendUnaryDataCallback<unknown>
+): void {
+  switch (type) {
+    case 'unary':
+    case 'clientStream':
+    case 'client_stream':
+      return (originalFunc as Function).call({}, call, callback);
+    case 'serverStream':
+    case 'server_stream':
+    case 'bidi':
+      return (originalFunc as Function).call({}, call);
     default:
       break;
   }
