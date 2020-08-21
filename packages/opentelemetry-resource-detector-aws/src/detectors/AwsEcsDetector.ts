@@ -43,10 +43,8 @@ export class AwsEcsDetector implements Detector {
       return Resource.empty();
     }
 
-    const [hostName, containerId] = await Promise.all([
-      this._getHostName(config),
-      this._getContainerId(config),
-    ]);
+    const hostName = os.hostname();
+    const containerId = await this._getContainerId(config);
 
     return !hostName && !containerId
       ? Resource.empty()
@@ -54,14 +52,6 @@ export class AwsEcsDetector implements Detector {
           [CONTAINER_RESOURCE.NAME]: hostName || '',
           [CONTAINER_RESOURCE.ID]: containerId || '',
         });
-  }
-
-  private _getHostName(
-    config: ResourceDetectionConfigWithLogger
-  ): Promise<string | undefined> {
-    return new Promise(resolve => {
-      resolve(os.hostname());
-    });
   }
 
   /**
