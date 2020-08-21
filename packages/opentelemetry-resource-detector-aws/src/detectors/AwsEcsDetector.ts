@@ -60,15 +60,7 @@ export class AwsEcsDetector implements Detector {
     config: ResourceDetectionConfigWithLogger
   ): Promise<string | undefined> {
     return new Promise(resolve => {
-      try {
-        const hostName = os.hostname();
-        resolve(hostName);
-      } catch (e) {
-        config.logger.warn(
-          `AwsEcsDetector failed to read container ID: ${e.message}`
-        );
-        resolve(undefined);
-      }
+      resolve(os.hostname());
     });
   }
 
@@ -82,25 +74,23 @@ export class AwsEcsDetector implements Detector {
   private async _getContainerId(
     config: ResourceDetectionConfigWithLogger
   ): Promise<string | undefined> {
-    return new Promise(resolve => {
-      AwsEcsDetector.readFileAsync(this.DEFAULT_CGROUP_PATH, 'utf8')
-        .then(rawData => {
-          const splitData = rawData.trim().split('\n');
-
-          for (const str of splitData) {
-            if (str.length > this.CONTAINER_ID_LENGTH) {
-              resolve(str.substring(str.length - this.CONTAINER_ID_LENGTH));
-            }
-          }
-          resolve(undefined);
-        })
-        .catch(e => {
-          config.logger.warn(
-            `AwsEcsDetector failed to read container ID: ${e.message}`
-          );
-          resolve(undefined);
-        });
-    });
+    try {
+      const rawData = await AwsEcsDetector.readFileAsync(
+        this.DEFAULT_CGROUP_PATH,
+        'utf8'
+      );
+      const splitData = rawData.trim().split('\n');
+      for (const str of splitData) {
+        if (str.length > this.CONTAINER_ID_LENGTH) {
+          return str.substring(str.length - this.CONTAINER_ID_LENGTH);
+        }
+      }
+    } catch (e) {
+      config.logger.warn(
+        `AwsEcsDetector failed to read container ID: ${e.message}`
+      );
+    }
+    return undefined;
   }
 }
 

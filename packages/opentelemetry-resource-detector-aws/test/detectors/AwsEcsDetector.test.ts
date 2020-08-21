@@ -30,7 +30,6 @@ import * as os from 'os';
 describe('BeanstalkResourceDetector', () => {
   const errorMsg = {
     fileNotFoundError: new Error('cannot find cgroup file'),
-    hostNameError: new Error('failed to obtain host name'),
   };
 
   const correctCgroupData =
@@ -168,7 +167,7 @@ describe('BeanstalkResourceDetector', () => {
 
   it('should return resource only with container ID attribute without hostname', async () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
-    hostStub = sandbox.stub(os, 'hostname').throws(errorMsg.hostNameError);
+    hostStub = sandbox.stub(os, 'hostname').returns('');
     readStub = sandbox
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .resolves(correctCgroupData);
@@ -187,7 +186,7 @@ describe('BeanstalkResourceDetector', () => {
 
   it('should return empty resource when both hostname and container ID are invalid', async () => {
     process.env.ECS_CONTAINER_METADATA_URI_V4 = 'ecs_metadata_v4_uri';
-    hostStub = sandbox.stub(os, 'hostname').throws(errorMsg.hostNameError);
+    hostStub = sandbox.stub(os, 'hostname').returns('');
     readStub = sandbox
       .stub(AwsEcsDetector, 'readFileAsync' as any)
       .rejects(errorMsg.fileNotFoundError);
