@@ -50,9 +50,7 @@ export class PropagationAPI {
   /**
    * Set the current propagator. Returns the initialized propagator
    */
-  public setGlobalPropagator(
-    propagator: TextMapPropagator
-  ): TextMapPropagator {
+  public setGlobalPropagator(propagator: TextMapPropagator): TextMapPropagator {
     if (_global[GLOBAL_PROPAGATION_API_KEY]) {
       // global propagator has already been set
       return this._getGlobalPropagator();
