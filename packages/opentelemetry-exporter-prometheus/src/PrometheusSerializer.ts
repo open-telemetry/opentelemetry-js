@@ -17,6 +17,7 @@ import {
   MetricRecord,
   AggregatorKind,
   Distribution,
+  MetricKind,
 } from '@opentelemetry/metrics';
 import { PrometheusCheckpoint } from './types';
 import { Labels } from '@opentelemetry/api';
@@ -77,16 +78,24 @@ function valueString(value: number) {
   }
 }
 
-function aggregatorKindToPrometheusType(
-  kind: AggregatorKind
+function toPrometheusType(
+  metricKind: MetricKind,
+  aggregatorKind: AggregatorKind
 ): PrometheusDataTypeLiteral {
-  switch (kind) {
+  switch (aggregatorKind) {
     case AggregatorKind.SUM:
-      return 'counter';
+      if (
+        metricKind === MetricKind.COUNTER ||
+        metricKind === MetricKind.SUM_OBSERVER
+      ) {
+        return 'counter';
+      }
+      /** MetricKind.UP_DOWN_COUNTER and MetricKind.UP_DOWN_SUM_OBSERVER */
+      return 'gauge';
     case AggregatorKind.LAST_VALUE:
       return 'gauge';
     case AggregatorKind.DISTRIBUTION:
-      return 'gauge';
+      return 'summary';
     case AggregatorKind.HISTOGRAM:
       return 'histogram';
     default:
@@ -157,7 +166,8 @@ export class PrometheusSerializer {
     const help = `# HELP ${name} ${escapeString(
       checkpoint.descriptor.description || 'description missing'
     )}`;
-    const type = `# TYPE ${name} ${aggregatorKindToPrometheusType(
+    const type = `# TYPE ${name} ${toPrometheusType(
+      checkpoint.descriptor.metricKind,
       checkpoint.aggregatorKind
     )}`;
 
@@ -187,13 +197,7 @@ export class PrometheusSerializer {
       case AggregatorKind.DISTRIBUTION: {
         const { value, timestamp: hrtime } = record.aggregator.toPoint();
         const timestamp = hrTimeToMilliseconds(hrtime);
-        for (const key of [
-          'min',
-          'max',
-          'count',
-          'last',
-          'sum',
-        ] as (keyof Distribution)[]) {
+        for (const key of ['count', 'sum'] as (keyof Distribution)[]) {
           results += stringify(
             name + '_' + key,
             record.labels,
@@ -202,6 +206,24 @@ export class PrometheusSerializer {
             undefined
           );
         }
+        results += stringify(
+          name,
+          record.labels,
+          value.min,
+          this._appendTimestamp ? timestamp : undefined,
+          {
+            quantile: '0',
+          }
+        );
+        results += stringify(
+          name,
+          record.labels,
+          value.max,
+          this._appendTimestamp ? timestamp : undefined,
+          {
+            quantile: '1',
+          }
+        );
         break;
       }
       case AggregatorKind.HISTOGRAM: {

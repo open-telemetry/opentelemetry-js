@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 import {
-  Point,
-  Sum,
   SumAggregator,
   MinMaxLastSumCountAggregator,
   HistogramAggregator,
@@ -25,13 +23,12 @@ import {
   UpDownCounterMetric,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
-import { HrTime, Labels } from '@opentelemetry/api';
+import { Labels } from '@opentelemetry/api';
 import { PrometheusSerializer } from '../src/PrometheusSerializer';
 import { PrometheusLabelsBatcher } from '../src/PrometheusLabelsBatcher';
 import { ExactBatcher } from './ExactBatcher';
+import { mockedHrTimeMs, mockAggregator } from './util';
 
-const mockedHrTime: HrTime = [1586347902211, 0];
-const mockedHrTimeMs = 1586347902211000;
 const labels = {
   foo1: 'bar1',
   foo2: 'bar2',
@@ -112,11 +109,10 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          `test_min{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_max{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_last{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n`
+          `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
+            `test_sum{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
+            `test{foo1="bar1",foo2="bar2",quantile="0"} 1 ${mockedHrTimeMs}\n` +
+            `test{foo1="bar1",foo2="bar2",quantile="1"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -138,11 +134,10 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          'test_min{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_max{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_count{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_last{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_sum{foo1="bar1",foo2="bar2"} 1\n'
+          'test_count{foo1="bar1",foo2="bar2"} 1\n' +
+            'test_sum{foo1="bar1",foo2="bar2"} 1\n' +
+            'test{foo1="bar1",foo2="bar2",quantile="0"} 1\n' +
+            'test{foo1="bar1",foo2="bar2",quantile="1"} 1\n'
         );
       });
     });
@@ -291,17 +286,15 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-            '# TYPE test gauge\n' +
-            `test_min{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_max{val="1"} 1 ${mockedHrTimeMs}\n` +
+            '# TYPE test summary\n' +
             `test_count{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_last{val="1"} 1 ${mockedHrTimeMs}\n` +
             `test_sum{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_min{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test_max{val="2"} 1 ${mockedHrTimeMs}\n` +
+            `test{val="1",quantile="0"} 1 ${mockedHrTimeMs}\n` +
+            `test{val="1",quantile="1"} 1 ${mockedHrTimeMs}\n` +
             `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test_last{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{val="2"} 1 ${mockedHrTimeMs}\n`
+            `test_sum{val="2"} 1 ${mockedHrTimeMs}\n` +
+            `test{val="2",quantile="0"} 1 ${mockedHrTimeMs}\n` +
+            `test{val="2",quantile="1"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });
@@ -467,18 +460,3 @@ describe('PrometheusSerializer', () => {
     });
   });
 });
-
-function mockAggregator(Aggregator: any) {
-  let toPoint: () => Point<Sum>;
-  before(() => {
-    toPoint = Aggregator.prototype.toPoint;
-    Aggregator.prototype.toPoint = function (): Point<Sum> {
-      const point = toPoint.apply(this);
-      point.timestamp = mockedHrTime;
-      return point;
-    };
-  });
-  after(() => {
-    Aggregator.prototype.toPoint = toPoint;
-  });
-}
