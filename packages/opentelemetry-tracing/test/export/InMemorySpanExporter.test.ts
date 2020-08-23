@@ -24,13 +24,13 @@ import { context } from '@opentelemetry/api';
 import { ExportResult, setActiveSpan } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
-  const memoryExporter = new InMemorySpanExporter();
-  const provider = new BasicTracerProvider();
-  provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
+  let memoryExporter: InMemorySpanExporter;
+  let provider: BasicTracerProvider;
 
-  afterEach(() => {
-    // reset spans in memory.
-    memoryExporter.reset();
+  beforeEach(() => {
+    memoryExporter = new InMemorySpanExporter();
+    provider = new BasicTracerProvider();
+    provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
   });
 
   it('should get finished spans', () => {

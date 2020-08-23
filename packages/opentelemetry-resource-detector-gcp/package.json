@@ -1,0 +1,64 @@
+{
+  "name": "@opentelemetry/resource-detector-gcp",
+  "version": "0.10.2",
+  "description": "OpenTelemetry SDK resource detector for GCP",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "clean": "rimraf build/*",
+    "precompile": "tsc --version",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "prepare": "npm run compile"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "resources",
+    "stats",
+    "profiling"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/mocha": "8.0.1",
+    "@types/node": "14.0.27",
+    "@types/sinon": "9.0.4",
+    "codecov": "3.7.2",
+    "gts": "2.0.2",
+    "mocha": "7.2.0",
+    "nock": "12.0.3",
+    "nyc": "15.1.0",
+    "rimraf": "3.0.2",
+    "sinon": "9.0.2",
+    "ts-mocha": "7.0.0",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.7"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.10.2",
+    "@opentelemetry/core": "^0.10.2",
+    "@opentelemetry/resources": "^0.10.2",
+    "gcp-metadata": "^3.5.0"
+  }
+}
