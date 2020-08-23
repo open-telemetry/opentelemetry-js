@@ -21,6 +21,7 @@ import {
   MeterProvider,
   Meter,
 } from '@opentelemetry/metrics';
+import { Labels } from '@opentelemetry/api';
 
 describe('PrometheusBatcher', () => {
   let meter: Meter;
@@ -50,6 +51,34 @@ describe('PrometheusBatcher', () => {
       assert.strictEqual(checkPointSet[0].descriptor.name, 'test_counter');
       assert.strictEqual(checkPointSet[0].aggregatorKind, AggregatorKind.SUM);
       assert.strictEqual(checkPointSet[0].records.length, 2);
+    });
+
+    it('should recognize identical labels with different key-insertion order', async () => {
+      const batcher = new PrometheusLabelsBatcher();
+      const counter = meter.createCounter('test_counter') as CounterMetric;
+
+      const label1: Labels = {};
+      label1.key1 = '1';
+      label1.key2 = '2';
+
+      const label2: Labels = {};
+      label2.key2 = '2';
+      label2.key1 = '1';
+
+      counter.bind(label1).add(1);
+      counter.bind(label2).add(1);
+
+      const records = await counter.getMetricRecord();
+      records.forEach(it => batcher.process(it));
+
+      const checkPointSet = batcher.checkPointSet();
+      assert.strictEqual(checkPointSet.length, 1);
+      const checkPoint = checkPointSet[0];
+      assert.strictEqual(checkPoint.descriptor.name, 'test_counter');
+      assert.strictEqual(checkPoint.aggregatorKind, AggregatorKind.SUM);
+      assert.strictEqual(checkPoint.records.length, 1);
+      const record = checkPoint.records[0];
+      assert.strictEqual(record.aggregator.toPoint().value, 2);
     });
   });
 });
