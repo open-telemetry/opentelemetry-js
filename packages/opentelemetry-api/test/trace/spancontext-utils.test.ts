@@ -16,7 +16,7 @@
 
 import * as assert from 'assert';
 import * as context from '../../src/trace/spancontext-utils';
-import { TraceFlags } from '@opentelemetry/api';
+import { TraceFlags } from '../../src';
 
 describe('spancontext-utils', () => {
   it('should return true for valid spancontext', () => {

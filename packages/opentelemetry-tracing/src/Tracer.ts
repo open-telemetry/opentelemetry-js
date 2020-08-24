@@ -20,7 +20,6 @@ import {
   getActiveSpan,
   getParentSpanContext,
   InstrumentationLibrary,
-  isValid,
   NoRecordingSpan,
   IdGenerator,
   RandomIdGenerator,
@@ -73,7 +72,7 @@ export class Tracer implements api.Tracer {
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
-    if (!parentContext || !isValid(parentContext)) {
+    if (!parentContext || !api.isValid(parentContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {

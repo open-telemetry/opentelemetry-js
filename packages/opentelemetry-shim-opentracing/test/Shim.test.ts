@@ -19,13 +19,12 @@ import * as opentracing from 'opentracing';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
 import {
-  INVALID_SPAN_CONTEXT,
   timeInputToHrTime,
   HttpTraceContext,
   CompositePropagator,
   HttpCorrelationContext,
 } from '@opentelemetry/core';
-import { propagation } from '@opentelemetry/api';
+import { INVALID_SPAN_CONTEXT, propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { SpanContext } from './span_context';
+import { TraceFlags } from './trace_flags';
 
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
-
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
+export const INVALID_SPANID = '00000000';
+export const INVALID_TRACEID = '0000000000000000';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,

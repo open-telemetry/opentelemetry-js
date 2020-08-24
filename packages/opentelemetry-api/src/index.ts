@@ -41,6 +41,7 @@ export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
 export * from './trace/Sampler';
 export * from './trace/SamplingResult';
+export * from './trace/spancontext-utils';
 export * from './trace/span_context';
 export * from './trace/span_kind';
 export * from './trace/span';
