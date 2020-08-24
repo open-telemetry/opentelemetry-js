@@ -1,12 +1,8 @@
 {
-  "name": "@opentelemetry/resources",
+  "name": "@opentelemetry/resource-detector-aws",
   "version": "0.10.2",
-  "description": "OpenTelemetry SDK resources",
+  "description": "OpenTelemetry SDK resource detector for AWS",
   "main": "build/src/index.js",
-  "browser": {
-    "./src/platform/index.ts": "./src/platform/browser/index.ts",
-    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
-  },
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
   "scripts": {
@@ -45,7 +41,7 @@
     "access": "public"
   },
   "devDependencies": {
-    "@types/mocha": "8.0.2",
+    "@types/mocha": "8.0.1",
     "@types/node": "14.0.27",
     "@types/sinon": "9.0.4",
     "codecov": "3.7.2",
@@ -54,13 +50,14 @@
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.3",
+    "sinon": "9.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/core": "^0.10.2"
+    "@opentelemetry/core": "^0.10.2",
+    "@opentelemetry/resources": "^0.10.2"
   }
 }

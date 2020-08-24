@@ -11,6 +11,11 @@ jobs:
     steps:
       - name: Checkout 🛎️
         uses: actions/checkout@v2
+        with:
+          # Fetch all history (needed for lerna / semantic release to correctly version)
+          fetch-depth: 0
+      # pulls all tags (needed for lerna / semantic release to correctly version)
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
       - name: Set up Node.js
         uses: actions/setup-node@master
         with:
@@ -35,6 +40,9 @@ jobs:
           npx lerna bootstrap --no-ci
 
       - name: Publish
-        run: npx lerna publish --canary --dist-tag canary --preid canary --yes
+        run: npx lerna publish --canary --yes
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Push new version tag to github
+      - run: git push --tags

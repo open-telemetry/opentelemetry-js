@@ -138,10 +138,10 @@ Note, that this will only work if TLS is also configured on the server.
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
+const { CollectorExporter, CollectorProtocolNode } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
-  protocolNode: CollectorTransportNode.HTTP_JSON,
+  protocolNode: CollectorProtocolNode.HTTP_JSON,
   serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {
@@ -161,10 +161,10 @@ provider.register();
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter, CollectorTransportNode } =  require('@opentelemetry/exporter-collector');
+const { CollectorExporter, CollectorProtocolNode } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
-  protocolNode: CollectorTransportNode.HTTP_PROTO,
+  protocolNode: CollectorProtocolNode.HTTP_PROTO,
   serviceName: 'basic-service',
   url: '<opentelemetry-collector-url>', // url is optional and can be omitted - default is http://localhost:55681/v1/trace
   headers: {

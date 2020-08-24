@@ -18,9 +18,16 @@ import { HttpTextPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
-import { detectResources, Resource } from '@opentelemetry/resources';
+import {
+  detectResources,
+  Resource,
+  ResourceDetectionConfig,
+  envDetector,
+} from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
+import { awsEc2Detector } from '@opentelemetry/resource-detector-aws';
+import { gcpDetector } from '@opentelemetry/resource-detector-gcp';
 
 /** This class represents everything needed to register a fully configured OpenTelemetry Node.js SDK */
 export class NodeSDK {
@@ -119,8 +126,13 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources() {
-    this.addResource(await detectResources());
+  public async detectResources(config?: ResourceDetectionConfig) {
+    const internalConfig: ResourceDetectionConfig = {
+      detectors: [awsEc2Detector, gcpDetector, envDetector],
+      ...config,
+    };
+
+    this.addResource(await detectResources(internalConfig));
   }
 
   /** Manually add a resource */

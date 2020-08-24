@@ -29,6 +29,8 @@ import {
   grpcStatusCodeToSpanStatus,
   grpcStatusCodeToCanonicalCode,
   CALL_SPAN_ENDED,
+  containsOtelMetadata,
+  methodIsIgnored,
 } from '../utils';
 import { EventEmitter } from 'events';
 
@@ -37,6 +39,7 @@ import { EventEmitter } from 'events';
  * with both possible casings e.g. "TestMethod" & "testMethod"
  */
 export function getMethodsToWrap(
+  this: GrpcJsPlugin,
   client: typeof grpcJs.Client,
   methods: { [key: string]: { originalName?: string } }
 ): string[] {
@@ -44,15 +47,17 @@ export function getMethodsToWrap(
 
   // For a method defined in .proto as "UnaryMethod"
   Object.entries(methods).forEach(([name, { originalName }]) => {
-    methodList.push(name); // adds camel case method name: "unaryMethod"
-    if (
-      originalName &&
-      // eslint-disable-next-line no-prototype-builtins
-      client.prototype.hasOwnProperty(originalName) &&
-      name !== originalName // do not add duplicates
-    ) {
-      // adds original method name: "UnaryMethod",
-      methodList.push(originalName);
+    if (!methodIsIgnored(name, this._config.ignoreGrpcMethods)) {
+      methodList.push(name); // adds camel case method name: "unaryMethod"
+      if (
+        originalName &&
+        // eslint-disable-next-line no-prototype-builtins
+        client.prototype.hasOwnProperty(originalName) &&
+        name !== originalName // do not add duplicates
+      ) {
+        // adds original method name: "UnaryMethod",
+        methodList.push(originalName);
+      }
     }
   });
 
@@ -71,11 +76,15 @@ export function getPatchedClientMethods(
     return function clientMethodTrace(this: grpcJs.Client) {
       const name = `grpc.${original.path.replace('/', '')}`;
       const args = [...arguments];
+      const metadata = getMetadata.call(plugin, original, args);
+      if (containsOtelMetadata(metadata)) {
+        return original.apply(this, args);
+      }
       const span = plugin.tracer.startSpan(name, {
         kind: SpanKind.CLIENT,
       });
       return plugin.tracer.withSpan(span, () =>
-        makeGrpcClientRemoteCall(original, args, this, plugin)(span)
+        makeGrpcClientRemoteCall(original, args, metadata, this, plugin)(span)
       );
     };
   };
@@ -88,6 +97,7 @@ export function getPatchedClientMethods(
 export function makeGrpcClientRemoteCall(
   original: GrpcClientFunc,
   args: unknown[],
+  metadata: grpcJs.Metadata,
   self: grpcJs.Client,
   plugin: GrpcJsPlugin
 ): (span: Span) => EventEmitter {
@@ -127,7 +137,6 @@ export function makeGrpcClientRemoteCall(
   }
 
   return (span: Span) => {
-    const metadata = getMetadata.call(plugin, original, args);
     // if unary or clientStream
     if (!original.responseStream) {
       const callbackFuncIndex = args.findIndex(arg => {
