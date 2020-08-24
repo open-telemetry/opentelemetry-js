@@ -131,7 +131,7 @@ export class NoopMetric<T> implements UnboundMetric<T> {
   }
 }
 
- export class NoopCounterMetric
+export class NoopCounterMetric
   extends NoopMetric<BoundCounter>
   implements Counter {
   add(value: number, labels: Labels) {
