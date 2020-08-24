@@ -57,7 +57,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
   describe('export', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -86,6 +86,11 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
       metrics[3].aggregator.update(5);
+
+      // due to lazy loading ensure to wait to next tick
+      setImmediate(() => {
+        done();
+      });
     });
     afterEach(() => {
       spyRequest.restore();

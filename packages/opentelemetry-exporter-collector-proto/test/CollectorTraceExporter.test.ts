@@ -51,7 +51,7 @@ describe('CollectorExporter - node with proto over http', () => {
   let spyWrite: sinon.SinonSpy;
   let spans: ReadableSpan[];
   describe('export', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -67,6 +67,11 @@ describe('CollectorExporter - node with proto over http', () => {
       collectorExporter = new CollectorTraceExporter(collectorExporterConfig);
       spans = [];
       spans.push(Object.assign({}, mockedReadableSpan));
+
+      // due to lazy loading ensure to wait to next tick
+      setImmediate(() => {
+        done();
+      });
     });
     afterEach(() => {
       spyRequest.restore();
