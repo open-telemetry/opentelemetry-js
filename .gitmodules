@@ -1,3 +1,6 @@
-[submodule "packages/opentelemetry-exporter-collector/src/platform/node/protos"]
-	path = packages/opentelemetry-exporter-collector/src/platform/node/protos
+[submodule "packages/opentelemetry-exporter-collector-grpc/protos"]
+	path = packages/opentelemetry-exporter-collector-grpc/protos
+	url = https://github.com/open-telemetry/opentelemetry-proto.git
+[submodule "packages/opentelemetry-exporter-collector-proto/protos"]
+	path = packages/opentelemetry-exporter-collector-proto/protos
 	url = https://github.com/open-telemetry/opentelemetry-proto.git
