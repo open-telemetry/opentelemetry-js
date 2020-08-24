@@ -16,8 +16,11 @@
 
 import * as grpcModule from 'grpc';
 import * as events from 'events';
+import { PluginConfig } from '@opentelemetry/api';
 
 export type grpc = typeof grpcModule;
+
+export type IgnoreMatcher = string | RegExp | ((str: string) => boolean);
 
 export type SendUnaryDataCallback = (
   error: grpcModule.ServiceError | null,
@@ -26,8 +29,12 @@ export type SendUnaryDataCallback = (
   flags?: grpcModule.writeFlags
 ) => void;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface GrpcPluginOptions {}
+export interface GrpcPluginOptions extends PluginConfig {
+  /* Omits tracing on any gRPC methods that match any of
+   * the IgnoreMatchers in the ignoreGrpcMethods list
+   */
+  ignoreGrpcMethods?: IgnoreMatcher[];
+}
 
 interface GrpcStatus {
   code: number;

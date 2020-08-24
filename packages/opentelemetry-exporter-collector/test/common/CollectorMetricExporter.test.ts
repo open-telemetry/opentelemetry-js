@@ -63,8 +63,8 @@ describe('CollectorMetricExporter - common', () => {
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       metrics = [];
-      metrics.push(Object.assign({}, mockCounter));
-      metrics.push(Object.assign({}, mockObserver));
+      metrics.push(mockCounter());
+      metrics.push(mockObserver());
     });
 
     afterEach(() => {

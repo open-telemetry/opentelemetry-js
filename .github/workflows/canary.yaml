@@ -1,0 +1,48 @@
+name: Deploy Canary Release
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v2
+        with:
+          # Fetch all history (needed for lerna / semantic release to correctly version)
+          fetch-depth: 0
+      # pulls all tags (needed for lerna / semantic release to correctly version)
+      - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/*
+      - name: Set up Node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 14.x
+          registry-url: https://registry.npmjs.org
+          scope: '@opentelemetry'
+
+      - name: restore lerna
+        uses: actions/cache@master # must use unreleased master to cache multiple paths
+        id: cache
+        with:
+          path: |
+            node_modules
+            packages/*/node_modules
+            metapackages/*/node_modules
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
+
+      - name: Install and Build 🔧
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          npm install --ignore-scripts
+          npx lerna bootstrap --no-ci
+
+      - name: Publish
+        run: npx lerna publish --canary --yes
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # Push new version tag to github
+      - run: git push --tags

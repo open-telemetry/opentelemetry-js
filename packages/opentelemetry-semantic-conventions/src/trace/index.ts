@@ -18,4 +18,5 @@ export * from './database';
 export * from './exception';
 export * from './general';
 export * from './http';
+export * from './os';
 export * from './rpc';

@@ -23,16 +23,16 @@ import {
   resetIsAvailableCache,
 } from 'gcp-metadata';
 import * as nock from 'nock';
-import { Resource } from '../../src';
-import { gcpDetector } from '../../src/platform/node/detectors';
+import { gcpDetector } from '../../src';
 import {
   assertCloudResource,
   assertHostResource,
   assertK8sResource,
   assertContainerResource,
   assertEmptyResource,
-} from '../util/resource-assertions';
+} from '@opentelemetry/resources/test/util/resource-assertions';
 import { NoopLogger } from '@opentelemetry/core';
+import { Resource } from '@opentelemetry/resources';
 
 const HEADERS = {
   [HEADER_NAME.toLowerCase()]: HEADER_VALUE,
@@ -95,7 +95,7 @@ describe('gcpDetector', () => {
       assertHostResource(resource, { id: '4520031799277582000' });
     });
 
-    it('should populate K8s labels resource when KUBERNETES_SERVICE_HOST is set', async () => {
+    it('should populate K8s attributes when KUBERNETES_SERVICE_HOST is set', async () => {
       process.env.KUBERNETES_SERVICE_HOST = 'my-host';
       process.env.NAMESPACE = 'my-namespace';
       process.env.HOSTNAME = 'my-hostname';

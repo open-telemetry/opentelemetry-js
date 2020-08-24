@@ -68,10 +68,11 @@ export class TraceState implements api.TraceState {
       .split(LIST_MEMBERS_SEPARATOR)
       .reverse() // Store in reverse so new keys (.set(...)) will be placed at the beginning
       .reduce((agg: Map<string, string>, part: string) => {
-        const i = part.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
+        const listMember = part.trim(); // Optional Whitespace (OWS) handling
+        const i = listMember.indexOf(LIST_MEMBER_KEY_VALUE_SPLITTER);
         if (i !== -1) {
-          const key = part.slice(0, i);
-          const value = part.slice(i + 1, part.length);
+          const key = listMember.slice(0, i);
+          const value = listMember.slice(i + 1, part.length);
           if (validateKey(key) && validateValue(value)) {
             agg.set(key, value);
           } else {

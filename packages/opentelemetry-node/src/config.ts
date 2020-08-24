@@ -38,4 +38,6 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   ioredis: { enabled: true, path: '@opentelemetry/plugin-ioredis' },
   'pg-pool': { enabled: true, path: '@opentelemetry/plugin-pg-pool' },
   express: { enabled: true, path: '@opentelemetry/plugin-express' },
+  '@hapi/hapi': { enabled: true, path: '@opentelemetry/hapi-instrumentation' },
+  koa: { enabled: true, path: '@opentelemetry/koa-instrumentation' },
 };
