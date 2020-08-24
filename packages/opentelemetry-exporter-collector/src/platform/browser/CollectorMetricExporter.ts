@@ -15,12 +15,12 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
+import { CollectorExporterConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
 import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
-import { CollectorExporterConfigBrowser } from './types';
 
-const DEFAULT_COLLECTOR_URL = 'http://localhost:55680/v1/metrics';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
 
 /**
@@ -45,11 +45,11 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBrowser): string {
+  getDefaultUrl(config: CollectorExporterConfigBase): string {
     return config.url || DEFAULT_COLLECTOR_URL;
   }
 
-  getDefaultServiceName(config: CollectorExporterConfigBrowser): string {
+  getDefaultServiceName(config: CollectorExporterConfigBase): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 }

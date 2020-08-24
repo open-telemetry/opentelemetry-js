@@ -15,16 +15,18 @@
  */
 
 import * as protoLoader from '@grpc/proto-loader';
+import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as grpc from 'grpc';
 import * as path from 'path';
-import { ServiceClientType } from '../../types';
-import * as collectorTypes from '../../types';
 
-import { CollectorExporterConfigNode, GRPCQueueItem } from './types';
-import { removeProtocol } from './util';
+import {
+  CollectorExporterConfigNode,
+  GRPCQueueItem,
+  ServiceClientType,
+} from './types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
-export function initWithGrpc<ExportItem, ServiceRequest>(
+export function onInit<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   config: CollectorExporterConfigNode
 ): void {
@@ -33,7 +35,7 @@ export function initWithGrpc<ExportItem, ServiceRequest>(
   const credentials: grpc.ChannelCredentials =
     config.credentials || grpc.credentials.createInsecure();
 
-  const includeDirs = [path.resolve(__dirname, 'protos')];
+  const includeDirs = [path.resolve(__dirname, '..', 'protos')];
 
   protoLoader
     .load(collector.getServiceProtoPath(), {
@@ -68,7 +70,7 @@ export function initWithGrpc<ExportItem, ServiceRequest>(
     });
 }
 
-export function sendWithGrpc<ExportItem, ServiceRequest>(
+export function send<ExportItem, ServiceRequest>(
   collector: CollectorExporterNodeBase<ExportItem, ServiceRequest>,
   objects: ExportItem[],
   onSuccess: () => void,
@@ -97,4 +99,8 @@ export function sendWithGrpc<ExportItem, ServiceRequest>(
       onError,
     });
   }
+}
+
+function removeProtocol(url: string): string {
+  return url.replace(/^https?:\/\//, '');
 }
