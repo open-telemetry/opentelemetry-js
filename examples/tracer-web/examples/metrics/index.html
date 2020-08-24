@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>Metrics Example</title>
+  <base href="/">
+
+  <!--
+    https://www.w3.org/TR/trace-context/
+    Set the `traceparent` in the server's HTML template code. It should be
+    dynamically generated server side to have the server's request trace Id,
+    a parent span Id that was set on the server's request span, and the trace
+    flags to indicate the server's sampling decision
+    (01 = sampled, 00 = notsampled).
+    '{version}-{traceId}-{spanId}-{sampleDecision}'
+  -->
+<!--  <meta name="traceparent" content="00-ab42124a3c573678d4d8b21ba52df3bf-d21f7bc17caa5aba-01">-->
+
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+  Example of using metrics with Collector Exporter
+  <script type="text/javascript" src="metrics.js"></script>
+  <br/>
+  <button id="startBtn">Start metrics</button>
+  <button id="stopBtn">Stop metrics</button>
+  <br/>
+
+If you run the collector from example "opentelemetry-exporter-collector" you should see traces at: <br/>
+<a href="http://localhost:9090/graph?g0.range_input=1m&g0.expr=requests&g0.tab=0/" target="_blank">http://localhost:9090/</a>
+
+</body>
+
+</html>
