@@ -21,26 +21,7 @@ import { TraceState } from './trace_state';
  * A SpanContext represents the portion of a {@link Span} which must be
  * serialized and propagated along side of a {@link CorrelationContext}.
  */
-export class SpanContext {
-  constructor({
-    traceId,
-    spanId,
-    isRemote,
-    traceFlags,
-    traceState,
-  }: {
-    traceId: string;
-    spanId: string;
-    isRemote?: boolean;
-    traceFlags: TraceFlags;
-    traceState?: TraceState;
-  }) {
-    this.traceId = traceId;
-    this.spanId = spanId;
-    this.isRemote = isRemote;
-    this.traceFlags = traceFlags;
-    this.traceState = traceState;
-  }
+export interface SpanContext {
   /**
    * The ID of the trace that this span belongs to. It is worldwide unique
    * with practically sufficient probability by being made as 16 randomly
@@ -86,19 +67,4 @@ export class SpanContext {
    *         tracestate: rojo=00f067aa0ba902b7,congo=t61rcWkgMzE
    */
   traceState?: TraceState;
-
-  /**
-   * A function that determines whether the span context is valid
-   */
-  isValid(): boolean {
-    return this.traceId !== INVALID_TRACEID && this.spanId !== INVALID_SPANID;
-  }
 }
-
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
-export const INVALID_SPAN_CONTEXT: SpanContext = new SpanContext({
-  traceId: INVALID_TRACEID,
-  spanId: INVALID_SPANID,
-  traceFlags: TraceFlags.NONE,
-});

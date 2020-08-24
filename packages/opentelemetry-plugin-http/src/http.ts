@@ -61,11 +61,11 @@ export class HttpPlugin extends BasePlugin<Http> {
   /** keep track on spans not ended */
   private readonly _spanNotEnded: WeakSet<Span>;
 
-  private readonly _emptySpanContext: SpanContext = new SpanContext({
+  private readonly _emptySpanContext: SpanContext = {
     traceId: '',
     spanId: '',
     traceFlags: TraceFlags.NONE,
-  });
+  };
 
   constructor(readonly moduleName: string, readonly version: string) {
     super(`@opentelemetry/plugin-${moduleName}`, VERSION);

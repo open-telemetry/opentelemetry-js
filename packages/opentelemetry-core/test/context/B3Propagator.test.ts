@@ -48,11 +48,11 @@ describe('B3Propagator', () => {
 
   describe('.inject()', () => {
     it('should set b3 traceId and spanId headers', () => {
-      const spanContext: SpanContext = new SpanContext({
+      const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.SAMPLED,
-      });
+      };
 
       b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
@@ -70,13 +70,13 @@ describe('B3Propagator', () => {
     });
 
     it('should set b3 traceId and spanId headers - ignore tracestate', () => {
-      const spanContext: SpanContext = new SpanContext({
+      const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
         traceState: new TraceState('foo=bar,baz=qux'),
         isRemote: false,
-      });
+      };
 
       b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, spanContext),
@@ -94,11 +94,11 @@ describe('B3Propagator', () => {
     });
 
     it('should set flags headers', () => {
-      const spanContext: SpanContext = new SpanContext({
+      const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
-      });
+      };
       const contextWithDebug = Context.ROOT_CONTEXT.setValue(
         DEBUG_FLAG_KEY,
         '1'
@@ -120,11 +120,11 @@ describe('B3Propagator', () => {
     });
 
     it('should set parentSpanId headers', () => {
-      const spanContext: SpanContext = new SpanContext({
+      const spanContext: SpanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
-      });
+      };
 
       const contextWithParentSpanId = Context.ROOT_CONTEXT.setValue(
         PARENT_SPAN_ID_KEY,
@@ -146,11 +146,11 @@ describe('B3Propagator', () => {
     });
 
     it('should not inject empty spancontext', () => {
-      const emptySpanContext = new SpanContext({
+      const emptySpanContext = {
         traceId: '',
         spanId: '',
         traceFlags: TraceFlags.NONE,
-      });
+      };
       b3Propagator.inject(
         setExtractedSpanContext(Context.ROOT_CONTEXT, emptySpanContext),
         carrier,
@@ -173,15 +173,12 @@ describe('B3Propagator', () => {
         defaultGetter
       );
       const extractedSpanContext = getExtractedSpanContext(context);
-      assert.deepStrictEqual(
-        extractedSpanContext,
-        new SpanContext({
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.NONE,
-        })
-      );
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
       assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
     });
@@ -199,15 +196,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.SAMPLED,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -225,15 +219,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.SAMPLED,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -251,15 +242,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.NONE,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -279,15 +267,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.SAMPLED,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
           assert.strictEqual(context.getValue(DEBUG_FLAG_KEY), '1');
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -308,15 +293,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.SAMPLED,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -335,15 +317,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.NONE,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -362,15 +341,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.NONE,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -389,15 +365,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.NONE,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.NONE,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
           assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
         });
@@ -418,15 +391,12 @@ describe('B3Propagator', () => {
         );
         const extractedSpanContext = getExtractedSpanContext(context);
 
-        assert.deepStrictEqual(
-          extractedSpanContext,
-          new SpanContext({
-            spanId: 'b7ad6b7169203331',
-            traceId: '0af7651916cd43dd8448eb211c80319c',
-            isRemote: true,
-            traceFlags: TraceFlags.SAMPLED,
-          })
-        );
+        assert.deepStrictEqual(extractedSpanContext, {
+          spanId: 'b7ad6b7169203331',
+          traceId: '0af7651916cd43dd8448eb211c80319c',
+          isRemote: true,
+          traceFlags: TraceFlags.SAMPLED,
+        });
         assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
         assert.equal(context.getValue(PARENT_SPAN_ID_KEY), 'f4592dc481026a8c');
       });
@@ -445,15 +415,12 @@ describe('B3Propagator', () => {
           );
           const extractedSpanContext = getExtractedSpanContext(context);
 
-          assert.deepStrictEqual(
-            extractedSpanContext,
-            new SpanContext({
-              spanId: 'b7ad6b7169203331',
-              traceId: '0af7651916cd43dd8448eb211c80319c',
-              isRemote: true,
-              traceFlags: TraceFlags.SAMPLED,
-            })
-          );
+          assert.deepStrictEqual(extractedSpanContext, {
+            spanId: 'b7ad6b7169203331',
+            traceId: '0af7651916cd43dd8448eb211c80319c',
+            isRemote: true,
+            traceFlags: TraceFlags.SAMPLED,
+          });
           assert.equal(context.getValue(DEBUG_FLAG_KEY), '1');
           assert.equal(
             context.getValue(PARENT_SPAN_ID_KEY),
@@ -553,15 +520,12 @@ describe('B3Propagator', () => {
         defaultGetter
       );
       const extractedSpanContext = getExtractedSpanContext(context);
-      assert.deepStrictEqual(
-        extractedSpanContext,
-        new SpanContext({
-          spanId: 'b7ad6b7169203331',
-          traceId: '0af7651916cd43dd8448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
-        })
-      );
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '0af7651916cd43dd8448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
       assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
     });
@@ -645,15 +609,12 @@ describe('B3Propagator', () => {
       );
       const extractedSpanContext = getExtractedSpanContext(context);
 
-      assert.deepStrictEqual(
-        extractedSpanContext,
-        new SpanContext({
-          spanId: 'b7ad6b7169203331',
-          traceId: '00000000000000008448eb211c80319c',
-          isRemote: true,
-          traceFlags: TraceFlags.SAMPLED,
-        })
-      );
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'b7ad6b7169203331',
+        traceId: '00000000000000008448eb211c80319c',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
       assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
       assert.equal(context.getValue(PARENT_SPAN_ID_KEY), undefined);
     });

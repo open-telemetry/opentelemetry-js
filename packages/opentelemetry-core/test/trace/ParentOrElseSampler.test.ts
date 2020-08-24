@@ -17,7 +17,7 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
 import { ParentOrElseSampler } from '../../src/trace/sampler/ParentOrElseSampler';
-import { TraceFlags, SpanKind, SpanContext } from '@opentelemetry/api';
+import { TraceFlags, SpanKind } from '@opentelemetry/api';
 import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
 import { ProbabilitySampler } from '../../src';
 
@@ -43,11 +43,11 @@ describe('ParentOrElseSampler', () => {
   it('should return api.SamplingDecision.NOT_RECORD for not sampled parent while composited with AlwaysOnSampler', () => {
     const sampler = new ParentOrElseSampler(new AlwaysOnSampler());
 
-    const spanContext = new SpanContext({
+    const spanContext = {
       traceId,
       spanId,
       traceFlags: TraceFlags.NONE,
-    });
+    };
     assert.deepStrictEqual(
       sampler.shouldSample(
         spanContext,
@@ -84,11 +84,11 @@ describe('ParentOrElseSampler', () => {
   it('should return api.SamplingDecision.RECORD_AND_SAMPLED for sampled parent while composited with AlwaysOffSampler', () => {
     const sampler = new ParentOrElseSampler(new AlwaysOffSampler());
 
-    const spanContext = new SpanContext({
+    const spanContext = {
       traceId,
       spanId,
       traceFlags: TraceFlags.SAMPLED,
-    });
+    };
     assert.deepStrictEqual(
       sampler.shouldSample(
         spanContext,

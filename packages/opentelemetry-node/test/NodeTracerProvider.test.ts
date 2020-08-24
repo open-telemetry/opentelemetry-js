@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { context, SpanContext, TraceFlags } from '@opentelemetry/api';
+import { context, TraceFlags } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
@@ -164,11 +164,11 @@ describe('NodeTracerProvider', () => {
       const sampledParent = provider
         .getTracer('default')
         .startSpan('not-sampled-span', {
-          parent: new SpanContext({
+          parent: {
             traceId: 'd4cda95b652f4a1592b449d5929fda1b',
             spanId: '6e0c63257de34c92',
             traceFlags: TraceFlags.NONE,
-          }),
+          },
         });
       assert.ok(sampledParent instanceof Span);
       assert.strictEqual(

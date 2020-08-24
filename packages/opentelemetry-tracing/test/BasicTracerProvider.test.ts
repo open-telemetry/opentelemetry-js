@@ -177,15 +177,12 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(
-          Context.ROOT_CONTEXT,
-          new SpanContext({
-            traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-            spanId: '6e0c63257de34c92',
-            traceFlags: TraceFlags.SAMPLED,
-            traceState: state,
-          })
-        )
+        setExtractedSpanContext(Context.ROOT_CONTEXT, {
+          traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+          spanId: '6e0c63257de34c92',
+          traceFlags: TraceFlags.SAMPLED,
+          traceState: state,
+        })
       );
       assert.ok(span instanceof Span);
       const context = span.context();
@@ -280,14 +277,11 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(
-          Context.ROOT_CONTEXT,
-          new SpanContext({
-            traceId: '0',
-            spanId: '0',
-            traceFlags: TraceFlags.SAMPLED,
-          })
-        )
+        setExtractedSpanContext(Context.ROOT_CONTEXT, {
+          traceId: '0',
+          spanId: '0',
+          traceFlags: TraceFlags.SAMPLED,
+        })
       );
       assert.ok(span instanceof Span);
       const context = span.context();

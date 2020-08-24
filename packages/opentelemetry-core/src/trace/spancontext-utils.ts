@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import { SpanContext, NoopSpan } from '@opentelemetry/api';
-import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
+import { SpanContext, TraceFlags } from '@opentelemetry/api';
+
+export const INVALID_SPANID = '0';
+export const INVALID_TRACEID = '0';
+export const INVALID_SPAN_CONTEXT: SpanContext = {
+  traceId: INVALID_TRACEID,
+  spanId: INVALID_SPANID,
+  traceFlags: TraceFlags.NONE,
+};
 
 /**
- * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-op
- * except context propagation.
+ * Returns true if this {@link SpanContext} is valid.
+ * @return true if this {@link SpanContext} is valid.
  */
-export class NoRecordingSpan extends NoopSpan {
-  private readonly _context: SpanContext;
-
-  constructor(spanContext: SpanContext) {
-    super(spanContext);
-    this._context = spanContext || INVALID_SPAN_CONTEXT;
-  }
-
-  // Returns a SpanContext.
-  context(): SpanContext {
-    return this._context;
-  }
+export function isValid(spanContext: SpanContext): boolean {
+  return (
+    spanContext.traceId !== INVALID_TRACEID &&
+    spanContext.spanId !== INVALID_SPANID
+  );
 }

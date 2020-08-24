@@ -20,6 +20,7 @@ import {
   getActiveSpan,
   getParentSpanContext,
   InstrumentationLibrary,
+  isValid,
   NoRecordingSpan,
   IdGenerator,
   RandomIdGenerator,
@@ -72,7 +73,7 @@ export class Tracer implements api.Tracer {
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
-    if (!parentContext || !parentContext.isValid || !parentContext.isValid()) {
+    if (!parentContext || !isValid(parentContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {
@@ -97,12 +98,7 @@ export class Tracer implements api.Tracer {
       samplingResult.decision === api.SamplingDecision.RECORD_AND_SAMPLED
         ? api.TraceFlags.SAMPLED
         : api.TraceFlags.NONE;
-    const spanContext = new api.SpanContext({
-      traceId,
-      spanId,
-      traceFlags,
-      traceState,
-    });
+    const spanContext = { traceId, spanId, traceFlags, traceState };
     if (samplingResult.decision === api.SamplingDecision.NOT_RECORD) {
       this.logger.debug('Recording is off, starting no recording span');
       return new NoRecordingSpan(spanContext);

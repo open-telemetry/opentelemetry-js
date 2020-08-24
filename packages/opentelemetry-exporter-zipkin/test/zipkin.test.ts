@@ -38,11 +38,11 @@ function getReadableSpan() {
   const readableSpan: ReadableSpan = {
     name: 'my-span',
     kind: api.SpanKind.INTERNAL,
-    spanContext: new api.SpanContext({
+    spanContext: {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
-    }),
+    },
     startTime: [startTime, 0],
     endTime: [startTime + duration, 0],
     ended: true,
@@ -152,11 +152,11 @@ describe('ZipkinExporter', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,
@@ -182,11 +182,11 @@ describe('ZipkinExporter', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,
@@ -364,11 +364,11 @@ describe('ZipkinExporter', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,
@@ -394,11 +394,11 @@ describe('ZipkinExporter', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,
@@ -436,11 +436,11 @@ describe('ZipkinExporter', () => {
         name: 'my-span',
         kind: api.SpanKind.INTERNAL,
         parentSpanId,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,
@@ -468,11 +468,11 @@ describe('ZipkinExporter', () => {
       const span2: ReadableSpan = {
         name: 'my-span',
         kind: api.SpanKind.SERVER,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [startTime, 0],
         endTime: [startTime + duration, 0],
         ended: true,

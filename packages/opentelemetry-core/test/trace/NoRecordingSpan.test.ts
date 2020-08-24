@@ -16,15 +16,15 @@
 
 import * as assert from 'assert';
 import { NoRecordingSpan } from '../../src/trace/NoRecordingSpan';
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import { TraceFlags } from '@opentelemetry/api';
 
 describe('NoRecordingSpan', () => {
   it('propagates span contexts', () => {
-    const spanContext = new SpanContext({
+    const spanContext = {
       traceId: 'd4cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
-    });
+    };
 
     const span = new NoRecordingSpan(spanContext);
     assert.strictEqual(span.context(), spanContext);

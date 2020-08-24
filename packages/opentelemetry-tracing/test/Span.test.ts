@@ -38,11 +38,11 @@ describe('Span', () => {
     logger: new NoopLogger(),
   }).getTracer('default');
   const name = 'span1';
-  const spanContext: SpanContext = new SpanContext({
+  const spanContext: SpanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
     traceFlags: TraceFlags.SAMPLED,
-  });
+  };
   const linkContext: LinkContext = {
     traceId: 'e4cda95b652f4a1592b449d5929fda1b',
     spanId: '7e0c63257de34c92',
@@ -169,11 +169,11 @@ describe('Span', () => {
   });
 
   it('should set a link', () => {
-    const spanContext: SpanContext = new SpanContext({
+    const spanContext: SpanContext = {
       traceId: 'a3cda95b652f4a1592b449d5929fda1b',
       spanId: '5e0c63257de34c92',
       traceFlags: TraceFlags.SAMPLED,
-    });
+    };
     const linkContext: LinkContext = {
       traceId: 'b3cda95b652f4a1592b449d5929fda1b',
       spanId: '6e0c63257de34c92',

@@ -24,11 +24,11 @@ import { hrTimeToMicroseconds } from '@opentelemetry/core';
 import { TraceFlags } from '@opentelemetry/api';
 
 describe('transform', () => {
-  const spanContext = new api.SpanContext({
+  const spanContext = {
     traceId: 'd4cda95b652f4a1592b449d5929fda1b',
     spanId: '6e0c63257de34c92',
     traceFlags: TraceFlags.NONE,
-  });
+  };
 
   describe('spanToThrift', () => {
     it('should convert an OpenTelemetry span to a Thrift', () => {
@@ -268,11 +268,11 @@ describe('transform', () => {
       const readableSpan: ReadableSpan = {
         name: 'my-span1',
         kind: api.SpanKind.CLIENT,
-        spanContext: new api.SpanContext({
+        spanContext: {
           traceId: '92b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.NONE,
-        }),
+        },
         startTime: [1566156729, 709],
         endTime: [1566156731, 709],
         ended: true,
