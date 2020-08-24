@@ -16,6 +16,9 @@
 import { SpanContext } from './span_context';
 import { TraceFlags } from './trace_flags';
 
+const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
+const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
+const INVALID_ID_REGEX = /^0+$/i;
 export const INVALID_SPANID = '0000000000000000';
 export const INVALID_TRACEID = '00000000000000000000000000000000';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
@@ -24,13 +27,20 @@ export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceFlags: TraceFlags.NONE,
 };
 
+export function isValidTraceId(traceId: string): boolean {
+  return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
+}
+
+export function isValidSpanId(spanId: string): boolean {
+  return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
+}
+
 /**
  * Returns true if this {@link SpanContext} is valid.
  * @return true if this {@link SpanContext} is valid.
  */
 export function isValid(spanContext: SpanContext): boolean {
   return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
+    isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId)
   );
 }
