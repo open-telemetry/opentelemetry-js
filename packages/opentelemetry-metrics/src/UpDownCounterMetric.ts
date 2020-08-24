@@ -23,7 +23,8 @@ import { Batcher } from './export/Batcher';
 import { Metric } from './Metric';
 
 /** This is a SDK implementation of UpDownCounter Metric. */
-export class UpDownCounterMetric extends Metric<BoundUpDownCounter>
+export class UpDownCounterMetric
+  extends Metric<BoundUpDownCounter>
   implements api.UpDownCounter {
   constructor(
     name: string,
