@@ -16,8 +16,8 @@
 import { SpanContext } from './span_context';
 import { TraceFlags } from './trace_flags';
 
-export const INVALID_SPANID = '00000000';
-export const INVALID_TRACEID = '0000000000000000';
+export const INVALID_SPANID = '0000000000000000';
+export const INVALID_TRACEID = '00000000000000000000000000000000';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
