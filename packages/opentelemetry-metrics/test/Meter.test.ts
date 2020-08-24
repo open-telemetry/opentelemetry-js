@@ -41,6 +41,35 @@ import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
+import { ValueType } from '@opentelemetry/api';
+
+const nonNumberValues = [
+  // type undefined
+  undefined,
+  // type null
+  null,
+  // type function
+  function () {},
+  // type boolean
+  true,
+  false,
+  // type string
+  '1',
+  // type object
+  {},
+  // type symbol
+  // symbols cannot be cast to number, early errors will be thrown.
+];
+
+if (Number(process.versions.node.match(/^\d+/)) >= 10) {
+  nonNumberValues.push(
+    // type bigint
+    // Preferring BigInt builtin object instead of bigint literal to keep Node.js v8.x working.
+    // TODO: should metric instruments support bigint?
+    // @ts-ignore
+    BigInt(1) // eslint-disable-line node/no-unsupported-features/es-builtins
+  );
+}
 
 describe('Meter', () => {
   let meter: Meter;
@@ -374,6 +403,56 @@ describe('Meter', () => {
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
         assert.strictEqual(boundCounter, boundCounter1);
       });
+
+      it('should truncate non-integer values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.INT,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        [-1.1, 2.2].forEach(val => {
+          boundCounter.add(val);
+        });
+        await meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 1);
+      });
+
+      it('should ignore non-number values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundCounter.add(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
+      });
+
+      it('should ignore non-number values for DOUBLE valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundCounter.add(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
+      });
     });
 
     describe('.unbind()', () => {
@@ -650,6 +729,33 @@ describe('Meter', () => {
           }
         );
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
+      });
+
+      it('should ignore non-number values', async () => {
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundValueRecorder.record(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.deepStrictEqual(
+              record1.aggregator.toPoint().value as Distribution,
+              {
+                count: 0,
+                last: 0,
+                max: -Infinity,
+                min: Infinity,
+                sum: 0,
+              }
+            );
+          })
+        );
       });
     });
 

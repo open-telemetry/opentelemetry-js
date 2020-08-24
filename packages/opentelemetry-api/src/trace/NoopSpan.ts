@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { Exception } from '../common/Exception';
 import { TimeInput } from '../common/Time';
 import { Attributes } from './attributes';
 import { Span } from './span';
@@ -68,6 +69,9 @@ export class NoopSpan implements Span {
   isRecording(): boolean {
     return false;
   }
+
+  // By default does nothing
+  recordException(exception: Exception, time?: TimeInput): void {}
 }
 
 export const NOOP_SPAN = new NoopSpan();

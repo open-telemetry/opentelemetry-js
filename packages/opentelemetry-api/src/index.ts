@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './common/Exception';
 export * from './common/Logger';
 export * from './common/Time';
 export * from './context/propagation/getter';

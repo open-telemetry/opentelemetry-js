@@ -18,3 +18,4 @@ export * from './Resource';
 export * from './platform';
 export * from './constants';
 export * from './types';
+export * from './config';

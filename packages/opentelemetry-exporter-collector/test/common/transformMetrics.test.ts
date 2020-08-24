@@ -34,6 +34,7 @@ import {
 import { MetricRecord, SumAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+
 describe('transformMetrics', () => {
   describe('toCollectorMetric', () => {
     const counter: MetricRecord = mockCounter();
@@ -72,6 +73,7 @@ describe('transformMetrics', () => {
       // ValueRecorder
       recorder.aggregator.update(5);
     });
+
     it('should convert metric', () => {
       ensureCounterIsCorrect(
         transform.toCollectorMetric(counter, 1592602232694000000),
@@ -101,6 +103,28 @@ describe('transformMetrics', () => {
         1592602232694000000
       );
       assert.deepStrictEqual(emptyMetric.int64DataPoints, []);
+    });
+
+    it('should convert metric labels value to string', () => {
+      const metric = transform.toCollectorMetric(
+        {
+          descriptor: {
+            name: 'name',
+            description: 'description',
+            unit: 'unit',
+            metricKind: 0,
+            valueType: 0,
+          },
+          labels: { foo: (1 as unknown) as string },
+          aggregator: new SumAggregator(),
+          resource: new Resource({}),
+          instrumentationLibrary: { name: 'x', version: 'y' },
+        },
+        1592602232694000000
+      );
+      const collectorMetric =
+        metric.int64DataPoints && metric.int64DataPoints[0];
+      assert.strictEqual(collectorMetric?.labels[0].value, '1');
     });
   });
   describe('toCollectorMetricDescriptor', () => {
