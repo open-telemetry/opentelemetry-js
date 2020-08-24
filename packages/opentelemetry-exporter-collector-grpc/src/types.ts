@@ -14,12 +14,8 @@
  * limitations under the License.
  */
 
+import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as grpc from 'grpc';
-import { CollectorProtocolNode } from '../../enums';
-import {
-  CollectorExporterError,
-  CollectorExporterConfigBase,
-} from '../../types';
 
 /**
  * Queue item to be used to save temporary spans/metrics in case the GRPC service
@@ -28,7 +24,7 @@ import {
 export interface GRPCQueueItem<ExportedItem> {
   objects: ExportedItem[];
   onSuccess: () => void;
-  onError: (error: CollectorExporterError) => void;
+  onError: (error: collectorTypes.CollectorExporterError) => void;
 }
 
 /**
@@ -46,8 +42,12 @@ export interface ServiceClient extends grpc.Client {
  * Collector Exporter Config for Node
  */
 export interface CollectorExporterConfigNode
-  extends CollectorExporterConfigBase {
+  extends collectorTypes.CollectorExporterConfigBase {
   credentials?: grpc.ChannelCredentials;
   metadata?: grpc.Metadata;
-  protocolNode?: CollectorProtocolNode;
+}
+
+export enum ServiceClientType {
+  SPANS,
+  METRICS,
 }

@@ -18,6 +18,7 @@ import { NoopLogger } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
+import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
 import { MetricRecord } from '@opentelemetry/metrics';
 import {
@@ -33,7 +34,6 @@ import {
   ensureValueRecorderIsCorrect,
   ensureHistogramIsCorrect,
 } from '../helper';
-import { CollectorExporterConfigBrowser } from '../../src/platform/browser/types';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 const sendBeacon = navigator.sendBeacon;
 
@@ -342,7 +342,7 @@ describe('CollectorMetricExporter - web', () => {
       foo: 'bar',
       bar: 'baz',
     };
-    let collectorExporterConfig: CollectorExporterConfigBrowser;
+    let collectorExporterConfig: CollectorExporterConfigBase;
 
     beforeEach(() => {
       collectorExporterConfig = {

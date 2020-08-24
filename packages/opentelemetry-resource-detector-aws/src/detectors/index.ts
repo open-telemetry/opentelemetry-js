@@ -15,4 +15,5 @@
  */
 
 export * from './AwsEc2Detector';
+export * from './AwsBeanstalkDetector';
 export * from './AwsEcsDetector';

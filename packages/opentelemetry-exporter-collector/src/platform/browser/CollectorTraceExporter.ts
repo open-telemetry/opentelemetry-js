@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+import { CollectorExporterConfigBase } from '../../types';
 import { CollectorExporterBrowserBase } from './CollectorExporterBrowserBase';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { toCollectorExportTraceServiceRequest } from '../../transform';
-import { CollectorExporterConfigBrowser } from './types';
 import * as collectorTypes from '../../types';
 
 const DEFAULT_SERVICE_NAME = 'collector-trace-exporter';
@@ -38,11 +38,11 @@ export class CollectorTraceExporter
     return toCollectorExportTraceServiceRequest(spans, this);
   }
 
-  getDefaultUrl(config: CollectorExporterConfigBrowser) {
+  getDefaultUrl(config: CollectorExporterConfigBase) {
     return config.url || DEFAULT_COLLECTOR_URL;
   }
 
-  getDefaultServiceName(config: CollectorExporterConfigBrowser): string {
+  getDefaultServiceName(config: CollectorExporterConfigBase): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
   }
 }

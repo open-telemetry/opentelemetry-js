@@ -38,7 +38,7 @@ export function toCollectorLabels(
   labels: api.Labels
 ): opentelemetryProto.common.v1.StringKeyValue[] {
   return Object.entries(labels).map(([key, value]) => {
-    return { key, value };
+    return { key, value: String(value) };
   });
 }
 
