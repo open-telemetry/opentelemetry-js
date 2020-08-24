@@ -15,7 +15,7 @@
  */
 
 import { CollectorExporterBase } from '../../CollectorExporterBase';
-import { CollectorExporterConfigBrowser } from './types';
+import { CollectorExporterConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
 import { parseHeaders } from '../../util';
 import { sendWithBeacon, sendWithXhr } from './util';
@@ -27,7 +27,7 @@ export abstract class CollectorExporterBrowserBase<
   ExportItem,
   ServiceRequest
 > extends CollectorExporterBase<
-  CollectorExporterConfigBrowser,
+  CollectorExporterConfigBase,
   ExportItem,
   ServiceRequest
 > {
@@ -37,7 +37,7 @@ export abstract class CollectorExporterBrowserBase<
   /**
    * @param config
    */
-  constructor(config: CollectorExporterConfigBrowser = {}) {
+  constructor(config: CollectorExporterConfigBase = {}) {
     super(config);
     this._useXHR =
       !!config.headers || typeof navigator.sendBeacon !== 'function';

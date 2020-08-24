@@ -15,6 +15,7 @@
  */
 
 import { Logger } from '@opentelemetry/api';
+import type { Detector } from './types';
 
 /**
  * ResourceDetectionConfig provides an interface for configuring resource auto-detection.
@@ -22,6 +23,7 @@ import { Logger } from '@opentelemetry/api';
 export interface ResourceDetectionConfig {
   /** Optional Logger. */
   logger?: Logger;
+  detectors?: Array<Detector>;
 }
 
 /**

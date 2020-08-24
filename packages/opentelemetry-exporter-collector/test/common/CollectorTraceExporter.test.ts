@@ -133,11 +133,12 @@ describe('CollectorTraceExporter - common', () => {
       assert.strictEqual(spySend.callCount, 1);
     });
 
-    describe('when exporter is shutdown', () => {
-      it('should not export anything but return callback with code "FailedNotRetryable"', () => {
+    describe('when exporter is shutdown',  () => {
+      it('should not export anything but return callback with code' +
+        ' "FailedNotRetryable"', async () => {
         const spans: ReadableSpan[] = [];
         spans.push(Object.assign({}, mockedReadableSpan));
-        collectorExporter.shutdown();
+        await collectorExporter.shutdown();
         spySend.resetHistory();
 
         const callbackSpy = sinon.spy();
@@ -174,7 +175,7 @@ describe('CollectorTraceExporter - common', () => {
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
-        }, 500);
+        });
       });
 
       it('should return a Retryable Error', done => {
@@ -198,7 +199,7 @@ describe('CollectorTraceExporter - common', () => {
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
-        }, 500);
+        });
       });
     });
   });
@@ -223,12 +224,9 @@ describe('CollectorTraceExporter - common', () => {
       onShutdownSpy.restore();
     });
 
-    it('should call onShutdown', done => {
-      collectorExporter.shutdown();
-      setTimeout(() => {
-        assert.equal(onShutdownSpy.callCount, 1);
-        done();
-      });
+    it('should call onShutdown', async() => {
+      await collectorExporter.shutdown();
+      assert.strictEqual(onShutdownSpy.callCount, 1);
     });
   });
 });

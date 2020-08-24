@@ -27,7 +27,8 @@ const NOOP_CALLBACK = () => {};
 const MAX_TIMEOUT_UPDATE_MS = 500;
 
 /** This is a SDK implementation of Batch Observer Metric. */
-export class BatchObserverMetric extends Metric<BoundObserver>
+export class BatchObserverMetric
+  extends Metric<BoundObserver>
   implements api.BatchObserver {
   private _callback: (observerResult: api.BatchObserverResult) => void;
   private _maxTimeoutUpdateMS: number;
