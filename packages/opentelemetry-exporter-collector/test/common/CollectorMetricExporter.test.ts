@@ -138,21 +138,24 @@ describe('CollectorMetricExporter - common', () => {
     });
 
     describe('when exporter is shutdown', () => {
-      it('should not export anything but return callback with code' +
-        ' "FailedNotRetryable"', async () => {
-        await collectorExporter.shutdown();
-        spySend.resetHistory();
+      it(
+        'should not export anything but return callback with code' +
+          ' "FailedNotRetryable"',
+        async () => {
+          await collectorExporter.shutdown();
+          spySend.resetHistory();
 
-        const callbackSpy = sinon.spy();
-        collectorExporter.export(metrics, callbackSpy);
-        const returnCode = callbackSpy.args[0][0];
-        assert.strictEqual(
-          returnCode,
-          ExportResult.FAILED_NOT_RETRYABLE,
-          'return value is wrong'
-        );
-        assert.strictEqual(spySend.callCount, 0, 'should not call send');
-      });
+          const callbackSpy = sinon.spy();
+          collectorExporter.export(metrics, callbackSpy);
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_NOT_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 0, 'should not call send');
+        }
+      );
     });
     describe('when an error occurs', () => {
       it('should return a Not Retryable Error', done => {
