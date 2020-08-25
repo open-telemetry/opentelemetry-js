@@ -37,9 +37,10 @@
     "@opentelemetry/context-zone": "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/exporter-collector": "^0.10.2",
-    "@opentelemetry/plugin-document-load": "^0.6.1",
+    "@opentelemetry/metrics": "^0.10.2",
+    "@opentelemetry/plugin-document-load": "^0.9.0",
     "@opentelemetry/plugin-fetch": "^0.10.2",
-    "@opentelemetry/plugin-user-interaction": "^0.6.1",
+    "@opentelemetry/plugin-user-interaction": "^0.9.0",
     "@opentelemetry/plugin-xml-http-request": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2",
     "@opentelemetry/web": "^0.10.2"

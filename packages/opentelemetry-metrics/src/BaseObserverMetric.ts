@@ -28,7 +28,8 @@ const NOOP_CALLBACK = () => {};
  * This is a SDK implementation of Base Observer Metric.
  * All observers should extend this class
  */
-export abstract class BaseObserverMetric extends Metric<BoundObserver>
+export abstract class BaseObserverMetric
+  extends Metric<BoundObserver>
   implements api.BaseObserver {
   protected _callback: (observerResult: api.ObserverResult) => unknown;
 
