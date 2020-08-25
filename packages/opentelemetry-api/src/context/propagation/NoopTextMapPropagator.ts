@@ -15,12 +15,12 @@
  */
 
 import { Context } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from './HttpTextPropagator';
+import { TextMapPropagator } from './TextMapPropagator';
 
 /**
- * No-op implementations of {@link HttpTextPropagator}.
+ * No-op implementations of {@link TextMapPropagator}.
  */
-export class NoopHttpTextPropagator implements HttpTextPropagator {
+export class NoopTextMapPropagator implements TextMapPropagator {
   /** Noop inject function does nothing */
   inject(context: Context, carrier: unknown, setter: Function): void {}
   /** Noop extract function does nothing and returns the input context */
@@ -29,4 +29,4 @@ export class NoopHttpTextPropagator implements HttpTextPropagator {
   }
 }
 
-export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();
+export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();

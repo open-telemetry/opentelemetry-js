@@ -16,7 +16,7 @@
 
 import {
   context,
-  NoopHttpTextPropagator,
+  NoopTextMapPropagator,
   propagation,
   trace,
 } from '@opentelemetry/api';
@@ -50,7 +50,7 @@ describe('API registration', () => {
     const tracerProvider = new NodeTracerProvider();
 
     const contextManager = new NoopContextManager();
-    const propagator = new NoopHttpTextPropagator();
+    const propagator = new NoopTextMapPropagator();
 
     tracerProvider.register({
       contextManager,
@@ -84,7 +84,7 @@ describe('API registration', () => {
     });
 
     assert.ok(
-      propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+      propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
     );
 
     assert.ok(

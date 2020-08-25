@@ -76,7 +76,7 @@ Detect resources automatically from the environment using the default resource d
 
 Use a custom context manager. Default: [AsyncHooksContextManager](../opentelemetry-context-async-hooks/README.md)
 
-### httpTextPropagator
+### textMapPropagator
 
 Use a custom propagator. Default: [CompositePropagator](../opentelemetry-core/src/context/propagation/composite.ts) using [W3C Trace Context](../opentelemetry-core/README.md#httptracecontext-propagator) and [Correlation Context](../opentelemetry-core/README.md#correlation-context-propagator)
 
