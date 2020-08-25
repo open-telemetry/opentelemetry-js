@@ -29,11 +29,11 @@ import { GetterFunction } from './getter';
  * usually implemented via library-specific request interceptors, where the
  * client-side injects values and the server-side extracts them.
  */
-export interface HttpTextPropagator {
+export interface TextMapPropagator {
   /**
    * Injects values from a given `Context` into a carrier.
    *
-   * OpenTelemetry defines a common set of format values (HttpTextPropagator),
+   * OpenTelemetry defines a common set of format values (TextMapPropagator),
    * and each has an expected `carrier` type.
    *
    * @param context the Context from which to extract values to transmit over
