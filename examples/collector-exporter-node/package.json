@@ -31,8 +31,8 @@
     "@opentelemetry/api": "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/exporter-collector": "^0.10.2",
-    "@opentelemetry/exporter-collector-grpc": "^0.10.2",
-    "@opentelemetry/exporter-collector-proto": "^0.10.2",
+    "@opentelemetry/exporter-collector-grpc": "^0.10.3-alpha.35",
+    "@opentelemetry/exporter-collector-proto": "^0.10.3-alpha.35",
     "@opentelemetry/metrics": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2"
   },
