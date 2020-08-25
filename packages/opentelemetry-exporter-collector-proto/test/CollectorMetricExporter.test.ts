@@ -14,26 +14,26 @@
  * limitations under the License.
  */
 
+import { collectorTypes } from '@opentelemetry/exporter-collector';
+
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
-import { CollectorProtocolNode } from '../../src/enums';
-import { CollectorMetricExporter } from '../../src/platform/node';
-import { CollectorExporterConfigNode } from '../../src/platform/node/types';
-import * as collectorTypes from '../../src/types';
+import { CollectorMetricExporter } from '../src';
+import { getExportRequestProto } from '../src/util';
 
 import {
   mockCounter,
   mockObserver,
   mockHistogram,
   ensureExportMetricsServiceRequestIsSet,
-  ensureCounterIsCorrect,
   mockValueRecorder,
-  ensureValueRecorderIsCorrect,
-  ensureHistogramIsCorrect,
-  ensureObserverIsCorrect,
-} from '../helper';
+  ensureExportedCounterIsCorrect,
+  ensureExportedObserverIsCorrect,
+  ensureExportedHistogramIsCorrect,
+  ensureExportedValueRecorderIsCorrect,
+} from './helper';
 import { MetricRecord } from '@opentelemetry/metrics';
 
 const fakeRequest = {
@@ -50,21 +50,20 @@ const mockResError = {
   statusCode: 400,
 };
 
-describe('CollectorMetricExporter - node with json over http', () => {
+describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporter: CollectorMetricExporter;
-  let collectorExporterConfig: CollectorExporterConfigNode;
+  let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
   let spyRequest: sinon.SinonSpy;
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
   describe('export', () => {
-    beforeEach(() => {
+    beforeEach(done => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
         headers: {
           foo: 'bar',
         },
-        protocolNode: CollectorProtocolNode.HTTP_JSON,
         hostname: 'foo',
         logger: new core.NoopLogger(),
         serviceName: 'bar',
@@ -87,6 +86,11 @@ describe('CollectorMetricExporter - node with json over http', () => {
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
       metrics[3].aggregator.update(5);
+
+      // due to lazy loading ensure to wait to next tick
+      setImmediate(() => {
+        done();
+      });
     });
     afterEach(() => {
       spyRequest.restore();
@@ -123,9 +127,10 @@ describe('CollectorMetricExporter - node with json over http', () => {
 
       setTimeout(() => {
         const writeArgs = spyWrite.args[0];
-        const json = JSON.parse(
-          writeArgs[0]
-        ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+        const ExportTraceServiceRequestProto = getExportRequestProto();
+        const data = ExportTraceServiceRequestProto?.decode(writeArgs[0]);
+        const json = data?.toJSON() as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
         const metric2 =
@@ -135,28 +140,16 @@ describe('CollectorMetricExporter - node with json over http', () => {
         const metric4 =
           json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
-        ensureCounterIsCorrect(
-          metric1,
-          core.hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
-        );
+        ensureExportedCounterIsCorrect(metric1);
         assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-        ensureObserverIsCorrect(
-          metric2,
-          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
-        );
+        ensureExportedObserverIsCorrect(metric2);
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
-        ensureHistogramIsCorrect(
-          metric3,
-          core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-        );
+        ensureExportedHistogramIsCorrect(metric3);
         assert.ok(
           typeof metric4 !== 'undefined',
           "value recorder doesn't exist"
         );
-        ensureValueRecorderIsCorrect(
-          metric4,
-          core.hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
-        );
+        ensureExportedValueRecorderIsCorrect(metric4);
 
         ensureExportMetricsServiceRequestIsSet(json);
 
@@ -202,29 +195,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });
-      });
-    });
-  });
-  describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
-    it('should default to localhost', done => {
-      const collectorExporter = new CollectorMetricExporter({
-        protocolNode: CollectorProtocolNode.HTTP_JSON,
-      });
-      setTimeout(() => {
-        assert.strictEqual(
-          collectorExporter['url'],
-          'http://localhost:55681/v1/metrics'
-        );
-        done();
-      });
-    });
-
-    it('should keep the URL if included', done => {
-      const url = 'http://foo.bar.com';
-      const collectorExporter = new CollectorMetricExporter({ url });
-      setTimeout(() => {
-        assert.strictEqual(collectorExporter['url'], url);
-        done();
       });
     });
   });

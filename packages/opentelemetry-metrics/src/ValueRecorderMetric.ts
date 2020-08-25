@@ -23,7 +23,8 @@ import { MetricKind } from './export/types';
 import { Metric } from './Metric';
 
 /** This is a SDK implementation of Value Recorder Metric. */
-export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+export class ValueRecorderMetric
+  extends Metric<BoundValueRecorder>
   implements api.ValueRecorder {
   protected readonly _absolute: boolean;
 

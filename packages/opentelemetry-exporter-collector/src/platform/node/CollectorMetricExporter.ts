@@ -15,16 +15,13 @@
  */
 
 import { MetricRecord, MetricExporter } from '@opentelemetry/metrics';
-import { ServiceClientType } from '../../types';
+import { CollectorExporterConfigBase } from '../../types';
 import * as collectorTypes from '../../types';
-import { CollectorExporterConfigNode } from './types';
-import { CollectorProtocolNode } from '../../enums';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 import { toCollectorExportMetricServiceRequest } from '../../transformMetrics';
 
 const DEFAULT_SERVICE_NAME = 'collector-metric-exporter';
-const DEFAULT_COLLECTOR_URL_GRPC = 'localhost:55680';
-const DEFAULT_COLLECTOR_URL_JSON = 'http://localhost:55681/v1/metrics';
+const DEFAULT_COLLECTOR_URL = 'http://localhost:55681/v1/metrics';
 
 /**
  * Collector Metric Exporter for Node
@@ -48,24 +45,14 @@ export class CollectorMetricExporter
     );
   }
 
-  getDefaultUrl(config: CollectorExporterConfigNode): string {
+  getDefaultUrl(config: CollectorExporterConfigBase): string {
     if (!config.url) {
-      return config.protocolNode === CollectorProtocolNode.HTTP_JSON
-        ? DEFAULT_COLLECTOR_URL_JSON
-        : DEFAULT_COLLECTOR_URL_GRPC;
+      return DEFAULT_COLLECTOR_URL;
     }
     return config.url;
   }
 
-  getDefaultServiceName(config: CollectorExporterConfigNode): string {
+  getDefaultServiceName(config: CollectorExporterConfigBase): string {
     return config.serviceName || DEFAULT_SERVICE_NAME;
-  }
-
-  getServiceClientType() {
-    return ServiceClientType.METRICS;
-  }
-
-  getServiceProtoPath(): string {
-    return 'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
   }
 }

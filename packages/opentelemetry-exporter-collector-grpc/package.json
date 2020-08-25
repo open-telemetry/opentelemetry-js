@@ -1,0 +1,76 @@
+{
+  "name": "@opentelemetry/exporter-collector-grpc",
+  "version": "0.10.2",
+  "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "repository": "open-telemetry/opentelemetry-js",
+  "scripts": {
+    "clean": "rimraf build/*",
+    "compile": "npm run version:update && tsc -p .",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "postcompile": "npm run submodule && npm run protos:copy",
+    "precompile": "tsc --version",
+    "prepare": "npm run compile",
+    "protos:copy": "cpx protos/opentelemetry/**/*.* build/protos/opentelemetry",
+    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
+    "version:update": "node ../../scripts/version-update.js",
+    "watch": "npm run protos:copy && tsc -w"
+  },
+  "keywords": [
+    "opentelemetry",
+    "nodejs",
+    "grpc",
+    "tracing",
+    "profiling",
+    "metrics",
+    "stats"
+  ],
+  "author": "OpenTelemetry Authors",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "build/src/**/*.proto",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@babel/core": "7.11.1",
+    "@types/mocha": "8.0.2",
+    "@types/node": "14.0.27",
+    "@types/sinon": "9.0.4",
+    "codecov": "3.7.2",
+    "cpx": "1.5.0",
+    "gts": "2.0.2",
+    "mocha": "7.2.0",
+    "nyc": "15.1.0",
+    "rimraf": "3.0.2",
+    "sinon": "9.0.3",
+    "ts-loader": "8.0.2",
+    "ts-mocha": "7.0.0",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.7"
+  },
+  "dependencies": {
+    "@grpc/proto-loader": "^0.5.4",
+    "@opentelemetry/api": "^0.10.2",
+    "@opentelemetry/core": "^0.10.2",
+    "@opentelemetry/exporter-collector": "^0.10.2",
+    "@opentelemetry/metrics": "^0.10.2",
+    "@opentelemetry/resources": "^0.10.2",
+    "@opentelemetry/tracing": "^0.10.2",
+    "grpc": "^1.24.2"
+  }
+}
