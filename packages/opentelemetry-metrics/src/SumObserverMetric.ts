@@ -24,7 +24,8 @@ import { Batcher } from './export/Batcher';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of SumObserver Metric. */
-export class SumObserverMetric extends BaseObserverMetric
+export class SumObserverMetric
+  extends BaseObserverMetric
   implements api.SumObserver {
   constructor(
     name: string,

@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-import { CollectorExporterConfigBase } from '../../types';
-
-/**
- * Collector Exporter Config for Web
- */
-export interface CollectorExporterConfigBrowser
-  extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
+export enum ServiceClientType {
+  SPANS,
+  METRICS,
 }

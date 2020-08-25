@@ -10,22 +10,19 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "postcompile": "npm run submodule && npm run protos:copy",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "precompile": "tsc --version",
     "prepare": "npm run compile",
-    "protos:copy": "cpx src/platform/node/protos/opentelemetry/**/*.* build/src/platform/node/protos/opentelemetry",
-    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w"
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -45,7 +42,6 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
-    "build/src/**/*.proto",
     "doc",
     "LICENSE",
     "README.md"
@@ -83,13 +79,11 @@
     "webpack-merge": "5.1.1"
   },
   "dependencies": {
-    "@grpc/proto-loader": "^0.5.4",
     "@opentelemetry/api": "^0.10.2",
     "@opentelemetry/core": "^0.10.2",
     "@opentelemetry/metrics": "^0.10.2",
     "@opentelemetry/resources": "^0.10.2",
     "@opentelemetry/tracing": "^0.10.2",
-    "grpc": "^1.24.2",
-    "protobufjs": "^6.9.0"
+    "axios": "^0.19.2"
   }
 }
