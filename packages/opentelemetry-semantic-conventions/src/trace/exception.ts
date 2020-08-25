@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './os';
-export * from './rpc';
+export const ExceptionAttribute = {
+  MESSAGE: 'exception.message',
+  STACKTRACE: 'exception.stacktrace',
+  TYPE: 'exception.type',
+};
+
+export const ExceptionEventName = 'exception';
