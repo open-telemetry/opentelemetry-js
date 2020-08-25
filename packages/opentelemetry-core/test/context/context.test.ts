@@ -19,13 +19,14 @@ import * as assert from 'assert';
 import {
   SUPPRESS_INSTRUMENTATION_KEY,
   suppressInstrumentation,
+  unsuppressInstrumentation,
   isInstrumentationSuppressed,
 } from '../../src/context/context';
 import { Context } from '@opentelemetry/api';
 
 describe('Context Helpers', () => {
   describe('suppressInstrumentation', () => {
-    it('should set suppress to true by default', () => {
+    it('should set suppress to true', () => {
       const expectedValue = true;
       const context = suppressInstrumentation(Context.ROOT_CONTEXT);
 
@@ -34,13 +35,12 @@ describe('Context Helpers', () => {
 
       assert.equal(boolValue, expectedValue);
     });
+  });
 
-    it('should set suppress instrumentation value', () => {
+  describe('unsuppressInstrumentation', () => {
+    it('should set suppress to false', () => {
       const expectedValue = false;
-      const context = suppressInstrumentation(
-        Context.ROOT_CONTEXT,
-        expectedValue
-      );
+      const context = unsuppressInstrumentation(Context.ROOT_CONTEXT);
 
       const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
       const boolValue = value as boolean;

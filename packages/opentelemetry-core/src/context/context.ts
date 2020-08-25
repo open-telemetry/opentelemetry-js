@@ -93,17 +93,23 @@ export function getParentSpanContext(
 }
 
 /**
- * Set whether or not instrumentation should be suppressed beyond
- * this current scope.
+ * Sets value on context to indicate that instrumentation should
+ * be suppressed beyond this current scope.
  *
  * @param context context to set the suppress instrumentation value on.
- * @param shouldSuppress value to set.
  */
-export function suppressInstrumentation(
-  context: Context,
-  suppress = true
-): Context {
-  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, suppress);
+export function suppressInstrumentation(context: Context): Context {
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, true);
+}
+
+/**
+ * Sets value on context to indicate that instrumentation should
+ * no-longer be suppressed beyond this current scope.
+ *
+ * @param context context to set the suppress instrumentation value on.
+ */
+export function unsuppressInstrumentation(context: Context): Context {
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, false);
 }
 
 /**
