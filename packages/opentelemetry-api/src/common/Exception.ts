@@ -14,9 +14,34 @@
  * limitations under the License.
  */
 
-export * from './database';
-export * from './exception';
-export * from './general';
-export * from './http';
-export * from './os';
-export * from './rpc';
+interface ExceptionWithCode {
+  code: string;
+  name?: string;
+  message?: string;
+  stack?: string;
+}
+
+interface ExceptionWithMessage {
+  code?: string;
+  message: string;
+  name?: string;
+  stack?: string;
+}
+
+interface ExceptionWithName {
+  code?: string;
+  message?: string;
+  name: string;
+  stack?: string;
+}
+
+/**
+ * Defines Exception.
+ *
+ * string or an object with one of (message or name or code) and optional stack
+ */
+export type Exception =
+  | ExceptionWithCode
+  | ExceptionWithMessage
+  | ExceptionWithName
+  | string;
