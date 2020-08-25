@@ -39,7 +39,7 @@ export function isValidSpanId(spanId: string): boolean {
  * Returns true if this {@link SpanContext} is valid.
  * @return true if this {@link SpanContext} is valid.
  */
-export function isValid(spanContext: SpanContext): boolean {
+export function isSpanContextValid(spanContext: SpanContext): boolean {
   return (
     isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId)
   );

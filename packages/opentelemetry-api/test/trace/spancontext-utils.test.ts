@@ -25,7 +25,7 @@ describe('spancontext-utils', () => {
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
     };
-    assert.ok(context.isValid(spanContext));
+    assert.ok(context.isSpanContextValid(spanContext));
   });
 
   it('should return false when traceId is invalid', () => {
@@ -34,7 +34,7 @@ describe('spancontext-utils', () => {
       spanId: '6e0c63257de34c92',
       traceFlags: TraceFlags.NONE,
     };
-    assert.ok(!context.isValid(spanContext));
+    assert.ok(!context.isSpanContextValid(spanContext));
   });
 
   it('should return false when spanId is invalid', () => {
@@ -43,7 +43,7 @@ describe('spancontext-utils', () => {
       spanId: context.INVALID_SPANID,
       traceFlags: TraceFlags.NONE,
     };
-    assert.ok(!context.isValid(spanContext));
+    assert.ok(!context.isSpanContextValid(spanContext));
   });
 
   it('should return false when traceId & spanId is invalid', () => {
@@ -52,6 +52,6 @@ describe('spancontext-utils', () => {
       spanId: context.INVALID_SPANID,
       traceFlags: TraceFlags.NONE,
     };
-    assert.ok(!context.isValid(spanContext));
+    assert.ok(!context.isSpanContextValid(spanContext));
   });
 });
