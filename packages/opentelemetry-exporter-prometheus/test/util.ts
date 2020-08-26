@@ -13,6 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Point, Sum } from '@opentelemetry/metrics';
+import { HrTime } from '@opentelemetry/api';
 
-export * from './PrometheusExporter';
-export * from './export/types';
+export const mockedHrTime: HrTime = [1586347902, 211_000_000];
+export const mockedHrTimeMs = 1586347902211;
+export function mockAggregator(Aggregator: any) {
+  let toPoint: () => Point<Sum>;
+  before(() => {
+    toPoint = Aggregator.prototype.toPoint;
+    Aggregator.prototype.toPoint = function (): Point<Sum> {
+      const point = toPoint.apply(this);
+      point.timestamp = mockedHrTime;
+      return point;
+    };
+  });
+  after(() => {
+    Aggregator.prototype.toPoint = toPoint;
+  });
+}
