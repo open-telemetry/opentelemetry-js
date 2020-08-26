@@ -20,12 +20,16 @@ import { ExportResult } from '@opentelemetry/core';
 
 /**
  * This class can be used for testing purposes. It stores the exported spans
- * in a list in memory that can be retrieve using the `getFinishedSpans()`
+ * in a list in memory that can be retrieved using the `getFinishedSpans()`
  * method.
  */
 export class InMemorySpanExporter implements SpanExporter {
   private _finishedSpans: ReadableSpan[] = [];
-  private _stopped = false;
+  /**
+   * Indicates if the exporter has been "shutdown."
+   * When false, exported spans will not be stored in-memory.
+   */
+  protected _stopped = false;
 
   export(
     spans: ReadableSpan[],
@@ -33,7 +37,8 @@ export class InMemorySpanExporter implements SpanExporter {
   ): void {
     if (this._stopped) return resultCallback(ExportResult.FAILED_NOT_RETRYABLE);
     this._finishedSpans.push(...spans);
-    return resultCallback(ExportResult.SUCCESS);
+
+    setTimeout(() => resultCallback(ExportResult.SUCCESS), 0);
   }
 
   shutdown(): void {
