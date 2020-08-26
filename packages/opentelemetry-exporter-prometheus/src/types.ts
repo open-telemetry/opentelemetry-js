@@ -14,5 +14,14 @@
  * limitations under the License.
  */
 
-export * from './PrometheusExporter';
-export * from './export/types';
+import {
+  MetricDescriptor,
+  AggregatorKind,
+  MetricRecord,
+} from '@opentelemetry/metrics';
+
+export interface PrometheusCheckpoint {
+  descriptor: MetricDescriptor;
+  aggregatorKind: AggregatorKind;
+  records: MetricRecord[];
+}
