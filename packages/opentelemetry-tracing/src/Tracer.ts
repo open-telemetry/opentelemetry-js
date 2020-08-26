@@ -78,7 +78,7 @@ export class Tracer implements api.Tracer {
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
-    if (!parentContext || !api.isSpanContextValid(parentContext)) {
+    if (!parentContext || !api.trace.isSpanContextValid(parentContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {

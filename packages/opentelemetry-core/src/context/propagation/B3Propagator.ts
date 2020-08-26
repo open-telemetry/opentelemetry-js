@@ -17,8 +17,6 @@
 import {
   Context,
   GetterFunction,
-  isValidSpanId,
-  isValidTraceId,
   TextMapPropagator,
   SetterFunction,
   TraceFlags,
@@ -36,8 +34,19 @@ export const PARENT_SPAN_ID_KEY = Context.createKey(
 export const DEBUG_FLAG_KEY = Context.createKey(
   'OpenTelemetry Context Key B3 Debug Flag'
 );
+const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;
+const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
+const INVALID_ID_REGEX = /^0+$/i;
 const VALID_SAMPLED_VALUES = new Set([true, 'true', 'True', '1', 1]);
 const VALID_UNSAMPLED_VALUES = new Set([false, 'false', 'False', '0', 0]);
+
+function isValidTraceId(traceId: string): boolean {
+  return VALID_TRACEID_REGEX.test(traceId) && !INVALID_ID_REGEX.test(traceId);
+}
+
+function isValidSpanId(spanId: string): boolean {
+  return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
+}
 
 function isValidParentSpanID(spanId: string | undefined): boolean {
   return spanId === undefined || isValidSpanId(spanId);
