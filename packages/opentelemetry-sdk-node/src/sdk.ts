@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextPropagator, metrics } from '@opentelemetry/api';
+import { TextMapPropagator, metrics } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import { MeterConfig, MeterProvider } from '@opentelemetry/metrics';
 import { NodeTracerConfig, NodeTracerProvider } from '@opentelemetry/node';
@@ -35,7 +35,7 @@ export class NodeSDK {
     tracerConfig: NodeTracerConfig;
     spanProcessor: SpanProcessor;
     contextManager?: ContextManager;
-    httpTextPropagator?: HttpTextPropagator;
+    textMapPropagator?: TextMapPropagator;
   };
   private _meterProviderConfig?: MeterConfig;
 
@@ -78,7 +78,7 @@ export class NodeSDK {
         tracerProviderConfig,
         spanProcessor,
         configuration.contextManager,
-        configuration.httpTextPropagator
+        configuration.textMapPropagator
       );
     }
 
@@ -110,13 +110,13 @@ export class NodeSDK {
     tracerConfig: NodeTracerConfig,
     spanProcessor: SpanProcessor,
     contextManager?: ContextManager,
-    httpTextPropagator?: HttpTextPropagator
+    textMapPropagator?: TextMapPropagator
   ) {
     this._tracerProviderConfig = {
       tracerConfig,
       spanProcessor,
       contextManager,
-      httpTextPropagator,
+      textMapPropagator,
     };
   }
 
@@ -157,7 +157,7 @@ export class NodeSDK {
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
       tracerProvider.register({
         contextManager: this._tracerProviderConfig.contextManager,
-        propagator: this._tracerProviderConfig.httpTextPropagator,
+        propagator: this._tracerProviderConfig.textMapPropagator,
       });
     }
 

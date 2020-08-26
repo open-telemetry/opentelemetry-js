@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-/**
- * Collector transport protocol node options
- * Default is GRPC
- */
-export enum CollectorProtocolNode {
-  GRPC,
-  HTTP_JSON,
-  HTTP_PROTO,
+export enum ServiceClientType {
+  SPANS,
+  METRICS,
 }

@@ -14,19 +14,34 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from './HttpTextPropagator';
-
-/**
- * No-op implementations of {@link HttpTextPropagator}.
- */
-export class NoopHttpTextPropagator implements HttpTextPropagator {
-  /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown, setter: Function): void {}
-  /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown, getter: Function): Context {
-    return context;
-  }
+interface ExceptionWithCode {
+  code: string;
+  name?: string;
+  message?: string;
+  stack?: string;
 }
 
-export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();
+interface ExceptionWithMessage {
+  code?: string;
+  message: string;
+  name?: string;
+  stack?: string;
+}
+
+interface ExceptionWithName {
+  code?: string;
+  message?: string;
+  name: string;
+  stack?: string;
+}
+
+/**
+ * Defines Exception.
+ *
+ * string or an object with one of (message or name or code) and optional stack
+ */
+export type Exception =
+  | ExceptionWithCode
+  | ExceptionWithMessage
+  | ExceptionWithName
+  | string;

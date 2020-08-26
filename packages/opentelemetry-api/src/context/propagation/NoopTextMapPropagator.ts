@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-import { CollectorExporterConfigBase } from '../../types';
+import { Context } from '@opentelemetry/context-base';
+import { TextMapPropagator } from './TextMapPropagator';
 
 /**
- * Collector Exporter Config for Web
+ * No-op implementations of {@link TextMapPropagator}.
  */
-export interface CollectorExporterConfigBrowser
-  extends CollectorExporterConfigBase {
-  headers?: { [key: string]: string };
+export class NoopTextMapPropagator implements TextMapPropagator {
+  /** Noop inject function does nothing */
+  inject(context: Context, carrier: unknown, setter: Function): void {}
+  /** Noop extract function does nothing and returns the input context */
+  extract(context: Context, carrier: unknown, getter: Function): Context {
+    return context;
+  }
 }
+
+export const NOOP_TEXT_MAP_PROPAGATOR = new NoopTextMapPropagator();
