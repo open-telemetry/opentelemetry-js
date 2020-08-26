@@ -15,3 +15,4 @@
  */
 
 export * from './detect-resources';
+export * from './detectors';

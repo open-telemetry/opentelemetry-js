@@ -14,124 +14,81 @@
  * limitations under the License.
  */
 
-import * as protoLoader from '@grpc/proto-loader';
-import * as grpc from 'grpc';
-import * as path from 'path';
-import * as fs from 'fs';
-
+import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
+import * as core from '@opentelemetry/core';
+import * as http from 'http';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/node';
+import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
-import { MetricRecord } from '@opentelemetry/metrics';
+
 import {
   mockCounter,
   mockObserver,
   mockHistogram,
-  ensureExportedCounterIsCorrect,
-  ensureExportedObserverIsCorrect,
-  ensureMetadataIsCorrect,
-  ensureResourceIsCorrect,
-  ensureExportedHistogramIsCorrect,
-  ensureExportedValueRecorderIsCorrect,
+  ensureExportMetricsServiceRequestIsSet,
+  ensureCounterIsCorrect,
   mockValueRecorder,
+  ensureValueRecorderIsCorrect,
+  ensureHistogramIsCorrect,
+  ensureObserverIsCorrect,
 } from '../helper';
-import { ConsoleLogger, LogLevel } from '@opentelemetry/core';
-import { CollectorProtocolNode } from '../../src';
+import { MetricRecord } from '@opentelemetry/metrics';
 
-const metricsServiceProtoPath =
-  'opentelemetry/proto/collector/metrics/v1/metrics_service.proto';
-const includeDirs = [path.resolve(__dirname, '../../src/platform/node/protos')];
+const fakeRequest = {
+  end: function () {},
+  on: function () {},
+  write: function () {},
+};
+
+const mockRes = {
+  statusCode: 200,
+};
+
+const mockResError = {
+  statusCode: 400,
+};
 
 const address = 'localhost:1501';
 
-type TestParams = {
-  useTLS?: boolean;
-  metadata?: grpc.Metadata;
-};
-
-const metadata = new grpc.Metadata();
-metadata.set('k', 'v');
-
-const testCollectorMetricExporter = (params: TestParams) =>
-  describe(`CollectorMetricExporter - node ${
-    params.useTLS ? 'with' : 'without'
-  } TLS, ${params.metadata ? 'with' : 'without'} metadata`, () => {
-    let collectorExporter: CollectorMetricExporter;
-    let server: grpc.Server;
-    let exportedData:
-      | collectorTypes.opentelemetryProto.metrics.v1.ResourceMetrics[]
-      | undefined;
-    let metrics: MetricRecord[];
-    let reqMetadata: grpc.Metadata | undefined;
-
-    before(done => {
-      server = new grpc.Server();
-      protoLoader
-        .load(metricsServiceProtoPath, {
-          keepCase: false,
-          longs: String,
-          enums: String,
-          defaults: true,
-          oneofs: true,
-          includeDirs,
-        })
-        .then((packageDefinition: protoLoader.PackageDefinition) => {
-          const packageObject: any = grpc.loadPackageDefinition(
-            packageDefinition
-          );
-          server.addService(
-            packageObject.opentelemetry.proto.collector.metrics.v1
-              .MetricsService.service,
-            {
-              Export: (data: {
-                request: collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
-                metadata: grpc.Metadata;
-              }) => {
-                try {
-                  exportedData = data.request.resourceMetrics;
-                  reqMetadata = data.metadata;
-                } catch (e) {
-                  exportedData = undefined;
-                }
-              },
-            }
-          );
-          const credentials = params.useTLS
-            ? grpc.ServerCredentials.createSsl(
-                fs.readFileSync('./test/certs/ca.crt'),
-                [
-                  {
-                    cert_chain: fs.readFileSync('./test/certs/server.crt'),
-                    private_key: fs.readFileSync('./test/certs/server.key'),
-                  },
-                ]
-              )
-            : grpc.ServerCredentials.createInsecure();
-          server.bind(address, credentials);
-          server.start();
-          done();
-        });
-    });
-
-    after(() => {
-      server.forceShutdown();
-    });
-
-    beforeEach(done => {
-      const credentials = params.useTLS
-        ? grpc.credentials.createSsl(
-            fs.readFileSync('./test/certs/ca.crt'),
-            fs.readFileSync('./test/certs/client.key'),
-            fs.readFileSync('./test/certs/client.crt')
-          )
-        : undefined;
+describe('CollectorMetricExporter - node with json over http', () => {
+  let collectorExporter: CollectorMetricExporter;
+  let collectorExporterConfig: CollectorExporterConfigBase;
+  let spyRequest: sinon.SinonSpy;
+  let spyWrite: sinon.SinonSpy;
+  let metrics: MetricRecord[];
+  describe('instance', () => {
+    it('should warn about metadata when using json', () => {
+      const metadata = 'foo';
+      const logger = new ConsoleLogger(LogLevel.DEBUG);
+      const spyLoggerWarn = sinon.stub(logger, 'warn');
       collectorExporter = new CollectorMetricExporter({
-        url: address,
-        credentials,
+        logger,
         serviceName: 'basic-service',
-        metadata: params.metadata,
-      });
+        url: address,
+        metadata,
+      } as any);
+      const args = spyLoggerWarn.args[0];
+      assert.strictEqual(args[0], 'Metadata cannot be set when using http');
+    });
+  });
+
+  describe('export', () => {
+    beforeEach(() => {
+      spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
+      spyWrite = sinon.stub(fakeRequest, 'write');
+      collectorExporterConfig = {
+        headers: {
+          foo: 'bar',
+        },
+        hostname: 'foo',
+        logger: new core.NoopLogger(),
+        serviceName: 'bar',
+        attributes: {},
+        url: 'http://foo.bar.com',
+      };
+      collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       // Overwrites the start time to make tests consistent
       Object.defineProperty(collectorExporter, '_startTime', {
         value: 1592602232694000000,
@@ -141,114 +98,149 @@ const testCollectorMetricExporter = (params: TestParams) =>
       metrics.push(mockObserver());
       metrics.push(mockHistogram());
       metrics.push(mockValueRecorder());
-
       metrics[0].aggregator.update(1);
-
       metrics[1].aggregator.update(3);
       metrics[1].aggregator.update(6);
-
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
       metrics[3].aggregator.update(5);
-      done();
     });
-
     afterEach(() => {
-      exportedData = undefined;
-      reqMetadata = undefined;
+      spyRequest.restore();
+      spyWrite.restore();
     });
 
-    describe('instance', () => {
-      it('should warn about headers when using grpc', () => {
-        const logger = new ConsoleLogger(LogLevel.DEBUG);
-        const spyLoggerWarn = sinon.stub(logger, 'warn');
-        collectorExporter = new CollectorMetricExporter({
-          logger,
-          serviceName: 'basic-service',
-          url: address,
-          headers: {
-            foo: 'bar',
-          },
-        });
-        const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'Headers cannot be set when using grpc');
-      });
-      it('should warn about metadata when using json', () => {
-        const metadata = new grpc.Metadata();
-        metadata.set('k', 'v');
-        const logger = new ConsoleLogger(LogLevel.DEBUG);
-        const spyLoggerWarn = sinon.stub(logger, 'warn');
-        collectorExporter = new CollectorMetricExporter({
-          logger,
-          serviceName: 'basic-service',
-          url: address,
-          metadata,
-          protocolNode: CollectorProtocolNode.HTTP_JSON,
-        });
-        const args = spyLoggerWarn.args[0];
-        assert.strictEqual(args[0], 'Metadata cannot be set when using http');
+    it('should open the connection', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+
+        assert.strictEqual(options.hostname, 'foo.bar.com');
+        assert.strictEqual(options.method, 'POST');
+        assert.strictEqual(options.path, '/');
+        done();
       });
     });
 
-    describe('export', () => {
-      it('should export metrics', done => {
-        const responseSpy = sinon.spy();
-        collectorExporter.export(metrics, responseSpy);
+    it('should set custom headers', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const options = args[0];
+        assert.strictEqual(options.headers['foo'], 'bar');
+        done();
+      });
+    });
+
+    it('should successfully send metrics', done => {
+      collectorExporter.export(metrics, () => {});
+
+      setTimeout(() => {
+        const writeArgs = spyWrite.args[0];
+        const json = JSON.parse(
+          writeArgs[0]
+        ) as collectorTypes.opentelemetryProto.collector.metrics.v1.ExportMetricsServiceRequest;
+        const metric1 =
+          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
+        const metric2 =
+          json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+        const metric3 =
+          json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
+        const metric4 =
+          json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+        assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
+        ensureCounterIsCorrect(
+          metric1,
+          core.hrTimeToNanoseconds(metrics[0].aggregator.toPoint().timestamp)
+        );
+        assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
+        ensureObserverIsCorrect(
+          metric2,
+          core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
+        );
+        assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
+        ensureHistogramIsCorrect(
+          metric3,
+          core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
+        );
+        assert.ok(
+          typeof metric4 !== 'undefined',
+          "value recorder doesn't exist"
+        );
+        ensureValueRecorderIsCorrect(
+          metric4,
+          core.hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+        );
+
+        ensureExportMetricsServiceRequestIsSet(json);
+
+        done();
+      });
+    });
+
+    it('should log the successful message', done => {
+      const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
+      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+
+      const responseSpy = sinon.spy();
+      collectorExporter.export(metrics, responseSpy);
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const callback = args[1];
+        callback(mockRes);
         setTimeout(() => {
-          assert.ok(
-            typeof exportedData !== 'undefined',
-            'resource' + " doesn't exist"
-          );
-          let resource;
-          if (exportedData) {
-            resource = exportedData[0].resource;
-            const counter =
-              exportedData[0].instrumentationLibraryMetrics[0].metrics[0];
-            const observer =
-              exportedData[1].instrumentationLibraryMetrics[0].metrics[0];
-            const histogram =
-              exportedData[2].instrumentationLibraryMetrics[0].metrics[0];
-            const recorder =
-              exportedData[3].instrumentationLibraryMetrics[0].metrics[0];
-            ensureExportedCounterIsCorrect(counter);
-            ensureExportedObserverIsCorrect(observer);
-            ensureExportedHistogramIsCorrect(histogram);
-            ensureExportedValueRecorderIsCorrect(recorder);
-            assert.ok(
-              typeof resource !== 'undefined',
-              "resource doesn't exist"
-            );
-            if (resource) {
-              ensureResourceIsCorrect(resource, true);
-            }
-          }
-          if (params.metadata && reqMetadata) {
-            ensureMetadataIsCorrect(reqMetadata, params.metadata);
-          }
+          const response: any = spyLoggerDebug.args[1][0];
+          assert.strictEqual(response, 'statusCode: 200');
+          assert.strictEqual(spyLoggerError.args.length, 0);
+          assert.strictEqual(responseSpy.args[0][0], 0);
           done();
-        }, 500);
+        });
+      });
+    });
+
+    it('should log the error message', done => {
+      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+
+      const responseSpy = sinon.spy();
+      collectorExporter.export(metrics, responseSpy);
+
+      setTimeout(() => {
+        const args = spyRequest.args[0];
+        const callback = args[1];
+        callback(mockResError);
+        setTimeout(() => {
+          const response: any = spyLoggerError.args[0][0];
+          assert.strictEqual(response, 'statusCode: 400');
+
+          assert.strictEqual(responseSpy.args[0][0], 1);
+          done();
+        });
       });
     });
   });
-
-describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
-  it('should default to localhost', done => {
-    const collectorExporter = new CollectorMetricExporter({});
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], 'localhost:55680');
-      done();
+  describe('CollectorMetricExporter - node (getDefaultUrl)', () => {
+    it('should default to localhost', done => {
+      const collectorExporter = new CollectorMetricExporter();
+      setTimeout(() => {
+        assert.strictEqual(
+          collectorExporter['url'],
+          'http://localhost:55681/v1/metrics'
+        );
+        done();
+      });
     });
-  });
-  it('should keep the URL if included', done => {
-    const url = 'http://foo.bar.com';
-    const collectorExporter = new CollectorMetricExporter({ url });
-    setTimeout(() => {
-      assert.strictEqual(collectorExporter['url'], url);
-      done();
+
+    it('should keep the URL if included', done => {
+      const url = 'http://foo.bar.com';
+      const collectorExporter = new CollectorMetricExporter({ url });
+      setTimeout(() => {
+        assert.strictEqual(collectorExporter['url'], url);
+        done();
+      });
     });
   });
 });
-
-testCollectorMetricExporter({ useTLS: true });
-testCollectorMetricExporter({ useTLS: false });
-testCollectorMetricExporter({ metadata });

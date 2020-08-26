@@ -18,7 +18,7 @@ import {
   Context,
   CorrelationContext,
   GetterFunction,
-  HttpTextPropagator,
+  TextMapPropagator,
   SetterFunction,
 } from '@opentelemetry/api';
 import {
@@ -49,7 +49,7 @@ type KeyPair = {
  * Based on the Correlation Context specification:
  * https://w3c.github.io/correlation-context/
  */
-export class HttpCorrelationContext implements HttpTextPropagator {
+export class HttpCorrelationContext implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const correlationContext = getCorrelationContext(context);
     if (!correlationContext) return;

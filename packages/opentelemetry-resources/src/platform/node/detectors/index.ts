@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-export { awsEc2Detector } from './AwsEc2Detector';
-export { envDetector } from './EnvDetector';
-export { gcpDetector } from './GcpDetector';
+export * from './EnvDetector';
