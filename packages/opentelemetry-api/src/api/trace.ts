@@ -31,7 +31,7 @@ import {
 export class TraceAPI {
   private static _instance?: TraceAPI;
 
-  private _tracerProviderProxy = new ProxyTracerProvider();
+  private _proxyTracerProvider = new ProxyTracerProvider();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -54,11 +54,11 @@ export class TraceAPI {
       return this.getTracerProvider();
     }
 
-    this._tracerProviderProxy.setDelegate(provider);
+    this._proxyTracerProvider.setDelegate(provider);
 
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      this._tracerProviderProxy,
+      this._proxyTracerProvider,
       NOOP_TRACER_PROVIDER
     );
 
@@ -71,7 +71,7 @@ export class TraceAPI {
   public getTracerProvider(): TracerProvider {
     return (
       _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      this._tracerProviderProxy
+      this._proxyTracerProvider
     );
   }
 
@@ -85,6 +85,6 @@ export class TraceAPI {
   /** Remove the global tracer provider */
   public disable() {
     delete _global[GLOBAL_TRACE_API_KEY];
-    this._tracerProviderProxy = new ProxyTracerProvider();
+    this._proxyTracerProvider = new ProxyTracerProvider();
   }
 }

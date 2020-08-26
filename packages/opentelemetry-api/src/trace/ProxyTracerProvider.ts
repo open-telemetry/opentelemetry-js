@@ -34,7 +34,7 @@ export class ProxyTracerProvider implements TracerProvider {
    */
   getTracer(name: string, version?: string): Tracer {
     return (
-      this._delegate?.getTracer(name, version) ??
+      this.getDelegateTracer(name, version) ??
       new ProxyTracer(this, name, version)
     );
   }
