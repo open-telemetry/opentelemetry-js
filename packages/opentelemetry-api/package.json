@@ -57,6 +57,7 @@
   "devDependencies": {
     "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
+    "@types/sinon": "4.3.1",
     "@types/webpack-env": "1.15.2",
     "codecov": "3.7.2",
     "gts": "2.0.2",
@@ -70,6 +71,7 @@
     "linkinator": "2.1.1",
     "mocha": "7.2.0",
     "nyc": "15.1.0",
+    "sinon": "9.0.3",
     "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
     "typedoc": "0.18.0",

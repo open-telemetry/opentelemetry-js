@@ -19,6 +19,7 @@ import {
   NoopTextMapPropagator,
   propagation,
   trace,
+  ProxyTracerProvider,
 } from '@opentelemetry/api';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
@@ -40,7 +41,9 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should register configured implementations', () => {
@@ -57,7 +60,9 @@ describe('API registration', () => {
     assert.ok(context['_getContextManager']() === contextManager);
     assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should skip null context manager', () => {
@@ -71,7 +76,9 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should skip null propagator', () => {
@@ -85,6 +92,8 @@ describe('API registration', () => {
     );
 
     assert.ok(context['_getContextManager']() instanceof StackContextManager);
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 });
