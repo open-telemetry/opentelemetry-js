@@ -34,8 +34,10 @@ describe('BeanstalkResourceDetector', () => {
 
   const correctCgroupData =
     'abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcdefghijklm';
+  const unexpectedCgroupdata =
+    'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb';
   const noisyCgroupData = `\n\n\n abcdefghijklmnopqrstuvwxyz \n ${correctCgroupData}`;
-  const multiValidCgroupData = `${correctCgroupData}\nabc${correctCgroupData}\nbcd${correctCgroupData}`;
+  const multiValidCgroupData = `${unexpectedCgroupdata}\n${correctCgroupData}\nbcd${unexpectedCgroupdata}`;
   const hostNameData = 'abcd.test.testing.com';
 
   let readStub, hostStub;
@@ -103,7 +105,7 @@ describe('BeanstalkResourceDetector', () => {
     });
 
     sandbox.assert.calledOnce(hostStub);
-    // sandbox.assert.calledOnce(readStub);
+    sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
     assertContainerResource(resource, {
       name: 'abcd.test.testing.com',
@@ -158,7 +160,7 @@ describe('BeanstalkResourceDetector', () => {
     });
 
     sandbox.assert.calledOnce(hostStub);
-    // sandbox.assert.calledOnce(readStub);
+    sandbox.assert.calledOnce(readStub);
     assert.ok(resource);
     assertContainerResource(resource, {
       name: 'abcd.test.testing.com',
