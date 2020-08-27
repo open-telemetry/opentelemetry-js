@@ -198,55 +198,58 @@ describe('Node SDK', () => {
     });
 
     // GCP detector only works in 10+
-    (semver.satisfies(process.version, ">=10") ? describe : describe.skip)('in GCP environment', () => {
-      after(() => {
-        resetIsAvailableCache();
-      });
-
-      it('returns a merged resource', async () => {
-        const sdk = new NodeSDK({
-          autoDetectResources: true,
+    (semver.satisfies(process.version, '>=10') ? describe : describe.skip)(
+      'in GCP environment',
+      () => {
+        after(() => {
+          resetIsAvailableCache();
         });
-        const gcpScope = nock(HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS)
-          .get(INSTANCE_ID_PATH)
-          .reply(200, () => 452003179927758, HEADERS)
-          .get(PROJECT_ID_PATH)
-          .reply(200, () => 'my-project-id', HEADERS)
-          .get(ZONE_PATH)
-          .reply(200, () => 'project/zone/my-zone', HEADERS)
-          .get(CLUSTER_NAME_PATH)
-          .reply(404);
-        const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .reply(200, {}, HEADERS);
-        const awsScope = nock(AWS_HOST)
-          .persist()
-          .put(AWS_TOKEN_PATH)
-          .matchHeader(AWS_METADATA_TTL_HEADER, '60')
-          .replyWithError({ code: 'ENOTFOUND' });
-        await sdk.detectResources();
-        const resource = sdk['_resource'];
 
-        awsScope.done();
-        gcpSecondaryScope.done();
-        gcpScope.done();
+        it('returns a merged resource', async () => {
+          const sdk = new NodeSDK({
+            autoDetectResources: true,
+          });
+          const gcpScope = nock(HOST_ADDRESS)
+            .get(INSTANCE_PATH)
+            .reply(200, {}, HEADERS)
+            .get(INSTANCE_ID_PATH)
+            .reply(200, () => 452003179927758, HEADERS)
+            .get(PROJECT_ID_PATH)
+            .reply(200, () => 'my-project-id', HEADERS)
+            .get(ZONE_PATH)
+            .reply(200, () => 'project/zone/my-zone', HEADERS)
+            .get(CLUSTER_NAME_PATH)
+            .reply(404);
+          const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
+            .get(INSTANCE_PATH)
+            .reply(200, {}, HEADERS);
+          const awsScope = nock(AWS_HOST)
+            .persist()
+            .put(AWS_TOKEN_PATH)
+            .matchHeader(AWS_METADATA_TTL_HEADER, '60')
+            .replyWithError({ code: 'ENOTFOUND' });
+          await sdk.detectResources();
+          const resource = sdk['_resource'];
 
-        assertCloudResource(resource, {
-          provider: 'gcp',
-          accountId: 'my-project-id',
-          zone: 'my-zone',
+          awsScope.done();
+          gcpSecondaryScope.done();
+          gcpScope.done();
+
+          assertCloudResource(resource, {
+            provider: 'gcp',
+            accountId: 'my-project-id',
+            zone: 'my-zone',
+          });
+          assertHostResource(resource, { id: '452003179927758' });
+          assertServiceResource(resource, {
+            instanceId: '627cc493',
+            name: 'my-service',
+            namespace: 'default',
+            version: '0.0.1',
+          });
         });
-        assertHostResource(resource, { id: '452003179927758' });
-        assertServiceResource(resource, {
-          instanceId: '627cc493',
-          name: 'my-service',
-          namespace: 'default',
-          version: '0.0.1',
-        });
-      });
-    });
+      }
+    );
 
     describe('in AWS environment', () => {
       it('returns a merged resource', async () => {
