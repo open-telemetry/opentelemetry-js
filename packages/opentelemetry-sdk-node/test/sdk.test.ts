@@ -18,11 +18,12 @@ import * as nock from 'nock';
 import {
   context,
   metrics,
-  NoopHttpTextPropagator,
+  NoopTextMapPropagator,
   NoopMeterProvider,
   NoopTracerProvider,
   propagation,
   trace,
+  ProxyTracerProvider,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
@@ -102,10 +103,14 @@ describe('Node SDK', () => {
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
-      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+      const apiTracerProvider = trace.getTracerProvider();
+      console.log(apiTracerProvider);
+      assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+      assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
+
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
     });
 
@@ -125,7 +130,9 @@ describe('Node SDK', () => {
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
+      const apiTracerProvider = trace.getTracerProvider();
+      assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+      assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
     it('should register a tracer provider if a span processor is provided', async () => {
@@ -147,7 +154,9 @@ describe('Node SDK', () => {
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
       );
-      assert.ok(trace.getTracerProvider() instanceof NodeTracerProvider);
+      const apiTracerProvider = trace.getTracerProvider();
+      assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+      assert.ok(apiTracerProvider.getDelegate() instanceof NodeTracerProvider);
     });
 
     it('should register a meter provider if an exporter is provided', async () => {
@@ -162,10 +171,12 @@ describe('Node SDK', () => {
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
-      assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
+      const apiTracerProvider = trace.getTracerProvider();
+      assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+      assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
 
       assert.ok(metrics.getMeterProvider() instanceof MeterProvider);
     });
