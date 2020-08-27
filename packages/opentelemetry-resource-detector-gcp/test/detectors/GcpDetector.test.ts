@@ -132,6 +132,11 @@ describe('gcpDetector', () => {
     });
 
     it('should return resource and empty data for non-available metadata attributes', async () => {
+      console.log('HOST_ADDRESS', HOST_ADDRESS);
+      console.log('INSTANCE_PATH', INSTANCE_PATH);
+      console.log('PROJECT_ID_PATH', INSTANCE_PATH);
+      console.log('INSTANCE_ID_PATH', INSTANCE_PATH);
+      console.log('CLUSTER_NAME_PATH', INSTANCE_PATH);
       const scope = nock(HOST_ADDRESS)
         .get(INSTANCE_PATH)
         .reply(200, {}, HEADERS)
