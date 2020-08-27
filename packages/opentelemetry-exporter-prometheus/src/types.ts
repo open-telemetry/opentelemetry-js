@@ -13,6 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export function unrefTimer(timer: NodeJS.Timer): void {
-  timer.unref();
+
+import {
+  MetricDescriptor,
+  AggregatorKind,
+  MetricRecord,
+} from '@opentelemetry/metrics';
+
+export interface PrometheusCheckpoint {
+  descriptor: MetricDescriptor;
+  aggregatorKind: AggregatorKind;
+  records: MetricRecord[];
 }
