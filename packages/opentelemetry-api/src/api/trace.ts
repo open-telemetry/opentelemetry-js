@@ -84,7 +84,5 @@ export class TraceAPI {
     delete _global[GLOBAL_TRACE_API_KEY];
   }
 
-  public isSpanContextValid(sc: SpanContext): boolean {
-    return isSpanContextValid(sc);
-  }
+  public isSpanContextValid = isSpanContextValid;
 }
