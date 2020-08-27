@@ -144,7 +144,8 @@ export class BoundValueRecorder
 /**
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
-export class BoundObserver extends BaseBoundInstrument
+export class BoundObserver
+  extends BaseBoundInstrument
   implements api.BoundBaseObserver {
   constructor(
     labels: api.Labels,
