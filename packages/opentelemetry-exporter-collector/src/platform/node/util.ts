@@ -19,10 +19,6 @@ import * as https from 'https';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
 
-export function removeProtocol(url: string): string {
-  return url.replace(/^https?:\/\//, '');
-}
-
 /**
  * Sends data using http
  * @param collector

@@ -17,7 +17,7 @@
 import {
   Context,
   GetterFunction,
-  HttpTextPropagator,
+  TextMapPropagator,
   SetterFunction,
   TraceFlags,
 } from '@opentelemetry/api';
@@ -120,7 +120,7 @@ function getTraceFlags(
  * Propagator for the B3 HTTP header format.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
-export class B3Propagator implements HttpTextPropagator {
+export class B3Propagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;

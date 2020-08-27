@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Context, HttpTextPropagator, TraceFlags } from '@opentelemetry/api';
+import { Context, TextMapPropagator, TraceFlags } from '@opentelemetry/api';
 import {
   getParentSpanContext,
   setExtractedSpanContext,
 } from '@opentelemetry/core';
 import * as http from 'http';
 
-export class DummyPropagation implements HttpTextPropagator {
+export class DummyPropagation implements TextMapPropagator {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
   extract(context: Context, carrier: http.OutgoingHttpHeaders) {

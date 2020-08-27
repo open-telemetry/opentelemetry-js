@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
+export * from './common/Exception';
 export * from './common/Logger';
 export * from './common/Time';
 export * from './context/propagation/getter';
-export * from './context/propagation/HttpTextPropagator';
-export * from './context/propagation/NoopHttpTextPropagator';
+export * from './context/propagation/TextMapPropagator';
+export * from './context/propagation/NoopTextMapPropagator';
 export * from './context/propagation/setter';
 export * from './correlation_context/CorrelationContext';
 export * from './correlation_context/EntryValue';

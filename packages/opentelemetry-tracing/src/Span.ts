@@ -23,6 +23,10 @@ import {
   timeInputToHrTime,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
+import {
+  ExceptionAttribute,
+  ExceptionEventName,
+} from '@opentelemetry/semantic-conventions';
 import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
@@ -176,6 +180,35 @@ export class Span implements api.Span, ReadableSpan {
 
   isRecording(): boolean {
     return true;
+  }
+
+  recordException(exception: api.Exception, time: api.TimeInput = hrTime()) {
+    const attributes: api.Attributes = {};
+    if (typeof exception === 'string') {
+      attributes[ExceptionAttribute.MESSAGE] = exception;
+    } else if (exception) {
+      if (exception.code) {
+        attributes[ExceptionAttribute.TYPE] = exception.code;
+      } else if (exception.name) {
+        attributes[ExceptionAttribute.TYPE] = exception.name;
+      }
+      if (exception.message) {
+        attributes[ExceptionAttribute.MESSAGE] = exception.message;
+      }
+      if (exception.stack) {
+        attributes[ExceptionAttribute.STACKTRACE] = exception.stack;
+      }
+    }
+
+    // these are minimum requirements from spec
+    if (
+      attributes[ExceptionAttribute.TYPE] ||
+      attributes[ExceptionAttribute.MESSAGE]
+    ) {
+      this.addEvent(ExceptionEventName, attributes as api.Attributes, time);
+    } else {
+      this._logger.warn(`Failed to record an exception ${exception}`);
+    }
   }
 
   get duration(): api.HrTime {

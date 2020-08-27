@@ -3,7 +3,9 @@
 const opentelemetry = require('@opentelemetry/api');
 // const { ConsoleLogger,  LogLevel} = require('@opentelemetry/core');
 const { BasicTracerProvider, ConsoleSpanExporter, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorTraceExporter, CollectorProtocolNode } = require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector');
+// const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-grpc');
+// const { CollectorTraceExporter } = require('@opentelemetry/exporter-collector-proto');
 
 const exporter = new CollectorTraceExporter({
   serviceName: 'basic-service',
@@ -11,8 +13,6 @@ const exporter = new CollectorTraceExporter({
   // headers: {
   //   foo: 'bar'
   // },
-  protocolNode: CollectorProtocolNode.HTTP_PROTO,
-  // protocolNode: CollectorProtocolNode.HTTP_JSON,
 });
 
 const provider = new BasicTracerProvider();

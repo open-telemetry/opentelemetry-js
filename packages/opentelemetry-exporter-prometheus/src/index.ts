@@ -14,5 +14,5 @@
  * limitations under the License.
  */
 
-export * from './prometheus';
+export * from './PrometheusExporter';
 export * from './export/types';

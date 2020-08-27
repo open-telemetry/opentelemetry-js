@@ -18,7 +18,7 @@ import * as nock from 'nock';
 import {
   context,
   metrics,
-  NoopHttpTextPropagator,
+  NoopTextMapPropagator,
   NoopMeterProvider,
   NoopTracerProvider,
   propagation,
@@ -102,7 +102,7 @@ describe('Node SDK', () => {
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
       assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
@@ -162,7 +162,7 @@ describe('Node SDK', () => {
 
       assert.ok(context['_getContextManager']() instanceof NoopContextManager);
       assert.ok(
-        propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+        propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
       );
 
       assert.ok(trace.getTracerProvider() instanceof NoopTracerProvider);
