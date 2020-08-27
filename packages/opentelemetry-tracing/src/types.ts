@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { HttpTextPropagator, Logger, Sampler } from '@opentelemetry/api';
+import { TextMapPropagator, Logger, Sampler } from '@opentelemetry/api';
 import { LogLevel, IdGenerator } from '@opentelemetry/core';
 
 import { ContextManager } from '@opentelemetry/context-base';
@@ -43,6 +43,9 @@ export interface TracerConfig {
   /** Resource associated with trace telemetry  */
   resource?: Resource;
 
+  /** Bool for whether or not graceful shutdown is enabled. If disabled spans will not be exported when SIGTERM is recieved */
+  gracefulShutdown?: boolean;
+
   /**
    * Generator of trace and span IDs
    * The default idGenerator generates random ids
@@ -57,7 +60,7 @@ export interface TracerConfig {
  */
 export interface SDKRegistrationConfig {
   /** Propagator to register as the global propagator */
-  propagator?: HttpTextPropagator | null;
+  propagator?: TextMapPropagator | null;
 
   /** Context manager to register as the global context manager */
   contextManager?: ContextManager | null;

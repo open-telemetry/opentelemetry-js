@@ -23,6 +23,9 @@ import {
   InMemorySpanExporter,
   Span,
 } from '../../src';
+import { context } from '@opentelemetry/api';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
+import { TestStackContextManager } from './TestStackContextManager';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -214,7 +217,6 @@ describe('BatchSpanProcessor', () => {
       it('should call an async callback when shutdown is complete', done => {
         let exportedSpans = 0;
         sinon.stub(exporter, 'export').callsFake((spans, callback) => {
-          console.log('uh, export?');
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;
             callback(ExportResult.SUCCESS);
@@ -223,6 +225,33 @@ describe('BatchSpanProcessor', () => {
 
         processor.shutdown(() => {
           assert.strictEqual(exportedSpans, 1);
+          done();
+        });
+      });
+    });
+
+    describe('flushing spans with exporter triggering instrumentation', () => {
+      beforeEach(() => {
+        const contextManager = new TestStackContextManager().enable();
+        context.setGlobalContextManager(contextManager);
+      });
+
+      afterEach(() => {
+        context.disable();
+      });
+
+      it('should prevent instrumentation prior to export', done => {
+        const testTracingExporter = new TestTracingSpanExporter();
+        const processor = new BatchSpanProcessor(testTracingExporter);
+
+        const span = createSampledSpan('test');
+        processor.onStart(span);
+        processor.onEnd(span);
+
+        processor.forceFlush(() => {
+          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          assert.equal(exporterCreatedSpans.length, 0);
+
           done();
         });
       });

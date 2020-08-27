@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/plugin-xml-http-request",
-  "version": "0.10.1",
+  "version": "0.10.2",
   "description": "OpenTelemetry XMLHttpRequest automatic instrumentation package.",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -44,10 +44,10 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.11.0",
-    "@opentelemetry/context-zone": "^0.10.1",
-    "@opentelemetry/tracing": "^0.10.1",
-    "@types/mocha": "8.0.0",
+    "@babel/core": "7.11.1",
+    "@opentelemetry/context-zone": "^0.10.2",
+    "@opentelemetry/tracing": "^0.10.2",
+    "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "@types/shimmer": "1.0.1",
     "@types/sinon": "9.0.4",
@@ -65,20 +65,20 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.2",
-    "ts-loader": "8.0.1",
+    "sinon": "9.0.3",
+    "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7",
     "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
-    "webpack-merge": "5.0.9"
+    "webpack-merge": "5.1.1"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.1",
-    "@opentelemetry/core": "^0.10.1",
-    "@opentelemetry/semantic-conventions": "^0.10.1",
-    "@opentelemetry/web": "^0.10.1",
+    "@opentelemetry/api": "^0.10.2",
+    "@opentelemetry/core": "^0.10.2",
+    "@opentelemetry/semantic-conventions": "^0.10.2",
+    "@opentelemetry/web": "^0.10.2",
     "shimmer": "^1.2.1"
   }
 }

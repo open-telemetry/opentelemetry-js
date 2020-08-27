@@ -17,7 +17,7 @@
 import {
   defaultGetter,
   defaultSetter,
-  HttpTextPropagator,
+  TextMapPropagator,
   SpanContext,
 } from '@opentelemetry/api';
 import { Context } from '@opentelemetry/context-base';
@@ -154,7 +154,7 @@ describe('Composite Propagator', () => {
   });
 });
 
-class ThrowingPropagator implements HttpTextPropagator {
+class ThrowingPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown) {
     throw new Error('this propagator throws');
   }

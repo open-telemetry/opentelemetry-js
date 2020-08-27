@@ -38,12 +38,25 @@ export class PushController extends Controller {
     unrefTimer(this._timer);
   }
 
-  private _collect() {
-    this._meter.collect();
-    this._exporter.export(this._meter.getBatcher().checkPointSet(), result => {
-      if (result !== ExportResult.SUCCESS) {
-        // @todo: log error
-      }
+  async shutdown(): Promise<void> {
+    clearInterval(this._timer);
+    await this._collect();
+  }
+
+  private async _collect(): Promise<void> {
+    await this._meter.collect();
+    return new Promise((resolve, reject) => {
+      this._exporter.export(
+        this._meter.getBatcher().checkPointSet(),
+        result => {
+          if (result === ExportResult.SUCCESS) {
+            resolve();
+          } else {
+            // @todo log error
+            reject();
+          }
+        }
+      );
     });
   }
 }

@@ -40,7 +40,7 @@ export function patchClient(
       const client = original.call(this, methods, serviceName, options);
       shimmer.massWrap<typeof client.prototype, string>(
         client.prototype,
-        getMethodsToWrap(client, methods),
+        getMethodsToWrap.call(plugin, client, methods),
         getPatchedClientMethods.call(plugin)
       );
       return client;

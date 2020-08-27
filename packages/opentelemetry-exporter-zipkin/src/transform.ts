@@ -83,8 +83,8 @@ export function _toZipkinTags(
     tags[statusDescriptionTagName] = status.message;
   }
 
-  Object.keys(resource.labels).forEach(
-    name => (tags[name] = resource.labels[name])
+  Object.keys(resource.attributes).forEach(
+    name => (tags[name] = resource.attributes[name])
   );
 
   return tags;

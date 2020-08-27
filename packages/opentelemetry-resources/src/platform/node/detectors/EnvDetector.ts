@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-import { Resource } from '../../../Resource';
-import { Detector, ResourceLabels } from '../../../types';
-import { ResourceDetectionConfigWithLogger } from '../../../config';
+import {
+  Detector,
+  Resource,
+  ResourceDetectionConfigWithLogger,
+  ResourceAttributes,
+} from '../../../';
 
 /**
  * EnvDetector can be used to detect the presence of and create a Resource
- * from the OTEL_RESOURCE_LABELS environment variable.
+ * from the OTEL_RESOURCE_ATTRIBUTES environment variable.
  */
 class EnvDetector implements Detector {
-  // Type, label keys, and label values should not exceed 256 characters.
+  // Type, attribute keys, and attribute values should not exceed 256 characters.
   private readonly _MAX_LENGTH = 255;
 
-  // OTEL_RESOURCE_LABELS is a comma-separated list of labels.
+  // OTEL_RESOURCE_ATTRIBUTES is a comma-separated list of attributes.
   private readonly _COMMA_SEPARATOR = ',';
 
-  // OTEL_RESOURCE_LABELS contains key value pair separated by '='.
+  // OTEL_RESOURCE_ATTRIBUTES contains key value pair separated by '='.
   private readonly _LABEL_KEY_VALUE_SPLITTER = '=';
 
   private readonly _ERROR_MESSAGE_INVALID_CHARS =
@@ -43,25 +46,23 @@ class EnvDetector implements Detector {
     ' characters.';
 
   /**
-   * Returns a {@link Resource} populated with labels from the
-   * OTEL_RESOURCE_LABELS environment variable. Note this is an async function
-   * to conform to the Detector interface.
+   * Returns a {@link Resource} populated with attributes from the
+   * OTEL_RESOURCE_ATTRIBUTES environment variable. Note this is an async
+   * function to conform to the Detector interface.
    *
    * @param config The resource detection config with a required logger
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     try {
-      const labelString = process.env.OTEL_RESOURCE_LABELS;
-      if (!labelString) {
+      const rawAttributes = process.env.OTEL_RESOURCE_ATTRIBUTES;
+      if (!rawAttributes) {
         config.logger.debug(
-          'EnvDetector failed: Environment variable "OTEL_RESOURCE_LABELS" is missing.'
+          'EnvDetector failed: Environment variable "OTEL_RESOURCE_ATTRIBUTES" is missing.'
         );
         return Resource.empty();
       }
-      const labels = this._parseResourceLabels(
-        process.env.OTEL_RESOURCE_LABELS
-      );
-      return new Resource(labels);
+      const attributes = this._parseResourceAttributes(rawAttributes);
+      return new Resource(attributes);
     } catch (e) {
       config.logger.debug(`EnvDetector failed: ${e.message}`);
       return Resource.empty();
@@ -69,24 +70,31 @@ class EnvDetector implements Detector {
   }
 
   /**
-   * Creates a label map from the OTEL_RESOURCE_LABELS environment variable.
+   * Creates an attribute map from the OTEL_RESOURCE_ATTRIBUTES environment
+   * variable.
    *
-   * OTEL_RESOURCE_LABELS: A comma-separated list of labels describing the
-   * source in more detail, e.g. “key1=val1,key2=val2”. Domain names and paths
-   * are accepted as label keys. Values may be quoted or unquoted in general. If
-   * a value contains whitespaces, =, or " characters, it must always be quoted.
+   * OTEL_RESOURCE_ATTRIBUTES: A comma-separated list of attributes describing
+   * the source in more detail, e.g. “key1=val1,key2=val2”. Domain names and
+   * paths are accepted as attribute keys. Values may be quoted or unquoted in
+   * general. If a value contains whitespaces, =, or " characters, it must
+   * always be quoted.
    *
-   * @param rawEnvLabels The resource labels as a comma-seperated list
+   * @param rawEnvAttributes The resource attributes as a comma-seperated list
    * of key/value pairs.
-   * @returns The sanitized resource labels.
+   * @returns The sanitized resource attributes.
    */
-  private _parseResourceLabels(rawEnvLabels?: string): ResourceLabels {
-    if (!rawEnvLabels) return {};
+  private _parseResourceAttributes(
+    rawEnvAttributes?: string
+  ): ResourceAttributes {
+    if (!rawEnvAttributes) return {};
 
-    const labels: ResourceLabels = {};
-    const rawLabels: string[] = rawEnvLabels.split(this._COMMA_SEPARATOR, -1);
-    for (const rawLabel of rawLabels) {
-      const keyValuePair: string[] = rawLabel.split(
+    const attributes: ResourceAttributes = {};
+    const rawAttributes: string[] = rawEnvAttributes.split(
+      this._COMMA_SEPARATOR,
+      -1
+    );
+    for (const rawAttribute of rawAttributes) {
+      const keyValuePair: string[] = rawAttribute.split(
         this._LABEL_KEY_VALUE_SPLITTER,
         -1
       );
@@ -98,14 +106,14 @@ class EnvDetector implements Detector {
       key = key.trim();
       value = value.trim().split('^"|"$').join('');
       if (!this._isValidAndNotEmpty(key)) {
-        throw new Error(`Label key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
+        throw new Error(`Attribute key ${this._ERROR_MESSAGE_INVALID_CHARS}`);
       }
       if (!this._isValid(value)) {
-        throw new Error(`Label value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
+        throw new Error(`Attribute value ${this._ERROR_MESSAGE_INVALID_VALUE}`);
       }
-      labels[key] = value;
+      attributes[key] = value;
     }
-    return labels;
+    return attributes;
   }
 
   /**
