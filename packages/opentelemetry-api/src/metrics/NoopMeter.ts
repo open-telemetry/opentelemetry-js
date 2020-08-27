@@ -131,16 +131,14 @@ export class NoopMetric<T> implements UnboundMetric<T> {
   }
 }
 
-export class NoopCounterMetric
-  extends NoopMetric<BoundCounter>
+export class NoopCounterMetric extends NoopMetric<BoundCounter>
   implements Counter {
   add(value: number, labels: Labels) {
     this.bind(labels).add(value);
   }
 }
 
-export class NoopValueRecorderMetric
-  extends NoopMetric<BoundValueRecorder>
+export class NoopValueRecorderMetric extends NoopMetric<BoundValueRecorder>
   implements ValueRecorder {
   record(
     value: number,
@@ -158,8 +156,7 @@ export class NoopValueRecorderMetric
   }
 }
 
-export class NoopBaseObserverMetric
-  extends NoopMetric<BoundBaseObserver>
+export class NoopBaseObserverMetric extends NoopMetric<BoundBaseObserver>
   implements BaseObserver {
   observation() {
     return {
@@ -169,8 +166,7 @@ export class NoopBaseObserverMetric
   }
 }
 
-export class NoopBatchObserverMetric
-  extends NoopMetric<void>
+export class NoopBatchObserverMetric extends NoopMetric<void>
   implements BatchObserver {}
 
 export class NoopBoundCounter implements BoundCounter {

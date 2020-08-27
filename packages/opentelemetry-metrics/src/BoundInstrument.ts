@@ -72,8 +72,7 @@ export class BaseBoundInstrument {
  * BoundCounter allows the SDK to observe/record a single metric event. The
  * value of single instrument in the `Counter` associated with specified Labels.
  */
-export class BoundCounter
-  extends BaseBoundInstrument
+export class BoundCounter extends BaseBoundInstrument
   implements api.BoundCounter {
   constructor(
     labels: api.Labels,
@@ -102,8 +101,7 @@ export class BoundCounter
  * The value of single instrument in the `UpDownCounter` associated with
  * specified Labels.
  */
-export class BoundUpDownCounter
-  extends BaseBoundInstrument
+export class BoundUpDownCounter extends BaseBoundInstrument
   implements api.BoundCounter {
   constructor(
     labels: api.Labels,
@@ -123,8 +121,7 @@ export class BoundUpDownCounter
 /**
  * BoundMeasure is an implementation of the {@link BoundMeasure} interface.
  */
-export class BoundValueRecorder
-  extends BaseBoundInstrument
+export class BoundValueRecorder extends BaseBoundInstrument
   implements api.BoundValueRecorder {
   private readonly _absolute: boolean;
 
