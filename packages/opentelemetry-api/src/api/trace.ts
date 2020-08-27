@@ -17,7 +17,6 @@
 import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
-import { SpanContext } from '../trace/span_context';
 import { isSpanContextValid } from '../trace/spancontext-utils';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
