@@ -13,6 +13,7 @@
     "compile": "lerna run compile",
     "test": "lerna run test",
     "test:browser": "lerna run test:browser",
+    "test:backcompat": "lerna run test:backcompat",
     "bootstrap": "lerna bootstrap",
     "bump": "lerna publish",
     "codecov": "lerna run codecov",
