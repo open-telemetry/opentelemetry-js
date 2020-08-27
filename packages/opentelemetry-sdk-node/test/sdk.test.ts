@@ -15,6 +15,7 @@
  */
 
 import * as nock from 'nock';
+import * as semver from 'semver';
 import {
   context,
   metrics,
@@ -84,6 +85,7 @@ describe('Node SDK', () => {
   before(() => {
     // Disable attempted load of default plugins
     Sinon.replace(NodeConfig, 'DEFAULT_INSTRUMENTATION_PLUGINS', {});
+    nock.disableNetConnect();
   });
 
   beforeEach(() => {
@@ -195,7 +197,8 @@ describe('Node SDK', () => {
       delete process.env.OTEL_RESOURCE_ATTRIBUTES;
     });
 
-    describe('in GCP environment', () => {
+    // GCP detector only works in 10+
+    (semver.satisfies(process.version, ">=10") ? describe : describe.skip)('in GCP environment', () => {
       after(() => {
         resetIsAvailableCache();
       });
@@ -250,14 +253,6 @@ describe('Node SDK', () => {
         const sdk = new NodeSDK({
           autoDetectResources: true,
         });
-        const gcpScope = nock(HOST_ADDRESS).get(INSTANCE_PATH).replyWithError({
-          code: 'ENOTFOUND',
-        });
-        const gcpSecondaryScope = nock(SECONDARY_HOST_ADDRESS)
-          .get(INSTANCE_PATH)
-          .replyWithError({
-            code: 'ENOTFOUND',
-          });
         const awsScope = nock(AWS_HOST)
           .persist()
           .put(AWS_TOKEN_PATH)
@@ -271,8 +266,6 @@ describe('Node SDK', () => {
           .reply(200, () => mockedHostResponse);
         await sdk.detectResources();
         const resource: Resource = sdk['_resource'];
-        gcpSecondaryScope.done();
-        gcpScope.done();
         awsScope.done();
 
         assertCloudResource(resource, {
