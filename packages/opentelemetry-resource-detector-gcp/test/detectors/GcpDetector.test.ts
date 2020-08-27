@@ -23,6 +23,7 @@ import {
   resetIsAvailableCache,
 } from 'gcp-metadata';
 import * as nock from 'nock';
+import * as semver from 'semver';
 import { gcpDetector } from '../../src';
 import {
   assertCloudResource,
@@ -43,8 +44,8 @@ const PROJECT_ID_PATH = BASE_PATH + '/project/project-id';
 const ZONE_PATH = BASE_PATH + '/instance/zone';
 const CLUSTER_NAME_PATH = BASE_PATH + '/instance/attributes/cluster-name';
 
-describe('gcpDetector', () => {
-  describe('.detect', () => {
+(semver.satisfies(process.version, ">=10") ? describe : describe.skip)('gcpDetector', () => {
+  describe('.detect', function() {
     before(() => {
       nock.disableNetConnect();
     });
