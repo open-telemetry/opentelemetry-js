@@ -107,7 +107,7 @@ describe('Node SDK', () => {
       );
 
       const apiTracerProvider = trace.getTracerProvider();
-      console.log(apiTracerProvider)
+      console.log(apiTracerProvider);
       assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
       assert.ok(apiTracerProvider.getDelegate() instanceof NoopTracerProvider);
 

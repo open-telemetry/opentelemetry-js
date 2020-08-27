@@ -41,7 +41,7 @@ export class ProxyTracerProvider implements TracerProvider {
   }
 
   getDelegate(): TracerProvider {
-    return this._delegate ?? NOOP_TRACER_PROVIDER
+    return this._delegate ?? NOOP_TRACER_PROVIDER;
   }
 
   /**
