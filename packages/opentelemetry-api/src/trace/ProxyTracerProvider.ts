@@ -17,6 +17,7 @@
 import { Tracer } from './tracer';
 import { TracerProvider } from './tracer_provider';
 import { ProxyTracer } from './ProxyTracer';
+import { NOOP_TRACER_PROVIDER } from './NoopTracerProvider';
 
 /**
  * Tracer provider which provides {@link ProxyTracer}s.
@@ -37,6 +38,10 @@ export class ProxyTracerProvider implements TracerProvider {
       this.getDelegateTracer(name, version) ??
       new ProxyTracer(this, name, version)
     );
+  }
+
+  getDelegate(): TracerProvider {
+    return this._delegate ?? NOOP_TRACER_PROVIDER
   }
 
   /**
