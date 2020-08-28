@@ -15,4 +15,4 @@
  */
 
 export * from './zipkin';
-export { ExporterConfig } from './types'
+export { ExporterConfig } from './types';
