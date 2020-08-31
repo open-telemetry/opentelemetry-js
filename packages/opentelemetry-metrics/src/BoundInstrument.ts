@@ -126,34 +126,17 @@ export class BoundUpDownCounter
 export class BoundValueRecorder
   extends BaseBoundInstrument
   implements api.BoundValueRecorder {
-  private readonly _absolute: boolean;
-
   constructor(
     labels: api.Labels,
     disabled: boolean,
-    absolute: boolean,
     valueType: api.ValueType,
     logger: api.Logger,
     aggregator: Aggregator
   ) {
     super(labels, logger, disabled, valueType, aggregator);
-    this._absolute = absolute;
   }
 
-  record(
-    value: number,
-    correlationContext?: api.CorrelationContext,
-    spanContext?: api.SpanContext
-  ): void {
-    if (this._absolute && value < 0) {
-      this._logger.error(
-        `Absolute ValueRecorder cannot contain negative values for $${Object.values(
-          this._labels
-        )}`
-      );
-      return;
-    }
-
+  record(value: number): void {
     this.update(value);
   }
 }
@@ -161,7 +144,9 @@ export class BoundValueRecorder
 /**
  * BoundObserver is an implementation of the {@link BoundObserver} interface.
  */
-export class BoundObserver extends BaseBoundInstrument {
+export class BoundObserver
+  extends BaseBoundInstrument
+  implements api.BoundBaseObserver {
   constructor(
     labels: api.Labels,
     disabled: boolean,

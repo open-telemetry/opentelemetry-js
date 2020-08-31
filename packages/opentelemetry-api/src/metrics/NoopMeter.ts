@@ -142,19 +142,8 @@ export class NoopCounterMetric
 export class NoopValueRecorderMetric
   extends NoopMetric<BoundValueRecorder>
   implements ValueRecorder {
-  record(
-    value: number,
-    labels: Labels,
-    correlationContext?: CorrelationContext,
-    spanContext?: SpanContext
-  ) {
-    if (typeof correlationContext === 'undefined') {
-      this.bind(labels).record(value);
-    } else if (typeof spanContext === 'undefined') {
-      this.bind(labels).record(value, correlationContext);
-    } else {
-      this.bind(labels).record(value, correlationContext, spanContext);
-    }
+  record(value: number, labels: Labels) {
+    this.bind(labels).record(value);
   }
 }
 

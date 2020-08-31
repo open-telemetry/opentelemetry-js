@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 
-import { CorrelationContext } from '../correlation_context/CorrelationContext';
-import { SpanContext } from '../trace/span_context';
-
 /** An Instrument for Counter Metric. */
 export interface BoundCounter {
   /**
@@ -31,18 +28,8 @@ export interface BoundValueRecorder {
   /**
    * Records the given value to this value recorder.
    * @param value to record.
-   * @param correlationContext the correlationContext associated with the
-   *     values.
-   * @param spanContext the {@link SpanContext} that identifies the {@link Span}
-   *     which the values are associated with.
    */
   record(value: number): void;
-  record(value: number, correlationContext: CorrelationContext): void;
-  record(
-    value: number,
-    correlationContext: CorrelationContext,
-    spanContext: SpanContext
-  ): void;
 }
 
 /** An Instrument for Base Observer */
