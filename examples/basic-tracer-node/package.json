@@ -1,7 +1,7 @@
 {
   "name": "example-basic-tracer-node",
   "private": true,
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "Example of using @opentelemetry/tracing in Node.js",
   "main": "index.js",
   "scripts": {
@@ -24,9 +24,9 @@
     "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
   },
   "dependencies": {
-    "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/exporter-jaeger": "^0.10.2",
-    "@opentelemetry/tracing": "^0.10.2"
+    "@opentelemetry/api": "^0.11.0",
+    "@opentelemetry/exporter-jaeger": "^0.11.0",
+    "@opentelemetry/tracing": "^0.11.0"
   },
   "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme"
 }
