@@ -5,7 +5,7 @@ node_test_env: &node_test_env
 
 
 cache_1: &cache_1
-  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+  key: npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
   paths:
     - ./node_modules
     - ./package-lock.json
@@ -25,13 +25,15 @@ cache_1: &cache_1
     - packages/opentelemetry-web/node_modules
 
 cache_2: &cache_2
-  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+  key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
   paths:
     - packages/opentelemetry-plugin-grpc/node_modules
     - packages/opentelemetry-plugin-http/node_modules
     - packages/opentelemetry-plugin-https/node_modules
     - packages/opentelemetry-exporter-collector/node_modules
     - packages/opentelemetry-plugin-xml-http-request/node_modules
+    - packages/opentelemetry-resource-detector-aws/node_modules
+    - packages/opentelemetry-resource-detector-gcp/node_modules
     - packages/opentelemetry-resources/node_modules
 
 node_unit_tests: &node_unit_tests
@@ -53,10 +55,10 @@ node_unit_tests: &node_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
     - run:
         name: Install Root Dependencies
         command: npm install --ignore-scripts
@@ -93,10 +95,10 @@ browsers_unit_tests: &browsers_unit_tests
           echo "CIRCLE_NODE_VERSION=${CIRCLE_NODE_VERSION}"
     - restore_cache:
         keys:
-          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+          - npm-cache-01-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
     - restore_cache:
         keys:
-          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-F267A71D
+          - npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
     - run:
         name: Install Root Dependencies
         command: npm install --ignore-scripts

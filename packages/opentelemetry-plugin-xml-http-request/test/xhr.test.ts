@@ -263,7 +263,7 @@ describe('xhr', () => {
 
         it('span should have correct name', () => {
           const span: tracing.ReadableSpan = exportSpy.args[1][0][0];
-          assert.strictEqual(span.name, url, 'span has wrong name');
+          assert.strictEqual(span.name, 'HTTP GET', 'span has wrong name');
         });
 
         it('span should have correct kind', () => {

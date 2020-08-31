@@ -13,24 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { SpanContext } from './span_context';
+import { TraceFlags } from './trace_flags';
 
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
-
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
+const VALID_TRACEID_REGEX = /^([0-9a-f]{32})$/i;
+const VALID_SPANID_REGEX = /^[0-9a-f]{16}$/i;
+export const INVALID_SPANID = '0000000000000000';
+export const INVALID_TRACEID = '00000000000000000000000000000000';
 export const INVALID_SPAN_CONTEXT: SpanContext = {
   traceId: INVALID_TRACEID,
   spanId: INVALID_SPANID,
   traceFlags: TraceFlags.NONE,
 };
 
+export function isValidTraceId(traceId: string): boolean {
+  return VALID_TRACEID_REGEX.test(traceId) && traceId !== INVALID_TRACEID;
+}
+
+export function isValidSpanId(spanId: string): boolean {
+  return VALID_SPANID_REGEX.test(spanId) && spanId !== INVALID_SPANID;
+}
+
 /**
  * Returns true if this {@link SpanContext} is valid.
  * @return true if this {@link SpanContext} is valid.
  */
-export function isValid(spanContext: SpanContext): boolean {
+export function isSpanContextValid(spanContext: SpanContext): boolean {
   return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
+    isValidTraceId(spanContext.traceId) && isValidSpanId(spanContext.spanId)
   );
 }
