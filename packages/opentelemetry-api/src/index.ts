@@ -55,6 +55,12 @@ export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
 
+export {
+  INVALID_SPANID,
+  INVALID_TRACEID,
+  INVALID_SPAN_CONTEXT,
+} from './trace/spancontext-utils';
+
 export { Context } from '@opentelemetry/context-base';
 
 import { ContextAPI } from './api/context';
