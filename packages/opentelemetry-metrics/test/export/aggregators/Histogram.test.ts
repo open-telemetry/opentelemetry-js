@@ -27,9 +27,23 @@ describe('HistogramAggregator', () => {
     });
 
     it('should sort boundaries', () => {
-      const aggregator = new HistogramAggregator([500, 300, 700]);
+      const aggregator = new HistogramAggregator([
+        200,
+        500,
+        300,
+        700,
+        1000,
+        1500,
+      ]);
       const point = aggregator.toPoint().value as Histogram;
-      assert.deepEqual(point.buckets.boundaries, [300, 500, 700]);
+      assert.deepEqual(point.buckets.boundaries, [
+        200,
+        300,
+        500,
+        700,
+        1000,
+        1500,
+      ]);
     });
 
     it('should throw if no boundaries are defined', () => {
