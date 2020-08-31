@@ -17,8 +17,8 @@
 import * as assert from 'assert';
 import {
   CanonicalCode,
-  INVALID_SPAN_ID,
-  INVALID_TRACE_ID,
+  INVALID_SPANID,
+  INVALID_TRACEID,
   NoopSpan,
   TraceFlags,
 } from '../../src';
@@ -45,8 +45,8 @@ describe('NoopSpan', () => {
 
     assert.ok(!span.isRecording());
     assert.deepStrictEqual(span.context(), {
-      traceId: INVALID_TRACE_ID,
-      spanId: INVALID_SPAN_ID,
+      traceId: INVALID_TRACEID,
+      spanId: INVALID_SPANID,
       traceFlags: TraceFlags.NONE,
     });
     span.end();
