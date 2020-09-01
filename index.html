@@ -296,9 +296,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
-						<a href="classes/noophttptextpropagator.html" class="tsd-kind-icon">Noop<wbr>Http<wbr>Text<wbr>Propagator</a>
-					</li>
-					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -311,6 +308,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="classes/noopspan.html" class="tsd-kind-icon">Noop<wbr>Span</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/nooptextmappropagator.html" class="tsd-kind-icon">Noop<wbr>Text<wbr>Map<wbr>Propagator</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/nooptracer.html" class="tsd-kind-icon">Noop<wbr>Tracer</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
@@ -321,6 +321,12 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/propagationapi.html" class="tsd-kind-icon">PropagationAPI</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/proxytracer.html" class="tsd-kind-icon">Proxy<wbr>Tracer</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/proxytracerprovider.html" class="tsd-kind-icon">Proxy<wbr>Tracer<wbr>Provider</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/traceapi.html" class="tsd-kind-icon">TraceAPI</a>
@@ -359,7 +365,13 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/event.html" class="tsd-kind-icon">Event</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
-						<a href="interfaces/httptextpropagator.html" class="tsd-kind-icon">Http<wbr>Text<wbr>Propagator</a>
+						<a href="interfaces/exceptionwithcode.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Code</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/exceptionwithmessage.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Message</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/exceptionwithname.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Name</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/link.html" class="tsd-kind-icon">Link</a>
@@ -416,6 +428,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/status.html" class="tsd-kind-icon">Status</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
+						<a href="interfaces/textmappropagator.html" class="tsd-kind-icon">Text<wbr>Map<wbr>Propagator</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-external">
 						<a href="interfaces/timedevent.html" class="tsd-kind-icon">Timed<wbr>Event</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-external">
@@ -438,6 +453,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#batchobserver" class="tsd-kind-icon">Batch<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#exception" class="tsd-kind-icon">Exception</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#get" class="tsd-kind-icon">Get</a>
@@ -491,10 +509,10 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#global_trace_api_key" class="tsd-kind-icon">GLOBAL_<wbr>TRACE_<wbr>API_<wbr>KEY</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#invalid_span_id" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>ID</a>
+						<a href="globals.html#invalid_spanid" class="tsd-kind-icon">INVALID_<wbr>SPANID</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#invalid_trace_id" class="tsd-kind-icon">INVALID_<wbr>TRACE_<wbr>ID</a>
+						<a href="globals.html#invalid_traceid" class="tsd-kind-icon">INVALID_<wbr>TRACEID</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_batch_observer_metric" class="tsd-kind-icon">NOOP_<wbr>BATCH_<wbr>OBSERVER_<wbr>METRIC</a>
@@ -515,9 +533,6 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#noop_counter_metric" class="tsd-kind-icon">NOOP_<wbr>COUNTER_<wbr>METRIC</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
-						<a href="globals.html#noop_http_text_propagator" class="tsd-kind-icon">NOOP_<wbr>HTTP_<wbr>TEXT_<wbr>PROPAGATOR</a>
-					</li>
-					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_meter" class="tsd-kind-icon">NOOP_<wbr>METER</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -528,6 +543,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_sum_observer_metric" class="tsd-kind-icon">NOOP_<wbr>SUM_<wbr>OBSERVER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#noop_text_map_propagator" class="tsd-kind-icon">NOOP_<wbr>TEXT_<wbr>MAP_<wbr>PROPAGATOR</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_tracer" class="tsd-kind-icon">NOOP_<wbr>TRACER</a>
@@ -543,6 +561,12 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#valid_spanid_regex" class="tsd-kind-icon">VALID_<wbr>SPANID_<wbr>REGEX</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#valid_traceid_regex" class="tsd-kind-icon">VALID_<wbr>TRACEID_<wbr>REGEX</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#_global" class="tsd-kind-icon">_global</a>
@@ -576,6 +600,15 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#defaultsetter" class="tsd-kind-icon">default<wbr>Setter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#isspancontextvalid" class="tsd-kind-icon">is<wbr>Span<wbr>Context<wbr>Valid</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#isvalidspanid" class="tsd-kind-icon">is<wbr>Valid<wbr>Span<wbr>Id</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#isvalidtraceid" class="tsd-kind-icon">is<wbr>Valid<wbr>Trace<wbr>Id</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a>

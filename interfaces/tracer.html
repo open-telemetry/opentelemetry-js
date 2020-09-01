@@ -88,6 +88,7 @@
 				<h3>Implemented by</h3>
 				<ul class="tsd-hierarchy">
 					<li><a href="../classes/nooptracer.html" class="tsd-signature-type">NoopTracer</a></li>
+					<li><a href="../classes/proxytracer.html" class="tsd-signature-type">ProxyTracer</a></li>
 				</ul>
 			</section>
 			<section class="tsd-panel-group tsd-index-group">
@@ -118,7 +119,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/tracer.ts#L86">src/trace/tracer.ts:86</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/tracer.ts#L86">src/trace/tracer.ts:86</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -158,7 +159,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/tracer.ts#L40">src/trace/tracer.ts:40</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/tracer.ts#L40">src/trace/tracer.ts:40</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -185,7 +186,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/tracer.ts#L58">src/trace/tracer.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/tracer.ts#L58">src/trace/tracer.ts:58</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -198,7 +199,8 @@
 									<dt>example</dt>
 									<dd><pre><code>const span = tracer.start<span class="hljs-constructor">Span(&#x27;<span class="hljs-params">op</span>&#x27;)</span>;
 span.set<span class="hljs-constructor">Attribute(&#x27;<span class="hljs-params">key</span>&#x27;, &#x27;<span class="hljs-params">value</span>&#x27;)</span>;
-span.<span class="hljs-keyword">end</span><span class="hljs-literal">()</span>;</code></pre></dd>
+span.<span class="hljs-keyword">end</span><span class="hljs-literal">()</span>;</code></pre>
+									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -231,7 +233,7 @@ span.<span class="hljs-keyword">end</span><span class="hljs-literal">()</span>;<
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/tracer.ts#L75">src/trace/tracer.ts:75</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/tracer.ts#L75">src/trace/tracer.ts:75</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -246,7 +248,8 @@ span.<span class="hljs-keyword">end</span><span class="hljs-literal">()</span>;<
 									<dd><pre><code>tracer.<span class="hljs-keyword">with</span><span class="hljs-constructor">Span(<span class="hljs-params">span</span>, ()</span> =&gt; {
     tracer.get<span class="hljs-constructor">CurrentSpan()</span>.add<span class="hljs-constructor">Event(<span class="hljs-string">&quot;parent&#x27;s event&quot;</span>)</span>;
     <span class="hljs-keyword">do</span><span class="hljs-constructor">SomeOtherWork()</span>;  <span class="hljs-comment">// Here &quot;span&quot; is the current Span.</span>
-});</code></pre></dd>
+});</code></pre>
+									</dd>
 								</dl>
 							</div>
 							<h4 class="tsd-type-parameters-title">Type parameters</h4>

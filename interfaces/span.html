@@ -103,6 +103,7 @@
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#context" class="tsd-kind-icon">context</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#end" class="tsd-kind-icon">end</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#isrecording" class="tsd-kind-icon">is<wbr>Recording</a></li>
+								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#recordexception" class="tsd-kind-icon">record<wbr>Exception</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#setattribute" class="tsd-kind-icon">set<wbr>Attribute</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#setattributes" class="tsd-kind-icon">set<wbr>Attributes</a></li>
 								<li class="tsd-kind-method tsd-parent-kind-interface tsd-is-external"><a href="span.html#setstatus" class="tsd-kind-icon">set<wbr>Status</a></li>
@@ -124,7 +125,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L69">src/trace/span.ts:69</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L70">src/trace/span.ts:70</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -161,7 +162,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L41">src/trace/span.ts:41</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L42">src/trace/span.ts:42</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -187,7 +188,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L108">src/trace/span.ts:108</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L109">src/trace/span.ts:109</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -219,7 +220,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L116">src/trace/span.ts:116</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L117">src/trace/span.ts:117</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -234,6 +235,40 @@
 					</ul>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+					<a name="recordexception" class="tsd-anchor"></a>
+					<h3>record<wbr>Exception</h3>
+					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+						<li class="tsd-signature tsd-kind-icon">record<wbr>Exception<span class="tsd-signature-symbol">(</span>exception<span class="tsd-signature-symbol">: </span><a href="../globals.html#exception" class="tsd-signature-type">Exception</a>, time<span class="tsd-signature-symbol">?: </span><a href="../globals.html#timeinput" class="tsd-signature-type">TimeInput</a><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+					</ul>
+					<ul class="tsd-descriptions">
+						<li class="tsd-description">
+							<aside class="tsd-sources">
+								<ul>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L125">src/trace/span.ts:125</a></li>
+								</ul>
+							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>Sets exception as a span event</p>
+								</div>
+							</div>
+							<h4 class="tsd-parameters-title">Parameters</h4>
+							<ul class="tsd-parameters">
+								<li>
+									<h5>exception: <a href="../globals.html#exception" class="tsd-signature-type">Exception</a></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>the exception the only accepted values are string or Error</p>
+									</div>
+								</li>
+								<li>
+									<h5><span class="tsd-flag ts-flagOptional">Optional</span> time: <a href="../globals.html#timeinput" class="tsd-signature-type">TimeInput</a></h5>
+								</li>
+							</ul>
+							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
+						</li>
+					</ul>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 					<a name="setattribute" class="tsd-anchor"></a>
 					<h3>set<wbr>Attribute</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-interface tsd-is-external">
@@ -243,7 +278,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L51">src/trace/span.ts:51</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L52">src/trace/span.ts:52</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -281,7 +316,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L58">src/trace/span.ts:58</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L59">src/trace/span.ts:59</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -312,7 +347,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L82">src/trace/span.ts:82</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L83">src/trace/span.ts:83</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -345,7 +380,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/b247e69/packages/opentelemetry-api/src/trace/span.ts#L94">src/trace/span.ts:94</a></li>
+									<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/span.ts#L95">src/trace/span.ts:95</a></li>
 								</ul>
 							</aside>
 							<div class="tsd-comment tsd-typography">
@@ -397,6 +432,9 @@
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="span.html#isrecording" class="tsd-kind-icon">is<wbr>Recording</a>
+							</li>
+							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
+								<a href="span.html#recordexception" class="tsd-kind-icon">record<wbr>Exception</a>
 							</li>
 							<li class=" tsd-kind-method tsd-parent-kind-interface tsd-is-external">
 								<a href="span.html#setattribute" class="tsd-kind-icon">set<wbr>Attribute</a>

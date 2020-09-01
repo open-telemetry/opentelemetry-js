@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>Event | OpenTelemetry API for JavaScript</title>
+	<title>ExceptionWithMessage | OpenTelemetry API for JavaScript</title>
 	<meta name="description" content="Documentation for OpenTelemetry API for JavaScript">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,33 +56,21 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="event.html">Event</a>
+					<a href="exceptionwithmessage.html">ExceptionWithMessage</a>
 				</li>
 			</ul>
-			<h1>Interface Event</h1>
+			<h1>Interface ExceptionWithMessage</h1>
 		</div>
 	</div>
 </header>
 <div class="container container-main">
 	<div class="row">
 		<div class="col-8 col-content">
-			<section class="tsd-panel tsd-comment">
-				<div class="tsd-comment tsd-typography">
-					<div class="lead">
-						<p>A text annotation with a set of attributes.</p>
-					</div>
-				</div>
-			</section>
 			<section class="tsd-panel tsd-hierarchy">
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">Event</span>
-						<ul class="tsd-hierarchy">
-							<li>
-								<a href="timedevent.html" class="tsd-signature-type">TimedEvent</a>
-							</li>
-						</ul>
+						<span class="target">ExceptionWithMessage</span>
 					</li>
 				</ul>
 			</section>
@@ -93,8 +81,10 @@
 						<section class="tsd-index-section tsd-is-external">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="event.html#attributes" class="tsd-kind-icon">attributes</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="event.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="exceptionwithmessage.html#code" class="tsd-kind-icon">code</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="exceptionwithmessage.html#message" class="tsd-kind-icon">message</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="exceptionwithmessage.html#name" class="tsd-kind-icon">name</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-external"><a href="exceptionwithmessage.html#stack" class="tsd-kind-icon">stack</a></li>
 							</ul>
 						</section>
 					</div>
@@ -103,34 +93,44 @@
 			<section class="tsd-panel-group tsd-member-group tsd-is-external">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-					<a name="attributes" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> attributes</h3>
-					<div class="tsd-signature tsd-kind-icon">attributes<span class="tsd-signature-symbol">:</span> <a href="attributes.html" class="tsd-signature-type">Attributes</a></div>
+					<a name="code" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> code</h3>
+					<div class="tsd-signature tsd-kind-icon">code<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/Event.ts#L24">src/trace/Event.ts:24</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/common/Exception.ts#L25">src/common/Exception.ts:25</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The attributes of the event.</p>
-						</div>
-					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="message" class="tsd-anchor"></a>
+					<h3>message</h3>
+					<div class="tsd-signature tsd-kind-icon">message<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/common/Exception.ts#L26">src/common/Exception.ts:26</a></li>
+						</ul>
+					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
 					<a name="name" class="tsd-anchor"></a>
-					<h3>name</h3>
-					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> name</h3>
+					<div class="tsd-signature tsd-kind-icon">name<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/trace/Event.ts#L22">src/trace/Event.ts:22</a></li>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/common/Exception.ts#L27">src/common/Exception.ts:27</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-comment tsd-typography">
-						<div class="lead">
-							<p>The name of the event.</p>
-						</div>
-					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+					<a name="stack" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> stack</h3>
+					<div class="tsd-signature tsd-kind-icon">stack<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/open-telemetry/opentelemetry-js/blob/15174c6/packages/opentelemetry-api/src/common/Exception.ts#L28">src/common/Exception.ts:28</a></li>
+						</ul>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -147,13 +147,19 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface tsd-is-external">
-						<a href="event.html" class="tsd-kind-icon">Event</a>
+						<a href="exceptionwithmessage.html" class="tsd-kind-icon">Exception<wbr>With<wbr>Message</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="event.html#attributes" class="tsd-kind-icon">attributes</a>
+								<a href="exceptionwithmessage.html#code" class="tsd-kind-icon">code</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
-								<a href="event.html#name" class="tsd-kind-icon">name</a>
+								<a href="exceptionwithmessage.html#message" class="tsd-kind-icon">message</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="exceptionwithmessage.html#name" class="tsd-kind-icon">name</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-external">
+								<a href="exceptionwithmessage.html#stack" class="tsd-kind-icon">stack</a>
 							</li>
 						</ul>
 					</li>
