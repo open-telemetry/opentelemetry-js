@@ -44,7 +44,7 @@ Since we use `lerna`, we can use [lerna-changelog](https://github.com/lerna/lern
 #### How to use
 
 Pass your [github token](https://help.github.com/en/articles/creating-a-personal-access-token-for-the-command-line) to generate the changelog automatically.
-For security reasons, when you create a Github token, select the permissions: under **repo**, select **Access public repositories**, **commit status**.
+For security reasons, when you create a Github token, select the permissions: under **repo**, select **Access public repositories**, **Access commit status**.
 
 In your terminal, execute the following command:
 
