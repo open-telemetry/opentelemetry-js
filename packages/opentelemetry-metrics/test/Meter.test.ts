@@ -555,31 +555,6 @@ describe('Meter', () => {
       assert.ok(valueRecorder instanceof Metric);
     });
 
-    it('should be absolute by default', () => {
-      const valueRecorder = meter.createValueRecorder('name', {
-        description: 'desc',
-        unit: '1',
-        disabled: false,
-      });
-      assert.strictEqual(
-        (valueRecorder as ValueRecorderMetric)['_absolute'],
-        true
-      );
-    });
-
-    it('should be able to set absolute to false', () => {
-      const valueRecorder = meter.createValueRecorder('name', {
-        description: 'desc',
-        unit: '1',
-        disabled: false,
-        absolute: false,
-      });
-      assert.strictEqual(
-        (valueRecorder as ValueRecorderMetric)['_absolute'],
-        false
-      );
-    });
-
     it('should pipe through resource', async () => {
       const valueRecorder = meter.createValueRecorder(
         'name'
@@ -638,25 +613,6 @@ describe('Meter', () => {
         assert.doesNotThrow(() => boundValueRecorder.record(10));
       });
 
-      it('should not accept negative values by default', async () => {
-        const valueRecorder = meter.createValueRecorder('name');
-        const boundValueRecorder = valueRecorder.bind(labels);
-        boundValueRecorder.record(-10);
-
-        await meter.collect();
-        const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            last: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
-      });
-
       it('should not set the instrument data when disabled', async () => {
         const valueRecorder = meter.createValueRecorder('name', {
           disabled: true,
@@ -678,35 +634,29 @@ describe('Meter', () => {
         );
       });
 
-      it(
-        'should accept negative (and positive) values when absolute is set' +
-          ' to false',
-        async () => {
-          const valueRecorder = meter.createValueRecorder('name', {
-            absolute: false,
-          });
-          const boundValueRecorder = valueRecorder.bind(labels);
-          boundValueRecorder.record(-10);
-          boundValueRecorder.record(50);
+      it('should accept negative (and positive) values', async () => {
+        const valueRecorder = meter.createValueRecorder('name');
+        const boundValueRecorder = valueRecorder.bind(labels);
+        boundValueRecorder.record(-10);
+        boundValueRecorder.record(50);
 
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-          assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 2,
-              last: 50,
-              max: 50,
-              min: -10,
-              sum: 40,
-            }
-          );
-          assert.ok(
-            hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
-              hrTimeToNanoseconds(performanceTimeOrigin)
-          );
-        }
-      );
+        await meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 2,
+            last: 50,
+            max: 50,
+            min: -10,
+            sum: 40,
+          }
+        );
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
+        );
+      });
 
       it('should return same instrument on same label values', async () => {
         const valueRecorder = meter.createValueRecorder(

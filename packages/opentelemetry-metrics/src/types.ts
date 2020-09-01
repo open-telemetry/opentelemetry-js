@@ -53,7 +53,6 @@ export const DEFAULT_CONFIG = {
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
-  absolute: false,
   description: '',
   unit: '1',
   valueType: api.ValueType.DOUBLE,
