@@ -316,11 +316,12 @@ describe('BasicTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should assign a resource', () => {
+    it('should assign a resource', async () => {
       const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span') as Span;
       assert.ok(span);
-      assert.ok(span.resource instanceof Resource);
+      const resource = await span.toReadableSpan().then(s => s.resource);
+      assert.ok(resource instanceof Resource);
     });
   });
 
@@ -362,9 +363,10 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.resource', () => {
-    it('should return a Resource', () => {
+    it('should return a Resource', async () => {
       const tracerProvider = new BasicTracerProvider();
-      assert.ok(tracerProvider.resource instanceof Resource);
+      const resource = await tracerProvider.resource;
+      assert.ok(resource instanceof Resource);
     });
   });
 

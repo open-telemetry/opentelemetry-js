@@ -28,7 +28,7 @@ describe('ConsoleSpanExporter', () => {
 
   beforeEach(() => {
     previousConsoleLog = console.log;
-    console.log = () => {};
+    console.log = () => { };
     consoleExporter = new ConsoleSpanExporter();
   });
 
@@ -37,7 +37,7 @@ describe('ConsoleSpanExporter', () => {
   });
 
   describe('.export()', () => {
-    it('should export information about span', () => {
+    it('should export information about span', done => {
       assert.doesNotThrow(() => {
         const basicTracerProvider = new BasicTracerProvider();
         consoleExporter = new ConsoleSpanExporter();
@@ -53,32 +53,35 @@ describe('ConsoleSpanExporter', () => {
         span.addEvent('foobar');
         span.end();
 
-        const spans = spyExport.args[0];
-        const firstSpan = spans[0][0];
-        const firstEvent = firstSpan.events[0];
-        const consoleArgs = spyConsole.args[0];
-        const consoleSpan = consoleArgs[0];
-        const keys = Object.keys(consoleSpan).sort().join(',');
+        setTimeout(() => {
+          const spans = spyExport.args[0];
+          const firstSpan = spans[0][0];
+          const firstEvent = firstSpan.events[0];
+          const consoleArgs = spyConsole.args[0];
+          const consoleSpan = consoleArgs[0];
+          const keys = Object.keys(consoleSpan).sort().join(',');
 
-        const expectedKeys = [
-          'attributes',
-          'duration',
-          'events',
-          'id',
-          'kind',
-          'name',
-          'parentId',
-          'status',
-          'timestamp',
-          'traceId',
-        ].join(',');
+          const expectedKeys = [
+            'attributes',
+            'duration',
+            'events',
+            'id',
+            'kind',
+            'name',
+            'parentId',
+            'status',
+            'timestamp',
+            'traceId',
+          ].join(',');
 
-        assert.ok(firstSpan.name === 'foo');
-        assert.ok(firstEvent.name === 'foobar');
-        assert.ok(consoleSpan.id === firstSpan.spanContext.spanId);
-        assert.ok(keys === expectedKeys);
+          assert.ok(firstSpan.name === 'foo');
+          assert.ok(firstEvent.name === 'foobar');
+          assert.ok(consoleSpan.id === firstSpan.spanContext.spanId);
+          assert.ok(keys === expectedKeys);
 
-        assert.ok(spyExport.calledOnce);
+          assert.ok(spyExport.calledOnce);
+          done();
+        }, 10)
       });
     });
   });

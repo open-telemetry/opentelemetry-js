@@ -37,7 +37,7 @@ export abstract class BaseObserverMetric
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource,
+    resource: Promise<Resource>,
     metricKind: MetricKind,
     instrumentationLibrary: InstrumentationLibrary,
     callback?: (observerResult: api.ObserverResult) => unknown

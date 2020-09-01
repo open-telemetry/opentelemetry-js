@@ -185,15 +185,16 @@ describe('NodeTracerProvider', () => {
       assert.strictEqual(span.isRecording(), true);
     });
 
-    it('should assign resource to span', () => {
+    it('should assign resource to span', async () => {
       provider = new NodeTracerProvider({
         logger: new NoopLogger(),
       });
       const span = provider.getTracer('default').startSpan('my-span') as Span;
       assert.ok(span);
-      assert.ok(span.resource instanceof Resource);
+      const resource = await span.resource;
+      assert.ok(resource instanceof Resource);
       assert.equal(
-        span.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
+        resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE],
         'nodejs'
       );
     });

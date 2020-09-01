@@ -126,13 +126,15 @@ export class NodeSDK {
   }
 
   /** Detect resource attributes */
-  public async detectResources(config?: ResourceDetectionConfig) {
+  private _detectResources(
+    config?: ResourceDetectionConfig
+  ): Promise<Resource> {
     const internalConfig: ResourceDetectionConfig = {
       detectors: [awsEc2Detector, gcpDetector, envDetector],
       ...config,
     };
 
-    this.addResource(await detectResources(internalConfig));
+    return detectResources(internalConfig);
   }
 
   /** Manually add a resource */
@@ -143,15 +145,16 @@ export class NodeSDK {
   /**
    * Once the SDK has been configured, call this method to construct SDK components and register them with the OpenTelemetry API.
    */
-  public async start() {
-    if (this._autoDetectResources) {
-      await this.detectResources();
-    }
+  public start() {
+    const resource = (this._autoDetectResources
+      ? this._detectResources()
+      : Promise.resolve(new Resource({}))
+    ).then(resource => this._resource.merge(resource));
 
     if (this._tracerProviderConfig) {
       const tracerProvider = new NodeTracerProvider({
         ...this._tracerProviderConfig.tracerConfig,
-        resource: this._resource,
+        resource,
       });
 
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
@@ -164,7 +167,7 @@ export class NodeSDK {
     if (this._meterProviderConfig) {
       const meterProvider = new MeterProvider({
         ...this._meterProviderConfig,
-        resource: this._resource,
+        resource,
       });
 
       metrics.setGlobalMeterProvider(meterProvider);

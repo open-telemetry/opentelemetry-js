@@ -34,7 +34,7 @@ export abstract class Metric<T extends BaseBoundInstrument>
     private readonly _name: string,
     private readonly _options: api.MetricOptions,
     private readonly _kind: MetricKind,
-    readonly resource: Resource,
+    readonly resource: Promise<Resource>,
     readonly instrumentationLibrary: InstrumentationLibrary
   ) {
     this._disabled = !!_options.disabled;
@@ -78,17 +78,14 @@ export abstract class Metric<T extends BaseBoundInstrument>
   }
 
   getMetricRecord(): Promise<MetricRecord[]> {
-    return new Promise(resolve => {
-      resolve(
-        Array.from(this._instruments.values()).map(instrument => ({
-          descriptor: this._descriptor,
-          labels: instrument.getLabels(),
-          aggregator: instrument.getAggregator(),
-          resource: this.resource,
-          instrumentationLibrary: this.instrumentationLibrary,
-        }))
-      );
-    });
+    return this.resource.then(resource => Array.from(this._instruments.values()).map(instrument => ({
+      descriptor: this._descriptor,
+      labels: instrument.getLabels(),
+      aggregator: instrument.getAggregator(),
+      resource,
+      instrumentationLibrary: this.instrumentationLibrary,
+    })))
+
   }
 
   private _getMetricDescriptor(): MetricDescriptor {

@@ -36,8 +36,8 @@ describe('SimpleSpanProcessor', () => {
     });
   });
 
-  describe('.onStart/.onEnd/.shutdown', () => {
-    it('should handle span started and ended when SAMPLED', () => {
+  describe('.onStart/.onEnd/.shutdown', async () => {
+    it('should handle span started and ended when SAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -50,17 +50,19 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
-      processor.onStart(span);
+      const readableSpan = await span.toReadableSpan();
+
+      processor.onStart(readableSpan);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.onEnd(span);
+      processor.onEnd(readableSpan);
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
       processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should handle span started and ended when UNSAMPLED', () => {
+    it('should handle span started and ended when UNSAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -73,10 +75,11 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
-      processor.onStart(span);
+      const readableSpan = await span.toReadableSpan();
+      processor.onStart(readableSpan);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.onEnd(span);
+      processor.onEnd(readableSpan);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
       processor.shutdown();
@@ -114,7 +117,7 @@ describe('SimpleSpanProcessor', () => {
       context.disable();
     });
 
-    it('should prevent instrumentation prior to export', () => {
+    it('should prevent instrumentation prior to export', async () => {
       const testTracingExporter = new TestTracingSpanExporter();
       const processor = new SimpleSpanProcessor(testTracingExporter);
 
@@ -129,8 +132,9 @@ describe('SimpleSpanProcessor', () => {
         spanContext,
         SpanKind.CLIENT
       );
+      const readableSpan = await span.toReadableSpan();
 
-      processor.onEnd(span);
+      processor.onEnd(readableSpan);
 
       const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
       assert.equal(exporterCreatedSpans.length, 0);

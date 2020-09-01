@@ -35,7 +35,7 @@ import { TraceParams } from './types';
 /**
  * This class represents a span.
  */
-export class Span implements api.Span, ReadableSpan {
+export class Span implements api.Span {
   // Below properties are included to implement ReadableSpan for export
   // purposes but are not intended to be written-to directly.
   readonly spanContext: api.SpanContext;
@@ -45,7 +45,7 @@ export class Span implements api.Span, ReadableSpan {
   readonly links: api.Link[] = [];
   readonly events: api.TimedEvent[] = [];
   readonly startTime: api.HrTime;
-  readonly resource: Resource;
+  readonly resource: Promise<Resource>;
   readonly instrumentationLibrary: InstrumentationLibrary;
   name: string;
   status: api.Status = {
@@ -79,7 +79,7 @@ export class Span implements api.Span, ReadableSpan {
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this._spanProcessor.onStart(this);
+    this.toReadableSpan().then(readableSpan => this._spanProcessor.onStart(readableSpan))
   }
 
   context(): api.SpanContext {
@@ -175,7 +175,7 @@ export class Span implements api.Span, ReadableSpan {
       );
     }
 
-    this._spanProcessor.onEnd(this);
+    this.toReadableSpan().then(readableSpan => this._spanProcessor.onEnd(readableSpan));
   }
 
   isRecording(): boolean {
@@ -217,6 +217,25 @@ export class Span implements api.Span, ReadableSpan {
 
   get ended(): boolean {
     return this._ended;
+  }
+
+  public toReadableSpan(): Promise<ReadableSpan> {
+    return this.resource.then(resource => ({
+      attributes: this.attributes,
+      duration: this.duration,
+      endTime: this.endTime,
+      ended: this.ended,
+      events: this.events,
+      instrumentationLibrary: this.instrumentationLibrary,
+      kind: this.kind,
+      links: this.links,
+      name: this.name,
+      resource,
+      spanContext: this.spanContext,
+      startTime: this.startTime,
+      status: this.status,
+      parentSpanId: this.parentSpanId
+    }))
   }
 
   private _isSpanEnded(): boolean {

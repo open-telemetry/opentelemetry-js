@@ -41,7 +41,7 @@ export interface TracerConfig {
   traceParams?: TraceParams;
 
   /** Resource associated with trace telemetry  */
-  resource?: Resource;
+  resource?: Resource | Promise<Resource>;
 
   /** Bool for whether or not graceful shutdown is enabled. If disabled spans will not be exported when SIGTERM is recieved */
   gracefulShutdown?: boolean;

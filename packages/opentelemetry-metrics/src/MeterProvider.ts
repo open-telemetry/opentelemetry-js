@@ -27,12 +27,12 @@ export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
   private _cleanNotifyOnGlobalShutdown: Function | undefined;
-  readonly resource: Resource;
+  readonly resource: Promise<Resource>;
   readonly logger: api.Logger;
 
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
-    this.resource = config.resource ?? Resource.createTelemetrySDKResource();
+    this.resource = Promise.resolve(config.resource ?? Resource.createTelemetrySDKResource());
     this._config = Object.assign({}, config, {
       logger: this.logger,
       resource: this.resource,

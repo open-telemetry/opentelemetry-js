@@ -52,7 +52,7 @@ const DUMMY_RESOURCE = new Resource({
 
 describe('transform', () => {
   describe('toZipkinSpan', () => {
-    it('should convert an OpenTelemetry span to a Zipkin span', () => {
+    it('should convert an OpenTelemetry span to a Zipkin span', async () => {
       const span = new Span(
         tracer,
         'my-span',
@@ -68,7 +68,7 @@ describe('transform', () => {
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span,
+        await span.toReadableSpan(),
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -102,7 +102,7 @@ describe('transform', () => {
         traceId: span.spanContext.traceId,
       });
     });
-    it("should skip parentSpanId if doesn't exist", () => {
+    it("should skip parentSpanId if doesn't exist", async () => {
       const span = new Span(
         tracer,
         'my-span',
@@ -112,7 +112,7 @@ describe('transform', () => {
       span.end();
 
       const zipkinSpan = toZipkinSpan(
-        span,
+        await span.toReadableSpan(),
         'my-service',
         statusCodeTagName,
         statusDescriptionTagName
@@ -149,12 +149,12 @@ describe('transform', () => {
     ].forEach(item =>
       it(`should map OpenTelemetry SpanKind ${
         api.SpanKind[item.ot]
-      } to Zipkin ${item.zipkin}`, () => {
+      } to Zipkin ${item.zipkin}`, async () => {
         const span = new Span(tracer, 'my-span', spanContext, item.ot);
         span.end();
 
         const zipkinSpan = toZipkinSpan(
-          span,
+          await span.toReadableSpan(),
           'my-service',
           statusCodeTagName,
           statusDescriptionTagName

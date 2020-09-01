@@ -28,7 +28,7 @@ export class CounterMetric extends Metric<BoundCounter> implements api.Counter {
     name: string,
     options: api.MetricOptions,
     private readonly _batcher: Batcher,
-    resource: Resource,
+    resource: Promise<Resource>,
     instrumentationLibrary: InstrumentationLibrary
   ) {
     super(name, options, MetricKind.COUNTER, resource, instrumentationLibrary);

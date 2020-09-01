@@ -38,7 +38,7 @@ export class Meter implements api.Meter {
   private readonly _logger: api.Logger;
   private readonly _metrics = new Map<string, Metric<BaseBoundInstrument>>();
   private readonly _batcher: Batcher;
-  private readonly _resource: Resource;
+  private readonly _resource: Promise<Resource>;
   private readonly _instrumentationLibrary: InstrumentationLibrary;
   private readonly _controller: PushController;
 
@@ -51,7 +51,7 @@ export class Meter implements api.Meter {
   ) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = config.batcher ?? new UngroupedBatcher();
-    this._resource = config.resource || Resource.createTelemetrySDKResource();
+    this._resource = Promise.resolve(config.resource || Resource.createTelemetrySDKResource());
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
     const exporter = config.exporter || new NoopExporter();

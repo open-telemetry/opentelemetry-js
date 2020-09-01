@@ -33,7 +33,7 @@ describe('InMemorySpanExporter', () => {
     provider.addSpanProcessor(new SimpleSpanProcessor(memoryExporter));
   });
 
-  it('should get finished spans', () => {
+  it('should get finished spans', done => {
     const root = provider.getTracer('default').startSpan('root');
     const child = provider
       .getTracer('default')
@@ -44,23 +44,30 @@ describe('InMemorySpanExporter', () => {
 
     assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
     grandChild.end();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
-    child.end();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
-    root.end();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 3);
-
-    const [span1, span2, span3] = memoryExporter.getFinishedSpans();
-    assert.strictEqual(span1.name, 'grand-child');
-    assert.strictEqual(span2.name, 'child');
-    assert.strictEqual(span3.name, 'root');
-    assert.strictEqual(span1.spanContext.traceId, span2.spanContext.traceId);
-    assert.strictEqual(span2.spanContext.traceId, span3.spanContext.traceId);
-    assert.strictEqual(span1.parentSpanId, span2.spanContext.spanId);
-    assert.strictEqual(span2.parentSpanId, span3.spanContext.spanId);
+    setTimeout(() => {
+      assert.strictEqual(memoryExporter.getFinishedSpans().length, 1);
+      child.end();
+      setTimeout(() => {
+        assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+        root.end();
+        setTimeout(() => {
+          assert.strictEqual(memoryExporter.getFinishedSpans().length, 3);
+      
+          const [span1, span2, span3] = memoryExporter.getFinishedSpans();
+          assert.strictEqual(span1.name, 'grand-child');
+          assert.strictEqual(span2.name, 'child');
+          assert.strictEqual(span3.name, 'root');
+          assert.strictEqual(span1.spanContext.traceId, span2.spanContext.traceId);
+          assert.strictEqual(span2.spanContext.traceId, span3.spanContext.traceId);
+          assert.strictEqual(span1.parentSpanId, span2.spanContext.spanId);
+          assert.strictEqual(span2.parentSpanId, span3.spanContext.spanId);
+          done();
+        }, 10)
+      }, 10)
+    }, 10)
   });
 
-  it('should shutdown the exporter', () => {
+  it('should shutdown the exporter', done => {
     const root = provider.getTracer('default').startSpan('root');
 
     provider
@@ -68,32 +75,39 @@ describe('InMemorySpanExporter', () => {
       .startSpan('child', {}, setActiveSpan(context.active(), root))
       .end();
     root.end();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
-    memoryExporter.shutdown();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-
-    // after shutdown no new spans are accepted
-    provider
-      .getTracer('default')
-      .startSpan('child1', {}, setActiveSpan(context.active(), root))
-      .end();
-    assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+    setTimeout(() => {
+      assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
+      memoryExporter.shutdown();
+      assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+  
+      // after shutdown no new spans are accepted
+      provider
+        .getTracer('default')
+        .startSpan('child1', {}, setActiveSpan(context.active(), root))
+        .end();
+      setTimeout(() => {
+        assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
+        done();
+      }, 10)
+    }, 10);
   });
 
-  it('should return the success result', () => {
-    const exorter = new InMemorySpanExporter();
-    exorter.export([], (result: ExportResult) => {
+  it('should return the success result', done => {
+    const exporter = new InMemorySpanExporter();
+    exporter.export([], (result: ExportResult) => {
       assert.strictEqual(result, ExportResult.SUCCESS);
+      done();
     });
   });
 
-  it('should return the FailedNotRetryable result after shutdown', () => {
-    const exorter = new InMemorySpanExporter();
-    exorter.shutdown();
+  it('should return the FailedNotRetryable result after shutdown', done => {
+    const exporter = new InMemorySpanExporter();
+    exporter.shutdown();
 
     // after shutdown export should fail
-    exorter.export([], (result: ExportResult) => {
+    exporter.export([], (result: ExportResult) => {
       assert.strictEqual(result, ExportResult.FAILED_NOT_RETRYABLE);
+      done();
     });
   });
 });
