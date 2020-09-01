@@ -107,6 +107,7 @@ describe('HttpPlugin Integration tests', () => {
       const result = await httpRequest.get(
         `${protocol}://google.fr/?query=test`
       );
+      await new Promise(resolve => setTimeout(resolve))
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -133,6 +134,7 @@ describe('HttpPlugin Integration tests', () => {
       const result = await httpRequest.get(
         new url.URL(`${protocol}://google.fr/?query=test`)
       );
+      await new Promise(resolve => setTimeout(resolve))
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -162,6 +164,7 @@ describe('HttpPlugin Integration tests', () => {
           headers: { 'x-foo': 'foo' },
         }
       );
+      await new Promise(resolve => setTimeout(resolve))
 
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
@@ -189,6 +192,7 @@ describe('HttpPlugin Integration tests', () => {
 
     it('custom attributes should show up on client spans', async () => {
       const result = await httpRequest.get(`${protocol}://google.fr/`);
+      await new Promise(resolve => setTimeout(resolve))
       const spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -216,6 +220,7 @@ describe('HttpPlugin Integration tests', () => {
       );
 
       const result = await httpRequest.get(options);
+      await new Promise(resolve => setTimeout(resolve))
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {

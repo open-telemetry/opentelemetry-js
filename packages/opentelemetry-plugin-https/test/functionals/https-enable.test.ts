@@ -162,6 +162,7 @@ describe('HttpsPlugin', () => {
         const result = await httpsRequest.get(
           `${protocol}://${hostname}:${serverPort}${pathname}`
         );
+        await new Promise(resolve => setTimeout(resolve))
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
         const validations = {
@@ -198,6 +199,7 @@ describe('HttpsPlugin', () => {
         };
 
         const result = await httpsRequest.get(options);
+        await new Promise(resolve => setTimeout(resolve))
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
@@ -271,6 +273,7 @@ describe('HttpsPlugin', () => {
             },
           }
         );
+        await new Promise(resolve => setTimeout(resolve))
         const spans = memoryExporter.getFinishedSpans();
         const [incomingSpan, outgoingSpan] = spans;
         const validations = {
@@ -322,6 +325,7 @@ describe('HttpsPlugin', () => {
         };
 
         const result = await httpsRequest.get(options);
+        await new Promise(resolve => setTimeout(resolve))
         const spans = memoryExporter.getFinishedSpans();
         assert.strictEqual(result.data, 'Ok');
         assert.strictEqual(spans.length, 0);
@@ -340,12 +344,14 @@ describe('HttpsPlugin', () => {
             httpErrorCodes[i].toString()
           );
 
+          await new Promise(resolve => setTimeout(resolve))
           const isReset = memoryExporter.getFinishedSpans().length === 0;
           assert.ok(isReset);
 
           const result = await httpsRequest.get(
             `${protocol}://${hostname}${testPath}`
           );
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           const reqSpan = spans[0];
 
@@ -376,6 +382,7 @@ describe('HttpsPlugin', () => {
             `${protocol}://${hostname}${testPath}`
           );
           span.end();
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           const [reqSpan, localSpan] = spans;
           const validations = {
@@ -419,6 +426,7 @@ describe('HttpsPlugin', () => {
               `${protocol}://${hostname}${testPath}`
             );
             span.end();
+            await new Promise(resolve => setTimeout(resolve))
             const spans = memoryExporter.getFinishedSpans();
             const [reqSpan, localSpan] = spans;
             const validations = {
@@ -456,6 +464,7 @@ describe('HttpsPlugin', () => {
         await tracer.withSpan(span, async () => {
           for (let i = 0; i < num; i++) {
             await httpsRequest.get(`${protocol}://${hostname}${testPath}`);
+            await new Promise(resolve => setTimeout(resolve))
             const spans = memoryExporter.getFinishedSpans();
             assert.ok(spans[i].name.indexOf(testPath) >= 0);
             assert.strictEqual(
@@ -464,6 +473,7 @@ describe('HttpsPlugin', () => {
             );
           }
           span.end();
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           // 5 child spans ended + 1 span (root)
           assert.strictEqual(spans.length, 6);
@@ -477,6 +487,7 @@ describe('HttpsPlugin', () => {
           await httpsRequest.get(
             `${protocol}://${hostname}:${serverPort}${testPath}`
           );
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 0);
         });
@@ -493,6 +504,7 @@ describe('HttpsPlugin', () => {
             // nock throw
             assert.ok(error.message.startsWith('Nock: No match for request'));
           }
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
         });
@@ -513,16 +525,18 @@ describe('HttpsPlugin', () => {
               ) > 0
             );
           }
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           // for this arg with don't provide trace. We pass arg to original method (https.get)
           assert.strictEqual(spans.length, 0);
         });
       }
 
-      it('should have 1 ended span when request throw on bad "options" object', () => {
+      it('should have 1 ended span when request throw on bad "options" object', async () => {
         try {
           https.request({ protocol: 'telnet' });
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
         }
@@ -552,18 +566,20 @@ describe('HttpsPlugin', () => {
           await promiseRequest;
           assert.fail();
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
         }
       });
 
-      it('should have 1 ended span when request throw on bad "options" object', () => {
+      it('should have 1 ended span when request throw on bad "options" object', async () => {
         nock.cleanAll();
         nock.enableNetConnect();
         try {
           https.request({ protocol: 'telnet' });
           assert.fail();
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
         }
@@ -593,6 +609,7 @@ describe('HttpsPlugin', () => {
           await promiseRequest;
           assert.fail();
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 1);
         }
@@ -628,6 +645,7 @@ describe('HttpsPlugin', () => {
           await promiseRequest;
           assert.fail();
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
@@ -666,6 +684,7 @@ describe('HttpsPlugin', () => {
           await promiseRequest;
           assert.fail();
         } catch (error) {
+          await new Promise(resolve => setTimeout(resolve))
           const spans = memoryExporter.getFinishedSpans();
           const [span] = spans;
           assert.strictEqual(spans.length, 1);
@@ -679,8 +698,9 @@ describe('HttpsPlugin', () => {
         nock(host).get('/').reply(404);
         const req = https.request(`${host}/`);
         req.on('response', response => {
-          response.on('data', () => {});
-          response.on('end', () => {
+          response.on('data', () => { });
+          response.on('end', async () => {
+            await new Promise(resolve => setTimeout(resolve))
             const spans = memoryExporter.getFinishedSpans();
             const [span] = spans;
             assert.strictEqual(spans.length, 1);
