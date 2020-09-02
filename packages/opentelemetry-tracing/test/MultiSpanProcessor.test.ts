@@ -37,7 +37,7 @@ class TestProcessor implements SpanProcessor {
   }
   shutdown(cb: () => void): void {
     this.spans = [];
-    setImmediate(cb);
+    setTimeout(cb);
   }
   forceFlush(): void {}
 }
