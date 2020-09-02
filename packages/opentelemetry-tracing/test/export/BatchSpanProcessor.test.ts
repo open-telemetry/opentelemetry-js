@@ -182,7 +182,7 @@ describe('BatchSpanProcessor', () => {
         // no spans have been finished
         assert.strictEqual(exporter.getFinishedSpans().length, 0);
         clock.tick(defaultBufferConfig.bufferTimeout + 1000);
-      })
+      });
 
       clock.restore();
     });
@@ -261,12 +261,14 @@ describe('BatchSpanProcessor', () => {
         processor.onStart(readableSpan);
         processor.onEnd(readableSpan);
 
-        await new Promise(resolve => processor.forceFlush(() => {
-          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
-          assert.equal(exporterCreatedSpans.length, 0);
+        await new Promise(resolve =>
+          processor.forceFlush(() => {
+            const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+            assert.equal(exporterCreatedSpans.length, 0);
 
-          resolve();
-        }));
+            resolve();
+          })
+        );
       });
     });
   });

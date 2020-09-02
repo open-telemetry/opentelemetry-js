@@ -79,7 +79,9 @@ export class Span implements api.Span {
     this._logger = parentTracer.logger;
     this._traceParams = parentTracer.getActiveTraceParams();
     this._spanProcessor = parentTracer.getActiveSpanProcessor();
-    this.toReadableSpan().then(readableSpan => this._spanProcessor.onStart(readableSpan))
+    this.toReadableSpan().then(readableSpan =>
+      this._spanProcessor.onStart(readableSpan)
+    );
   }
 
   context(): api.SpanContext {
@@ -175,7 +177,9 @@ export class Span implements api.Span {
       );
     }
 
-    this.toReadableSpan().then(readableSpan => this._spanProcessor.onEnd(readableSpan));
+    this.toReadableSpan().then(readableSpan =>
+      this._spanProcessor.onEnd(readableSpan)
+    );
   }
 
   isRecording(): boolean {
@@ -234,8 +238,8 @@ export class Span implements api.Span {
       spanContext: this.spanContext,
       startTime: this.startTime,
       status: this.status,
-      parentSpanId: this.parentSpanId
-    }))
+      parentSpanId: this.parentSpanId,
+    }));
   }
 
   private _isSpanEnded(): boolean {

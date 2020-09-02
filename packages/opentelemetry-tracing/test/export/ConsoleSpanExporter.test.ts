@@ -28,7 +28,7 @@ describe('ConsoleSpanExporter', () => {
 
   beforeEach(() => {
     previousConsoleLog = console.log;
-    console.log = () => { };
+    console.log = () => {};
     consoleExporter = new ConsoleSpanExporter();
   });
 
@@ -81,7 +81,7 @@ describe('ConsoleSpanExporter', () => {
 
           assert.ok(spyExport.calledOnce);
           done();
-        }, 10)
+        }, 10);
       });
     });
   });

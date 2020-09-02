@@ -51,7 +51,9 @@ export class Meter implements api.Meter {
   ) {
     this._logger = config.logger || new ConsoleLogger(config.logLevel);
     this._batcher = config.batcher ?? new UngroupedBatcher();
-    this._resource = Promise.resolve(config.resource || Resource.createTelemetrySDKResource());
+    this._resource = Promise.resolve(
+      config.resource || Resource.createTelemetrySDKResource()
+    );
     this._instrumentationLibrary = instrumentationLibrary;
     // start the push controller
     const exporter = config.exporter || new NoopExporter();

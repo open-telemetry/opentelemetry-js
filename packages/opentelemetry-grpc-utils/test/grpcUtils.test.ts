@@ -106,8 +106,8 @@ const checkEqual = (x: TestRequestResponse | TestRequestResponse[]) => (
   x instanceof Array && y instanceof Array
     ? arrayIsEqual(requestEqual)(x as any)(y as any)
     : !(x instanceof Array) && !(y instanceof Array)
-      ? requestEqual(x)(y)
-      : false;
+    ? requestEqual(x)(y)
+    : false;
 
 export const runTests = (
   plugin: BasePlugin<typeof grpcJs | typeof grpcNapi>,
@@ -290,11 +290,11 @@ export const runTests = (
       unaryMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-            getError(
-              'Unary Method Error',
-              call.request.num
-            ) as grpcJs.ServiceError
-          )
+              getError(
+                'Unary Method Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
           : callback(null, { num: call.request.num });
       },
 
@@ -302,11 +302,11 @@ export const runTests = (
       camelCaseMethod(call: ServerUnaryCall, callback: RequestCallback) {
         call.request.num <= MAX_ERROR_STATUS
           ? callback(
-            getError(
-              'Unary Method Error',
-              call.request.num
-            ) as grpcJs.ServiceError
-          )
+              getError(
+                'Unary Method Error',
+                call.request.num
+              ) as grpcJs.ServiceError
+            )
           : callback(null, { num: call.request.num });
       },
 
@@ -476,46 +476,46 @@ export const runTests = (
     ) => {
       it(`should ${
         checkSpans ? 'do' : 'not'
-        }: create a rootSpan for client and a childSpan for server - ${
+      }: create a rootSpan for client and a childSpan for server - ${
         method.description
-        }`, async () => {
-          const args = [client, method.request, method.metadata];
-          await (method.method as any)
-            .apply({}, args)
-            .then(async (result: TestRequestResponse | TestRequestResponse[]) => {
-              assert.ok(
-                checkEqual(result)(method.result),
-                'gRPC call returns correct values'
-              );
-              await new Promise(resolve => setTimeout(resolve));
-              const spans = memoryExporter.getFinishedSpans();
-              if (checkSpans) {
-                const incomingSpan = spans[0];
-                const outgoingSpan = spans[1];
-                const validations = {
-                  name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
-                  status: grpc.status.OK,
-                };
+      }`, async () => {
+        const args = [client, method.request, method.metadata];
+        await (method.method as any)
+          .apply({}, args)
+          .then(async (result: TestRequestResponse | TestRequestResponse[]) => {
+            assert.ok(
+              checkEqual(result)(method.result),
+              'gRPC call returns correct values'
+            );
+            await new Promise(resolve => setTimeout(resolve));
+            const spans = memoryExporter.getFinishedSpans();
+            if (checkSpans) {
+              const incomingSpan = spans[0];
+              const outgoingSpan = spans[1];
+              const validations = {
+                name: `grpc.pkg_test.GrpcTester/${method.methodName}`,
+                status: grpc.status.OK,
+              };
 
-                assert.strictEqual(spans.length, 2);
-                assertSpan(
-                  moduleName,
-                  incomingSpan,
-                  SpanKind.SERVER,
-                  validations
-                );
-                assertSpan(
-                  moduleName,
-                  outgoingSpan,
-                  SpanKind.CLIENT,
-                  validations
-                );
-                assertPropagation(incomingSpan, outgoingSpan);
-              } else {
-                assert.strictEqual(spans.length, 0);
-              }
-            });
-        });
+              assert.strictEqual(spans.length, 2);
+              assertSpan(
+                moduleName,
+                incomingSpan,
+                SpanKind.SERVER,
+                validations
+              );
+              assertSpan(
+                moduleName,
+                outgoingSpan,
+                SpanKind.CLIENT,
+                validations
+              );
+              assertPropagation(incomingSpan, outgoingSpan);
+            } else {
+              assert.strictEqual(spans.length, 0);
+            }
+          });
+      });
 
       it(`should raise an error for client childSpan/server rootSpan - ${method.description} - status = OK`, async () => {
         const expectEmpty = memoryExporter.getFinishedSpans();
@@ -579,7 +579,7 @@ export const runTests = (
     const insertError = (
       request: TestRequestResponse | TestRequestResponse[]
     ) => (code: number) =>
-        request instanceof Array ? [{ num: code }, ...request] : { num: code };
+      request instanceof Array ? [{ num: code }, ...request] : { num: code };
 
     const runErrorTest = (
       method: typeof methodList[0],
@@ -839,9 +839,9 @@ export const runTests = (
       methodList.map(method => {
         describe(`Test should ${
           checkSpans[method.methodName] ? '' : 'not '
-          }create spans for grpc remote method ${method.methodName}`, () => {
-            runTest(method, provider, checkSpans[method.methodName]);
-          });
+        }create spans for grpc remote method ${method.methodName}`, () => {
+          runTest(method, provider, checkSpans[method.methodName]);
+        });
       });
     });
   });

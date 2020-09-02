@@ -32,7 +32,9 @@ export class MeterProvider implements api.MeterProvider {
 
   constructor(config: MeterConfig = DEFAULT_CONFIG) {
     this.logger = config.logger ?? new ConsoleLogger(config.logLevel);
-    this.resource = Promise.resolve(config.resource ?? Resource.createTelemetrySDKResource());
+    this.resource = Promise.resolve(
+      config.resource ?? Resource.createTelemetrySDKResource()
+    );
     this._config = Object.assign({}, config, {
       logger: this.logger,
       resource: this.resource,

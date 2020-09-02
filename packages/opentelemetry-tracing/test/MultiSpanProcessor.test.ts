@@ -31,7 +31,7 @@ import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
-  onStart(span: ReadableSpan): void { }
+  onStart(span: ReadableSpan): void {}
   onEnd(span: ReadableSpan): void {
     this.spans.push(span);
   }
@@ -39,7 +39,7 @@ class TestProcessor implements SpanProcessor {
     this.spans = [];
     setImmediate(cb);
   }
-  forceFlush(): void { }
+  forceFlush(): void {}
 }
 
 describe('MultiSpanProcessor', () => {
@@ -75,7 +75,7 @@ describe('MultiSpanProcessor', () => {
     setTimeout(() => {
       assert.strictEqual(processor1.spans.length, 1);
       multiSpanProcessor.shutdown();
-      done()
+      done();
     }, 10);
   });
 
@@ -101,8 +101,8 @@ describe('MultiSpanProcessor', () => {
         assert.strictEqual(processor1.spans.length, 0);
         assert.strictEqual(processor1.spans.length, processor2.spans.length);
         done();
-      }, 10)
-    }, 10)
+      }, 10);
+    }, 10);
   });
 
   it('should export spans on graceful shutdown from two span processor', done => {
@@ -128,7 +128,7 @@ describe('MultiSpanProcessor', () => {
         done();
       });
       _invokeGlobalShutdown();
-    }, 10)
+    }, 10);
   });
 
   it('should export spans on manual shutdown from two span processor', done => {
@@ -156,8 +156,8 @@ describe('MultiSpanProcessor', () => {
           assert.strictEqual(processor1.spans.length, processor2.spans.length);
           done();
         });
-      }, 10)
-    }, 10)
+      }, 10);
+    }, 10);
   });
 
   it('should force span processors to flush', () => {
@@ -166,9 +166,9 @@ describe('MultiSpanProcessor', () => {
       forceFlush: () => {
         flushed = true;
       },
-      onStart: span => { },
-      onEnd: span => { },
-      shutdown: () => { },
+      onStart: span => {},
+      onEnd: span => {},
+      shutdown: () => {},
     };
     const multiSpanProcessor = new MultiSpanProcessor([processor]);
     multiSpanProcessor.forceFlush();

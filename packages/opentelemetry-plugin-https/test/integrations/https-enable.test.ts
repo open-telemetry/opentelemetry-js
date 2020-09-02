@@ -94,7 +94,7 @@ describe('HttpsPlugin Integration tests', () => {
       };
       try {
         plugin.disable();
-      } catch (e) { }
+      } catch (e) {}
       plugin.enable(
         (https as unknown) as Http,
         provider,
@@ -108,7 +108,7 @@ describe('HttpsPlugin Integration tests', () => {
     });
 
     it('should create a rootSpan for GET requests and add propagation headers', async () => {
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -116,7 +116,7 @@ describe('HttpsPlugin Integration tests', () => {
         `${protocol}://google.fr/?query=test`
       );
 
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -136,7 +136,7 @@ describe('HttpsPlugin Integration tests', () => {
     });
 
     it('should create a rootSpan for GET requests and add propagation headers if URL is used', async () => {
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -144,7 +144,7 @@ describe('HttpsPlugin Integration tests', () => {
         new url.URL(`${protocol}://google.fr/?query=test`)
       );
 
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -164,7 +164,7 @@ describe('HttpsPlugin Integration tests', () => {
     });
 
     it('should create a valid rootSpan with propagation headers for GET requests if URL and options are used', async () => {
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
 
@@ -173,7 +173,7 @@ describe('HttpsPlugin Integration tests', () => {
         { headers: { 'x-foo': 'foo' } }
       );
 
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -200,7 +200,7 @@ describe('HttpsPlugin Integration tests', () => {
 
     it('custom attributes should show up on client spans', async () => {
       const result = await httpsRequest.get(`${protocol}://google.fr/`);
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       const spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -220,7 +220,7 @@ describe('HttpsPlugin Integration tests', () => {
     });
 
     it('should create a span for GET requests and add propagation headers with Expect headers', async () => {
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       let spans = memoryExporter.getFinishedSpans();
       assert.strictEqual(spans.length, 0);
       const options = Object.assign(
@@ -229,7 +229,7 @@ describe('HttpsPlugin Integration tests', () => {
       );
 
       const result = await httpsRequest.get(options);
-      await new Promise(resolve => setTimeout(resolve))
+      await new Promise(resolve => setTimeout(resolve));
       spans = memoryExporter.getFinishedSpans();
       const span = spans[0];
       const validations = {
@@ -270,7 +270,6 @@ describe('HttpsPlugin Integration tests', () => {
         };
         let data = '';
         setTimeout(() => {
-
           const spans = memoryExporter.getFinishedSpans();
           assert.strictEqual(spans.length, 0);
           const options = { headers };
@@ -303,16 +302,20 @@ describe('HttpsPlugin Integration tests', () => {
           );
 
           req.on('close', async () => {
-            await new Promise(resolve => setTimeout(resolve))
+            await new Promise(resolve => setTimeout(resolve));
             const spans = memoryExporter.getFinishedSpans();
             assert.strictEqual(spans.length, 1);
             assert.ok(spans[0].name.indexOf('GET /') >= 0);
             assert.ok(data);
-            assert.ok(validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]);
-            assert.ok(validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]);
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.TRACE_CONTEXT_KEY]
+            );
+            assert.ok(
+              validations.reqHeaders[DummyPropagation.SPAN_CONTEXT_KEY]
+            );
             done();
           });
-        })
+        });
       });
     }
   });

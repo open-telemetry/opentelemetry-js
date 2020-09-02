@@ -135,7 +135,7 @@ describe('Meter', () => {
 
     it('should pipe through resource', async () => {
       const counter = meter.createCounter('name') as CounterMetric;
-      assert.ok(await counter.resource instanceof Resource);
+      assert.ok((await counter.resource) instanceof Resource);
 
       counter.add(1, { foo: 'bar' });
 
@@ -349,7 +349,7 @@ describe('Meter', () => {
       const upDownCounter = meter.createUpDownCounter(
         'name'
       ) as UpDownCounterMetric;
-      assert.ok(await upDownCounter.resource instanceof Resource);
+      assert.ok((await upDownCounter.resource) instanceof Resource);
 
       upDownCounter.add(1, { foo: 'bar' });
 
@@ -559,7 +559,7 @@ describe('Meter', () => {
       const valueRecorder = meter.createValueRecorder(
         'name'
       ) as ValueRecorderMetric;
-      assert.ok(await valueRecorder.resource instanceof Resource);
+      assert.ok((await valueRecorder.resource) instanceof Resource);
 
       valueRecorder.record(1, { foo: 'bar' });
 
@@ -869,7 +869,7 @@ describe('Meter', () => {
         result.observe(42, { foo: 'bar' });
         return Promise.resolve();
       }) as SumObserverMetric;
-      assert.ok(await sumObserver.resource instanceof Resource);
+      assert.ok((await sumObserver.resource) instanceof Resource);
 
       const [record] = await sumObserver.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
@@ -950,7 +950,7 @@ describe('Meter', () => {
       const valueObserver = meter.createValueObserver('name', {}, result => {
         result.observe(42, { foo: 'bar' });
       }) as ValueObserverMetric;
-      assert.ok(await valueObserver.resource instanceof Resource);
+      assert.ok((await valueObserver.resource) instanceof Resource);
 
       const [record] = await valueObserver.getMetricRecord();
       assert.ok(record.resource instanceof Resource);
@@ -1093,7 +1093,7 @@ describe('Meter', () => {
           return Promise.resolve();
         }
       ) as UpDownSumObserverMetric;
-      assert.ok(await upDownSumObserver.resource instanceof Resource);
+      assert.ok((await upDownSumObserver.resource) instanceof Resource);
 
       const [record] = await upDownSumObserver.getMetricRecord();
       assert.ok(record.resource instanceof Resource);

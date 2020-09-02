@@ -52,19 +52,25 @@ describe('InMemorySpanExporter', () => {
         root.end();
         setTimeout(() => {
           assert.strictEqual(memoryExporter.getFinishedSpans().length, 3);
-      
+
           const [span1, span2, span3] = memoryExporter.getFinishedSpans();
           assert.strictEqual(span1.name, 'grand-child');
           assert.strictEqual(span2.name, 'child');
           assert.strictEqual(span3.name, 'root');
-          assert.strictEqual(span1.spanContext.traceId, span2.spanContext.traceId);
-          assert.strictEqual(span2.spanContext.traceId, span3.spanContext.traceId);
+          assert.strictEqual(
+            span1.spanContext.traceId,
+            span2.spanContext.traceId
+          );
+          assert.strictEqual(
+            span2.spanContext.traceId,
+            span3.spanContext.traceId
+          );
           assert.strictEqual(span1.parentSpanId, span2.spanContext.spanId);
           assert.strictEqual(span2.parentSpanId, span3.spanContext.spanId);
           done();
-        }, 10)
-      }, 10)
-    }, 10)
+        }, 10);
+      }, 10);
+    }, 10);
   });
 
   it('should shutdown the exporter', done => {
@@ -79,7 +85,7 @@ describe('InMemorySpanExporter', () => {
       assert.strictEqual(memoryExporter.getFinishedSpans().length, 2);
       memoryExporter.shutdown();
       assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
-  
+
       // after shutdown no new spans are accepted
       provider
         .getTracer('default')
@@ -88,7 +94,7 @@ describe('InMemorySpanExporter', () => {
       setTimeout(() => {
         assert.strictEqual(memoryExporter.getFinishedSpans().length, 0);
         done();
-      }, 10)
+      }, 10);
     }, 10);
   });
 

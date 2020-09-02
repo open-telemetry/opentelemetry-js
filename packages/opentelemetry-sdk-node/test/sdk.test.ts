@@ -17,13 +17,12 @@
 import {
   context,
   metrics,
-
-  NoopMeterProvider, NoopTextMapPropagator,
-
+  NoopMeterProvider,
+  NoopTextMapPropagator,
   NoopTracerProvider,
   propagation,
-
-  ProxyTracerProvider, trace
+  ProxyTracerProvider,
+  trace,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
@@ -33,7 +32,7 @@ import { NodeTracerProvider } from '@opentelemetry/node';
 import * as NodeConfig from '@opentelemetry/node/build/src/config';
 import {
   ConsoleSpanExporter,
-  SimpleSpanProcessor
+  SimpleSpanProcessor,
 } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as nock from 'nock';

@@ -78,14 +78,15 @@ export abstract class Metric<T extends BaseBoundInstrument>
   }
 
   getMetricRecord(): Promise<MetricRecord[]> {
-    return this.resource.then(resource => Array.from(this._instruments.values()).map(instrument => ({
-      descriptor: this._descriptor,
-      labels: instrument.getLabels(),
-      aggregator: instrument.getAggregator(),
-      resource,
-      instrumentationLibrary: this.instrumentationLibrary,
-    })))
-
+    return this.resource.then(resource =>
+      Array.from(this._instruments.values()).map(instrument => ({
+        descriptor: this._descriptor,
+        labels: instrument.getLabels(),
+        aggregator: instrument.getAggregator(),
+        resource,
+        instrumentationLibrary: this.instrumentationLibrary,
+      }))
+    );
   }
 
   private _getMetricDescriptor(): MetricDescriptor {
