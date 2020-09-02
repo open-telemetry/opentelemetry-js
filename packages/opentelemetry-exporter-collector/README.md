@@ -65,7 +65,7 @@ counter.add(10, { 'key': 'value' });
 
 ```js
 const { BasicTracerProvider, SimpleSpanProcessor } = require('@opentelemetry/tracing');
-const { CollectorExporter } =  require('@opentelemetry/exporter-collector');
+const { CollectorTraceExporter } =  require('@opentelemetry/exporter-collector');
 
 const collectorOptions = {
   serviceName: 'basic-service',
@@ -76,7 +76,7 @@ const collectorOptions = {
 };
 
 const provider = new BasicTracerProvider();
-const exporter = new CollectorExporter(collectorOptions);
+const exporter = new CollectorTraceExporter(collectorOptions);
 provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
 
 provider.register();
