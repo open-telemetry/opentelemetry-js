@@ -54,7 +54,8 @@ export class ConsoleMetricExporter implements MetricExporter {
     return resultCallback(ExportResult.SUCCESS);
   }
 
-  shutdown(): void {
+  shutdown(): Promise<void> {
     // By default does nothing
+    return Promise.resolve();
   }
 }

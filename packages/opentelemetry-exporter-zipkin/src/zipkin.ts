@@ -38,6 +38,7 @@ export class ZipkinExporter implements SpanExporter {
   private _send: zipkinTypes.SendFunction;
   private _serviceName?: string;
   private _isShutdown: boolean;
+  private _sendingPromises: Promise<unknown>[] = [];
 
   constructor(config: zipkinTypes.ExporterConfig = {}) {
     const urlStr = config.url || ZipkinExporter.DEFAULT_URL;
@@ -68,18 +69,28 @@ export class ZipkinExporter implements SpanExporter {
       setTimeout(() => resultCallback(ExportResult.FAILED_NOT_RETRYABLE));
       return;
     }
-    return this._sendSpans(spans, this._serviceName, resultCallback);
+    const promise = new Promise(resolve => {
+      this._sendSpans(spans, this._serviceName!, result => {
+        resolve();
+        resultCallback(result);
+        const index = this._sendingPromises.indexOf(promise);
+        this._sendingPromises.splice(index, 1);
+      });
+    });
+    this._sendingPromises.push(promise);
   }
 
   /**
    * Shutdown exporter. Noop operation in this exporter.
    */
-  shutdown() {
+  shutdown(): Promise<void> {
     this._logger.debug('Zipkin exporter shutdown');
-    if (this._isShutdown) {
-      return;
-    }
     this._isShutdown = true;
+    return new Promise((resolve, reject) => {
+      Promise.all(this._sendingPromises).then(() => {
+        resolve();
+      }, reject);
+    });
   }
 
   /**
