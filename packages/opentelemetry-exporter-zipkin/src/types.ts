@@ -15,6 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
+import { ExportResult } from '@opentelemetry/core';
 
 /**
  * Exporter config
@@ -177,3 +178,11 @@ export enum SpanKind {
   CONSUMER = 'CONSUMER',
   PRODUCER = 'PRODUCER',
 }
+
+/**
+ * interface for function that will send zipkin spans
+ */
+export type SendFunction = (
+  zipkinSpans: Span[],
+  done: (result: ExportResult) => void
+) => void;
