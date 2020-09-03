@@ -26,6 +26,7 @@ export enum MetricKind {
   SUM_OBSERVER,
   UP_DOWN_SUM_OBSERVER,
   VALUE_OBSERVER,
+  BATCH_OBSERVER,
 }
 
 /** The kind of aggregator. */
