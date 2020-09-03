@@ -248,7 +248,7 @@ describe('BatchSpanProcessor', () => {
         processor.onStart(span);
         processor.onEnd(span);
 
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
           assert.equal(exporterCreatedSpans.length, 0);
 

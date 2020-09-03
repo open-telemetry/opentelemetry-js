@@ -371,9 +371,9 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(lines, [
                 '# HELP counter a test description',
                 '# TYPE counter counter',
-                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
-                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
-                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
                 '',
               ]);
 
@@ -403,9 +403,9 @@ describe('PrometheusExporter', () => {
               assert.deepStrictEqual(lines, [
                 '# HELP counter a test description',
                 '# TYPE counter counter',
-                `counter{counterKey1="labelValue1"} 10 ${mockedTimeMS}`,
-                `counter{counterKey1="labelValue2"} 20 ${mockedTimeMS}`,
-                `counter{counterKey1="labelValue3"} 30 ${mockedTimeMS}`,
+                `counter{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                `counter{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
+                `counter{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
                 '',
               ]);
 
