@@ -19,6 +19,7 @@ import { ConsoleLogger, InstrumentationLibrary } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BatchObserverMetric } from './BatchObserverMetric';
 import { BaseBoundInstrument } from './BoundInstrument';
+import { MetricKind } from './export/types';
 import { UpDownCounterMetric } from './UpDownCounterMetric';
 import { CounterMetric } from './CounterMetric';
 import { UpDownSumObserverMetric } from './UpDownSumObserverMetric';
@@ -295,9 +296,29 @@ export class Meter implements api.Meter {
    * meter instance.
    */
   async collect(): Promise<void> {
-    const metrics = Array.from(this._metrics.values()).map(metric => {
-      return metric.getMetricRecord();
+    // call batch observers first
+    const batchObservers = Array.from(this._metrics.values())
+      .filter(metric => {
+        return metric.getKind() === MetricKind.BATCH_OBSERVER;
+      })
+      .map(metric => {
+        return metric.getMetricRecord();
+      });
+    await Promise.all(batchObservers).then(records => {
+      records.forEach(metrics => {
+        metrics.forEach(metric => this._batcher.process(metric));
+      });
     });
+
+    // after this all remaining metrics can be run
+    const metrics = Array.from(this._metrics.values())
+      .filter(metric => {
+        return metric.getKind() !== MetricKind.BATCH_OBSERVER;
+      })
+      .map(metric => {
+        return metric.getMetricRecord();
+      });
+
     await Promise.all(metrics).then(records => {
       records.forEach(metrics => {
         metrics.forEach(metric => this._batcher.process(metric));
