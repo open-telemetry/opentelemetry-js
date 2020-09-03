@@ -311,10 +311,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(
-          `HTTP ${method}`,
-          spanOptions
-        );
+        const span = plugin._startHttpSpan(`HTTP ${method}`, spanOptions);
 
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
