@@ -38,8 +38,9 @@ export class ConsoleSpanExporter implements SpanExporter {
   /**
    * Shutdown the exporter.
    */
-  shutdown(): void {
-    return this._sendSpans([]);
+  shutdown(): Promise<void> {
+    this._sendSpans([]);
+    return Promise.resolve();
   }
 
   /**

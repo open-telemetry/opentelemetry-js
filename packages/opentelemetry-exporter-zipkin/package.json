@@ -5,21 +5,29 @@
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
   "repository": "open-telemetry/opentelemetry-js",
+  "browser": {
+    "./src/platform/index.ts": "./src/platform/browser/index.ts",
+    "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
+  },
   "scripts": {
-    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts'",
-    "tdd": "npm run test -- --watch-extensions ts --watch",
     "clean": "rimraf build/*",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "compile": "npm run version:update && tsc -p .",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix",
-    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
     "precompile": "tsc --version",
+    "prepare": "npm run compile",
+    "tdd": "npm run test -- --watch-extensions ts --watch",
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
+    "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
-    "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile"
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
     "nodejs",
+    "browser",
     "tracing",
     "profiling"
   ],
@@ -40,17 +48,33 @@
     "access": "public"
   },
   "devDependencies": {
+    "@babel/core": "7.11.0",
     "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
+    "@types/sinon": "9.0.4",
+    "@types/webpack-env": "1.15.2",
+    "babel-loader": "8.1.0",
     "codecov": "3.7.2",
     "gts": "2.0.2",
+    "istanbul-instrumenter-loader": "3.0.1",
+    "karma": "5.1.1",
+    "karma-chrome-launcher": "3.1.0",
+    "karma-coverage-istanbul-reporter": "3.0.3",
+    "karma-mocha": "2.0.1",
+    "karma-spec-reporter": "0.0.32",
+    "karma-webpack": "4.0.2",
     "mocha": "7.2.0",
     "nock": "12.0.3",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
+    "sinon": "9.0.2",
+    "ts-loader": "8.0.1",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "webpack": "4.44.1",
+    "webpack-cli": "3.3.12",
+    "webpack-merge": "5.0.9"
   },
   "dependencies": {
     "@opentelemetry/api": "^0.11.0",

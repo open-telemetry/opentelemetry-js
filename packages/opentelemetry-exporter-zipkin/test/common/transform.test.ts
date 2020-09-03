@@ -29,14 +29,16 @@ import {
   _toZipkinAnnotations,
   statusCodeTagName,
   statusDescriptionTagName,
-} from '../src/transform';
-import * as zipkinTypes from '../src/types';
-import { Resource } from '@opentelemetry/resources';
-
+} from '../../src/transform';
+import * as zipkinTypes from '../../src/types';
+import { Resource, TELEMETRY_SDK_RESOURCE } from '@opentelemetry/resources';
 const logger = new NoopLogger();
 const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');
+
+const language = tracer.resource.attributes[TELEMETRY_SDK_RESOURCE.LANGUAGE];
+
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {
   traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -94,7 +96,7 @@ describe('transform', () => {
           key1: 'value1',
           key2: 'value2',
           [statusCodeTagName]: 'OK',
-          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
@@ -131,7 +133,7 @@ describe('transform', () => {
         parentId: undefined,
         tags: {
           [statusCodeTagName]: 'OK',
-          'telemetry.sdk.language': 'nodejs',
+          'telemetry.sdk.language': language,
           'telemetry.sdk.name': 'opentelemetry',
           'telemetry.sdk.version': VERSION,
         },
@@ -173,7 +175,7 @@ describe('transform', () => {
           parentId: undefined,
           tags: {
             [statusCodeTagName]: 'OK',
-            'telemetry.sdk.language': 'nodejs',
+            'telemetry.sdk.language': language,
             'telemetry.sdk.name': 'opentelemetry',
             'telemetry.sdk.version': VERSION,
           },
