@@ -138,20 +138,24 @@ describe('CollectorMetricExporter - common', () => {
     });
 
     describe('when exporter is shutdown', () => {
-      it('should not export anything but return callback with code "FailedNotRetryable"', () => {
-        collectorExporter.shutdown();
-        spySend.resetHistory();
+      it(
+        'should not export anything but return callback with code' +
+          ' "FailedNotRetryable"',
+        async () => {
+          await collectorExporter.shutdown();
+          spySend.resetHistory();
 
-        const callbackSpy = sinon.spy();
-        collectorExporter.export(metrics, callbackSpy);
-        const returnCode = callbackSpy.args[0][0];
-        assert.strictEqual(
-          returnCode,
-          ExportResult.FAILED_NOT_RETRYABLE,
-          'return value is wrong'
-        );
-        assert.strictEqual(spySend.callCount, 0, 'should not call send');
-      });
+          const callbackSpy = sinon.spy();
+          collectorExporter.export(metrics, callbackSpy);
+          const returnCode = callbackSpy.args[0][0];
+          assert.strictEqual(
+            returnCode,
+            ExportResult.FAILED_NOT_RETRYABLE,
+            'return value is wrong'
+          );
+          assert.strictEqual(spySend.callCount, 0, 'should not call send');
+        }
+      );
     });
     describe('when an error occurs', () => {
       it('should return a Not Retryable Error', done => {
@@ -173,7 +177,7 @@ describe('CollectorMetricExporter - common', () => {
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
-        }, 500);
+        });
       });
 
       it('should return a Retryable Error', done => {
@@ -195,7 +199,7 @@ describe('CollectorMetricExporter - common', () => {
           );
           assert.strictEqual(spySend.callCount, 1, 'should call send');
           done();
-        }, 500);
+        });
       });
     });
   });
@@ -220,12 +224,9 @@ describe('CollectorMetricExporter - common', () => {
       onShutdownSpy.restore();
     });
 
-    it('should call onShutdown', done => {
-      collectorExporter.shutdown();
-      setTimeout(() => {
-        assert.equal(onShutdownSpy.callCount, 1);
-        done();
-      });
+    it('should call onShutdown', async () => {
+      await collectorExporter.shutdown();
+      assert.strictEqual(onShutdownSpy.callCount, 1);
     });
   });
 });

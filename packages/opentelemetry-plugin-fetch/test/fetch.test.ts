@@ -29,7 +29,9 @@ import { AttributeNames } from '../src/enums/AttributeNames';
 class DummySpanExporter implements tracing.SpanExporter {
   export(spans: any) {}
 
-  shutdown() {}
+  shutdown() {
+    return Promise.resolve();
+  }
 }
 
 const getData = (url: string, method?: string) =>

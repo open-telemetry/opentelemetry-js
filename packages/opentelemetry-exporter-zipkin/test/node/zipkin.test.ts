@@ -24,9 +24,9 @@ import {
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { ZipkinExporter } from '../src';
-import * as zipkinTypes from '../src/types';
-import { OT_REQUEST_HEADER } from '../src/utils';
+import { ZipkinExporter } from '../../src';
+import * as zipkinTypes from '../../src/types';
+import { OT_REQUEST_HEADER } from '../../src/utils';
 import { TraceFlags } from '@opentelemetry/api';
 import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 
@@ -59,7 +59,7 @@ function getReadableSpan() {
   return readableSpan;
 }
 
-describe('ZipkinExporter', () => {
+describe('Zipkin Exporter - node', () => {
   describe('constructor', () => {
     it('should construct an exporter', () => {
       const exporter = new ZipkinExporter({ serviceName: 'my-service' });
@@ -97,21 +97,6 @@ describe('ZipkinExporter', () => {
       });
       assert.ok(typeof exporter.export === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
-    });
-    it('should construct an exporter with headers', () => {
-      const exporter = new ZipkinExporter({
-        headers: {
-          foo: 'bar',
-        },
-      });
-      interface ExporterWithHeaders {
-        _reqOpts: {
-          headers: { [key: string]: string };
-        };
-      }
-      const exporterWithHeaders = (exporter as unknown) as ExporterWithHeaders;
-
-      assert.ok(exporterWithHeaders._reqOpts.headers['foo'] === 'bar');
     });
   });
 
@@ -510,8 +495,5 @@ describe('ZipkinExporter', () => {
     after(() => {
       nock.enableNetConnect();
     });
-
-    // @todo: implement
-    it('should send by default');
   });
 });

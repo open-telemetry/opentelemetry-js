@@ -13,19 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-import { MetricExporter, MetricRecord } from './types';
-import { ExportResult } from '@opentelemetry/core';
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
 
-export class NoopExporter implements MetricExporter {
-  // By default does nothing
-  export(
-    metrics: MetricRecord[],
-    resultCallback: (result: ExportResult) => void
-  ): void {}
-
-  // By default does nothing
-  shutdown(): Promise<void> {
-    return Promise.resolve();
-  }
-}
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);
