@@ -14,5 +14,4 @@
  * limitations under the License.
  */
 
-export * from './zipkin';
-export * from './platform';
+export * from './node';
