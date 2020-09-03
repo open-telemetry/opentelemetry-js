@@ -15,8 +15,10 @@
  */
 
 import { NOOP_TRACER_PROVIDER } from '../trace/NoopTracerProvider';
+import { ProxyTracerProvider } from '../trace/ProxyTracerProvider';
 import { Tracer } from '../trace/tracer';
 import { TracerProvider } from '../trace/tracer_provider';
+import { isSpanContextValid } from '../trace/spancontext-utils';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_TRACE_API_KEY,
@@ -29,6 +31,8 @@ import {
  */
 export class TraceAPI {
   private static _instance?: TraceAPI;
+
+  private _proxyTracerProvider = new ProxyTracerProvider();
 
   /** Empty private constructor prevents end users from constructing a new instance of the API */
   private constructor() {}
@@ -51,9 +55,11 @@ export class TraceAPI {
       return this.getTracerProvider();
     }
 
+    this._proxyTracerProvider.setDelegate(provider);
+
     _global[GLOBAL_TRACE_API_KEY] = makeGetter(
       API_BACKWARDS_COMPATIBILITY_VERSION,
-      provider,
+      this._proxyTracerProvider,
       NOOP_TRACER_PROVIDER
     );
 
@@ -66,7 +72,7 @@ export class TraceAPI {
   public getTracerProvider(): TracerProvider {
     return (
       _global[GLOBAL_TRACE_API_KEY]?.(API_BACKWARDS_COMPATIBILITY_VERSION) ??
-      NOOP_TRACER_PROVIDER
+      this._proxyTracerProvider
     );
   }
 
@@ -80,5 +86,8 @@ export class TraceAPI {
   /** Remove the global tracer provider */
   public disable() {
     delete _global[GLOBAL_TRACE_API_KEY];
+    this._proxyTracerProvider = new ProxyTracerProvider();
   }
+
+  public isSpanContextValid = isSpanContextValid;
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { ExceptionAttribute } from '@opentelemetry/semantic-conventions';
 import * as assert from 'assert';
 import {
   SpanKind,
@@ -21,6 +22,7 @@ import {
   TraceFlags,
   SpanContext,
   LinkContext,
+  Exception,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Span } from '../src';
 import {
@@ -356,5 +358,92 @@ describe('Span', () => {
     assert.strictEqual(span.ended, false);
     span.end();
     assert.strictEqual(span.ended, true);
+  });
+
+  describe('recordException', () => {
+    const invalidExceptions: any[] = [
+      1,
+      null,
+      undefined,
+      { foo: 'bar' },
+      { stack: 'bar' },
+      ['a', 'b', 'c'],
+    ];
+
+    invalidExceptions.forEach(key => {
+      describe(`when exception is (${JSON.stringify(key)})`, () => {
+        it('should NOT record an exception', () => {
+          const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+          assert.strictEqual(span.events.length, 0);
+          span.recordException(key);
+          assert.strictEqual(span.events.length, 0);
+        });
+      });
+    });
+
+    describe('when exception type is "string"', () => {
+      let error: Exception;
+      beforeEach(() => {
+        error = 'boom';
+      });
+      it('should record an exception', () => {
+        const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+        assert.strictEqual(span.events.length, 0);
+        span.recordException(error);
+
+        const event = span.events[0];
+        assert.strictEqual(event.name, 'exception');
+        assert.deepStrictEqual(event.attributes, {
+          'exception.message': 'boom',
+        });
+        assert.ok(event.time[0] > 0);
+      });
+    });
+
+    const errorsObj = [
+      {
+        description: 'code',
+        obj: { code: 'Error', message: 'boom', stack: 'bar' },
+      },
+      {
+        description: 'name',
+        obj: { name: 'Error', message: 'boom', stack: 'bar' },
+      },
+    ];
+    errorsObj.forEach(errorObj => {
+      describe(`when exception type is an object with ${errorObj.description}`, () => {
+        const error: Exception = errorObj.obj;
+        it('should record an exception', () => {
+          const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+          assert.strictEqual(span.events.length, 0);
+          span.recordException(error);
+
+          const event = span.events[0];
+          assert.ok(event.time[0] > 0);
+          assert.strictEqual(event.name, 'exception');
+
+          assert.ok(event.attributes);
+
+          const type = event.attributes[ExceptionAttribute.TYPE];
+          const message = event.attributes[ExceptionAttribute.MESSAGE];
+          const stacktrace = String(
+            event.attributes[ExceptionAttribute.STACKTRACE]
+          );
+          assert.strictEqual(type, 'Error');
+          assert.strictEqual(message, 'boom');
+          assert.strictEqual(stacktrace, 'bar');
+        });
+      });
+    });
+
+    describe('when time is provided', () => {
+      it('should record an exception with provided time', () => {
+        const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
+        assert.strictEqual(span.events.length, 0);
+        span.recordException('boom', [0, 123]);
+        const event = span.events[0];
+        assert.deepStrictEqual(event.time, [0, 123]);
+      });
+    });
   });
 });

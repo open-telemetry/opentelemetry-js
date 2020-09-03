@@ -10,7 +10,7 @@ const providerWithZone = new WebTracerProvider({
   plugins: [
     new UserInteractionPlugin(),
     new XMLHttpRequestPlugin({
-      ignoreUrls: [/localhost:8090\/sockjs-node/],
+      ignoreUrls: [/localhost/],
       propagateTraceHeaderCorsUrls: [
         'http://localhost:8090'
       ]

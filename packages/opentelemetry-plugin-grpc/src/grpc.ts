@@ -42,6 +42,8 @@ import {
   findIndex,
   _grpcStatusCodeToCanonicalCode,
   _grpcStatusCodeToSpanStatus,
+  _methodIsIgnored,
+  _containsOtelMetadata,
 } from './utils';
 import { VERSION } from './version';
 
@@ -154,7 +156,22 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               callback: SendUnaryDataCallback
             ) {
               const self = this;
-
+              if (plugin._shouldNotTraceServerCall(call, name)) {
+                switch (type) {
+                  case 'unary':
+                  case 'client_stream':
+                    return (originalFunc as Function).call(
+                      self,
+                      call,
+                      callback
+                    );
+                  case 'server_stream':
+                  case 'bidi':
+                    return (originalFunc as Function).call(self, call);
+                  default:
+                    return originalResult;
+                }
+              }
               const spanName = `grpc.${name.replace('/', '')}`;
               const spanOptions: SpanOptions = {
                 kind: SpanKind.SERVER,
@@ -210,6 +227,23 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return originalResult;
       };
     };
+  }
+
+  /**
+   * Returns true if the server call should not be traced.
+   */
+  private _shouldNotTraceServerCall(
+    call: ServerCallWithMeta,
+    name: string
+  ): boolean {
+    const parsedName = name.split('/');
+    return (
+      _containsOtelMetadata(call.metadata) ||
+      _methodIsIgnored(
+        parsedName[parsedName.length - 1] || name,
+        this._config.ignoreGrpcMethods
+      )
+    );
   }
 
   private _clientStreamAndUnaryHandler<RequestType, ResponseType>(
@@ -329,17 +363,24 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     client: typeof grpcTypes.Client,
     methods: { [key: string]: { originalName?: string } }
   ): string[] {
-    const methodsToWrap = [
-      ...Object.keys(methods),
-      ...(Object.keys(methods)
-        .map(methodName => methods[methodName].originalName)
-        .filter(
-          originalName =>
-            // eslint-disable-next-line no-prototype-builtins
-            !!originalName && client.prototype.hasOwnProperty(originalName)
-        ) as string[]),
-    ];
-    return methodsToWrap;
+    const methodList: string[] = [];
+
+    // For a method defined in .proto as "UnaryMethod"
+    Object.entries(methods).forEach(([name, { originalName }]) => {
+      if (!_methodIsIgnored(name, this._config.ignoreGrpcMethods)) {
+        methodList.push(name); // adds camel case method name: "unaryMethod"
+        if (
+          originalName &&
+          // eslint-disable-next-line no-prototype-builtins
+          client.prototype.hasOwnProperty(originalName) &&
+          name !== originalName // do not add duplicates
+        ) {
+          // adds original method name: "UnaryMethod",
+          methodList.push(originalName);
+        }
+      }
+    });
+    return methodList;
   }
 
   private _getPatchedClientMethods() {
@@ -349,11 +390,21 @@ export class GrpcPlugin extends BasePlugin<grpc> {
       return function clientMethodTrace(this: grpcTypes.Client) {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
+        const metadata = plugin._getMetadata(original, args);
+        if (_containsOtelMetadata(metadata)) {
+          return original.apply(this, args);
+        }
         const span = plugin._tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });
         return plugin._tracer.withSpan(span, () =>
-          plugin._makeGrpcClientRemoteCall(original, args, this, plugin)(span)
+          plugin._makeGrpcClientRemoteCall(
+            original,
+            args,
+            metadata,
+            this,
+            plugin
+          )(span)
         );
       };
     };
@@ -365,6 +416,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
   private _makeGrpcClientRemoteCall(
     original: GrpcClientFunc,
     args: any[],
+    metadata: grpcTypes.Metadata,
     self: grpcTypes.Client,
     plugin: GrpcPlugin
   ) {
@@ -409,7 +461,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         return original.apply(self, args);
       }
 
-      const metadata = this._getMetadata(original, args);
       // if unary or clientStream
       if (!original.responseStream) {
         const callbackFuncIndex = findIndex(args, arg => {

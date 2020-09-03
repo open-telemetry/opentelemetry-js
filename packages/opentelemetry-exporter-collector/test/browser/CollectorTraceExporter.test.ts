@@ -19,8 +19,8 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorTraceExporter } from '../../src/platform/browser/index';
+import { CollectorExporterConfigBase } from '../../src/types';
 import * as collectorTypes from '../../src/types';
-import { CollectorExporterConfigBrowser } from '../../src/platform/browser/types';
 
 import {
   ensureSpanIsCorrect,
@@ -33,7 +33,7 @@ const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorTraceExporter - web', () => {
   let collectorTraceExporter: CollectorTraceExporter;
-  let collectorExporterConfig: CollectorExporterConfigBrowser;
+  let collectorExporterConfig: CollectorExporterConfigBase;
   let spyOpen: sinon.SinonSpy;
   let spySend: sinon.SinonSpy;
   let spyBeacon: sinon.SinonSpy;
@@ -333,7 +333,7 @@ describe('CollectorTraceExporter - browser (getDefaultUrl)', () => {
     setTimeout(() => {
       assert.strictEqual(
         collectorExporter['url'],
-        'http://localhost:55680/v1/trace'
+        'http://localhost:55681/v1/trace'
       );
       done();
     });

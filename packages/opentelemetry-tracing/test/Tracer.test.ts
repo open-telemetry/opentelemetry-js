@@ -15,13 +15,21 @@
  */
 
 import * as assert from 'assert';
-import { NoopSpan, Sampler, SamplingDecision } from '@opentelemetry/api';
+import {
+  NoopSpan,
+  Sampler,
+  SamplingDecision,
+  Context,
+  NOOP_SPAN,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
   InstrumentationLibrary,
   NoopLogger,
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
+  suppressInstrumentation,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {
@@ -40,6 +48,12 @@ describe('Tracer', () => {
     }
   }
 
+  afterEach(() => {
+    if (typeof process !== 'undefined' && process.release.name === 'node') {
+      delete process.env.OTEL_SAMPLING_PROBABILITY;
+    }
+  });
+
   it('should create a Tracer instance', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
@@ -49,10 +63,19 @@ describe('Tracer', () => {
     assert.ok(tracer instanceof Tracer);
   });
 
+  it('should use an AlwaysOnSampler by default', () => {
+    const tracer = new Tracer(
+      { name: 'default', version: '0.0.1' },
+      {},
+      tracerProvider
+    );
+    assert.strictEqual(tracer['_sampler'].toString(), 'AlwaysOnSampler');
+  });
+
   it('should respect NO_RECORD sampling result', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
-      { sampler: NEVER_SAMPLER },
+      { sampler: new AlwaysOffSampler() },
       tracerProvider
     );
     const span = tracer.startSpan('span1');
@@ -63,7 +86,7 @@ describe('Tracer', () => {
   it('should respect RECORD_AND_SAMPLE sampling result', () => {
     const tracer = new Tracer(
       { name: 'default', version: '0.0.1' },
-      { sampler: ALWAYS_SAMPLER },
+      { sampler: new AlwaysOnSampler() },
       tracerProvider
     );
     const span = tracer.startSpan('span2');
@@ -94,4 +117,83 @@ describe('Tracer', () => {
     assert.strictEqual(lib.name, 'default');
     assert.strictEqual(lib.version, '0.0.1');
   });
+
+  describe('when suppressInstrumentation true', () => {
+    const context = suppressInstrumentation(Context.ROOT_CONTEXT);
+
+    it('should return cached no-op span ', done => {
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        { sampler: new TestSampler() },
+        tracerProvider
+      );
+
+      const span = tracer.startSpan('span3', undefined, context);
+
+      assert.equal(span, NOOP_SPAN);
+      span.end();
+
+      done();
+    });
+  });
+
+  if (typeof process !== 'undefined' && process.release.name === 'node') {
+    it('should sample a trace when OTEL_SAMPLING_PROBABILITY is invalid', () => {
+      process.env.OTEL_SAMPLING_PROBABILITY = 'invalid value';
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        {},
+        tracerProvider
+      );
+      const span = tracer.startSpan('my-span');
+      const context = span.context();
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+      span.end();
+    });
+  }
+
+  if (typeof process !== 'undefined' && process.release.name === 'node') {
+    it('should sample a trace when OTEL_SAMPLING_PROBABILITY is greater than 1', () => {
+      process.env.OTEL_SAMPLING_PROBABILITY = '2';
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        {},
+        tracerProvider
+      );
+      const span = tracer.startSpan('my-span');
+      const context = span.context();
+      assert.strictEqual(context.traceFlags, TraceFlags.SAMPLED);
+      span.end();
+    });
+  }
+
+  if (typeof process !== 'undefined' && process.release.name === 'node') {
+    it('should not sample a trace when OTEL_SAMPLING_PROBABILITY is 0', () => {
+      process.env.OTEL_SAMPLING_PROBABILITY = '0';
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        {},
+        tracerProvider
+      );
+      const span = tracer.startSpan('my-span');
+      const context = span.context();
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
+      span.end();
+    });
+  }
+
+  if (typeof process !== 'undefined' && process.release.name === 'node') {
+    it('should not sample a trace when OTEL_SAMPLING_PROBABILITY is less than 0', () => {
+      process.env.OTEL_SAMPLING_PROBABILITY = '-1';
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        {},
+        tracerProvider
+      );
+      const span = tracer.startSpan('my-span');
+      const context = span.context();
+      assert.strictEqual(context.traceFlags, TraceFlags.NONE);
+      span.end();
+    });
+  }
 });

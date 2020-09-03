@@ -17,21 +17,36 @@
 import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
 import { ContextManager } from '@opentelemetry/context-base';
 import {
-  ALWAYS_SAMPLER,
-  NEVER_SAMPLER,
+  AlwaysOnSampler,
+  AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
+  notifyOnGlobalShutdown,
+  _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { BasicTracerProvider, Span } from '../src';
 
 describe('BasicTracerProvider', () => {
+  let sandbox: sinon.SinonSandbox;
+  let removeEvent: Function | undefined;
+
   beforeEach(() => {
     context.disable();
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
   });
 
   describe('constructor', () => {
@@ -49,7 +64,7 @@ describe('BasicTracerProvider', () => {
 
     it('should construct an instance with sampler', () => {
       const provider = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       });
       assert.ok(provider instanceof BasicTracerProvider);
     });
@@ -102,13 +117,8 @@ describe('BasicTracerProvider', () => {
       });
     });
 
-    it('should construct an instance with default attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: {
-          region: 'eu-west',
-          asg: 'my-asg',
-        },
-      });
+    it('should construct an instance of BasicTracerProvider', () => {
+      const tracer = new BasicTracerProvider();
       assert.ok(tracer instanceof BasicTracerProvider);
     });
   });
@@ -142,23 +152,12 @@ describe('BasicTracerProvider', () => {
       span.end();
     });
 
-    it('should start a span with defaultAttributes and spanoptions->attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: { foo: 'bar' },
-      }).getTracer('default');
+    it('should start a span with given attributes', () => {
+      const tracer = new BasicTracerProvider().getTracer('default');
       const span = tracer.startSpan('my-span', {
         attributes: { foo: 'foo', bar: 'bar' },
       }) as Span;
       assert.deepStrictEqual(span.attributes, { bar: 'bar', foo: 'foo' });
-      span.end();
-    });
-
-    it('should start a span with defaultAttributes and undefined spanoptions->attributes', () => {
-      const tracer = new BasicTracerProvider({
-        defaultAttributes: { foo: 'bar' },
-      }).getTracer('default');
-      const span = tracer.startSpan('my-span', {}) as Span;
-      assert.deepStrictEqual(span.attributes, { foo: 'bar' });
       span.end();
     });
 
@@ -294,7 +293,7 @@ describe('BasicTracerProvider', () => {
 
     it('should return a no recording span when never sampling', () => {
       const tracer = new BasicTracerProvider({
-        sampler: NEVER_SAMPLER,
+        sampler: new AlwaysOffSampler(),
         logger: new NoopLogger(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
@@ -309,25 +308,12 @@ describe('BasicTracerProvider', () => {
 
     it('should create real span when sampled', () => {
       const tracer = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const span = tracer.startSpan('my-span');
       assert.ok(span instanceof Span);
       assert.strictEqual(span.context().traceFlags, TraceFlags.SAMPLED);
       assert.strictEqual(span.isRecording(), true);
-    });
-
-    it('should set default attributes on span', () => {
-      const defaultAttributes = {
-        foo: 'bar',
-      };
-      const tracer = new BasicTracerProvider({
-        defaultAttributes,
-      }).getTracer('default');
-
-      const span = tracer.startSpan('my-span') as Span;
-      assert.ok(span instanceof Span);
-      assert.deepStrictEqual(span.attributes, defaultAttributes);
     });
 
     it('should assign a resource', () => {
@@ -379,6 +365,45 @@ describe('BasicTracerProvider', () => {
     it('should return a Resource', () => {
       const tracerProvider = new BasicTracerProvider();
       assert.ok(tracerProvider.resource instanceof Resource);
+    });
+  });
+
+  describe('.shutdown()', () => {
+    it('should trigger shutdown when SIGTERM is recieved', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      removeEvent = notifyOnGlobalShutdown(() => {
+        sinon.assert.calledOnce(shutdownStub);
+      });
+      _invokeGlobalShutdown();
+    });
+
+    it('should trigger shutdown when manually invoked', () => {
+      const tracerProvider = new BasicTracerProvider();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      tracerProvider.shutdown();
+      sinon.assert.calledOnce(shutdownStub);
+    });
+
+    it('should not trigger shutdown if graceful shutdown is turned off', () => {
+      const tracerProvider = new BasicTracerProvider({
+        gracefulShutdown: false,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub = sandbox.stub(
+        tracerProvider.getActiveSpanProcessor(),
+        'shutdown'
+      );
+      removeEvent = notifyOnGlobalShutdown(() => {
+        sinon.assert.notCalled(shutdownStub);
+      });
+      _invokeGlobalShutdown();
     });
   });
 });

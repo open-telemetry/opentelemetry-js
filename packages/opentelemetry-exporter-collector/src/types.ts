@@ -32,11 +32,16 @@ export namespace opentelemetryProto {
         resourceSpans: opentelemetryProto.trace.v1.ResourceSpans[];
       }
     }
+    export namespace metrics.v1 {
+      export interface ExportMetricsServiceRequest {
+        resourceMetrics: opentelemetryProto.metrics.v1.ResourceMetrics[];
+      }
+    }
   }
 
   export namespace resource.v1 {
     export interface Resource {
-      attributes: opentelemetryProto.common.v1.AttributeKeyValue[];
+      attributes: opentelemetryProto.common.v1.KeyValue[];
       droppedAttributesCount: number;
     }
   }
@@ -147,7 +152,7 @@ export namespace opentelemetryProto {
       export interface Event {
         timeUnixNano: number;
         name: string;
-        attributes?: opentelemetryProto.common.v1.AttributeKeyValue[];
+        attributes?: opentelemetryProto.common.v1.KeyValue[];
         droppedAttributesCount: number;
       }
 
@@ -155,7 +160,7 @@ export namespace opentelemetryProto {
         traceId: string;
         spanId: string;
         traceState?: opentelemetryProto.trace.v1.Span.TraceState;
-        attributes?: opentelemetryProto.common.v1.AttributeKeyValue[];
+        attributes?: opentelemetryProto.common.v1.KeyValue[];
         droppedAttributesCount: number;
       }
 
@@ -167,6 +172,7 @@ export namespace opentelemetryProto {
         PRODUCER,
         CONSUMER,
       }
+
       export type TraceState = string | undefined;
     }
 
@@ -201,7 +207,7 @@ export namespace opentelemetryProto {
       kind?: opentelemetryProto.trace.v1.Span.SpanKind;
       startTimeUnixNano?: number;
       endTimeUnixNano?: number;
-      attributes?: opentelemetryProto.common.v1.AttributeKeyValue[];
+      attributes?: opentelemetryProto.common.v1.KeyValue[];
       droppedAttributesCount: number;
       events?: opentelemetryProto.trace.v1.Span.Event[];
       droppedEventsCount: number;
@@ -219,14 +225,27 @@ export namespace opentelemetryProto {
     }
   }
   export namespace common.v1 {
-    export interface AttributeKeyValue {
+    export interface KeyValue {
       key: string;
-      type: opentelemetryProto.common.v1.ValueType;
+      value: AnyValue;
+    }
+
+    export type ArrayValue = {
+      values: AnyValue[];
+    };
+
+    export interface KeyValueList {
+      values: KeyValue[];
+    }
+
+    export type AnyValue = {
       stringValue?: string;
+      boolValue?: boolean;
       intValue?: number;
       doubleValue?: number;
-      boolValue?: boolean;
-    }
+      arrayValue?: ArrayValue;
+      kvlistValue?: KeyValueList;
+    };
 
     export interface InstrumentationLibrary {
       name: string;

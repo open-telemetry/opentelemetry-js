@@ -19,10 +19,11 @@ import {
   getExtractedSpanContext,
   NoopLogger,
   setExtractedSpanContext,
+  setCorrelationContext,
   setActiveSpan,
+  getCorrelationContext,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
-import { defaultSetter } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -72,10 +73,15 @@ function getContextWithParent(options: opentracing.SpanOptions) {
  */
 export class SpanContextShim extends opentracing.SpanContext {
   private readonly _spanContext: api.SpanContext;
+  private _correlationContext: api.CorrelationContext;
 
-  constructor(spanContext: api.SpanContext) {
+  constructor(
+    spanContext: api.SpanContext,
+    correlationContext: api.CorrelationContext
+  ) {
     super();
     this._spanContext = spanContext;
+    this._correlationContext = correlationContext;
   }
 
   /**
@@ -83,6 +89,13 @@ export class SpanContextShim extends opentracing.SpanContext {
    */
   getSpanContext(): api.SpanContext {
     return this._spanContext;
+  }
+
+  /**
+   * Returns the underlying {@link api.CorrelationContext}
+   */
+  getCorrelationContext(): api.CorrelationContext {
+    return this._correlationContext;
   }
 
   /**
@@ -97,6 +110,16 @@ export class SpanContextShim extends opentracing.SpanContext {
    */
   toSpanId(): string {
     return this._spanContext.spanId;
+  }
+
+  getBaggageItem(key: string): string | undefined {
+    return this._correlationContext[key]?.value;
+  }
+
+  setBaggageItem(key: string, value: string) {
+    this._correlationContext = Object.assign({}, this._correlationContext, {
+      [key]: { value },
+    });
   }
 }
 
@@ -125,11 +148,19 @@ export class TracerShim extends opentracing.Tracer {
       getContextWithParent(options)
     );
 
+    let correlationContext: api.CorrelationContext = {};
+    if (options.childOf instanceof SpanShim) {
+      const shimContext = options.childOf.context() as SpanContextShim;
+      correlationContext = shimContext.getCorrelationContext();
+    } else if (options.childOf instanceof SpanContextShim) {
+      correlationContext = options.childOf.getCorrelationContext();
+    }
+
     if (options.tags) {
       span.setAttributes(options.tags);
     }
 
-    return new SpanShim(this, span);
+    return new SpanShim(this, span, correlationContext);
   }
 
   _inject(
@@ -137,17 +168,20 @@ export class TracerShim extends opentracing.Tracer {
     format: string,
     carrier: unknown
   ): void {
-    const opentelemSpanContext: api.SpanContext = (spanContext as SpanContextShim).getSpanContext();
+    const spanContextShim: SpanContextShim = spanContext as SpanContextShim;
+    const oTelSpanContext: api.SpanContext = spanContextShim.getSpanContext();
+    const oTelSpanCorrelationContext: api.CorrelationContext = spanContextShim.getCorrelationContext();
+
     if (!carrier || typeof carrier !== 'object') return;
     switch (format) {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
-          defaultSetter,
-          setExtractedSpanContext(
-            api.Context.ROOT_CONTEXT,
-            opentelemSpanContext
+          api.defaultSetter,
+          setCorrelationContext(
+            setExtractedSpanContext(api.Context.ROOT_CONTEXT, oTelSpanContext),
+            oTelSpanCorrelationContext
           )
         );
         return;
@@ -156,7 +190,7 @@ export class TracerShim extends opentracing.Tracer {
         this._logger.warn(
           'OpentracingShim.inject() does not support FORMAT_BINARY'
         );
-        // @todo: Implement binary format
+        // @todo: Implement binary formats
         return;
       }
       default:
@@ -167,13 +201,14 @@ export class TracerShim extends opentracing.Tracer {
     switch (format) {
       case opentracing.FORMAT_HTTP_HEADERS:
       case opentracing.FORMAT_TEXT_MAP: {
-        const context = getExtractedSpanContext(
-          api.propagation.extract(carrier)
-        );
-        if (!context) {
+        const context: api.Context = api.propagation.extract(carrier);
+        const spanContext = getExtractedSpanContext(context);
+        const correlationContext = getCorrelationContext(context);
+
+        if (!spanContext) {
           return null;
         }
-        return new SpanContextShim(context);
+        return new SpanContextShim(spanContext, correlationContext || {});
       }
       case opentracing.FORMAT_BINARY: {
         // @todo: Implement binary format
@@ -191,8 +226,8 @@ export class TracerShim extends opentracing.Tracer {
 /**
  * SpanShim wraps an {@link types.Span} and implements the OpenTracing Span API
  * around it.
- * @todo: Out of band baggage propagation is not currently supported.
- */
+ *
+ **/
 export class SpanShim extends opentracing.Span {
   // _span is the original OpenTelemetry span that we are wrapping with
   // an opentracing interface.
@@ -200,10 +235,14 @@ export class SpanShim extends opentracing.Span {
   private readonly _contextShim: SpanContextShim;
   private readonly _tracerShim: TracerShim;
 
-  constructor(tracerShim: TracerShim, span: api.Span) {
+  constructor(
+    tracerShim: TracerShim,
+    span: api.Span,
+    correlationContext: api.CorrelationContext
+  ) {
     super();
     this._span = span;
-    this._contextShim = new SpanContextShim(span.context());
+    this._contextShim = new SpanContextShim(span.context(), correlationContext);
     this._tracerShim = tracerShim;
   }
 
@@ -295,12 +334,11 @@ export class SpanShim extends opentracing.Span {
   }
 
   getBaggageItem(key: string): string | undefined {
-    // TODO: should this go into the context?
-    return undefined;
+    return this._contextShim.getBaggageItem(key);
   }
 
   setBaggageItem(key: string, value: string): this {
-    // TODO: should this go into the context?
+    this._contextShim.setBaggageItem(key, value);
     return this;
   }
 

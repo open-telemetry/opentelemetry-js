@@ -21,7 +21,8 @@ import { Batcher } from './export/Batcher';
 import { MetricKind } from './export/types';
 
 /** This is a SDK implementation of Value Observer Metric. */
-export class ValueObserverMetric extends BaseObserverMetric
+export class ValueObserverMetric
+  extends BaseObserverMetric
   implements api.ValueObserver {
   constructor(
     name: string,
@@ -29,7 +30,7 @@ export class ValueObserverMetric extends BaseObserverMetric
     batcher: Batcher,
     resource: Resource,
     instrumentationLibrary: InstrumentationLibrary,
-    callback?: (observerResult: api.ObserverResult) => void
+    callback?: (observerResult: api.ObserverResult) => unknown
   ) {
     super(
       name,

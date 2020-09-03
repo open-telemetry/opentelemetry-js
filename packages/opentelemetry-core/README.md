@@ -80,7 +80,7 @@ api.propagation.setGlobalPropagator(new HttpCorrelationContext());
 
 Sampler is used to make decisions on `Span` sampling.
 
-#### Always Sampler
+#### AlwaysOn
 
 Samples every trace regardless of upstream sampling decisions.
 
@@ -88,27 +88,27 @@ Samples every trace regardless of upstream sampling decisions.
 
 ```js
 const { NodeTracerProvider } = require("@opentelemetry/node");
-const { ALWAYS_SAMPLER } = require("@opentelemetry/core");
+const { AlwaysOnSampler } = require("@opentelemetry/core");
 
 const tracerProvider = new NodeTracerProvider({
-  sampler: ALWAYS_SAMPLER
+  sampler: new AlwaysOnSampler()
 });
 ```
 
-#### Never Sampler
+#### AlwaysOff
 
 Doesn't sample any trace, regardless of upstream sampling decisions.
 
 ```js
 const { NodeTracerProvider } = require("@opentelemetry/node");
-const { NEVER_SAMPLER } = require("@opentelemetry/core");
+const { AlwaysOffSampler } = require("@opentelemetry/core");
 
 const tracerProvider = new NodeTracerProvider({
-  sampler: NEVER_SAMPLER
+  sampler: new AlwaysOffSampler()
 });
 ```
 
-#### Probability Sampler
+#### Probability
 
 Samples a configurable percentage of traces, and additionally samples any trace that was sampled upstream.
 
@@ -118,6 +118,19 @@ const { ProbabilitySampler } = require("@opentelemetry/core");
 
 const tracerProvider = new NodeTracerProvider({
   sampler: new ProbabilitySampler(0.5)
+});
+```
+
+#### ParentOrElse
+
+A composite sampler that either respects the parent span's sampling decision or delegates to `delegateSampler` for root spans.
+
+```js
+const { NodeTracerProvider } = require("@opentelemetry/node");
+const { ParentOrElseSampler, AlwaysOffSampler } = require("@opentelemetry/core");
+
+const tracerProvider = new NodeTracerProvider({
+  sampler: new ParentOrElseSampler(new AlwaysOffSampler())
 });
 ```
 

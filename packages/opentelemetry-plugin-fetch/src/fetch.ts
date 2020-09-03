@@ -98,7 +98,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
    * @param options
    * @param spanUrl
    */
-  private _addHeaders(options: RequestInit, spanUrl: string): void {
+  private _addHeaders(options: Request | RequestInit, spanUrl: string): void {
     if (
       !web.shouldPropagateTraceHeaders(
         spanUrl,
@@ -107,9 +107,16 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     ) {
       return;
     }
-    const headers: { [key: string]: unknown } = {};
-    api.propagation.inject(headers);
-    options.headers = Object.assign({}, headers, options.headers || {});
+
+    if (options instanceof Request) {
+      api.propagation.inject(options.headers, (h, k, v) =>
+        h.set(k, typeof v === 'string' ? v : String(v))
+      );
+    } else {
+      const headers: Partial<Record<string, unknown>> = {};
+      api.propagation.inject(headers);
+      options.headers = Object.assign({}, headers, options.headers || {});
+    }
   }
 
   /**
@@ -242,8 +249,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
         init?: RequestInit
       ): Promise<Response> {
         const url = input instanceof Request ? input.url : input;
-        const options: RequestInit =
-          input instanceof Request ? input : init || {};
+        const options = input instanceof Request ? input : init || {};
 
         const span = plugin._createSpan(url, options);
         if (!span) {

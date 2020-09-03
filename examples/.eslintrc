@@ -12,5 +12,6 @@
     "no-console": "off",
     "import/no-unresolved": "off",
     "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
-  }
+  },
+  "ignorePatterns": "**/*_pb.js"
 }

@@ -20,7 +20,7 @@ import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextMan
 
 export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   private _asyncHook: asyncHooks.AsyncHook;
-  private _contexts: Map<number, Context | undefined> = new Map();
+  private _contexts: Map<number, Context> = new Map();
   private _stack: Array<Context | undefined> = [];
 
   constructor() {
@@ -84,7 +84,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   }
 
   /**
-   * Before hook is called just beforing executing a async context.
+   * Before hook is called just before executing a async context.
    * @param uid uid of the async context
    */
   private _before(uid: number) {

@@ -24,9 +24,15 @@ import { ReadableSpan } from './export/ReadableSpan';
 export class MultiSpanProcessor implements SpanProcessor {
   constructor(private readonly _spanProcessors: SpanProcessor[]) {}
 
-  forceFlush(): void {
+  forceFlush(cb: () => void = () => {}): void {
+    let finished = 0;
+    const total = this._spanProcessors.length;
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.forceFlush();
+      spanProcessor.forceFlush(() => {
+        if (++finished === total) {
+          cb();
+        }
+      });
     }
   }
 
@@ -42,9 +48,15 @@ export class MultiSpanProcessor implements SpanProcessor {
     }
   }
 
-  shutdown(): void {
+  shutdown(cb: () => void = () => {}): void {
+    let finished = 0;
+    const total = this._spanProcessors.length;
     for (const spanProcessor of this._spanProcessors) {
-      spanProcessor.shutdown();
+      spanProcessor.shutdown(() => {
+        if (++finished === total) {
+          cb();
+        }
+      });
     }
   }
 }

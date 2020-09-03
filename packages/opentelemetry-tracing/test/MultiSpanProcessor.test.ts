@@ -15,8 +15,19 @@
  */
 
 import * as assert from 'assert';
+import * as Sinon from 'sinon';
+import {
+  BasicTracerProvider,
+  InMemorySpanExporter,
+  SimpleSpanProcessor,
+  Span,
+  SpanProcessor,
+} from '../src';
+import {
+  notifyOnGlobalShutdown,
+  _invokeGlobalShutdown,
+} from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
-import { SpanProcessor, Span, BasicTracerProvider } from '../src';
 
 class TestProcessor implements SpanProcessor {
   spans: Span[] = [];
@@ -31,6 +42,14 @@ class TestProcessor implements SpanProcessor {
 }
 
 describe('MultiSpanProcessor', () => {
+  let removeEvent: Function | undefined;
+  afterEach(() => {
+    if (removeEvent) {
+      removeEvent();
+      removeEvent = undefined;
+    }
+  });
+
   it('should handle empty span processor', () => {
     const multiSpanProcessor = new MultiSpanProcessor([]);
 
@@ -77,6 +96,51 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
   });
 
+  it('should export spans on graceful shutdown from two span processor', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    assert.strictEqual(processor1.spans.length, 0);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    span.end();
+    assert.strictEqual(processor1.spans.length, 1);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    removeEvent = notifyOnGlobalShutdown(() => {
+      assert.strictEqual(processor1.spans.length, 0);
+      assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    });
+    _invokeGlobalShutdown();
+  });
+
+  it('should export spans on manual shutdown from two span processor', () => {
+    const processor1 = new TestProcessor();
+    const processor2 = new TestProcessor();
+    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+
+    const tracerProvider = new BasicTracerProvider();
+    tracerProvider.addSpanProcessor(multiSpanProcessor);
+    const tracer = tracerProvider.getTracer('default');
+    const span = tracer.startSpan('one');
+    assert.strictEqual(processor1.spans.length, 0);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    span.end();
+    assert.strictEqual(processor1.spans.length, 1);
+    assert.strictEqual(processor1.spans.length, processor2.spans.length);
+
+    tracerProvider.shutdown(() => {
+      assert.strictEqual(processor1.spans.length, 0);
+      assert.strictEqual(processor1.spans.length, processor2.spans.length);
+    });
+  });
+
   it('should force span processors to flush', () => {
     let flushed = false;
     const processor: SpanProcessor = {
@@ -90,5 +154,28 @@ describe('MultiSpanProcessor', () => {
     const multiSpanProcessor = new MultiSpanProcessor([processor]);
     multiSpanProcessor.forceFlush();
     assert.ok(flushed);
+  });
+
+  it('should wait for all span processors to finish flushing', done => {
+    let flushed = 0;
+    const processor1 = new SimpleSpanProcessor(new InMemorySpanExporter());
+    const processor2 = new SimpleSpanProcessor(new InMemorySpanExporter());
+
+    const spy1 = Sinon.stub(processor1, 'forceFlush').callsFake(cb => {
+      flushed++;
+      cb!();
+    });
+    const spy2 = Sinon.stub(processor2, 'forceFlush').callsFake(cb => {
+      flushed++;
+      cb!();
+    });
+
+    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
+    multiSpanProcessor.forceFlush(() => {
+      Sinon.assert.calledOnce(spy1);
+      Sinon.assert.calledOnce(spy2);
+      assert.strictEqual(flushed, 2);
+      done();
+    });
   });
 });

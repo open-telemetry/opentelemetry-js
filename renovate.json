@@ -4,18 +4,15 @@
   ],
   "packageRules": [
     {
-      "minor": {
-        "groupName": "all non-major dependencies",
-        "updateTypes": ["patch", "minor"],
-        "groupSlug": "all-minor-patch"
-      }
+      "groupName": "all non-major dependencies",
+      "updateTypes": ["patch", "minor"],
+      "groupSlug": "all-minor-patch"
     }
   ],
   "ignoreDeps": [
     "gcp-metadata",
     "got",
-    "mocha",
-    "prom-client"
+    "mocha"
   ],
   "assignees": [
     "@dyladan",

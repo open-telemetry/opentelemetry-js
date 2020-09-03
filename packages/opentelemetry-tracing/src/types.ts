@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-import {
-  Attributes,
-  HttpTextPropagator,
-  Logger,
-  Sampler,
-} from '@opentelemetry/api';
-import { LogLevel } from '@opentelemetry/core';
+import { TextMapPropagator, Logger, Sampler } from '@opentelemetry/api';
+import { LogLevel, IdGenerator } from '@opentelemetry/core';
+
 import { ContextManager } from '@opentelemetry/context-base';
 import { Resource } from '@opentelemetry/resources';
 
@@ -28,12 +24,6 @@ import { Resource } from '@opentelemetry/resources';
  * TracerConfig provides an interface for configuring a Basic Tracer.
  */
 export interface TracerConfig {
-  /**
-   * Attributes that will be applied on every span created by Tracer.
-   * Useful to add infrastructure and environment information to your spans.
-   */
-  defaultAttributes?: Attributes;
-
   /**
    * User provided logger.
    */
@@ -52,6 +42,15 @@ export interface TracerConfig {
 
   /** Resource associated with trace telemetry  */
   resource?: Resource;
+
+  /** Bool for whether or not graceful shutdown is enabled. If disabled spans will not be exported when SIGTERM is recieved */
+  gracefulShutdown?: boolean;
+
+  /**
+   * Generator of trace and span IDs
+   * The default idGenerator generates random ids
+   */
+  idGenerator?: IdGenerator;
 }
 
 /**
@@ -61,7 +60,7 @@ export interface TracerConfig {
  */
 export interface SDKRegistrationConfig {
   /** Propagator to register as the global propagator */
-  propagator?: HttpTextPropagator | null;
+  propagator?: TextMapPropagator | null;
 
   /** Context manager to register as the global context manager */
   contextManager?: ContextManager | null;

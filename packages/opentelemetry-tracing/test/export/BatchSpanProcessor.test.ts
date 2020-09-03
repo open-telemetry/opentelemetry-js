@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ALWAYS_SAMPLER } from '@opentelemetry/core';
+import { AlwaysOnSampler, ExportResult } from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import {
@@ -23,10 +23,13 @@ import {
   InMemorySpanExporter,
   Span,
 } from '../../src';
+import { context } from '@opentelemetry/api';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
+import { TestStackContextManager } from './TestStackContextManager';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
-    sampler: ALWAYS_SAMPLER,
+    sampler: new AlwaysOnSampler(),
   }).getTracer('default');
   const span = tracer.startSpan(spanName);
   span.end();
@@ -149,7 +152,7 @@ describe('BatchSpanProcessor', () => {
       const clock = sinon.useFakeTimers();
 
       const tracer = new BasicTracerProvider({
-        sampler: ALWAYS_SAMPLER,
+        sampler: new AlwaysOnSampler(),
       }).getTracer('default');
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
 
@@ -172,6 +175,86 @@ describe('BatchSpanProcessor', () => {
       clock.tick(defaultBufferConfig.bufferTimeout + 1000);
 
       clock.restore();
+    });
+  });
+
+  describe('force flush', () => {
+    describe('no waiting spans', () => {
+      it('should call an async callback when flushing is complete', done => {
+        const processor = new BatchSpanProcessor(exporter);
+        processor.forceFlush(() => {
+          done();
+        });
+      });
+
+      it('should call an async callback when shutdown is complete', done => {
+        const processor = new BatchSpanProcessor(exporter);
+        processor.shutdown(() => {
+          done();
+        });
+      });
+    });
+
+    describe('spans waiting to flush', () => {
+      let processor: BatchSpanProcessor;
+
+      beforeEach(() => {
+        processor = new BatchSpanProcessor(exporter);
+        const span = createSampledSpan('test');
+        processor.onStart(span);
+        processor.onEnd(span);
+
+        assert.strictEqual(processor['_finishedSpans'].length, 1);
+      });
+
+      it('should call an async callback when flushing is complete', done => {
+        processor.forceFlush(() => {
+          assert.strictEqual(exporter.getFinishedSpans().length, 1);
+          done();
+        });
+      });
+
+      it('should call an async callback when shutdown is complete', done => {
+        let exportedSpans = 0;
+        sinon.stub(exporter, 'export').callsFake((spans, callback) => {
+          setTimeout(() => {
+            exportedSpans = exportedSpans + spans.length;
+            callback(ExportResult.SUCCESS);
+          }, 0);
+        });
+
+        processor.shutdown(() => {
+          assert.strictEqual(exportedSpans, 1);
+          done();
+        });
+      });
+    });
+
+    describe('flushing spans with exporter triggering instrumentation', () => {
+      beforeEach(() => {
+        const contextManager = new TestStackContextManager().enable();
+        context.setGlobalContextManager(contextManager);
+      });
+
+      afterEach(() => {
+        context.disable();
+      });
+
+      it('should prevent instrumentation prior to export', done => {
+        const testTracingExporter = new TestTracingSpanExporter();
+        const processor = new BatchSpanProcessor(testTracingExporter);
+
+        const span = createSampledSpan('test');
+        processor.onStart(span);
+        processor.onEnd(span);
+
+        processor.forceFlush(() => {
+          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          assert.equal(exporterCreatedSpans.length, 0);
+
+          done();
+        });
+      });
     });
   });
 });

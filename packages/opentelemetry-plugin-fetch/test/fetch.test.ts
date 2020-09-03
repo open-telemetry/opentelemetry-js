@@ -117,7 +117,7 @@ describe('fetch', () => {
     sandbox.stub(core.otperformance, 'timeOrigin').value(0);
     sandbox.stub(core.otperformance, 'now').callsFake(() => fakeNow);
 
-    function fakeFetch(input: RequestInfo, init: RequestInit = {}) {
+    function fakeFetch(input: RequestInfo | Request, init: RequestInit = {}) {
       return new Promise((resolve, reject) => {
         const response: any = {
           args: {},
@@ -457,6 +457,12 @@ describe('fetch', () => {
         String(span.context().traceFlags),
         `trace header '${core.X_B3_SAMPLED}' not set`
       );
+    });
+
+    it('should set trace headers with a request object', () => {
+      const r = new Request('url');
+      window.fetch(r);
+      assert.ok(typeof r.headers.get(core.X_B3_TRACE_ID) === 'string');
     });
 
     it('should NOT clear the resources', () => {

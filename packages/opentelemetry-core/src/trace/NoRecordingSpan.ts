@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { SpanContext, NoopSpan } from '@opentelemetry/api';
-import { INVALID_SPAN_CONTEXT } from '../trace/spancontext-utils';
+import {
+  SpanContext,
+  NoopSpan,
+  INVALID_SPAN_CONTEXT,
+} from '@opentelemetry/api';
 
 /**
  * The NoRecordingSpan extends the {@link NoopSpan}, making all operations no-op

@@ -22,7 +22,10 @@ const meter = new MeterProvider({
 
 meter.createValueObserver('cpu_core_usage', {
   description: 'Example of a sync value observer with callback',
-}, (observerResult) => { // this callback is called once per each interval
+}, async (observerResult) => { // this callback is called once per each interval
+  await new Promise((resolve) => {
+    setTimeout(()=> {resolve()}, 50);
+  });
   observerResult.observe(getRandomValue(), { core: '1' });
   observerResult.observe(getRandomValue(), { core: '2' });
 });
