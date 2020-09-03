@@ -31,6 +31,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
+import { CanonicalCode } from '../../opentelemetry-api/src/trace/status';
 
 /**
  * This class represents a span.
@@ -206,6 +207,7 @@ export class Span implements api.Span, ReadableSpan {
       attributes[ExceptionAttribute.MESSAGE]
     ) {
       this.addEvent(ExceptionEventName, attributes as api.Attributes, time);
+      this.setStatus({ code: CanonicalCode.INTERNAL });
     } else {
       this._logger.warn(`Failed to record an exception ${exception}`);
     }
