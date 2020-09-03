@@ -92,7 +92,7 @@ export class Span implements api.Span, ReadableSpan {
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
     if (key.length === 0) {
-      this._logger.warn(`Invalid attribute key: ${key} value=${value}`);
+      this._logger.warn(`Invalid attribute key: ${key}`);
       return this;
     }
     if (!isAttributeValue(value)) {
