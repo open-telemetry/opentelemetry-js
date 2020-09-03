@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { Point, Sum } from '@opentelemetry/metrics';
+import { HrTime } from '@opentelemetry/api';
 
-import { Context } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from './HttpTextPropagator';
-
-/**
- * No-op implementations of {@link HttpTextPropagator}.
- */
-export class NoopHttpTextPropagator implements HttpTextPropagator {
-  /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown, setter: Function): void {}
-  /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown, getter: Function): Context {
-    return context;
-  }
+export const mockedHrTime: HrTime = [1586347902, 211_000_000];
+export const mockedHrTimeMs = 1586347902211;
+export function mockAggregator(Aggregator: any) {
+  let toPoint: () => Point<Sum>;
+  before(() => {
+    toPoint = Aggregator.prototype.toPoint;
+    Aggregator.prototype.toPoint = function (): Point<Sum> {
+      const point = toPoint.apply(this);
+      point.timestamp = mockedHrTime;
+      return point;
+    };
+  });
+  after(() => {
+    Aggregator.prototype.toPoint = toPoint;
+  });
 }
-
-export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();

@@ -272,8 +272,9 @@ export class XMLHttpRequestPlugin extends BasePlugin<XMLHttpRequest> {
       this._logger.debug('ignoring span as url matches ignored url');
       return;
     }
+    const spanName = `HTTP ${method.toUpperCase()}`;
 
-    const currentSpan = this._tracer.startSpan(url, {
+    const currentSpan = this._tracer.startSpan(spanName, {
       kind: api.SpanKind.CLIENT,
       attributes: {
         [HttpAttribute.HTTP_METHOD]: method,

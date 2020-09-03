@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
+import {
+  MetricDescriptor,
+  AggregatorKind,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
-export const INVALID_SPAN_CONTEXT: SpanContext = {
-  traceId: INVALID_TRACEID,
-  spanId: INVALID_SPANID,
-  traceFlags: TraceFlags.NONE,
-};
-
-/**
- * Returns true if this {@link SpanContext} is valid.
- * @return true if this {@link SpanContext} is valid.
- */
-export function isValid(spanContext: SpanContext): boolean {
-  return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
-  );
+export interface PrometheusCheckpoint {
+  descriptor: MetricDescriptor;
+  aggregatorKind: AggregatorKind;
+  records: MetricRecord[];
 }

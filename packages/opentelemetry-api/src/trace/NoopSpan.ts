@@ -20,15 +20,7 @@ import { Attributes } from './attributes';
 import { Span } from './span';
 import { SpanContext } from './span_context';
 import { Status } from './status';
-import { TraceFlags } from './trace_flags';
-
-export const INVALID_TRACE_ID = '0';
-export const INVALID_SPAN_ID = '0';
-const INVALID_SPAN_CONTEXT: SpanContext = {
-  traceId: INVALID_TRACE_ID,
-  spanId: INVALID_SPAN_ID,
-  traceFlags: TraceFlags.NONE,
-};
+import { INVALID_SPAN_CONTEXT } from './spancontext-utils';
 
 /**
  * The NoopSpan is the default {@link Span} that is used when no Span

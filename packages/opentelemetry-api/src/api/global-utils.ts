@@ -15,7 +15,7 @@
  */
 
 import { ContextManager } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from '../context/propagation/HttpTextPropagator';
+import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { MeterProvider } from '../metrics/MeterProvider';
 import { TracerProvider } from '../trace/tracer_provider';
 import { _globalThis } from '../platform';
@@ -35,7 +35,7 @@ type Get<T> = (version: number) => T;
 type OtelGlobal = Partial<{
   [GLOBAL_CONTEXT_MANAGER_API_KEY]: Get<ContextManager>;
   [GLOBAL_METRICS_API_KEY]: Get<MeterProvider>;
-  [GLOBAL_PROPAGATION_API_KEY]: Get<HttpTextPropagator>;
+  [GLOBAL_PROPAGATION_API_KEY]: Get<TextMapPropagator>;
   [GLOBAL_TRACE_API_KEY]: Get<TracerProvider>;
 }>;
 
