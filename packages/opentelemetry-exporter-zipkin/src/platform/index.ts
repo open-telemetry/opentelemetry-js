@@ -14,18 +14,4 @@
  * limitations under the License.
  */
 
-import { MetricExporter, MetricRecord } from './types';
-import { ExportResult } from '@opentelemetry/core';
-
-export class NoopExporter implements MetricExporter {
-  // By default does nothing
-  export(
-    metrics: MetricRecord[],
-    resultCallback: (result: ExportResult) => void
-  ): void {}
-
-  // By default does nothing
-  shutdown(): Promise<void> {
-    return Promise.resolve();
-  }
-}
+export * from './node';
