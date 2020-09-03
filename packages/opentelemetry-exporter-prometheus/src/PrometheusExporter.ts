@@ -105,7 +105,6 @@ export class PrometheusExporter implements MetricExporter {
 
   /**
    * Stops the Prometheus export server
-   * @param callback A callback that will be executed once the server is stopped
    */
   stopServer(): Promise<void> {
     if (!this._server) {
