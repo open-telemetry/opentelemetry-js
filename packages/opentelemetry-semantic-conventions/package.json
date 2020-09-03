@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/semantic-conventions",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "OpenTelemetry semantic conventions",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -14,7 +14,8 @@
     "precompile": "tsc --version",
     "version:update": "node ../../scripts/version-update.js",
     "compile": "npm run version:update && tsc -p .",
-    "prepare": "npm run compile"
+    "prepare": "npm run compile",
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",

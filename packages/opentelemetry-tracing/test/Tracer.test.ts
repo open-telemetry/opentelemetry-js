@@ -19,6 +19,8 @@ import {
   NoopSpan,
   Sampler,
   SamplingDecision,
+  Context,
+  NOOP_SPAN,
   TraceFlags,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
@@ -27,6 +29,7 @@ import {
   NoopLogger,
   AlwaysOnSampler,
   AlwaysOffSampler,
+  suppressInstrumentation,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {
@@ -113,6 +116,25 @@ describe('Tracer', () => {
 
     assert.strictEqual(lib.name, 'default');
     assert.strictEqual(lib.version, '0.0.1');
+  });
+
+  describe('when suppressInstrumentation true', () => {
+    const context = suppressInstrumentation(Context.ROOT_CONTEXT);
+
+    it('should return cached no-op span ', done => {
+      const tracer = new Tracer(
+        { name: 'default', version: '0.0.1' },
+        { sampler: new TestSampler() },
+        tracerProvider
+      );
+
+      const span = tracer.startSpan('span3', undefined, context);
+
+      assert.equal(span, NOOP_SPAN);
+      span.end();
+
+      done();
+    });
   });
 
   if (typeof process !== 'undefined' && process.release.name === 'node') {

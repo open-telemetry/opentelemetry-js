@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
-import { HttpTextPropagator } from './HttpTextPropagator';
+import {
+  MetricDescriptor,
+  AggregatorKind,
+  MetricRecord,
+} from '@opentelemetry/metrics';
 
-/**
- * No-op implementations of {@link HttpTextPropagator}.
- */
-export class NoopHttpTextPropagator implements HttpTextPropagator {
-  /** Noop inject function does nothing */
-  inject(context: Context, carrier: unknown, setter: Function): void {}
-  /** Noop extract function does nothing and returns the input context */
-  extract(context: Context, carrier: unknown, getter: Function): Context {
-    return context;
-  }
+export interface PrometheusCheckpoint {
+  descriptor: MetricDescriptor;
+  aggregatorKind: AggregatorKind;
+  records: MetricRecord[];
 }
-
-export const NOOP_HTTP_TEXT_PROPAGATOR = new NoopHttpTextPropagator();

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import { context } from '@opentelemetry/api';
+import { ExportResult, unrefTimer, suppressInstrumentation } from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -99,13 +100,16 @@ export class BatchSpanProcessor implements SpanProcessor {
       return Promise.resolve();
     }
     return new Promise((resolve, reject) => {
-      this._exporter.export(this._finishedSpans, result => {
-        this._finishedSpans = [];
-        if (result === ExportResult.SUCCESS) {
-          resolve();
-        } else {
-          reject(result);
-        }
+      // prevent downstream exporter calls from generating spans
+      context.with(suppressInstrumentation(context.active()), () => {
+        this._exporter.export(this._finishedSpans, result => {
+          this._finishedSpans = [];
+          if (result === ExportResult.SUCCESS) {
+            resolve();
+          } else {
+            reject(result);
+          }
+        });
       });
     });
   }

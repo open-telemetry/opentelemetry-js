@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
+export * from './common/Exception';
 export * from './common/Logger';
 export * from './common/Time';
 export * from './context/propagation/getter';
-export * from './context/propagation/HttpTextPropagator';
-export * from './context/propagation/NoopHttpTextPropagator';
+export * from './context/propagation/TextMapPropagator';
+export * from './context/propagation/NoopTextMapPropagator';
 export * from './context/propagation/setter';
 export * from './correlation_context/CorrelationContext';
 export * from './correlation_context/EntryValue';
@@ -39,6 +40,8 @@ export * from './trace/link';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
+export * from './trace/ProxyTracer';
+export * from './trace/ProxyTracerProvider';
 export * from './trace/Sampler';
 export * from './trace/SamplingResult';
 export * from './trace/span_context';
@@ -51,6 +54,12 @@ export * from './trace/trace_flags';
 export * from './trace/trace_state';
 export * from './trace/tracer_provider';
 export * from './trace/tracer';
+
+export {
+  INVALID_SPANID,
+  INVALID_TRACEID,
+  INVALID_SPAN_CONTEXT,
+} from './trace/spancontext-utils';
 
 export { Context } from '@opentelemetry/context-base';
 

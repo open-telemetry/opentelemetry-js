@@ -21,7 +21,7 @@ export interface NodeSDKConfiguration {
   autoDetectResources: boolean;
   contextManager: ContextManager;
   defaultAttributes: api.Attributes;
-  httpTextPropagator: api.HttpTextPropagator;
+  textMapPropagator: api.TextMapPropagator;
   logger: api.Logger;
   logLevel: core.LogLevel;
   metricBatcher: metrics.Batcher;

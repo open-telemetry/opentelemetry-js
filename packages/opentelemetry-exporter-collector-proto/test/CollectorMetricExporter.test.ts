@@ -50,6 +50,9 @@ const mockResError = {
   statusCode: 400,
 };
 
+// send is lazy loading file so need to wait a bit
+const waitTimeMS = 20;
+
 describe('CollectorMetricExporter - node with proto over http', () => {
   let collectorExporter: CollectorMetricExporter;
   let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
@@ -57,7 +60,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
   describe('export', () => {
-    beforeEach(done => {
+    beforeEach(() => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -86,11 +89,6 @@ describe('CollectorMetricExporter - node with proto over http', () => {
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
       metrics[3].aggregator.update(5);
-
-      // due to lazy loading ensure to wait to next tick
-      setImmediate(() => {
-        done();
-      });
     });
     afterEach(() => {
       spyRequest.restore();
@@ -108,7 +106,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         assert.strictEqual(options.method, 'POST');
         assert.strictEqual(options.path, '/');
         done();
-      });
+      }, waitTimeMS);
     });
 
     it('should set custom headers', done => {
@@ -119,7 +117,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         const options = args[0];
         assert.strictEqual(options.headers['foo'], 'bar');
         done();
-      });
+      }, waitTimeMS);
     });
 
     it('should successfully send metrics', done => {
@@ -154,7 +152,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         ensureExportMetricsServiceRequestIsSet(json);
 
         done();
-      });
+      }, waitTimeMS);
     });
 
     it('should log the successful message', done => {
@@ -175,7 +173,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
           assert.strictEqual(responseSpy.args[0][0], 0);
           done();
         });
-      });
+      }, waitTimeMS);
     });
 
     it('should log the error message', done => {
@@ -195,7 +193,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });
-      });
+      }, waitTimeMS);
     });
   });
 });

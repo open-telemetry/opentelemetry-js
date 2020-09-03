@@ -79,7 +79,6 @@ export class Meter implements api.Meter {
     const opt: api.MetricOptions = {
       logger: this._logger,
       ...DEFAULT_METRIC_OPTIONS,
-      absolute: true, // value recorders are defined as absolute by default
       ...options,
     };
 

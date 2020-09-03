@@ -14,23 +14,34 @@
  * limitations under the License.
  */
 
-import { SpanContext, TraceFlags } from '@opentelemetry/api';
+interface ExceptionWithCode {
+  code: string;
+  name?: string;
+  message?: string;
+  stack?: string;
+}
 
-export const INVALID_SPANID = '0';
-export const INVALID_TRACEID = '0';
-export const INVALID_SPAN_CONTEXT: SpanContext = {
-  traceId: INVALID_TRACEID,
-  spanId: INVALID_SPANID,
-  traceFlags: TraceFlags.NONE,
-};
+interface ExceptionWithMessage {
+  code?: string;
+  message: string;
+  name?: string;
+  stack?: string;
+}
+
+interface ExceptionWithName {
+  code?: string;
+  message?: string;
+  name: string;
+  stack?: string;
+}
 
 /**
- * Returns true if this {@link SpanContext} is valid.
- * @return true if this {@link SpanContext} is valid.
+ * Defines Exception.
+ *
+ * string or an object with one of (message or name or code) and optional stack
  */
-export function isValid(spanContext: SpanContext): boolean {
-  return (
-    spanContext.traceId !== INVALID_TRACEID &&
-    spanContext.spanId !== INVALID_SPANID
-  );
-}
+export type Exception =
+  | ExceptionWithCode
+  | ExceptionWithMessage
+  | ExceptionWithName
+  | string;
