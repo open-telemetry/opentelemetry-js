@@ -60,7 +60,7 @@ describe('Span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.SERVER);
     assert.ok(
       hrTimeToMilliseconds(span.startTime) >
-      hrTimeToMilliseconds(performanceTimeOrigin)
+        hrTimeToMilliseconds(performanceTimeOrigin)
     );
   });
 
@@ -74,7 +74,7 @@ describe('Span', () => {
 
     assert.ok(
       hrTimeToMilliseconds(span.endTime) >
-      hrTimeToMilliseconds(performanceTimeOrigin),
+        hrTimeToMilliseconds(performanceTimeOrigin),
       'end time must be bigger than time origin'
     );
   });
@@ -90,7 +90,7 @@ describe('Span', () => {
     span.addEvent('my-event');
     assert.ok(
       hrTimeToMilliseconds(span.events[0].time) >
-      hrTimeToMilliseconds(performanceTimeOrigin)
+        hrTimeToMilliseconds(performanceTimeOrigin)
     );
   });
 

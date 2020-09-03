@@ -23,8 +23,7 @@ import {
 import { BaseAbstractPlugin } from '../BaseAbstractPlugin';
 
 /** This class represent the base to patch plugin. */
-export abstract class BasePlugin<T>
-  extends BaseAbstractPlugin<T>
+export abstract class BasePlugin<T> extends BaseAbstractPlugin<T>
   implements Plugin<T> {
   enable(
     moduleExports: T,
