@@ -53,7 +53,7 @@ describe('MultiSpanProcessor', () => {
     }
   });
 
-  it('should handle empty span processor', () => {
+  it('should handle empty span processor', async () => {
     const multiSpanProcessor = new MultiSpanProcessor([]);
 
     const tracerProvider = new BasicTracerProvider();
@@ -61,10 +61,10 @@ describe('MultiSpanProcessor', () => {
     const tracer = tracerProvider.getTracer('default');
     const span = tracer.startSpan('one');
     span.end();
-    multiSpanProcessor.shutdown();
+    await multiSpanProcessor.shutdown();
   });
 
-  it('should handle one span processor', done => {
+  it('should handle one span processor', async () => {
     const processor1 = new TestProcessor();
     const multiSpanProcessor = new MultiSpanProcessor([processor1]);
 
@@ -74,11 +74,9 @@ describe('MultiSpanProcessor', () => {
     const span = tracer.startSpan('one');
     assert.strictEqual(processor1.spans.length, 0);
     span.end();
-    setTimeout(() => {
-      assert.strictEqual(processor1.spans.length, 1);
-      multiSpanProcessor.shutdown();
-      done();
-    }, 10);
+    await new Promise(resolve => setTimeout(resolve));
+    assert.strictEqual(processor1.spans.length, 1);
+    await multiSpanProcessor.shutdown();
   });
 
   it('should handle two span processor', async () => {
@@ -103,7 +101,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor2.spans.length, 0);
   });
 
-  it('should export spans on graceful shutdown from two span processors', done => {
+  it('should export spans on graceful shutdown from two span processors', (done) => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
     const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
@@ -146,65 +144,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
   });
 
-  it('should export spans on graceful shutdown from two span processor', async () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    span.end();
-    await new Promise(resolve => setTimeout(resolve));
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    await new Promise(resolve => {
-      removeEvent = notifyOnGlobalShutdown(() => {
-        assert.strictEqual(processor1.spans.length, 0);
-        assert.strictEqual(processor2.spans.length, 0);
-        resolve();
-      })
-    });
-    _invokeGlobalShutdown();
-  });
-
-  it('should export spans on manual shutdown from two span processor', async () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor2.spans.length, 0);
-
-    span.end();
-    await new Promise(resolve => setTimeout(resolve));
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor2.spans.length, 1);
-
-    await tracerProvider.shutdown()
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor2.spans.length, 0);
-
-    span.end();
-    await new Promise(resolve => setTimeout(resolve));
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor2.spans.length, 1);
-
-    await tracerProvider.shutdown();
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor2.spans.length, 0);
-  });
-
-  it('should force span processors to flush', () => {
+  it('should force span processors to flush', async () => {
     let flushed = false;
     const processor: SpanProcessor = {
       forceFlush: () => {
@@ -218,7 +158,7 @@ describe('MultiSpanProcessor', () => {
       },
     };
     const multiSpanProcessor = new MultiSpanProcessor([processor]);
-    multiSpanProcessor.forceFlush();
+    await multiSpanProcessor.forceFlush();
     assert.ok(flushed);
   });
 

@@ -50,15 +50,6 @@ export class MultiSpanProcessor implements SpanProcessor {
   }
 
   shutdown(): Promise<void> {
-    const promises: Promise<void>[] = [];
-
-    for (const spanProcessor of this._spanProcessors) {
-      promises.push(spanProcessor.shutdown());
-    }
-    return new Promise((resolve, reject) => {
-      Promise.all(promises).then(() => {
-        resolve();
-      }, reject);
-    });
+    return Promise.all(this._spanProcessors.map(processor => processor.shutdown())).then(() => {})
   }
 }
