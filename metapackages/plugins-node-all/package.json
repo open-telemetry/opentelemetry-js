@@ -1,6 +1,6 @@
 {
     "name": "@opentelemetry/plugins-node-all",
-    "version": "0.10.2",
+    "version": "0.11.0",
     "description": "Metapackage which bundles opentelemetry node core and contrib plugins",
     "author": "OpenTelemetry Authors",
     "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
@@ -23,6 +23,6 @@
         "@opentelemetry/plugin-pg": "0.9.0",
         "@opentelemetry/plugin-pg-pool": "0.9.0",
         "@opentelemetry/plugin-redis": "0.9.0",
-        "@opentelemetry/plugins-node-core": "^0.10.2"
+        "@opentelemetry/plugins-node-core": "^0.11.0"
     }
 }

@@ -12,6 +12,7 @@ const common = {
     fetch: 'examples/fetch/index.js',
     'xml-http-request': 'examples/xml-http-request/index.js',
     'user-interaction': 'examples/user-interaction/index.js',
+    zipkin: 'examples/zipkin/index.js',
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

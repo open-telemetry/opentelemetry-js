@@ -405,7 +405,7 @@ describe('HttpPlugin', () => {
 
           assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
           assert.strictEqual(spans.length, 2);
-          assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+          assert.strictEqual(reqSpan.name, 'HTTP GET');
           assert.strictEqual(
             localSpan.spanContext.traceId,
             reqSpan.spanContext.traceId
@@ -449,7 +449,7 @@ describe('HttpPlugin', () => {
 
             assert.ok(localSpan.name.indexOf('TestRootSpan') >= 0);
             assert.strictEqual(spans.length, 2);
-            assert.ok(reqSpan.name.indexOf(testPath) >= 0);
+            assert.strictEqual(reqSpan.name, 'HTTP GET');
             assert.strictEqual(
               localSpan.spanContext.traceId,
               reqSpan.spanContext.traceId
@@ -474,7 +474,7 @@ describe('HttpPlugin', () => {
             await httpRequest.get(`${protocol}://${hostname}${testPath}`);
             await new Promise(resolve => setTimeout(resolve));
             const spans = memoryExporter.getFinishedSpans();
-            assert.ok(spans[i].name.indexOf(testPath) >= 0);
+            assert.strictEqual(spans[i].name, 'HTTP GET');
             assert.strictEqual(
               span.context().traceId,
               spans[i].spanContext.traceId

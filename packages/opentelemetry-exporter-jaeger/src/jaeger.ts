@@ -30,6 +30,9 @@ export class JaegerExporter implements SpanExporter {
   private readonly _process: jaegerTypes.ThriftProcess;
   private readonly _sender: typeof jaegerTypes.UDPSender;
   private readonly _onShutdownFlushTimeout: number;
+  private _isShutdown = false;
+  private _shutdownFlushTimeout: NodeJS.Timeout | undefined;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
   constructor(config: jaegerTypes.ExporterConfig) {
     const localConfig = Object.assign({}, config);
@@ -85,14 +88,40 @@ export class JaegerExporter implements SpanExporter {
   }
 
   /** Shutdown exporter. */
-  shutdown(): void {
-    // Make an optimistic flush.
-    this._flush();
-    // Sleeping x seconds before closing the sender's connection to ensure
-    // all spans are flushed.
-    setTimeout(() => {
-      this._sender.close();
-    }, this._onShutdownFlushTimeout);
+  shutdown(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
+    }
+    this._isShutdown = true;
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      let rejected = false;
+      this._shutdownFlushTimeout = setTimeout(() => {
+        rejected = true;
+        reject('timeout');
+        this._sender.close();
+      }, this._onShutdownFlushTimeout);
+
+      Promise.resolve()
+        .then(() => {
+          // Make an optimistic flush.
+          return this._flush();
+        })
+        .then(() => {
+          if (rejected) {
+            return;
+          } else {
+            this._shutdownFlushTimeout &&
+              clearTimeout(this._shutdownFlushTimeout);
+            resolve();
+            this._sender.close();
+          }
+        })
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   /** Transform spans and sends to Jaeger service. */

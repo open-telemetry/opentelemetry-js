@@ -1180,16 +1180,13 @@ describe('Meter', () => {
       );
 
       await meter.collect();
+      const records = meter.getBatcher().checkPointSet();
+      assert.strictEqual(records.length, 8);
 
-      const tempMetricRecords: MetricRecord[] = await tempMetric.getMetricRecord();
-      const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
-      assert.strictEqual(tempMetricRecords.length, 4);
-      assert.strictEqual(cpuUsageMetricRecords.length, 4);
-
-      const metric1 = tempMetricRecords[0];
-      const metric2 = tempMetricRecords[1];
-      const metric3 = tempMetricRecords[2];
-      const metric4 = tempMetricRecords[3];
+      const metric1 = records[0];
+      const metric2 = records[1];
+      const metric3 = records[2];
+      const metric4 = records[3];
       assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
       assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
       assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
@@ -1224,14 +1221,14 @@ describe('Meter', () => {
         sum: 69,
       });
 
-      const metric5 = cpuUsageMetricRecords[0];
-      const metric6 = cpuUsageMetricRecords[1];
-      const metric7 = cpuUsageMetricRecords[2];
-      const metric8 = cpuUsageMetricRecords[3];
-      assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
-      assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
-      assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
-      assert.strictEqual(hashLabels(metric4.labels), '|#app:app2,core:2');
+      const metric5 = records[4];
+      const metric6 = records[5];
+      const metric7 = records[6];
+      const metric8 = records[7];
+      assert.strictEqual(hashLabels(metric5.labels), '|#app:app1,core:1');
+      assert.strictEqual(hashLabels(metric6.labels), '|#app:app1,core:2');
+      assert.strictEqual(hashLabels(metric7.labels), '|#app:app2,core:1');
+      assert.strictEqual(hashLabels(metric8.labels), '|#app:app2,core:2');
 
       ensureMetric(metric5, 'cpu_usage_per_app', {
         count: 1,

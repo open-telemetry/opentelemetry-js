@@ -44,7 +44,7 @@ export class BatchObserverMetric
     super(
       name,
       options,
-      MetricKind.VALUE_OBSERVER,
+      MetricKind.BATCH_OBSERVER,
       resource,
       instrumentationLibrary
     );
