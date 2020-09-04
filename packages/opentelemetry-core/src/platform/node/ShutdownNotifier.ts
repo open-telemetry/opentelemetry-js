@@ -14,23 +14,13 @@
  * limitations under the License.
  */
 
-let shutDownListeners: Array<() => void> = [];
-process.on('SIGTERM', function () {
-  shutDownListeners.forEach(listener => listener());
-  process.exit(0);
-});
-
 /**
  * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
  */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  shutDownListeners.push(cb);
-
+  process.once('SIGTERM', cb);
   return function removeCallbackFromGlobalShutdown() {
-    const i = shutDownListeners.findIndex((v) => v === cb);
-    if (i !== -1) {
-      shutDownListeners = shutDownListeners.slice(0, i).concat(shutDownListeners.slice(i + 1))
-    }
+    process.removeListener('SIGTERM', cb);
   };
 }
 
