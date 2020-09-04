@@ -516,7 +516,7 @@ describe('xhr', () => {
               clearData();
               prepareData(
                 done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json',
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
                 { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
               );
             });
@@ -549,7 +549,7 @@ describe('xhr', () => {
               clearData();
               prepareData(
                 done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json'
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
               );
             });
             it('should NOT set trace headers', () => {
@@ -685,7 +685,7 @@ describe('xhr', () => {
         let rootSpan: api.Span;
         let spyEntries: any;
         const url =
-          'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json';
+          'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
         let fakeNow = 0;
 
         beforeEach(() => {
