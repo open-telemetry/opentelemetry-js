@@ -15,8 +15,9 @@
  */
 
 let shutDownListeners: Array<() => void> = [];
-process.once('SIGTERM', function () {
+process.on('SIGTERM', function () {
   shutDownListeners.forEach(listener => listener());
+  process.exit(0);
 });
 
 /**
