@@ -112,14 +112,14 @@ function createResource(resource = {}): PerformanceResourceTiming {
   ) as PerformanceResourceTiming;
 }
 
-function createMasterResource(resource = {}): PerformanceResourceTiming {
-  const masterResource: any = createResource(resource);
-  Object.keys(masterResource).forEach((key: string) => {
-    if (typeof masterResource[key] === 'number') {
-      masterResource[key] = masterResource[key] + 30;
+function createMainResource(resource = {}): PerformanceResourceTiming {
+  const mainResource: any = createResource(resource);
+  Object.keys(mainResource).forEach((key: string) => {
+    if (typeof mainResource[key] === 'number') {
+      mainResource[key] = mainResource[key] + 30;
     }
   });
-  return masterResource;
+  return mainResource;
 }
 
 describe('xhr', () => {
@@ -180,7 +180,7 @@ describe('xhr', () => {
             createResource({
               name: fileUrl,
             }),
-            createMasterResource({
+            createMainResource({
               name: fileUrl,
             })
           );
@@ -516,7 +516,7 @@ describe('xhr', () => {
               clearData();
               prepareData(
                 done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json',
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json',
                 { propagateTraceHeaderCorsUrls: /raw\.githubusercontent\.com/ }
               );
             });
@@ -549,7 +549,7 @@ describe('xhr', () => {
               clearData();
               prepareData(
                 done,
-                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json'
+                'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json'
               );
             });
             it('should NOT set trace headers', () => {
@@ -685,7 +685,7 @@ describe('xhr', () => {
         let rootSpan: api.Span;
         let spyEntries: any;
         const url =
-          'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/master/package.json';
+          'https://raw.githubusercontent.com/open-telemetry/opentelemetry-js/main/package.json';
         let fakeNow = 0;
 
         beforeEach(() => {
