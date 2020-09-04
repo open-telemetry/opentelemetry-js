@@ -37,7 +37,7 @@ const tracer = new BasicTracerProvider({
   logger,
 }).getTracer('default');
 
-const language = 'nodejs'
+const language = 'nodejs';
 
 const parentId = '5c1c63257de34c67';
 const spanContext: api.SpanContext = {

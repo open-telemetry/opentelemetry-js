@@ -31,7 +31,7 @@ import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
-  onStart(span: ReadableSpan): void { }
+  onStart(span: ReadableSpan): void {}
   onEnd(span: ReadableSpan): void {
     this.spans.push(span);
   }
@@ -101,7 +101,7 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor2.spans.length, 0);
   });
 
-  it('should export spans on graceful shutdown from two span processors', (done) => {
+  it('should export spans on graceful shutdown from two span processors', done => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
     const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
@@ -151,8 +151,8 @@ describe('MultiSpanProcessor', () => {
         flushed = true;
         return Promise.resolve();
       },
-      onStart: span => { },
-      onEnd: span => { },
+      onStart: span => {},
+      onEnd: span => {},
       shutdown: () => {
         return Promise.resolve();
       },
