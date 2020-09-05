@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import * as assert from 'assert';
-import deepMerge from '../../src/utils/deep-merge';
+import { deepMerge } from '../../src/utils/deep-merge';
 
 describe('deepMerge', () => {
   it('should deep merge two objects', () => {

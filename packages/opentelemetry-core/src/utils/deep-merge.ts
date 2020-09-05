@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function deepMerge(target: Record<string, any>, source: Record<string, any>) {
+export function deepMerge(
+  target: Record<string, any>,
+  source: Record<string, any>
+) {
   const merged = target;
   for (const prop in source) {
     if (typeof source[prop] === 'object' && source[prop] !== null) {
@@ -24,5 +27,3 @@ function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   }
   return merged;
 }
-
-export default deepMerge;
