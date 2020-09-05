@@ -13,15 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function deepMerge(
-  target: { [prop: string]: any },
-  source: { [prop: string]: any }
-) {
+function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   const merged = target;
   for (const prop in source) {
     if (propIsArrayInBoth(source, prop, target)) {
       merged[prop] = source[prop].concat(target[prop]);
-    } else if (propIsObj(source, prop)) {
+    } else if (typeof source[prop] === 'object' && source[prop] !== null) {
       merged[prop] = deepMerge(target[prop], source[prop]);
     } else {
       merged[prop] = source[prop];
@@ -30,14 +27,10 @@ function deepMerge(
   return merged;
 }
 
-function propIsObj(source: { [prop: string]: any }, prop: string) {
-  return Object.prototype.toString.call(source[prop]) === '[object Object]';
-}
-
 function propIsArrayInBoth(
-  source: { [prop: string]: any },
+  source: Record<string, any>,
   prop: string,
-  target: { [prop: string]: any }
+  target: Record<string, any>
 ) {
   return Array.isArray(source[prop]) && Array.isArray(target[prop]);
 }
