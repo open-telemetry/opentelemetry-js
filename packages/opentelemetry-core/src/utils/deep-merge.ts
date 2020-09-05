@@ -16,23 +16,13 @@
 function deepMerge(target: Record<string, any>, source: Record<string, any>) {
   const merged = target;
   for (const prop in source) {
-    if (propIsArrayInBoth(source, prop, target)) {
-      merged[prop] = source[prop].concat(target[prop]);
-    } else if (typeof source[prop] === 'object' && source[prop] !== null) {
+    if (typeof source[prop] === 'object' && source[prop] !== null) {
       merged[prop] = deepMerge(target[prop], source[prop]);
     } else {
       merged[prop] = source[prop];
     }
   }
   return merged;
-}
-
-function propIsArrayInBoth(
-  source: Record<string, any>,
-  prop: string,
-  target: Record<string, any>
-) {
-  return Array.isArray(source[prop]) && Array.isArray(target[prop]);
 }
 
 export default deepMerge;

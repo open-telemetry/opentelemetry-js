@@ -25,8 +25,39 @@ describe('deepMerge', () => {
       b: 2,
       c: 2,
       d: 1,
-      e: [1, 2, 3, 4, 5, 6],
+      e: [1, 2, 3],
       f: { g: 1, h: 1, i: 1 },
+    };
+    const merged = deepMerge(target, source);
+    assert.deepEqual(merged, expected);
+  });
+
+  it('should replace array-properties', () => {
+    const target = { a: [4, 5, 6] };
+    const source = { a: [1, 2, 3] };
+    const expected = {
+      a: [1, 2, 3],
+    };
+    const merged = deepMerge(target, source);
+    assert.deepEqual(merged, expected);
+  });
+
+  it('should nullify and undefine as per source props', () => {
+    const target = { a: 1, b: 1, d: 1, e: [4, 5, 6], f: { g: 1, h: 2 } };
+    const source = {
+      a: null,
+      b: undefined,
+      c: 2,
+      e: [1, null, undefined],
+      f: { h: null, i: undefined },
+    };
+    const expected = {
+      a: null,
+      b: undefined,
+      c: 2,
+      d: 1,
+      e: [1, null, undefined],
+      f: { g: 1, h: null, i: undefined },
     };
     const merged = deepMerge(target, source);
     assert.deepEqual(merged, expected);
