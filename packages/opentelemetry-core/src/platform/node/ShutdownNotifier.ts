@@ -14,22 +14,26 @@
  * limitations under the License.
  */
 
-let shutDownListeners: Array<() => void> = [];
-process.on('SIGTERM', function () {
-  shutDownListeners.forEach(listener => listener());
-  shutDownListeners = [];
+type ListenerReference = { listener: () => void };
+let shutDownListenerReferences: Array<ListenerReference> = [];
+process.on('SIGTERM', () => {
+  shutDownListenerReferences.forEach(ref => ref.listener());
+  shutDownListenerReferences = [];
 });
 
 /**
  * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
  */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  shutDownListeners.push(cb);
+  // wrap listener in a reference object so it has a unique reference
+  // even if the same listener is used twice
+  const ref: ListenerReference = { listener: cb };
+  shutDownListenerReferences.push(ref);
 
   return function removeCallbackFromGlobalShutdown() {
-    const i = shutDownListeners.findIndex((v) => v === cb);
+    const i = shutDownListenerReferences.findIndex(v => v === ref);
     if (i !== -1) {
-      shutDownListeners = shutDownListeners.slice(0, i).concat(shutDownListeners.slice(i + 1))
+      shutDownListenerReferences.splice(i, 1);
     }
   };
 }
