@@ -15,10 +15,10 @@
  * limitations under the License.
  */
 
-let shutDownListenerReferences: Array<() => void> = [];
+let shutDownListeners: Array<() => void> = [];
 process.on('SIGTERM', function () {
-  shutDownListenerReferences.forEach(listener => listener());
-  shutDownListenerReferences = [];
+  shutDownListeners.forEach(listener => listener());
+  shutDownListeners = [];
 });
 
 /**
@@ -26,13 +26,13 @@ process.on('SIGTERM', function () {
  */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
   function removeCallbackFromGlobalShutdown() {
-    const i = shutDownListenerReferences.findIndex((v) => v === cb);
+    const i = shutDownListeners.findIndex((v) => v === cb);
     if (i !== -1) {
-      shutDownListenerReferences.splice(i, 1);
+      shutDownListeners.splice(i, 1);
     }
   };
   removeCallbackFromGlobalShutdown();
-  shutDownListenerReferences.push(cb);
+  shutDownListeners.push(cb);
   return removeCallbackFromGlobalShutdown;
 }
 
