@@ -1,3 +1,4 @@
+
 /*
  * Copyright The OpenTelemetry Authors
  *
@@ -14,10 +15,9 @@
  * limitations under the License.
  */
 
-type ListenerReference = { listener: () => void };
-let shutDownListenerReferences: Array<ListenerReference> = [];
-process.on('SIGTERM', () => {
-  shutDownListenerReferences.forEach(ref => ref.listener());
+let shutDownListenerReferences: Array<() => void> = [];
+process.on('SIGTERM', function () {
+  shutDownListenerReferences.forEach(listener => listener());
   shutDownListenerReferences = [];
 });
 
@@ -25,17 +25,15 @@ process.on('SIGTERM', () => {
  * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
  */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  // wrap listener in a reference object so it has a unique reference
-  // even if the same listener is used twice
-  const ref: ListenerReference = { listener: cb };
-  shutDownListenerReferences.push(ref);
-
-  return function removeCallbackFromGlobalShutdown() {
-    const i = shutDownListenerReferences.findIndex(v => v === ref);
+  function removeCallbackFromGlobalShutdown() {
+    const i = shutDownListenerReferences.findIndex((v) => v === cb);
     if (i !== -1) {
       shutDownListenerReferences.splice(i, 1);
     }
   };
+  removeCallbackFromGlobalShutdown();
+  shutDownListenerReferences.push(cb);
+  return removeCallbackFromGlobalShutdown;
 }
 
 /**
