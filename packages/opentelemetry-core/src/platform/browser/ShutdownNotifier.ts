@@ -14,14 +14,26 @@
  * limitations under the License.
  */
 
+
+let shutDownListeners: Array<() => void> = [];
+window.addEventListener('unload', function () {
+  shutDownListeners.forEach(listener => listener());
+  shutDownListeners = [];
+});
+
 /**
  * Adds an event listener to trigger a callback when an unload event in the window is detected
  */
 export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  window.addEventListener('unload', cb, { once: true });
-  return function removeCallbackFromGlobalShutdown() {
-    window.removeEventListener('unload', cb, false);
+  function removeCallbackFromGlobalShutdown() {
+    const i = shutDownListeners.findIndex((v) => v === cb);
+    if (i !== -1) {
+      shutDownListeners.splice(i, 1);
+    }
   };
+  removeCallbackFromGlobalShutdown();
+  shutDownListeners.push(cb);
+  return removeCallbackFromGlobalShutdown;
 }
 
 /**
