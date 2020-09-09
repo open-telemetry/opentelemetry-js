@@ -84,7 +84,7 @@ export function _toZipkinTags(
   }
 
   Object.keys(resource.attributes).forEach(
-    name => (tags[name] = resource.attributes[name])
+    name => (tags[name] = String(resource.attributes[name]))
   );
 
   return tags;
