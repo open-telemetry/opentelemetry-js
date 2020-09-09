@@ -13,7 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { AttributeValue } from '@opentelemetry/api';
+import { AttributeValue, Attributes } from '@opentelemetry/api';
+
+export function sanitizeAttributes(attributes: unknown): Attributes {
+  const out: Attributes = {};
+
+  if (attributes == null || typeof attributes !== 'object') {
+    return out;
+  }
+
+  for (const [k, v] of Object.entries(attributes!)) {
+    if (isAttributeValue(v)) {
+      if (Array.isArray(v)) {
+        out[k] = v.slice();
+      } else {
+        out[k] = v;
+      }
+    }
+  }
+
+  return out;
+}
 
 export function isAttributeValue(val: unknown): val is AttributeValue {
   if (val == null) {
