@@ -15,3 +15,4 @@
  */
 
 export * from './zipkin';
+export * from './platform';

@@ -28,11 +28,13 @@ import { suppressInstrumentation } from '@opentelemetry/core';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   constructor(private readonly _exporter: SpanExporter) {}
-  private _isShutdown = false;
 
-  forceFlush(cb: () => void = () => {}): void {
+  private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+
+  forceFlush(): Promise<void> {
     // do nothing as all spans are being exported without waiting
-    setTimeout(cb, 0);
+    return Promise.resolve();
   }
 
   // does nothing.
@@ -49,14 +51,21 @@ export class SimpleSpanProcessor implements SpanProcessor {
     });
   }
 
-  shutdown(cb: () => void = () => {}): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
-      setTimeout(cb, 0);
-      return;
+      return this._shuttingDownPromise;
     }
     this._isShutdown = true;
-
-    this._exporter.shutdown();
-    setTimeout(cb, 0);
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._exporter.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

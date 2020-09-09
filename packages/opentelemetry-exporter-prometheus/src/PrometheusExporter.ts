@@ -60,7 +60,7 @@ export class PrometheusExporter implements MetricExporter {
     ).replace(/^([^/])/, '/$1');
 
     if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
-      this.startServer(callback);
+      this.startServer().then(callback);
     } else if (callback) {
       callback();
     }
@@ -98,48 +98,52 @@ export class PrometheusExporter implements MetricExporter {
 
   /**
    * Shuts down the export server and clears the registry
-   *
-   * @param cb called when server is stopped
    */
-  shutdown(cb?: () => void) {
-    this.stopServer(cb);
+  shutdown(): Promise<void> {
+    return this.stopServer();
   }
 
   /**
    * Stops the Prometheus export server
-   * @param callback A callback that will be executed once the server is stopped
    */
-  stopServer(callback?: () => void) {
+  stopServer(): Promise<void> {
     if (!this._server) {
       this._logger.debug(
         'Prometheus stopServer() was called but server was never started.'
       );
-      if (callback) {
-        callback();
-      }
+      return Promise.resolve();
     } else {
-      this._server.close(() => {
-        this._logger.debug('Prometheus exporter was stopped');
-        if (callback) {
-          callback();
-        }
+      return new Promise(resolve => {
+        this._server.close(err => {
+          if (!err) {
+            this._logger.debug('Prometheus exporter was stopped');
+          } else {
+            if (
+              ((err as unknown) as { code: string }).code !==
+              'ERR_SERVER_NOT_RUNNING'
+            ) {
+              this._logger.error(
+                `Error during stopping the Prometheus Exporter "${err.message}"`
+              );
+            }
+          }
+          resolve();
+        });
       });
     }
   }
 
   /**
    * Starts the Prometheus export server
-   *
-   * @param callback called once the server is ready
    */
-  startServer(callback?: () => void) {
-    this._server.listen(this._port, () => {
-      this._logger.debug(
-        `Prometheus exporter started on port ${this._port} at endpoint ${this._endpoint}`
-      );
-      if (callback) {
-        callback();
-      }
+  startServer(): Promise<void> {
+    return new Promise(resolve => {
+      this._server.listen(this._port, () => {
+        this._logger.debug(
+          `Prometheus exporter started on port ${this._port} at endpoint ${this._endpoint}`
+        );
+        resolve();
+      });
     });
   }
 

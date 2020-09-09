@@ -15,6 +15,7 @@
  */
 
 import * as os from 'os';
+import * as semver from 'semver';
 import * as gcpMetadata from 'gcp-metadata';
 import {
   Detector,
@@ -42,7 +43,10 @@ class GcpDetector implements Detector {
    * @param config The resource detection config with a required logger
    */
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
-    if (!(await gcpMetadata.isAvailable())) {
+    if (
+      !semver.satisfies(process.version, '>=10') ||
+      !(await gcpMetadata.isAvailable())
+    ) {
       config.logger.debug('GcpDetector failed: GCP Metadata unavailable.');
       return Resource.empty();
     }

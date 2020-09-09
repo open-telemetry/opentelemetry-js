@@ -14,6 +14,4 @@
  * limitations under the License.
  */
 
-describe('Zipkin Exporter E2E', () => {
-  it('should report spans to Zipkin server');
-});
+export * from './util';

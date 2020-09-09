@@ -16,7 +16,7 @@ OpenTelemetry Zipkin Trace Exporter allows the user to send collected traces to 
 npm install --save @opentelemetry/exporter-zipkin
 ```
 
-## Usage
+## Usage in Node and Browser
 
 Install the exporter on your application and pass the options. `serviceName` is an optional string. If omitted, the exporter will first try to get the service name from the Resource. If no service name can be detected on the Resource, a fallback name of "OpenTelemetry Service" will be used.
 
