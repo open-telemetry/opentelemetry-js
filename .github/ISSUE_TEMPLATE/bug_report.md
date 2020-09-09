@@ -10,6 +10,13 @@ Please answer these questions before submitting a bug report.
 
 ### What version of Node are you using?
 
+### What code are you using to set up your tracing?
+
+```typescript
+// Please provide the code used to set up your MeterProvider/TracerProvider
+// and register it for use with the API
+```
+
 ### What did you do?
 
 If possible, provide a recipe for reproducing the error.
