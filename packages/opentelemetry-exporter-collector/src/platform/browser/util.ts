@@ -15,6 +15,7 @@
  */
 import * as collectorTypes from '../../types';
 import { Logger } from '@opentelemetry/api';
+import { globalErrorHandler } from '@opentelemetry/core';
 
 /**
  * Send metrics/spans using browser navigator.sendBeacon
@@ -33,8 +34,9 @@ export function sendWithBeacon(
     logger.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
-    logger.error('sendBeacon - cannot send', body);
-    onError({});
+    const error = { message: 'sendBeacon - cannot send', body };
+    globalErrorHandler(error);
+    onError(error);
   }
 }
 
@@ -69,12 +71,14 @@ export function sendWithXhr(
         logger.debug('xhr success', body);
         onSuccess();
       } else {
-        logger.error('body', body);
-        logger.error('xhr error', xhr);
-        onError({
+        const error = {
+          body,
+          xhrData: xhr,
           code: xhr.status,
           message: xhr.responseText,
-        });
+        };
+        globalErrorHandler(error);
+        onError(error);
       }
     }
   };

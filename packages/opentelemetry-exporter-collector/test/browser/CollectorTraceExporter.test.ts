@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  setGlobalErrorHandler,
+  loggingErrorHandler,
+} from '@opentelemetry/core';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
@@ -131,13 +135,18 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the error message', done => {
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
+
         const spyLoggerDebug = sinon.stub(
           collectorTraceExporter.logger,
           'debug'
-        );
-        const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
-          'error'
         );
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
@@ -145,8 +154,8 @@ describe('CollectorTraceExporter - web', () => {
         collectorTraceExporter.export(spans, () => {});
 
         setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'sendBeacon - cannot send');
+          const response = spyLoggerError.args[0][0] as string;
+          assert.ok(response.includes('message: sendBeacon - cannot send'));
           assert.strictEqual(spyLoggerDebug.args.length, 1);
 
           done();
@@ -227,10 +236,14 @@ describe('CollectorTraceExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        const spyLoggerError = sinon.stub(
-          collectorTraceExporter.logger,
-          'error'
-        );
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
 
         collectorTraceExporter.export(spans, () => {});
 
@@ -238,10 +251,11 @@ describe('CollectorTraceExporter - web', () => {
           const request = server.requests[0];
           request.respond(400);
 
-          const response1: any = spyLoggerError.args[0][0];
-          const response2: any = spyLoggerError.args[1][0];
-          assert.strictEqual(response1, 'body');
-          assert.strictEqual(response2, 'xhr error');
+          const response = spyLoggerError.args[0][0] as string;
+
+          assert.ok(response.includes('body: '));
+          assert.ok(response.includes('xhrData: '));
+          assert.ok(response.includes('code: 400'));
 
           assert.strictEqual(spyBeacon.callCount, 0);
           done();

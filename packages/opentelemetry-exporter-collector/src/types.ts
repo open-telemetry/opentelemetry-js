@@ -268,7 +268,7 @@ export namespace opentelemetryProto {
  */
 export interface CollectorExporterError {
   code?: number;
-  message?: string;
+  message: string;
   stack?: string;
 }
 
