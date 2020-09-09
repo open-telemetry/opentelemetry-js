@@ -25,8 +25,8 @@ export function notifyOnGlobalShutdown(cb: () => void): () => void {
 }
 
 /**
- * Warning: meant for internal use only! Closes the current window, triggering the unload event
+ * Warning: meant for internal use only!
  */
 export function _invokeGlobalShutdown() {
-  window.close();
+  window.dispatchEvent(new Event("unload"));
 }
