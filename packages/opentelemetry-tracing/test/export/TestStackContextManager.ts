@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ContextManager, Context } from '@opentelemetry/context-base';
+import { ContextManager, Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 
 /**
  * A test-only ContextManager that uses an in-memory stack to keep track of
@@ -27,7 +27,7 @@ export class TestStackContextManager implements ContextManager {
 
   active(): Context {
     return (
-      this._contextStack[this._contextStack.length - 1] ?? Context.ROOT_CONTEXT
+      this._contextStack[this._contextStack.length - 1] ?? ROOT_CONTEXT
     );
   }
 

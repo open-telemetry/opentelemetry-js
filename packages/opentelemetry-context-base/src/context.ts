@@ -13,24 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-export class Context {
+
+import { Context } from "./types";
+
+export class BaseContext implements Context {
   private _currentContext: Map<symbol, unknown>;
 
   /** The root context is used as the default parent context when there is no active context */
-  public static readonly ROOT_CONTEXT = new Context();
-
-  /**
-   * This is another identifier to the root context which allows developers to easily search the
-   * codebase for direct uses of context which need to be removed in later PRs.
-   *
-   * It's existence is temporary and it should be removed when all references are fixed.
-   */
-  public static readonly TODO = Context.ROOT_CONTEXT;
-
-  /** Get a key to uniquely identify a context value */
-  public static createKey(description: string) {
-    return Symbol.for(description);
-  }
+  public static readonly ROOT_CONTEXT = new BaseContext();
 
   /**
    * Construct a new context which inherits values from an optional parent context.
@@ -58,7 +48,7 @@ export class Context {
    * @param value value to set for the given key
    */
   setValue(key: symbol, value: unknown): Context {
-    const context = new Context(this._currentContext);
+    const context = new BaseContext(this._currentContext);
     context._currentContext.set(key, value);
     return context;
   }
@@ -70,8 +60,13 @@ export class Context {
    * @param key context key for which to clear a value
    */
   deleteValue(key: symbol): Context {
-    const context = new Context(this._currentContext);
+    const context = new BaseContext(this._currentContext);
     context._currentContext.delete(key);
     return context;
   }
+}
+
+/** Get a key to uniquely identify a context value */
+export function createContextKey(description: string) {
+  return Symbol.for(description);
 }

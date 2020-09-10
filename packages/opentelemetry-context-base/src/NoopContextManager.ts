@@ -15,21 +15,21 @@
  */
 
 import * as types from './types';
-import { Context } from './context';
+import { BaseContext } from './context';
 
 export class NoopContextManager implements types.ContextManager {
-  active(): Context {
-    return Context.ROOT_CONTEXT;
+  active(): types.Context {
+    return BaseContext.ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
-    context: Context,
+    context: types.Context,
     fn: T
   ): ReturnType<T> {
     return fn();
   }
 
-  bind<T>(target: T, context?: Context): T {
+  bind<T>(target: T, context?: types.Context): T {
     return target;
   }
 

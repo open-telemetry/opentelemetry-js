@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as asyncHooks from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
@@ -35,7 +35,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   }
 
   active(): Context {
-    return this._stack[this._stack.length - 1] ?? Context.ROOT_CONTEXT;
+    return this._stack[this._stack.length - 1] ?? ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(

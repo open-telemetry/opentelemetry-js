@@ -20,7 +20,7 @@ import {
   TextMapPropagator,
   SpanContext,
 } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import {
   CompositePropagator,
@@ -67,7 +67,7 @@ describe('Composite Propagator', () => {
         traceState: new TraceState('foo=bar'),
       };
       ctxWithSpanContext = setExtractedSpanContext(
-        Context.ROOT_CONTEXT,
+        ROOT_CONTEXT,
         spanContext
       );
     });
@@ -119,7 +119,7 @@ describe('Composite Propagator', () => {
         propagators: [new B3Propagator(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
-        composite.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       if (!spanContext) {
@@ -138,7 +138,7 @@ describe('Composite Propagator', () => {
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
-        composite.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       if (!spanContext) {
