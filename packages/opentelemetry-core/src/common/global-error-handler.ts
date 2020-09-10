@@ -34,5 +34,7 @@ export function setGlobalErrorHandler(handler: ErrorHandler) {
  * @param {Exception} ex
  */
 export const globalErrorHandler = (ex: Exception) => {
-  delegateHandler(ex);
+  try {
+    delegateHandler(ex);
+  } catch {}
 };
