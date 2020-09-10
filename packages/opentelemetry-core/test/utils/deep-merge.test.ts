@@ -67,4 +67,14 @@ describe('deepMerge', () => {
     const merged = deepMerge(target, source);
     assert.deepEqual(merged, expected);
   });
+
+  it('should respect the max depth', () => {
+    assert.throws(() => {
+      deepMerge(
+        { a: { a: { a: { a: { a: { a: 1 } } } } } },
+        { a: { a: { a: { a: { a: { a: 1 } } } } } },
+        5
+      );
+    });
+  });
 });

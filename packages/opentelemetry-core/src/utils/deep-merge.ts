@@ -15,15 +15,19 @@
  */
 export function deepMerge(
   target: Record<string, any>,
-  source: Record<string, any>
+  source: Record<string, any>,
+  maxDepth = 10
 ) {
   const merged = target;
+  if (maxDepth === 0) {
+    throw new Error('Max depth exceeded.');
+  }
   for (const prop in source) {
     if (bothPropsAreArrays(target, source, prop)) {
       merged[prop] = [];
       merged[prop] = source[prop];
     } else if (bothPropsAreObjects(target, source, prop)) {
-      merged[prop] = deepMerge(target[prop], source[prop]);
+      merged[prop] = deepMerge(target[prop], source[prop], maxDepth - 1);
     } else {
       merged[prop] = source[prop];
     }
