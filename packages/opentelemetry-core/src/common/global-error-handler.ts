@@ -36,5 +36,5 @@ export function setGlobalErrorHandler(handler: ErrorHandler) {
 export const globalErrorHandler = (ex: Exception) => {
   try {
     delegateHandler(ex);
-  } catch {}
+  } catch {} // eslint-disable-line no-empty
 };

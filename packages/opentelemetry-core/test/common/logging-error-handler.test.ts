@@ -20,7 +20,7 @@ import { ErrorHandler, loggingErrorHandler } from '../../src';
 
 describe('loggingErrorHandler', () => {
   let handler: ErrorHandler;
-  let errorStub = sinon.fake();
+  const errorStub = sinon.fake();
 
   beforeEach(() => {
     handler = loggingErrorHandler({
