@@ -19,11 +19,34 @@ export function deepMerge(
 ) {
   const merged = target;
   for (const prop in source) {
-    if (typeof source[prop] === 'object' && source[prop] !== null) {
+    if (bothPropsAreArrays(target, source, prop)) {
+      merged[prop] = [];
+      merged[prop] = source[prop];
+    } else if (bothPropsAreObjects(target, source, prop)) {
       merged[prop] = deepMerge(target[prop], source[prop]);
     } else {
       merged[prop] = source[prop];
     }
   }
   return merged;
+}
+
+function bothPropsAreObjects(
+  target: Record<string, any>,
+  source: Record<string, any>,
+  prop: string
+) {
+  const targetIsObject =
+    typeof target[prop] === 'object' && target[prop] !== null;
+  const sourceIsObject =
+    typeof source[prop] === 'object' && source[prop] !== null;
+  return targetIsObject && sourceIsObject;
+}
+
+function bothPropsAreArrays(
+  target: Record<string, any>,
+  source: Record<string, any>,
+  prop: string
+) {
+  return Array.isArray(source[prop]) && Array.isArray(target[prop]);
 }

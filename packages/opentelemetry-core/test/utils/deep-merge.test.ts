@@ -19,27 +19,32 @@ import { deepMerge } from '../../src/utils/deep-merge';
 describe('deepMerge', () => {
   it('should deep merge two objects', () => {
     const target = { a: 1, b: 1, d: 1, e: [4, 5, 6], f: { g: 1, h: 2 } };
-    const source = { a: 1, b: 2, c: 2, e: [1, 2, 3], f: { h: 1, i: 1 } };
+    const source = { a: 1, b: 2, c: 2, e: [1], f: { h: 1, i: 1 } };
     const expected = {
       a: 1,
       b: 2,
       c: 2,
       d: 1,
-      e: [1, 2, 3],
+      e: [1],
       f: { g: 1, h: 1, i: 1 },
     };
     const merged = deepMerge(target, source);
     assert.deepEqual(merged, expected);
   });
 
-  it('should replace array-properties', () => {
+  it('should replace array-props', () => {
     const target = { a: [4, 5, 6] };
-    const source = { a: [1, 2, 3] };
+    const source = { a: [1] };
     const expected = {
-      a: [1, 2, 3],
+      a: [1],
     };
     const merged = deepMerge(target, source);
     assert.deepEqual(merged, expected);
+  });
+
+  it('should override a primitive target prop by a structural source prop', () => {
+    const merged = deepMerge({ a: 1, b: 'c' }, { a: { b: 1 }, b: [{ d: 1 }] });
+    assert.deepEqual(merged, { a: { b: 1 }, b: [{ d: 1 }] });
   });
 
   it('should nullify and undefine as per source props', () => {
