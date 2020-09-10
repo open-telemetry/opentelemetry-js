@@ -176,9 +176,8 @@ describe('CollectorTraceExporter - node with json over http', () => {
         callback(mockResError);
         setTimeout(() => {
           const response: any = spyLoggerError.args[0][0];
-          console.log(response);
-          assert.strictEqual(response, 'code: 400');
 
+          assert.strictEqual(response, 'code: 400');
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });
