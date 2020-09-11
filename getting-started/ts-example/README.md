@@ -78,7 +78,7 @@ import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
+  logLevel: LogLevel.ERROR,
 });
 
 provider.register();
@@ -117,7 +117,7 @@ import { ZipkinExporter } from '@opentelemetry/exporter-zipkin';
 // import { JaegerExporter } from '@opentelemetry/exporter-jaeger';
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
-  logLevel: LogLevel.ERROR
+  logLevel: LogLevel.ERROR,
 });
 
 provider.register();
@@ -125,17 +125,17 @@ provider.register();
 provider.addSpanProcessor(
   new SimpleSpanProcessor(
     new ZipkinExporter({
-    // For Jaeger, use the following line instead:
-    // new JaegerExporter({
-      serviceName: "getting-started"
+      // For Jaeger, use the following line instead:
+      // new JaegerExporter({
+      serviceName: 'getting-started',
       // If you are running your tracing backend on another host,
       // you can point to it using the `url` parameter of the
       // exporter config.
-    })
-  )
+    }),
+  ),
 );
 
-console.log("tracing initialized");
+console.log('tracing initialized');
 ```
 
 Now if you run your application with the `tracing.ts` file loaded, and you send requests to your application over HTTP (in the sample application just browse to <http://localhost:8080),> you will see traces exported to your tracing backend that look like this:
@@ -247,18 +247,18 @@ Now, you can require this file from your application code and use the `Meter` to
 
 ```typescript
 import { MeterProvider } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/api';
+import { Request, Response, NextFunction } from 'express';
 
 const meter = new MeterProvider().getMeter('your-meter-name');
 
-const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
-  description: "Count all incoming requests"
+const requestCount = meter.createCounter('requests', {
+  description: 'Count all incoming requests',
 });
 
 const handles = new Map();
 
 export const countAllRequests = () => {
-  return (req, res, next) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!handles.has(req.path)) {
       const labels = { route: req.path };
       const handle = requestCount.bind(labels);
@@ -274,7 +274,7 @@ export const countAllRequests = () => {
 Now let's import and use this middleware in our application code:
 
 ```typescript
-import { countAllRequests } from "./monitoring";
+import { countAllRequests } from './monitoring';
 const app = express();
 app.use(countAllRequests());
 ```
@@ -296,12 +296,12 @@ npm install @opentelemetry/exporter-prometheus
 Next, modify your `monitoring.ts` file to look like this:
 
 ```typescript
+import { Request, Response, NextFunction } from 'express';
 import { MeterProvider } from '@opentelemetry/metrics';
-import { Metric, BoundCounter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
 
-const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port
-const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint
+const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port;
+const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
 
 const exporter = new PrometheusExporter(
   {
@@ -309,7 +309,7 @@ const exporter = new PrometheusExporter(
   },
   () => {
     console.log(
-      `prometheus scrape endpoint: http://localhost:${prometheusPort}${Prometheusendpoint}`,
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${prometheusEndpoint}`,
     );
   },
 );
@@ -319,14 +319,14 @@ const meter = new MeterProvider({
   interval: 1000,
 }).getMeter('your-meter-name');
 
-const requestCount: Metric<BoundCounter> = meter.createCounter("requests", {
-  description: "Count all incoming requests"
+const requestCount = meter.createCounter('requests', {
+  description: 'Count all incoming requests',
 });
 
 const handles = new Map();
 
 export const countAllRequests = () => {
-  return (req, res, next) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!handles.has(req.path)) {
       const labels = { route: req.path };
       const handle = requestCount.bind(labels);
