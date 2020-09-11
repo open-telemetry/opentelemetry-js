@@ -1,0 +1,54 @@
+{
+  "name": "@opentelemetry/instrumentation-base",
+  "version": "0.10.2",
+  "description": "Base class which OpenTelemetry instrumentation modules extend",
+  "author": "OpenTelemetry Authors",
+  "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+  "license": "Apache-2.0",
+  "main": "build/src/index.js",
+  "types": "build/src/index.d.ts",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+  },
+  "files": [
+    "build/src/**/*.js",
+    "build/src/**/*.js.map",
+    "build/src/**/*.d.ts",
+    "doc",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/index-webpack.ts'",
+    "test:browser": "nyc karma start --single-run",
+    "tdd": "npm run tdd:node",
+    "tdd:node": "npm run test -- --watch-extensions ts --watch",
+    "tdd:browser": "karma start",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "clean": "rimraf build/*",
+    "codecov": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
+    "precompile": "tsc --version",
+    "version:update": "node ../../scripts/version-update.js",
+    "compile": "npm run version:update && tsc -p .",
+    "prepare": "npm run compile",
+    "watch": "tsc -w"
+  },
+  "bugs": {
+    "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+  },
+  "dependencies": {
+    "@opentelemetry/api": "^0.10.2",
+    "@types/semver": "^7.3.1",
+    "require-in-the-middle": "5.0.3",
+    "semver": "^7.3.2",
+    "shimmer": "1.2.1"
+  },
+  "devDependencies": {
+    "typescript": "3.4.3"
+  }
+}
