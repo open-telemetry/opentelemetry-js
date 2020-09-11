@@ -66,10 +66,7 @@ describe('Composite Propagator', () => {
         traceFlags: 1,
         traceState: new TraceState('foo=bar'),
       };
-      ctxWithSpanContext = setExtractedSpanContext(
-        ROOT_CONTEXT,
-        spanContext
-      );
+      ctxWithSpanContext = setExtractedSpanContext(ROOT_CONTEXT, spanContext);
     });
 
     it('should inject context using all configured propagators', () => {

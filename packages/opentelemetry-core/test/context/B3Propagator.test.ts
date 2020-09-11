@@ -99,10 +99,7 @@ describe('B3Propagator', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       };
-      const contextWithDebug = ROOT_CONTEXT.setValue(
-        DEBUG_FLAG_KEY,
-        '1'
-      );
+      const contextWithDebug = ROOT_CONTEXT.setValue(DEBUG_FLAG_KEY, '1');
 
       b3Propagator.inject(
         setExtractedSpanContext(contextWithDebug, spanContext),

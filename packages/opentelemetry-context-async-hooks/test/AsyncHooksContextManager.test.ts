@@ -227,19 +227,13 @@ for (const contextManagerClass of [
     describe('.bind(function)', () => {
       it('should return the same target (when enabled)', () => {
         const test = { a: 1 };
-        assert.deepStrictEqual(
-          contextManager.bind(test, ROOT_CONTEXT),
-          test
-        );
+        assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
       });
 
       it('should return the same target (when disabled)', () => {
         contextManager.disable();
         const test = { a: 1 };
-        assert.deepStrictEqual(
-          contextManager.bind(test, ROOT_CONTEXT),
-          test
-        );
+        assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
         contextManager.enable();
       });
 
@@ -294,19 +288,13 @@ for (const contextManagerClass of [
     describe('.bind(event-emitter)', () => {
       it('should return the same target (when enabled)', () => {
         const ee = new EventEmitter();
-        assert.deepStrictEqual(
-          contextManager.bind(ee, ROOT_CONTEXT),
-          ee
-        );
+        assert.deepStrictEqual(contextManager.bind(ee, ROOT_CONTEXT), ee);
       });
 
       it('should return the same target (when disabled)', () => {
         const ee = new EventEmitter();
         contextManager.disable();
-        assert.deepStrictEqual(
-          contextManager.bind(ee, ROOT_CONTEXT),
-          ee
-        );
+        assert.deepStrictEqual(contextManager.bind(ee, ROOT_CONTEXT), ee);
       });
 
       it('should return current context and removeListener (when enabled)', done => {

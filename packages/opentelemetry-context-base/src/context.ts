@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from "./types";
+import { Context } from './types';
 
 export class BaseContext implements Context {
   private _currentContext: Map<symbol, unknown>;

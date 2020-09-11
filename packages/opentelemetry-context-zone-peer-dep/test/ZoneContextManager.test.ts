@@ -158,18 +158,9 @@ describe('ZoneContextManager', () => {
           contextManager.active().getValue(key1) === 'root',
           'Current span is rootSpan'
         );
-        const concurrentSpan1 = ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan1'
-        );
-        const concurrentSpan2 = ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan2'
-        );
-        const concurrentSpan3 = ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan3'
-        );
+        const concurrentSpan1 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan1');
+        const concurrentSpan2 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan2');
+        const concurrentSpan3 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan3');
 
         contextManager.with(concurrentSpan1, () => {
           setTimeout(() => {
@@ -242,19 +233,13 @@ describe('ZoneContextManager', () => {
 
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };
-      assert.deepStrictEqual(
-        contextManager.bind(test, ROOT_CONTEXT),
-        test
-      );
+      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
       const test = { a: 1 };
-      assert.deepStrictEqual(
-        contextManager.bind(test, ROOT_CONTEXT),
-        test
-      );
+      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
       contextManager.enable();
     });
 

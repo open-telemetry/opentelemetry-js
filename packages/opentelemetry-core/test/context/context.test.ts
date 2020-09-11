@@ -63,10 +63,7 @@ describe('Context Helpers', () => {
     });
 
     describe('when suppress instrumentation set to null', () => {
-      const context = ROOT_CONTEXT.setValue(
-        SUPPRESS_INSTRUMENTATION_KEY,
-        null
-      );
+      const context = ROOT_CONTEXT.setValue(SUPPRESS_INSTRUMENTATION_KEY, null);
 
       it('should return false', () => {
         const value = isInstrumentationSuppressed(context);

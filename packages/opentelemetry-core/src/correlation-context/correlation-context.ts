@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { CorrelationContext, Context, createContextKey } from '@opentelemetry/api';
+import {
+  CorrelationContext,
+  Context,
+  createContextKey,
+} from '@opentelemetry/api';
 
 const CORRELATION_CONTEXT = createContextKey(
   'OpenTelemetry Distributed Contexts Key'

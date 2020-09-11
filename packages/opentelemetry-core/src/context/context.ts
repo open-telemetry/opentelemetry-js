@@ -14,7 +14,12 @@
  * limitations under the License.
  */
 
-import { Span, SpanContext, createContextKey, Context } from '@opentelemetry/api';
+import {
+  Span,
+  SpanContext,
+  createContextKey,
+  Context,
+} from '@opentelemetry/api';
 
 /**
  * Active span key

@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { Context, ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
+import {
+  Context,
+  ContextManager,
+  ROOT_CONTEXT,
+} from '@opentelemetry/context-base';
 import { Func, TargetWithEvents } from './types';
 import { isListenerObject } from './util';
 
@@ -46,9 +50,7 @@ export class ZoneContextManager implements ContextManager {
    * @param activeZone
    */
   private _activeContextFromZone(activeZone: Zone | undefined): Context {
-    return (
-      (activeZone && activeZone.get(ZONE_CONTEXT_KEY)) || ROOT_CONTEXT
-    );
+    return (activeZone && activeZone.get(ZONE_CONTEXT_KEY)) || ROOT_CONTEXT;
   }
 
   /**

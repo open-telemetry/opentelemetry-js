@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-import { context, SpanContext, TraceFlags, ContextManager, ROOT_CONTEXT } from '@opentelemetry/api';
+import {
+  context,
+  SpanContext,
+  TraceFlags,
+  ContextManager,
+  ROOT_CONTEXT,
+} from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
@@ -326,8 +332,7 @@ describe('BasicTracerProvider', () => {
   describe('.getCurrentSpan()', () => {
     it('should return current span when it exists', () => {
       context.setGlobalContextManager({
-        active: () =>
-          setActiveSpan(ROOT_CONTEXT, ('foo' as any) as Span),
+        active: () => setActiveSpan(ROOT_CONTEXT, ('foo' as any) as Span),
         disable: () => {},
       } as ContextManager);
 
