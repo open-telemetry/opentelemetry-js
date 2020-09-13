@@ -187,9 +187,13 @@ export class PluginLoader {
           this._plugins.push(plugin);
           // Enable each supported plugin.
           return plugin.enable(exports, this.provider, this.logger, config);
-        } catch (e) {
-          this.logger.error(
-            `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${e.message}`
+        } catch (err) {
+          const logLevel =
+            err instanceof Error && err.message.match(/Cannot find module/)
+              ? this.logger.warn
+              : this.logger.error;
+          logLevel(
+            `PluginLoader#load: could not load plugin ${modulePath} of module ${name}. Error: ${err.message}`
           );
           return exports;
         }
