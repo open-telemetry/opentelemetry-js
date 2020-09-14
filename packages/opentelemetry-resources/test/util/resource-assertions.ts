@@ -262,7 +262,7 @@ export const assertServiceResource = (
 };
 
 /**
- * Test utility method to validate an process resource
+ * Test utility method to validate a process resources
  *
  * @param resource the Resource to validate
  * @param validations validations for the resource attributes

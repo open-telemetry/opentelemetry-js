@@ -117,7 +117,7 @@ export const SERVICE_RESOURCE = {
   VERSION: 'service.version',
 };
 
-/** Attributes describing a Process service. */
+/** Attributes describing a Process. */
 export const PROCESS_RESOURCE = {
   /** A command which launced this proces.  */
   COMMAND: 'process.command',
@@ -125,7 +125,7 @@ export const PROCESS_RESOURCE = {
   /** The full command with arguments as string.  */
   COMMAND_LINE: 'process.command_line',
 
-  /** A name given to currently running porcess defaults to executable else set as process.title .  */
+  /** A name given to currently running porcess defaults to executable (process.title) .  */
   NAME: 'process.executable.name',
 
   /** An owner of currently running process.  */
