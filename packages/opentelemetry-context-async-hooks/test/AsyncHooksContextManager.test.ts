@@ -222,6 +222,34 @@ for (const contextManagerClass of [
         });
         assert.strictEqual(contextManager.active(), Context.ROOT_CONTEXT);
       });
+
+      it('should work with timers using the same timeout', done => {
+        let cnt = 3;
+        function countDown() {
+          cnt--;
+          if (cnt === 0) done();
+          if (cnt < 0) throw new Error('too many calls to countDown()');
+        }
+
+        const time1 = 2;
+        const time2 = time1 + 1;
+        const rootCtx = contextManager.active();
+        const innerCtx = rootCtx.setValue(Symbol('test'), 23);
+        contextManager.with(innerCtx, () => {
+          setTimeout(() => {
+            assert.strictEqual(contextManager.active(), innerCtx);
+            countDown();
+          }, time1);
+        });
+        setTimeout(() => {
+          assert.strictEqual(contextManager.active(), rootCtx);
+          countDown();
+        }, time1);
+        setTimeout(() => {
+          assert.strictEqual(contextManager.active(), rootCtx);
+          countDown();
+        }, time2);
+      });
     });
 
     describe('.bind(function)', () => {
