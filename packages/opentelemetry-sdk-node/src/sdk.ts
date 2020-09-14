@@ -23,6 +23,7 @@ import {
   Resource,
   ResourceDetectionConfig,
   envDetector,
+  processDetector,
 } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
@@ -128,7 +129,7 @@ export class NodeSDK {
   /** Detect resource attributes */
   public async detectResources(config?: ResourceDetectionConfig) {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [awsEc2Detector, gcpDetector, envDetector],
+      detectors: [awsEc2Detector, gcpDetector, envDetector, processDetector],
       ...config,
     };
 
