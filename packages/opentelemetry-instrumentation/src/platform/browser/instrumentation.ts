@@ -30,14 +30,8 @@ export abstract class Instrumentation<T = any>
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    this._init();
-
     if (this._config.enabled) {
       this.enable();
     }
   }
-
-  /** Init method that will be called during initialisation before
-   *  instrumentation is enabled */
-  protected _init() {}
 }

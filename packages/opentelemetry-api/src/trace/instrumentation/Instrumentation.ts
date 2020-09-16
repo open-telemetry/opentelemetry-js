@@ -71,11 +71,6 @@ export interface InstrumentationConfig {
   logger?: Logger;
 
   /**
-   * Request methods that match any string in ignoreMethods will not be traced.
-   */
-  ignoreMethods?: string[];
-
-  /**
    * Path of the trace plugin to load.
    * @default '@opentelemetry/plugin-http' in case of http.
    */
