@@ -6,7 +6,6 @@
 [![devDependencies][devDependencies-image]][devDependencies-url]
 [![Apache License][license-image]][license-image]
 
-
 ## Installation
 
 ```bash
