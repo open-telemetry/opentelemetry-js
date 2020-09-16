@@ -23,10 +23,13 @@ import * as http from 'http';
 export class DummyPropagation implements TextMapPropagator {
   static TRACE_CONTEXT_KEY = 'x-dummy-trace-id';
   static SPAN_CONTEXT_KEY = 'x-dummy-span-id';
+  static SPAN_CONTEXT_KEY_REAL = 'x-dummy-real-span-id';
   extract(context: Context, carrier: http.OutgoingHttpHeaders) {
     const extractedSpanContext = {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
-      spanId: DummyPropagation.SPAN_CONTEXT_KEY,
+      spanId:
+        (carrier[DummyPropagation.SPAN_CONTEXT_KEY_REAL] as string) ||
+        DummyPropagation.SPAN_CONTEXT_KEY,
       traceFlags: TraceFlags.SAMPLED,
     };
     if (extractedSpanContext.traceId && extractedSpanContext.spanId) {

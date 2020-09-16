@@ -421,21 +421,23 @@ export class HttpPlugin extends BasePlugin<Http> {
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
-      const span = plugin._startHttpSpan(operationName, spanOptions);
+      const headers = optionsParsed.headers || {};
+      return context.with(propagation.extract(headers), () => {
+        const span = plugin._startHttpSpan(operationName, spanOptions);
+        return plugin._tracer.withSpan(span, () => {
+          if (!optionsParsed.headers) optionsParsed.headers = {};
+          propagation.inject(optionsParsed.headers);
 
-      return plugin._tracer.withSpan(span, () => {
-        if (!optionsParsed.headers) optionsParsed.headers = {};
-        propagation.inject(optionsParsed.headers);
+          const request: ClientRequest = plugin._safeExecute(
+            span,
+            () => original.apply(this, [optionsParsed, ...args]),
+            true
+          );
 
-        const request: ClientRequest = plugin._safeExecute(
-          span,
-          () => original.apply(this, [optionsParsed, ...args]),
-          true
-        );
-
-        plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-        plugin._tracer.bind(request);
-        return plugin._traceClientRequest(request, optionsParsed, span);
+          plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+          plugin._tracer.bind(request);
+          return plugin._traceClientRequest(request, optionsParsed, span);
+        });
       });
     };
   }

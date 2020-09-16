@@ -187,6 +187,35 @@ describe('HttpPlugin Integration tests', () => {
       assertSpan(span, SpanKind.CLIENT, validations);
     });
 
+    it('should create a new span with context propagation from headers', async () => {
+      let spans = memoryExporter.getFinishedSpans();
+      assert.strictEqual(spans.length, 0);
+
+      const headers = {
+        'x-dummy-trace-id': '53ece31d4c6e79b0dff69d80aa491273',
+        'x-dummy-real-span-id': '1abdc509c79fc6a9',
+        'x-dummy-sampled': '1',
+      };
+
+      const result = await httpRequest.get(
+        new url.URL(`${protocol}://google.fr/?query=test`),
+        {
+          headers,
+        }
+      );
+
+      spans = memoryExporter.getFinishedSpans();
+      const span = spans[0];
+      assert.strictEqual(
+        span.spanContext.traceId,
+        '53ece31d4c6e79b0dff69d80aa491273'
+      );
+      assert.strictEqual(
+        result.reqHeaders['x-dummy-trace-id'],
+        '53ece31d4c6e79b0dff69d80aa491273'
+      );
+    });
+
     it('custom attributes should show up on client spans', async () => {
       const result = await httpRequest.get(`${protocol}://google.fr/`);
       const spans = memoryExporter.getFinishedSpans();
