@@ -52,13 +52,13 @@ describe('loggingErrorHandler', () => {
 
     const [result] = errorStub.lastCall.args;
 
-    assert.ok(result.includes(`name: ${err.name}`));
-    assert.ok(result.includes(`message: ${err.message}`));
-    assert.ok(result.includes(`randomString: ${err.randomString}`));
-    assert.ok(result.includes(`randomNumber: ${err.randomNumber}`));
-    assert.ok(result.includes(`randomArray: ${err.randomArray}`));
-    assert.ok(result.includes(`randomObject: ${err.randomObject}`));
-    assert.ok(result.includes(`stack: ${err.stack}`));
+    assert.ok(result.includes(err.name));
+    assert.ok(result.includes(err.message));
+    assert.ok(result.includes(err.randomString));
+    assert.ok(result.includes(err.randomNumber));
+    assert.ok(result.includes(err.randomArray));
+    assert.ok(result.includes(err.randomObject));
+    assert.ok(result.includes(JSON.stringify(err.stack)));
   });
 
   it('logs from an error', () => {
@@ -68,8 +68,8 @@ describe('loggingErrorHandler', () => {
 
     const [result] = errorStub.lastCall.args;
 
-    assert.ok(result.includes(`name: ${err.name}`));
-    assert.ok(result.includes(`message: ${err.message}`));
-    assert.ok(result.includes(`stack: ${err.stack}`));
+    assert.ok(result.includes(err.name));
+    assert.ok(result.includes(err.message));
+    assert.ok(result.includes(JSON.stringify(err.stack)));
   });
 });

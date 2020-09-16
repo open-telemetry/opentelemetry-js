@@ -155,7 +155,7 @@ describe('CollectorTraceExporter - web', () => {
 
         setTimeout(() => {
           const response = spyLoggerError.args[0][0] as string;
-          assert.ok(response.includes('message: sendBeacon - cannot send'));
+          assert.ok(response.includes('sendBeacon - cannot send'));
           assert.strictEqual(spyLoggerDebug.args.length, 1);
 
           done();
@@ -253,7 +253,7 @@ describe('CollectorTraceExporter - web', () => {
 
           const response = spyLoggerError.args[0][0] as string;
 
-          assert.ok(response.includes('code: 400'));
+          assert.ok(response.includes('"code":"400"'));
 
           assert.strictEqual(spyBeacon.callCount, 0);
           done();

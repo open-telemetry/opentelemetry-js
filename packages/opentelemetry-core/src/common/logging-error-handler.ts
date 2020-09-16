@@ -38,9 +38,7 @@ function stringifyException(ex: Exception | string): string {
   if (typeof ex === 'string') {
     return ex;
   } else {
-    return Object.entries(flattenException(ex))
-      .map(([k, v]) => `${k}: ${v}`)
-      .join('\n');
+    return JSON.stringify(flattenException(ex));
   }
 }
 

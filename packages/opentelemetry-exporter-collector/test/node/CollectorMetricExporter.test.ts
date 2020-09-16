@@ -221,8 +221,8 @@ describe('CollectorMetricExporter - node with json over http', () => {
         callback(mockResError);
         setTimeout(() => {
           const response = spyLoggerError.args[0][0] as string;
-
-          assert.ok(response.includes('code: 400'));
+          console.log(response);
+          assert.ok(response.includes('"code":"400"'));
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });
