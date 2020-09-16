@@ -18,7 +18,6 @@ import { MeterProvider } from '../..';
 import { Logger } from '../../common/Logger';
 import { TracerProvider } from '../tracer_provider';
 
-
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation {
   /** Instrumentation Name  */
@@ -32,7 +31,7 @@ export interface Instrumentation {
    * as Instrumentation might patch different version of different modules,
    * or support different browsers etc.
    */
-   instrumentationDescription?: string;
+  instrumentationDescription?: string;
 
   /** Method to disable the instrumentation  */
   disable(): void;
@@ -47,7 +46,7 @@ export interface Instrumentation {
   setTracerProvider(tracerProvider: TracerProvider): void;
 
   /** Method to set meter provider  */
-  setMeterProvider(meterProvider: MeterProvider): void
+  setMeterProvider(meterProvider: MeterProvider): void;
 
   /**
    * Contains all supported versions.
