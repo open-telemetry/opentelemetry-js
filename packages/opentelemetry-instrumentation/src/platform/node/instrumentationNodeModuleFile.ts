@@ -20,7 +20,7 @@ export class InstrumentationNodeModuleFile<T>
   implements InstrumentationModuleFile<T> {
   constructor(
     public name: string,
-    public patch: (exports: T) => T,
-    public unpatch: () => void
+    public patch: (moduleExports: T) => T,
+    public unpatch: (moduleExports?: T) => void
   ) {}
 }

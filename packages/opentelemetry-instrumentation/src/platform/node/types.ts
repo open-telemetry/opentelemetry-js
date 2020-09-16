@@ -18,16 +18,22 @@ export interface InstrumentationModuleFile<T> {
   /** Name of file to be patched with relative path */
   name: string;
 
+  moduleExports?: T;
+
   /** Method to patch the instrumentation  */
-  patch(exports: T): T;
+  patch(moduleExports: T): T;
+
+  /** Method to patch the instrumentation  */
 
   /** Method to unpatch the instrumentation  */
-  unpatch(): void;
+  unpatch(moduleExports?: T): void;
 }
 
 export interface InstrumentationModuleDefinition<T> {
   /** Module name or path  */
   name: string;
+
+  moduleExports?: T;
 
   /** Supported version of module  */
   supportedVersions: string[];
@@ -36,8 +42,8 @@ export interface InstrumentationModuleDefinition<T> {
   files: InstrumentationModuleFile<T>[];
 
   /** Method to patch the instrumentation  */
-  patch?: (exports: T) => T;
+  patch?: (moduleExports: T) => T;
 
   /** Method to unpatch the instrumentation  */
-  unpatch?: () => void;
+  unpatch?: (moduleExports: T) => void;
 }

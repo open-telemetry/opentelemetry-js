@@ -32,6 +32,7 @@ export abstract class Instrumentation<T = any>
   implements api.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
+  private _enabled = false;
 
   constructor(
     instrumentationName: string,
@@ -96,9 +97,11 @@ export abstract class Instrumentation<T = any>
       const version = require(path.join(baseDir, 'package.json')).version;
       if (typeof version === 'string' && this._isSupported(name, version)) {
         if (typeof module.patch === 'function') {
-          return module.patch(exports);
+          module.moduleExports = exports;
+          if (this._enabled) {
+            return module.patch(exports);
+          }
         }
-        return exports;
       }
     } else {
       // internal file
@@ -107,13 +110,36 @@ export abstract class Instrumentation<T = any>
         (file: InstrumentationModuleFile<T>) => file.name === name
       );
       if (file) {
-        return file.patch(exports);
+        file.moduleExports = exports;
+        if (this._enabled) {
+          return file.patch(exports);
+        }
       }
     }
     return exports;
   }
 
   public enable() {
+    if (this._enabled) {
+      return;
+    }
+    this._enabled = true;
+
+    // already hooked, just call patch again
+    if (this._hooks.length > 0) {
+      for (const module of this._modules) {
+        if (typeof module.patch === 'function' && module.moduleExports) {
+          module.patch(module.moduleExports);
+        }
+        for (const file of module.files) {
+          if (file.moduleExports) {
+            file.patch(file.moduleExports);
+          }
+        }
+      }
+      return;
+    }
+
     for (const module of this._modules) {
       this._hooks.push(
         RequireInTheMiddle(
@@ -135,15 +161,19 @@ export abstract class Instrumentation<T = any>
   }
 
   public disable() {
-    this._hooks.forEach(hook => {
-      hook.unhook();
-    });
+    if (!this._enabled) {
+      return;
+    }
+    this._enabled = false;
+
     for (const module of this._modules) {
-      if (typeof module.unpatch === 'function') {
-        module.unpatch();
+      if (typeof module.unpatch === 'function' && module.moduleExports) {
+        module.unpatch(module.moduleExports);
       }
       for (const file of module.files) {
-        file.unpatch();
+        if (file.moduleExports) {
+          file.unpatch(file.moduleExports);
+        }
       }
     }
   }
