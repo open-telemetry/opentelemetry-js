@@ -50,6 +50,8 @@ export class MyPlugin extends Instrumentation {
     module.files.push(this._addPatchingMethod());
 
     return module;
+    // you can also define more modules then just return an array of modules
+    // return [module1, module2, ....]
   }
 
   private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof plugin_name_to_be_pached> {
