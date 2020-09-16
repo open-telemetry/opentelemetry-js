@@ -253,8 +253,6 @@ describe('CollectorTraceExporter - web', () => {
 
           const response = spyLoggerError.args[0][0] as string;
 
-          assert.ok(response.includes('body: '));
-          assert.ok(response.includes('xhrData: '));
           assert.ok(response.includes('code: 400'));
 
           assert.strictEqual(spyBeacon.callCount, 0);

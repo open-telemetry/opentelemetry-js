@@ -55,10 +55,10 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       collector.logger.debug(`statusCode: ${res.statusCode}`);
       onSuccess();
     } else {
-      const error = {
-        code: res.statusCode,
-        message: res.statusMessage || '',
-      };
+      const error = new collectorTypes.CollectorExporterError(
+        res.statusMessage,
+        res.statusCode
+      );
       globalErrorHandler(error);
       onError(error);
     }

@@ -220,9 +220,9 @@ describe('CollectorMetricExporter - node with json over http', () => {
         const callback = args[1];
         callback(mockResError);
         setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'code: 400');
+          const response = spyLoggerError.args[0][0] as string;
 
+          assert.ok(response.includes('code: 400'));
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });

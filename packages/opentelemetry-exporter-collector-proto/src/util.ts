@@ -80,8 +80,6 @@ export function send<ExportItem, ServiceRequest>(
       );
     }
   } else {
-    onError({
-      message: 'No proto',
-    });
+    onError(new collectorTypes.CollectorExporterError('No proto'));
   }
 }
