@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+	"newLine": "LF"
   },
   "include": [
     "src/**/*.ts",

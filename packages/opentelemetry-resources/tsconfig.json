@@ -2,7 +2,8 @@
   "extends": "../tsconfig.base",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build"
+    "outDir": "build",
+	"newLine": "LF"
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
