@@ -23,11 +23,11 @@ import {
   Status,
   SpanContext,
   TraceFlags,
+  getExtractedSpanContext,
 } from '@opentelemetry/api';
 import {
   BasePlugin,
   NoRecordingSpan,
-  getExtractedSpanContext,
 } from '@opentelemetry/core';
 import type {
   ClientRequest,

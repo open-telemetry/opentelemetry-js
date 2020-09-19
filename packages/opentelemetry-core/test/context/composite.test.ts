@@ -19,6 +19,8 @@ import {
   defaultSetter,
   TextMapPropagator,
   SpanContext,
+  getExtractedSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
@@ -27,10 +29,6 @@ import {
   HttpTraceContext,
   RandomIdGenerator,
 } from '../../src';
-import {
-  getExtractedSpanContext,
-  setExtractedSpanContext,
-} from '../../src/context/context';
 import {
   B3Propagator,
   X_B3_SAMPLED,
