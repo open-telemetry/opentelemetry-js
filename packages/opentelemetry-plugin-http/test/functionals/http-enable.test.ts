@@ -20,7 +20,7 @@ import {
   Span as ISpan,
   SpanKind,
 } from '@opentelemetry/api';
-import { NoopLogger } from '@opentelemetry/core';
+import { NoopLogger, getActiveSpan } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 import {
   InMemorySpanExporter,
@@ -708,6 +708,14 @@ describe('HttpPlugin', () => {
           outgoingSpan.attributes['span kind'],
           SpanKind.CLIENT
         );
+      });
+
+      it('should not set span as active in context for outgoing request', async () => {
+        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        await httpRequest.get(`${protocol}://${hostname}:${serverPort}/test`);
+        assert.deepStrictEqual(getActiveSpan(context.active()), undefined);
+        const spans = memoryExporter.getFinishedSpans();
+        assert.strictEqual(spans.length, 2);
       });
     });
 
