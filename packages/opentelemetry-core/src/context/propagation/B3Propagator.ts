@@ -24,7 +24,7 @@ import {
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 
-import { createContextKey } from '@opentelemetry/context-base'
+import { createContextKey } from '@opentelemetry/context-base';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';

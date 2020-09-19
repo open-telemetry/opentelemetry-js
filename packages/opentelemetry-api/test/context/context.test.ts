@@ -15,7 +15,7 @@
  */
 
 import * as assert from 'assert';
-import { ROOT_CONTEXT, createContextKey } from '@opentelemetry/context-base'
+import { ROOT_CONTEXT, createContextKey } from '@opentelemetry/context-base';
 import {
   suppressInstrumentation,
   unsuppressInstrumentation,

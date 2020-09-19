@@ -15,10 +15,7 @@
  */
 
 import { context, suppressInstrumentation } from '@opentelemetry/api';
-import {
-  ExportResult,
-  unrefTimer,
-} from '@opentelemetry/core';
+import { ExportResult, unrefTimer } from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';

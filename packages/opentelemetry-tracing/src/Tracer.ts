@@ -149,7 +149,9 @@ export class Tracer implements api.Tracer {
   bind<T>(target: T, span?: api.Span): T {
     return api.context.bind(
       target,
-      span ? api.setActiveSpan(api.context.active(), span) : api.context.active()
+      span
+        ? api.setActiveSpan(api.context.active(), span)
+        : api.context.active()
     );
   }
 
