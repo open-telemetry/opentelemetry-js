@@ -29,7 +29,7 @@ import { ResourceAttributes } from '../../../types';
 class ProcessDetector implements Detector {
   async detect(config: ResourceDetectionConfigWithLogger): Promise<Resource> {
     const processResource: ResourceAttributes = {
-      [PROCESS_RESOURCE.PID]: process.pid || '',
+      [PROCESS_RESOURCE.PID]: process.pid,
       [PROCESS_RESOURCE.NAME]: process.title || '',
       [PROCESS_RESOURCE.COMMAND]: process.argv[1] || '',
       [PROCESS_RESOURCE.COMMAND_LINE]: process.argv.join(' ') || '',
@@ -47,7 +47,7 @@ class ProcessDetector implements Detector {
     processResource: ResourceAttributes,
     config: ResourceDetectionConfigWithLogger
   ) {
-    if (processResource[PROCESS_RESOURCE.PID] === '') {
+    if (processResource[PROCESS_RESOURCE.PID] === undefined) {
       config.logger.debug(
         'ProcessDetector failed: unable to locate pid for currently running process'
       );

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+import * as sinon from 'sinon';
 import { processDetector, Resource } from '../../src';
 import {
   assertProcessResource,
@@ -22,16 +22,23 @@ import {
 import { NoopLogger } from '@opentelemetry/core';
 
 describe('processDetector()', () => {
+  let sandbox: sinon.SinonSandbox;
+
+  beforeEach(() => {
+    sandbox = sinon.createSandbox();
+  });
+
+  afterEach(() => {
+    sandbox.restore();
+  });
+
   it('should return resource information from process', async () => {
-    Object.defineProperty(process, 'pid', {
-      value: 1234,
-    });
-    Object.defineProperty(process, 'title', {
-      value: 'otProcess',
-    });
-    Object.defineProperty(process, 'argv', {
-      value: ['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2'],
-    });
+    sandbox.stub(process, 'pid').value(1234);
+    sandbox.stub(process, 'title').value('otProcess');
+    sandbox
+      .stub(process, 'argv')
+      .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
+
     const resource: Resource = await processDetector.detect({
       logger: new NoopLogger(),
     });
@@ -43,30 +50,21 @@ describe('processDetector()', () => {
     });
   });
   it('should return empty resources if title, command and commondLine is missing', async () => {
-    Object.defineProperty(process, 'pid', {
-      value: 1234,
-    });
-    Object.defineProperty(process, 'title', {
-      value: undefined,
-    });
-    Object.defineProperty(process, 'argv', {
-      value: [],
-    });
+    sandbox.stub(process, 'pid').value(1234);
+    sandbox.stub(process, 'title').value(undefined);
+    sandbox.stub(process, 'argv').value([]);
     const resource: Resource = await processDetector.detect({
       logger: new NoopLogger(),
     });
     assertEmptyResource(resource);
   });
   it('should return empty resources if pid is missing', async () => {
-    Object.defineProperty(process, 'pid', {
-      value: undefined,
-    });
-    Object.defineProperty(process, 'title', {
-      value: 'otProcess',
-    });
-    Object.defineProperty(process, 'argv', {
-      value: ['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2'],
-    });
+    sandbox.stub(process, 'pid').value(undefined);
+    sandbox.stub(process, 'title').value('otProcess');
+    sandbox
+      .stub(process, 'argv')
+      .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
+
     const resource: Resource = await processDetector.detect({
       logger: new NoopLogger(),
     });
