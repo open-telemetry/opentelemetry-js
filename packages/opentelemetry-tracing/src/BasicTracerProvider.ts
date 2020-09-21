@@ -20,7 +20,6 @@ import {
   HttpTraceContext,
   HttpCorrelationContext,
   CompositePropagator,
-  notifyOnGlobalShutdown,
 } from '@opentelemetry/core';
 import { SpanProcessor, Tracer } from '.';
 import { DEFAULT_CONFIG } from './config';
@@ -36,7 +35,6 @@ export class BasicTracerProvider implements api.TracerProvider {
   private readonly _config: TracerConfig;
   private readonly _registeredSpanProcessors: SpanProcessor[] = [];
   private readonly _tracers: Map<string, Tracer> = new Map();
-  private _cleanNotifyOnGlobalShutdown: Function | undefined;
 
   activeSpanProcessor = new NoopSpanProcessor();
   readonly logger: api.Logger;
@@ -49,11 +47,6 @@ export class BasicTracerProvider implements api.TracerProvider {
       logger: this.logger,
       resource: this.resource,
     });
-    if (this._config.gracefulShutdown) {
-      this._cleanNotifyOnGlobalShutdown = notifyOnGlobalShutdown(
-        this._shutdownActiveProcessor.bind(this)
-      );
-    }
   }
 
   getTracer(name: string, version = '*', config?: TracerConfig): Tracer {
@@ -108,14 +101,6 @@ export class BasicTracerProvider implements api.TracerProvider {
   }
 
   shutdown() {
-    if (this._cleanNotifyOnGlobalShutdown) {
-      this._cleanNotifyOnGlobalShutdown();
-      this._cleanNotifyOnGlobalShutdown = undefined;
-    }
-    return this.activeSpanProcessor.shutdown();
-  }
-
-  private _shutdownActiveProcessor() {
     return this.activeSpanProcessor.shutdown();
   }
 }

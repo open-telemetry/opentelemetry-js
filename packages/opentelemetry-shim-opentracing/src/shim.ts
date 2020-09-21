@@ -24,6 +24,7 @@ import {
   getCorrelationContext,
 } from '@opentelemetry/core';
 import * as opentracing from 'opentracing';
+import { Attributes, AttributeValue } from '@opentelemetry/api';
 
 function translateReferences(references: opentracing.Reference[]): api.Link[] {
   const links: api.Link[] = [];
@@ -32,7 +33,7 @@ function translateReferences(references: opentracing.Reference[]): api.Link[] {
     if (context instanceof SpanContextShim) {
       links.push({
         context: (context as SpanContextShim).getSpanContext(),
-        attributes: { 'span.kind': reference.type },
+        attributes: { 'span.kind': reference.type() },
       });
     }
   }
@@ -287,19 +288,15 @@ export class SpanShim extends opentracing.Span {
    * @param eventName name of the event.
    * @param payload an arbitrary object to be attached to the event.
    */
-  logEvent(eventName: string, payload?: unknown): void {
-    let attrs: api.Attributes = {};
-    if (payload) {
-      attrs = { payload };
-    }
-    this._span.addEvent(eventName, attrs);
+  logEvent(eventName: string, payload?: Attributes): void {
+    this._span.addEvent(eventName, payload);
   }
 
   /**
    * Logs a set of key value pairs. Since OpenTelemetry only supports events,
    * the KV pairs are used as attributes on an event named "log".
    */
-  log(keyValuePairs: { [key: string]: unknown }, timestamp?: number): this {
+  log(keyValuePairs: Attributes, timestamp?: number): this {
     // @todo: Handle timestamp
     this._span.addEvent('log', keyValuePairs);
     return this;
@@ -309,7 +306,7 @@ export class SpanShim extends opentracing.Span {
    * Adds a set of tags to the span.
    * @param keyValueMap set of KV pairs representing tags
    */
-  addTags(keyValueMap: { [key: string]: unknown }): this {
+  addTags(keyValueMap: Attributes): this {
     this._span.setAttributes(keyValueMap);
     return this;
   }
@@ -320,7 +317,7 @@ export class SpanShim extends opentracing.Span {
    * @param key key for the tag
    * @param value value for the tag
    */
-  setTag(key: string, value: unknown): this {
+  setTag(key: string, value: AttributeValue): this {
     if (
       key === opentracing.Tags.ERROR &&
       (value === true || value === 'true')

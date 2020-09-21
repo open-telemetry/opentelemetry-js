@@ -116,3 +116,24 @@ export const SERVICE_RESOURCE = {
   /** The version string of the service API or implementation. */
   VERSION: 'service.version',
 };
+
+/** Attributes describing a Process. */
+export const PROCESS_RESOURCE = {
+  /** A command which launced this proces.  */
+  COMMAND: 'process.command',
+
+  /** The full command with arguments as string.  */
+  COMMAND_LINE: 'process.command_line',
+
+  /** A name given to currently running porcess defaults to executable (process.title) .  */
+  NAME: 'process.executable.name',
+
+  /** An owner of currently running process.  */
+  OWNER: 'process.owner',
+
+  /** The full path to the process executable.  */
+  PATH: 'process.executable.path',
+
+  /** Process identifier of currently running process.  */
+  PID: 'process.id',
+};
