@@ -29,7 +29,7 @@ import {
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
-import {
+import type {
   ClientRequest,
   IncomingMessage,
   request,
