@@ -19,15 +19,12 @@ import { Context } from './types';
 export class BaseContext implements Context {
   private _currentContext: Map<symbol, unknown>;
 
-  /** The root context is used as the default parent context when there is no active context */
-  public static readonly ROOT_CONTEXT = new BaseContext();
-
   /**
    * Construct a new context which inherits values from an optional parent context.
    *
    * @param parentContext a context from which to inherit values
    */
-  private constructor(parentContext?: Map<symbol, unknown>) {
+  constructor(parentContext?: Map<symbol, unknown>) {
     this._currentContext = parentContext ? new Map(parentContext) : new Map();
   }
 
@@ -65,6 +62,9 @@ export class BaseContext implements Context {
     return context;
   }
 }
+
+/** The root context is used as the default parent context when there is no active context */
+export const ROOT_CONTEXT: Context = new BaseContext();
 
 /** Get a key to uniquely identify a context value */
 export function createContextKey(description: string) {

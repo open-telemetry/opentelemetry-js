@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+import { ROOT_CONTEXT } from './context';
 import * as types from './types';
-import { BaseContext } from './context';
 
 export class NoopContextManager implements types.ContextManager {
   active(): types.Context {
-    return BaseContext.ROOT_CONTEXT;
+    return ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
