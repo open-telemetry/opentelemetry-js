@@ -28,6 +28,33 @@ export abstract class CollectorExporterNodeBase<
   ServiceRequest
 > extends CollectorExporterBaseMain<ExportItem, ServiceRequest> {
   private _send!: Function;
+
+  private _sendPromise(
+    objects: ExportItem[],
+    onSuccess: () => void,
+    onError: (error: collectorTypes.CollectorExporterError) => void
+  ): void {
+    const promise = new Promise(resolve => {
+      const _onSuccess = (): void => {
+        onSuccess();
+        _onFinish();
+      };
+      const _onError = (error: collectorTypes.CollectorExporterError): void => {
+        onError(error);
+        _onFinish();
+      };
+      const _onFinish = () => {
+        const index = this._sendingPromises.indexOf(promise);
+        this._sendingPromises.splice(index, 1);
+        resolve();
+      };
+
+      this._send(this, objects, _onSuccess, _onError);
+    });
+
+    this._sendingPromises.push(promise);
+  }
+
   onInit(config: collectorTypes.CollectorExporterConfigBase): void {
     this._isShutdown = false;
     // defer to next tick and lazy load to avoid loading protobufjs too early
@@ -55,10 +82,10 @@ export abstract class CollectorExporterNodeBase<
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         const { send } = require('./util');
         this._send = send;
-        this._send(this, objects, onSuccess, onError);
+        this._sendPromise(objects, onSuccess, onError);
       });
     } else {
-      this._send(this, objects, onSuccess, onError);
+      this._sendPromise(objects, onSuccess, onError);
     }
   }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as asyncHooks from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
@@ -35,7 +35,7 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
   }
 
   active(): Context {
-    return this._stack[this._stack.length - 1] ?? Context.ROOT_CONTEXT;
+    return this._stack[this._stack.length - 1] ?? ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(
@@ -66,8 +66,15 @@ export class AsyncHooksContextManager extends AbstractAsyncHooksContextManager {
    * Init hook will be called when userland create a async context, setting the
    * context as the current one if it exist.
    * @param uid id of the async context
+   * @param type the resource type
    */
-  private _init(uid: number) {
+  private _init(uid: number, type: string) {
+    // ignore TIMERWRAP as they combine timers with same timeout which can lead to
+    // false context propagation. TIMERWRAP has been removed in node 11
+    // every timer has it's own `Timeout` resource anyway which is used to propagete
+    // context.
+    if (type === 'TIMERWRAP') return;
+
     const context = this._stack[this._stack.length - 1];
     if (context !== undefined) {
       this._contexts.set(uid, context);
