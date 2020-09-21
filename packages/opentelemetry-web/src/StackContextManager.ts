@@ -15,7 +15,7 @@
  */
 
 import { Context } from '@opentelemetry/api';
-import { ContextManager } from '@opentelemetry/context-base';
+import { ContextManager, ROOT_CONTEXT } from '@opentelemetry/context-base';
 
 /**
  * Stack Context Manager for managing the state in web
@@ -30,7 +30,7 @@ export class StackContextManager implements ContextManager {
   /**
    * Keeps the reference to current context
    */
-  public _currentContext = Context.ROOT_CONTEXT;
+  public _currentContext = ROOT_CONTEXT;
 
   /**
    *
@@ -39,7 +39,7 @@ export class StackContextManager implements ContextManager {
    */
   private _bindFunction<T extends Function>(
     target: T,
-    context = Context.ROOT_CONTEXT
+    context = ROOT_CONTEXT
   ): T {
     const manager = this;
     const contextWrapper = function (this: unknown, ...args: unknown[]) {
@@ -66,7 +66,7 @@ export class StackContextManager implements ContextManager {
    * @param target
    * @param context
    */
-  bind<T>(target: T, context = Context.ROOT_CONTEXT): T {
+  bind<T>(target: T, context = ROOT_CONTEXT): T {
     // if no specific context to propagate is given, we use the current one
     if (context === undefined) {
       context = this.active();
@@ -81,7 +81,7 @@ export class StackContextManager implements ContextManager {
    * Disable the context manager (clears the current context)
    */
   disable(): this {
-    this._currentContext = Context.ROOT_CONTEXT;
+    this._currentContext = ROOT_CONTEXT;
     this._enabled = false;
     return this;
   }
@@ -94,7 +94,7 @@ export class StackContextManager implements ContextManager {
       return this;
     }
     this._enabled = true;
-    this._currentContext = Context.ROOT_CONTEXT;
+    this._currentContext = ROOT_CONTEXT;
     return this;
   }
 
@@ -109,7 +109,7 @@ export class StackContextManager implements ContextManager {
     fn: () => ReturnType<T>
   ): ReturnType<T> {
     const previousContext = this._currentContext;
-    this._currentContext = context || Context.ROOT_CONTEXT;
+    this._currentContext = context || ROOT_CONTEXT;
 
     try {
       return fn();

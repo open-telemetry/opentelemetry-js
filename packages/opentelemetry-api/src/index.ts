@@ -61,7 +61,12 @@ export {
   INVALID_SPAN_CONTEXT,
 } from './trace/spancontext-utils';
 
-export { Context } from '@opentelemetry/context-base';
+export {
+  Context,
+  ROOT_CONTEXT,
+  createContextKey,
+  ContextManager,
+} from '@opentelemetry/context-base';
 
 import { ContextAPI } from './api/context';
 /** Entrypoint for context API */

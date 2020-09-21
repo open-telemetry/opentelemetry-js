@@ -19,7 +19,7 @@ import {
   defaultSetter,
   CorrelationContext,
 } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/context-base';
+import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import {
   getCorrelationContext,
@@ -49,7 +49,7 @@ describe('HttpCorrelationContext', () => {
       };
 
       httpTraceContext.inject(
-        setCorrelationContext(Context.ROOT_CONTEXT, correlationContext),
+        setCorrelationContext(ROOT_CONTEXT, correlationContext),
         carrier,
         defaultSetter
       );
@@ -70,7 +70,7 @@ describe('HttpCorrelationContext', () => {
       correlationContext['longPair'] = { value };
 
       httpTraceContext.inject(
-        setCorrelationContext(Context.ROOT_CONTEXT, correlationContext),
+        setCorrelationContext(ROOT_CONTEXT, correlationContext),
         carrier,
         defaultSetter
       );
@@ -101,7 +101,7 @@ describe('HttpCorrelationContext', () => {
       expected = expected.slice(0, -1);
 
       httpTraceContext.inject(
-        setCorrelationContext(Context.ROOT_CONTEXT, correlationContext),
+        setCorrelationContext(ROOT_CONTEXT, correlationContext),
         carrier,
         defaultSetter
       );
@@ -114,7 +114,7 @@ describe('HttpCorrelationContext', () => {
       carrier[CORRELATION_CONTEXT_HEADER] =
         'key1=d4cda95b,key3=c88815a7, keyn   = valn, keym =valm';
       const extractedCorrelationContext = getCorrelationContext(
-        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
 
       const expected: CorrelationContext = {
@@ -130,7 +130,7 @@ describe('HttpCorrelationContext', () => {
   it('returns undefined if header is missing', () => {
     assert.deepStrictEqual(
       getCorrelationContext(
-        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
       ),
       undefined
     );
@@ -145,7 +145,7 @@ describe('HttpCorrelationContext', () => {
     };
     assert.deepStrictEqual(
       getCorrelationContext(
-        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
       ),
       expected
     );
@@ -188,7 +188,7 @@ describe('HttpCorrelationContext', () => {
       carrier[CORRELATION_CONTEXT_HEADER] = testCases[testCase].header;
 
       const extractedSpanContext = getCorrelationContext(
-        httpTraceContext.extract(Context.ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
       );
       assert.deepStrictEqual(
         extractedSpanContext,
