@@ -58,16 +58,4 @@ describe('processDetector()', () => {
     });
     assertEmptyResource(resource);
   });
-  it('should return empty resources if pid is missing', async () => {
-    sandbox.stub(process, 'pid').value(undefined);
-    sandbox.stub(process, 'title').value('otProcess');
-    sandbox
-      .stub(process, 'argv')
-      .value(['/tmp/node', '/home/ot/test.js', 'arg1', 'arg2']);
-
-    const resource: Resource = await processDetector.detect({
-      logger: new NoopLogger(),
-    });
-    assertEmptyResource(resource);
-  });
 });

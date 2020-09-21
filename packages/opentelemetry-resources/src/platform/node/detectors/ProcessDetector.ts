@@ -47,12 +47,7 @@ class ProcessDetector implements Detector {
     processResource: ResourceAttributes,
     config: ResourceDetectionConfigWithLogger
   ) {
-    if (processResource[PROCESS_RESOURCE.PID] === undefined) {
-      config.logger.debug(
-        'ProcessDetector failed: unable to locate pid for currently running process'
-      );
-      return Resource.empty();
-    } else if (
+    if (
       processResource[PROCESS_RESOURCE.NAME] === '' ||
       processResource[PROCESS_RESOURCE.PATH] === '' ||
       processResource[PROCESS_RESOURCE.COMMAND] === '' ||
