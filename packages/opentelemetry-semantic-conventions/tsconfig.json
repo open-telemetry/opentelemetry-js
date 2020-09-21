@@ -2,8 +2,7 @@
   "extends": "../tsconfig.es5",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "build",
-	"newLine": "LF"
+    "outDir": "build"
   },
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }

@@ -3,8 +3,7 @@
   "compilerOptions": {
     "rootDir": ".",
     "outDir": "build",
-    "skipLibCheck": true,
-	"newLine": "LF"
+    "skipLibCheck": true
   },
   "files": [ "node_modules/zone.js/dist/zone.js.d.ts"],
   "include": [
