@@ -180,7 +180,7 @@ export class TracerShim extends opentracing.Tracer {
           carrier,
           api.defaultSetter,
           setCorrelationContext(
-            setExtractedSpanContext(api.Context.ROOT_CONTEXT, oTelSpanContext),
+            setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanCorrelationContext
           )
         );

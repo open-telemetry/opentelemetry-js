@@ -75,7 +75,7 @@ export class PropagationAPI {
   public inject<Carrier>(
     carrier: Carrier,
     setter: SetterFunction<Carrier> = defaultSetter,
-    context = contextApi.active()
+    context: Context = contextApi.active()
   ): void {
     return this._getGlobalPropagator().inject(context, carrier, setter);
   }
@@ -90,7 +90,7 @@ export class PropagationAPI {
   public extract<Carrier>(
     carrier: Carrier,
     getter: GetterFunction<Carrier> = defaultGetter,
-    context = contextApi.active()
+    context: Context = contextApi.active()
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
   }

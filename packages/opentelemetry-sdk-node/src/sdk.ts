@@ -44,6 +44,9 @@ export class NodeSDK {
 
   private _autoDetectResources: boolean;
 
+  private _tracerProvider?: NodeTracerProvider;
+  private _meterProvider?: MeterProvider;
+
   /**
    * Create a new NodeJS SDK instance
    */
@@ -155,6 +158,8 @@ export class NodeSDK {
         resource: this._resource,
       });
 
+      this._tracerProvider = tracerProvider;
+
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
       tracerProvider.register({
         contextManager: this._tracerProviderConfig.contextManager,
@@ -168,7 +173,25 @@ export class NodeSDK {
         resource: this._resource,
       });
 
+      this._meterProvider = meterProvider;
+
       metrics.setGlobalMeterProvider(meterProvider);
     }
+  }
+
+  public shutdown(): Promise<void> {
+    const promises: Promise<unknown>[] = [];
+    if (this._tracerProvider) {
+      promises.push(this._tracerProvider.shutdown());
+    }
+    if (this._meterProvider) {
+      promises.push(this._meterProvider.shutdown());
+    }
+
+    return (
+      Promise.all(promises)
+        // return void instead of the array from Promise.all
+        .then(() => {})
+    );
   }
 }
