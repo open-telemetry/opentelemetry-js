@@ -19,9 +19,9 @@ import {
   NoopSpan,
   Sampler,
   SamplingDecision,
-  Context,
   NOOP_SPAN,
   TraceFlags,
+  ROOT_CONTEXT,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
@@ -119,7 +119,7 @@ describe('Tracer', () => {
   });
 
   describe('when suppressInstrumentation true', () => {
-    const context = suppressInstrumentation(Context.ROOT_CONTEXT);
+    const context = suppressInstrumentation(ROOT_CONTEXT);
 
     it('should return cached no-op span ', done => {
       const tracer = new Tracer(
