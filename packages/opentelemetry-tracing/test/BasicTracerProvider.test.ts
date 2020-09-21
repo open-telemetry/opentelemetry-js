@@ -29,8 +29,6 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
-  notifyOnGlobalShutdown,
-  _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -373,18 +371,6 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.shutdown()', () => {
-    it('should trigger shutdown when SIGTERM is recieved', () => {
-      const tracerProvider = new BasicTracerProvider();
-      const shutdownStub = sandbox.stub(
-        tracerProvider.getActiveSpanProcessor(),
-        'shutdown'
-      );
-      removeEvent = notifyOnGlobalShutdown(() => {
-        sinon.assert.calledOnce(shutdownStub);
-      });
-      _invokeGlobalShutdown();
-    });
-
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
       const shutdownStub = sandbox.stub(
@@ -393,21 +379,6 @@ describe('BasicTracerProvider', () => {
       );
       tracerProvider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
-    });
-
-    it('should not trigger shutdown if graceful shutdown is turned off', () => {
-      const tracerProvider = new BasicTracerProvider({
-        gracefulShutdown: false,
-      });
-      const sandbox = sinon.createSandbox();
-      const shutdownStub = sandbox.stub(
-        tracerProvider.getActiveSpanProcessor(),
-        'shutdown'
-      );
-      removeEvent = notifyOnGlobalShutdown(() => {
-        sinon.assert.notCalled(shutdownStub);
-      });
-      _invokeGlobalShutdown();
     });
   });
 });
