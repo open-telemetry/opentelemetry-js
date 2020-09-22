@@ -24,6 +24,7 @@ import {
   K8S_RESOURCE,
   TELEMETRY_SDK_RESOURCE,
   SERVICE_RESOURCE,
+  PROCESS_RESOURCE,
 } from '../../src/constants';
 
 /**
@@ -258,6 +259,45 @@ export const assertServiceResource = (
       resource.attributes[SERVICE_RESOURCE.VERSION],
       validations.version
     );
+};
+
+/**
+ * Test utility method to validate a process resources
+ *
+ * @param resource the Resource to validate
+ * @param validations validations for the resource attributes
+ */
+export const assertProcessResource = (
+  resource: Resource,
+  validations: {
+    pid?: number;
+    name?: string;
+    command?: string;
+    commandLine?: string;
+  }
+) => {
+  assert.strictEqual(
+    resource.attributes[PROCESS_RESOURCE.PID],
+    validations.pid
+  );
+  if (validations.name) {
+    assert.strictEqual(
+      resource.attributes[PROCESS_RESOURCE.NAME],
+      validations.name
+    );
+  }
+  if (validations.command) {
+    assert.strictEqual(
+      resource.attributes[PROCESS_RESOURCE.COMMAND],
+      validations.command
+    );
+  }
+  if (validations.commandLine) {
+    assert.strictEqual(
+      resource.attributes[PROCESS_RESOURCE.COMMAND_LINE],
+      validations.commandLine
+    );
+  }
 };
 
 /**

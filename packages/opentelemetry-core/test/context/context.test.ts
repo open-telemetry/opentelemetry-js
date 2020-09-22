@@ -22,13 +22,13 @@ import {
   unsuppressInstrumentation,
   isInstrumentationSuppressed,
 } from '../../src/context/context';
-import { Context } from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/api';
 
 describe('Context Helpers', () => {
   describe('suppressInstrumentation', () => {
     it('should set suppress to true', () => {
       const expectedValue = true;
-      const context = suppressInstrumentation(Context.ROOT_CONTEXT);
+      const context = suppressInstrumentation(ROOT_CONTEXT);
 
       const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
       const boolValue = value as boolean;
@@ -40,7 +40,7 @@ describe('Context Helpers', () => {
   describe('unsuppressInstrumentation', () => {
     it('should set suppress to false', () => {
       const expectedValue = false;
-      const context = unsuppressInstrumentation(Context.ROOT_CONTEXT);
+      const context = unsuppressInstrumentation(ROOT_CONTEXT);
 
       const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
       const boolValue = value as boolean;
@@ -52,7 +52,7 @@ describe('Context Helpers', () => {
   describe('isInstrumentationSuppressed', () => {
     it('should get value as bool', () => {
       const expectedValue = true;
-      const context = Context.ROOT_CONTEXT.setValue(
+      const context = ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
         expectedValue
       );
@@ -63,10 +63,7 @@ describe('Context Helpers', () => {
     });
 
     describe('when suppress instrumentation set to null', () => {
-      const context = Context.ROOT_CONTEXT.setValue(
-        SUPPRESS_INSTRUMENTATION_KEY,
-        null
-      );
+      const context = ROOT_CONTEXT.setValue(SUPPRESS_INSTRUMENTATION_KEY, null);
 
       it('should return false', () => {
         const value = isInstrumentationSuppressed(context);
@@ -76,7 +73,7 @@ describe('Context Helpers', () => {
     });
 
     describe('when suppress instrumentation set to undefined', () => {
-      const context = Context.ROOT_CONTEXT.setValue(
+      const context = ROOT_CONTEXT.setValue(
         SUPPRESS_INSTRUMENTATION_KEY,
         undefined
       );
