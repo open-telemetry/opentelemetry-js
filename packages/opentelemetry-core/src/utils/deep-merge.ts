@@ -13,6 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/**
+ * Deeply merges a source object onto a target object.
+ * If a given property is an array in both source and target, the
+ * source property replaces the target property entirely.
+ * @param target
+ * @param source
+ * @param maxDepth avoids an infinite CPU loop. Defaults to 10.
+ * @returns a deeply merged object
+ */
 export function deepMerge(
   target: Record<string, any>,
   source: Record<string, any>,
