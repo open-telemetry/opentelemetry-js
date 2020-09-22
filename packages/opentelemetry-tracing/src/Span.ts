@@ -16,6 +16,7 @@
 
 import * as api from '@opentelemetry/api';
 import {
+  isAttributeValue,
   hrTime,
   hrTimeDuration,
   InstrumentationLibrary,
@@ -31,6 +32,7 @@ import { ReadableSpan } from './export/ReadableSpan';
 import { Tracer } from './Tracer';
 import { SpanProcessor } from './SpanProcessor';
 import { TraceParams } from './types';
+import { AttributeValue } from '@opentelemetry/api';
 
 /**
  * This class represents a span.
@@ -86,8 +88,22 @@ export class Span implements api.Span, ReadableSpan {
     return this.spanContext;
   }
 
+  setAttribute(key: string, value: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
     if (this._isSpanEnded()) return this;
+    if (key.length === 0) {
+      this._logger.warn(`Invalid attribute key: ${key}`);
+      return this;
+    }
+    if (!isAttributeValue(value)) {
+      this._logger.warn(`Invalid attribute value set for key: ${key}`);
+      return this;
+    }
+
+    if (value == null) {
+      delete this.attributes[key];
+      return this;
+    }
 
     if (
       Object.keys(this.attributes).length >=
@@ -106,9 +122,9 @@ export class Span implements api.Span, ReadableSpan {
   }
 
   setAttributes(attributes: api.Attributes): this {
-    Object.keys(attributes).forEach(key => {
-      this.setAttribute(key, attributes[key]);
-    });
+    for (const [k, v] of Object.entries(attributes)) {
+      this.setAttribute(k, v);
+    }
     return this;
   }
 
