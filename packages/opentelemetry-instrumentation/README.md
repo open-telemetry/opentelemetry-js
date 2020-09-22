@@ -21,30 +21,26 @@ import {
   InstrumentationNodeModuleFile,
 } from '@opentelemetry/instrumentation';
 
-import * as module_name_to_be_pached from 'module_name_to_be_pached';
+import type * as module_name_to_be_pached from 'module_name_to_be_pached';
 
 export class MyPlugin extends Instrumentation {
   constructor(config: api.InstrumentationConfig = {}) {
     super('MyPlugin', VERSION, config);
   }
 
-  // init method is default method that needs to be defined where
-  // definitions for patching should be defined. It will be then called
-  // before enabling the plugin and loading
+  /**
+   * Init method will be called when the plugin is constructed.
+   * It returns an `InstrumentationNodeModuleDefinition` which describes
+   *   the node module to be instrumented and patched.
+   * It may also return a list of `InstrumentationNodeModuleDefinition`s if
+   *   the plugin should patch multiple modules or versions.
+   */
   protected _init() {
     const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_pached>(
       'module_name_to_be_pached',
       ['1.*'],
-       (moduleExports: typeof module_name_to_be_pached) => {
-        this._wrap(
-          moduleExports,
-          'mainMethodName',
-          this._patchMainMethodName()
-        );
-       },
-       (moduleExports: typeof module_name_to_be_pached) => {
-        this._unwrap(moduleExports, 'mainMethodName');
-       }
+       this._onPatchMain,
+       this._onUnPatchMain,
     );
     // in case you need to patch additional files - this is optional
     module.files.push(this._addPatchingMethod());
@@ -54,22 +50,39 @@ export class MyPlugin extends Instrumentation {
     // return [module1, module2, ....]
   }
 
+  private _onPatchMain(moduleExports: typeof module_name_to_be_pached) {
+    this._wrap(
+      moduleExports,
+      'mainMethodName',
+      this._patchMainMethodName()
+    );
+    return moduleExports;
+  }
+
+  private _onUnPatchMain(moduleExports: typeof module_name_to_be_pached) {
+    this._unwrap(moduleExports, 'mainMethodName');
+  }
+
   private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof module_name_to_be_pached> {
     const file = new InstrumentationNodeModuleFile<typeof module_name_to_be_pached>(
       'module_name_to_be_pached/src/some_file.js',
-      (moduleExports: typeof module_name_to_be_pached) => {
-        this._wrap(
-          moduleExports,
-          'methodName',
-          this._patchMethodName()
-        );
-        return moduleExports;
-      },
-      (moduleExports: typeof module_name_to_be_pached) => {
-        this._unwrap(moduleExports, 'methodName');
-      }
+      this._onPatchMethodName,
+      this._onUnPatchMethodName,
     );
     return file;
+  }
+
+  private _onPatchMethodName(moduleExports: typeof module_name_to_be_pached) {
+    this._wrap(
+      moduleExports,
+      'methodName',
+      this._patchMethodName()
+    );
+    return moduleExports;
+  }
+
+  private _onUnPatchMethodName(moduleExports: typeof module_name_to_be_pached) {
+    this._unwrap(moduleExports, 'methodName');
   }
 
   private _patchMethodName(): (original) => any {
@@ -96,8 +109,8 @@ export class MyPlugin extends Instrumentation {
 // Later
 
 const myPLugin = new MyPlugin();
-myPLugin.setTracerProvider(provider);
-myPLugin.setMeterProvider(meterProvider);
+myPLugin.setTracerProvider(provider); // this is optional
+myPLugin.setMeterProvider(meterProvider); // this is optional
 myPLugin.enable();
 ```
 
