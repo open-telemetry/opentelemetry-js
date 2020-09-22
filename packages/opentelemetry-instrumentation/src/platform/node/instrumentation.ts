@@ -41,7 +41,7 @@ export abstract class Instrumentation<T = any>
   ) {
     super(instrumentationName, instrumentationVersion, config);
 
-    let modules = this._init();
+    let modules = this.init();
 
     if (modules && !Array.isArray(modules)) {
       modules = [modules];
@@ -182,7 +182,7 @@ export abstract class Instrumentation<T = any>
    * Init method in which plugin should define _modules and patches for
    * methods
    */
-  protected abstract _init():
+  protected abstract init():
     | InstrumentationModuleDefinition<T>
     | InstrumentationModuleDefinition<T>[];
 }

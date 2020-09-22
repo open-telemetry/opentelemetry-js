@@ -35,7 +35,7 @@ export class MyPlugin extends Instrumentation {
    * It may also return a list of `InstrumentationNodeModuleDefinition`s if
    *   the plugin should patch multiple modules or versions.
    */
-  protected _init() {
+  protected init() {
     const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_pached>(
       'module_name_to_be_pached',
       ['1.*'],
