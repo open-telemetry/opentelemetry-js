@@ -23,6 +23,7 @@ import {
   Resource,
   ResourceDetectionConfig,
   envDetector,
+  processDetector,
 } from '@opentelemetry/resources';
 import { BatchSpanProcessor, SpanProcessor } from '@opentelemetry/tracing';
 import { NodeSDKConfiguration } from './types';
@@ -42,6 +43,9 @@ export class NodeSDK {
   private _resource: Resource;
 
   private _autoDetectResources: boolean;
+
+  private _tracerProvider?: NodeTracerProvider;
+  private _meterProvider?: MeterProvider;
 
   /**
    * Create a new NodeJS SDK instance
@@ -128,7 +132,7 @@ export class NodeSDK {
   /** Detect resource attributes */
   public async detectResources(config?: ResourceDetectionConfig) {
     const internalConfig: ResourceDetectionConfig = {
-      detectors: [awsEc2Detector, gcpDetector, envDetector],
+      detectors: [awsEc2Detector, gcpDetector, envDetector, processDetector],
       ...config,
     };
 
@@ -154,6 +158,8 @@ export class NodeSDK {
         resource: this._resource,
       });
 
+      this._tracerProvider = tracerProvider;
+
       tracerProvider.addSpanProcessor(this._tracerProviderConfig.spanProcessor);
       tracerProvider.register({
         contextManager: this._tracerProviderConfig.contextManager,
@@ -167,7 +173,25 @@ export class NodeSDK {
         resource: this._resource,
       });
 
+      this._meterProvider = meterProvider;
+
       metrics.setGlobalMeterProvider(meterProvider);
     }
+  }
+
+  public shutdown(): Promise<void> {
+    const promises: Promise<unknown>[] = [];
+    if (this._tracerProvider) {
+      promises.push(this._tracerProvider.shutdown());
+    }
+    if (this._meterProvider) {
+      promises.push(this._meterProvider.shutdown());
+    }
+
+    return (
+      Promise.all(promises)
+        // return void instead of the array from Promise.all
+        .then(() => {})
+    );
   }
 }
