@@ -50,11 +50,11 @@ function bothPropsAreObjects(
   source: Record<string, any>,
   prop: string
 ) {
-  const targetIsObject =
-    typeof target[prop] === 'object' && target[prop] !== null;
-  const sourceIsObject =
-    typeof source[prop] === 'object' && source[prop] !== null;
-  return targetIsObject && sourceIsObject;
+  return propIsObject(target, prop) && propIsObject(source, prop);
+}
+
+function propIsObject(object: any, prop: string) {
+  return typeof object[prop] === 'object' && object[prop] !== null;
 }
 
 function bothPropsAreArrays(
