@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
-import { BaseInstrumentation } from '../../instrumentation';
+import { InstrumentationAbstract } from '../../instrumentation';
+import * as types from '../../types';
 
 /**
  * Base abstract class for instrumenting web plugins
  */
-export abstract class Instrumentation<T = any>
-  extends BaseInstrumentation
-  implements api.Instrumentation {
+export abstract class InstrumentationBase<T = any>
+  extends InstrumentationAbstract
+  implements types.Instrumentation {
   constructor(
     readonly instrumentationName: string,
     readonly instrumentationVersion: string,
-    config: api.InstrumentationConfig = {}
+    config: types.InstrumentationConfig = {}
   ) {
     super(instrumentationName, instrumentationVersion, config);
 

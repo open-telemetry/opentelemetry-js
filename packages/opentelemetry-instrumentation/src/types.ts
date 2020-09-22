@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import { MeterProvider } from '../..';
-import { Logger } from '../../common/Logger';
-import { TracerProvider } from '../tracer_provider';
+import { Logger, MeterProvider, TracerProvider } from '@opentelemetry/api';
 
 /** Interface Instrumentation to apply patch. */
 export interface Instrumentation {

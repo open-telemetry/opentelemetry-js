@@ -15,9 +15,10 @@
  */
 
 import * as assert from 'assert';
-import { BaseInstrumentation } from '../../src/instrumentation';
+import { Instrumentation } from '../../src';
+import { InstrumentationAbstract } from '../../src/instrumentation';
 
-class TestInstrumentation extends BaseInstrumentation {
+class TestInstrumentation extends InstrumentationAbstract {
   constructor() {
     super('test', '1.0.0');
   }
@@ -26,13 +27,13 @@ class TestInstrumentation extends BaseInstrumentation {
 }
 
 describe('BaseInstrumentation', () => {
-  let instrumentation: BaseInstrumentation;
+  let instrumentation: Instrumentation;
   beforeEach(() => {
     instrumentation = new TestInstrumentation();
   });
 
   it('should create an instance', () => {
-    assert.ok(instrumentation instanceof BaseInstrumentation);
+    assert.ok(instrumentation instanceof InstrumentationAbstract);
   });
 
   it('should have a name', () => {

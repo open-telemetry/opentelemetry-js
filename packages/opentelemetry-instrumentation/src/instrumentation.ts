@@ -16,13 +16,14 @@
 
 import * as api from '@opentelemetry/api';
 import * as shimmer from 'shimmer';
+import * as types from './types';
 
 /**
  * Base abstract internal class for instrumenting node and web plugins
  */
-export abstract class BaseInstrumentation<T = any>
-  implements api.Instrumentation {
-  protected _config: api.InstrumentationConfig;
+export abstract class InstrumentationAbstract<T = any>
+  implements types.Instrumentation {
+  protected _config: types.InstrumentationConfig;
 
   private _tracer: api.Tracer;
   private _meter: api.Meter;
@@ -31,7 +32,7 @@ export abstract class BaseInstrumentation<T = any>
   constructor(
     public readonly instrumentationName: string,
     public readonly instrumentationVersion: string,
-    config: api.InstrumentationConfig = {}
+    config: types.InstrumentationConfig = {}
   ) {
     this._config = {
       enabled: true,

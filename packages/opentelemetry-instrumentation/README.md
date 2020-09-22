@@ -16,15 +16,16 @@ npm install --save @opentelemetry/instrumentation
 
 ```typescript
 import {
-  Instrumentation,
+  InstrumentationBase,
+  InstrumentationConfig,
   InstrumentationNodeModuleDefinition,
   InstrumentationNodeModuleFile,
 } from '@opentelemetry/instrumentation';
 
 import type * as module_name_to_be_pached from 'module_name_to_be_pached';
 
-export class MyPlugin extends Instrumentation {
-  constructor(config: api.InstrumentationConfig = {}) {
+export class MyPlugin extends InstrumentationBase {
+  constructor(config: InstrumentationConfig = {}) {
     super('MyPlugin', VERSION, config);
   }
 
@@ -117,10 +118,15 @@ myPLugin.enable();
 ## Usage in Web
 
 ```typescript
+import {
+  InstrumentationBase,
+  InstrumentationConfig,
+} from '@opentelemetry/instrumentation';
+
 import { Instrumentation } from '@opentelemetry/instrumentation';
 
-export class MyPlugin extends Instrumentation {
-  constructor(config: api.InstrumentationConfig = {}) {
+export class MyPlugin extends InstrumentationBase {
+  constructor(config: InstrumentationConfig = {}) {
     super('MyPlugin', VERSION, config);
   }
 

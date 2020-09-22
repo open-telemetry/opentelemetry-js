@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import * as api from '@opentelemetry/api';
+import * as types from '../../types';
 import * as path from 'path';
 import * as RequireInTheMiddle from 'require-in-the-middle';
 import * as semver from 'semver';
-import { BaseInstrumentation } from '../../instrumentation';
+import { InstrumentationAbstract } from '../../instrumentation';
 import {
   InstrumentationModuleDefinition,
   InstrumentationModuleFile,
@@ -27,9 +27,9 @@ import {
 /**
  * Base abstract class for instrumenting node plugins
  */
-export abstract class Instrumentation<T = any>
-  extends BaseInstrumentation
-  implements api.Instrumentation {
+export abstract class InstrumentationBase<T = any>
+  extends InstrumentationAbstract
+  implements types.Instrumentation {
   private _modules: InstrumentationModuleDefinition<T>[];
   private _hooks: RequireInTheMiddle.Hooked[] = [];
   private _enabled = false;
@@ -37,7 +37,7 @@ export abstract class Instrumentation<T = any>
   constructor(
     instrumentationName: string,
     instrumentationVersion: string,
-    config: api.InstrumentationConfig = {}
+    config: types.InstrumentationConfig = {}
   ) {
     super(instrumentationName, instrumentationVersion, config);
 

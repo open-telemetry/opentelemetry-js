@@ -35,7 +35,6 @@ export * from './metrics/ObserverResult';
 export * from './trace/attributes';
 export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
-export * from './trace/instrumentation/Instrumentation';
 export * from './trace/link_context';
 export * from './trace/link';
 export * from './trace/NoopLogger';
