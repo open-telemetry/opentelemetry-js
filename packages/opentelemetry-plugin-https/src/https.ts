@@ -69,7 +69,7 @@ export class HttpsPlugin extends HttpPlugin {
       shimmer.wrap(
         this._moduleExports,
         'get',
-        this._getPatchHttpsOutgoingGetFunction(https.request)
+        this._getPatchHttpsOutgoingGetFunction(this._moduleExports.request)
       );
     }
 
