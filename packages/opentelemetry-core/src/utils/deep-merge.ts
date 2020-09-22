@@ -36,7 +36,9 @@ export function deepMerge(
     if (bothPropsAreObjects(target, source, prop)) {
       if (bothPropsAreArrays(target, source, prop)) {
         merged[prop] = value;
-      } else merged[prop] = deepMerge(target[prop], value, maxDepth - 1);
+      } else {
+        merged[prop] = deepMerge(target[prop], value, maxDepth - 1);
+      }
     } else {
       merged[prop] = value;
     }
