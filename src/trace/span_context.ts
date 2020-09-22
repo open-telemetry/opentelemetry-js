@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { TraceFlags } from './trace_flags';
 import { TraceState } from './trace_state';
 
 /**
@@ -47,9 +46,9 @@ export interface SpanContext {
    * caller may have recorded trace data. A caller who does not record trace
    * data out-of-band leaves this flag unset.
    *
-   * SAMPLED = 0x1 and NONE = 0x0;
+   * see {@link TraceFlags} for valid flag values.
    */
-  traceFlags: TraceFlags;
+  traceFlags: number;
   /**
    * Tracing-system-specific info to propagate.
    *
