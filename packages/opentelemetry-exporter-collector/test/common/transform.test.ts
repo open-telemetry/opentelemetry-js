@@ -63,62 +63,6 @@ describe('transform', () => {
         { key: 'foo', value: { doubleValue: 1.34 } },
       ]);
     });
-    it('should convert attribute mixed with maps and array', () => {
-      const attributes: Attributes = {
-        foo: [
-          0,
-          1,
-          2.25,
-          'otel',
-          {
-            foo: 'bar',
-            baz: 'json',
-            array: [1, 2, 'boom'],
-          },
-        ],
-      };
-      assert.deepStrictEqual(transform.toCollectorAttributes(attributes), [
-        {
-          key: 'foo',
-          value: {
-            arrayValue: {
-              values: [
-                { doubleValue: 0 },
-                { doubleValue: 1 },
-                { doubleValue: 2.25 },
-                { stringValue: 'otel' },
-                {
-                  kvlistValue: {
-                    values: [
-                      {
-                        key: 'foo',
-                        value: { stringValue: 'bar' },
-                      },
-                      {
-                        key: 'baz',
-                        value: { stringValue: 'json' },
-                      },
-                      {
-                        key: 'array',
-                        value: {
-                          arrayValue: {
-                            values: [
-                              { doubleValue: 1 },
-                              { doubleValue: 2 },
-                              { stringValue: 'boom' },
-                            ],
-                          },
-                        },
-                      },
-                    ],
-                  },
-                },
-              ],
-            },
-          },
-        },
-      ]);
-    });
   });
 
   describe('toCollectorEvents', () => {
