@@ -34,7 +34,6 @@ export function deepMerge(
   }
   for (const [prop, value] of Object.entries(source)) {
     if (bothPropsAreArrays(target, source, prop)) {
-      merged[prop] = [];
       merged[prop] = value;
     } else if (bothPropsAreObjects(target, source, prop)) {
       merged[prop] = deepMerge(target[prop], value, maxDepth - 1);
