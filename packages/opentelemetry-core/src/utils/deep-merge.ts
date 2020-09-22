@@ -33,10 +33,10 @@ export function deepMerge(
     throw new Error('Max depth exceeded.');
   }
   for (const [prop, value] of Object.entries(source)) {
-    if (bothPropsAreArrays(target, source, prop)) {
-      merged[prop] = value;
-    } else if (bothPropsAreObjects(target, source, prop)) {
-      merged[prop] = deepMerge(target[prop], value, maxDepth - 1);
+    if (bothPropsAreObjects(target, source, prop)) {
+      if (bothPropsAreArrays(target, source, prop)) {
+        merged[prop] = value;
+      } else merged[prop] = deepMerge(target[prop], value, maxDepth - 1);
     } else {
       merged[prop] = value;
     }
