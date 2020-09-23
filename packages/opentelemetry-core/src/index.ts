@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './common/attributes';
 export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
 export * from './common/time';

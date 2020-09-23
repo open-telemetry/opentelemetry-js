@@ -18,14 +18,14 @@ import 'zone.js';
 import * as sinon from 'sinon';
 import * as assert from 'assert';
 import { ZoneContextManager } from '../src';
-import { Context } from '@opentelemetry/context-base';
+import { ROOT_CONTEXT, createContextKey } from '@opentelemetry/context-base';
 
 let clock: any;
 
 describe('ZoneContextManager', () => {
   let contextManager: ZoneContextManager;
-  const key1 = Context.createKey('test key 1');
-  const key2 = Context.createKey('test key 2');
+  const key1 = createContextKey('test key 1');
+  const key2 = createContextKey('test key 2');
 
   beforeEach(() => {
     clock = sinon.useFakeTimers();
@@ -40,7 +40,7 @@ describe('ZoneContextManager', () => {
 
   describe('.enable()', () => {
     it('should work', () => {
-      const ctx = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const ctx = ROOT_CONTEXT.setValue(key1, 1);
       assert.doesNotThrow(() => {
         assert(
           contextManager.enable() === contextManager,
@@ -55,7 +55,7 @@ describe('ZoneContextManager', () => {
 
   describe('.disable()', () => {
     it('should work', () => {
-      const ctx = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const ctx = ROOT_CONTEXT.setValue(key1, 1);
       assert.doesNotThrow(() => {
         assert(
           contextManager.disable() === contextManager,
@@ -63,7 +63,7 @@ describe('ZoneContextManager', () => {
         );
         contextManager.with(ctx, () => {
           assert(
-            contextManager.active() === Context.ROOT_CONTEXT,
+            contextManager.active() === ROOT_CONTEXT,
             'should have root context'
           );
         });
@@ -77,7 +77,7 @@ describe('ZoneContextManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const test = ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
         assert.strictEqual(
           contextManager.active(),
@@ -106,9 +106,9 @@ describe('ZoneContextManager', () => {
     });
 
     it('should finally restore an old context, including the async task', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 'ctx1');
-      const ctx2 = Context.ROOT_CONTEXT.setValue(key1, 'ctx2');
-      const ctx3 = Context.ROOT_CONTEXT.setValue(key1, 'ctx3');
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 'ctx1');
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 'ctx2');
+      const ctx3 = ROOT_CONTEXT.setValue(key1, 'ctx3');
 
       contextManager.with(ctx1, () => {
         assert.strictEqual(contextManager.active(), ctx1);
@@ -130,9 +130,9 @@ describe('ZoneContextManager', () => {
     });
 
     it('should finally restore an old context when context is an object, including the async task', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 1);
-      const ctx2 = Context.ROOT_CONTEXT.setValue(key1, 2);
-      const ctx3 = Context.ROOT_CONTEXT.setValue(key1, 3);
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 2);
+      const ctx3 = ROOT_CONTEXT.setValue(key1, 3);
       contextManager.with(ctx1, () => {
         assert.strictEqual(contextManager.active(), ctx1);
         contextManager.with(ctx2, () => {
@@ -152,24 +152,15 @@ describe('ZoneContextManager', () => {
       assert.strictEqual(contextManager.active(), window);
     });
     it('should correctly return the contexts for 3 parallel actions', () => {
-      const rootSpan = Context.ROOT_CONTEXT.setValue(key1, 'root');
+      const rootSpan = ROOT_CONTEXT.setValue(key1, 'root');
       contextManager.with(rootSpan, () => {
         assert.ok(
           contextManager.active().getValue(key1) === 'root',
           'Current span is rootSpan'
         );
-        const concurrentSpan1 = Context.ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan1'
-        );
-        const concurrentSpan2 = Context.ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan2'
-        );
-        const concurrentSpan3 = Context.ROOT_CONTEXT.setValue(
-          key2,
-          'concurrentSpan3'
-        );
+        const concurrentSpan1 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan1');
+        const concurrentSpan2 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan2');
+        const concurrentSpan3 = ROOT_CONTEXT.setValue(key2, 'concurrentSpan3');
 
         contextManager.with(concurrentSpan1, () => {
           setTimeout(() => {
@@ -201,7 +192,7 @@ describe('ZoneContextManager', () => {
     });
 
     it('should fork new zone from active one', () => {
-      const context = Context.ROOT_CONTEXT;
+      const context = ROOT_CONTEXT;
       const rootZone = Zone.current;
       contextManager.with(context, () => {
         const zone1 = Zone.current;
@@ -233,7 +224,7 @@ describe('ZoneContextManager', () => {
       }
 
       const obj1 = new Obj('a1');
-      const ctx = Context.ROOT_CONTEXT.setValue(key1, obj1);
+      const ctx = ROOT_CONTEXT.setValue(key1, obj1);
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
       const wrapper: any = contextManager.bind(obj2.getTitle, ctx);
@@ -242,24 +233,18 @@ describe('ZoneContextManager', () => {
 
     it('should return the same target (when enabled)', () => {
       const test = { a: 1 };
-      assert.deepStrictEqual(
-        contextManager.bind(test, Context.ROOT_CONTEXT),
-        test
-      );
+      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
       const test = { a: 1 };
-      assert.deepStrictEqual(
-        contextManager.bind(test, Context.ROOT_CONTEXT),
-        test
-      );
+      assert.deepStrictEqual(contextManager.bind(test, ROOT_CONTEXT), test);
       contextManager.enable();
     });
 
     it('should return current context (when enabled)', done => {
-      const context = Context.ROOT_CONTEXT.setValue(key1, { a: 1 });
+      const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
       const fn: any = contextManager.bind(() => {
         assert.strictEqual(
           contextManager.active(),
@@ -273,11 +258,11 @@ describe('ZoneContextManager', () => {
 
     it('should return root context (when disabled)', done => {
       contextManager.disable();
-      const context = Context.ROOT_CONTEXT.setValue(key1, { a: 1 });
+      const context = ROOT_CONTEXT.setValue(key1, { a: 1 });
       const fn: any = contextManager.bind(() => {
         assert.strictEqual(
           contextManager.active(),
-          Context.ROOT_CONTEXT,
+          ROOT_CONTEXT,
           'should have context'
         );
         return done();
@@ -286,7 +271,7 @@ describe('ZoneContextManager', () => {
     });
 
     it('should bind the the certain context to the target "addEventListener" function', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
       contextManager.bind(element, ctx1);
@@ -310,7 +295,7 @@ describe('ZoneContextManager', () => {
     });
 
     it('should preserve zone when creating new click event inside zone', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
       const element = document.createElement('div');
 
       contextManager.bind(element, ctx1);

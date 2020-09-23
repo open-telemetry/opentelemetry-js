@@ -71,8 +71,8 @@ export function ensureSpanIsCorrect(span: Span) {
       component: 'foo',
       'ot.status_code': 'OK',
       service: 'ui',
-      version: 1,
-      cost: 112.12,
+      version: '1',
+      cost: '112.12',
     },
   });
 }
