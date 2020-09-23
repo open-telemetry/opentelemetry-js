@@ -211,9 +211,9 @@ describe('transform', () => {
         key1: 'value1',
         key2: 'value2',
         [statusCodeTagName]: 'OK',
-        cost: 112.12,
+        cost: '112.12',
         service: 'ui',
-        version: 1,
+        version: '1',
       });
     });
     it('should map OpenTelemetry Status.code to a Zipkin tag', () => {

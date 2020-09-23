@@ -197,7 +197,7 @@ describe('OpenTracing Shim', () => {
       const payload = { user: 'payload', request: 1 };
       span.logEvent('some log', payload);
       assert.strictEqual(otSpan.events[0].name, 'some log');
-      assert.deepStrictEqual(otSpan.events[0].attributes, { payload });
+      assert.deepStrictEqual(otSpan.events[0].attributes, payload);
     });
 
     it('updates the name', () => {

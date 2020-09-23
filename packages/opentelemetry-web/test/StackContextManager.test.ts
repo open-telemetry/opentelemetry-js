@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+import { createContextKey, ROOT_CONTEXT } from '@opentelemetry/api';
 import * as assert from 'assert';
 import { StackContextManager } from '../src';
-import { Context } from '@opentelemetry/api';
 
 describe('StackContextManager', () => {
   let contextManager: StackContextManager;
-  const key1 = Context.createKey('test key 1');
+  const key1 = createContextKey('test key 1');
 
   beforeEach(() => {
     contextManager = new StackContextManager();
@@ -39,7 +39,7 @@ describe('StackContextManager', () => {
           'should return this'
         );
         assert(
-          contextManager.active() === Context.ROOT_CONTEXT,
+          contextManager.active() === ROOT_CONTEXT,
           'should have root context'
         );
       });
@@ -54,7 +54,7 @@ describe('StackContextManager', () => {
           'should return this'
         );
         assert(
-          contextManager.active() === Context.ROOT_CONTEXT,
+          contextManager.active() === ROOT_CONTEXT,
           'should have no context'
         );
       });
@@ -67,7 +67,7 @@ describe('StackContextManager', () => {
     });
 
     it('should run the callback (object as target)', done => {
-      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const test = ROOT_CONTEXT.setValue(key1, 1);
       contextManager.with(test, () => {
         assert.strictEqual(
           contextManager.active(),
@@ -96,9 +96,9 @@ describe('StackContextManager', () => {
     });
 
     it('should finally restore an old context', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 'ctx1');
-      const ctx2 = Context.ROOT_CONTEXT.setValue(key1, 'ctx2');
-      const ctx3 = Context.ROOT_CONTEXT.setValue(key1, 'ctx3');
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 'ctx1');
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 'ctx2');
+      const ctx3 = ROOT_CONTEXT.setValue(key1, 'ctx3');
       contextManager.with(ctx1, () => {
         assert.strictEqual(contextManager.active(), ctx1);
         contextManager.with(ctx2, () => {
@@ -115,9 +115,9 @@ describe('StackContextManager', () => {
     });
 
     it('should finally restore an old context when context is an object', done => {
-      const ctx1 = Context.ROOT_CONTEXT.setValue(key1, 1);
-      const ctx2 = Context.ROOT_CONTEXT.setValue(key1, 2);
-      const ctx3 = Context.ROOT_CONTEXT.setValue(key1, 3);
+      const ctx1 = ROOT_CONTEXT.setValue(key1, 1);
+      const ctx2 = ROOT_CONTEXT.setValue(key1, 2);
+      const ctx3 = ROOT_CONTEXT.setValue(key1, 3);
       contextManager.with(ctx1, () => {
         assert.strictEqual(contextManager.active(), ctx1);
         contextManager.with(ctx2, () => {
@@ -149,7 +149,7 @@ describe('StackContextManager', () => {
       }
 
       const obj1 = new Obj('a1');
-      const ctx = Context.ROOT_CONTEXT.setValue(key1, obj1);
+      const ctx = ROOT_CONTEXT.setValue(key1, obj1);
       obj1.title = 'a2';
       const obj2 = new Obj('b1');
       const wrapper: any = contextManager.bind(obj2.getTitle, ctx);
@@ -157,19 +157,19 @@ describe('StackContextManager', () => {
     });
 
     it('should return the same target (when enabled)', () => {
-      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const test = ROOT_CONTEXT.setValue(key1, 1);
       assert.deepStrictEqual(contextManager.bind(test), test);
     });
 
     it('should return the same target (when disabled)', () => {
       contextManager.disable();
-      const test = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const test = ROOT_CONTEXT.setValue(key1, 1);
       assert.deepStrictEqual(contextManager.bind(test), test);
       contextManager.enable();
     });
 
     it('should return current context (when enabled)', done => {
-      const context = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const context = ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(() => {
         assert.strictEqual(
           contextManager.active(),
@@ -183,7 +183,7 @@ describe('StackContextManager', () => {
 
     it('should return current context (when disabled)', done => {
       contextManager.disable();
-      const context = Context.ROOT_CONTEXT.setValue(key1, 1);
+      const context = ROOT_CONTEXT.setValue(key1, 1);
       const fn: any = contextManager.bind(() => {
         assert.strictEqual(
           contextManager.active(),
