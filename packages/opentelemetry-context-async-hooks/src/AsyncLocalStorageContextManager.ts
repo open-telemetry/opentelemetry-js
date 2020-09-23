@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Context } from '@opentelemetry/context-base';
+import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
 import { AsyncLocalStorage } from 'async_hooks';
 import { AbstractAsyncHooksContextManager } from './AbstractAsyncHooksContextManager';
 
@@ -27,7 +27,7 @@ export class AsyncLocalStorageContextManager extends AbstractAsyncHooksContextMa
   }
 
   active(): Context {
-    return this._asyncLocalStorage.getStore() ?? Context.ROOT_CONTEXT;
+    return this._asyncLocalStorage.getStore() ?? ROOT_CONTEXT;
   }
 
   with<T extends (...args: unknown[]) => ReturnType<T>>(

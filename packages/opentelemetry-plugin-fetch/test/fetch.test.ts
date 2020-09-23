@@ -76,14 +76,14 @@ function createResource(resource = {}): PerformanceResourceTiming {
   ) as PerformanceResourceTiming;
 }
 
-function createMasterResource(resource = {}): PerformanceResourceTiming {
-  const masterResource: any = createResource(resource);
-  Object.keys(masterResource).forEach((key: string) => {
-    if (typeof masterResource[key] === 'number') {
-      masterResource[key] = masterResource[key] + 30;
+function createMainResource(resource = {}): PerformanceResourceTiming {
+  const mainResource: any = createResource(resource);
+  Object.keys(mainResource).forEach((key: string) => {
+    if (typeof mainResource[key] === 'number') {
+      mainResource[key] = mainResource[key] + 30;
     }
   });
-  return masterResource;
+  return mainResource;
 }
 
 describe('fetch', () => {
@@ -150,7 +150,7 @@ describe('fetch', () => {
       createResource({
         name: fileUrl,
       }),
-      createMasterResource({
+      createMainResource({
         name: fileUrl,
       })
     );

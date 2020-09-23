@@ -25,7 +25,7 @@ $ npm install \
     @opentelemetry/plugin-http # add plugins as needed
 
 $ # or install all officially supported core and contrib plugins
-$ npm install @opentelemetry/plugins-node-all
+$ npm install @opentelemetry/plugins-node-core-and-contrib
 ```
 
 > Note: this example is for Node.js. See [examples/tracer-web](https://github.com/open-telemetry/opentelemetry-js/tree/master/examples/tracer-web) for a browser example.
@@ -62,6 +62,18 @@ sdk
   .then(() => {
     // Resources have been detected and SDK is started
   })
+
+// You can also use the shutdown method to gracefully shut down the SDK before process shutdown
+// or on some operating system signal.
+const process = require("process");
+process.on("SIGTERM", () => {
+  sdk.shutdown()
+    .then(
+      () => console.log("SDK shut down successfully"),
+      (err) => console.log("Error shutting down SDK", err),
+    )
+    .finally(() => process.exit(0))
+});
 ```
 
 ## Configuration
