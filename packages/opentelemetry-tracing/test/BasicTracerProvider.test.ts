@@ -14,8 +14,13 @@
  * limitations under the License.
  */
 
-import { Context, context, SpanContext, TraceFlags } from '@opentelemetry/api';
-import { ContextManager } from '@opentelemetry/context-base';
+import {
+  context,
+  SpanContext,
+  TraceFlags,
+  ContextManager,
+  ROOT_CONTEXT,
+} from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
@@ -24,8 +29,6 @@ import {
   setActiveSpan,
   setExtractedSpanContext,
   TraceState,
-  notifyOnGlobalShutdown,
-  _invokeGlobalShutdown,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import * as assert from 'assert';
@@ -177,7 +180,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(Context.ROOT_CONTEXT, {
+        setExtractedSpanContext(ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92',
           traceFlags: TraceFlags.SAMPLED,
@@ -198,7 +201,7 @@ describe('BasicTracerProvider', () => {
       const childSpan = tracer.startSpan(
         'child-span',
         {},
-        setActiveSpan(Context.ROOT_CONTEXT, span)
+        setActiveSpan(ROOT_CONTEXT, span)
       );
       const context = childSpan.context();
       assert.strictEqual(context.traceId, span.context().traceId);
@@ -216,7 +219,7 @@ describe('BasicTracerProvider', () => {
         {
           parent: overrideParent,
         },
-        setActiveSpan(Context.ROOT_CONTEXT, span)
+        setActiveSpan(ROOT_CONTEXT, span)
       );
       const context = childSpan.context();
       assert.strictEqual(context.traceId, overrideParent.context().traceId);
@@ -234,7 +237,7 @@ describe('BasicTracerProvider', () => {
         {
           parent: overrideParent.context(),
         },
-        setActiveSpan(Context.ROOT_CONTEXT, span)
+        setActiveSpan(ROOT_CONTEXT, span)
       );
       const context = childSpan.context();
       assert.strictEqual(context.traceId, overrideParent.context().traceId);
@@ -250,7 +253,7 @@ describe('BasicTracerProvider', () => {
       const rootSpan = tracer.startSpan(
         'root-span',
         { parent: null },
-        setActiveSpan(Context.ROOT_CONTEXT, span)
+        setActiveSpan(ROOT_CONTEXT, span)
       );
       const context = rootSpan.context();
       assert.notStrictEqual(context.traceId, overrideParent.context().traceId);
@@ -264,7 +267,7 @@ describe('BasicTracerProvider', () => {
         'my-span',
         {},
         setExtractedSpanContext(
-          Context.ROOT_CONTEXT,
+          ROOT_CONTEXT,
           ('invalid-parent' as unknown) as SpanContext
         )
       );
@@ -277,7 +280,7 @@ describe('BasicTracerProvider', () => {
       const span = tracer.startSpan(
         'my-span',
         {},
-        setExtractedSpanContext(Context.ROOT_CONTEXT, {
+        setExtractedSpanContext(ROOT_CONTEXT, {
           traceId: '0',
           spanId: '0',
           traceFlags: TraceFlags.SAMPLED,
@@ -327,8 +330,7 @@ describe('BasicTracerProvider', () => {
   describe('.getCurrentSpan()', () => {
     it('should return current span when it exists', () => {
       context.setGlobalContextManager({
-        active: () =>
-          setActiveSpan(Context.ROOT_CONTEXT, ('foo' as any) as Span),
+        active: () => setActiveSpan(ROOT_CONTEXT, ('foo' as any) as Span),
         disable: () => {},
       } as ContextManager);
 
@@ -369,18 +371,6 @@ describe('BasicTracerProvider', () => {
   });
 
   describe('.shutdown()', () => {
-    it('should trigger shutdown when SIGTERM is recieved', () => {
-      const tracerProvider = new BasicTracerProvider();
-      const shutdownStub = sandbox.stub(
-        tracerProvider.getActiveSpanProcessor(),
-        'shutdown'
-      );
-      removeEvent = notifyOnGlobalShutdown(() => {
-        sinon.assert.calledOnce(shutdownStub);
-      });
-      _invokeGlobalShutdown();
-    });
-
     it('should trigger shutdown when manually invoked', () => {
       const tracerProvider = new BasicTracerProvider();
       const shutdownStub = sandbox.stub(
@@ -389,21 +379,6 @@ describe('BasicTracerProvider', () => {
       );
       tracerProvider.shutdown();
       sinon.assert.calledOnce(shutdownStub);
-    });
-
-    it('should not trigger shutdown if graceful shutdown is turned off', () => {
-      const tracerProvider = new BasicTracerProvider({
-        gracefulShutdown: false,
-      });
-      const sandbox = sinon.createSandbox();
-      const shutdownStub = sandbox.stub(
-        tracerProvider.getActiveSpanProcessor(),
-        'shutdown'
-      );
-      removeEvent = notifyOnGlobalShutdown(() => {
-        sinon.assert.notCalled(shutdownStub);
-      });
-      _invokeGlobalShutdown();
     });
   });
 });

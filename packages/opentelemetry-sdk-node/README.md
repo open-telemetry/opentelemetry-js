@@ -62,6 +62,18 @@ sdk
   .then(() => {
     // Resources have been detected and SDK is started
   })
+
+// You can also use the shutdown method to gracefully shut down the SDK before process shutdown
+// or on some operating system signal.
+const process = require("process");
+process.on("SIGTERM", () => {
+  sdk.shutdown()
+    .then(
+      () => console.log("SDK shut down successfully"),
+      (err) => console.log("Error shutting down SDK", err),
+    )
+    .finally(() => process.exit(0))
+});
 ```
 
 ## Configuration

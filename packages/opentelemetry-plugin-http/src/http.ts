@@ -29,10 +29,9 @@ import {
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
-import {
+import type {
   ClientRequest,
   IncomingMessage,
-  request,
   RequestOptions,
   ServerResponse,
 } from 'http';
@@ -95,7 +94,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       shimmer.wrap(
         this._moduleExports,
         'get',
-        this._getPatchOutgoingGetFunction(request)
+        this._getPatchOutgoingGetFunction(this._moduleExports.request)
       );
     }
 

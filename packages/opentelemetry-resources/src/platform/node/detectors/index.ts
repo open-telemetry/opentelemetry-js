@@ -15,3 +15,4 @@
  */
 
 export * from './EnvDetector';
+export * from './ProcessDetector';
