@@ -66,11 +66,13 @@ describe('assertContainerResource', () => {
   it('validates optional attributes', () => {
     const resource = new Resource({
       [CONTAINER_RESOURCE.NAME]: 'opentelemetry-autoconf',
+      [CONTAINER_RESOURCE.ID]: 'abc',
       [CONTAINER_RESOURCE.IMAGE_NAME]: 'gcr.io/opentelemetry/operator',
       [CONTAINER_RESOURCE.IMAGE_TAG]: '0.1',
     });
     assertContainerResource(resource, {
       name: 'opentelemetry-autoconf',
+      id: 'abc',
       imageName: 'gcr.io/opentelemetry/operator',
       imageTag: '0.1',
     });
