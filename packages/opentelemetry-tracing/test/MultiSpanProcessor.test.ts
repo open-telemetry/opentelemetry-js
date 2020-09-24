@@ -23,10 +23,6 @@ import {
   Span,
   SpanProcessor,
 } from '../src';
-import {
-  notifyOnGlobalShutdown,
-  _invokeGlobalShutdown,
-} from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
@@ -99,29 +95,6 @@ describe('MultiSpanProcessor', () => {
     assert.strictEqual(processor1.spans.length, processor2.spans.length);
   });
 
-  it('should export spans on graceful shutdown from two span processor', () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    span.end();
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    removeEvent = notifyOnGlobalShutdown(() => {
-      assert.strictEqual(processor1.spans.length, 0);
-      assert.strictEqual(processor1.spans.length, processor2.spans.length);
-    });
-    _invokeGlobalShutdown();
-  });
-
   it('should export spans on manual shutdown from two span processor', () => {
     const processor1 = new TestProcessor();
     const processor2 = new TestProcessor();
@@ -142,29 +115,6 @@ describe('MultiSpanProcessor', () => {
       assert.strictEqual(processor1.spans.length, 0);
       assert.strictEqual(processor1.spans.length, processor2.spans.length);
     });
-  });
-
-  it('should export spans on graceful shutdown from two span processor', () => {
-    const processor1 = new TestProcessor();
-    const processor2 = new TestProcessor();
-    const multiSpanProcessor = new MultiSpanProcessor([processor1, processor2]);
-
-    const tracerProvider = new BasicTracerProvider();
-    tracerProvider.addSpanProcessor(multiSpanProcessor);
-    const tracer = tracerProvider.getTracer('default');
-    const span = tracer.startSpan('one');
-    assert.strictEqual(processor1.spans.length, 0);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    span.end();
-    assert.strictEqual(processor1.spans.length, 1);
-    assert.strictEqual(processor1.spans.length, processor2.spans.length);
-
-    removeEvent = notifyOnGlobalShutdown(() => {
-      assert.strictEqual(processor1.spans.length, 0);
-      assert.strictEqual(processor1.spans.length, processor2.spans.length);
-    });
-    _invokeGlobalShutdown();
   });
 
   it('should export spans on manual shutdown from two span processor', () => {

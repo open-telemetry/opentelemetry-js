@@ -15,10 +15,10 @@
  */
 
 import { Exception } from '../common/Exception';
-import { Attributes } from './attributes';
+import { TimeInput } from '../common/Time';
+import { Attributes, AttributeValue } from './attributes';
 import { SpanContext } from './span_context';
 import { Status } from './status';
-import { TimeInput } from '../common/Time';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -49,7 +49,7 @@ export interface Span {
    * @param key the key for this attribute.
    * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: unknown): this;
+  setAttribute(key: string, value: AttributeValue): this;
 
   /**
    * Sets attributes to the span.

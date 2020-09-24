@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export * from './common/attributes';
 export * from './common/ConsoleLogger';
 export * from './common/NoopLogger';
 export * from './common/time';
@@ -35,5 +36,6 @@ export * from './trace/sampler/ParentOrElseSampler';
 export * from './trace/sampler/ProbabilitySampler';
 export * from './trace/TraceState';
 export * from './trace/IdGenerator';
+export * from './utils/deep-merge';
 export * from './utils/url';
 export * from './utils/wrap';

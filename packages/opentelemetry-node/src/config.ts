@@ -40,4 +40,5 @@ export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   express: { enabled: true, path: '@opentelemetry/plugin-express' },
   '@hapi/hapi': { enabled: true, path: '@opentelemetry/hapi-instrumentation' },
   koa: { enabled: true, path: '@opentelemetry/koa-instrumentation' },
+  dns: { enabled: true, path: '@opentelemetry/plugin-dns' },
 };
