@@ -20,11 +20,12 @@ import {
   getActiveSpan,
   getParentSpanContext,
   InstrumentationLibrary,
-  isValid,
   NoRecordingSpan,
   IdGenerator,
   RandomIdGenerator,
   setActiveSpan,
+  isInstrumentationSuppressed,
+  sanitizeAttributes,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 import { BasicTracerProvider } from './BasicTracerProvider';
@@ -69,11 +70,16 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
+    if (isInstrumentationSuppressed(context)) {
+      this.logger.debug('Instrumentation suppressed, returning Noop Span');
+      return api.NOOP_SPAN;
+    }
+
     const parentContext = getParent(options, context);
     const spanId = this._idGenerator.generateSpanId();
     let traceId;
     let traceState;
-    if (!parentContext || !isValid(parentContext)) {
+    if (!parentContext || !api.trace.isSpanContextValid(parentContext)) {
       // New root span.
       traceId = this._idGenerator.generateTraceId();
     } else {
@@ -81,9 +87,10 @@ export class Tracer implements api.Tracer {
       traceId = parentContext.traceId;
       traceState = parentContext.traceState;
     }
+
     const spanKind = options.kind ?? api.SpanKind.INTERNAL;
     const links = options.links ?? [];
-    const attributes = options.attributes ?? {};
+    const attributes = sanitizeAttributes(options.attributes);
     // make sampling decision
     const samplingResult = this._sampler.shouldSample(
       parentContext,

@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-import { Attributes } from './attributes';
+import { Exception } from '../common/Exception';
+import { TimeInput } from '../common/Time';
+import { Attributes, AttributeValue } from './attributes';
 import { SpanContext } from './span_context';
 import { Status } from './status';
-import { TimeInput } from '../common/Time';
 
 /**
  * An interface that represents a span. A span represents a single operation
@@ -48,7 +49,7 @@ export interface Span {
    * @param key the key for this attribute.
    * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: unknown): this;
+  setAttribute(key: string, value: AttributeValue): this;
 
   /**
    * Sets attributes to the span.
@@ -114,4 +115,12 @@ export interface Span {
    *     with the `AddEvent` operation and attributes using `setAttributes`.
    */
   isRecording(): boolean;
+
+  /**
+   * Sets exception as a span event
+   * @param exception the exception the only accepted values are string or Error
+   * @param [time] the time to set as Span's event time. If not provided,
+   *     use the current time.
+   */
+  recordException(exception: Exception, time?: TimeInput): void;
 }

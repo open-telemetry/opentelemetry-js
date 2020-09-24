@@ -15,8 +15,6 @@
  */
 
 import { Resource } from '../../Resource';
-import { envDetector, awsEc2Detector, gcpDetector } from './detectors';
-import { Detector } from '../../types';
 import {
   ResourceDetectionConfig,
   ResourceDetectionConfigWithLogger,
@@ -24,8 +22,6 @@ import {
 import { Logger } from '@opentelemetry/api';
 import * as util from 'util';
 import { NoopLogger } from '@opentelemetry/core';
-
-const DETECTORS: Array<Detector> = [envDetector, awsEc2Detector, gcpDetector];
 
 /**
  * Runs all resource detectors and returns the results merged into a single
@@ -44,10 +40,13 @@ export const detectResources = async (
   );
 
   const resources: Array<Resource> = await Promise.all(
-    DETECTORS.map(d => {
+    (internalConfig.detectors || []).map(async d => {
       try {
-        return d.detect(internalConfig);
-      } catch {
+        const resource = await d.detect(internalConfig);
+        config.logger?.debug(`${d.constructor.name} found resource.`, resource);
+        return resource;
+      } catch (e) {
+        config.logger?.debug(`${d.constructor.name} failed: ${e.message}`);
         return Resource.empty();
       }
     })
@@ -69,19 +68,15 @@ export const detectResources = async (
  * @param resources The array of {@link Resource} that should be logged. Empty entried will be ignored.
  */
 const logResources = (logger: Logger, resources: Array<Resource>) => {
-  resources.forEach((resource, index) => {
+  resources.forEach(resource => {
     // Print only populated resources
-    if (Object.keys(resource.labels).length > 0) {
-      const resourceDebugString = util.inspect(resource.labels, {
+    if (Object.keys(resource.attributes).length > 0) {
+      const resourceDebugString = util.inspect(resource.attributes, {
         depth: 2,
         breakLength: Infinity,
         sorted: true,
         compact: false,
       });
-      const detectorName = DETECTORS[index].constructor
-        ? DETECTORS[index].constructor.name
-        : 'Unknown detector';
-      logger.debug(`${detectorName} found resource.`);
       logger.debug(resourceDebugString);
     }
   });

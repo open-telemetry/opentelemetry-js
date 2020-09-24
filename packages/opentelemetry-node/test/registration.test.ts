@@ -16,9 +16,10 @@
 
 import {
   context,
-  NoopHttpTextPropagator,
+  NoopTextMapPropagator,
   propagation,
   trace,
+  ProxyTracerProvider,
 } from '@opentelemetry/api';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
@@ -43,14 +44,17 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should register configured implementations', () => {
     const tracerProvider = new NodeTracerProvider();
 
     const contextManager = new NoopContextManager();
-    const propagator = new NoopHttpTextPropagator();
+    const propagator = new NoopTextMapPropagator();
 
     tracerProvider.register({
       contextManager,
@@ -60,7 +64,9 @@ describe('API registration', () => {
     assert.ok(context['_getContextManager']() === contextManager);
     assert.ok(propagation['_getGlobalPropagator']() === propagator);
 
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should skip null context manager', () => {
@@ -74,7 +80,10 @@ describe('API registration', () => {
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 
   it('should skip null propagator', () => {
@@ -84,12 +93,15 @@ describe('API registration', () => {
     });
 
     assert.ok(
-      propagation['_getGlobalPropagator']() instanceof NoopHttpTextPropagator
+      propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
     );
 
     assert.ok(
       context['_getContextManager']() instanceof AsyncHooksContextManager
     );
-    assert.ok(trace.getTracerProvider() === tracerProvider);
+
+    const apiTracerProvider = trace.getTracerProvider();
+    assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
+    assert.ok(apiTracerProvider.getDelegate() === tracerProvider);
   });
 });

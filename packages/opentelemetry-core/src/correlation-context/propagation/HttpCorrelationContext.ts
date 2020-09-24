@@ -18,7 +18,7 @@ import {
   Context,
   CorrelationContext,
   GetterFunction,
-  HttpTextPropagator,
+  TextMapPropagator,
   SetterFunction,
 } from '@opentelemetry/api';
 import {
@@ -49,7 +49,7 @@ type KeyPair = {
  * Based on the Correlation Context specification:
  * https://w3c.github.io/correlation-context/
  */
-export class HttpCorrelationContext implements HttpTextPropagator {
+export class HttpCorrelationContext implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const correlationContext = getCorrelationContext(context);
     if (!correlationContext) return;
@@ -91,13 +91,15 @@ export class HttpCorrelationContext implements HttpTextPropagator {
       return context;
     }
     const pairs = headerValue.split(ITEMS_SEPARATOR);
-    if (pairs.length == 1) return context;
     pairs.forEach(entry => {
       const keyPair = this._parsePairKeyValue(entry);
       if (keyPair) {
         correlationContext[keyPair.key] = { value: keyPair.value };
       }
     });
+    if (Object.entries(correlationContext).length === 0) {
+      return context;
+    }
     return setCorrelationContext(context, correlationContext);
   }
 
@@ -107,7 +109,7 @@ export class HttpCorrelationContext implements HttpTextPropagator {
     const keyPairPart = valueProps.shift();
     if (!keyPairPart) return;
     const keyPair = keyPairPart.split(KEY_PAIR_SEPARATOR);
-    if (keyPair.length <= 1) return;
+    if (keyPair.length != 2) return;
     const key = decodeURIComponent(keyPair[0].trim());
     let value = decodeURIComponent(keyPair[1].trim());
     if (valueProps.length > 0) {

@@ -119,7 +119,7 @@ describe('Packages', () => {
         };
 
         assert.strictEqual(spans.length, 1);
-        assert.ok(span.name.indexOf(`GET ${urlparsed.pathname}`) >= 0);
+        assert.strictEqual(span.name, 'HTTP GET');
 
         switch (name) {
           case 'axios':

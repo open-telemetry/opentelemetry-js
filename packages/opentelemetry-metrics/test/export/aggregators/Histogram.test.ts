@@ -27,9 +27,23 @@ describe('HistogramAggregator', () => {
     });
 
     it('should sort boundaries', () => {
-      const aggregator = new HistogramAggregator([500, 300, 700]);
+      const aggregator = new HistogramAggregator([
+        200,
+        500,
+        300,
+        700,
+        1000,
+        1500,
+      ]);
       const point = aggregator.toPoint().value as Histogram;
-      assert.deepEqual(point.buckets.boundaries, [300, 500, 700]);
+      assert.deepEqual(point.buckets.boundaries, [
+        200,
+        300,
+        500,
+        700,
+        1000,
+        1500,
+      ]);
     });
 
     it('should throw if no boundaries are defined', () => {
@@ -68,6 +82,17 @@ describe('HistogramAggregator', () => {
       const point = aggregator.toPoint().value as Histogram;
       assert.equal(point.count, 1);
       assert.equal(point.sum, 250);
+      assert.equal(point.buckets.counts[0], 0);
+      assert.equal(point.buckets.counts[1], 0);
+      assert.equal(point.buckets.counts[2], 1);
+    });
+
+    it('should update the third bucket since boundaries are inclusive lower bounds', () => {
+      const aggregator = new HistogramAggregator([100, 200]);
+      aggregator.update(200);
+      const point = aggregator.toPoint().value as Histogram;
+      assert.equal(point.count, 1);
+      assert.equal(point.sum, 200);
       assert.equal(point.buckets.counts[0], 0);
       assert.equal(point.buckets.counts[1], 0);
       assert.equal(point.buckets.counts[2], 1);

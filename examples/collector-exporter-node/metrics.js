@@ -1,17 +1,21 @@
 'use strict';
 
+const { ConsoleLogger, LogLevel } = require('@opentelemetry/core');
 const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector');
+// const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-grpc');
+// const { CollectorMetricExporter } = require('@opentelemetry/exporter-collector-proto');
 const { MeterProvider } = require('@opentelemetry/metrics');
 
 const metricExporter = new CollectorMetricExporter({
   serviceName: 'basic-metric-service',
-  // logger: new ConsoleLogger(LogLevel.DEBUG),
+  // url: 'http://localhost:55681/v1/metrics',
+  logger: new ConsoleLogger(LogLevel.DEBUG),
 });
 
 const meter = new MeterProvider({
   exporter: metricExporter,
   interval: 1000,
-}).getMeter('example-prometheus');
+}).getMeter('example-exporter-collector');
 
 const requestCounter = meter.createCounter('requests', {
   description: 'Example of a Counter',

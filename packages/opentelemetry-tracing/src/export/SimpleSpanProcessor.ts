@@ -17,6 +17,8 @@
 import { SpanProcessor } from '../SpanProcessor';
 import { SpanExporter } from './SpanExporter';
 import { ReadableSpan } from './ReadableSpan';
+import { context } from '@opentelemetry/api';
+import { suppressInstrumentation } from '@opentelemetry/core';
 
 /**
  * An implementation of the {@link SpanProcessor} that converts the {@link Span}
@@ -26,11 +28,13 @@ import { ReadableSpan } from './ReadableSpan';
  */
 export class SimpleSpanProcessor implements SpanProcessor {
   constructor(private readonly _exporter: SpanExporter) {}
-  private _isShutdown = false;
 
-  forceFlush(cb: () => void = () => {}): void {
+  private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+
+  forceFlush(): Promise<void> {
     // do nothing as all spans are being exported without waiting
-    setTimeout(cb, 0);
+    return Promise.resolve();
   }
 
   // does nothing.
@@ -40,17 +44,28 @@ export class SimpleSpanProcessor implements SpanProcessor {
     if (this._isShutdown) {
       return;
     }
-    this._exporter.export([span], () => {});
+
+    // prevent downstream exporter calls from generating spans
+    context.with(suppressInstrumentation(context.active()), () => {
+      this._exporter.export([span], () => {});
+    });
   }
 
-  shutdown(cb: () => void = () => {}): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
-      setTimeout(cb, 0);
-      return;
+      return this._shuttingDownPromise;
     }
     this._isShutdown = true;
-
-    this._exporter.shutdown();
-    setTimeout(cb, 0);
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._exporter.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

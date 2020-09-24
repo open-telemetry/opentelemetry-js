@@ -21,7 +21,9 @@ import {
   InMemorySpanExporter,
   SimpleSpanProcessor,
 } from '../../src';
-import { SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
+import { SpanContext, SpanKind, TraceFlags, context } from '@opentelemetry/api';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
+import { TestStackContextManager } from './TestStackContextManager';
 
 describe('SimpleSpanProcessor', () => {
   const provider = new BasicTracerProvider();
@@ -35,7 +37,7 @@ describe('SimpleSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
-    it('should handle span started and ended when SAMPLED', () => {
+    it('should handle span started and ended when SAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -54,11 +56,11 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should handle span started and ended when UNSAMPLED', () => {
+    it('should handle span started and ended when UNSAMPLED', async () => {
       const processor = new SimpleSpanProcessor(exporter);
       const spanContext: SpanContext = {
         traceId: 'a3cda95b652f4a1592b449d5929fda1b',
@@ -77,24 +79,61 @@ describe('SimpleSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
+  });
 
-    describe('force flush', () => {
-      it('should call an async callback when flushing is complete', done => {
+  describe('force flush', () => {
+    describe('when flushing complete', () => {
+      it('should call an async callback', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           done();
         });
       });
+    });
 
-      it('should call an async callback when shutdown is complete', done => {
+    describe('when shutdown is complete', () => {
+      it('should call an async callback', done => {
         const processor = new SimpleSpanProcessor(exporter);
-        processor.shutdown(() => {
+        processor.shutdown().then(() => {
           done();
         });
       });
+    });
+  });
+
+  describe('onEnd', () => {
+    beforeEach(() => {
+      const contextManager = new TestStackContextManager().enable();
+      context.setGlobalContextManager(contextManager);
+    });
+
+    afterEach(() => {
+      context.disable();
+    });
+
+    it('should prevent instrumentation prior to export', () => {
+      const testTracingExporter = new TestTracingSpanExporter();
+      const processor = new SimpleSpanProcessor(testTracingExporter);
+
+      const spanContext: SpanContext = {
+        traceId: 'a3cda95b652f4a1592b449d5929fda1b',
+        spanId: '5e0c63257de34c92',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+      const span = new Span(
+        provider.getTracer('default'),
+        'span-name',
+        spanContext,
+        SpanKind.CLIENT
+      );
+
+      processor.onEnd(span);
+
+      const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+      assert.equal(exporterCreatedSpans.length, 0);
     });
   });
 });

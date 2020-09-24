@@ -1,6 +1,6 @@
 {
   "name": "@opentelemetry/exporter-collector",
-  "version": "0.10.2",
+  "version": "0.11.0",
   "description": "OpenTelemetry Collector Exporter allows user to send collected traces to the OpenTelemetry Collector",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -10,22 +10,19 @@
     "./build/src/platform/index.js": "./build/src/platform/browser/index.js"
   },
   "scripts": {
-    "lint": "eslint . --ext .ts",
-    "lint:fix": "eslint . --ext .ts --fix",
     "clean": "rimraf build/*",
     "codecov:browser": "nyc report --reporter=json && codecov -f coverage/*.json -p ../../",
-    "precompile": "tsc --version",
     "compile": "npm run version:update && tsc -p .",
-    "postcompile": "npm run submodule && npm run protos:copy",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix",
+    "precompile": "tsc --version",
     "prepare": "npm run compile",
-    "protos:copy": "cpx src/platform/node/protos/opentelemetry/**/*.* build/src/platform/node/protos/opentelemetry",
-    "submodule": "git submodule sync --recursive && git submodule update --init --recursive",
     "tdd": "npm run test -- --watch-extensions ts --watch",
     "tdd:browser": "karma start",
     "test": "nyc ts-mocha -p tsconfig.json 'test/**/*.test.ts' --exclude 'test/browser/**/*.ts'",
     "test:browser": "nyc karma start --single-run",
     "version:update": "node ../../scripts/version-update.js",
-    "watch": "npm run protos:copy && tsc -w"
+    "watch": "tsc -w"
   },
   "keywords": [
     "opentelemetry",
@@ -45,7 +42,6 @@
     "build/src/**/*.js",
     "build/src/**/*.js.map",
     "build/src/**/*.d.ts",
-    "build/src/**/*.proto",
     "doc",
     "LICENSE",
     "README.md"
@@ -54,8 +50,8 @@
     "access": "public"
   },
   "devDependencies": {
-    "@babel/core": "7.11.0",
-    "@types/mocha": "8.0.0",
+    "@babel/core": "7.11.1",
+    "@types/mocha": "8.0.2",
     "@types/node": "14.0.27",
     "@types/sinon": "9.0.4",
     "@types/webpack-env": "1.15.2",
@@ -73,23 +69,21 @@
     "mocha": "7.2.0",
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
-    "sinon": "9.0.2",
-    "ts-loader": "8.0.1",
+    "sinon": "9.0.3",
+    "ts-loader": "8.0.2",
     "ts-mocha": "7.0.0",
     "ts-node": "8.10.2",
     "typescript": "3.9.7",
     "webpack": "4.44.1",
     "webpack-cli": "3.3.12",
-    "webpack-merge": "5.0.9"
+    "webpack-merge": "5.1.1"
   },
   "dependencies": {
-    "@grpc/proto-loader": "^0.5.4",
-    "@opentelemetry/api": "^0.10.2",
-    "@opentelemetry/core": "^0.10.2",
-    "@opentelemetry/metrics": "^0.10.2",
-    "@opentelemetry/resources": "^0.10.2",
-    "@opentelemetry/tracing": "^0.10.2",
-    "grpc": "^1.24.2",
-    "protobufjs": "^6.9.0"
+    "@opentelemetry/api": "^0.11.0",
+    "@opentelemetry/core": "^0.11.0",
+    "@opentelemetry/metrics": "^0.11.0",
+    "@opentelemetry/resources": "^0.11.0",
+    "@opentelemetry/tracing": "^0.11.0",
+    "axios": "^0.19.2"
   }
 }

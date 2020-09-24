@@ -39,7 +39,7 @@ export class HistogramAggregator implements HistogramAggregatorType {
     }
     // we need to an ordered set to be able to correctly compute count for each
     // boundary since we'll iterate on each in order.
-    this._boundaries = boundaries.sort();
+    this._boundaries = boundaries.sort((a, b) => a - b);
     this._current = this._newEmptyCheckpoint();
     this._lastUpdateTime = hrTime();
   }

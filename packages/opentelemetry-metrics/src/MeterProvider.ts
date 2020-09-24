@@ -26,6 +26,8 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
 export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  private _isShutdown = false;
   readonly resource: Resource;
   readonly logger: api.Logger;
 
@@ -53,5 +55,32 @@ export class MeterProvider implements api.MeterProvider {
     }
 
     return this._meters.get(key)!;
+  }
+
+  shutdown(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
+    }
+    this._isShutdown = true;
+
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return Promise.all(
+            Array.from(this._meters, ([_, meter]) => meter.shutdown())
+          );
+        })
+        .then(() => {
+          if (this._config.exporter) {
+            return this._config.exporter.shutdown();
+          }
+          return;
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

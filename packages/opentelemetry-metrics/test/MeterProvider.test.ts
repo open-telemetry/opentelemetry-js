@@ -15,6 +15,7 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { MeterProvider, Meter, CounterMetric } from '../src';
 import { NoopLogger } from '@opentelemetry/core';
 
@@ -71,6 +72,27 @@ describe('MeterProvider', () => {
       const meter3 = provider.getMeter('meter2', 'ver2');
       const meter4 = provider.getMeter('meter3', 'ver2');
       assert.notEqual(meter3, meter4);
+    });
+  });
+
+  describe('shutdown()', () => {
+    it('should call shutdown when manually invoked', () => {
+      const meterProvider = new MeterProvider({
+        interval: Math.pow(2, 31) - 1,
+      });
+      const sandbox = sinon.createSandbox();
+      const shutdownStub1 = sandbox.stub(
+        meterProvider.getMeter('meter1'),
+        'shutdown'
+      );
+      const shutdownStub2 = sandbox.stub(
+        meterProvider.getMeter('meter2'),
+        'shutdown'
+      );
+      meterProvider.shutdown().then(() => {
+        sinon.assert.calledOnce(shutdownStub1);
+        sinon.assert.calledOnce(shutdownStub2);
+      });
     });
   });
 });

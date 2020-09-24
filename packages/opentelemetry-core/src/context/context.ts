@@ -14,17 +14,28 @@
  * limitations under the License.
  */
 
-import { Span, SpanContext } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/context-base';
+import {
+  Span,
+  SpanContext,
+  createContextKey,
+  Context,
+} from '@opentelemetry/api';
 
 /**
  * Active span key
  */
-export const ACTIVE_SPAN_KEY = Context.createKey(
+export const ACTIVE_SPAN_KEY = createContextKey(
   'OpenTelemetry Context Key ACTIVE_SPAN'
 );
-const EXTRACTED_SPAN_CONTEXT_KEY = Context.createKey(
+const EXTRACTED_SPAN_CONTEXT_KEY = createContextKey(
   'OpenTelemetry Context Key EXTRACTED_SPAN_CONTEXT'
+);
+/**
+ * Shared key for indicating if instrumentation should be suppressed beyond
+ * this current scope.
+ */
+export const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
+  'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
 );
 
 /**
@@ -83,4 +94,34 @@ export function getParentSpanContext(
   context: Context
 ): SpanContext | undefined {
   return getActiveSpan(context)?.context() || getExtractedSpanContext(context);
+}
+
+/**
+ * Sets value on context to indicate that instrumentation should
+ * be suppressed beyond this current scope.
+ *
+ * @param context context to set the suppress instrumentation value on.
+ */
+export function suppressInstrumentation(context: Context): Context {
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, true);
+}
+
+/**
+ * Sets value on context to indicate that instrumentation should
+ * no-longer be suppressed beyond this current scope.
+ *
+ * @param context context to set the suppress instrumentation value on.
+ */
+export function unsuppressInstrumentation(context: Context): Context {
+  return context.setValue(SUPPRESS_INSTRUMENTATION_KEY, false);
+}
+
+/**
+ * Return current suppress instrumentation value for the given context,
+ * if it exists.
+ *
+ * @param context context check for the suppress instrumentation value.
+ */
+export function isInstrumentationSuppressed(context: Context): boolean {
+  return Boolean(context.getValue(SUPPRESS_INSTRUMENTATION_KEY));
 }

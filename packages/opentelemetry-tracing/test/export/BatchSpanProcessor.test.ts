@@ -23,6 +23,9 @@ import {
   InMemorySpanExporter,
   Span,
 } from '../../src';
+import { context } from '@opentelemetry/api';
+import { TestTracingSpanExporter } from './TestTracingSpanExporter';
+import { TestStackContextManager } from './TestStackContextManager';
 
 function createSampledSpan(spanName: string): Span {
   const tracer = new BasicTracerProvider({
@@ -69,7 +72,7 @@ describe('BatchSpanProcessor', () => {
   });
 
   describe('.onStart/.onEnd/.shutdown', () => {
-    it('should do nothing after processor is shutdown', () => {
+    it('should do nothing after processor is shutdown', async () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       const spy: sinon.SinonSpy = sinon.spy(exporter, 'export') as any;
 
@@ -78,14 +81,14 @@ describe('BatchSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
-      processor.forceFlush();
+      await processor.forceFlush();
       assert.strictEqual(exporter.getFinishedSpans().length, 1);
 
       processor.onEnd(span);
       assert.strictEqual(processor['_finishedSpans'].length, 1);
 
       assert.strictEqual(spy.args.length, 1);
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(spy.args.length, 2);
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
 
@@ -95,7 +98,7 @@ describe('BatchSpanProcessor', () => {
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
-    it('should export the sampled spans with buffer size reached', () => {
+    it('should export the sampled spans with buffer size reached', async () => {
       const processor = new BatchSpanProcessor(exporter, defaultBufferConfig);
       for (let i = 0; i < defaultBufferConfig.bufferSize; i++) {
         const span = createSampledSpan(`${name}_${i}`);
@@ -110,7 +113,7 @@ describe('BatchSpanProcessor', () => {
       processor.onEnd(span);
       assert.strictEqual(exporter.getFinishedSpans().length, 6);
 
-      processor.shutdown();
+      await processor.shutdown();
       assert.strictEqual(exporter.getFinishedSpans().length, 0);
     });
 
@@ -179,14 +182,14 @@ describe('BatchSpanProcessor', () => {
     describe('no waiting spans', () => {
       it('should call an async callback when flushing is complete', done => {
         const processor = new BatchSpanProcessor(exporter);
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           done();
         });
       });
 
       it('should call an async callback when shutdown is complete', done => {
         const processor = new BatchSpanProcessor(exporter);
-        processor.shutdown(() => {
+        processor.shutdown().then(() => {
           done();
         });
       });
@@ -205,7 +208,7 @@ describe('BatchSpanProcessor', () => {
       });
 
       it('should call an async callback when flushing is complete', done => {
-        processor.forceFlush(() => {
+        processor.forceFlush().then(() => {
           assert.strictEqual(exporter.getFinishedSpans().length, 1);
           done();
         });
@@ -214,15 +217,41 @@ describe('BatchSpanProcessor', () => {
       it('should call an async callback when shutdown is complete', done => {
         let exportedSpans = 0;
         sinon.stub(exporter, 'export').callsFake((spans, callback) => {
-          console.log('uh, export?');
           setTimeout(() => {
             exportedSpans = exportedSpans + spans.length;
             callback(ExportResult.SUCCESS);
           }, 0);
         });
 
-        processor.shutdown(() => {
+        processor.shutdown().then(() => {
           assert.strictEqual(exportedSpans, 1);
+          done();
+        });
+      });
+    });
+
+    describe('flushing spans with exporter triggering instrumentation', () => {
+      beforeEach(() => {
+        const contextManager = new TestStackContextManager().enable();
+        context.setGlobalContextManager(contextManager);
+      });
+
+      afterEach(() => {
+        context.disable();
+      });
+
+      it('should prevent instrumentation prior to export', done => {
+        const testTracingExporter = new TestTracingSpanExporter();
+        const processor = new BatchSpanProcessor(testTracingExporter);
+
+        const span = createSampledSpan('test');
+        processor.onStart(span);
+        processor.onEnd(span);
+
+        processor.forceFlush().then(() => {
+          const exporterCreatedSpans = testTracingExporter.getExporterCreatedSpans();
+          assert.equal(exporterCreatedSpans.length, 0);
+
           done();
         });
       });

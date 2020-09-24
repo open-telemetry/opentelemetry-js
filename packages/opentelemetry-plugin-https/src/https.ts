@@ -15,12 +15,11 @@
  */
 
 import { HttpPlugin, Func, HttpRequestArgs } from '@opentelemetry/plugin-http';
-import * as http from 'http';
-import * as https from 'https';
+import type * as http from 'http';
+import type * as https from 'https';
 import { URL } from 'url';
 import * as semver from 'semver';
 import * as shimmer from 'shimmer';
-import * as utils from './utils';
 
 /**
  * Https instrumentation plugin for Opentelemetry
@@ -70,7 +69,7 @@ export class HttpsPlugin extends HttpPlugin {
       shimmer.wrap(
         this._moduleExports,
         'get',
-        this._getPatchHttpsOutgoingGetFunction(https.request)
+        this._getPatchHttpsOutgoingGetFunction(this._moduleExports.request)
       );
     }
 
@@ -88,7 +87,7 @@ export class HttpsPlugin extends HttpPlugin {
         // Makes sure options will have default HTTPS parameters
         if (typeof options === 'object' && !(options instanceof URL)) {
           options = Object.assign({}, options);
-          utils.setDefaultOptions(options as https.RequestOptions);
+          plugin._setDefaultOptions(options);
         }
         return plugin._getPatchOutgoingRequestFunction()(original)(
           options,
@@ -96,6 +95,12 @@ export class HttpsPlugin extends HttpPlugin {
         );
       };
     };
+  }
+
+  private _setDefaultOptions(options: https.RequestOptions) {
+    options.protocol = options.protocol || 'https:';
+    options.port = options.port || 443;
+    options.agent = options.agent || this._moduleExports.globalAgent;
   }
 
   /** Patches HTTPS outgoing get requests */

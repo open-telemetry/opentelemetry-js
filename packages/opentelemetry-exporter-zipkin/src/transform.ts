@@ -74,7 +74,7 @@ export function _toZipkinTags(
   statusDescriptionTagName: string,
   resource: Resource
 ): zipkinTypes.Tags {
-  const tags: { [key: string]: unknown } = {};
+  const tags: { [key: string]: string } = {};
   for (const key of Object.keys(attributes)) {
     tags[key] = String(attributes[key]);
   }
@@ -83,8 +83,8 @@ export function _toZipkinTags(
     tags[statusDescriptionTagName] = status.message;
   }
 
-  Object.keys(resource.labels).forEach(
-    name => (tags[name] = resource.labels[name])
+  Object.keys(resource.attributes).forEach(
+    name => (tags[name] = String(resource.attributes[name]))
   );
 
   return tags;

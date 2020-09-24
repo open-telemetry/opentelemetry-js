@@ -17,7 +17,7 @@
 import {
   Context,
   GetterFunction,
-  HttpTextPropagator,
+  TextMapPropagator,
   SetterFunction,
   SpanContext,
   TraceFlags,
@@ -27,8 +27,14 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';
-const VALID_TRACE_PARENT_REGEX = /^(?!ff)[\da-f]{2}-([\da-f]{32})-([\da-f]{16})-([\da-f]{2})(-|$)/;
+
 const VERSION = '00';
+const VERSION_PART_COUNT = 4; // Version 00 only allows the specific 4 fields.
+
+const VERSION_REGEX = /^(?!ff)[\da-f]{2}$/;
+const TRACE_ID_REGEX = /^(?![0]{32})[\da-f]{32}$/;
+const PARENT_ID_REGEX = /^(?![0]{16})[\da-f]{16}$/;
+const FLAGS_REGEX = /^[\da-f]{2}$/;
 
 /**
  * Parses information from the [traceparent] span tag and converts it into {@link SpanContext}
@@ -41,19 +47,33 @@ const VERSION = '00';
  *     For more information see {@link https://www.w3.org/TR/trace-context/}
  */
 export function parseTraceParent(traceParent: string): SpanContext | null {
-  const match = traceParent.match(VALID_TRACE_PARENT_REGEX);
+  const trimmed = traceParent.trim();
+  const traceParentParts = trimmed.split('-');
+
+  // Current version must be structured correctly.
+  // For future versions, we can grab just the parts we do support.
   if (
-    !match ||
-    match[1] === '00000000000000000000000000000000' ||
-    match[2] === '0000000000000000'
+    traceParentParts[0] === VERSION &&
+    traceParentParts.length !== VERSION_PART_COUNT
   ) {
     return null;
   }
 
+  const [version, traceId, parentId, flags] = traceParentParts;
+  const isValidParent =
+    VERSION_REGEX.test(version) &&
+    TRACE_ID_REGEX.test(traceId) &&
+    PARENT_ID_REGEX.test(parentId) &&
+    FLAGS_REGEX.test(flags);
+
+  if (!isValidParent) {
+    return null;
+  }
+
   return {
-    traceId: match[1],
-    spanId: match[2],
-    traceFlags: parseInt(match[3], 16),
+    traceId: traceId,
+    spanId: parentId,
+    traceFlags: parseInt(flags, 16),
   };
 }
 
@@ -63,7 +83,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * Based on the Trace Context specification:
  * https://www.w3.org/TR/trace-context/
  */
-export class HttpTraceContext implements HttpTextPropagator {
+export class HttpTraceContext implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;

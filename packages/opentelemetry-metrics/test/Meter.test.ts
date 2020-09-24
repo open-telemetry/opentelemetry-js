@@ -41,6 +41,35 @@ import { Resource } from '@opentelemetry/resources';
 import { UpDownSumObserverMetric } from '../src/UpDownSumObserverMetric';
 import { hashLabels } from '../src/Utils';
 import { Batcher } from '../src/export/Batcher';
+import { ValueType } from '@opentelemetry/api';
+
+const nonNumberValues = [
+  // type undefined
+  undefined,
+  // type null
+  null,
+  // type function
+  function () {},
+  // type boolean
+  true,
+  false,
+  // type string
+  '1',
+  // type object
+  {},
+  // type symbol
+  // symbols cannot be cast to number, early errors will be thrown.
+];
+
+if (Number(process.versions.node.match(/^\d+/)) >= 10) {
+  nonNumberValues.push(
+    // type bigint
+    // Preferring BigInt builtin object instead of bigint literal to keep Node.js v8.x working.
+    // TODO: should metric instruments support bigint?
+    // @ts-ignore
+    BigInt(1) // eslint-disable-line node/no-unsupported-features/es-builtins
+  );
+}
 
 describe('Meter', () => {
   let meter: Meter;
@@ -374,6 +403,56 @@ describe('Meter', () => {
         assert.strictEqual(record1.aggregator.toPoint().value, 20);
         assert.strictEqual(boundCounter, boundCounter1);
       });
+
+      it('should truncate non-integer values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.INT,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        [-1.1, 2.2].forEach(val => {
+          boundCounter.add(val);
+        });
+        await meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.strictEqual(record1.aggregator.toPoint().value, 1);
+      });
+
+      it('should ignore non-number values for INT valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundCounter.add(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
+      });
+
+      it('should ignore non-number values for DOUBLE valueType', async () => {
+        const upDownCounter = meter.createUpDownCounter('name', {
+          valueType: ValueType.DOUBLE,
+        });
+        const boundCounter = upDownCounter.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundCounter.add(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.strictEqual(record1.aggregator.toPoint().value, 0);
+          })
+        );
+      });
     });
 
     describe('.unbind()', () => {
@@ -476,31 +555,6 @@ describe('Meter', () => {
       assert.ok(valueRecorder instanceof Metric);
     });
 
-    it('should be absolute by default', () => {
-      const valueRecorder = meter.createValueRecorder('name', {
-        description: 'desc',
-        unit: '1',
-        disabled: false,
-      });
-      assert.strictEqual(
-        (valueRecorder as ValueRecorderMetric)['_absolute'],
-        true
-      );
-    });
-
-    it('should be able to set absolute to false', () => {
-      const valueRecorder = meter.createValueRecorder('name', {
-        description: 'desc',
-        unit: '1',
-        disabled: false,
-        absolute: false,
-      });
-      assert.strictEqual(
-        (valueRecorder as ValueRecorderMetric)['_absolute'],
-        false
-      );
-    });
-
     it('should pipe through resource', async () => {
       const valueRecorder = meter.createValueRecorder(
         'name'
@@ -559,25 +613,6 @@ describe('Meter', () => {
         assert.doesNotThrow(() => boundValueRecorder.record(10));
       });
 
-      it('should not accept negative values by default', async () => {
-        const valueRecorder = meter.createValueRecorder('name');
-        const boundValueRecorder = valueRecorder.bind(labels);
-        boundValueRecorder.record(-10);
-
-        await meter.collect();
-        const [record1] = meter.getBatcher().checkPointSet();
-        assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
-          {
-            count: 0,
-            last: 0,
-            max: -Infinity,
-            min: Infinity,
-            sum: 0,
-          }
-        );
-      });
-
       it('should not set the instrument data when disabled', async () => {
         const valueRecorder = meter.createValueRecorder('name', {
           disabled: true,
@@ -599,35 +634,29 @@ describe('Meter', () => {
         );
       });
 
-      it(
-        'should accept negative (and positive) values when absolute is set' +
-          ' to false',
-        async () => {
-          const valueRecorder = meter.createValueRecorder('name', {
-            absolute: false,
-          });
-          const boundValueRecorder = valueRecorder.bind(labels);
-          boundValueRecorder.record(-10);
-          boundValueRecorder.record(50);
+      it('should accept negative (and positive) values', async () => {
+        const valueRecorder = meter.createValueRecorder('name');
+        const boundValueRecorder = valueRecorder.bind(labels);
+        boundValueRecorder.record(-10);
+        boundValueRecorder.record(50);
 
-          await meter.collect();
-          const [record1] = meter.getBatcher().checkPointSet();
-          assert.deepStrictEqual(
-            record1.aggregator.toPoint().value as Distribution,
-            {
-              count: 2,
-              last: 50,
-              max: 50,
-              min: -10,
-              sum: 40,
-            }
-          );
-          assert.ok(
-            hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
-              hrTimeToNanoseconds(performanceTimeOrigin)
-          );
-        }
-      );
+        await meter.collect();
+        const [record1] = meter.getBatcher().checkPointSet();
+        assert.deepStrictEqual(
+          record1.aggregator.toPoint().value as Distribution,
+          {
+            count: 2,
+            last: 50,
+            max: 50,
+            min: -10,
+            sum: 40,
+          }
+        );
+        assert.ok(
+          hrTimeToNanoseconds(record1.aggregator.toPoint().timestamp) >
+            hrTimeToNanoseconds(performanceTimeOrigin)
+        );
+      });
 
       it('should return same instrument on same label values', async () => {
         const valueRecorder = meter.createValueRecorder(
@@ -650,6 +679,33 @@ describe('Meter', () => {
           }
         );
         assert.strictEqual(boundValueRecorder1, boundValueRecorder2);
+      });
+
+      it('should ignore non-number values', async () => {
+        const valueRecorder = meter.createValueRecorder(
+          'name'
+        ) as ValueRecorderMetric;
+        const boundValueRecorder = valueRecorder.bind(labels);
+
+        await Promise.all(
+          nonNumberValues.map(async val => {
+            // @ts-expect-error
+            boundValueRecorder.record(val);
+            await meter.collect();
+            const [record1] = meter.getBatcher().checkPointSet();
+
+            assert.deepStrictEqual(
+              record1.aggregator.toPoint().value as Distribution,
+              {
+                count: 0,
+                last: 0,
+                max: -Infinity,
+                min: Infinity,
+                sum: 0,
+              }
+            );
+          })
+        );
       });
     });
 
@@ -1124,16 +1180,13 @@ describe('Meter', () => {
       );
 
       await meter.collect();
+      const records = meter.getBatcher().checkPointSet();
+      assert.strictEqual(records.length, 8);
 
-      const tempMetricRecords: MetricRecord[] = await tempMetric.getMetricRecord();
-      const cpuUsageMetricRecords: MetricRecord[] = await cpuUsageMetric.getMetricRecord();
-      assert.strictEqual(tempMetricRecords.length, 4);
-      assert.strictEqual(cpuUsageMetricRecords.length, 4);
-
-      const metric1 = tempMetricRecords[0];
-      const metric2 = tempMetricRecords[1];
-      const metric3 = tempMetricRecords[2];
-      const metric4 = tempMetricRecords[3];
+      const metric1 = records[0];
+      const metric2 = records[1];
+      const metric3 = records[2];
+      const metric4 = records[3];
       assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
       assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
       assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
@@ -1168,14 +1221,14 @@ describe('Meter', () => {
         sum: 69,
       });
 
-      const metric5 = cpuUsageMetricRecords[0];
-      const metric6 = cpuUsageMetricRecords[1];
-      const metric7 = cpuUsageMetricRecords[2];
-      const metric8 = cpuUsageMetricRecords[3];
-      assert.strictEqual(hashLabels(metric1.labels), '|#app:app1,core:1');
-      assert.strictEqual(hashLabels(metric2.labels), '|#app:app1,core:2');
-      assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
-      assert.strictEqual(hashLabels(metric4.labels), '|#app:app2,core:2');
+      const metric5 = records[4];
+      const metric6 = records[5];
+      const metric7 = records[6];
+      const metric8 = records[7];
+      assert.strictEqual(hashLabels(metric5.labels), '|#app:app1,core:1');
+      assert.strictEqual(hashLabels(metric6.labels), '|#app:app1,core:2');
+      assert.strictEqual(hashLabels(metric7.labels), '|#app:app2,core:1');
+      assert.strictEqual(hashLabels(metric8.labels), '|#app:app2,core:2');
 
       ensureMetric(metric5, 'cpu_usage_per_app', {
         count: 1,

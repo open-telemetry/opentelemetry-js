@@ -23,10 +23,9 @@ import { MetricKind } from './export/types';
 import { Metric } from './Metric';
 
 /** This is a SDK implementation of Value Recorder Metric. */
-export class ValueRecorderMetric extends Metric<BoundValueRecorder>
+export class ValueRecorderMetric
+  extends Metric<BoundValueRecorder>
   implements api.ValueRecorder {
-  protected readonly _absolute: boolean;
-
   constructor(
     name: string,
     options: api.MetricOptions,
@@ -41,14 +40,12 @@ export class ValueRecorderMetric extends Metric<BoundValueRecorder>
       resource,
       instrumentationLibrary
     );
-
-    this._absolute = options.absolute !== undefined ? options.absolute : true; // Absolute default is true
   }
+
   protected _makeInstrument(labels: api.Labels): BoundValueRecorder {
     return new BoundValueRecorder(
       labels,
       this._disabled,
-      this._absolute,
       this._valueType,
       this._logger,
       this._batcher.aggregatorFor(this._descriptor)

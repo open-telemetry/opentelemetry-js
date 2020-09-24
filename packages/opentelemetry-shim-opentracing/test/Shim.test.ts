@@ -19,13 +19,12 @@ import * as opentracing from 'opentracing';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { TracerShim, SpanShim, SpanContextShim } from '../src/shim';
 import {
-  INVALID_SPAN_CONTEXT,
   timeInputToHrTime,
   HttpTraceContext,
   CompositePropagator,
   HttpCorrelationContext,
 } from '@opentelemetry/core';
-import { propagation } from '@opentelemetry/api';
+import { INVALID_SPAN_CONTEXT, propagation } from '@opentelemetry/api';
 import { performance } from 'perf_hooks';
 
 describe('OpenTracing Shim', () => {
@@ -198,7 +197,7 @@ describe('OpenTracing Shim', () => {
       const payload = { user: 'payload', request: 1 };
       span.logEvent('some log', payload);
       assert.strictEqual(otSpan.events[0].name, 'some log');
-      assert.deepStrictEqual(otSpan.events[0].attributes, { payload });
+      assert.deepStrictEqual(otSpan.events[0].attributes, payload);
     });
 
     it('updates the name', () => {

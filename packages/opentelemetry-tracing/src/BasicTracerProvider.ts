@@ -99,4 +99,8 @@ export class BasicTracerProvider implements api.TracerProvider {
       api.propagation.setGlobalPropagator(config.propagator);
     }
   }
+
+  shutdown() {
+    return this.activeSpanProcessor.shutdown();
+  }
 }
