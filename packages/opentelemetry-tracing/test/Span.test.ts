@@ -182,9 +182,7 @@ describe('Span', () => {
     const span = new Span(tracer, name, spanContext, SpanKind.CLIENT);
 
     span.setAttribute('overwrite', 'initial value');
-    span.setAttribute('remove', 'initial value');
     span.setAttribute('overwrite', 'overwritten value');
-    span.setAttribute('remove', null);
 
     assert.deepStrictEqual(span.attributes, {
       overwrite: 'overwritten value',
