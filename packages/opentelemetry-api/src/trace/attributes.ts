@@ -13,6 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 export interface Attributes {
-  [attributeKey: string]: unknown;
+  [attributeKey: string]: AttributeValue | undefined;
 }
+
+export type AttributeValue =
+  | string
+  | number
+  | boolean
+  | Array<null | undefined | string>
+  | Array<null | undefined | number>
+  | Array<null | undefined | boolean>;
