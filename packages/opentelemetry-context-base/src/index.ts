@@ -14,6 +14,6 @@
  * limitations under the License.
  */
 
-export * from './types';
-export * from './context';
+export { createContextKey, ROOT_CONTEXT } from './context';
 export * from './NoopContextManager';
+export * from './types';

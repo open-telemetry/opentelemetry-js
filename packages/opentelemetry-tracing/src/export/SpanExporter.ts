@@ -35,5 +35,5 @@ export interface SpanExporter {
   ): void;
 
   /** Stops the exporter. */
-  shutdown(): void;
+  shutdown(): Promise<void>;
 }

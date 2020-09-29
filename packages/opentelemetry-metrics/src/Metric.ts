@@ -77,6 +77,13 @@ export abstract class Metric<T extends BaseBoundInstrument>
     this._instruments.clear();
   }
 
+  /**
+   * Returns kind of metric
+   */
+  getKind(): MetricKind {
+    return this._kind;
+  }
+
   getMetricRecord(): Promise<MetricRecord[]> {
     return new Promise(resolve => {
       resolve(

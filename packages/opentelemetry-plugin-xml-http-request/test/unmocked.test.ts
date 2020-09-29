@@ -22,9 +22,13 @@ import { HttpAttribute } from '@opentelemetry/semantic-conventions';
 class TestSpanProcessor implements SpanProcessor {
   spans: ReadableSpan[] = [];
 
-  forceFlush(callback: () => void): void {}
+  forceFlush(): Promise<void> {
+    return Promise.resolve();
+  }
   onStart(span: ReadableSpan): void {}
-  shutdown(callback: () => void): void {}
+  shutdown(): Promise<void> {
+    return Promise.resolve();
+  }
 
   onEnd(span: ReadableSpan): void {
     this.spans.push(span);

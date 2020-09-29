@@ -13,20 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-/**
- * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
- */
-export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  process.once('SIGTERM', cb);
-  return function removeCallbackFromGlobalShutdown() {
-    process.removeListener('SIGTERM', cb);
-  };
-}
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
 
-/**
- * Warning: meant for internal use only! Sends a SIGTERM to the current process
- */
-export function _invokeGlobalShutdown() {
-  process.kill(process.pid, 'SIGTERM');
-}
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

@@ -15,7 +15,11 @@
  */
 
 import { context } from '@opentelemetry/api';
-import { unrefTimer, suppressInstrumentation } from '@opentelemetry/core';
+import {
+  ExportResult,
+  unrefTimer,
+  suppressInstrumentation,
+} from '@opentelemetry/core';
 import { SpanProcessor } from '../SpanProcessor';
 import { BufferConfig } from '../types';
 import { ReadableSpan } from './ReadableSpan';
@@ -35,6 +39,7 @@ export class BatchSpanProcessor implements SpanProcessor {
   private _finishedSpans: ReadableSpan[] = [];
   private _timer: NodeJS.Timeout | undefined;
   private _isShutdown = false;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
 
   constructor(private readonly _exporter: SpanExporter, config?: BufferConfig) {
     this._bufferSize =
@@ -45,12 +50,11 @@ export class BatchSpanProcessor implements SpanProcessor {
         : DEFAULT_BUFFER_TIMEOUT_MS;
   }
 
-  forceFlush(cb: () => void = () => {}): void {
+  forceFlush(): Promise<void> {
     if (this._isShutdown) {
-      setTimeout(cb, 0);
-      return;
+      return this._shuttingDownPromise;
     }
-    this._flush(cb);
+    return this._flush();
   }
 
   // does nothing.
@@ -63,14 +67,25 @@ export class BatchSpanProcessor implements SpanProcessor {
     this._addToBuffer(span);
   }
 
-  shutdown(cb: () => void = () => {}): void {
+  shutdown(): Promise<void> {
     if (this._isShutdown) {
-      setTimeout(cb, 0);
-      return;
+      return this._shuttingDownPromise;
     }
-    this.forceFlush(cb);
     this._isShutdown = true;
-    this._exporter.shutdown();
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return this._flush();
+        })
+        .then(() => {
+          return this._exporter.shutdown();
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 
   /** Add a span in the buffer. */
@@ -83,26 +98,31 @@ export class BatchSpanProcessor implements SpanProcessor {
   }
 
   /** Send the span data list to exporter */
-  private _flush(cb: () => void = () => {}) {
+  private _flush(): Promise<void> {
     this._clearTimer();
     if (this._finishedSpans.length === 0) {
-      setTimeout(cb, 0);
-      return;
+      return Promise.resolve();
     }
-
-    // prevent downstream exporter calls from generating spans
-    context.with(suppressInstrumentation(context.active()), () => {
-      this._exporter.export(this._finishedSpans, cb);
+    return new Promise((resolve, reject) => {
+      // prevent downstream exporter calls from generating spans
+      context.with(suppressInstrumentation(context.active()), () => {
+        this._exporter.export(this._finishedSpans, result => {
+          this._finishedSpans = [];
+          if (result === ExportResult.SUCCESS) {
+            resolve();
+          } else {
+            reject(result);
+          }
+        });
+      });
     });
-
-    this._finishedSpans = [];
   }
 
   private _maybeStartTimer() {
     if (this._timer !== undefined) return;
 
     this._timer = setTimeout(() => {
-      this._flush();
+      this._flush().catch();
     }, this._bufferTimeout);
     unrefTimer(this._timer);
   }

@@ -39,9 +39,13 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
     });
 
     const spanProcessor: SpanProcessor = {
-      forceFlush: () => {},
+      forceFlush: () => {
+        return Promise.resolve();
+      },
       onStart: () => {},
-      shutdown: () => {},
+      shutdown: () => {
+        return Promise.resolve();
+      },
       onEnd: span => {
         this._exporterCreatedSpans.push(span);
       },
@@ -69,9 +73,10 @@ export class TestTracingSpanExporter extends InMemorySpanExporter {
     super.export(spans, resultCallback);
   }
 
-  shutdown(): void {
-    super.shutdown();
-    this._exporterCreatedSpans = [];
+  shutdown(): Promise<void> {
+    return super.shutdown().then(() => {
+      this._exporterCreatedSpans = [];
+    });
   }
 
   reset() {

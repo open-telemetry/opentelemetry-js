@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ConsoleLogger, notifyOnGlobalShutdown } from '@opentelemetry/core';
+import { ConsoleLogger } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { Meter } from '.';
@@ -26,7 +26,8 @@ import { DEFAULT_CONFIG, MeterConfig } from './types';
 export class MeterProvider implements api.MeterProvider {
   private readonly _config: MeterConfig;
   private readonly _meters: Map<string, Meter> = new Map();
-  private _cleanNotifyOnGlobalShutdown: Function | undefined;
+  private _shuttingDownPromise: Promise<void> = Promise.resolve();
+  private _isShutdown = false;
   readonly resource: Resource;
   readonly logger: api.Logger;
 
@@ -37,11 +38,6 @@ export class MeterProvider implements api.MeterProvider {
       logger: this.logger,
       resource: this.resource,
     });
-    if (this._config.gracefulShutdown) {
-      this._cleanNotifyOnGlobalShutdown = notifyOnGlobalShutdown(
-        this._shutdownAllMeters.bind(this)
-      );
-    }
   }
 
   /**
@@ -61,22 +57,30 @@ export class MeterProvider implements api.MeterProvider {
     return this._meters.get(key)!;
   }
 
-  shutdown(cb: () => void = () => {}): void {
-    this._shutdownAllMeters().then(() => {
-      setTimeout(cb, 0);
-    });
-    if (this._cleanNotifyOnGlobalShutdown) {
-      this._cleanNotifyOnGlobalShutdown();
-      this._cleanNotifyOnGlobalShutdown = undefined;
+  shutdown(): Promise<void> {
+    if (this._isShutdown) {
+      return this._shuttingDownPromise;
     }
-  }
+    this._isShutdown = true;
 
-  private _shutdownAllMeters() {
-    if (this._config.exporter) {
-      this._config.exporter.shutdown();
-    }
-    return Promise.all(
-      Array.from(this._meters, ([_, meter]) => meter.shutdown())
-    );
+    this._shuttingDownPromise = new Promise((resolve, reject) => {
+      Promise.resolve()
+        .then(() => {
+          return Promise.all(
+            Array.from(this._meters, ([_, meter]) => meter.shutdown())
+          );
+        })
+        .then(() => {
+          if (this._config.exporter) {
+            return this._config.exporter.shutdown();
+          }
+          return;
+        })
+        .then(resolve)
+        .catch(e => {
+          reject(e);
+        });
+    });
+    return this._shuttingDownPromise;
   }
 }

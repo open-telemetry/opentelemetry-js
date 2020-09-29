@@ -29,10 +29,9 @@ import {
   NoRecordingSpan,
   getExtractedSpanContext,
 } from '@opentelemetry/core';
-import {
+import type {
   ClientRequest,
   IncomingMessage,
-  request,
   RequestOptions,
   ServerResponse,
 } from 'http';
@@ -95,7 +94,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       shimmer.wrap(
         this._moduleExports,
         'get',
-        this._getPatchOutgoingGetFunction(request)
+        this._getPatchOutgoingGetFunction(this._moduleExports.request)
       );
     }
 
@@ -311,10 +310,7 @@ export class HttpPlugin extends BasePlugin<Http> {
       };
 
       return context.with(propagation.extract(headers), () => {
-        const span = plugin._startHttpSpan(
-          `${method} ${pathname}`,
-          spanOptions
-        );
+        const span = plugin._startHttpSpan(`HTTP ${method}`, spanOptions);
 
         return plugin._tracer.withSpan(span, () => {
           context.bind(request);
@@ -420,7 +416,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         return original.apply(this, [optionsParsed, ...args]);
       }
 
-      const operationName = `${method} ${pathname}`;
+      const operationName = `HTTP ${method}`;
       const spanOptions: SpanOptions = {
         kind: SpanKind.CLIENT,
       };
