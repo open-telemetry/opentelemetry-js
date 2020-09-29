@@ -22,7 +22,7 @@ import {
   InstrumentationNodeModuleFile,
 } from '@opentelemetry/instrumentation';
 
-import type * as module_name_to_be_pached from 'module_name_to_be_pached';
+import type * as module_name_to_be_patched from 'module_name_to_be_patched';
 
 export class MyPlugin extends InstrumentationBase {
   constructor(config: InstrumentationConfig = {}) {
@@ -37,8 +37,8 @@ export class MyPlugin extends InstrumentationBase {
    *   the plugin should patch multiple modules or versions.
    */
   protected init() {
-    const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_pached>(
-      'module_name_to_be_pached',
+    const module = new InstrumentationNodeModuleDefinition<typeof module_name_to_be_patched>(
+      'module_name_to_be_patched',
       ['1.*'],
        this._onPatchMain,
        this._onUnPatchMain,
@@ -51,7 +51,7 @@ export class MyPlugin extends InstrumentationBase {
     // return [module1, module2, ....]
   }
 
-  private _onPatchMain(moduleExports: typeof module_name_to_be_pached) {
+  private _onPatchMain(moduleExports: typeof module_name_to_be_patched) {
     this._wrap(
       moduleExports,
       'mainMethodName',
@@ -60,20 +60,20 @@ export class MyPlugin extends InstrumentationBase {
     return moduleExports;
   }
 
-  private _onUnPatchMain(moduleExports: typeof module_name_to_be_pached) {
+  private _onUnPatchMain(moduleExports: typeof module_name_to_be_patched) {
     this._unwrap(moduleExports, 'mainMethodName');
   }
 
-  private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof module_name_to_be_pached> {
-    const file = new InstrumentationNodeModuleFile<typeof module_name_to_be_pached>(
-      'module_name_to_be_pached/src/some_file.js',
+  private _addPatchingMethod(): InstrumentationNodeModuleFile<typeof module_name_to_be_patched> {
+    const file = new InstrumentationNodeModuleFile<typeof module_name_to_be_patched>(
+      'module_name_to_be_patched/src/some_file.js',
       this._onPatchMethodName,
       this._onUnPatchMethodName,
     );
     return file;
   }
 
-  private _onPatchMethodName(moduleExports: typeof module_name_to_be_pached) {
+  private _onPatchMethodName(moduleExports: typeof module_name_to_be_patched) {
     this._wrap(
       moduleExports,
       'methodName',
@@ -82,14 +82,14 @@ export class MyPlugin extends InstrumentationBase {
     return moduleExports;
   }
 
-  private _onUnPatchMethodName(moduleExports: typeof module_name_to_be_pached) {
+  private _onUnPatchMethodName(moduleExports: typeof module_name_to_be_patched) {
     this._unwrap(moduleExports, 'methodName');
   }
 
   private _patchMethodName(): (original) => any {
     const plugin = this;
     return function methodName(original) {
-      return function patchMethodName(this: any): PromiseOrValue<module_name_to_be_pached.methodName> {
+      return function patchMethodName(this: any): PromiseOrValue<module_name_to_be_patched.methodName> {
         console.log('methodName', arguments);
         return original.apply(this, arguments);
       };
@@ -99,7 +99,7 @@ export class MyPlugin extends InstrumentationBase {
   private _patchMainMethodName(): (original) => any {
     const plugin = this;
     return function mainMethodName(original) {
-      return function patchMainMethodName(this: any): PromiseOrValue<module_name_to_be_pached.mainMethodName> {
+      return function patchMainMethodName(this: any): PromiseOrValue<module_name_to_be_patched.mainMethodName> {
         console.log('mainMethodName', arguments);
         return original.apply(this, arguments);
       };
