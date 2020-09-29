@@ -25,7 +25,6 @@ import {
   ServiceClientType,
 } from './types';
 import { ServiceClient } from './types';
-import { globalErrorHandler } from '@opentelemetry/core';
 
 /**
  * Collector Metric Exporter abstract base class
@@ -61,7 +60,6 @@ export abstract class CollectorExporterNodeBase<
         _onFinish();
       };
       const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        globalErrorHandler(error);
         onError(error);
         _onFinish();
       };

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import { globalErrorHandler } from '@opentelemetry/core';
 import {
   CollectorExporterNodeBase as CollectorExporterBaseMain,
   collectorTypes,
@@ -41,7 +40,6 @@ export abstract class CollectorExporterNodeBase<
         _onFinish();
       };
       const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        globalErrorHandler(error);
         onError(error);
         _onFinish();
       };
