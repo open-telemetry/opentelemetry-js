@@ -37,9 +37,6 @@ export interface Instrumentation {
   /** Method to enable the instrumentation  */
   enable(): void;
 
-  /** Method to patch the instrumentation  */
-  // patch<T>(exports: T, name: string, baseDir?: string): T;
-
   /** Method to set tracer provider  */
   setTracerProvider(tracerProvider: TracerProvider): void;
 
@@ -53,9 +50,6 @@ export interface Instrumentation {
    * If omitted, all versions of the module will be patched.
    */
   supportedVersions?: string[];
-
-  /** Method to unpatch the instrumentation  */
-  // unpatch(): void;
 }
 
 export interface InstrumentationConfig {

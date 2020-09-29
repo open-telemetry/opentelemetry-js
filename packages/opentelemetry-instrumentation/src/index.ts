@@ -16,3 +16,4 @@
 
 export * from './platform/index';
 export * from './types';
+export * from './utils';
