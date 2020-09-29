@@ -26,7 +26,6 @@ import { PrometheusLabelsBatcher } from './PrometheusLabelsBatcher';
 export class PrometheusExporter implements MetricExporter {
   static readonly DEFAULT_OPTIONS = {
     port: 9464,
-    startServer: false,
     endpoint: '/metrics',
     prefix: '',
   };
@@ -59,7 +58,7 @@ export class PrometheusExporter implements MetricExporter {
       config.endpoint || PrometheusExporter.DEFAULT_OPTIONS.endpoint
     ).replace(/^([^/])/, '/$1');
 
-    if (config.startServer || PrometheusExporter.DEFAULT_OPTIONS.startServer) {
+    if (config.preventServerStart !== true) {
       this.startServer().then(callback);
     } else if (callback) {
       callback();
