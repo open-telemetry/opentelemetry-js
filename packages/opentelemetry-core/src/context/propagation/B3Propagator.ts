@@ -21,16 +21,22 @@ import {
   SetterFunction,
 } from '@opentelemetry/api';
 
+import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 import { B3MultiPropagator } from './B3MultiPropagator';
 
 export class B3Propagator implements TextMapPropagator {
   private readonly _b3MultiPropagator: B3MultiPropagator = new B3MultiPropagator();
+  private readonly _b3SinglePropagator: B3SinglePropagator = new B3SinglePropagator();
 
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
-    this._b3MultiPropagator.inject(context, carrier, setter);
+    this._b3SinglePropagator.inject(context, carrier, setter);
   }
 
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    return this._b3MultiPropagator.extract(context, carrier, getter);
+    if (getter(carrier, B3_CONTEXT_HEADER)) {
+      return this._b3SinglePropagator.extract(context, carrier, getter);
+    } else {
+      return this._b3MultiPropagator.extract(context, carrier, getter);
+    }
   }
 }

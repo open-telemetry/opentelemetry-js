@@ -13,3 +13,112 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import * as assert from 'assert';
+import {
+  defaultGetter,
+  defaultSetter,
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/context-base';
+import {
+  getExtractedSpanContext,
+  setExtractedSpanContext,
+} from '../../src/context/context';
+import { B3Propagator } from '../../src/context/propagation/B3Propagator';
+import { B3_CONTEXT_HEADER } from '../../src/context/propagation/B3SinglePropagator';
+import {
+  X_B3_SAMPLED,
+  X_B3_SPAN_ID,
+  X_B3_TRACE_ID,
+} from '../../src/context/propagation/B3MultiPropagator';
+
+describe('B3Propagator', () => {
+  const propagator = new B3Propagator();
+  let carrier: { [key: string]: unknown };
+
+  beforeEach(() => {
+    carrier = {};
+  });
+
+  describe('.inject()', () => {
+    it('injects single header by default', () => {
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultSetter
+      );
+
+      const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1';
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], expected);
+    });
+  });
+
+  describe('.extract()', () => {
+    const b3SingleCarrier = {
+      [B3_CONTEXT_HEADER]:
+        '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-0',
+    };
+    const b3MultiCarrier = {
+      [X_B3_TRACE_ID]: 'd4cda95b652f4a1592b449d5929fda1b',
+      [X_B3_SPAN_ID]: '6e0c63257de34c92',
+      [X_B3_SAMPLED]: '1',
+    };
+    const b3MixedCarrier = { ...b3SingleCarrier, ...b3MultiCarrier };
+
+    it('extracts single header b3', () => {
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        b3SingleCarrier,
+        defaultGetter
+      );
+
+      const extractedSpanContext = getExtractedSpanContext(context);
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'e457b5a2e4d86bd1',
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
+    });
+
+    it('extracts multi header b3', () => {
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        b3MultiCarrier,
+        defaultGetter
+      );
+
+      const extractedSpanContext = getExtractedSpanContext(context);
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: '6e0c63257de34c92',
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        isRemote: true,
+        traceFlags: TraceFlags.SAMPLED,
+      });
+    });
+
+    it('extracts single header over multi', () => {
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        b3MixedCarrier,
+        defaultGetter
+      );
+
+      const extractedSpanContext = getExtractedSpanContext(context);
+      assert.deepStrictEqual(extractedSpanContext, {
+        spanId: 'e457b5a2e4d86bd1',
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        isRemote: true,
+        traceFlags: TraceFlags.NONE,
+      });
+    });
+  });
+});
