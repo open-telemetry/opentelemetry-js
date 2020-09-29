@@ -47,7 +47,7 @@ const mockResError = {
 // send is lazy loading file so need to wait a bit
 const waitTimeMS = 20;
 
-describe('CollectorExporter - node with proto over http', () => {
+describe('CollectorTraceExporter - node with proto over http', () => {
   let collectorExporter: CollectorTraceExporter;
   let collectorExporterConfig: collectorTypes.CollectorExporterConfigBase;
   let spyRequest: sinon.SinonSpy;

@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+const testsContext = require.context('../browser', true, /test$/);
+testsContext.keys().forEach(testsContext);
 
-describe('Zipkin Exporter E2E', () => {
-  it('should report spans to Zipkin server');
-});
+const testsContextCommon = require.context('../common', true, /test$/);
+testsContextCommon.keys().forEach(testsContextCommon);
+
+const srcContext = require.context('.', true, /src$/);
+srcContext.keys().forEach(srcContext);

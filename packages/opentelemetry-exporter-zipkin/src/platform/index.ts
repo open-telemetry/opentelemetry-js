@@ -14,19 +14,4 @@
  * limitations under the License.
  */
 
-/**
- * Adds an event listener to trigger a callback when a SIGTERM is detected in the process
- */
-export function notifyOnGlobalShutdown(cb: () => void): () => void {
-  process.once('SIGTERM', cb);
-  return function removeCallbackFromGlobalShutdown() {
-    process.removeListener('SIGTERM', cb);
-  };
-}
-
-/**
- * Warning: meant for internal use only! Sends a SIGTERM to the current process
- */
-export function _invokeGlobalShutdown() {
-  process.kill(process.pid, 'SIGTERM');
-}
+export * from './node';

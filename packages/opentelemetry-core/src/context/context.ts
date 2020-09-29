@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-import { Span, SpanContext } from '@opentelemetry/api';
-import { Context } from '@opentelemetry/context-base';
+import {
+  Span,
+  SpanContext,
+  createContextKey,
+  Context,
+} from '@opentelemetry/api';
 
 /**
  * Active span key
  */
-export const ACTIVE_SPAN_KEY = Context.createKey(
+export const ACTIVE_SPAN_KEY = createContextKey(
   'OpenTelemetry Context Key ACTIVE_SPAN'
 );
-const EXTRACTED_SPAN_CONTEXT_KEY = Context.createKey(
+const EXTRACTED_SPAN_CONTEXT_KEY = createContextKey(
   'OpenTelemetry Context Key EXTRACTED_SPAN_CONTEXT'
 );
 /**
  * Shared key for indicating if instrumentation should be suppressed beyond
  * this current scope.
  */
-export const SUPPRESS_INSTRUMENTATION_KEY = Context.createKey(
+export const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
   'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
 );
 

@@ -20,6 +20,7 @@ import {
   TextMapPropagator,
   SetterFunction,
   TraceFlags,
+  createContextKey,
 } from '@opentelemetry/api';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
@@ -28,10 +29,10 @@ export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
 export const X_B3_FLAGS = 'x-b3-flags';
-export const PARENT_SPAN_ID_KEY = Context.createKey(
+export const PARENT_SPAN_ID_KEY = createContextKey(
   'OpenTelemetry Context Key B3 Parent Span Id'
 );
-export const DEBUG_FLAG_KEY = Context.createKey(
+export const DEBUG_FLAG_KEY = createContextKey(
   'OpenTelemetry Context Key B3 Debug Flag'
 );
 const VALID_TRACEID_REGEX = /^([0-9a-f]{16}){1,2}$/i;

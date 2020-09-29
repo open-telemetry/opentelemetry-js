@@ -39,21 +39,16 @@ export interface MeterConfig {
 
   /** Metric batcher. */
   batcher?: Batcher;
-
-  /** Bool for whether or not graceful shutdown is enabled. If disabled metrics will not be exported when SIGTERM is recieved */
-  gracefulShutdown?: boolean;
 }
 
 /** Default Meter configuration. */
 export const DEFAULT_CONFIG = {
   logLevel: getEnv().OTEL_LOG_LEVEL,
-  gracefulShutdown: true,
 };
 
 /** The default metric creation options value. */
 export const DEFAULT_METRIC_OPTIONS = {
   disabled: false,
-  absolute: false,
   description: '',
   unit: '1',
   valueType: api.ValueType.DOUBLE,

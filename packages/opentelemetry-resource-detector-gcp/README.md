@@ -12,6 +12,8 @@ The OpenTelemetry Resource is an immutable representation of the entity producin
 
 ## Installation
 
+The GCP resource detector requires Node.JS 10+ due to a dependency on [`gcp-metadata`](https://www.npmjs.com/package/gcp-metadata) which uses features only available in Node.JS 10+.
+
 ```bash
 npm install --save @opentelemetry/resource-detector-gcp
 ```
