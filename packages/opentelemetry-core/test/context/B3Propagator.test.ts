@@ -26,7 +26,10 @@ import {
   getExtractedSpanContext,
   setExtractedSpanContext,
 } from '../../src/context/context';
-import { B3Propagator } from '../../src/context/propagation/B3Propagator';
+import {
+  B3Propagator,
+  B3InjectEncoding,
+} from '../../src/context/propagation/B3Propagator';
 import { B3_CONTEXT_HEADER } from '../../src/context/propagation/B3SinglePropagator';
 import {
   X_B3_SAMPLED,
@@ -35,15 +38,18 @@ import {
 } from '../../src/context/propagation/B3MultiPropagator';
 
 describe('B3Propagator', () => {
-  const propagator = new B3Propagator();
+  let propagator: B3Propagator;
   let carrier: { [key: string]: unknown };
 
   beforeEach(() => {
+    propagator = new B3Propagator();
     carrier = {};
   });
 
   describe('.inject()', () => {
     it('injects single header by default', () => {
+      propagator = new B3Propagator();
+
       const spanContext: SpanContext = {
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
         spanId: 'e457b5a2e4d86bd1',
@@ -58,6 +64,31 @@ describe('B3Propagator', () => {
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1';
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], expected);
+    });
+
+    it('can be configured for multi header', () => {
+      propagator = new B3Propagator({
+        injectEncoding: B3InjectEncoding.MULTI_HEADER,
+      });
+
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultSetter
+      );
+
+      assert.strictEqual(
+        carrier[X_B3_TRACE_ID],
+        '80f198ee56343ba864fe8b2a57d3eff7'
+      );
+      assert.strictEqual(carrier[X_B3_SPAN_ID], 'e457b5a2e4d86bd1');
+      assert.strictEqual(carrier[X_B3_SAMPLED], '1');
     });
   });
 

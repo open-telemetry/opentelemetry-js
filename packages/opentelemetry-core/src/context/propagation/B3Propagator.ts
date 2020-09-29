@@ -24,12 +24,34 @@ import {
 import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 import { B3MultiPropagator } from './B3MultiPropagator';
 
+export enum B3InjectEncoding {
+  SINGLE_HEADER,
+  MULTI_HEADER,
+}
+
+export interface B3PropagatorConfig {
+  injectEncoding?: B3InjectEncoding;
+}
+
 export class B3Propagator implements TextMapPropagator {
   private readonly _b3MultiPropagator: B3MultiPropagator = new B3MultiPropagator();
   private readonly _b3SinglePropagator: B3SinglePropagator = new B3SinglePropagator();
+  private readonly _inject: (
+    context: Context,
+    carrier: unknown,
+    setter: SetterFunction
+  ) => void;
+
+  constructor(config: B3PropagatorConfig = {}) {
+    if (config.injectEncoding === B3InjectEncoding.MULTI_HEADER) {
+      this._inject = this._b3MultiPropagator.inject;
+    } else {
+      this._inject = this._b3SinglePropagator.inject;
+    }
+  }
 
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
-    this._b3SinglePropagator.inject(context, carrier, setter);
+    this._inject(context, carrier, setter);
   }
 
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
