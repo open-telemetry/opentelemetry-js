@@ -37,6 +37,7 @@ export * from './trace/Event';
 export * from './trace/instrumentation/Plugin';
 export * from './trace/link_context';
 export * from './trace/link';
+export * from './trace/NoopLogger';
 export * from './trace/NoopSpan';
 export * from './trace/NoopTracer';
 export * from './trace/NoopTracerProvider';
