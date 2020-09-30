@@ -20,12 +20,10 @@ import {
   TextMapPropagator,
   SetterFunction,
   TraceFlags,
-} from '@opentelemetry/api';
-import {
   isValidSpanId,
   isValidTraceId,
   isSpanContextValid,
-} from '@opentelemetry/api/src/trace/spancontext-utils';
+} from '@opentelemetry/api';
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
