@@ -29,9 +29,6 @@ export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
 export const X_B3_FLAGS = 'x-b3-flags';
-export const PARENT_SPAN_ID_KEY = createContextKey(
-  'OpenTelemetry Context Key B3 Parent Span Id'
-);
 export const DEBUG_FLAG_KEY = createContextKey(
   'OpenTelemetry Context Key B3 Debug Flag'
 );
@@ -47,10 +44,6 @@ function isValidTraceId(traceId: string): boolean {
 
 function isValidSpanId(spanId: string): boolean {
   return VALID_SPANID_REGEX.test(spanId) && !INVALID_ID_REGEX.test(spanId);
-}
-
-function isValidParentSpanID(spanId: string | undefined): boolean {
-  return spanId === undefined || isValidSpanId(spanId);
 }
 
 function isValidSampledValue(sampled: TraceFlags | undefined): boolean {
@@ -80,17 +73,6 @@ function getSpanId(carrier: unknown, getter: GetterFunction): string {
     return spanId;
   }
   return '';
-}
-
-function getParentSpanId(
-  carrier: unknown,
-  getter: GetterFunction
-): string | undefined {
-  const spanId = getHeaderValue(carrier, getter, X_B3_PARENT_SPAN_ID);
-  if (typeof spanId === 'string') {
-    return spanId;
-  }
-  return;
 }
 
 function getDebug(
@@ -125,20 +107,14 @@ export class B3MultiPropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
-    const parentSpanId = context.getValue(PARENT_SPAN_ID_KEY) as
-      | undefined
-      | string;
+
     if (
       isValidTraceId(spanContext.traceId) &&
-      isValidSpanId(spanContext.spanId) &&
-      isValidParentSpanID(parentSpanId)
+      isValidSpanId(spanContext.spanId)
     ) {
       const debug = context.getValue(DEBUG_FLAG_KEY);
       setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
       setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
-      if (parentSpanId) {
-        setter(carrier, X_B3_PARENT_SPAN_ID, parentSpanId);
-      }
       // According to the B3 spec, if the debug flag is set,
       // the sampled flag shouldn't be propagated as well.
       if (debug === '1') {
@@ -160,17 +136,14 @@ export class B3MultiPropagator implements TextMapPropagator {
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
     const traceId = getTraceId(carrier, getter);
     const spanId = getSpanId(carrier, getter);
-    const parentSpanId = getParentSpanId(carrier, getter);
     const traceFlags = getTraceFlags(carrier, getter) as TraceFlags;
     const debug = getDebug(carrier, getter);
 
     if (
       isValidTraceId(traceId) &&
       isValidSpanId(spanId) &&
-      isValidParentSpanID(parentSpanId) &&
       isValidSampledValue(traceFlags)
     ) {
-      context = context.setValue(PARENT_SPAN_ID_KEY, parentSpanId);
       context = context.setValue(DEBUG_FLAG_KEY, debug);
       return setExtractedSpanContext(context, {
         traceId,
