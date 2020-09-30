@@ -245,18 +245,18 @@ describe('CollectorTraceExporter - web', () => {
         });
         setGlobalErrorHandler(handler);
 
-        collectorTraceExporter.export(spans, () => {});
-
-        setTimeout(() => {
-          const request = server.requests[0];
-          request.respond(400);
-
+        collectorTraceExporter.export(spans, () => {
           const response = spyLoggerError.args[0][0] as string;
 
           assert.ok(response.includes('"code":"400"'));
 
           assert.strictEqual(spyBeacon.callCount, 0);
           done();
+        });
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(400);
         });
       });
 

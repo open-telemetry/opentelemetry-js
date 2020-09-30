@@ -18,7 +18,6 @@ import * as http from 'http';
 import * as https from 'https';
 import * as collectorTypes from '../../types';
 import { CollectorExporterNodeBase } from './CollectorExporterNodeBase';
-import { globalErrorHandler } from '@opentelemetry/core';
 
 /**
  * Sends data using http
@@ -59,13 +58,11 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
         res.statusMessage,
         res.statusCode
       );
-      globalErrorHandler(error);
       onError(error);
     }
   });
 
   req.on('error', (error: Error) => {
-    globalErrorHandler(error);
     onError(error);
   });
   req.write(data);

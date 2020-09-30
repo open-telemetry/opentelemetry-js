@@ -325,17 +325,17 @@ describe('CollectorMetricExporter - web', () => {
         });
         setGlobalErrorHandler(handler);
 
-        collectorExporter.export(metrics, () => {});
-
-        setTimeout(() => {
-          const request = server.requests[0];
-          request.respond(400);
-
+        collectorExporter.export(metrics, () => {
           const response = spyLoggerError.args[0][0] as string;
           assert.ok(response.includes('"code":"400"'));
 
           assert.strictEqual(spyBeacon.callCount, 0);
           done();
+        });
+
+        setTimeout(() => {
+          const request = server.requests[0];
+          request.respond(400);
         });
       });
       it('should send custom headers', done => {
