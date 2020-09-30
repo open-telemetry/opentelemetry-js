@@ -49,7 +49,7 @@
     "nyc": "15.1.0",
     "rimraf": "3.0.2",
     "ts-mocha": "7.0.0",
-    "ts-node": "8.10.2",
+    "ts-node": "9.0.0",
     "tslint-consistent-codestyle": "1.16.0",
     "tslint-microsoft-contrib": "6.2.0",
     "typescript": "3.9.7"
