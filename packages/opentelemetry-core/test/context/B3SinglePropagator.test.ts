@@ -32,6 +32,7 @@ import {
   B3SinglePropagator,
   B3_CONTEXT_HEADER,
 } from '../../src/context/propagation/B3SinglePropagator';
+import { DEBUG_FLAG_KEY } from '../../src';
 
 describe('B3SinglePropagator', () => {
   const propagator = new B3SinglePropagator();
@@ -73,6 +74,25 @@ describe('B3SinglePropagator', () => {
       );
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-0';
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], expected);
+    });
+
+    it('injects debug flag when present', () => {
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      const context = ROOT_CONTEXT.setValue(DEBUG_FLAG_KEY, 'd');
+
+      propagator.inject(
+        setExtractedSpanContext(context, spanContext),
+        carrier,
+        defaultSetter
+      );
+
+      const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-d';
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], expected);
     });
   });
@@ -160,6 +180,7 @@ describe('B3SinglePropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
+      assert.strictEqual('d', context.getValue(DEBUG_FLAG_KEY));
     });
 
     it('handles malformed traceid', () => {

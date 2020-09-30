@@ -11,18 +11,22 @@ import {
   isValidTraceId,
 } from '@opentelemetry/api/src/trace/spancontext-utils';
 
+import { DEBUG_FLAG_KEY } from './B3MultiPropagator';
+
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const B3_CONTEXT_HEADER = 'b3';
-const B3_CONTEXT_REGEX = /(?<traceId>(?:[0-9a-f]{16}){1,2})-(?<spanId>[0-9a-f]{16})(?:-(?<sampled>[01d](?![0-9a-f])))?(?:-(?<parentSpanId>[0-9a-f]{16}))?/;
+const B3_CONTEXT_REGEX = /(?<traceId>(?:[0-9a-f]{16}){1,2})-(?<spanId>[0-9a-f]{16})(?:-(?<samplingState>[01d](?![0-9a-f])))?(?:-(?<parentSpanId>[0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);
+const SAMPLED_VALUES = new Set(['d', '1']);
+const DEBUG_STATE = 'd';
 
 function convertToTraceId128(traceId: string): string {
   return traceId.length == 32 ? traceId : `${PADDING}${traceId}`;
 }
 
-function convertToTraceFlags(sampled: string | undefined): TraceFlags {
-  if (sampled == '1' || sampled == 'd') {
+function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
+  if (samplingState && SAMPLED_VALUES.has(samplingState)) {
     return TraceFlags.SAMPLED;
   }
   return TraceFlags.NONE;
@@ -32,8 +36,9 @@ export class B3SinglePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
-
-    const value = `${spanContext.traceId}-${spanContext.spanId}-${spanContext.traceFlags}`;
+    const samplingState =
+      context.getValue(DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;
+    const value = `${spanContext.traceId}-${spanContext.spanId}-${samplingState}`;
     setter(carrier, B3_CONTEXT_HEADER, value);
   }
 
@@ -44,12 +49,16 @@ export class B3SinglePropagator implements TextMapPropagator {
     const match = header.match(B3_CONTEXT_REGEX);
     if (!match) return context;
 
-    const { traceId: extractedTraceId, spanId, sampled } = match.groups!;
+    const { traceId: extractedTraceId, spanId, samplingState } = match.groups!;
     const traceId = convertToTraceId128(extractedTraceId);
 
     if (!isValidTraceId(traceId) || !isValidSpanId(spanId)) return context;
 
-    const traceFlags = convertToTraceFlags(sampled);
+    const traceFlags = convertToTraceFlags(samplingState);
+
+    if (samplingState === DEBUG_STATE) {
+      context = context.setValue(DEBUG_FLAG_KEY, samplingState);
+    }
 
     return setExtractedSpanContext(context, {
       traceId,
