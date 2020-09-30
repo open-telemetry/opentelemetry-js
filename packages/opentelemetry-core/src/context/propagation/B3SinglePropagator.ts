@@ -32,7 +32,7 @@ import { getParentSpanContext, setExtractedSpanContext } from '../context';
 /** B3 single-header name */
 export const B3_CONTEXT_HEADER = 'b3';
 
-const B3_CONTEXT_REGEX = /(?<traceId>(?:[0-9a-f]{16}){1,2})-(?<spanId>[0-9a-f]{16})(?:-(?<samplingState>[01d](?![0-9a-f])))?(?:-(?<parentSpanId>[0-9a-f]{16}))?/;
+const B3_CONTEXT_REGEX = /((?:[0-9a-f]{16}){1,2})-([0-9a-f]{16})(?:-([01d](?![0-9a-f])))?(?:-([0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);
 const SAMPLED_VALUES = new Set(['d', '1']);
 const DEBUG_STATE = 'd';
@@ -71,7 +71,7 @@ export class B3SinglePropagator implements TextMapPropagator {
     const match = b3Context.match(B3_CONTEXT_REGEX);
     if (!match) return context;
 
-    const { traceId: extractedTraceId, spanId, samplingState } = match.groups!;
+    const [, extractedTraceId, spanId, samplingState] = match;
     const traceId = convertToTraceId128(extractedTraceId);
 
     if (!isValidTraceId(traceId) || !isValidSpanId(spanId)) return context;
