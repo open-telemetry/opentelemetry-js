@@ -29,6 +29,7 @@ import {
   isSpanContextValid,
 } from '@opentelemetry/api/src/trace/spancontext-utils';
 
+/* b3 multi-header keys */
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
@@ -92,7 +93,7 @@ function getTraceFlags(
 }
 
 /**
- * Propagator for the B3 HTTP header format.
+ * Propagator for the B3 multiple-header HTTP format.
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3MultiPropagator implements TextMapPropagator {

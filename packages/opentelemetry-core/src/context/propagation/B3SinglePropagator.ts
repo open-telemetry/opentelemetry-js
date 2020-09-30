@@ -1,3 +1,19 @@
+/*
+ * Copyright The OpenTelemetry Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import {
   Context,
   GetterFunction,
@@ -5,18 +21,17 @@ import {
   SetterFunction,
   TraceFlags,
 } from '@opentelemetry/api';
-
 import {
   isValidSpanId,
   isValidTraceId,
+  isSpanContextValid,
 } from '@opentelemetry/api/src/trace/spancontext-utils';
-
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
-
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
-import { isSpanContextValid } from '@opentelemetry/api/build/src/trace/spancontext-utils';
 
+/** B3 single-header name */
 export const B3_CONTEXT_HEADER = 'b3';
+
 const B3_CONTEXT_REGEX = /(?<traceId>(?:[0-9a-f]{16}){1,2})-(?<spanId>[0-9a-f]{16})(?:-(?<samplingState>[01d](?![0-9a-f])))?(?:-(?<parentSpanId>[0-9a-f]{16}))?/;
 const PADDING = '0'.repeat(16);
 const SAMPLED_VALUES = new Set(['d', '1']);
@@ -33,6 +48,10 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
   return TraceFlags.NONE;
 }
 
+/**
+ * Propagator for the B3 single-header HTTP format.
+ * Based on: https://github.com/openzipkin/b3-propagation
+ */
 export class B3SinglePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);

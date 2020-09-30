@@ -20,19 +20,27 @@ import {
   TextMapPropagator,
   SetterFunction,
 } from '@opentelemetry/api';
-
 import { B3SinglePropagator, B3_CONTEXT_HEADER } from './B3SinglePropagator';
 import { B3MultiPropagator } from './B3MultiPropagator';
 
+/** Enumeraion of B3 inject encodings */
 export enum B3InjectEncoding {
   SINGLE_HEADER,
   MULTI_HEADER,
 }
 
+/** Configuration for the B3Propagator */
 export interface B3PropagatorConfig {
   injectEncoding?: B3InjectEncoding;
 }
 
+/**
+ * Propagator that extracts B3 context in both single and multi-header variants,
+ * with configurable injection format defaulting to B3 single-header. Due to
+ * the asymmetry in injection and extraction formats this is not suitable to
+ * be implemented as a composite propagator.
+ * Based on: https://github.com/openzipkin/b3-propagation
+ */
 export class B3Propagator implements TextMapPropagator {
   private readonly _b3MultiPropagator: B3MultiPropagator = new B3MultiPropagator();
   private readonly _b3SinglePropagator: B3SinglePropagator = new B3SinglePropagator();
