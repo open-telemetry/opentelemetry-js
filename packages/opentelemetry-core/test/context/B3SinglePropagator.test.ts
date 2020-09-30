@@ -95,6 +95,38 @@ describe('B3SinglePropagator', () => {
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-d';
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], expected);
     });
+
+    it('no-ops if traceid invalid', () => {
+      const spanContext: SpanContext = {
+        traceId: INVALID_TRACEID,
+        spanId: 'e457b5a2e4d86bd1',
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultSetter
+      );
+
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
+    });
+
+    it('no-ops if spanid invalid', () => {
+      const spanContext: SpanContext = {
+        traceId: '80f198ee56343ba864fe8b2a57d3eff7',
+        spanId: INVALID_SPANID,
+        traceFlags: TraceFlags.SAMPLED,
+      };
+
+      propagator.inject(
+        setExtractedSpanContext(ROOT_CONTEXT, spanContext),
+        carrier,
+        defaultSetter
+      );
+
+      assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
+    });
   });
 
   describe('.extract', () => {

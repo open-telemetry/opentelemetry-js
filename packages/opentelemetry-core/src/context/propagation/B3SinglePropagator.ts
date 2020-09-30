@@ -14,6 +14,7 @@ import {
 import { DEBUG_FLAG_KEY } from './B3MultiPropagator';
 
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
+import { isSpanContextValid } from '@opentelemetry/api/build/src/trace/spancontext-utils';
 
 export const B3_CONTEXT_HEADER = 'b3';
 const B3_CONTEXT_REGEX = /(?<traceId>(?:[0-9a-f]{16}){1,2})-(?<spanId>[0-9a-f]{16})(?:-(?<samplingState>[01d](?![0-9a-f])))?(?:-(?<parentSpanId>[0-9a-f]{16}))?/;
@@ -35,7 +36,8 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
 export class B3SinglePropagator implements TextMapPropagator {
   inject(context: Context, carrier: unknown, setter: SetterFunction) {
     const spanContext = getParentSpanContext(context);
-    if (!spanContext) return;
+    if (!spanContext || !isSpanContextValid(spanContext)) return;
+
     const samplingState =
       context.getValue(DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;
     const value = `${spanContext.traceId}-${spanContext.spanId}-${samplingState}`;
