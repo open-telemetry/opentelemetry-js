@@ -45,10 +45,11 @@ export class B3SinglePropagator implements TextMapPropagator {
   }
 
   extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const header = getter(carrier, B3_CONTEXT_HEADER) as string;
-    if (!header) return context;
+    const header = getter(carrier, B3_CONTEXT_HEADER);
+    const b3Context = Array.isArray(header) ? header[0] : header;
+    if (typeof b3Context !== 'string') return context;
 
-    const match = header.match(B3_CONTEXT_REGEX);
+    const match = b3Context.match(B3_CONTEXT_REGEX);
     if (!match) return context;
 
     const { traceId: extractedTraceId, spanId, samplingState } = match.groups!;
