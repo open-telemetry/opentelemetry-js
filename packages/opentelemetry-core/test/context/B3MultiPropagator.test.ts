@@ -33,8 +33,8 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-  DEBUG_FLAG_KEY,
 } from '../../src/context/propagation/B3MultiPropagator';
+import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
 import { TraceState } from '../../src/trace/TraceState';
 
 describe('B3MultiPropagator', () => {
@@ -96,7 +96,7 @@ describe('B3MultiPropagator', () => {
         spanId: '6e0c63257de34c92',
         traceFlags: TraceFlags.NONE,
       };
-      const contextWithDebug = ROOT_CONTEXT.setValue(DEBUG_FLAG_KEY, '1');
+      const contextWithDebug = ROOT_CONTEXT.setValue(B3_DEBUG_FLAG_KEY, '1');
 
       b3Propagator.inject(
         setExtractedSpanContext(contextWithDebug, spanContext),
@@ -146,7 +146,7 @@ describe('B3MultiPropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.NONE,
       });
-      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
     });
 
     describe('when sampled flag is valid', () => {
@@ -168,7 +168,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.SAMPLED,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
 
@@ -190,7 +190,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.SAMPLED,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
 
@@ -212,7 +212,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.NONE,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
     });
@@ -236,7 +236,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.SAMPLED,
           });
-          assert.strictEqual(context.getValue(DEBUG_FLAG_KEY), '1');
+          assert.strictEqual(context.getValue(B3_DEBUG_FLAG_KEY), '1');
         });
       });
     });
@@ -261,7 +261,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.SAMPLED,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
 
@@ -284,7 +284,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.NONE,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
 
@@ -307,7 +307,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.NONE,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
 
@@ -330,7 +330,7 @@ describe('B3MultiPropagator', () => {
             isRemote: true,
             traceFlags: TraceFlags.NONE,
           });
-          assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+          assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
         });
       });
     });
@@ -407,7 +407,7 @@ describe('B3MultiPropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
-      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
     });
 
     it('should gracefully handle an invalid b3 header', () => {
@@ -495,7 +495,7 @@ describe('B3MultiPropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
-      assert.equal(context.getValue(DEBUG_FLAG_KEY), undefined);
+      assert.equal(context.getValue(B3_DEBUG_FLAG_KEY), undefined);
     });
   });
 });

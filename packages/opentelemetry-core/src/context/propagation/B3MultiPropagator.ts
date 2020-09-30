@@ -20,8 +20,8 @@ import {
   TextMapPropagator,
   SetterFunction,
   TraceFlags,
-  createContextKey,
 } from '@opentelemetry/api';
+import { B3_DEBUG_FLAG_KEY } from './b3-common';
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 import {
   isValidSpanId,
@@ -34,9 +34,6 @@ export const X_B3_SPAN_ID = 'x-b3-spanid';
 export const X_B3_SAMPLED = 'x-b3-sampled';
 export const X_B3_PARENT_SPAN_ID = 'x-b3-parentspanid';
 export const X_B3_FLAGS = 'x-b3-flags';
-export const DEBUG_FLAG_KEY = createContextKey(
-  'OpenTelemetry Context Key B3 Debug Flag'
-);
 
 const VALID_SAMPLED_VALUES = new Set([true, 'true', 'True', '1', 1]);
 const VALID_UNSAMPLED_VALUES = new Set([false, 'false', 'False', '0', 0]);
@@ -45,7 +42,7 @@ function isValidSampledValue(sampled: TraceFlags | undefined): boolean {
   return sampled === TraceFlags.SAMPLED || sampled === TraceFlags.NONE;
 }
 
-function parseHeader(header: unknown) {
+export function parseHeader(header: unknown) {
   return Array.isArray(header) ? header[0] : header;
 }
 
@@ -103,7 +100,7 @@ export class B3MultiPropagator implements TextMapPropagator {
     const spanContext = getParentSpanContext(context);
     if (!spanContext || !isSpanContextValid(spanContext)) return;
 
-    const debug = context.getValue(DEBUG_FLAG_KEY);
+    const debug = context.getValue(B3_DEBUG_FLAG_KEY);
     setter(carrier, X_B3_TRACE_ID, spanContext.traceId);
     setter(carrier, X_B3_SPAN_ID, spanContext.spanId);
     // According to the B3 spec, if the debug flag is set,
@@ -134,7 +131,7 @@ export class B3MultiPropagator implements TextMapPropagator {
       isValidSpanId(spanId) &&
       isValidSampledValue(traceFlags)
     ) {
-      context = context.setValue(DEBUG_FLAG_KEY, debug);
+      context = context.setValue(B3_DEBUG_FLAG_KEY, debug);
       return setExtractedSpanContext(context, {
         traceId,
         spanId,

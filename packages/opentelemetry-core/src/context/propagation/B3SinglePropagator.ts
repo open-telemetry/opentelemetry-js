@@ -11,7 +11,7 @@ import {
   isValidTraceId,
 } from '@opentelemetry/api/src/trace/spancontext-utils';
 
-import { DEBUG_FLAG_KEY } from './B3MultiPropagator';
+import { B3_DEBUG_FLAG_KEY } from './b3-common';
 
 import { getParentSpanContext, setExtractedSpanContext } from '../context';
 import { isSpanContextValid } from '@opentelemetry/api/build/src/trace/spancontext-utils';
@@ -39,7 +39,7 @@ export class B3SinglePropagator implements TextMapPropagator {
     if (!spanContext || !isSpanContextValid(spanContext)) return;
 
     const samplingState =
-      context.getValue(DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;
+      context.getValue(B3_DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;
     const value = `${spanContext.traceId}-${spanContext.spanId}-${samplingState}`;
     setter(carrier, B3_CONTEXT_HEADER, value);
   }
@@ -59,7 +59,7 @@ export class B3SinglePropagator implements TextMapPropagator {
     const traceFlags = convertToTraceFlags(samplingState);
 
     if (samplingState === DEBUG_STATE) {
-      context = context.setValue(DEBUG_FLAG_KEY, samplingState);
+      context = context.setValue(B3_DEBUG_FLAG_KEY, samplingState);
     }
 
     return setExtractedSpanContext(context, {

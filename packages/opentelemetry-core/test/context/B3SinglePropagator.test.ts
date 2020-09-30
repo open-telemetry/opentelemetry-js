@@ -32,7 +32,7 @@ import {
   B3SinglePropagator,
   B3_CONTEXT_HEADER,
 } from '../../src/context/propagation/B3SinglePropagator';
-import { DEBUG_FLAG_KEY } from '../../src';
+import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
 
 describe('B3SinglePropagator', () => {
   const propagator = new B3SinglePropagator();
@@ -84,7 +84,7 @@ describe('B3SinglePropagator', () => {
         traceFlags: TraceFlags.SAMPLED,
       };
 
-      const context = ROOT_CONTEXT.setValue(DEBUG_FLAG_KEY, 'd');
+      const context = ROOT_CONTEXT.setValue(B3_DEBUG_FLAG_KEY, 'd');
 
       propagator.inject(
         setExtractedSpanContext(context, spanContext),
@@ -212,7 +212,7 @@ describe('B3SinglePropagator', () => {
         isRemote: true,
         traceFlags: TraceFlags.SAMPLED,
       });
-      assert.strictEqual('d', context.getValue(DEBUG_FLAG_KEY));
+      assert.strictEqual('d', context.getValue(B3_DEBUG_FLAG_KEY));
     });
 
     it('handles malformed traceid', () => {
