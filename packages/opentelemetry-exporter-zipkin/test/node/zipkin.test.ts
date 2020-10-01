@@ -26,7 +26,6 @@ import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
 import { ZipkinExporter } from '../../src';
 import * as zipkinTypes from '../../src/types';
-import { OT_REQUEST_HEADER } from '../../src/utils';
 import { TraceFlags } from '@opentelemetry/api';
 import { SERVICE_RESOURCE } from '@opentelemetry/resources';
 
@@ -241,26 +240,6 @@ describe('Zipkin Exporter - node', () => {
       const scope = nock('https://localhost:9411')
         .post('/api/v2/spans')
         .reply(200);
-
-      const exporter = new ZipkinExporter({
-        serviceName: 'my-service',
-        logger: new NoopLogger(),
-        url: 'https://localhost:9411/api/v2/spans',
-      });
-
-      exporter.export([getReadableSpan()], (result: ExportResult) => {
-        scope.done();
-        assert.strictEqual(result, ExportResult.SUCCESS);
-      });
-    });
-
-    it(`should send '${OT_REQUEST_HEADER}' header`, () => {
-      const scope = nock('https://localhost:9411')
-        .post('/api/v2/spans')
-        .reply(function (uri, requestBody, cb) {
-          assert.ok(this.req.headers[OT_REQUEST_HEADER]);
-          cb(null, [200, 'Ok']);
-        });
 
       const exporter = new ZipkinExporter({
         serviceName: 'my-service',
