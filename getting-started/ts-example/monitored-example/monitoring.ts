@@ -1,7 +1,9 @@
+import { Request, Response, NextFunction } from 'express';
 import { MeterProvider } from '@opentelemetry/metrics';
-import { Counter } from '@opentelemetry/api';
 import { PrometheusExporter } from '@opentelemetry/exporter-prometheus';
-import { RequestHandler } from "express";
+
+const prometheusPort = PrometheusExporter.DEFAULT_OPTIONS.port;
+const prometheusEndpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
 
 const exporter = new PrometheusExporter(
   {
@@ -9,7 +11,7 @@ const exporter = new PrometheusExporter(
   },
   () => {
     console.log(
-      `prometheus scrape endpoint: http://localhost:${PrometheusExporter.DEFAULT_OPTIONS.port}${PrometheusExporter.DEFAULT_OPTIONS.endpoint}`,
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${prometheusEndpoint}`,
     );
   },
 );
@@ -17,16 +19,16 @@ const exporter = new PrometheusExporter(
 const meter = new MeterProvider({
   exporter,
   interval: 1000,
-}).getMeter('example-ts');
+}).getMeter('your-meter-name');
 
-const requestCount: Counter = meter.createCounter("requests", {
-  description: "Count all incoming requests"
+const requestCount = meter.createCounter('requests', {
+  description: 'Count all incoming requests',
 });
 
 const handles = new Map();
 
-export const countAllRequests = (): RequestHandler => {
-  return (req, res, next) => {
+export const countAllRequests = () => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     if (!handles.has(req.path)) {
       const labels = { route: req.path };
       const handle = requestCount.bind(labels);

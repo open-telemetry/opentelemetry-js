@@ -49,7 +49,7 @@ export interface Span {
    * @param key the key for this attribute.
    * @param value the value for this attribute.
    */
-  setAttribute(key: string, value: AttributeValue): this;
+  setAttribute(key: string, value?: AttributeValue): this;
 
   /**
    * Sets attributes to the span.

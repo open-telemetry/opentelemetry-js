@@ -88,20 +88,15 @@ export class Span implements api.Span, ReadableSpan {
     return this.spanContext;
   }
 
-  setAttribute(key: string, value: AttributeValue): this;
+  setAttribute(key: string, value?: AttributeValue): this;
   setAttribute(key: string, value: unknown): this {
-    if (this._isSpanEnded()) return this;
+    if (value == null || this._isSpanEnded()) return this;
     if (key.length === 0) {
       this._logger.warn(`Invalid attribute key: ${key}`);
       return this;
     }
     if (!isAttributeValue(value)) {
       this._logger.warn(`Invalid attribute value set for key: ${key}`);
-      return this;
-    }
-
-    if (value == null) {
-      delete this.attributes[key];
       return this;
     }
 

@@ -22,7 +22,7 @@ This guide will walk you through the setup and configuration process for a traci
 
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
 
-An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with tracing enabled in the [traced-example directory](traced-example).
+An example application which can be used with this guide can be found in the [example directory](example). You can see what it looks like with tracing enabled in the [traced-example directory](traced-example).
 
 ### Setting up a Tracing Backend
 
@@ -44,7 +44,7 @@ Browse to <http://localhost:9411> to ensure that you can see the Zipkin UI.
 
 ([link to TypeScript version](ts-example/README.md#trace-your-nodejs-application))
 
-This guide uses the example application provided in the `example` directory, but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
+This guide uses the example application provided in the [example directory](example), but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
 
 1. Install the required OpenTelemetry libraries
 2. Initialize a global tracer
@@ -169,10 +169,10 @@ Open a command line and `cd` into the directory where you downloaded the Prometh
 $ cd Downloads
 
 $ # Replace the file name below with your downloaded tarball
-$ tar xvfz prometheus-2.14.0.darwin-amd64.tar
+$ tar xvfz prometheus-2.20.1.darwin-amd64.tar
 
 $ # Replace the dir below with your created directory
-$ cd prometheus-2.14.0.darwin-amd64
+$ cd prometheus-2.20.1.darwin-amd64
 
 $ ls
 LICENSE           console_libraries data              prometheus.yml    tsdb
@@ -313,7 +313,7 @@ const exporter = new PrometheusExporter(
   },
   () => {
     console.log(
-      `prometheus scrape endpoint: http://localhost:${prometheusPort}${Prometheusendpoint}`,
+      `prometheus scrape endpoint: http://localhost:${prometheusPort}${prometheusEndpoint}`,
     );
   },
 );

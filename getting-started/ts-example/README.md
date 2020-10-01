@@ -22,7 +22,7 @@ This TypeScript guide will walk you through the setup and configuration process 
 
 This guide assumes you are going to be using Zipkin as your tracing backend, but modifying it for Jaeger should be straightforward.
 
-An example application which can be used with this guide can be found at in the same directory.
+An example application which can be used with this guide can be found in the [example directory](example). You can see what it looks like with tracing enabled in the [traced-example directory](traced-example).
 
 ### Setting up a Tracing Backend
 
@@ -44,7 +44,7 @@ Browse to <http://localhost:9411> to ensure that you can see the Zipkin UI.
 
 ([link to JavaScript version](../README.md#trace-your-nodejs-application))
 
-This guide uses the example application provided in the `example` directory, but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
+This guide uses the example application provided in the [example directory](example) but the steps to instrument your own application should be broadly the same. Here is an overview of what we will be doing.
 
 1. Install the required OpenTelemetry libraries
 2. Initialize a global tracer
@@ -61,7 +61,8 @@ $ npm install \
   @opentelemetry/core \
   @opentelemetry/node \
   @opentelemetry/plugin-http \
-  @opentelemetry/api
+  @opentelemetry/plugin-https \
+  @opentelemetry/plugin-express
 ```
 
 #### Initialize a global tracer
@@ -73,7 +74,6 @@ All tracing initialization should happen before your application’s code runs. 
 Create a file named `tracing.ts` and add the following code:
 
 ```typescript
-import * as opentelemetry from '@opentelemetry/api';
 import { LogLevel } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
 
@@ -170,10 +170,10 @@ Open a command line and `cd` into the directory where you downloaded the Prometh
 $ cd Downloads
 
 $ # Replace the file name below with your downloaded tarball
-$ tar xvfz prometheus-2.14.0.darwin-amd64.tar
+$ tar xvfz prometheus-2.20.1.darwin-amd64.tar
 
 $ # Replace the dir below with your created directory
-$ cd prometheus-2.14.0.darwin-amd64
+$ cd prometheus-2.20.1.darwin-amd64
 
 $ ls
 LICENSE           console_libraries data              prometheus.yml    tsdb
@@ -213,7 +213,7 @@ scrape_configs:
 
 ([link to JavaScript version](../README.md#monitor-your-nodejs-application))
 
-An example application which can be used with this guide can be found at in the current directory.
+An example application which can be used with this guide can be found at in the [example directory](example). You can see what it looks like with metric monitoring enabled in the [monitored-example directory](monitored-example).
 
 1. Install the required OpenTelemetry metrics libraries
 2. Initialize a meter and collect metrics
@@ -342,11 +342,7 @@ export const countAllRequests = () => {
 Ensure prometheus is running by running the `prometheus` binary from earlier and start your application.
 
 ```sh
-$ npm start
-
-> @opentelemetry/getting-started@1.0.0 start /Users/.../opentelemetry-js/getting-started/example/ts
-> ts-node app.ts
-
+$ ts-node app.ts
 prometheus scrape endpoint: http://localhost:9464/metrics
 Listening for requests on http://localhost:8080
 ```
