@@ -20,7 +20,6 @@ import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
 import * as zipkinTypes from '../../types';
-import { OT_REQUEST_HEADER } from '../../utils';
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
@@ -37,7 +36,6 @@ export function prepareSend(
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        [OT_REQUEST_HEADER]: 1,
         ...headers,
       },
     },

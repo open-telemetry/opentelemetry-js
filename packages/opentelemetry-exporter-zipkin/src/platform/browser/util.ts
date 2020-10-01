@@ -17,7 +17,6 @@
 import * as api from '@opentelemetry/api';
 import { ExportResult } from '@opentelemetry/core';
 import * as zipkinTypes from '../../types';
-import { OT_REQUEST_HEADER } from '../../utils';
 
 /**
  * Prepares send function that will send spans to the remote Zipkin service.
@@ -33,7 +32,6 @@ export function prepareSend(
     xhrHeaders = {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      [OT_REQUEST_HEADER]: '1',
       ...headers,
     };
   }

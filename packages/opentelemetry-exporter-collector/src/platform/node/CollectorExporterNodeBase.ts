@@ -31,9 +31,7 @@ export abstract class CollectorExporterNodeBase<
   ExportItem,
   ServiceRequest
 > {
-  DEFAULT_HEADERS: Record<string, string> = {
-    [collectorTypes.OT_REQUEST_HEADER]: '1',
-  };
+  DEFAULT_HEADERS: Record<string, string> = {};
   headers: Record<string, string>;
   constructor(config: CollectorExporterConfigBase = {}) {
     super(config);
