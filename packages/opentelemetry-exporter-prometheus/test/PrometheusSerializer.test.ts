@@ -15,12 +15,13 @@
  */
 import {
   SumAggregator,
-  MinMaxLastSumCountAggregator,
   HistogramAggregator,
+  LastValueAggregator,
   MeterProvider,
   CounterMetric,
   ValueRecorderMetric,
   UpDownCounterMetric,
+  ValueObserverMetric,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import { Labels } from '@opentelemetry/api';
@@ -88,19 +89,24 @@ describe('PrometheusSerializer', () => {
       });
     });
 
-    describe('with MinMaxLastSumCountAggregator', () => {
-      mockAggregator(MinMaxLastSumCountAggregator);
+    describe('with LastValueAggregator', () => {
+      mockAggregator(LastValueAggregator);
 
-      it('should serialize metric record with sum aggregator', async () => {
+      it('should serialize metric record with LastValue aggregator', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(LastValueAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
-        counter.bind(labels).add(1);
-
-        const records = await counter.getMetricRecord();
+        const observer = meter.createValueObserver(
+          'test',
+          {},
+          observerResult => {
+            observerResult.observe(1, labels);
+          }
+        ) as ValueObserverMetric;
+        await meter.collect();
+        const records = await observer.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
@@ -109,10 +115,7 @@ describe('PrometheusSerializer', () => {
         );
         assert.strictEqual(
           result,
-          `test_count{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n` +
-            `test{foo1="bar1",foo2="bar2",quantile="0"} 1 ${mockedHrTimeMs}\n` +
-            `test{foo1="bar1",foo2="bar2",quantile="1"} 1 ${mockedHrTimeMs}\n`
+          `test{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -120,25 +123,24 @@ describe('PrometheusSerializer', () => {
         const serializer = new PrometheusSerializer(undefined, false);
 
         const meter = new MeterProvider({
-          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(LastValueAggregator),
         }).getMeter('test');
-        const counter = meter.createCounter('test') as CounterMetric;
-        counter.bind(labels).add(1);
-
-        const records = await counter.getMetricRecord();
+        const observer = meter.createValueObserver(
+          'test',
+          {},
+          observerResult => {
+            observerResult.observe(1, labels);
+          }
+        ) as ValueObserverMetric;
+        await meter.collect();
+        const records = await observer.getMetricRecord();
         const record = records[0];
 
         const result = serializer.serializeRecord(
           record.descriptor.name,
           record
         );
-        assert.strictEqual(
-          result,
-          'test_count{foo1="bar1",foo2="bar2"} 1\n' +
-            'test_sum{foo1="bar1",foo2="bar2"} 1\n' +
-            'test{foo1="bar1",foo2="bar2",quantile="0"} 1\n' +
-            'test{foo1="bar1",foo2="bar2",quantile="1"} 1\n'
-        );
+        assert.strictEqual(result, 'test{foo1="bar1",foo2="bar2"} 1\n');
       });
     });
 
@@ -262,23 +264,27 @@ describe('PrometheusSerializer', () => {
       });
     });
 
-    describe('with MinMaxLastSumCountAggregator', () => {
-      mockAggregator(MinMaxLastSumCountAggregator);
+    describe('with LastValueAggregator', () => {
+      mockAggregator(LastValueAggregator);
 
-      it('serialize metric record with MinMaxLastSumCountAggregator aggregator', async () => {
+      it('serialize metric record with LastValue aggregator', async () => {
         const serializer = new PrometheusSerializer();
 
         const meter = new MeterProvider({
-          batcher: new ExactBatcher(MinMaxLastSumCountAggregator),
+          batcher: new ExactBatcher(LastValueAggregator),
         }).getMeter('test');
         const batcher = new PrometheusLabelsBatcher();
-        const counter = meter.createCounter('test', {
-          description: 'foobar',
-        }) as CounterMetric;
-        counter.bind({ val: '1' }).add(1);
-        counter.bind({ val: '2' }).add(1);
-
-        const records = await counter.getMetricRecord();
+        const observer = meter.createValueObserver(
+          'test',
+          {
+            description: 'foobar',
+          },
+          observerResult => {
+            observerResult.observe(1, labels);
+          }
+        ) as ValueObserverMetric;
+        await meter.collect();
+        const records = await observer.getMetricRecord();
         records.forEach(it => batcher.process(it));
         const checkPointSet = batcher.checkPointSet();
 
@@ -286,15 +292,8 @@ describe('PrometheusSerializer', () => {
         assert.strictEqual(
           result,
           '# HELP test foobar\n' +
-            '# TYPE test summary\n' +
-            `test_count{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test{val="1",quantile="0"} 1 ${mockedHrTimeMs}\n` +
-            `test{val="1",quantile="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{val="2"} 1 ${mockedHrTimeMs}\n` +
-            `test{val="2",quantile="0"} 1 ${mockedHrTimeMs}\n` +
-            `test{val="2",quantile="1"} 1 ${mockedHrTimeMs}\n`
+            '# TYPE test gauge\n' +
+            `test{foo1="bar1",foo2="bar2"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });

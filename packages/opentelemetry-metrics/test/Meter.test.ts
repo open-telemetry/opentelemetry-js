@@ -29,8 +29,9 @@ import {
   Aggregator,
   MetricDescriptor,
   UpDownCounterMetric,
-  Distribution,
-  MinMaxLastSumCountAggregator,
+  LastValueAggregator,
+  LastValue,
+  Histogram,
 } from '../src';
 import * as api from '@opentelemetry/api';
 import { NoopLogger, hrTime, hrTimeToNanoseconds } from '@opentelemetry/core';
@@ -623,12 +624,13 @@ describe('Meter', () => {
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
+          record1.aggregator.toPoint().value as Histogram,
           {
+            buckets: {
+              boundaries: [Infinity],
+              counts: [0, 0],
+            },
             count: 0,
-            last: 0,
-            max: -Infinity,
-            min: Infinity,
             sum: 0,
           }
         );
@@ -643,12 +645,13 @@ describe('Meter', () => {
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
+          record1.aggregator.toPoint().value as Histogram,
           {
+            buckets: {
+              boundaries: [Infinity],
+              counts: [2, 0],
+            },
             count: 2,
-            last: 50,
-            max: 50,
-            min: -10,
             sum: 40,
           }
         );
@@ -669,12 +672,13 @@ describe('Meter', () => {
         await meter.collect();
         const [record1] = meter.getBatcher().checkPointSet();
         assert.deepStrictEqual(
-          record1.aggregator.toPoint().value as Distribution,
+          record1.aggregator.toPoint().value as Histogram,
           {
+            buckets: {
+              boundaries: [Infinity],
+              counts: [2, 0],
+            },
             count: 2,
-            last: 100,
-            max: 100,
-            min: 10,
             sum: 110,
           }
         );
@@ -693,14 +697,14 @@ describe('Meter', () => {
             boundValueRecorder.record(val);
             await meter.collect();
             const [record1] = meter.getBatcher().checkPointSet();
-
             assert.deepStrictEqual(
-              record1.aggregator.toPoint().value as Distribution,
+              record1.aggregator.toPoint().value as Histogram,
               {
+                buckets: {
+                  boundaries: [Infinity],
+                  counts: [0, 0],
+                },
                 count: 0,
-                last: 0,
-                max: -Infinity,
-                min: Infinity,
                 sum: 0,
               }
             );
@@ -768,12 +772,14 @@ describe('Meter', () => {
 
     it('should set callback and observe value ', async () => {
       let counter = 0;
+
       function getValue() {
         if (++counter % 2 == 0) {
           return -1;
         }
         return 3;
       }
+
       const sumObserver = meter.createSumObserver(
         'name',
         {
@@ -987,6 +993,7 @@ describe('Meter', () => {
 
     it('should set callback and observe value ', async () => {
       let counter = 0;
+
       function getValue() {
         counter++;
         if (counter % 2 === 0) {
@@ -994,6 +1001,7 @@ describe('Meter', () => {
         }
         return 3;
       }
+
       const upDownSumObserver = meter.createUpDownSumObserver(
         'name',
         {
@@ -1192,34 +1200,10 @@ describe('Meter', () => {
       assert.strictEqual(hashLabels(metric3.labels), '|#app:app2,core:1');
       assert.strictEqual(hashLabels(metric4.labels), '|#app:app2,core:2');
 
-      ensureMetric(metric1, 'cpu_temp_per_app', {
-        count: 1,
-        last: 67,
-        max: 67,
-        min: 67,
-        sum: 67,
-      });
-      ensureMetric(metric2, 'cpu_temp_per_app', {
-        count: 1,
-        last: 69,
-        max: 69,
-        min: 69,
-        sum: 69,
-      });
-      ensureMetric(metric3, 'cpu_temp_per_app', {
-        count: 1,
-        last: 67,
-        max: 67,
-        min: 67,
-        sum: 67,
-      });
-      ensureMetric(metric4, 'cpu_temp_per_app', {
-        count: 1,
-        last: 69,
-        max: 69,
-        min: 69,
-        sum: 69,
-      });
+      ensureMetric(metric1, 'cpu_temp_per_app', 67);
+      ensureMetric(metric2, 'cpu_temp_per_app', 69);
+      ensureMetric(metric3, 'cpu_temp_per_app', 67);
+      ensureMetric(metric4, 'cpu_temp_per_app', 69);
 
       const metric5 = records[4];
       const metric6 = records[5];
@@ -1230,34 +1214,10 @@ describe('Meter', () => {
       assert.strictEqual(hashLabels(metric7.labels), '|#app:app2,core:1');
       assert.strictEqual(hashLabels(metric8.labels), '|#app:app2,core:2');
 
-      ensureMetric(metric5, 'cpu_usage_per_app', {
-        count: 1,
-        last: 2.1,
-        max: 2.1,
-        min: 2.1,
-        sum: 2.1,
-      });
-      ensureMetric(metric6, 'cpu_usage_per_app', {
-        count: 1,
-        last: 3.1,
-        max: 3.1,
-        min: 3.1,
-        sum: 3.1,
-      });
-      ensureMetric(metric7, 'cpu_usage_per_app', {
-        count: 1,
-        last: 1.2,
-        max: 1.2,
-        min: 1.2,
-        sum: 1.2,
-      });
-      ensureMetric(metric8, 'cpu_usage_per_app', {
-        count: 1,
-        last: 4.5,
-        max: 4.5,
-        min: 4.5,
-        sum: 4.5,
-      });
+      ensureMetric(metric5, 'cpu_usage_per_app', 2.1);
+      ensureMetric(metric6, 'cpu_usage_per_app', 3.1);
+      ensureMetric(metric7, 'cpu_usage_per_app', 1.2);
+      ensureMetric(metric8, 'cpu_usage_per_app', 4.5);
     });
 
     it('should not observe values when timeout', done => {
@@ -1287,15 +1247,9 @@ describe('Meter', () => {
             const value = cpuUsageMetric
               .bind({ foo: 'bar' })
               .getAggregator()
-              .toPoint().value as Distribution;
+              .toPoint().value;
 
-            assert.deepStrictEqual(value, {
-              count: 0,
-              last: 0,
-              max: -Infinity,
-              min: Infinity,
-              sum: 0,
-            });
+            assert.deepStrictEqual(value, 0);
             assert.strictEqual(cpuUsageMetricRecords.length, 0);
             done();
           });
@@ -1393,22 +1347,17 @@ class CustomBatcher extends Batcher {
   process(record: MetricRecord): void {
     throw new Error('process method not implemented.');
   }
+
   aggregatorFor(metricKind: MetricDescriptor): Aggregator {
     throw new Error('aggregatorFor method not implemented.');
   }
 }
 
-function ensureMetric(
-  metric: MetricRecord,
-  name?: string,
-  value?: Distribution
-) {
-  assert.ok(metric.aggregator instanceof MinMaxLastSumCountAggregator);
-  const distribution = metric.aggregator.toPoint().value as Distribution;
+function ensureMetric(metric: MetricRecord, name?: string, value?: LastValue) {
+  assert.ok(metric.aggregator instanceof LastValueAggregator);
+  const lastValue = metric.aggregator.toPoint().value;
   if (value) {
-    assert.deepStrictEqual(distribution, value);
-  } else {
-    assert.ok(distribution.last >= 0 && distribution.last <= 1);
+    assert.deepStrictEqual(lastValue, value);
   }
   const descriptor = metric.descriptor;
   assert.strictEqual(descriptor.name, name || 'name');

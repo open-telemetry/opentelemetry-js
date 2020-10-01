@@ -52,7 +52,7 @@ describe('CollectorMetricExporter - common', () => {
   describe('constructor', () => {
     let onInitSpy: any;
 
-    beforeEach(() => {
+    beforeEach(async () => {
       onInitSpy = sinon.stub(CollectorMetricExporter.prototype, 'onInit');
       collectorExporterConfig = {
         hostname: 'foo',
@@ -63,8 +63,8 @@ describe('CollectorMetricExporter - common', () => {
       };
       collectorExporter = new CollectorMetricExporter(collectorExporterConfig);
       metrics = [];
-      metrics.push(mockCounter());
-      metrics.push(mockObserver());
+      metrics.push(await mockCounter());
+      metrics.push(await mockObserver());
     });
 
     afterEach(() => {

@@ -16,7 +16,6 @@
 import {
   MetricRecord,
   AggregatorKind,
-  Distribution,
   MetricKind,
 } from '@opentelemetry/metrics';
 import { PrometheusCheckpoint } from './types';
@@ -94,8 +93,6 @@ function toPrometheusType(
       return 'gauge';
     case AggregatorKind.LAST_VALUE:
       return 'gauge';
-    case AggregatorKind.DISTRIBUTION:
-      return 'summary';
     case AggregatorKind.HISTOGRAM:
       return 'histogram';
     default:
@@ -191,38 +188,6 @@ export class PrometheusSerializer {
           value,
           this._appendTimestamp ? timestamp : undefined,
           undefined
-        );
-        break;
-      }
-      case AggregatorKind.DISTRIBUTION: {
-        const { value, timestamp: hrtime } = record.aggregator.toPoint();
-        const timestamp = hrTimeToMilliseconds(hrtime);
-        for (const key of ['count', 'sum'] as (keyof Distribution)[]) {
-          results += stringify(
-            name + '_' + key,
-            record.labels,
-            value[key],
-            this._appendTimestamp ? timestamp : undefined,
-            undefined
-          );
-        }
-        results += stringify(
-          name,
-          record.labels,
-          value.min,
-          this._appendTimestamp ? timestamp : undefined,
-          {
-            quantile: '0',
-          }
-        );
-        results += stringify(
-          name,
-          record.labels,
-          value.max,
-          this._appendTimestamp ? timestamp : undefined,
-          {
-            quantile: '1',
-          }
         );
         break;
       }
