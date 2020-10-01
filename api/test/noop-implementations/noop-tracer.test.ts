@@ -15,7 +15,15 @@
  */
 
 import * as assert from 'assert';
-import { NoopTracer, NOOP_SPAN, SpanKind } from '../../src';
+import {
+  NoopTracer,
+  NOOP_SPAN,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+  context,
+  setExtractedSpanContext,
+} from '../../src';
 
 describe('NoopTracer', () => {
   it('should not crash', () => {
@@ -50,5 +58,35 @@ describe('NoopTracer', () => {
     };
     const patchedFn = tracer.bind(fn, NOOP_SPAN);
     return patchedFn();
+  });
+
+  it('should propagate valid spanContext on the span (from parent)', () => {
+    const tracer = new NoopTracer();
+    const parent: SpanContext = {
+      traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+      spanId: '6e0c63257de34c92',
+      traceFlags: TraceFlags.NONE,
+    };
+    const span = tracer.startSpan('test-1', { parent });
+    assert(span.context().traceId === parent.traceId);
+    assert(span.context().spanId === parent.spanId);
+    assert(span.context().traceFlags === parent.traceFlags);
+  });
+
+  it('should propagate valid spanContext on the span (from context)', () => {
+    const tracer = new NoopTracer();
+    const parent: SpanContext = {
+      traceId: 'd4cda95b652f4a1592b449dd92ffda3b',
+      spanId: '6e0c63ffe4e34c42',
+      traceFlags: TraceFlags.NONE,
+    };
+    const span = tracer.startSpan(
+      'test-1',
+      {},
+      setExtractedSpanContext(context.active(), parent)
+    );
+    assert(span.context().traceId === parent.traceId);
+    assert(span.context().spanId === parent.spanId);
+    assert(span.context().traceFlags === parent.traceFlags);
   });
 });
