@@ -20,9 +20,11 @@ import {
   TextMapPropagator,
   SetterFunction,
   TraceFlags,
-  createContextKey,
+  getParentSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
-import { getParentSpanContext, setExtractedSpanContext } from '../context';
+
+import { createContextKey } from '@opentelemetry/context-base';
 
 export const X_B3_TRACE_ID = 'x-b3-traceid';
 export const X_B3_SPAN_ID = 'x-b3-spanid';

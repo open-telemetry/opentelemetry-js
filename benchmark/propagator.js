@@ -31,7 +31,7 @@ for (const setup of setups) {
   const suite = benchmark(100)
     .add('#Inject', function () {
       propagator.inject(
-        opentelemetry.setExtractedSpanContext(Context.ROOT_CONTEXT, {
+        api.setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92'
         }), setup.injectCarrier, api.defaultSetter);

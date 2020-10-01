@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Context, TextMapPropagator, TraceFlags } from '@opentelemetry/api';
 import {
+  Context,
+  TextMapPropagator,
+  TraceFlags,
   getParentSpanContext,
   setExtractedSpanContext,
-} from '@opentelemetry/core';
+} from '@opentelemetry/api';
 import * as http from 'http';
 
 export class DummyPropagation implements TextMapPropagator {
