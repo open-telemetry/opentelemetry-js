@@ -20,7 +20,6 @@ import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
-import { OT_REQUEST_HEADER } from './utils';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -54,7 +53,6 @@ export class JaegerExporter implements SpanExporter {
     localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
     if (localConfig.endpoint) {
       this._sender = new jaegerTypes.HTTPSender(localConfig);
-      this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
     } else {
       this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
         localConfig

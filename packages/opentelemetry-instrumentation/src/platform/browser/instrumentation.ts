@@ -14,4 +14,24 @@
  * limitations under the License.
  */
 
-export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+import { InstrumentationAbstract } from '../../instrumentation';
+import * as types from '../../types';
+
+/**
+ * Base abstract class for instrumenting web plugins
+ */
+export abstract class InstrumentationBase<T = any>
+  extends InstrumentationAbstract
+  implements types.Instrumentation {
+  constructor(
+    readonly instrumentationName: string,
+    readonly instrumentationVersion: string,
+    config: types.InstrumentationConfig = {}
+  ) {
+    super(instrumentationName, instrumentationVersion, config);
+
+    if (this._config.enabled) {
+      this.enable();
+    }
+  }
+}

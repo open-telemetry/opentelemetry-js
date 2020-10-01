@@ -14,4 +14,4 @@
  * limitations under the License.
  */
 
-export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+export * from './instrumentation';

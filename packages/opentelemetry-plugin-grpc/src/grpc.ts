@@ -43,7 +43,6 @@ import {
   _grpcStatusCodeToCanonicalCode,
   _grpcStatusCodeToSpanStatus,
   _methodIsIgnored,
-  _containsOtelMetadata,
 } from './utils';
 import { VERSION } from './version';
 
@@ -237,12 +236,9 @@ export class GrpcPlugin extends BasePlugin<grpc> {
     name: string
   ): boolean {
     const parsedName = name.split('/');
-    return (
-      _containsOtelMetadata(call.metadata) ||
-      _methodIsIgnored(
-        parsedName[parsedName.length - 1] || name,
-        this._config.ignoreGrpcMethods
-      )
+    return _methodIsIgnored(
+      parsedName[parsedName.length - 1] || name,
+      this._config.ignoreGrpcMethods
     );
   }
 
@@ -391,9 +387,6 @@ export class GrpcPlugin extends BasePlugin<grpc> {
         const name = `grpc.${original.path.replace('/', '')}`;
         const args = Array.prototype.slice.call(arguments);
         const metadata = plugin._getMetadata(original, args);
-        if (_containsOtelMetadata(metadata)) {
-          return original.apply(this, args);
-        }
         const span = plugin._tracer.startSpan(name, {
           kind: SpanKind.CLIENT,
         });

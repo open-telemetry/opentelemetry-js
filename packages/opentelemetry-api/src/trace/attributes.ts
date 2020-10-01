@@ -15,12 +15,10 @@
  */
 
 export interface Attributes {
-  [attributeKey: string]: AttributeValue;
+  [attributeKey: string]: AttributeValue | undefined;
 }
 
 export type AttributeValue =
-  | undefined
-  | null
   | string
   | number
   | boolean

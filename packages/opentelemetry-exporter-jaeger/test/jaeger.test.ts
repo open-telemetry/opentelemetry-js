@@ -22,7 +22,6 @@ import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { TraceFlags } from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
-import { OT_REQUEST_HEADER } from '../src/utils';
 import * as nock from 'nock';
 
 describe('JaegerExporter', () => {
@@ -156,12 +155,11 @@ describe('JaegerExporter', () => {
       });
     });
 
-    it('should use httpSender if config.endpoint is setten and set x-opentelemetry-outgoing-request header', done => {
+    it('should use httpSender if config.endpoint is setten', done => {
       const mockedEndpoint = 'http://testendpoint';
       nock(mockedEndpoint)
         .post('/')
         .reply(function () {
-          assert.strictEqual(this.req.headers[OT_REQUEST_HEADER], 1);
           assert.strictEqual(
             this.req.headers['content-type'],
             'application/x-thrift'
@@ -174,10 +172,6 @@ describe('JaegerExporter', () => {
         endpoint: mockedEndpoint,
       });
       assert.strictEqual(exporter['_sender'].constructor.name, 'HTTPSender');
-      assert.strictEqual(
-        exporter['_sender']._httpOptions.headers[OT_REQUEST_HEADER],
-        1
-      );
       const spanContext = {
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
         spanId: '6e0c63257de34c92',

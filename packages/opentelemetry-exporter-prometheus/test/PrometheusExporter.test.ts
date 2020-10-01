@@ -32,34 +32,30 @@ describe('PrometheusExporter', () => {
   mockAggregator(MinMaxLastSumCountAggregator);
 
   describe('constructor', () => {
-    it('should construct an exporter', () => {
+    it('should construct an exporter', done => {
       const exporter = new PrometheusExporter();
       assert.ok(typeof exporter.startServer === 'function');
       assert.ok(typeof exporter.shutdown === 'function');
+      exporter.shutdown().then(done);
     });
 
-    it('should start the server if startServer is passed as an option', done => {
+    it('should start the server by default and call the callback', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter(
-        {
-          startServer: true,
-        },
-        () => {
-          const url = `http://localhost:${port}${endpoint}`;
-          http.get(url, (res: any) => {
-            assert.strictEqual(res.statusCode, 200);
-            exporter.shutdown().then(() => {
-              return done();
-            });
+      const exporter = new PrometheusExporter({}, () => {
+        const url = `http://localhost:${port}${endpoint}`;
+        http.get(url, (res: any) => {
+          assert.strictEqual(res.statusCode, 200);
+          exporter.shutdown().then(() => {
+            return done();
           });
-        }
-      );
+        });
+      });
     });
 
-    it('should not start the server by default', () => {
-      const exporter = new PrometheusExporter();
-      assert.ok(exporter['_server']!.listening === false);
+    it('should not start the server if preventServerStart is passed as an option', () => {
+      const exporter = new PrometheusExporter({ preventServerStart: true });
+      assert.ok(exporter['_server'].listening === false);
     });
   });
 
@@ -67,6 +63,7 @@ describe('PrometheusExporter', () => {
     it('it should start on startServer() and call the callback', done => {
       const exporter = new PrometheusExporter({
         port: 9722,
+        preventServerStart: true,
       });
       exporter.startServer().then(() => {
         exporter.shutdown().then(() => {
@@ -78,9 +75,7 @@ describe('PrometheusExporter', () => {
     it('it should listen on the default port and default endpoint', done => {
       const port = PrometheusExporter.DEFAULT_OPTIONS.port;
       const endpoint = PrometheusExporter.DEFAULT_OPTIONS.endpoint;
-      const exporter = new PrometheusExporter();
-
-      exporter.startServer().then(() => {
+      const exporter = new PrometheusExporter({}, () => {
         const url = `http://localhost:${port}${endpoint}`;
         http.get(url, (res: any) => {
           assert.strictEqual(res.statusCode, 200);
@@ -95,76 +90,81 @@ describe('PrometheusExporter', () => {
       const port = 9991;
       const endpoint = '/metric';
 
-      const exporter = new PrometheusExporter({
-        port,
-        endpoint,
-      });
-
-      exporter.startServer().then(() => {
-        const url = `http://localhost:${port}${endpoint}`;
-        http.get(url, (res: any) => {
-          assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown().then(() => {
-            return done();
+      const exporter = new PrometheusExporter(
+        {
+          port,
+          endpoint,
+        },
+        () => {
+          const url = `http://localhost:${port}${endpoint}`;
+          http.get(url, (res: any) => {
+            assert.strictEqual(res.statusCode, 200);
+            exporter.shutdown().then(() => {
+              return done();
+            });
           });
-        });
-      });
+        }
+      );
     });
 
     it('it should not require endpoints to start with a slash', done => {
       const port = 9991;
       const endpoint = 'metric';
 
-      const exporter = new PrometheusExporter({
-        port,
-        endpoint,
-      });
-
-      exporter.startServer().then(() => {
-        const url = `http://localhost:${port}/metric`;
-        http.get(url, (res: any) => {
-          assert.strictEqual(res.statusCode, 200);
-          exporter.shutdown().then(() => {
-            const exporter2 = new PrometheusExporter({
-              port,
-              endpoint: `/${endpoint}`,
-            });
-
-            exporter2.startServer().then(() => {
-              const url = `http://localhost:${port}/metric`;
-              http.get(url, (res: any) => {
-                assert.strictEqual(res.statusCode, 200);
-                exporter2.stopServer().then(() => {
-                  return done();
-                });
-              });
+      const exporter = new PrometheusExporter(
+        {
+          port,
+          endpoint,
+        },
+        () => {
+          const url = `http://localhost:${port}/metric`;
+          http.get(url, (res: any) => {
+            assert.strictEqual(res.statusCode, 200);
+            exporter.shutdown().then(() => {
+              const exporter2 = new PrometheusExporter(
+                {
+                  port,
+                  endpoint: `/${endpoint}`,
+                },
+                () => {
+                  const url = `http://localhost:${port}/metric`;
+                  http.get(url, (res: any) => {
+                    assert.strictEqual(res.statusCode, 200);
+                    exporter2.stopServer().then(() => {
+                      return done();
+                    });
+                  });
+                }
+              );
             });
           });
-        });
-      });
+        }
+      );
     });
 
     it('it should return a HTTP status 404 if the endpoint does not match', done => {
       const port = 9912;
       const endpoint = '/metrics';
-      const exporter = new PrometheusExporter({
-        port,
-        endpoint,
-      });
-      exporter.startServer().then(() => {
-        const url = `http://localhost:${port}/invalid`;
+      const exporter = new PrometheusExporter(
+        {
+          port,
+          endpoint,
+        },
+        () => {
+          const url = `http://localhost:${port}/invalid`;
 
-        http.get(url, (res: any) => {
-          assert.strictEqual(res.statusCode, 404);
-          exporter.shutdown().then(() => {
-            return done();
+          http.get(url, (res: any) => {
+            assert.strictEqual(res.statusCode, 404);
+            exporter.shutdown().then(() => {
+              return done();
+            });
           });
-        });
-      });
+        }
+      );
     });
 
-    it('should call a provided callback regardless of if the server is running', done => {
-      const exporter = new PrometheusExporter();
+    it('should call a provided callback on shutdown regardless of if the server is running', done => {
+      const exporter = new PrometheusExporter({ preventServerStart: true });
       exporter.shutdown().then(() => {
         return done();
       });
@@ -177,14 +177,15 @@ describe('PrometheusExporter', () => {
     let meter: Meter;
 
     beforeEach(done => {
-      exporter = new PrometheusExporter();
-      meterProvider = new MeterProvider({
-        interval: Math.pow(2, 31) - 1,
+      exporter = new PrometheusExporter({}, () => {
+        meterProvider = new MeterProvider({
+          interval: Math.pow(2, 31) - 1,
+        });
+        meter = meterProvider.getMeter('test-prometheus', '1', {
+          exporter,
+        });
+        done();
       });
-      meter = meterProvider.getMeter('test-prometheus', '1', {
-        exporter: exporter,
-      });
-      exporter.startServer().then(done);
     });
 
     afterEach(done => {
@@ -307,37 +308,6 @@ describe('PrometheusExporter', () => {
             })
             .on('error', errorHandler(done));
         });
-      });
-    });
-
-    it('should export multiple labels on manual shutdown', done => {
-      const counter = meter.createCounter('counter', {
-        description: 'a test description',
-      }) as CounterMetric;
-
-      counter.bind({ counterKey1: 'labelValue1' }).add(10);
-      counter.bind({ counterKey1: 'labelValue2' }).add(20);
-      counter.bind({ counterKey1: 'labelValue3' }).add(30);
-      meterProvider.shutdown().then(() => {
-        http
-          .get('http://localhost:9464/metrics', res => {
-            res.on('data', chunk => {
-              const body = chunk.toString();
-              const lines = body.split('\n');
-
-              assert.deepStrictEqual(lines, [
-                '# HELP counter a test description',
-                '# TYPE counter counter',
-                `counter{counterKey1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                `counter{counterKey1="labelValue2"} 20 ${mockedHrTimeMs}`,
-                `counter{counterKey1="labelValue3"} 30 ${mockedHrTimeMs}`,
-                '',
-              ]);
-
-              done();
-            });
-          })
-          .on('error', errorHandler(done));
       });
     });
 
@@ -605,90 +575,93 @@ describe('PrometheusExporter', () => {
     });
 
     it('should use a configured name prefix', done => {
-      exporter = new PrometheusExporter({
-        prefix: 'test_prefix',
-      });
+      exporter = new PrometheusExporter(
+        {
+          prefix: 'test_prefix',
+        },
+        async () => {
+          await meter.collect();
+          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+            http
+              .get('http://localhost:9464/metrics', res => {
+                res.on('data', chunk => {
+                  const body = chunk.toString();
+                  const lines = body.split('\n');
 
-      exporter.startServer().then(async () => {
-        await meter.collect();
-        exporter!.export(meter.getBatcher().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+                  assert.deepStrictEqual(lines, [
+                    '# HELP test_prefix_counter description missing',
+                    '# TYPE test_prefix_counter counter',
+                    `test_prefix_counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '',
+                  ]);
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP test_prefix_counter description missing',
-                  '# TYPE test_prefix_counter counter',
-                  `test_prefix_counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+                  done();
+                });
+              })
+              .on('error', errorHandler(done));
+          });
+        }
+      );
     });
 
     it('should use a configured port', done => {
-      exporter = new PrometheusExporter({
-        port: 8080,
-      });
+      exporter = new PrometheusExporter(
+        {
+          port: 8080,
+        },
+        async () => {
+          await meter.collect();
+          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+            http
+              .get('http://localhost:8080/metrics', res => {
+                res.on('data', chunk => {
+                  const body = chunk.toString();
+                  const lines = body.split('\n');
 
-      exporter.startServer().then(async () => {
-        await meter.collect();
-        exporter!.export(meter.getBatcher().checkPointSet(), () => {
-          http
-            .get('http://localhost:8080/metrics', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+                  assert.deepStrictEqual(lines, [
+                    '# HELP counter description missing',
+                    '# TYPE counter counter',
+                    `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '',
+                  ]);
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP counter description missing',
-                  '# TYPE counter counter',
-                  `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+                  done();
+                });
+              })
+              .on('error', errorHandler(done));
+          });
+        }
+      );
     });
 
     it('should use a configured endpoint', done => {
-      exporter = new PrometheusExporter({
-        endpoint: '/test',
-      });
+      exporter = new PrometheusExporter(
+        {
+          endpoint: '/test',
+        },
+        async () => {
+          await meter.collect();
+          exporter!.export(meter.getBatcher().checkPointSet(), () => {
+            http
+              .get('http://localhost:9464/test', res => {
+                res.on('data', chunk => {
+                  const body = chunk.toString();
+                  const lines = body.split('\n');
 
-      exporter.startServer().then(async () => {
-        await meter.collect();
-        exporter!.export(meter.getBatcher().checkPointSet(), () => {
-          http
-            .get('http://localhost:9464/test', res => {
-              res.on('data', chunk => {
-                const body = chunk.toString();
-                const lines = body.split('\n');
+                  assert.deepStrictEqual(lines, [
+                    '# HELP counter description missing',
+                    '# TYPE counter counter',
+                    `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
+                    '',
+                  ]);
 
-                assert.deepStrictEqual(lines, [
-                  '# HELP counter description missing',
-                  '# TYPE counter counter',
-                  `counter{key1="labelValue1"} 10 ${mockedHrTimeMs}`,
-                  '',
-                ]);
-
-                done();
-              });
-            })
-            .on('error', errorHandler(done));
-        });
-      });
+                  done();
+                });
+              })
+              .on('error', errorHandler(done));
+          });
+        }
+      );
     });
   });
 });
