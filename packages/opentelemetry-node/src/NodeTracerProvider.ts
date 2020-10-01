@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {
+  AsyncHooksContextManager,
+  AsyncLocalStorageContextManager,
+} from '@opentelemetry/context-async-hooks';
 import {
   BasicTracerProvider,
   SDKRegistrationConfig,
 } from '@opentelemetry/tracing';
 import { DEFAULT_INSTRUMENTATION_PLUGINS, NodeTracerConfig } from './config';
 import { PluginLoader, Plugins } from './instrumentation/PluginLoader';
+import * as semver from 'semver';
 
 /**
  * Register this TracerProvider for use with the OpenTelemetry API.
@@ -53,7 +57,10 @@ export class NodeTracerProvider extends BasicTracerProvider {
 
   register(config: SDKRegistrationConfig = {}) {
     if (config.contextManager === undefined) {
-      config.contextManager = new AsyncHooksContextManager();
+      const ContextManager = semver.gte(process.version, '14.8.0')
+        ? AsyncLocalStorageContextManager
+        : AsyncHooksContextManager;
+      config.contextManager = new ContextManager();
       config.contextManager.enable();
     }
 
