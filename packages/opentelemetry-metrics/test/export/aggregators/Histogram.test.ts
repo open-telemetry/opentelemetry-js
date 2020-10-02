@@ -20,8 +20,8 @@ import { Histogram } from '../../../src';
 import { hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
 
 const sleep = async (milliseconds: number) => {
-  return new Promise((resolve) => setTimeout(resolve, milliseconds));
-}
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+};
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {
@@ -115,7 +115,11 @@ describe('HistogramAggregator', () => {
       assert.equal(point.buckets.counts[0], 0);
       assert.equal(point.buckets.counts[1], 1);
       assert.equal(point.buckets.counts[2], 0);
-      assert.equal(hrTimeToMilliseconds(aggregator.toPoint().timestamp) >= timestamp + timeDiff, true);
+      assert.equal(
+        hrTimeToMilliseconds(aggregator.toPoint().timestamp) >=
+          timestamp + timeDiff,
+        true
+      );
     });
   });
 
