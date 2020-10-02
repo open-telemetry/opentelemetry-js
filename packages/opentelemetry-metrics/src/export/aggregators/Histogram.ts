@@ -48,15 +48,14 @@ export class HistogramAggregator implements HistogramAggregatorType {
     this._current.count += 1;
     this._current.sum += value;
 
+    this._lastUpdateTime = hrTime();
+
     for (let i = 0; i < this._boundaries.length; i++) {
       if (value < this._boundaries[i]) {
         this._current.buckets.counts[i] += 1;
         return;
       }
     }
-
-    this._lastUpdateTime = hrTime();
-
     // value is above all observed boundaries
     this._current.buckets.counts[this._boundaries.length] += 1;
   }
