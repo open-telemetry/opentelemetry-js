@@ -18,6 +18,12 @@ import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { TraceIdRatioBasedSampler } from '../../src/trace/sampler/TraceIdRatioBasedSampler';
 
+const spanContext = (traceId = '1') => ({
+  traceId,
+  spanId: '1.1',
+  traceFlags: api.TraceFlags.NONE,
+});
+
 describe('TraceIdRatioBasedSampler', () => {
   it('should reflect sampler name with ratio', () => {
     let sampler = new TraceIdRatioBasedSampler(1.0);
@@ -47,28 +53,28 @@ describe('TraceIdRatioBasedSampler', () => {
 
   it('should return a always sampler for 1', () => {
     const sampler = new TraceIdRatioBasedSampler(1);
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
   });
 
   it('should return a always sampler for >1', () => {
     const sampler = new TraceIdRatioBasedSampler(100);
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
   });
 
   it('should return a never sampler for 0', () => {
     const sampler = new TraceIdRatioBasedSampler(0);
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
 
   it('should return a never sampler for <0', () => {
     const sampler = new TraceIdRatioBasedSampler(-1);
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
@@ -76,7 +82,7 @@ describe('TraceIdRatioBasedSampler', () => {
   it('should handle NaN', () => {
     const sampler = new TraceIdRatioBasedSampler(NaN);
     assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{0}');
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
@@ -84,7 +90,7 @@ describe('TraceIdRatioBasedSampler', () => {
   it('should handle -NaN', () => {
     const sampler = new TraceIdRatioBasedSampler(-NaN);
     assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{0}');
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
@@ -92,18 +98,18 @@ describe('TraceIdRatioBasedSampler', () => {
   it('should handle undefined', () => {
     const sampler = new TraceIdRatioBasedSampler(undefined);
     assert.strictEqual(sampler.toString(), 'TraceIdRatioBased{0}');
-    assert.deepStrictEqual(sampler.shouldSample(undefined, ''), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('1'), '1'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
 
   it('should sample based on trace id', () => {
     const sampler = new TraceIdRatioBasedSampler(0.2);
-    assert.deepStrictEqual(sampler.shouldSample(undefined, '\x00'), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('\x00'), '\x00'), {
       decision: api.SamplingDecision.RECORD_AND_SAMPLED,
     });
 
-    assert.deepStrictEqual(sampler.shouldSample(undefined, '\x15'), {
+    assert.deepStrictEqual(sampler.shouldSample(spanContext('\x15'), '\x15'), {
       decision: api.SamplingDecision.NOT_RECORD,
     });
   });
@@ -111,18 +117,30 @@ describe('TraceIdRatioBasedSampler', () => {
   it('should sample traces that a lower sampling ratio would sample', () => {
     const sampler10 = new TraceIdRatioBasedSampler(0.1);
     const sampler20 = new TraceIdRatioBasedSampler(0.2);
-    assert.deepStrictEqual(sampler10.shouldSample(undefined, '\x00'), {
-      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-    });
-    assert.deepStrictEqual(sampler20.shouldSample(undefined, '\x00'), {
-      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-    });
+    assert.deepStrictEqual(
+      sampler10.shouldSample(spanContext('\x00'), '\x00'),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
+    assert.deepStrictEqual(
+      sampler20.shouldSample(spanContext('\x00'), '\x00'),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
 
-    assert.deepStrictEqual(sampler10.shouldSample(undefined, '\x0a'), {
-      decision: api.SamplingDecision.NOT_RECORD,
-    });
-    assert.deepStrictEqual(sampler20.shouldSample(undefined, '\x0a'), {
-      decision: api.SamplingDecision.RECORD_AND_SAMPLED,
-    });
+    assert.deepStrictEqual(
+      sampler10.shouldSample(spanContext('\x0a'), '\x0a'),
+      {
+        decision: api.SamplingDecision.NOT_RECORD,
+      }
+    );
+    assert.deepStrictEqual(
+      sampler20.shouldSample(spanContext('\x0a'), '\x0a'),
+      {
+        decision: api.SamplingDecision.RECORD_AND_SAMPLED,
+      }
+    );
   });
 });
