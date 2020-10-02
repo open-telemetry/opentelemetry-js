@@ -55,6 +55,8 @@ export class HistogramAggregator implements HistogramAggregatorType {
       }
     }
 
+    this._lastUpdateTime = hrTime();
+
     // value is above all observed boundaries
     this._current.buckets.counts[this._boundaries.length] += 1;
   }
