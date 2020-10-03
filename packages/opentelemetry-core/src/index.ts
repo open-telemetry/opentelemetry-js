@@ -32,7 +32,7 @@ export * from './trace/NoRecordingSpan';
 export * from './trace/sampler/AlwaysOffSampler';
 export * from './trace/sampler/AlwaysOnSampler';
 export * from './trace/sampler/ParentOrElseSampler';
-export * from './trace/sampler/ProbabilitySampler';
+export * from './trace/sampler/TraceIdRatioBasedSampler';
 export * from './trace/TraceState';
 export * from './trace/IdGenerator';
 export * from './utils/deep-merge';
