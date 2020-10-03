@@ -45,10 +45,9 @@ export class HistogramAggregator implements HistogramAggregatorType {
   }
 
   update(value: number): void {
+    this._lastUpdateTime = hrTime();
     this._current.count += 1;
     this._current.sum += value;
-
-    this._lastUpdateTime = hrTime();
 
     for (let i = 0; i < this._boundaries.length; i++) {
       if (value < this._boundaries[i]) {

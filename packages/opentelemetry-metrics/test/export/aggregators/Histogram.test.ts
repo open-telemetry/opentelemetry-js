@@ -18,10 +18,7 @@ import * as assert from 'assert';
 import { HistogramAggregator } from '../../../src/export/aggregators';
 import { Histogram } from '../../../src';
 import { hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
-
-const sleep = async (milliseconds: number) => {
-  return new Promise(resolve => setTimeout(resolve, milliseconds));
-};
+import sinon = require('sinon');
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {
@@ -102,24 +99,29 @@ describe('HistogramAggregator', () => {
       assert.equal(point.buckets.counts[1], 0);
       assert.equal(point.buckets.counts[2], 1);
     });
+  });
 
-    it('should update the second bucket, and change timestamp', async () => {
+  describe('.timestamp', () => {
+    let clock: sinon.SinonFakeTimers;
+    before(() => {
+      clock = sinon.useFakeTimers({ toFake: ['hrtime'] });
+    });
+
+    it('should update point timestamp', () => {
       const aggregator = new HistogramAggregator([100, 200]);
       const timestamp = hrTimeToMilliseconds(hrTime());
       const timeDiff = 10;
-      await sleep(timeDiff);
+      clock.tick(timeDiff);
       aggregator.update(150);
-      const point = aggregator.toPoint().value as Histogram;
-      assert.equal(point.count, 1);
-      assert.equal(point.sum, 150);
-      assert.equal(point.buckets.counts[0], 0);
-      assert.equal(point.buckets.counts[1], 1);
-      assert.equal(point.buckets.counts[2], 0);
       assert.equal(
         hrTimeToMilliseconds(aggregator.toPoint().timestamp) >=
           timestamp + timeDiff,
         true
       );
+    });
+
+    after(() => {
+      clock.restore();
     });
   });
 
