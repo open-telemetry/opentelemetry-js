@@ -20,8 +20,8 @@ import {
   SimpleSpanProcessor,
   BasicTracerProvider,
 } from '../../src';
-import { context } from '@opentelemetry/api';
-import { ExportResult, setActiveSpan } from '@opentelemetry/core';
+import { context, setActiveSpan } from '@opentelemetry/api';
+import { ExportResult } from '@opentelemetry/core';
 
 describe('InMemorySpanExporter', () => {
   let memoryExporter: InMemorySpanExporter;

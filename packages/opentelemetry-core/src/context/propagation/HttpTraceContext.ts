@@ -21,9 +21,10 @@ import {
   SetterFunction,
   SpanContext,
   TraceFlags,
+  getParentSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
-import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 export const TRACE_PARENT_HEADER = 'traceparent';
 export const TRACE_STATE_HEADER = 'tracestate';

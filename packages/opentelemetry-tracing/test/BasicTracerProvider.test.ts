@@ -20,14 +20,14 @@ import {
   TraceFlags,
   ContextManager,
   ROOT_CONTEXT,
+  setActiveSpan,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
-  setActiveSpan,
-  setExtractedSpanContext,
   TraceState,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
