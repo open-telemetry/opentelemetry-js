@@ -319,7 +319,7 @@ describe('PrometheusExporter', () => {
       counter.bind({ counterKey1: 'labelValue1' }).add(10);
       counter.bind({ counterKey1: 'labelValue2' }).add(20);
       counter.bind({ counterKey1: 'labelValue3' }).add(30);
-      meterProvider.shutdown().then(() => {
+      meterProvider.shutdown(() => {
         http
           .get('http://localhost:9464/metrics', res => {
             res.on('data', chunk => {

@@ -239,17 +239,20 @@ export class PrometheusSerializer {
             undefined
           );
         }
+
+        let cumulativeSum = 0;
         for (const [idx, val] of value.buckets.counts.entries()) {
           const upperBound = value.buckets.boundaries[idx];
           results += stringify(
             name + '_bucket',
             record.labels,
-            val,
+            val + cumulativeSum,
             this._appendTimestamp ? timestamp : undefined,
             {
               le: upperBound === undefined ? '+Inf' : String(upperBound),
             }
           );
+          cumulativeSum += val;
         }
         break;
       }
