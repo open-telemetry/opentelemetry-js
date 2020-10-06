@@ -302,7 +302,7 @@ describe('PrometheusSerializer', () => {
     describe('with HistogramAggregator', () => {
       mockAggregator(HistogramAggregator);
 
-      it('serialize metric record with MinMaxLastSumCountAggregator aggregator, cumulative', async () => {
+      it('serialize metric record with HistogramAggregator aggregator, cumulative', async () => {
         const serializer = new PrometheusSerializer();
 
         const batcher = new ExactBatcher(HistogramAggregator, [1, 10, 100]);
