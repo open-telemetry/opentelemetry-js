@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-import { Span, SpanOptions, Tracer } from '..';
-import { NOOP_SPAN } from './NoopSpan';
+import { Span, SpanOptions, Tracer, SpanContext } from '..';
+import { Context } from '@opentelemetry/context-base';
+import { NoopSpan, NOOP_SPAN } from './NoopSpan';
+import { isSpanContextValid } from './spancontext-utils';
+import { getExtractedSpanContext } from '../context/context';
 
 /**
  * No-op implementations of {@link Tracer}.
@@ -26,8 +29,19 @@ export class NoopTracer implements Tracer {
   }
 
   // startSpan starts a noop span.
-  startSpan(name: string, options?: SpanOptions): Span {
-    return NOOP_SPAN;
+  startSpan(name: string, options?: SpanOptions, context?: Context): Span {
+    const parent = options?.parent;
+    const parentFromContext = context && getExtractedSpanContext(context);
+    if (isSpanContext(parent) && isSpanContextValid(parent)) {
+      return new NoopSpan(parent);
+    } else if (
+      isSpanContext(parentFromContext) &&
+      isSpanContextValid(parentFromContext)
+    ) {
+      return new NoopSpan(parentFromContext);
+    } else {
+      return NOOP_SPAN;
+    }
   }
 
   withSpan<T extends (...args: unknown[]) => ReturnType<T>>(
@@ -40,6 +54,15 @@ export class NoopTracer implements Tracer {
   bind<T>(target: T, span?: Span): T {
     return target;
   }
+}
+
+function isSpanContext(spanContext: any): spanContext is SpanContext {
+  return (
+    typeof spanContext === 'object' &&
+    typeof spanContext['spanId'] === 'string' &&
+    typeof spanContext['traceId'] === 'string' &&
+    typeof spanContext['traceFlags'] === 'number'
+  );
 }
 
 export const NOOP_TRACER = new NoopTracer();

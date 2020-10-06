@@ -19,13 +19,11 @@ import {
   defaultSetter,
   SpanContext,
   TraceFlags,
+  getExtractedSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
-import {
-  getExtractedSpanContext,
-  setExtractedSpanContext,
-} from '../../src/context/context';
 import {
   B3Propagator,
   X_B3_FLAGS,
