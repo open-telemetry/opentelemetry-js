@@ -23,12 +23,9 @@ import {
   Status,
   SpanContext,
   TraceFlags,
-} from '@opentelemetry/api';
-import {
-  BasePlugin,
-  NoRecordingSpan,
   getExtractedSpanContext,
-} from '@opentelemetry/core';
+} from '@opentelemetry/api';
+import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
   ClientRequest,
   IncomingMessage,
@@ -397,15 +394,7 @@ export class HttpPlugin extends BasePlugin<Http> {
         extraOptions
       );
 
-      if (utils.isOpenTelemetryRequest(optionsParsed)) {
-        // clone the headers so delete will not modify the user's object
-        optionsParsed.headers = Object.assign({}, optionsParsed.headers);
-        delete optionsParsed.headers[utils.OT_REQUEST_HEADER];
-        return original.apply(this, [optionsParsed, ...args]);
-      }
-
       if (
-        utils.isOpenTelemetryRequest(optionsParsed) ||
         utils.isIgnored(
           origin + pathname,
           plugin._config.ignoreOutgoingUrls,

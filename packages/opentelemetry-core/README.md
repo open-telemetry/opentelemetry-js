@@ -114,10 +114,10 @@ Samples a configurable percentage of traces, and additionally samples any trace 
 
 ```js
 const { NodeTracerProvider } = require("@opentelemetry/node");
-const { ProbabilitySampler } = require("@opentelemetry/core");
+const { TraceIdRatioBasedSampler } = require("@opentelemetry/core");
 
 const tracerProvider = new NodeTracerProvider({
-  sampler: new ProbabilitySampler(0.5)
+  sampler: new TraceIdRatioBasedSampler(0.5)
 });
 ```
 

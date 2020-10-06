@@ -17,9 +17,6 @@
 import { SpanKind, Logger, Attributes } from '@opentelemetry/api';
 import * as api from '@opentelemetry/api';
 
-// header to prevent instrumentation on request
-export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
-
 /* eslint-disable @typescript-eslint/no-namespace */
 export namespace opentelemetryProto {
   export namespace collector {

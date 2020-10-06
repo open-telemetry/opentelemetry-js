@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-import { context, TraceFlags } from '@opentelemetry/api';
+import { context, TraceFlags, setActiveSpan } from '@opentelemetry/api';
 import {
   AlwaysOnSampler,
   AlwaysOffSampler,
   NoopLogger,
   NoRecordingSpan,
-  setActiveSpan,
 } from '@opentelemetry/core';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { Span } from '@opentelemetry/tracing';

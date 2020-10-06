@@ -19,7 +19,7 @@ import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
 import { ParentOrElseSampler } from '../../src/trace/sampler/ParentOrElseSampler';
 import { TraceFlags, SpanKind } from '@opentelemetry/api';
 import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
-import { ProbabilitySampler } from '../../src';
+import { TraceIdRatioBasedSampler } from '../../src';
 
 const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
 const spanId = '6e0c63257de34c92';
@@ -33,10 +33,10 @@ describe('ParentOrElseSampler', () => {
     sampler = new ParentOrElseSampler(new AlwaysOnSampler());
     assert.strictEqual(sampler.toString(), 'ParentOrElse{AlwaysOnSampler}');
 
-    sampler = new ParentOrElseSampler(new ProbabilitySampler(0.5));
+    sampler = new ParentOrElseSampler(new TraceIdRatioBasedSampler(0.5));
     assert.strictEqual(
       sampler.toString(),
-      'ParentOrElse{ProbabilitySampler{0.5}}'
+      'ParentOrElse{TraceIdRatioBased{0.5}}'
     );
   });
 

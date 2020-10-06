@@ -23,11 +23,7 @@ import {
 } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { NodeTracerProvider } from '@opentelemetry/node';
-import {
-  Http,
-  HttpPluginConfig,
-  OT_REQUEST_HEADER,
-} from '@opentelemetry/plugin-http';
+import { Http, HttpPluginConfig } from '@opentelemetry/plugin-http';
 import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
 import { ContextManager } from '@opentelemetry/context-base';
 import {
@@ -186,22 +182,6 @@ describe('HttpsPlugin', () => {
           serverPort
         );
       });
-
-      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
-        const testPath = '/outgoing/do-not-trace';
-        doNock(hostname, testPath, 200, 'Ok');
-
-        const options = {
-          host: hostname,
-          path: testPath,
-          headers: { [OT_REQUEST_HEADER]: 1 },
-        };
-
-        const result = await httpsRequest.get(options);
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(result.data, 'Ok');
-        assert.strictEqual(spans.length, 0);
-      });
     });
     describe('with good plugin options', () => {
       beforeEach(() => {
@@ -309,22 +289,6 @@ describe('HttpsPlugin', () => {
           );
           assertSpan(span, kind, validations);
         });
-      });
-
-      it(`should not trace requests with '${OT_REQUEST_HEADER}' header`, async () => {
-        const testPath = '/outgoing/do-not-trace';
-        doNock(hostname, testPath, 200, 'Ok');
-
-        const options = {
-          host: hostname,
-          path: testPath,
-          headers: { [OT_REQUEST_HEADER]: 1 },
-        };
-
-        const result = await httpsRequest.get(options);
-        const spans = memoryExporter.getFinishedSpans();
-        assert.strictEqual(result.data, 'Ok');
-        assert.strictEqual(spans.length, 0);
       });
 
       const httpErrorCodes = [400, 401, 403, 404, 429, 501, 503, 504, 500, 505];

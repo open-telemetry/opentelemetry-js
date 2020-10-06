@@ -26,11 +26,6 @@ import { IgnoreMatcher } from './types';
 export const CALL_SPAN_ENDED = Symbol('opentelemetry call span ended');
 
 /**
- * Metadata key used to denote an outgoing opentelemetry request.
- */
-const OTEL_OUTGOING_REQUEST_KEY = 'x-opentelemetry-outgoing-request';
-
-/**
  * Convert a grpc status code to an opentelemetry Canonical code. For now, the enums are exactly the same
  * @param status
  */
@@ -49,14 +44,6 @@ export const grpcStatusCodeToCanonicalCode = (
  */
 export const grpcStatusCodeToSpanStatus = (status: number): Status => {
   return { code: status };
-};
-
-/**
- * Returns true if the metadata contains
- * the opentelemetry outgoing request header.
- */
-export const containsOtelMetadata = (metadata: grpcTypes.Metadata): boolean => {
-  return metadata.get(OTEL_OUTGOING_REQUEST_KEY).length > 0;
 };
 
 /**

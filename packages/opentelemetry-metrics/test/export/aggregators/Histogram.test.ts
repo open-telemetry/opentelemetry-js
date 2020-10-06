@@ -17,6 +17,8 @@
 import * as assert from 'assert';
 import { HistogramAggregator } from '../../../src/export/aggregators';
 import { Histogram } from '../../../src';
+import { hrTime, hrTimeToMilliseconds } from '@opentelemetry/core';
+import sinon = require('sinon');
 
 describe('HistogramAggregator', () => {
   describe('constructor()', () => {
@@ -96,6 +98,30 @@ describe('HistogramAggregator', () => {
       assert.equal(point.buckets.counts[0], 0);
       assert.equal(point.buckets.counts[1], 0);
       assert.equal(point.buckets.counts[2], 1);
+    });
+  });
+
+  describe('.timestamp', () => {
+    let clock: sinon.SinonFakeTimers;
+    before(() => {
+      clock = sinon.useFakeTimers({ toFake: ['hrtime'] });
+    });
+
+    it('should update point timestamp', () => {
+      const aggregator = new HistogramAggregator([100, 200]);
+      const timestamp = hrTimeToMilliseconds(hrTime());
+      const timeDiff = 10;
+      clock.tick(timeDiff);
+      aggregator.update(150);
+      assert.equal(
+        hrTimeToMilliseconds(aggregator.toPoint().timestamp) >=
+          timestamp + timeDiff,
+        true
+      );
+    });
+
+    after(() => {
+      clock.restore();
     });
   });
 

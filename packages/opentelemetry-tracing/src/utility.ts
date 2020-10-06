@@ -23,7 +23,7 @@ import {
 import { TracerConfig } from './types';
 import {
   ParentOrElseSampler,
-  ProbabilitySampler,
+  TraceIdRatioBasedSampler,
   getEnv,
 } from '@opentelemetry/core';
 
@@ -41,7 +41,7 @@ export function mergeConfig(userConfig: TracerConfig) {
     otelSamplingProbability !== undefined && otelSamplingProbability < 1
       ? {
           sampler: new ParentOrElseSampler(
-            new ProbabilitySampler(otelSamplingProbability)
+            new TraceIdRatioBasedSampler(otelSamplingProbability)
           ),
         }
       : {},
