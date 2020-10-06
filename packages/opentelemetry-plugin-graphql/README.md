@@ -9,6 +9,7 @@
 This module provides *automated instrumentation and tracing* for GraphQL in Node.js applications.
 
 ## Installation
+
 ```shell script
 npm install @opentelemetry/plugin-graphql
 ```

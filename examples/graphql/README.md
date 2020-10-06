@@ -1,15 +1,13 @@
-# Overview OpenTelemetry GraphQL Plugin
-
-[![NPM Published Version][npm-img]][npm-url]
+# Overview OpenTelemetry GraphQL Plugin Example
 
 This example shows how to use 2 popular graphql servers
+
 - [Apollo GraphQL](https://www.npmjs.com/package/apollo-server)
 - [GraphQL HTTP Server Middleware](https://www.npmjs.com/package/express-graphql)
 
 and [@opentelemetry/plugin-graphql](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-plugin-graphql) to instrument a simple Node.js application.
 
 This plugin should work with any graphql server as it instruments graphql directly.
-
 
 This example will export spans data simultaneously using [Exporter Collector](https://github.com/open-telemetry/opentelemetry-js/tree/master/packages/opentelemetry-exporter-collector).
 
@@ -47,8 +45,7 @@ npm install
     npm run client
     ```
 
-5. You can also write your own queries, open page http://localhost:4000/graphql
-
+5. You can also write your own queries, open page `http://localhost:4000/graphql`
 
 ## Useful links
 
@@ -58,5 +55,3 @@ npm install
 ## LICENSE
 
 Apache License 2.0
-[npm-url]: https://www.npmjs.com/package/@opentelemetry/plugin-graphql
-[npm-img]: https://badge.fury.io/js/%40opentelemetry%2Fplugin-graphql.svg
