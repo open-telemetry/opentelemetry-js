@@ -24,7 +24,7 @@ import {
   SpanContext,
   TraceFlags,
   getExtractedSpanContext,
-  setActiveSpan
+  setActiveSpan,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
