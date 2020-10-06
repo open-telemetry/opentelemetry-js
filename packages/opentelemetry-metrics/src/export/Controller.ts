@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { ExportResult, unrefTimer } from '@opentelemetry/core';
+import {
+  ExportResult,
+  unrefTimer,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import { Meter } from '../Meter';
 import { MetricExporter } from './types';
 
@@ -49,12 +53,12 @@ export class PushController extends Controller {
       this._exporter.export(
         this._meter.getBatcher().checkPointSet(),
         result => {
-          if (result === ExportResult.SUCCESS) {
-            resolve();
-          } else {
-            // @todo log error
-            reject();
+          if (result !== ExportResult.SUCCESS) {
+            globalErrorHandler(
+              new Error('PushController: export failed in _collect')
+            );
           }
+          resolve();
         }
       );
     });
