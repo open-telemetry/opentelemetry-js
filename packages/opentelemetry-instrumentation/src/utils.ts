@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import { ShimWrapped } from './types';
+
 /**
  * function to execute patched function and being able to catch errors
  * @param execute - function to be executed
@@ -38,4 +40,17 @@ export function safeExecuteInTheMiddle<T>(
     // eslint-disable-next-line no-unsafe-finally
     return result as T;
   }
+}
+
+/**
+ * Checks if certain function has been already wrapped
+ * @param func
+ */
+export function isWrapped(func: any) {
+  return (
+    typeof func === 'function' &&
+    typeof (func as ShimWrapped).__original === 'function' &&
+    typeof (func as ShimWrapped).__unwrap === 'function' &&
+    (func as ShimWrapped).__wrapped === true
+  );
 }
