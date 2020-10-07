@@ -575,17 +575,27 @@ describe('B3Propagator', () => {
       const ctx1 = b3Propagator.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => 1 // not a number
+        {
+          // @ts-expect-error
+          get: (c, k) => 1, // not a number
+          keys: () => []
+        }
       );
       const ctx2 = b3Propagator.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => [] // empty array
+        {
+          get: (c, k) => [], // empty array
+          keys: () => []
+        }
       );
       const ctx3 = b3Propagator.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => undefined // missing value
+        {
+          get: (c, k) => undefined, // missing value
+          keys: () => []
+        }
       );
 
       assert.ok(ctx1 === ROOT_CONTEXT);

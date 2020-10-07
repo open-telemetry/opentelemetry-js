@@ -273,17 +273,27 @@ describe('HttpTraceContext', () => {
       const ctx1 = httpTraceContext.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => 1 // not a number
+        {
+          // @ts-expect-error
+          get: (c, k) => 1, // not a number
+          keys: () => []
+        }
       );
       const ctx2 = httpTraceContext.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => [] // empty array
+        {
+          get: (c, k) => [], // empty array
+          keys: () => []
+        }
       );
       const ctx3 = httpTraceContext.extract(
         ROOT_CONTEXT,
         carrier,
-        (c, k) => undefined // missing value
+        {
+          get: (c, k) => undefined, // missing value
+          keys: () => []
+        }
       );
 
       assert.ok(ctx1 === ROOT_CONTEXT);

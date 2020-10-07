@@ -109,9 +109,7 @@ export class FetchPlugin extends core.BasePlugin<Promise<Response>> {
     }
 
     if (options instanceof Request) {
-      api.propagation.inject(options.headers, (h, k, v) =>
-        h.set(k, typeof v === 'string' ? v : String(v))
-      );
+      api.propagation.inject(options.headers);
     } else {
       const headers: Partial<Record<string, unknown>> = {};
       api.propagation.inject(headers);

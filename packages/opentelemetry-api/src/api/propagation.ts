@@ -15,16 +15,14 @@
  */
 
 import { Context } from '@opentelemetry/context-base';
-import { defaultGetter, GetterFunction } from '../context/propagation/getter';
-import { TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { NOOP_TEXT_MAP_PROPAGATOR } from '../context/propagation/NoopTextMapPropagator';
-import { defaultSetter, SetterFunction } from '../context/propagation/setter';
+import { defaultGetter, defaultSetter, Getter, Setter, TextMapPropagator } from '../context/propagation/TextMapPropagator';
 import { ContextAPI } from './context';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_PROPAGATION_API_KEY,
   makeGetter,
-  _global,
+  _global
 } from './global-utils';
 
 const contextApi = ContextAPI.getInstance();
@@ -74,7 +72,7 @@ export class PropagationAPI {
    */
   public inject<Carrier>(
     carrier: Carrier,
-    setter: SetterFunction<Carrier> = defaultSetter,
+    setter: Setter<Carrier> = defaultSetter,
     context: Context = contextApi.active()
   ): void {
     return this._getGlobalPropagator().inject(context, carrier, setter);
@@ -89,7 +87,7 @@ export class PropagationAPI {
    */
   public extract<Carrier>(
     carrier: Carrier,
-    getter: GetterFunction<Carrier> = defaultGetter,
+    getter: Getter<Carrier> = defaultGetter,
     context: Context = contextApi.active()
   ): Context {
     return this._getGlobalPropagator().extract(context, carrier, getter);
