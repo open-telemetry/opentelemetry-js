@@ -14,34 +14,27 @@
  * limitations under the License.
  */
 
-interface ExceptionWithCode {
-  code: string | number;
-  name?: string;
-  message?: string;
-  stack?: string;
-}
+import { Exception } from '@opentelemetry/api';
+import { loggingErrorHandler } from './logging-error-handler';
+import { ErrorHandler } from './types';
 
-interface ExceptionWithMessage {
-  code?: string | number;
-  message: string;
-  name?: string;
-  stack?: string;
-}
+/** The global error handler delegate */
+let delegateHandler = loggingErrorHandler();
 
-interface ExceptionWithName {
-  code?: string | number;
-  message?: string;
-  name: string;
-  stack?: string;
+/**
+ * Set the global error handler
+ * @param {ErrorHandler} handler
+ */
+export function setGlobalErrorHandler(handler: ErrorHandler) {
+  delegateHandler = handler;
 }
 
 /**
- * Defines Exception.
- *
- * string or an object with one of (message or name or code) and optional stack
+ * Return the global error handler
+ * @param {Exception} ex
  */
-export type Exception =
-  | ExceptionWithCode
-  | ExceptionWithMessage
-  | ExceptionWithName
-  | string;
+export const globalErrorHandler = (ex: Exception) => {
+  try {
+    delegateHandler(ex);
+  } catch {} // eslint-disable-line no-empty
+};
