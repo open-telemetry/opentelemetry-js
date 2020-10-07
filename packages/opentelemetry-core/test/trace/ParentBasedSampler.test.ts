@@ -28,12 +28,20 @@ const spanName = 'foobar';
 describe('ParentBasedSampler', () => {
   it('should reflect sampler name with delegate sampler', () => {
     let sampler = new ParentBasedSampler({ root: new AlwaysOnSampler() });
-    assert.strictEqual(sampler.toString(), 'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}');
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
 
     sampler = new ParentBasedSampler({ root: new AlwaysOffSampler() });
-    assert.strictEqual(sampler.toString(), 'ParentBased{root=AlwaysOffSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}');
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentBased{root=AlwaysOffSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
 
-    sampler = new ParentBasedSampler({ root: new TraceIdRatioBasedSampler(0.5) });
+    sampler = new ParentBasedSampler({
+      root: new TraceIdRatioBasedSampler(0.5),
+    });
     assert.strictEqual(
       sampler.toString(),
       'ParentBased{root=TraceIdRatioBased{0.5}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'

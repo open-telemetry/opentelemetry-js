@@ -14,7 +14,15 @@
  * limitations under the License.
  */
 
-import { Attributes, Link, Sampler, SamplingResult, SpanContext, SpanKind, TraceFlags } from '@opentelemetry/api';
+import {
+  Attributes,
+  Link,
+  Sampler,
+  SamplingResult,
+  SpanContext,
+  SpanKind,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
 
@@ -31,10 +39,14 @@ export class ParentBasedSampler implements Sampler {
 
   constructor(config: ParentBasedSamplerConfig) {
     this.root = config.root;
-    this.remoteParentSampled = config.remoteParentSampled ?? new AlwaysOnSampler();
-    this.remoteParentNotSampled = config.remoteParentNotSampled ?? new AlwaysOffSampler();
-    this.localParentSampled = config.localParentSampled ?? new AlwaysOnSampler();
-    this.localParentNotSampled = config.localParentNotSampled ?? new AlwaysOffSampler();
+    this.remoteParentSampled =
+      config.remoteParentSampled ?? new AlwaysOnSampler();
+    this.remoteParentNotSampled =
+      config.remoteParentNotSampled ?? new AlwaysOffSampler();
+    this.localParentSampled =
+      config.localParentSampled ?? new AlwaysOnSampler();
+    this.localParentNotSampled =
+      config.localParentNotSampled ?? new AlwaysOffSampler();
   }
 
   shouldSample(
@@ -46,21 +58,56 @@ export class ParentBasedSampler implements Sampler {
     links: Link[]
   ): SamplingResult {
     if (!parentContext) {
-      return this.root.shouldSample(parentContext, traceId, spanName, spanKind, attributes, links);
+      return this.root.shouldSample(
+        parentContext,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
     }
 
     if (parentContext.isRemote) {
       if (parentContext.traceFlags & TraceFlags.SAMPLED) {
-        return this.remoteParentSampled.shouldSample(parentContext, traceId, spanName, spanKind, attributes, links)
+        return this.remoteParentSampled.shouldSample(
+          parentContext,
+          traceId,
+          spanName,
+          spanKind,
+          attributes,
+          links
+        );
       }
-      return this.remoteParentNotSampled.shouldSample(parentContext, traceId, spanName, spanKind, attributes, links);
+      return this.remoteParentNotSampled.shouldSample(
+        parentContext,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
     }
 
     if (parentContext.traceFlags & TraceFlags.SAMPLED) {
-      return this.localParentSampled.shouldSample(parentContext, traceId, spanName, spanKind, attributes, links);
+      return this.localParentSampled.shouldSample(
+        parentContext,
+        traceId,
+        spanName,
+        spanKind,
+        attributes,
+        links
+      );
     }
 
-    return this.localParentNotSampled.shouldSample(parentContext, traceId, spanName, spanKind, attributes, links);
+    return this.localParentNotSampled.shouldSample(
+      parentContext,
+      traceId,
+      spanName,
+      spanKind,
+      attributes,
+      links
+    );
   }
 
   toString(): string {

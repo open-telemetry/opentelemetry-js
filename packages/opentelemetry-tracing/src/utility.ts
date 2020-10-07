@@ -41,7 +41,7 @@ export function mergeConfig(userConfig: TracerConfig) {
     otelSamplingProbability !== undefined && otelSamplingProbability < 1
       ? {
           sampler: new ParentBasedSampler({
-            root: new TraceIdRatioBasedSampler(otelSamplingProbability)
+            root: new TraceIdRatioBasedSampler(otelSamplingProbability),
           }),
         }
       : {},
