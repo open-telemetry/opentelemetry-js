@@ -125,7 +125,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
 
   private _setSpanContext(metadata: grpcTypes.Metadata): void {
     propagation.inject(metadata, {
-      set: (metadata, k, v) => metadata.set(k, v as grpcTypes.MetadataValue)
+      set: (metadata, k, v) => metadata.set(k, v as grpcTypes.MetadataValue),
     });
   }
 
@@ -184,7 +184,7 @@ export class GrpcPlugin extends BasePlugin<grpc> {
               context.with(
                 propagation.extract(call.metadata, {
                   get: (metadata, key) => metadata.get(key).map(String),
-                  keys: (metadata) => Object.keys(metadata.getMap())
+                  keys: metadata => Object.keys(metadata.getMap()),
                 }),
                 () => {
                   const span = plugin._tracer

@@ -95,7 +95,11 @@ export class HttpTraceContext implements TextMapPropagator {
 
     setter.set(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
-      setter.set(carrier, TRACE_STATE_HEADER, spanContext.traceState.serialize());
+      setter.set(
+        carrier,
+        TRACE_STATE_HEADER,
+        spanContext.traceState.serialize()
+      );
     }
   }
 

@@ -572,31 +572,19 @@ describe('B3Propagator', () => {
     });
 
     it('should fail gracefully on bad responses from getter', () => {
-      const ctx1 = b3Propagator.extract(
-        ROOT_CONTEXT,
-        carrier,
-        {
-          // @ts-expect-error
-          get: (c, k) => 1, // not a number
-          keys: () => []
-        }
-      );
-      const ctx2 = b3Propagator.extract(
-        ROOT_CONTEXT,
-        carrier,
-        {
-          get: (c, k) => [], // empty array
-          keys: () => []
-        }
-      );
-      const ctx3 = b3Propagator.extract(
-        ROOT_CONTEXT,
-        carrier,
-        {
-          get: (c, k) => undefined, // missing value
-          keys: () => []
-        }
-      );
+      const ctx1 = b3Propagator.extract(ROOT_CONTEXT, carrier, {
+        // @ts-expect-error
+        get: (c, k) => 1, // not a number
+        keys: () => [],
+      });
+      const ctx2 = b3Propagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => [], // empty array
+        keys: () => [],
+      });
+      const ctx3 = b3Propagator.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => undefined, // missing value
+        keys: () => [],
+      });
 
       assert.ok(ctx1 === ROOT_CONTEXT);
       assert.ok(ctx2 === ROOT_CONTEXT);

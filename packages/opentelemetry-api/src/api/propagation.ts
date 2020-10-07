@@ -16,13 +16,19 @@
 
 import { Context } from '@opentelemetry/context-base';
 import { NOOP_TEXT_MAP_PROPAGATOR } from '../context/propagation/NoopTextMapPropagator';
-import { defaultGetter, defaultSetter, Getter, Setter, TextMapPropagator } from '../context/propagation/TextMapPropagator';
+import {
+  defaultGetter,
+  defaultSetter,
+  Getter,
+  Setter,
+  TextMapPropagator,
+} from '../context/propagation/TextMapPropagator';
 import { ContextAPI } from './context';
 import {
   API_BACKWARDS_COMPATIBILITY_VERSION,
   GLOBAL_PROPAGATION_API_KEY,
   makeGetter,
-  _global
+  _global,
 } from './global-utils';
 
 const contextApi = ContextAPI.getInstance();

@@ -84,10 +84,7 @@ function getSpanId(carrier: unknown, getter: Getter): string {
   return '';
 }
 
-function getParentSpanId(
-  carrier: unknown,
-  getter: Getter
-): string | undefined {
+function getParentSpanId(carrier: unknown, getter: Getter): string | undefined {
   const spanId = getHeaderValue(carrier, getter, X_B3_PARENT_SPAN_ID);
   if (typeof spanId === 'string') {
     return spanId;
@@ -95,10 +92,7 @@ function getParentSpanId(
   return;
 }
 
-function getDebug(
-  carrier: unknown,
-  getter: Getter
-): string | undefined {
+function getDebug(carrier: unknown, getter: Getter): string | undefined {
   const debug = getHeaderValue(carrier, getter, X_B3_FLAGS);
   return debug === '1' ? '1' : undefined;
 }

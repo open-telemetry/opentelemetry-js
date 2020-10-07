@@ -103,7 +103,7 @@ export function patchServer(
             context.with(
               propagation.extract(call.metadata, {
                 get: (carrier, key) => carrier.get(key).map(String),
-                keys: (carrier) => Object.keys(carrier.getMap())
+                keys: carrier => Object.keys(carrier.getMap()),
               }),
               () => {
                 const span = plugin.tracer

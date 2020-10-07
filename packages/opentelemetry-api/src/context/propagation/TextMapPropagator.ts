@@ -65,19 +65,15 @@ export interface TextMapPropagator<Carrier = any> {
 export interface Setter<Carrier = any> {
   /**
    * Callback used to set a key/value pair on an object.
-   * 
+   *
    * Should be called by the propagator each time a key/value pair
    * should be set, and should set that key/value pair on the propagator.
-   * 
+   *
    * @param carrier object or class which carries key/value pairs
    * @param key string key to modify
    * @param value value to be set to the key on the carrier
    */
-  set(
-    carrier: Carrier,
-    key: string,
-    value: string
-  ): void;
+  set(carrier: Carrier, key: string, value: string): void;
 }
 
 /**
@@ -87,16 +83,16 @@ export interface Setter<Carrier = any> {
 export interface Getter<Carrier = any> {
   /**
    * Get a list of all keys available on the carrier.
-   * 
-   * @param carrier 
+   *
+   * @param carrier
    */
   keys(carrier: Carrier): string[];
 
   /**
    * Get the value of a specific key from the carrier.
-   * 
-   * @param carrier 
-   * @param key 
+   *
+   * @param carrier
+   * @param key
    */
   get(carrier: Carrier, key: string): undefined | string | string[];
 }
@@ -114,8 +110,8 @@ export const defaultGetter: Getter = {
       return [];
     }
     return Object.keys(carrier);
-  }
-}
+  },
+};
 
 export const defaultSetter: Setter = {
   set(carrier, key, value) {
@@ -124,5 +120,5 @@ export const defaultSetter: Setter = {
     }
 
     carrier[key] = value;
-  }
-}
+  },
+};
