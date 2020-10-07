@@ -25,6 +25,7 @@ import {
 } from '@opentelemetry/api';
 import { AlwaysOffSampler } from './AlwaysOffSampler';
 import { AlwaysOnSampler } from './AlwaysOnSampler';
+import { globalErrorHandler } from '../../common/global-error-handler';
 
 /**
  * A composite sampler that either respects the parent span's sampling decision
@@ -39,6 +40,11 @@ export class ParentBasedSampler implements Sampler {
 
   constructor(config: ParentBasedSamplerConfig) {
     this.root = config.root;
+
+    if (!this.root) {
+      globalErrorHandler(new Error("ParentBasedSampler must have a root sampler configured"))
+    }
+
     this.remoteParentSampled =
       config.remoteParentSampled ?? new AlwaysOnSampler();
     this.remoteParentNotSampled =
