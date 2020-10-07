@@ -13,6 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import { Exception } from '@opentelemetry/api';
+
 export enum LogLevel {
   ERROR,
   WARN,
@@ -56,3 +59,6 @@ export interface InstrumentationLibrary {
   readonly name: string;
   readonly version: string;
 }
+
+/** Defines an error handler function */
+export type ErrorHandler = (ex: Exception) => void;

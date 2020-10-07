@@ -16,11 +16,14 @@
 
 import * as assert from 'assert';
 import * as nock from 'nock';
+import * as sinon from 'sinon';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import {
   ExportResult,
   NoopLogger,
   hrTimeToMicroseconds,
+  setGlobalErrorHandler,
+  loggingErrorHandler,
 } from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { Resource } from '@opentelemetry/resources';
@@ -462,6 +465,30 @@ describe('Zipkin Exporter - node', () => {
           scope.done();
           assert.equal(exporter['_serviceName'], resource_service_name);
         });
+      });
+
+      it('should call globalErrorHandler on error', () => {
+        const errorHandlerSpy = sinon.spy();
+        setGlobalErrorHandler(errorHandlerSpy);
+        const expectedError = new Error('Whoops');
+        const scope = nock('http://localhost:9411')
+          .post('/api/v2/spans')
+          .replyWithError(expectedError);
+
+        const exporter = new ZipkinExporter({
+          serviceName: 'my-service',
+          logger: new NoopLogger(),
+        });
+
+        exporter.export([getReadableSpan()], (result: ExportResult) => {
+          scope.done();
+        });
+
+        const [[error]] = errorHandlerSpy.args;
+
+        assert.strictEqual(errorHandlerSpy.callCount, 1);
+        assert.strictEqual(error, expectedError);
+        setGlobalErrorHandler(loggingErrorHandler());
       });
     });
   });
