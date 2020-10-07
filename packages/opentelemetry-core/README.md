@@ -123,24 +123,24 @@ const tracerProvider = new NodeTracerProvider({
 
 #### ParentBasedSampler
 
-* This is a composite sampler. `ParentBased` helps distinguished between the
+- This is a composite sampler. `ParentBased` helps distinguished between the
 following cases:
-  * No parent (root span).
-  * Remote parent with `sampled` flag `true`
-  * Remote parent with `sampled` flag `false`
-  * Local parent with `sampled` flag `true`
-  * Local parent with `sampled` flag `false`
+  - No parent (root span).
+  - Remote parent with `sampled` flag `true`
+  - Remote parent with `sampled` flag `false`
+  - Local parent with `sampled` flag `true`
+  - Local parent with `sampled` flag `false`
 
 Required parameters:
 
-* `root(Sampler)` - Sampler called for spans with no parent (root spans)
+- `root(Sampler)` - Sampler called for spans with no parent (root spans)
 
 Optional parameters:
 
-* `remoteParentSampled(Sampler)` (default: `AlwaysOn`)
-* `remoteParentNotSampled(Sampler)` (default: `AlwaysOff`)
-* `localParentSampled(Sampler)` (default: `AlwaysOn`)
-* `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
+- `remoteParentSampled(Sampler)` (default: `AlwaysOn`)
+- `remoteParentNotSampled(Sampler)` (default: `AlwaysOff`)
+- `localParentSampled(Sampler)` (default: `AlwaysOn`)
+- `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
 
 |Parent| parent.isRemote() | parent.isSampled()| Invoke sampler|
 |--|--|--|--|
