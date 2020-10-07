@@ -121,16 +121,41 @@ const tracerProvider = new NodeTracerProvider({
 });
 ```
 
-#### ParentOrElse
+#### ParentBasedSampler
 
-A composite sampler that either respects the parent span's sampling decision or delegates to `delegateSampler` for root spans.
+* This is a composite sampler. `ParentBased` helps distinguished between the
+following cases:
+  * No parent (root span).
+  * Remote parent with `sampled` flag `true`
+  * Remote parent with `sampled` flag `false`
+  * Local parent with `sampled` flag `true`
+  * Local parent with `sampled` flag `false`
+
+Required parameters:
+
+* `root(Sampler)` - Sampler called for spans with no parent (root spans)
+
+Optional parameters:
+
+* `remoteParentSampled(Sampler)` (default: `AlwaysOn`)
+* `remoteParentNotSampled(Sampler)` (default: `AlwaysOff`)
+* `localParentSampled(Sampler)` (default: `AlwaysOn`)
+* `localParentNotSampled(Sampler)` (default: `AlwaysOff`)
+
+|Parent| parent.isRemote() | parent.isSampled()| Invoke sampler|
+|--|--|--|--|
+|absent| n/a | n/a |`root()`|
+|present|true|true|`remoteParentSampled()`|
+|present|true|false|`remoteParentNotSampled()`|
+|present|false|true|`localParentSampled()`|
+|present|false|false|`localParentNotSampled()`|
 
 ```js
 const { NodeTracerProvider } = require("@opentelemetry/node");
-const { ParentOrElseSampler, AlwaysOffSampler } = require("@opentelemetry/core");
+const { ParentBasedSampler, AlwaysOffSampler, TraceIdRatioBasedSampler } = require("@opentelemetry/core");
 
 const tracerProvider = new NodeTracerProvider({
-  sampler: new ParentOrElseSampler(new AlwaysOffSampler())
+  sampler: new ParentBasedSampler({ root: new TraceIdRatioBasedSampler(0.5) })
 });
 ```
 
