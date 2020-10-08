@@ -15,7 +15,11 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import { MetricExporter, MetricRecord } from '@opentelemetry/metrics';
 import { createServer, IncomingMessage, Server, ServerResponse } from 'http';
 import * as url from 'url';
@@ -121,9 +125,7 @@ export class PrometheusExporter implements MetricExporter {
               ((err as unknown) as { code: string }).code !==
               'ERR_SERVER_NOT_RUNNING'
             ) {
-              this._logger.error(
-                `Error during stopping the Prometheus Exporter "${err.message}"`
-              );
+              globalErrorHandler(err);
             }
           }
           resolve();

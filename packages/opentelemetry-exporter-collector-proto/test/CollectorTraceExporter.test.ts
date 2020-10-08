@@ -144,7 +144,14 @@ describe('CollectorTraceExporter - node with proto over http', () => {
     });
 
     it('should log the error message', done => {
-      const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+      const spyLoggerError = sinon.spy();
+      const handler = core.loggingErrorHandler({
+        debug: sinon.fake(),
+        info: sinon.fake(),
+        warn: sinon.fake(),
+        error: spyLoggerError,
+      });
+      core.setGlobalErrorHandler(handler);
 
       const responseSpy = sinon.spy();
       collectorExporter.export(spans, responseSpy);
@@ -154,9 +161,9 @@ describe('CollectorTraceExporter - node with proto over http', () => {
         const callback = args[1];
         callback(mockResError);
         setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'statusCode: 400');
+          const response = spyLoggerError.args[0][0] as string;
 
+          assert.ok(response.includes('"code":"400"'));
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();
         });

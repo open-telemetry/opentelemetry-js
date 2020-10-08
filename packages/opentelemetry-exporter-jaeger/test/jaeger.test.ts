@@ -15,8 +15,14 @@
  */
 
 import * as assert from 'assert';
+import * as sinon from 'sinon';
 import { JaegerExporter } from '../src';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  loggingErrorHandler,
+  NoopLogger,
+  setGlobalErrorHandler,
+} from '@opentelemetry/core';
 import * as api from '@opentelemetry/api';
 import { ThriftProcess } from '../src/types';
 import { ReadableSpan } from '@opentelemetry/tracing';
@@ -106,7 +112,33 @@ describe('JaegerExporter', () => {
   });
 
   describe('export', () => {
+    const readableSpan: ReadableSpan = {
+      name: 'my-span1',
+      kind: api.SpanKind.CLIENT,
+      spanContext: {
+        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
+        spanId: '6e0c63257de34c92',
+        traceFlags: TraceFlags.NONE,
+      },
+      startTime: [1566156729, 709],
+      endTime: [1566156731, 709],
+      ended: true,
+      status: {
+        code: api.CanonicalCode.DATA_LOSS,
+      },
+      attributes: {},
+      links: [],
+      events: [],
+      duration: [32, 800000000],
+      resource: Resource.empty(),
+      instrumentationLibrary: {
+        name: 'default',
+        version: '0.0.1',
+      },
+    };
+
     let exporter: JaegerExporter;
+
     beforeEach(() => {
       exporter = new JaegerExporter({
         serviceName: 'opentelemetry',
@@ -124,32 +156,6 @@ describe('JaegerExporter', () => {
     });
 
     it('should send spans to Jaeger backend and return with Success', () => {
-      const spanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-        traceFlags: TraceFlags.NONE,
-      };
-      const readableSpan: ReadableSpan = {
-        name: 'my-span1',
-        kind: api.SpanKind.CLIENT,
-        spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
-        ended: true,
-        status: {
-          code: api.CanonicalCode.DATA_LOSS,
-        },
-        attributes: {},
-        links: [],
-        events: [],
-        duration: [32, 800000000],
-        resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
-      };
-
       exporter.export([readableSpan], (result: ExportResult) => {
         assert.strictEqual(result, ExportResult.SUCCESS);
       });
@@ -172,32 +178,33 @@ describe('JaegerExporter', () => {
         endpoint: mockedEndpoint,
       });
       assert.strictEqual(exporter['_sender'].constructor.name, 'HTTPSender');
-      const spanContext = {
-        traceId: 'd4cda95b652f4a1592b449d5929fda1b',
-        spanId: '6e0c63257de34c92',
-        traceFlags: TraceFlags.NONE,
-      };
-      const readableSpan: ReadableSpan = {
-        name: 'my-span1',
-        kind: api.SpanKind.CLIENT,
-        spanContext,
-        startTime: [1566156729, 709],
-        endTime: [1566156731, 709],
-        ended: true,
-        status: {
-          code: api.CanonicalCode.DATA_LOSS,
-        },
-        attributes: {},
-        links: [],
-        events: [],
-        duration: [32, 800000000],
-        resource: Resource.empty(),
-        instrumentationLibrary: {
-          name: 'default',
-          version: '0.0.1',
-        },
-      };
       exporter.export([readableSpan], () => {});
+    });
+
+    it('should call globalErrorHandler on error', () => {
+      nock.cleanAll();
+      const errorHandlerSpy = sinon.spy();
+      setGlobalErrorHandler(errorHandlerSpy);
+      const expectedError = new Error('whoops');
+      const mockedEndpoint = 'http://testendpoint';
+      const scope = nock(mockedEndpoint)
+        .post('/')
+        .replyWithError(expectedError);
+      const exporter = new JaegerExporter({
+        serviceName: 'opentelemetry',
+        endpoint: mockedEndpoint,
+      });
+
+      exporter.export([readableSpan], () => {
+        scope.done();
+        assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+        const [[error]] = errorHandlerSpy.args;
+        assert.strictEqual(error, expectedError);
+      });
+
+      // reset global error handler
+      setGlobalErrorHandler(loggingErrorHandler());
     });
   });
 });
