@@ -25,11 +25,11 @@ After the plugin is created, it must be added in the [list of default supported 
 export const DEFAULT_INSTRUMENTATION_PLUGINS: Plugins = {
   http: {
     enabled: true,
-    path: '@opentelemetry/plugin-http',
+    path: '@opentelemetry/instrumentation-http',
   },
   grpc: {
     enabled: true,
-    path: '@opentelemetry/plugin-grpc',
+    path: '@opentelemetry/instrumentation-grpc',
   },
   // [ADD NEW PLUGIN HERE]
   xxx: {
@@ -47,6 +47,6 @@ Please refer to the [HTTP instrumentation][http-plugin] or [gRPC instrumentation
 [shimmer]: https://github.com/othiym23/shimmer
 [builtin-plugins]: https://github.com/open-telemetry/opentelemetry-js#plugins
 [base-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-core/src/platform/node/BasePlugin.ts
-[http-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-http/src/http.ts#L44
-[grpc-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-plugin-grpc/src/grpc.ts#L52
+[http-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-http/src/http.ts#L44
+[grpc-plugin]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-instrumentation-grpc/src/grpc.ts#L52
 [DEFAULT_INSTRUMENTATION_PLUGINS]: https://github.com/open-telemetry/opentelemetry-js/blob/master/packages/opentelemetry-node/src/config.ts#L29

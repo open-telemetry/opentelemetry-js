@@ -1,6 +1,6 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
+import { XMLHttpRequestPlugin } from '@opentelemetry/instrumentation-xml-http-request';
 import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';

@@ -3,7 +3,7 @@
 import { ConsoleSpanExporter, SimpleSpanProcessor } from '@opentelemetry/tracing';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
 import { WebTracerProvider } from '@opentelemetry/web';
-import { FetchPlugin } from '@opentelemetry/plugin-fetch';
+import { FetchPlugin } from '@opentelemetry/instrumentation-fetch';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { B3Propagator } from '@opentelemetry/core';
 

@@ -13,7 +13,7 @@ module.exports = (serviceName) => {
     plugins: {
       '@grpc/grpc-js': {
         enabled: true,
-        path: '@opentelemetry/plugin-grpc-js',
+        path: '@opentelemetry/instrumentation-grpc-js',
       },
     },
   });

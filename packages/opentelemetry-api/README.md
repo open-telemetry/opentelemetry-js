@@ -22,7 +22,7 @@ $ npm install \
     @opentelemetry/node \
     @opentelemetry/tracing \
     @opentelemetry/exporter-jaeger \ # add exporters as needed
-    @opentelemetry/plugin-http # add plugins as needed
+    @opentelemetry/instrumentation-http # add plugins as needed
 
 $ # Install metrics dependencies
 $ npm install \

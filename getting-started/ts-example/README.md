@@ -54,14 +54,14 @@ This guide uses the example application provided in the [example directory](exam
 
 ([link to JavaScript version](../README.md#install-the-required-opentelemetry-libraries))
 
-To create traces on NodeJS, you will need `@opentelemetry/node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/plugin-http`.
+To create traces on NodeJS, you will need `@opentelemetry/node`, `@opentelemetry/core`, and any plugins required by your application such as gRPC, or HTTP. If you are using the example application, you will need to install `@opentelemetry/instrumentation-http`.
 
 ```sh
 $ npm install \
   @opentelemetry/core \
   @opentelemetry/node \
-  @opentelemetry/plugin-http \
-  @opentelemetry/plugin-https \
+  @opentelemetry/instrumentation-http \
+  @opentelemetry/instrumentation-https \
   @opentelemetry/plugin-express
 ```
 

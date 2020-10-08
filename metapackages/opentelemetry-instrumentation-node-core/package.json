@@ -1,0 +1,24 @@
+{
+    "name": "@opentelemetry/instrumentation-node-core",
+    "version": "0.11.0",
+    "description": "Metapackage which bundles all opentelemetry node core instrumentation",
+    "author": "OpenTelemetry Authors",
+    "homepage": "https://github.com/open-telemetry/opentelemetry-js#readme",
+    "license": "Apache-2.0",
+    "publishConfig": {
+        "access": "public"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/open-telemetry/opentelemetry-js.git"
+    },
+    "bugs": {
+        "url": "https://github.com/open-telemetry/opentelemetry-js/issues"
+    },
+    "dependencies": {
+        "@opentelemetry/instrumentation-grpc": "^0.11.0",
+        "@opentelemetry/instrumentation-grpc-js": "^0.11.0",
+        "@opentelemetry/instrumentation-http": "^0.11.0",
+        "@opentelemetry/instrumentation-https": "^0.11.0"
+    }
+}

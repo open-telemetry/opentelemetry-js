@@ -27,11 +27,11 @@ cache_1: &cache_1
 cache_2: &cache_2
   key: npm-cache-02-{{ .Environment.CIRCLE_JOB }}-{{ checksum "/tmp/checksums.txt" }}-20B74F85
   paths:
-    - packages/opentelemetry-plugin-grpc/node_modules
-    - packages/opentelemetry-plugin-http/node_modules
-    - packages/opentelemetry-plugin-https/node_modules
+    - packages/opentelemetry-instrumentation-grpc/node_modules
+    - packages/opentelemetry-instrumentation-http/node_modules
+    - packages/opentelemetry-instrumentation-https/node_modules
     - packages/opentelemetry-exporter-collector/node_modules
-    - packages/opentelemetry-plugin-xml-http-request/node_modules
+    - packages/opentelemetry-instrumentation-xml-http-request/node_modules
     - packages/opentelemetry-resource-detector-aws/node_modules
     - packages/opentelemetry-resource-detector-gcp/node_modules
     - packages/opentelemetry-resources/node_modules

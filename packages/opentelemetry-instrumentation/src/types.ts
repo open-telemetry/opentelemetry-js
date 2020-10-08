@@ -63,7 +63,7 @@ export interface InstrumentationConfig {
 
   /**
    * Path of the trace plugin to load.
-   * @default '@opentelemetry/plugin-http' in case of http.
+   * @default '@opentelemetry/instrumentation-http' in case of http.
    */
   path?: string;
 }

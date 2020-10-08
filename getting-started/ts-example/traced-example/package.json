@@ -18,8 +18,8 @@
     "@opentelemetry/exporter-zipkin": "^0.11.0",
     "@opentelemetry/node": "^0.11.0",
     "@opentelemetry/plugin-express": "^0.10.0",
-    "@opentelemetry/plugin-http": "^0.11.0",
-    "@opentelemetry/plugin-https": "^0.11.0",
+    "@opentelemetry/instrumentation-http": "^0.11.0",
+    "@opentelemetry/instrumentation-https": "^0.11.0",
     "@opentelemetry/tracing": "^0.11.0",
     "axios": "^0.19.1",
     "express": "^4.17.1"

@@ -22,7 +22,7 @@ $ # Install exporters and plugins
 $ npm install \
     @opentelemetry/exporter-jaeger \ # add tracing exporters as needed
     @opentelemetry/exporter-prometheus # add metrics exporters as needed
-    @opentelemetry/plugin-http # add plugins as needed
+    @opentelemetry/instrumentation-http # add plugins as needed
 
 $ # or install all officially supported core and contrib plugins
 $ npm install @opentelemetry/plugins-node-core-and-contrib
