@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { NoopLogger } from '@opentelemetry/core';
+import {
+  NoopLogger,
+  setGlobalErrorHandler,
+  loggingErrorHandler,
+} from '@opentelemetry/core';
 import * as assert from 'assert';
 import * as sinon from 'sinon';
 import { CollectorMetricExporter } from '../../src/platform/browser/index';
@@ -176,16 +180,23 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the error message', done => {
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
         const spyLoggerDebug = sinon.stub(collectorExporter.logger, 'debug');
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
         spyBeacon.restore();
         spyBeacon = sinon.stub(window.navigator, 'sendBeacon').returns(false);
 
         collectorExporter.export(metrics, () => {});
 
         setTimeout(() => {
-          const response: any = spyLoggerError.args[0][0];
-          assert.strictEqual(response, 'sendBeacon - cannot send');
+          const response: any = spyLoggerError.args[0][0] as string;
+          assert.ok(response.includes('sendBeacon - cannot send'));
           assert.strictEqual(spyLoggerDebug.args.length, 1);
 
           done();
@@ -305,21 +316,26 @@ describe('CollectorMetricExporter - web', () => {
       });
 
       it('should log the error message', done => {
-        const spyLoggerError = sinon.stub(collectorExporter.logger, 'error');
+        const spyLoggerError = sinon.spy();
+        const handler = loggingErrorHandler({
+          debug: sinon.fake(),
+          info: sinon.fake(),
+          warn: sinon.fake(),
+          error: spyLoggerError,
+        });
+        setGlobalErrorHandler(handler);
 
-        collectorExporter.export(metrics, () => {});
+        collectorExporter.export(metrics, () => {
+          const response = spyLoggerError.args[0][0] as string;
+          assert.ok(response.includes('"code":"400"'));
+
+          assert.strictEqual(spyBeacon.callCount, 0);
+          done();
+        });
 
         setTimeout(() => {
           const request = server.requests[0];
           request.respond(400);
-
-          const response1: any = spyLoggerError.args[0][0];
-          const response2: any = spyLoggerError.args[1][0];
-          assert.strictEqual(response1, 'body');
-          assert.strictEqual(response2, 'xhr error');
-
-          assert.strictEqual(spyBeacon.callCount, 0);
-          done();
         });
       });
       it('should send custom headers', done => {

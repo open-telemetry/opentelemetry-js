@@ -33,8 +33,10 @@ export function sendWithBeacon(
     logger.debug('sendBeacon - can send', body);
     onSuccess();
   } else {
-    logger.error('sendBeacon - cannot send', body);
-    onError({});
+    const error = new collectorTypes.CollectorExporterError(
+      `sendBeacon - cannot send ${body}`
+    );
+    onError(error);
   }
 }
 
@@ -69,12 +71,12 @@ export function sendWithXhr(
         logger.debug('xhr success', body);
         onSuccess();
       } else {
-        logger.error('body', body);
-        logger.error('xhr error', xhr);
-        onError({
-          code: xhr.status,
-          message: xhr.responseText,
-        });
+        const error = new collectorTypes.CollectorExporterError(
+          xhr.responseText,
+          xhr.status
+        );
+
+        onError(error);
       }
     }
   };

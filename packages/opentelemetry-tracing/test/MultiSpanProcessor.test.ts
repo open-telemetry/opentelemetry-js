@@ -23,6 +23,10 @@ import {
   Span,
   SpanProcessor,
 } from '../src';
+import {
+  setGlobalErrorHandler,
+  loggingErrorHandler,
+} from '@opentelemetry/core';
 import { MultiSpanProcessor } from '../src/MultiSpanProcessor';
 
 class TestProcessor implements SpanProcessor {
@@ -178,5 +182,28 @@ describe('MultiSpanProcessor', () => {
       assert.strictEqual(flushed, 2);
       done();
     });
+  });
+
+  it('should call globalErrorHandler in forceFlush', async () => {
+    const expectedError = new Error('whoops');
+    const testProcessor = new TestProcessor();
+    const forceFlush = Sinon.stub(testProcessor, 'forceFlush');
+    forceFlush.rejects(expectedError);
+
+    const multiSpanProcessor = new MultiSpanProcessor([testProcessor]);
+    const errorHandlerSpy = Sinon.spy();
+
+    setGlobalErrorHandler(errorHandlerSpy);
+
+    await multiSpanProcessor.forceFlush();
+
+    forceFlush.restore();
+    const [[error]] = errorHandlerSpy.args;
+
+    assert.strictEqual(error, expectedError);
+    assert.strictEqual(errorHandlerSpy.callCount, 1);
+
+    //reset global error handler
+    setGlobalErrorHandler(loggingErrorHandler());
   });
 });

@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
 import * as zipkinTypes from '../../types';
 
 /**
@@ -73,7 +73,7 @@ function sendWithBeacon(
     logger.debug('sendBeacon - can send', data);
     done(ExportResult.SUCCESS);
   } else {
-    logger.error('sendBeacon - cannot send', data);
+    globalErrorHandler(new Error(`sendBeacon - cannot send ${data}`));
     done(ExportResult.FAILED_NOT_RETRYABLE);
   }
 }
@@ -118,8 +118,8 @@ function sendWithXhr(
     }
   };
 
-  xhr.onerror = err => {
-    logger.error('Zipkin request error', err);
+  xhr.onerror = msg => {
+    globalErrorHandler(new Error(`Zipkin request error: ${msg}`));
     return done(ExportResult.FAILED_RETRYABLE);
   };
 
