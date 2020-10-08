@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
-import { HttpPlugin, Func, HttpRequestArgs } from '@opentelemetry/instrumentation-http';
+import {
+  HttpPlugin,
+  Func,
+  HttpRequestArgs,
+} from '@opentelemetry/instrumentation-http';
 import type * as http from 'http';
 import type * as https from 'https';
 import { URL } from 'url';
