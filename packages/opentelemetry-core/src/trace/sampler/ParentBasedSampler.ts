@@ -32,26 +32,26 @@ import { globalErrorHandler } from '../../common/global-error-handler';
  * or delegates to `delegateSampler` for root spans.
  */
 export class ParentBasedSampler implements Sampler {
-  private root: Sampler;
-  private remoteParentSampled: Sampler;
-  private remoteParentNotSampled: Sampler;
-  private localParentSampled: Sampler;
-  private localParentNotSampled: Sampler;
+  private _root: Sampler;
+  private _remoteParentSampled: Sampler;
+  private _remoteParentNotSampled: Sampler;
+  private _localParentSampled: Sampler;
+  private _localParentNotSampled: Sampler;
 
   constructor(config: ParentBasedSamplerConfig) {
-    this.root = config.root;
+    this._root = config.root;
 
-    if (!this.root) {
+    if (!this._root) {
       globalErrorHandler(new Error("ParentBasedSampler must have a root sampler configured"))
     }
 
-    this.remoteParentSampled =
+    this._remoteParentSampled =
       config.remoteParentSampled ?? new AlwaysOnSampler();
-    this.remoteParentNotSampled =
+    this._remoteParentNotSampled =
       config.remoteParentNotSampled ?? new AlwaysOffSampler();
-    this.localParentSampled =
+    this._localParentSampled =
       config.localParentSampled ?? new AlwaysOnSampler();
-    this.localParentNotSampled =
+    this._localParentNotSampled =
       config.localParentNotSampled ?? new AlwaysOffSampler();
   }
 
@@ -64,7 +64,7 @@ export class ParentBasedSampler implements Sampler {
     links: Link[]
   ): SamplingResult {
     if (!parentContext) {
-      return this.root.shouldSample(
+      return this._root.shouldSample(
         parentContext,
         traceId,
         spanName,
@@ -76,7 +76,7 @@ export class ParentBasedSampler implements Sampler {
 
     if (parentContext.isRemote) {
       if (parentContext.traceFlags & TraceFlags.SAMPLED) {
-        return this.remoteParentSampled.shouldSample(
+        return this._remoteParentSampled.shouldSample(
           parentContext,
           traceId,
           spanName,
@@ -85,7 +85,7 @@ export class ParentBasedSampler implements Sampler {
           links
         );
       }
-      return this.remoteParentNotSampled.shouldSample(
+      return this._remoteParentNotSampled.shouldSample(
         parentContext,
         traceId,
         spanName,
@@ -96,7 +96,7 @@ export class ParentBasedSampler implements Sampler {
     }
 
     if (parentContext.traceFlags & TraceFlags.SAMPLED) {
-      return this.localParentSampled.shouldSample(
+      return this._localParentSampled.shouldSample(
         parentContext,
         traceId,
         spanName,
@@ -106,7 +106,7 @@ export class ParentBasedSampler implements Sampler {
       );
     }
 
-    return this.localParentNotSampled.shouldSample(
+    return this._localParentNotSampled.shouldSample(
       parentContext,
       traceId,
       spanName,
@@ -117,7 +117,7 @@ export class ParentBasedSampler implements Sampler {
   }
 
   toString(): string {
-    return `ParentBased{root=${this.root.toString()}, remoteParentSampled=${this.remoteParentSampled.toString()}, remoteParentNotSampled=${this.remoteParentNotSampled.toString()}, localParentSampled=${this.localParentSampled.toString()}, localParentNotSampled=${this.localParentNotSampled.toString()}}`;
+    return `ParentBased{root=${this._root.toString()}, remoteParentSampled=${this._remoteParentSampled.toString()}, remoteParentNotSampled=${this._remoteParentNotSampled.toString()}, localParentSampled=${this._localParentSampled.toString()}, localParentNotSampled=${this._localParentNotSampled.toString()}}`;
   }
 }
 
