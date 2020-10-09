@@ -168,7 +168,7 @@ const tracerProvider = new NodeTracerProvider({
     // By default, the ParentBasedSampler will respect the parent span's sampling
     // decision. This is configurable by providing a different sampler to use
     // based on the situation. See configuration details above.
-    // 
+    //
     // This will delegate the sampling decision of all root traces (no parent)
     // to the TraceIdRatioBasedSampler.
     // See details of TraceIdRatioBasedSampler above.
