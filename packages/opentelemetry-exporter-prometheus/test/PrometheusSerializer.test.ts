@@ -168,8 +168,8 @@ describe('PrometheusSerializer', () => {
             `test_sum{foo1="bar1",foo2="bar2"} 5 ${mockedHrTimeMs}\n` +
             `test_bucket{foo1="bar1",foo2="bar2",le="1"} 0 ${mockedHrTimeMs}\n` +
             `test_bucket{foo1="bar1",foo2="bar2",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 0 ${mockedHrTimeMs}\n`
+            `test_bucket{foo1="bar1",foo2="bar2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
 
@@ -196,8 +196,8 @@ describe('PrometheusSerializer', () => {
             'test_sum{foo1="bar1",foo2="bar2"} 5\n' +
             'test_bucket{foo1="bar1",foo2="bar2",le="1"} 0\n' +
             'test_bucket{foo1="bar1",foo2="bar2",le="10"} 1\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="100"} 0\n' +
-            'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 0\n'
+            'test_bucket{foo1="bar1",foo2="bar2",le="100"} 1\n' +
+            'test_bucket{foo1="bar1",foo2="bar2",le="+Inf"} 1\n'
         );
       });
     });
@@ -302,7 +302,7 @@ describe('PrometheusSerializer', () => {
     describe('with HistogramAggregator', () => {
       mockAggregator(HistogramAggregator);
 
-      it('serialize metric record with MinMaxLastSumCountAggregator aggregator', async () => {
+      it('serialize metric record with HistogramAggregator aggregator, cumulative', async () => {
         const serializer = new PrometheusSerializer();
 
         const batcher = new ExactBatcher(HistogramAggregator, [1, 10, 100]);
@@ -311,6 +311,9 @@ describe('PrometheusSerializer', () => {
           description: 'foobar',
         }) as ValueRecorderMetric;
         recorder.bind({ val: '1' }).record(5);
+        recorder.bind({ val: '1' }).record(50);
+        recorder.bind({ val: '1' }).record(120);
+
         recorder.bind({ val: '2' }).record(5);
 
         const records = await recorder.getMetricRecord();
@@ -323,18 +326,18 @@ describe('PrometheusSerializer', () => {
           result,
           '# HELP test foobar\n' +
             '# TYPE test histogram\n' +
-            `test_count{val="1"} 1 ${mockedHrTimeMs}\n` +
-            `test_sum{val="1"} 5 ${mockedHrTimeMs}\n` +
+            `test_count{val="1"} 3 ${mockedHrTimeMs}\n` +
+            `test_sum{val="1"} 175 ${mockedHrTimeMs}\n` +
             `test_bucket{val="1",le="1"} 0 ${mockedHrTimeMs}\n` +
             `test_bucket{val="1",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="100"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="1",le="+Inf"} 0 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="100"} 2 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="1",le="+Inf"} 3 ${mockedHrTimeMs}\n` +
             `test_count{val="2"} 1 ${mockedHrTimeMs}\n` +
             `test_sum{val="2"} 5 ${mockedHrTimeMs}\n` +
             `test_bucket{val="2",le="1"} 0 ${mockedHrTimeMs}\n` +
             `test_bucket{val="2",le="10"} 1 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="100"} 0 ${mockedHrTimeMs}\n` +
-            `test_bucket{val="2",le="+Inf"} 0 ${mockedHrTimeMs}\n`
+            `test_bucket{val="2",le="100"} 1 ${mockedHrTimeMs}\n` +
+            `test_bucket{val="2",le="+Inf"} 1 ${mockedHrTimeMs}\n`
         );
       });
     });

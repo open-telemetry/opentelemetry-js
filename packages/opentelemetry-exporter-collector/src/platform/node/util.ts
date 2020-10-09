@@ -54,19 +54,16 @@ export function sendWithHttp<ExportItem, ServiceRequest>(
       collector.logger.debug(`statusCode: ${res.statusCode}`);
       onSuccess();
     } else {
-      collector.logger.error(`statusCode: ${res.statusCode}`);
-      onError({
-        code: res.statusCode,
-        message: res.statusMessage,
-      });
+      const error = new collectorTypes.CollectorExporterError(
+        res.statusMessage,
+        res.statusCode
+      );
+      onError(error);
     }
   });
 
   req.on('error', (error: Error) => {
-    collector.logger.error('error', error.message);
-    onError({
-      message: error.message,
-    });
+    onError(error);
   });
   req.write(data);
   req.end();
