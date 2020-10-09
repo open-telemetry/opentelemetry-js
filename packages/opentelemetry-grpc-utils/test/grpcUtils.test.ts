@@ -769,22 +769,6 @@ export const runTests = (
           done();
         });
       });
-
-      methodList.map(method => {
-        const metadata = new grpc.Metadata();
-        metadata.set('x-opentelemetry-outgoing-request', '1');
-        describe(`Test should not create spans for grpc remote method ${method.description} when metadata has otel header`, () => {
-          before(() => {
-            method.metadata = metadata;
-          });
-
-          after(() => {
-            delete method.metadata;
-          });
-
-          runTest(method, provider, false);
-        });
-      });
     });
 
     describe('Test filtering requests using options', () => {

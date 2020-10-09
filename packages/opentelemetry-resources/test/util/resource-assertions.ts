@@ -122,11 +122,6 @@ export const assertHostResource = (
   }
 ) => {
   assertHasOneLabel(HOST_RESOURCE, resource);
-  if (validations.hostName)
-    assert.strictEqual(
-      resource.attributes[HOST_RESOURCE.HOSTNAME],
-      validations.hostName
-    );
   if (validations.id)
     assert.strictEqual(resource.attributes[HOST_RESOURCE.ID], validations.id);
   if (validations.name)

@@ -89,7 +89,6 @@ describe('assertHostResource', () => {
 
   it('validates optional attributes', () => {
     const resource = new Resource({
-      [HOST_RESOURCE.HOSTNAME]: 'opentelemetry-test-hostname',
       [HOST_RESOURCE.ID]: 'opentelemetry-test-id',
       [HOST_RESOURCE.NAME]: 'opentelemetry-test-name',
       [HOST_RESOURCE.TYPE]: 'n1-standard-1',

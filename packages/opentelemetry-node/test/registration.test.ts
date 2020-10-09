@@ -21,11 +21,19 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {
+  AsyncHooksContextManager,
+  AsyncLocalStorageContextManager,
+} from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { NodeTracerProvider } from '../src';
+import * as semver from 'semver';
+
+const DefaultContextManager = semver.gte(process.version, '14.8.0')
+  ? AsyncLocalStorageContextManager
+  : AsyncHooksContextManager;
 
 describe('API registration', () => {
   beforeEach(() => {
@@ -38,9 +46,7 @@ describe('API registration', () => {
     const tracerProvider = new NodeTracerProvider();
     tracerProvider.register();
 
-    assert.ok(
-      context['_getContextManager']() instanceof AsyncHooksContextManager
-    );
+    assert.ok(context['_getContextManager']() instanceof DefaultContextManager);
     assert.ok(
       propagation['_getGlobalPropagator']() instanceof CompositePropagator
     );
@@ -96,9 +102,7 @@ describe('API registration', () => {
       propagation['_getGlobalPropagator']() instanceof NoopTextMapPropagator
     );
 
-    assert.ok(
-      context['_getContextManager']() instanceof AsyncHooksContextManager
-    );
+    assert.ok(context['_getContextManager']() instanceof DefaultContextManager);
 
     const apiTracerProvider = trace.getTracerProvider();
     assert.ok(apiTracerProvider instanceof ProxyTracerProvider);
