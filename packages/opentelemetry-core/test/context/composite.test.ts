@@ -30,11 +30,11 @@ import {
   RandomIdGenerator,
 } from '../../src';
 import {
-  B3Propagator,
+  B3MultiPropagator,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3Propagator';
+} from '../../src/context/propagation/B3MultiPropagator';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
@@ -69,7 +69,7 @@ describe('Composite Propagator', () => {
 
     it('should inject context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Propagator(), new HttpTraceContext()],
+        propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
       composite.inject(ctxWithSpanContext, carrier, defaultSetter);
 
@@ -111,7 +111,7 @@ describe('Composite Propagator', () => {
 
     it('should extract context using all configured propagators', () => {
       const composite = new CompositePropagator({
-        propagators: [new B3Propagator(), new HttpTraceContext()],
+        propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
       const spanContext = getExtractedSpanContext(
         composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
