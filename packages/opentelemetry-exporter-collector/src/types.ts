@@ -55,12 +55,6 @@ export namespace opentelemetryProto {
       doubleSum?: opentelemetryProto.metrics.v1.Sum;
       intHistogram?: opentelemetryProto.metrics.v1.Histogram;
       doubleHistogram?: opentelemetryProto.metrics.v1.Histogram;
-
-      // metricDescriptor: opentelemetryProto.metrics.v1.MetricDescriptor;
-      // int64DataPoints?: opentelemetryProto.metrics.v1.Int64DataPoint[];
-      // doubleDataPoints?: opentelemetryProto.metrics.v1.DoubleDataPoint[];
-      // histogramDataPoints?: opentelemetryProto.metrics.v1.HistogramDataPoint[];
-      // summaryDataPoints?: opentelemetryProto.metrics.v1.SummaryDataPoint[];
     }
 
     export interface Gauge {
@@ -114,23 +108,6 @@ export namespace opentelemetryProto {
       resource?: opentelemetryProto.resource.v1.Resource;
       instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
     }
-
-    // export enum MetricDescriptorType {
-    //   INVALID_TYPE,
-    //   INT64,
-    //   MONOTONIC_INT64,
-    //   DOUBLE,
-    //   MONOTONIC_DOUBLE,
-    //   HISTOGRAM,
-    //   SUMMARY,
-    // }
-
-    // export enum MetricDescriptorTemporality {
-    //   INVALID_TEMPORALITY,
-    //   INSTANTANEOUS,
-    //   DELTA,
-    //   CUMULATIVE,
-    // }
 
     export enum AggregationTemporality {
       // UNSPECIFIED is the default AggregationTemporality, it MUST not be used.
