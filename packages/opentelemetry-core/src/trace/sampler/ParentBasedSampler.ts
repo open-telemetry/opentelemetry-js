@@ -43,6 +43,7 @@ export class ParentBasedSampler implements Sampler {
 
     if (!this._root) {
       globalErrorHandler(new Error("ParentBasedSampler must have a root sampler configured"))
+      this._root = new AlwaysOnSampler();
     }
 
     this._remoteParentSampled =
