@@ -218,7 +218,11 @@ describe('fetch', () => {
   });
 
   before(() => {
-    api.propagation.setGlobalPropagator(new core.B3Propagator());
+    api.propagation.setGlobalPropagator(
+      new core.B3Propagator({
+        injectEncoding: core.B3InjectEncoding.MULTI_HEADER,
+      })
+    );
   });
 
   describe('when request is successful', () => {

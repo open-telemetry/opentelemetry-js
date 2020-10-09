@@ -22,6 +22,7 @@ import {
   NOOP_SPAN,
   TraceFlags,
   ROOT_CONTEXT,
+  suppressInstrumentation,
 } from '@opentelemetry/api';
 import { BasicTracerProvider, Tracer, Span } from '../src';
 import {
@@ -29,7 +30,6 @@ import {
   NoopLogger,
   AlwaysOnSampler,
   AlwaysOffSampler,
-  suppressInstrumentation,
 } from '@opentelemetry/core';
 
 describe('Tracer', () => {

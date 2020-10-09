@@ -14,4 +14,9 @@
  * limitations under the License.
  */
 
-export const OT_REQUEST_HEADER = 'x-opentelemetry-outgoing-request';
+import { createContextKey } from '@opentelemetry/api';
+
+/** shared context for storing an extracted b3 debug flag */
+export const B3_DEBUG_FLAG_KEY = createContextKey(
+  'OpenTelemetry Context Key B3 Debug Flag'
+);

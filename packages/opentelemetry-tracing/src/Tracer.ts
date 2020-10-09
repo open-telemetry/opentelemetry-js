@@ -17,14 +17,10 @@
 import * as api from '@opentelemetry/api';
 import {
   ConsoleLogger,
-  getActiveSpan,
-  getParentSpanContext,
   InstrumentationLibrary,
   NoRecordingSpan,
   IdGenerator,
   RandomIdGenerator,
-  setActiveSpan,
-  isInstrumentationSuppressed,
   sanitizeAttributes,
 } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
@@ -70,7 +66,7 @@ export class Tracer implements api.Tracer {
     options: api.SpanOptions = {},
     context = api.context.active()
   ): api.Span {
-    if (isInstrumentationSuppressed(context)) {
+    if (api.isInstrumentationSuppressed(context)) {
       this.logger.debug('Instrumentation suppressed, returning Noop Span');
       return api.NOOP_SPAN;
     }
@@ -133,7 +129,7 @@ export class Tracer implements api.Tracer {
   getCurrentSpan(): api.Span | undefined {
     const ctx = api.context.active();
     // Get the current Span from the context or null if none found.
-    return getActiveSpan(ctx);
+    return api.getActiveSpan(ctx);
   }
 
   /**
@@ -144,7 +140,7 @@ export class Tracer implements api.Tracer {
     fn: T
   ): ReturnType<T> {
     // Set given span to context.
-    return api.context.with(setActiveSpan(api.context.active(), span), fn);
+    return api.context.with(api.setActiveSpan(api.context.active(), span), fn);
   }
 
   /**
@@ -153,7 +149,9 @@ export class Tracer implements api.Tracer {
   bind<T>(target: T, span?: api.Span): T {
     return api.context.bind(
       target,
-      span ? setActiveSpan(api.context.active(), span) : api.context.active()
+      span
+        ? api.setActiveSpan(api.context.active(), span)
+        : api.context.active()
     );
   }
 
@@ -180,7 +178,7 @@ function getParent(
 ): api.SpanContext | undefined {
   if (options.parent === null) return undefined;
   if (options.parent) return getContext(options.parent);
-  return getParentSpanContext(context);
+  return api.getParentSpanContext(context);
 }
 
 function getContext(span: api.Span | api.SpanContext): api.SpanContext {

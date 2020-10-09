@@ -26,7 +26,10 @@ import {
   trace,
   ProxyTracerProvider,
 } from '@opentelemetry/api';
-import { AsyncHooksContextManager } from '@opentelemetry/context-async-hooks';
+import {
+  AsyncHooksContextManager,
+  AsyncLocalStorageContextManager,
+} from '@opentelemetry/context-async-hooks';
 import { NoopContextManager } from '@opentelemetry/context-base';
 import { CompositePropagator } from '@opentelemetry/core';
 import { ConsoleMetricExporter, MeterProvider } from '@opentelemetry/metrics';
@@ -81,6 +84,10 @@ const mockedIdentityResponse = {
 };
 const mockedHostResponse = 'my-hostname';
 
+const DefaultContextManager = semver.gte(process.version, '14.8.0')
+  ? AsyncLocalStorageContextManager
+  : AsyncHooksContextManager;
+
 describe('Node SDK', () => {
   before(() => {
     // Disable attempted load of default plugins
@@ -127,7 +134,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
       assert.ok(
-        context['_getContextManager']() instanceof AsyncHooksContextManager
+        context['_getContextManager']() instanceof DefaultContextManager
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator
@@ -151,7 +158,7 @@ describe('Node SDK', () => {
       assert.ok(metrics.getMeterProvider() instanceof NoopMeterProvider);
 
       assert.ok(
-        context['_getContextManager']() instanceof AsyncHooksContextManager
+        context['_getContextManager']() instanceof DefaultContextManager
       );
       assert.ok(
         propagation['_getGlobalPropagator']() instanceof CompositePropagator

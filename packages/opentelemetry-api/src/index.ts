@@ -17,6 +17,7 @@
 export * from './common/Exception';
 export * from './common/Logger';
 export * from './common/Time';
+export * from './context/context';
 export * from './context/propagation/getter';
 export * from './context/propagation/TextMapPropagator';
 export * from './context/propagation/NoopTextMapPropagator';
@@ -60,6 +61,9 @@ export {
   INVALID_SPANID,
   INVALID_TRACEID,
   INVALID_SPAN_CONTEXT,
+  isSpanContextValid,
+  isValidTraceId,
+  isValidSpanId,
 } from './trace/spancontext-utils';
 
 export {

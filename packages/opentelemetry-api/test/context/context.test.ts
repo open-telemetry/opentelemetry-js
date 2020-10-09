@@ -15,37 +15,29 @@
  */
 
 import * as assert from 'assert';
-
+import { ROOT_CONTEXT, createContextKey } from '@opentelemetry/context-base';
 import {
-  SUPPRESS_INSTRUMENTATION_KEY,
   suppressInstrumentation,
   unsuppressInstrumentation,
   isInstrumentationSuppressed,
 } from '../../src/context/context';
-import { ROOT_CONTEXT } from '@opentelemetry/api';
+
+const SUPPRESS_INSTRUMENTATION_KEY = createContextKey(
+  'OpenTelemetry Context Key SUPPRESS_INSTRUMENTATION'
+);
 
 describe('Context Helpers', () => {
   describe('suppressInstrumentation', () => {
     it('should set suppress to true', () => {
-      const expectedValue = true;
       const context = suppressInstrumentation(ROOT_CONTEXT);
-
-      const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
-      const boolValue = value as boolean;
-
-      assert.equal(boolValue, expectedValue);
+      assert.deepStrictEqual(isInstrumentationSuppressed(context), true);
     });
   });
 
   describe('unsuppressInstrumentation', () => {
     it('should set suppress to false', () => {
-      const expectedValue = false;
       const context = unsuppressInstrumentation(ROOT_CONTEXT);
-
-      const value = context.getValue(SUPPRESS_INSTRUMENTATION_KEY);
-      const boolValue = value as boolean;
-
-      assert.equal(boolValue, expectedValue);
+      assert.deepStrictEqual(isInstrumentationSuppressed(context), false);
     });
   });
 

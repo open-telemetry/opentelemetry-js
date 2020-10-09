@@ -15,12 +15,15 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult, NoopLogger } from '@opentelemetry/core';
+import {
+  ExportResult,
+  NoopLogger,
+  globalErrorHandler,
+} from '@opentelemetry/core';
 import { ReadableSpan, SpanExporter } from '@opentelemetry/tracing';
 import { Socket } from 'dgram';
 import { spanToThrift } from './transform';
 import * as jaegerTypes from './types';
-import { OT_REQUEST_HEADER } from './utils';
 
 /**
  * Format and sends span information to Jaeger Exporter.
@@ -54,7 +57,6 @@ export class JaegerExporter implements SpanExporter {
     localConfig.host = localConfig.host || process.env.JAEGER_AGENT_HOST;
     if (localConfig.endpoint) {
       this._sender = new jaegerTypes.HTTPSender(localConfig);
-      this._sender._httpOptions.headers[OT_REQUEST_HEADER] = 1;
     } else {
       this._sender = localConfig.endpoint = new jaegerTypes.UDPSender(
         localConfig
@@ -83,7 +85,7 @@ export class JaegerExporter implements SpanExporter {
     }
     this._logger.debug('Jaeger exporter export');
     this._sendSpans(spans, resultCallback).catch(err => {
-      this._logger.error(`JaegerExporter failed to export: ${err}`);
+      globalErrorHandler(err);
     });
   }
 
@@ -134,7 +136,7 @@ export class JaegerExporter implements SpanExporter {
       try {
         await this._append(span);
       } catch (err) {
-        this._logger.error(`failed to append span: ${err}`);
+        globalErrorHandler(err);
         // TODO right now we break out on first error, is that desirable?
         if (done) return done(ExportResult.FAILED_NOT_RETRYABLE);
       }
