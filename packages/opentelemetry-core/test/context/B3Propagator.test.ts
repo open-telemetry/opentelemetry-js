@@ -20,12 +20,10 @@ import {
   defaultSetter,
   SpanContext,
   TraceFlags,
-} from '@opentelemetry/api';
-import { ROOT_CONTEXT } from '@opentelemetry/context-base';
-import {
   getExtractedSpanContext,
   setExtractedSpanContext,
-} from '../../src/context/context';
+} from '@opentelemetry/api';
+import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import {
   B3Propagator,
   B3InjectEncoding,

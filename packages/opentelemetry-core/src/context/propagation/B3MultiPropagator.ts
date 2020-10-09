@@ -23,9 +23,10 @@ import {
   isValidSpanId,
   isValidTraceId,
   isSpanContextValid,
+  getParentSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
-import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 /* b3 multi-header keys */
 export const X_B3_TRACE_ID = 'x-b3-traceid';

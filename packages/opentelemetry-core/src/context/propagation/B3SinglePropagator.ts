@@ -23,9 +23,10 @@ import {
   isValidSpanId,
   isValidTraceId,
   isSpanContextValid,
+  getParentSpanContext,
+  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
-import { getParentSpanContext, setExtractedSpanContext } from '../context';
 
 /** B3 single-header name */
 export const B3_CONTEXT_HEADER = 'b3';
