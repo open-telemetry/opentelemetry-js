@@ -539,7 +539,7 @@ describe('PrometheusExporter', () => {
                   `value_recorder_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
                   `value_recorder_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
                   `value_recorder_bucket{key1="labelValue1",le="Infinity"} 1 ${mockedHrTimeMs}`,
-                  `value_recorder_bucket{key1="labelValue1",le="+Inf"} 0 ${mockedHrTimeMs}`,
+                  `value_recorder_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
