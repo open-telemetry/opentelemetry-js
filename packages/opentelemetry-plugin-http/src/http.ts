@@ -23,7 +23,6 @@ import {
   Status,
   SpanContext,
   TraceFlags,
-  getExtractedSpanContext,
   setActiveSpan,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
@@ -441,13 +440,16 @@ export class HttpPlugin extends BasePlugin<Http> {
       options.kind === SpanKind.CLIENT
         ? this._config.requireParentforOutgoingSpans
         : this._config.requireParentforIncomingSpans;
+
     let span: Span;
-    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
-      const spanContext =
-        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+    const currentSpan = this._tracer.getCurrentSpan();
+
+    if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(spanContext);
+      span = new NoRecordingSpan(plugin._emptySpanContext);
+    } else if (requireParent === true && currentSpan?.context().isRemote) {
+      span = currentSpan;
     } else {
       span = this._tracer.startSpan(name, options);
     }
