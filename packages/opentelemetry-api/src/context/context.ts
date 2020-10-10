@@ -52,17 +52,6 @@ export function setActiveSpan(context: Context, span: Span): Context {
 }
 
 /**
- * Get the extracted span context from a context
- *
- * @param context context to get span context from
- */
-export function getExtractedSpanContext(
-  context: Context
-): SpanContext | undefined {
-  return getActiveSpan(context)?.context();
-}
-
-/**
  * Wrap extracted span context in a NoopSpan as set as active span in a new
  * context
  *

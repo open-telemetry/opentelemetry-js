@@ -22,7 +22,7 @@ import {
   TraceFlags,
   INVALID_SPANID,
   INVALID_TRACEID,
-  getExtractedSpanContext,
+  getActiveSpan,
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
@@ -136,7 +136,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -153,7 +153,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -170,7 +170,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -186,7 +186,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '00000000000000004aaba1a52cf8ee09',
@@ -203,7 +203,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -220,7 +220,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -231,7 +231,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -242,7 +242,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
 
@@ -253,7 +253,7 @@ describe('B3SinglePropagator', () => {
 
       const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
     });
   });
