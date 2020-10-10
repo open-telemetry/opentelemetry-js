@@ -15,7 +15,7 @@
  */
 
 import * as api from '@opentelemetry/api';
-import { ExportResult } from '@opentelemetry/core';
+import { ExportResult, globalErrorHandler } from '@opentelemetry/core';
 import * as http from 'http';
 import * as https from 'https';
 import * as url from 'url';
@@ -82,7 +82,7 @@ export function prepareSend(
     });
 
     req.on('error', (err: Error) => {
-      logger.error('Zipkin request error', err);
+      globalErrorHandler(err);
       return done(ExportResult.FAILED_RETRYABLE);
     });
 

@@ -14,34 +14,9 @@
  * limitations under the License.
  */
 
-interface ExceptionWithCode {
-  code: string | number;
-  name?: string;
-  message?: string;
-  stack?: string;
-}
+import { createContextKey } from '@opentelemetry/api';
 
-interface ExceptionWithMessage {
-  code?: string | number;
-  message: string;
-  name?: string;
-  stack?: string;
-}
-
-interface ExceptionWithName {
-  code?: string | number;
-  message?: string;
-  name: string;
-  stack?: string;
-}
-
-/**
- * Defines Exception.
- *
- * string or an object with one of (message or name or code) and optional stack
- */
-export type Exception =
-  | ExceptionWithCode
-  | ExceptionWithMessage
-  | ExceptionWithName
-  | string;
+/** shared context for storing an extracted b3 debug flag */
+export const B3_DEBUG_FLAG_KEY = createContextKey(
+  'OpenTelemetry Context Key B3 Debug Flag'
+);

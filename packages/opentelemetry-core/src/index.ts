@@ -16,12 +16,16 @@
 
 export * from './common/attributes';
 export * from './common/ConsoleLogger';
+export * from './common/global-error-handler';
+export * from './common/logging-error-handler';
 export * from './common/NoopLogger';
 export * from './common/time';
 export * from './common/types';
 export * from './ExportResult';
 export * from './version';
 export * from './context/propagation/B3Propagator';
+export * from './context/propagation/B3SinglePropagator';
+export * from './context/propagation/B3MultiPropagator';
 export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';

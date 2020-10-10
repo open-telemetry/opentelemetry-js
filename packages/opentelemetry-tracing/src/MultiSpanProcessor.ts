@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+import { globalErrorHandler } from '@opentelemetry/core';
 import { SpanProcessor } from './SpanProcessor';
 import { ReadableSpan } from './export/ReadableSpan';
 
@@ -30,10 +31,17 @@ export class MultiSpanProcessor implements SpanProcessor {
     for (const spanProcessor of this._spanProcessors) {
       promises.push(spanProcessor.forceFlush());
     }
-    return new Promise((resolve, reject) => {
-      Promise.all(promises).then(() => {
-        resolve();
-      }, reject);
+    return new Promise(resolve => {
+      Promise.all(promises)
+        .then(() => {
+          resolve();
+        })
+        .catch(error => {
+          globalErrorHandler(
+            error || new Error('MultiSpanProcessor: forceFlush failed')
+          );
+          resolve();
+        });
     });
   }
 
