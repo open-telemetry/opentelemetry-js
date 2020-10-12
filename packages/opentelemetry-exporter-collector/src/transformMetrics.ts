@@ -49,17 +49,17 @@ export function toAggregationTemporality(
 ): opentelemetryProto.metrics.v1.AggregationTemporality {
   if (
     metric.descriptor.metricKind === MetricKind.COUNTER ||
-    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
-  ) {
-    return opentelemetryProto.metrics.v1.AggregationTemporality
-      .AGGREGATION_TEMPORALITY_CUMULATIVE;
-  }
-  if (
-    metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER ||
-    metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER
   ) {
     return opentelemetryProto.metrics.v1.AggregationTemporality
       .AGGREGATION_TEMPORALITY_DELTA;
+  }
+  if (
+    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER ||
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
+  ) {
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
   if (
     metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
