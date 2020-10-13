@@ -14,13 +14,13 @@ implementations for systems using the b3 context format. See the
 
 Single-Header Format:
 
-```
+```bash
 b3: {TraceId}-{SpanId}-{SamplingState}-{ParentSpanId}
 ```
 
 Multi-Header Format:
 
-```
+```bash
 X-B3-TraceId: {TraceId}
 X-B3-SpanId: {SpanId}
 X-B3-ParentSpanId: {ParentSpanId}
