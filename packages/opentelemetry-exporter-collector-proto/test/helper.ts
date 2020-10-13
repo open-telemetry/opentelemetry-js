@@ -345,7 +345,7 @@ export function ensureExportedValueRecorderIsCorrect(
           explicitBounds: ['Infinity'],
         },
       ],
-      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
+      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
     },
   });
 }

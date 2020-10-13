@@ -54,6 +54,7 @@ export function toAggregationTemporality(
     return opentelemetryProto.metrics.v1.AggregationTemporality
       .AGGREGATION_TEMPORALITY_DELTA;
   }
+
   if (
     metric.descriptor.metricKind === MetricKind.SUM_OBSERVER ||
     metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
@@ -61,13 +62,18 @@ export function toAggregationTemporality(
     return opentelemetryProto.metrics.v1.AggregationTemporality
       .AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
-  if (
-    metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
-    metric.descriptor.metricKind === MetricKind.VALUE_RECORDER
-  ) {
+
+  if (metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER) {
     return opentelemetryProto.metrics.v1.AggregationTemporality
-      .AGGREGATION_TEMPORALITY_DELTA;
+      .AGGREGATION_TEMPORALITY_UNSPECIFIED;
   }
+
+  // until spec is resolved keep it as unspecified
+  if (metric.descriptor.metricKind === MetricKind.VALUE_RECORDER) {
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_CUMULATIVE;
+  }
+
   return opentelemetryProto.metrics.v1.AggregationTemporality
     .AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }

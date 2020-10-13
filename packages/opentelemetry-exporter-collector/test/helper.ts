@@ -583,7 +583,7 @@ export function ensureValueRecorderIsCorrect(
       ],
       aggregationTemporality:
         collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
-          .AGGREGATION_TEMPORALITY_DELTA,
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
   });
 }
