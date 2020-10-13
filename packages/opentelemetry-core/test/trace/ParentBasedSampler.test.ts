@@ -16,7 +16,7 @@
 import * as assert from 'assert';
 import * as api from '@opentelemetry/api';
 import { AlwaysOnSampler } from '../../src/trace/sampler/AlwaysOnSampler';
-import { ParentOrElseSampler } from '../../src/trace/sampler/ParentOrElseSampler';
+import { ParentBasedSampler } from '../../src/trace/sampler/ParentBasedSampler';
 import { TraceFlags, SpanKind } from '@opentelemetry/api';
 import { AlwaysOffSampler } from '../../src/trace/sampler/AlwaysOffSampler';
 import { TraceIdRatioBasedSampler } from '../../src';
@@ -25,23 +25,31 @@ const traceId = 'd4cda95b652f4a1592b449d5929fda1b';
 const spanId = '6e0c63257de34c92';
 const spanName = 'foobar';
 
-describe('ParentOrElseSampler', () => {
+describe('ParentBasedSampler', () => {
   it('should reflect sampler name with delegate sampler', () => {
-    let sampler = new ParentOrElseSampler(new AlwaysOnSampler());
-    assert.strictEqual(sampler.toString(), 'ParentOrElse{AlwaysOnSampler}');
-
-    sampler = new ParentOrElseSampler(new AlwaysOnSampler());
-    assert.strictEqual(sampler.toString(), 'ParentOrElse{AlwaysOnSampler}');
-
-    sampler = new ParentOrElseSampler(new TraceIdRatioBasedSampler(0.5));
+    let sampler = new ParentBasedSampler({ root: new AlwaysOnSampler() });
     assert.strictEqual(
       sampler.toString(),
-      'ParentOrElse{TraceIdRatioBased{0.5}}'
+      'ParentBased{root=AlwaysOnSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
+
+    sampler = new ParentBasedSampler({ root: new AlwaysOffSampler() });
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentBased{root=AlwaysOffSampler, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
+    );
+
+    sampler = new ParentBasedSampler({
+      root: new TraceIdRatioBasedSampler(0.5),
+    });
+    assert.strictEqual(
+      sampler.toString(),
+      'ParentBased{root=TraceIdRatioBased{0.5}, remoteParentSampled=AlwaysOnSampler, remoteParentNotSampled=AlwaysOffSampler, localParentSampled=AlwaysOnSampler, localParentNotSampled=AlwaysOffSampler}'
     );
   });
 
   it('should return api.SamplingDecision.NOT_RECORD for not sampled parent while composited with AlwaysOnSampler', () => {
-    const sampler = new ParentOrElseSampler(new AlwaysOnSampler());
+    const sampler = new ParentBasedSampler({ root: new AlwaysOnSampler() });
 
     const spanContext = {
       traceId,
@@ -64,7 +72,7 @@ describe('ParentOrElseSampler', () => {
   });
 
   it('should return api.SamplingDecision.RECORD_AND_SAMPLED while composited with AlwaysOnSampler', () => {
-    const sampler = new ParentOrElseSampler(new AlwaysOnSampler());
+    const sampler = new ParentBasedSampler({ root: new AlwaysOnSampler() });
 
     assert.deepStrictEqual(
       sampler.shouldSample(
@@ -82,7 +90,7 @@ describe('ParentOrElseSampler', () => {
   });
 
   it('should return api.SamplingDecision.RECORD_AND_SAMPLED for sampled parent while composited with AlwaysOffSampler', () => {
-    const sampler = new ParentOrElseSampler(new AlwaysOffSampler());
+    const sampler = new ParentBasedSampler({ root: new AlwaysOffSampler() });
 
     const spanContext = {
       traceId,
@@ -105,7 +113,7 @@ describe('ParentOrElseSampler', () => {
   });
 
   it('should return api.SamplingDecision.RECORD_AND_SAMPLED while composited with AlwaysOffSampler', () => {
-    const sampler = new ParentOrElseSampler(new AlwaysOffSampler());
+    const sampler = new ParentBasedSampler({ root: new AlwaysOffSampler() });
 
     assert.deepStrictEqual(
       sampler.shouldSample(

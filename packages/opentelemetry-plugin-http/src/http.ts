@@ -24,6 +24,7 @@ import {
   SpanContext,
   TraceFlags,
   getExtractedSpanContext,
+  setActiveSpan,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
@@ -410,21 +411,24 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.CLIENT,
       };
       const span = plugin._startHttpSpan(operationName, spanOptions);
+      if (!optionsParsed.headers) {
+        optionsParsed.headers = {};
+      }
+      propagation.inject(
+        optionsParsed.headers,
+        undefined,
+        setActiveSpan(context.active(), span)
+      );
 
-      return plugin._tracer.withSpan(span, () => {
-        if (!optionsParsed.headers) optionsParsed.headers = {};
-        propagation.inject(optionsParsed.headers);
+      const request: ClientRequest = plugin._safeExecute(
+        span,
+        () => original.apply(this, [optionsParsed, ...args]),
+        true
+      );
 
-        const request: ClientRequest = plugin._safeExecute(
-          span,
-          () => original.apply(this, [optionsParsed, ...args]),
-          true
-        );
-
-        plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-        plugin._tracer.bind(request);
-        return plugin._traceClientRequest(request, optionsParsed, span);
-      });
+      plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+      plugin._tracer.bind(request);
+      return plugin._traceClientRequest(request, optionsParsed, span);
     };
   }
 
