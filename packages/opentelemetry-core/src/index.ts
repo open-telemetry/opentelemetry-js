@@ -24,6 +24,8 @@ export * from './common/types';
 export * from './ExportResult';
 export * from './version';
 export * from './context/propagation/B3Propagator';
+export * from './context/propagation/B3SinglePropagator';
+export * from './context/propagation/B3MultiPropagator';
 export * from './context/propagation/composite';
 export * from './context/propagation/HttpTraceContext';
 export * from './context/propagation/types';
