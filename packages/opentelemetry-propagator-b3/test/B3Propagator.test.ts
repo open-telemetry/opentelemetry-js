@@ -24,7 +24,8 @@ import {
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
-import { B3Propagator, B3InjectEncoding } from '../src/B3Propagator';
+import { B3Propagator } from '../src/B3Propagator';
+import { B3InjectEncoding } from '../src/types';
 import { B3_CONTEXT_HEADER } from '../src/B3SinglePropagator';
 import {
   X_B3_SAMPLED,

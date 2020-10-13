@@ -30,7 +30,7 @@ import {
   B3SinglePropagator,
   B3_CONTEXT_HEADER,
 } from '../src/B3SinglePropagator';
-import { B3_DEBUG_FLAG_KEY } from '../src/b3-common';
+import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3SinglePropagator', () => {
   const propagator = new B3SinglePropagator();

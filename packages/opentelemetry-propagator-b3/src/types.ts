@@ -14,7 +14,13 @@
  * limitations under the License.
  */
 
-export * from './B3Propagator';
-export * from './B3SinglePropagator';
-export * from './B3MultiPropagator';
-export * from './types';
+/** Enumeration of B3 inject encodings */
+export enum B3InjectEncoding {
+  SINGLE_HEADER,
+  MULTI_HEADER,
+}
+
+/** Configuration for the B3Propagator */
+export interface B3PropagatorConfig {
+  injectEncoding?: B3InjectEncoding;
+}

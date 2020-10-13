@@ -32,7 +32,7 @@ import {
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
 } from '../src/B3MultiPropagator';
-import { B3_DEBUG_FLAG_KEY } from '../src/b3-common';
+import { B3_DEBUG_FLAG_KEY } from '../src/common';
 
 describe('B3MultiPropagator', () => {
   const b3Propagator = new B3MultiPropagator();
