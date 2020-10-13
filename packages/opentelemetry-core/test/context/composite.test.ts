@@ -34,7 +34,7 @@ import {
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
   X_B3_TRACE_ID,
-} from '../../src/context/propagation/B3MultiPropagator';
+} from '@opentelemetry/propagator-b3';
 import {
   TRACE_PARENT_HEADER,
   TRACE_STATE_HEADER,
