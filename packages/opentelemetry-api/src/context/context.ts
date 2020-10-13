@@ -52,7 +52,7 @@ export function setActiveSpan(context: Context, span: Span): Context {
 }
 
 /**
- * Wrap extracted span context in a NoopSpan as set as active span in a new
+ * Wrap extracted span context in a NoopSpan and set as active span in a new
  * context
  *
  * @param context context to set active span on
