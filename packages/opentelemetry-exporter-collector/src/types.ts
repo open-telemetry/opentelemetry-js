@@ -266,16 +266,21 @@ export namespace opentelemetryProto {
 /**
  * Interface for handling error
  */
-export interface CollectorExporterError {
-  code?: number;
-  message?: string;
-  stack?: string;
+export class CollectorExporterError extends Error {
+  readonly code?: number;
+  readonly name: string = 'CollectorExporterError';
+
+  constructor(message?: string, code?: number) {
+    super(message);
+    this.code = code;
+  }
 }
 
 /**
  * Interface for handling export service errors
  */
 export interface ExportServiceError {
+  name: string;
   code: number;
   details: string;
   metadata: { [key: string]: unknown };

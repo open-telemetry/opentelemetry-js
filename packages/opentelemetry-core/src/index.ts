@@ -16,6 +16,8 @@
 
 export * from './common/attributes';
 export * from './common/ConsoleLogger';
+export * from './common/global-error-handler';
+export * from './common/logging-error-handler';
 export * from './common/NoopLogger';
 export * from './common/time';
 export * from './common/types';
