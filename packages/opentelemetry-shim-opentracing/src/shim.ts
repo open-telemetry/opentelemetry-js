@@ -176,7 +176,7 @@ export class TracerShim extends opentracing.Tracer {
       case opentracing.FORMAT_TEXT_MAP: {
         api.propagation.inject(
           carrier,
-          api.defaultSetter,
+          api.defaultTextMapSetter,
           setCorrelationContext(
             api.setExtractedSpanContext(api.ROOT_CONTEXT, oTelSpanContext),
             oTelSpanCorrelationContext

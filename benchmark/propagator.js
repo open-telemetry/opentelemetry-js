@@ -34,10 +34,10 @@ for (const setup of setups) {
         api.setExtractedSpanContext(Context.ROOT_CONTEXT, {
           traceId: 'd4cda95b652f4a1592b449d5929fda1b',
           spanId: '6e0c63257de34c92'
-        }), setup.injectCarrier, api.defaultSetter);
+        }), setup.injectCarrier, api.defaultTextMapSetter);
     })
     .add('#Extract', function () {
-      propagator.extract(Context.ROOT_CONTEXT, setup.extractCarrier, api.defaultGetter);
+      propagator.extract(Context.ROOT_CONTEXT, setup.extractCarrier, api.defaultTextMapGetter);
     });
 
   // run async

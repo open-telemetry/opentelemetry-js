@@ -38,10 +38,14 @@ export interface TextMapPropagator<Carrier = any> {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
-   * @param setter an optional {@link Setter}. If undefined, values will be
+   * @param setter an optional {@link TextMapSetter}. If undefined, values will be
    *     set by direct object assignment.
    */
-  inject(context: Context, carrier: Carrier, setter: Setter<Carrier>): void;
+  inject(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void;
 
   /**
    * Given a `Context` and a carrier, extract context values from a
@@ -52,17 +56,21 @@ export interface TextMapPropagator<Carrier = any> {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
-   * @param getter an optional {@link Getter}. If undefined, keys will be all
+   * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
    *     own properties, and keys will be accessed by direct object access.
    */
-  extract(context: Context, carrier: Carrier, getter: Getter<Carrier>): Context;
+  extract(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context;
 }
 
 /**
  * A setter is specified by the caller to define a specific method
  * to set key/value pairs on the carrier within a propagator.
  */
-export interface Setter<Carrier = any> {
+export interface TextMapSetter<Carrier = any> {
   /**
    * Callback used to set a key/value pair on an object.
    *
@@ -80,7 +88,7 @@ export interface Setter<Carrier = any> {
  * A getter is specified by the caller to define a specific method
  * to get the value of a key from a carrier.
  */
-export interface Getter<Carrier = any> {
+export interface TextMapGetter<Carrier = any> {
   /**
    * Get a list of all keys available on the carrier.
    *
@@ -97,7 +105,7 @@ export interface Getter<Carrier = any> {
   get(carrier: Carrier, key: string): undefined | string | string[];
 }
 
-export const defaultGetter: Getter = {
+export const defaultTextMapGetter: TextMapGetter = {
   get(carrier, key) {
     if (carrier == null) {
       return undefined;
@@ -113,7 +121,7 @@ export const defaultGetter: Getter = {
   },
 };
 
-export const defaultSetter: Setter = {
+export const defaultTextMapSetter: TextMapSetter = {
   set(carrier, key, value) {
     if (carrier == null) {
       return;
