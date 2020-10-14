@@ -89,9 +89,9 @@ export async function mockValueRecorder(): Promise<MetricRecord> {
   return (await metric.getMetricRecord())[0];
 }
 
-const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
-const spanIdBase64 = 'XhByYfZPpT4=';
-const parentIdBase64 = 'eKiRUJiGQ4g=';
+const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
+const spanIdHex = '5e107261f64fa53e';
+const parentIdHex = '78a8915098864388';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -222,8 +222,8 @@ export function ensureProtoLinksAreCorrect(
     attributes,
     [
       {
-        traceId: traceIdBase64,
-        spanId: parentIdBase64,
+        traceId: traceIdHex,
+        spanId: parentIdHex,
         attributes: [
           {
             key: 'component',
@@ -251,11 +251,11 @@ export function ensureProtoSpanIsCorrect(
   if (span.links) {
     ensureProtoLinksAreCorrect(span.links);
   }
-  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
-  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(span.traceId, traceIdHex, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdHex, 'spanId is wrong');
   assert.deepStrictEqual(
     span.parentSpanId,
-    parentIdBase64,
+    parentIdHex,
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
