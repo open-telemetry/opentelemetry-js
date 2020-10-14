@@ -18,7 +18,7 @@ import { Span, SpanOptions, Tracer, SpanContext } from '..';
 import { Context } from '@opentelemetry/context-base';
 import { NoopSpan, NOOP_SPAN } from './NoopSpan';
 import { isSpanContextValid } from './spancontext-utils';
-import { getExtractedSpanContext } from '../context/context';
+import { getActiveSpan } from '../context/context';
 
 /**
  * No-op implementations of {@link Tracer}.
@@ -31,7 +31,7 @@ export class NoopTracer implements Tracer {
   // startSpan starts a noop span.
   startSpan(name: string, options?: SpanOptions, context?: Context): Span {
     const parent = options?.parent;
-    const parentFromContext = context && getExtractedSpanContext(context);
+    const parentFromContext = context && getActiveSpan(context)?.context();
     if (isSpanContext(parent) && isSpanContextValid(parent)) {
       return new NoopSpan(parent);
     } else if (
