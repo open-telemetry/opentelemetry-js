@@ -16,13 +16,13 @@
 
 import {
   Context,
+  getParentSpanContext,
+  setExtractedSpanContext,
+  SpanContext,
   TextMapGetter,
   TextMapPropagator,
   TextMapSetter,
-  SpanContext,
   TraceFlags,
-  getParentSpanContext,
-  setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
 

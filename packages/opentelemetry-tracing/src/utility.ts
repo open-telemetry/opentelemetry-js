@@ -22,7 +22,7 @@ import {
 } from './config';
 import { TracerConfig } from './types';
 import {
-  ParentOrElseSampler,
+  ParentBasedSampler,
   TraceIdRatioBasedSampler,
   getEnv,
 } from '@opentelemetry/core';
@@ -40,9 +40,9 @@ export function mergeConfig(userConfig: TracerConfig) {
     // use default AlwaysOnSampler if otelSamplingProbability is 1
     otelSamplingProbability !== undefined && otelSamplingProbability < 1
       ? {
-          sampler: new ParentOrElseSampler(
-            new TraceIdRatioBasedSampler(otelSamplingProbability)
-          ),
+          sampler: new ParentBasedSampler({
+            root: new TraceIdRatioBasedSampler(otelSamplingProbability),
+          }),
         }
       : {},
     userConfig

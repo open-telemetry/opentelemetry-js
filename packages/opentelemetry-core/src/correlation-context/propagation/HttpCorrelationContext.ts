@@ -31,7 +31,7 @@ const PROPERTIES_SEPARATOR = ';';
 const ITEMS_SEPARATOR = ',';
 
 // Name of the http header used to propagate the correlation context
-export const CORRELATION_CONTEXT_HEADER = 'otcorrelations';
+export const CORRELATION_CONTEXT_HEADER = 'baggage';
 // Maximum number of name-value pairs allowed by w3c spec
 export const MAX_NAME_VALUE_PAIRS = 180;
 // Maximum number of bytes per a single name-value pair allowed by w3c spec

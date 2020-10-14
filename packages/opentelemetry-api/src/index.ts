@@ -59,6 +59,9 @@ export {
   INVALID_SPANID,
   INVALID_TRACEID,
   INVALID_SPAN_CONTEXT,
+  isSpanContextValid,
+  isValidTraceId,
+  isValidSpanId,
 } from './trace/spancontext-utils';
 
 export {
