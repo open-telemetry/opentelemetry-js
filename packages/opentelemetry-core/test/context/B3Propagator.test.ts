@@ -20,7 +20,7 @@ import {
   defaultSetter,
   SpanContext,
   TraceFlags,
-  getExtractedSpanContext,
+  getActiveSpan,
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
@@ -109,7 +109,7 @@ describe('B3Propagator', () => {
         defaultGetter
       );
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
@@ -125,7 +125,7 @@ describe('B3Propagator', () => {
         defaultGetter
       );
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: '6e0c63257de34c92',
         traceId: 'd4cda95b652f4a1592b449d5929fda1b',
@@ -141,7 +141,7 @@ describe('B3Propagator', () => {
         defaultGetter
       );
 
-      const extractedSpanContext = getExtractedSpanContext(context);
+      const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'e457b5a2e4d86bd1',
         traceId: '80f198ee56343ba864fe8b2a57d3eff7',
