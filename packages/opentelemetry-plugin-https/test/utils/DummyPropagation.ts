@@ -30,6 +30,7 @@ export class DummyPropagation implements TextMapPropagator {
       traceId: carrier[DummyPropagation.TRACE_CONTEXT_KEY] as string,
       spanId: DummyPropagation.SPAN_CONTEXT_KEY,
       traceFlags: TraceFlags.SAMPLED,
+      isRemote: true,
     };
     if (extractedSpanContext.traceId && extractedSpanContext.spanId) {
       return setExtractedSpanContext(context, extractedSpanContext);

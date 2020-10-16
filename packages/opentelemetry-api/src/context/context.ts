@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Span, SpanContext } from '../';
+import { NoopSpan, Span, SpanContext } from '../';
 import { Context, createContextKey } from '@opentelemetry/context-base';
 
 /**
@@ -23,9 +23,7 @@ import { Context, createContextKey } from '@opentelemetry/context-base';
 const ACTIVE_SPAN_KEY = createContextKey(
   'OpenTelemetry Context Key ACTIVE_SPAN'
 );
-const EXTRACTED_SPAN_CONTEXT_KEY = createContextKey(
-  'OpenTelemetry Context Key EXTRACTED_SPAN_CONTEXT'
-);
+
 /**
  * Shared key for indicating if instrumentation should be suppressed beyond
  * this current scope.
@@ -54,29 +52,17 @@ export function setActiveSpan(context: Context, span: Span): Context {
 }
 
 /**
- * Get the extracted span context from a context
+ * Wrap extracted span context in a NoopSpan and set as active span in a new
+ * context
  *
- * @param context context to get span context from
- */
-export function getExtractedSpanContext(
-  context: Context
-): SpanContext | undefined {
-  return (
-    (context.getValue(EXTRACTED_SPAN_CONTEXT_KEY) as SpanContext) || undefined
-  );
-}
-
-/**
- * Set the extracted span context on a context
- *
- * @param context context to set span context on
- * @param spanContext span context to set
+ * @param context context to set active span on
+ * @param spanContext span context to be wrapped
  */
 export function setExtractedSpanContext(
   context: Context,
   spanContext: SpanContext
 ): Context {
-  return context.setValue(EXTRACTED_SPAN_CONTEXT_KEY, spanContext);
+  return setActiveSpan(context, new NoopSpan(spanContext));
 }
 
 /**
@@ -89,7 +75,7 @@ export function setExtractedSpanContext(
 export function getParentSpanContext(
   context: Context
 ): SpanContext | undefined {
-  return getActiveSpan(context)?.context() || getExtractedSpanContext(context);
+  return getActiveSpan(context)?.context();
 }
 
 /**
