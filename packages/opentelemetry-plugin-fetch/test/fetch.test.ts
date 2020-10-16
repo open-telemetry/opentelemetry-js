@@ -468,9 +468,6 @@ describe('fetch', () => {
     it('should set trace headers with a request object', () => {
       const r = new Request('url');
       window.fetch(r);
-      console.log(core.X_B3_TRACE_ID);
-      console.log(r.headers.has(core.X_B3_TRACE_ID));
-      console.log(r.headers.get(core.X_B3_TRACE_ID));
       assert.ok(typeof r.headers.get(core.X_B3_TRACE_ID) === 'string');
     });
 
