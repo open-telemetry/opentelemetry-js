@@ -14,7 +14,14 @@
  * limitations under the License.
  */
 
-import { defaultTextMapGetter, defaultTextMapSetter, getActiveSpan, setExtractedSpanContext, SpanContext, TraceFlags } from '@opentelemetry/api';
+import {
+  defaultTextMapGetter,
+  defaultTextMapSetter,
+  getActiveSpan,
+  setExtractedSpanContext,
+  SpanContext,
+  TraceFlags,
+} from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
 import * as assert from 'assert';
 import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
@@ -24,7 +31,7 @@ import {
   X_B3_PARENT_SPAN_ID,
   X_B3_SAMPLED,
   X_B3_SPAN_ID,
-  X_B3_TRACE_ID
+  X_B3_TRACE_ID,
 } from '../../src/context/propagation/B3MultiPropagator';
 import { TraceState } from '../../src/trace/TraceState';
 
