@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
+import { Attributes, CanonicalCode, SpanKind, TraceFlags } from '@opentelemetry/api';
 import { NoopLogger } from '@opentelemetry/core';
 import { BasicTracerProvider, Span } from '@opentelemetry/tracing';
 import { HttpAttribute } from '@opentelemetry/semantic-conventions';
@@ -309,4 +309,17 @@ describe('Utility', () => {
       assert.deepEqual(attributes[HttpAttribute.HTTP_ROUTE], undefined);
     });
   });
+
+  describe('setRequestContentLengthAttributes', () => {
+    it('should set attributes', () => {
+      const attributes: Attributes = {}
+      let headers: http.OutgoingHttpHeaders = {
+        'content-length': 1200
+      }
+
+      utils.setRequestContentLengthAttributes(headers, attributes)
+
+      assert.strictEqual(attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED], 1200)
+    })
+  })
 });

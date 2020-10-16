@@ -218,6 +218,36 @@ export const setSpanWithError = (
 };
 
 /**
+ * 
+ * @param headers 
+ * @param Attributes 
+ */
+export const setRequestContentLengthAttributes = (
+  headers: OutgoingHttpHeaders | IncomingHttpHeaders,
+  attributes: Attributes
+) => {
+  let isCompressed = false
+
+  if (headers['content-encoding'] && headers['content-encoding'] !== 'identity') {
+    isCompressed = true
+  }
+
+  if (isCompressed) {
+    if (headers as OutgoingHttpHeaders) {
+      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH] = headers['content-length']
+    } else {
+      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH] = headers['content-length']
+    }
+  } else {
+    if (headers as OutgoingHttpHeaders) {
+      attributes[HttpAttribute.HTTP_REQUEST_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
+    } else {
+      attributes[HttpAttribute.HTTP_RESPONSE_CONTENT_LENGTH_UNCOMPRESSED] = headers['content-length']
+    }
+  }
+};
+
+/**
  * Makes sure options is an url object
  * return an object with default value and parsed options
  * @param options original options for the request
@@ -356,13 +386,17 @@ export const getOutgoingRequestAttributesOnResponse = (
   response: IncomingMessage,
   options: { hostname: string }
 ): Attributes => {
-  const { statusCode, statusMessage, httpVersion, socket } = response;
+  const { statusCode, statusMessage, httpVersion, headers, socket } = response;
   const { remoteAddress, remotePort } = socket;
+
+  
   const attributes: Attributes = {
     [GeneralAttribute.NET_PEER_IP]: remoteAddress,
     [GeneralAttribute.NET_PEER_PORT]: remotePort,
     [HttpAttribute.HTTP_HOST]: `${options.hostname}:${remotePort}`,
   };
+
+  // Place content-length func here?  
 
   if (statusCode) {
     attributes[HttpAttribute.HTTP_STATUS_CODE] = statusCode;
@@ -423,6 +457,8 @@ export const getIncomingRequestAttributes = (
   if (userAgent !== undefined) {
     attributes[HttpAttribute.HTTP_USER_AGENT] = userAgent;
   }
+
+  // Place content-length func here?
 
   const httpKindAttributes = getAttributesFromHttpKind(httpVersion);
   return Object.assign(attributes, httpKindAttributes);
