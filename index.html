@@ -145,7 +145,7 @@ tracerProvider.register();</code></pre>
 <span class="hljs-keyword">const</span> meterProvider = <span class="hljs-keyword">new</span> MeterProvider({
   <span class="hljs-comment">// The Prometheus exporter runs an HTTP server which</span>
   <span class="hljs-comment">// the Prometheus backend scrapes to collect metrics.</span>
-  <span class="hljs-attr">exporter</span>: <span class="hljs-keyword">new</span> PrometheusExporter({ <span class="hljs-attr">startServer</span>: <span class="hljs-literal">true</span> }),
+  exporter: <span class="hljs-keyword">new</span> PrometheusExporter({ <span class="hljs-attr">startServer</span>: <span class="hljs-literal">true</span> }),
   <span class="hljs-attr">interval</span>: <span class="hljs-number">1000</span>,
 });
 
@@ -294,6 +294,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopcountermetric.html" class="tsd-kind-icon">Noop<wbr>Counter<wbr>Metric</a>
+					</li>
+					<li class=" tsd-kind-class tsd-is-external">
+						<a href="classes/nooplogger.html" class="tsd-kind-icon">Noop<wbr>Logger</a>
 					</li>
 					<li class=" tsd-kind-class tsd-is-external">
 						<a href="classes/noopmeter.html" class="tsd-kind-icon">Noop<wbr>Meter</a>
@@ -452,6 +455,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="interfaces/valuerecorder.html" class="tsd-kind-icon">Value<wbr>Recorder</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
+						<a href="globals.html#attributevalue" class="tsd-kind-icon">Attribute<wbr>Value</a>
+					</li>
+					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#batchobserver" class="tsd-kind-icon">Batch<wbr>Observer</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
@@ -492,6 +498,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-external">
 						<a href="globals.html#valueobserver" class="tsd-kind-icon">Value<wbr>Observer</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#active_span_key" class="tsd-kind-icon">ACTIVE_<wbr>SPAN_<wbr>KEY</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#api_backwards_compatibility_version" class="tsd-kind-icon">API_<wbr>BACKWARDS_<wbr>COMPATIBILITY_<wbr>VERSION</a>
@@ -563,6 +572,9 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#noop_value_recorder_metric" class="tsd-kind-icon">NOOP_<wbr>VALUE_<wbr>RECORDER_<wbr>METRIC</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
+						<a href="globals.html#suppress_instrumentation_key" class="tsd-kind-icon">SUPPRESS_<wbr>INSTRUMENTATION_<wbr>KEY</a>
+					</li>
+					<li class=" tsd-kind-variable tsd-is-external">
 						<a href="globals.html#valid_spanid_regex" class="tsd-kind-icon">VALID_<wbr>SPANID_<wbr>REGEX</a>
 					</li>
 					<li class=" tsd-kind-variable tsd-is-external">
@@ -602,6 +614,18 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 						<a href="globals.html#defaultsetter" class="tsd-kind-icon">default<wbr>Setter</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#getactivespan" class="tsd-kind-icon">get<wbr>Active<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#getparentspancontext" class="tsd-kind-icon">get<wbr>Parent<wbr>Span<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#isinstrumentationsuppressed" class="tsd-kind-icon">is<wbr>Instrumentation<wbr>Suppressed</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#isspancontext" class="tsd-kind-icon">is<wbr>Span<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
 						<a href="globals.html#isspancontextvalid" class="tsd-kind-icon">is<wbr>Span<wbr>Context<wbr>Valid</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-external">
@@ -612,6 +636,18 @@ api.context.setGlobalContextManager(asyncHooksContextManager);</code></pre>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-external">
 						<a href="globals.html#makegetter" class="tsd-kind-icon">make<wbr>Getter</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#setactivespan" class="tsd-kind-icon">set<wbr>Active<wbr>Span</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#setextractedspancontext" class="tsd-kind-icon">set<wbr>Extracted<wbr>Span<wbr>Context</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#suppressinstrumentation" class="tsd-kind-icon">suppress<wbr>Instrumentation</a>
+					</li>
+					<li class=" tsd-kind-function tsd-is-external">
+						<a href="globals.html#unsuppressinstrumentation" class="tsd-kind-icon">unsuppress<wbr>Instrumentation</a>
 					</li>
 					<li class=" tsd-kind-object-literal tsd-is-external">
 						<a href="globals.html#invalid_span_context" class="tsd-kind-icon">INVALID_<wbr>SPAN_<wbr>CONTEXT</a>
