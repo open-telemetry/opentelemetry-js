@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 
 ## 0.12.0
 
-#### :boom: Breaking Change
+### :boom: Breaking Change
+
 * `opentelemetry-api`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
   * [#1588](https://github.com/open-telemetry/opentelemetry-js/pull/1588) Update to Proto v0.5.0 ([@obecny](https://github.com/obecny))
 * `opentelemetry-api`, `opentelemetry-core`, `opentelemetry-plugin-http`, `opentelemetry-plugin-https`, `opentelemetry-shim-opentracing`
@@ -22,7 +23,8 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-core`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`, `opentelemetry-sdk-node`, `opentelemetry-tracing`
   * [#1522](https://github.com/open-telemetry/opentelemetry-js/pull/1522) Remove process listener ([@dyladan](https://github.com/dyladan))
 
-#### :rocket: (Enhancement)
+### :rocket: (Enhancement)
+
 * `opentelemetry-api`, `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-prometheus`, `opentelemetry-metrics`
   * [#1588](https://github.com/open-telemetry/opentelemetry-js/pull/1588) Update to Proto v0.5.0 ([@obecny](https://github.com/obecny))
 * `opentelemetry-core`, `opentelemetry-tracing`
@@ -63,7 +65,8 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`, `opentelemetry-exporter-jaeger`, `opentelemetry-exporter-prometheus`, `opentelemetry-exporter-zipkin`, `opentelemetry-metrics`, `opentelemetry-plugin-fetch`, `opentelemetry-plugin-xml-http-request`, `opentelemetry-tracing`
   * [#1439](https://github.com/open-telemetry/opentelemetry-js/pull/1439) unifying shutdown across code base ([@obecny](https://github.com/obecny))
 
-#### :bug: (Bug Fix)
+### :bug: (Bug Fix)
+
 * `opentelemetry-plugin-http`
   * [#1546](https://github.com/open-telemetry/opentelemetry-js/pull/1546) fix(http): do not set outgoing http span as active in the context #1479 ([@vmarchaud](https://github.com/vmarchaud))
 * `opentelemetry-metrics`
@@ -76,19 +79,22 @@ All notable changes to this project will be documented in this file.
 * `opentelemetry-exporter-collector-grpc`, `opentelemetry-exporter-collector-proto`
   * [#1539](https://github.com/open-telemetry/opentelemetry-js/pull/1539) fix: include missing proto files in npm distribution ([@blumamir](https://github.com/blumamir))
 
-#### :books: (Refine Doc)
+### :books: (Refine Doc)
+
 * Other
   * [#1536](https://github.com/open-telemetry/opentelemetry-js/pull/1536) chore: variable names cleanup ([@DarkPurple141](https://github.com/DarkPurple141))
 * `opentelemetry-exporter-collector-proto`, `opentelemetry-exporter-collector`
   * [#1483](https://github.com/open-telemetry/opentelemetry-js/pull/1483) docs: change CollectorExporter to CollectorTraceExporter ([@Hongbo-Miao](https://github.com/Hongbo-Miao))
 
-#### :sparkles: (Feature)
+### :sparkles: (Feature)
+
 * `opentelemetry-resource-detector-aws`, `opentelemetry-resources`
   * [#1404](https://github.com/open-telemetry/opentelemetry-js/pull/1404) Feat: Added AWS ECS Plugins Resource Detector ([@EdZou](https://github.com/EdZou))
 * `opentelemetry-exporter-zipkin`
   * [#1399](https://github.com/open-telemetry/opentelemetry-js/pull/1399) chore: refactoring zipkin to be able to use it in web ([@obecny](https://github.com/obecny))
 
-#### Committers: 19
+### Committers: 19
+
 * Alex Hinds ([@DarkPurple141](https://github.com/DarkPurple141))
 * Amir Blum ([@blumamir](https://github.com/blumamir))
 * Andrew ([@AndrewGrachov](https://github.com/AndrewGrachov))
