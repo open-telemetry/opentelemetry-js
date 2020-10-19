@@ -19,42 +19,26 @@ import {
   mockCounter,
   mockDoubleCounter,
   mockObserver,
-  mockedResources,
-  mockedInstrumentationLibraries,
-  multiResourceMetrics,
-  multiInstrumentationLibraryMetrics,
   ensureCounterIsCorrect,
   ensureDoubleCounterIsCorrect,
   ensureObserverIsCorrect,
-  mockHistogram,
-  ensureHistogramIsCorrect,
   ensureValueRecorderIsCorrect,
   mockValueRecorder,
+  mockedResources,
+  mockedInstrumentationLibraries,
+  multiResourceMetricsGet,
+  multiInstrumentationLibraryMetricsGet,
 } from '../helper';
 import { MetricRecord, SumAggregator } from '@opentelemetry/metrics';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
 import { Resource } from '@opentelemetry/resources';
 
 describe('transformMetrics', () => {
-  describe('toCollectorMetric', () => {
-    const counter: MetricRecord = mockCounter();
-    const doubleCounter: MetricRecord = mockDoubleCounter();
-    const observer: MetricRecord = mockObserver();
-    const histogram: MetricRecord = mockHistogram();
-    const recorder: MetricRecord = mockValueRecorder();
-    const invalidMetric: MetricRecord = {
-      descriptor: {
-        name: 'name',
-        description: 'description',
-        unit: 'unit',
-        metricKind: 8, // Not a valid metricKind
-        valueType: 2, // Not double or int
-      },
-      labels: {},
-      aggregator: new SumAggregator(),
-      resource: new Resource({}),
-      instrumentationLibrary: { name: 'x', version: 'y' },
-    };
+  describe('toCollectorMetric', async () => {
+    const counter: MetricRecord = await mockCounter();
+    const doubleCounter: MetricRecord = await mockDoubleCounter();
+    const observer: MetricRecord = await mockObserver();
+    const recorder: MetricRecord = await mockValueRecorder();
     beforeEach(() => {
       // Counter
       counter.aggregator.update(1);
@@ -66,12 +50,9 @@ describe('transformMetrics', () => {
       observer.aggregator.update(3);
       observer.aggregator.update(6);
 
-      // Histogram
-      histogram.aggregator.update(7);
-      histogram.aggregator.update(14);
-
       // ValueRecorder
-      recorder.aggregator.update(5);
+      recorder.aggregator.update(7);
+      recorder.aggregator.update(14);
     });
 
     it('should convert metric', () => {
@@ -83,10 +64,6 @@ describe('transformMetrics', () => {
         transform.toCollectorMetric(observer, 1592602232694000000),
         hrTimeToNanoseconds(observer.aggregator.toPoint().timestamp)
       );
-      ensureHistogramIsCorrect(
-        transform.toCollectorMetric(histogram, 1592602232694000000),
-        hrTimeToNanoseconds(histogram.aggregator.toPoint().timestamp)
-      );
 
       ensureValueRecorderIsCorrect(
         transform.toCollectorMetric(recorder, 1592602232694000000),
@@ -97,12 +74,6 @@ describe('transformMetrics', () => {
         transform.toCollectorMetric(doubleCounter, 1592602232694000000),
         hrTimeToNanoseconds(doubleCounter.aggregator.toPoint().timestamp)
       );
-
-      const emptyMetric = transform.toCollectorMetric(
-        invalidMetric,
-        1592602232694000000
-      );
-      assert.deepStrictEqual(emptyMetric.int64DataPoints, []);
     });
 
     it('should convert metric labels value to string', () => {
@@ -122,50 +93,52 @@ describe('transformMetrics', () => {
         },
         1592602232694000000
       );
-      const collectorMetric =
-        metric.int64DataPoints && metric.int64DataPoints[0];
+      const collectorMetric = metric.intSum?.dataPoints[0];
       assert.strictEqual(collectorMetric?.labels[0].value, '1');
     });
   });
-  describe('toCollectorMetricDescriptor', () => {
-    describe('groupMetricsByResourceAndLibrary', () => {
-      it('should group by resource', () => {
-        const [resource1, resource2] = mockedResources;
-        const [library] = mockedInstrumentationLibraries;
-        const [metric1, metric2, metric3] = multiResourceMetrics;
 
-        const expected = new Map([
-          [resource1, new Map([[library, [metric1, metric3]]])],
-          [resource2, new Map([[library, [metric2]]])],
-        ]);
+  describe('groupMetricsByResourceAndLibrary', () => {
+    it('should group by resource', async () => {
+      const [resource1, resource2] = mockedResources;
+      const [library] = mockedInstrumentationLibraries;
+      const [metric1, metric2, metric3] = await multiResourceMetricsGet();
 
-        const result = transform.groupMetricsByResourceAndLibrary(
-          multiResourceMetrics
-        );
+      const expected = new Map([
+        [resource1, new Map([[library, [metric1, metric3]]])],
+        [resource2, new Map([[library, [metric2]]])],
+      ]);
 
-        assert.deepStrictEqual(result, expected);
-      });
+      const result = transform.groupMetricsByResourceAndLibrary(
+        await multiResourceMetricsGet()
+      );
 
-      it('should group by instrumentation library', () => {
-        const [resource] = mockedResources;
-        const [lib1, lib2] = mockedInstrumentationLibraries;
-        const [metric1, metric2, metric3] = multiInstrumentationLibraryMetrics;
-        const expected = new Map([
-          [
-            resource,
-            new Map([
-              [lib1, [metric1, metric3]],
-              [lib2, [metric2]],
-            ]),
-          ],
-        ]);
+      assert.deepStrictEqual(result, expected);
+    });
 
-        const result = transform.groupMetricsByResourceAndLibrary(
-          multiInstrumentationLibraryMetrics
-        );
+    it('should group by instrumentation library', async () => {
+      const [resource] = mockedResources;
+      const [lib1, lib2] = mockedInstrumentationLibraries;
+      const [
+        metric1,
+        metric2,
+        metric3,
+      ] = await multiInstrumentationLibraryMetricsGet();
+      const expected = new Map([
+        [
+          resource,
+          new Map([
+            [lib1, [metric1, metric3]],
+            [lib2, [metric2]],
+          ]),
+        ],
+      ]);
 
-        assert.deepStrictEqual(result, expected);
-      });
+      const result = transform.groupMetricsByResourceAndLibrary(
+        await multiInstrumentationLibraryMetricsGet()
+      );
+
+      assert.deepStrictEqual(result, expected);
     });
   });
 });
