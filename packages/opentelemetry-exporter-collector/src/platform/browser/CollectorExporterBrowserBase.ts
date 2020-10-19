@@ -70,12 +70,10 @@ export abstract class CollectorExporterBrowserBase<
 
     const promise = new Promise(resolve => {
       const _onSuccess = (): void => {
-        onSuccess();
-        _onFinish();
+        Promise.resolve(onSuccess()).then(() => _onFinish());
       };
       const _onError = (error: collectorTypes.CollectorExporterError): void => {
-        onError(error);
-        _onFinish();
+        Promise.resolve(onError(error)).then(() => _onFinish());
       };
       const _onFinish = () => {
         const index = this._sendingPromises.indexOf(promise);
