@@ -15,7 +15,6 @@
  */
 
 import { collectorTypes } from '@opentelemetry/exporter-collector';
-
 import * as core from '@opentelemetry/core';
 import * as http from 'http';
 import * as assert from 'assert';
@@ -26,12 +25,10 @@ import { getExportRequestProto } from '../src/util';
 import {
   mockCounter,
   mockObserver,
-  mockHistogram,
   ensureExportMetricsServiceRequestIsSet,
   mockValueRecorder,
   ensureExportedCounterIsCorrect,
   ensureExportedObserverIsCorrect,
-  ensureExportedHistogramIsCorrect,
   ensureExportedValueRecorderIsCorrect,
 } from './helper';
 import { MetricRecord } from '@opentelemetry/metrics';
@@ -60,7 +57,7 @@ describe('CollectorMetricExporter - node with proto over http', () => {
   let spyWrite: sinon.SinonSpy;
   let metrics: MetricRecord[];
   describe('export', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -79,16 +76,14 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(mockCounter());
-      metrics.push(mockObserver());
-      metrics.push(mockHistogram());
-      metrics.push(mockValueRecorder());
+      metrics.push(await mockCounter());
+      metrics.push(await mockObserver());
+      metrics.push(await mockValueRecorder());
       metrics[0].aggregator.update(1);
       metrics[1].aggregator.update(3);
       metrics[1].aggregator.update(6);
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
-      metrics[3].aggregator.update(5);
     });
     afterEach(() => {
       spyRequest.restore();
@@ -132,22 +127,28 @@ describe('CollectorMetricExporter - node with proto over http', () => {
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
         const metric2 =
-          json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
         const metric3 =
-          json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-        const metric4 =
-          json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
-        ensureExportedCounterIsCorrect(metric1);
+        ensureExportedCounterIsCorrect(
+          metric1,
+          metric1.intSum?.dataPoints[0].timeUnixNano
+        );
         assert.ok(typeof metric2 !== 'undefined', "observer doesn't exist");
-        ensureExportedObserverIsCorrect(metric2);
-        assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
-        ensureExportedHistogramIsCorrect(metric3);
+        ensureExportedObserverIsCorrect(
+          metric2,
+          metric2.doubleGauge?.dataPoints[0].timeUnixNano
+        );
         assert.ok(
-          typeof metric4 !== 'undefined',
+          typeof metric3 !== 'undefined',
           "value recorder doesn't exist"
         );
-        ensureExportedValueRecorderIsCorrect(metric4);
+        ensureExportedValueRecorderIsCorrect(
+          metric3,
+          metric3.intHistogram?.dataPoints[0].timeUnixNano
+        );
 
         ensureExportMetricsServiceRequestIsSet(json);
 

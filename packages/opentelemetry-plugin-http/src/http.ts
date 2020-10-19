@@ -23,7 +23,7 @@ import {
   Status,
   SpanContext,
   TraceFlags,
-  getExtractedSpanContext,
+  setActiveSpan,
 } from '@opentelemetry/api';
 import { BasePlugin, NoRecordingSpan } from '@opentelemetry/core';
 import type {
@@ -410,21 +410,24 @@ export class HttpPlugin extends BasePlugin<Http> {
         kind: SpanKind.CLIENT,
       };
       const span = plugin._startHttpSpan(operationName, spanOptions);
+      if (!optionsParsed.headers) {
+        optionsParsed.headers = {};
+      }
+      propagation.inject(
+        optionsParsed.headers,
+        undefined,
+        setActiveSpan(context.active(), span)
+      );
 
-      return plugin._tracer.withSpan(span, () => {
-        if (!optionsParsed.headers) optionsParsed.headers = {};
-        propagation.inject(optionsParsed.headers);
+      const request: ClientRequest = plugin._safeExecute(
+        span,
+        () => original.apply(this, [optionsParsed, ...args]),
+        true
+      );
 
-        const request: ClientRequest = plugin._safeExecute(
-          span,
-          () => original.apply(this, [optionsParsed, ...args]),
-          true
-        );
-
-        plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
-        plugin._tracer.bind(request);
-        return plugin._traceClientRequest(request, optionsParsed, span);
-      });
+      plugin._logger.debug('%s plugin outgoingRequest', plugin.moduleName);
+      plugin._tracer.bind(request);
+      return plugin._traceClientRequest(request, optionsParsed, span);
     };
   }
 
@@ -437,13 +440,16 @@ export class HttpPlugin extends BasePlugin<Http> {
       options.kind === SpanKind.CLIENT
         ? this._config.requireParentforOutgoingSpans
         : this._config.requireParentforIncomingSpans;
+
     let span: Span;
-    if (requireParent === true && this._tracer.getCurrentSpan() === undefined) {
-      const spanContext =
-        getExtractedSpanContext(context.active()) ?? plugin._emptySpanContext;
+    const currentSpan = this._tracer.getCurrentSpan();
+
+    if (requireParent === true && currentSpan === undefined) {
       // TODO: Refactor this when a solution is found in
       // https://github.com/open-telemetry/opentelemetry-specification/issues/530
-      span = new NoRecordingSpan(spanContext);
+      span = new NoRecordingSpan(plugin._emptySpanContext);
+    } else if (requireParent === true && currentSpan?.context().isRemote) {
+      span = currentSpan;
     } else {
       span = this._tracer.startSpan(name, options);
     }

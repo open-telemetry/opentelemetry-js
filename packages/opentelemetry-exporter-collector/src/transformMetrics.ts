@@ -17,10 +17,8 @@
 import {
   MetricRecord,
   MetricKind,
-  HistogramAggregator,
-  MinMaxLastSumCountAggregator,
   Histogram,
-  Distribution,
+  AggregatorKind,
 } from '@opentelemetry/metrics';
 import { opentelemetryProto, CollectorExporterConfigBase } from './types';
 import * as api from '@opentelemetry/api';
@@ -43,98 +41,52 @@ export function toCollectorLabels(
 }
 
 /**
- * Given a MetricDescriptor, return its type in a compatible format with the collector
- * @param descriptor
- */
-export function toCollectorType(
-  metric: MetricRecord
-): opentelemetryProto.metrics.v1.MetricDescriptorType {
-  if (
-    metric.descriptor.metricKind === MetricKind.COUNTER ||
-    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
-  ) {
-    if (metric.descriptor.valueType === api.ValueType.INT) {
-      return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_INT64;
-    }
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.MONOTONIC_DOUBLE;
-  }
-  if (metric.aggregator instanceof HistogramAggregator) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM;
-  }
-  if (metric.aggregator instanceof MinMaxLastSumCountAggregator) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY;
-  }
-  if (metric.descriptor.valueType == api.ValueType.INT) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.INT64;
-  }
-  if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorType.DOUBLE;
-  }
-
-  return opentelemetryProto.metrics.v1.MetricDescriptorType.INVALID_TYPE;
-}
-
-/**
  * Given a MetricDescriptor, return its temporality in a compatible format with the collector
  * @param descriptor
  */
-export function toCollectorTemporality(
+export function toAggregationTemporality(
   metric: MetricRecord
-): opentelemetryProto.metrics.v1.MetricDescriptorTemporality {
+): opentelemetryProto.metrics.v1.AggregationTemporality {
   if (
     metric.descriptor.metricKind === MetricKind.COUNTER ||
-    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER
+    metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER
   ) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.CUMULATIVE;
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_DELTA;
   }
+
   if (
-    metric.descriptor.metricKind === MetricKind.UP_DOWN_COUNTER ||
+    metric.descriptor.metricKind === MetricKind.SUM_OBSERVER ||
     metric.descriptor.metricKind === MetricKind.UP_DOWN_SUM_OBSERVER
   ) {
-    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.DELTA;
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_CUMULATIVE;
   }
-  if (
-    metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER ||
-    metric.descriptor.metricKind === MetricKind.VALUE_RECORDER
-  ) {
-    // TODO: Change once LastValueAggregator is implemented.
-    // If the aggregator is LastValue or Exact, then it will be instantaneous
-    return opentelemetryProto.metrics.v1.MetricDescriptorTemporality.DELTA;
+
+  if (metric.descriptor.metricKind === MetricKind.VALUE_OBSERVER) {
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_UNSPECIFIED;
   }
-  return opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-    .INVALID_TEMPORALITY;
+
+  // until spec is resolved keep it as unspecified
+  if (metric.descriptor.metricKind === MetricKind.VALUE_RECORDER) {
+    return opentelemetryProto.metrics.v1.AggregationTemporality
+      .AGGREGATION_TEMPORALITY_CUMULATIVE;
+  }
+
+  return opentelemetryProto.metrics.v1.AggregationTemporality
+    .AGGREGATION_TEMPORALITY_UNSPECIFIED;
 }
 
 /**
- * Given a MetricRecord, return the Collector compatible type of MetricDescriptor
- * @param metric
- */
-export function toCollectorMetricDescriptor(
-  metric: MetricRecord
-): opentelemetryProto.metrics.v1.MetricDescriptor {
-  return {
-    name: metric.descriptor.name,
-    description: metric.descriptor.description,
-    unit: metric.descriptor.unit,
-    type: toCollectorType(metric),
-    temporality: toCollectorTemporality(metric),
-  };
-}
-
-/**
- * Returns an Int64Point or DoublePoint to the collector
+ * Returns an DataPoint which can have integers or doublle values
  * @param metric
  * @param startTime
  */
-export function toSingularPoint(
+export function toDataPoint(
   metric: MetricRecord,
   startTime: number
-): {
-  labels: opentelemetryProto.common.v1.StringKeyValue[];
-  startTimeUnixNano: number;
-  timeUnixNano: number;
-  value: number;
-} {
+): opentelemetryProto.metrics.v1.DataPoint {
   return {
     labels: toCollectorLabels(metric.labels),
     value: metric.aggregator.toPoint().value as number,
@@ -164,37 +116,8 @@ export function toHistogramPoint(
     count: value.count,
     startTimeUnixNano: startTime,
     timeUnixNano: core.hrTimeToNanoseconds(timestamp),
-    buckets: value.buckets.counts.map(count => {
-      return { count };
-    }),
+    bucketCounts: value.buckets.counts,
     explicitBounds: value.buckets.boundaries,
-  };
-}
-
-/**
- * Returns a SummaryPoint to the collector
- * @param metric
- * @param startTime
- */
-export function toSummaryPoint(
-  metric: MetricRecord,
-  startTime: number
-): opentelemetryProto.metrics.v1.SummaryDataPoint {
-  const { value, timestamp } = metric.aggregator.toPoint() as {
-    value: Distribution;
-    timestamp: HrTime;
-  };
-
-  return {
-    labels: toCollectorLabels(metric.labels),
-    sum: value.sum,
-    count: value.count,
-    startTimeUnixNano: startTime,
-    timeUnixNano: core.hrTimeToNanoseconds(timestamp),
-    percentileValues: [
-      { percentile: 0, value: value.min },
-      { percentile: 100, value: value.max },
-    ],
   };
 }
 
@@ -207,41 +130,59 @@ export function toCollectorMetric(
   metric: MetricRecord,
   startTime: number
 ): opentelemetryProto.metrics.v1.Metric {
-  if (
-    toCollectorType(metric) ===
-    opentelemetryProto.metrics.v1.MetricDescriptorType.HISTOGRAM
-  ) {
-    return {
-      metricDescriptor: toCollectorMetricDescriptor(metric),
-      histogramDataPoints: [toHistogramPoint(metric, startTime)],
-    };
-  }
-  if (
-    toCollectorType(metric) ===
-    opentelemetryProto.metrics.v1.MetricDescriptorType.SUMMARY
-  ) {
-    return {
-      metricDescriptor: toCollectorMetricDescriptor(metric),
-      summaryDataPoints: [toSummaryPoint(metric, startTime)],
-    };
-  }
-  if (metric.descriptor.valueType == api.ValueType.INT) {
-    return {
-      metricDescriptor: toCollectorMetricDescriptor(metric),
-      int64DataPoints: [toSingularPoint(metric, startTime)],
-    };
-  }
-  if (metric.descriptor.valueType === api.ValueType.DOUBLE) {
-    return {
-      metricDescriptor: toCollectorMetricDescriptor(metric),
-      doubleDataPoints: [toSingularPoint(metric, startTime)],
-    };
+  const metricCollector: opentelemetryProto.metrics.v1.Metric = {
+    name: metric.descriptor.name,
+    description: metric.descriptor.description,
+    unit: metric.descriptor.unit,
+  };
+
+  switch (metric.aggregator.kind) {
+    case AggregatorKind.SUM:
+      {
+        const result = {
+          dataPoints: [toDataPoint(metric, startTime)],
+          isMonotonic:
+            metric.descriptor.metricKind === MetricKind.COUNTER ||
+            metric.descriptor.metricKind === MetricKind.SUM_OBSERVER,
+          aggregationTemporality: toAggregationTemporality(metric),
+        };
+        if (metric.descriptor.valueType === api.ValueType.INT) {
+          metricCollector.intSum = result;
+        } else {
+          metricCollector.doubleSum = result;
+        }
+      }
+      break;
+
+    case AggregatorKind.LAST_VALUE:
+      {
+        const result = {
+          dataPoints: [toDataPoint(metric, startTime)],
+        };
+        if (metric.descriptor.valueType === api.ValueType.INT) {
+          metricCollector.intGauge = result;
+        } else {
+          metricCollector.doubleGauge = result;
+        }
+      }
+      break;
+
+    case AggregatorKind.HISTOGRAM:
+      {
+        const result = {
+          dataPoints: [toHistogramPoint(metric, startTime)],
+          aggregationTemporality: toAggregationTemporality(metric),
+        };
+        if (metric.descriptor.valueType === api.ValueType.INT) {
+          metricCollector.intHistogram = result;
+        } else {
+          metricCollector.doubleHistogram = result;
+        }
+      }
+      break;
   }
 
-  return {
-    metricDescriptor: toCollectorMetricDescriptor(metric),
-    int64DataPoints: [],
-  };
+  return metricCollector;
 }
 
 /**

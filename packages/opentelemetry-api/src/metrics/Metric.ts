@@ -59,6 +59,11 @@ export interface MetricOptions {
    * User provided logger.
    */
   logger?: Logger;
+
+  /**
+   * Boundaries optional for histogram
+   */
+  boundaries?: number[];
 }
 
 export interface BatchMetricOptions extends MetricOptions {

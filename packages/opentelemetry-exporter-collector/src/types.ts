@@ -45,25 +45,47 @@ export namespace opentelemetryProto {
 
   export namespace metrics.v1 {
     export interface Metric {
-      metricDescriptor: opentelemetryProto.metrics.v1.MetricDescriptor;
-      int64DataPoints?: opentelemetryProto.metrics.v1.Int64DataPoint[];
-      doubleDataPoints?: opentelemetryProto.metrics.v1.DoubleDataPoint[];
-      histogramDataPoints?: opentelemetryProto.metrics.v1.HistogramDataPoint[];
-      summaryDataPoints?: opentelemetryProto.metrics.v1.SummaryDataPoint[];
+      name: string;
+      description: string;
+      unit: string;
+      // data:
+      intGauge?: opentelemetryProto.metrics.v1.Gauge;
+      doubleGauge?: opentelemetryProto.metrics.v1.Gauge;
+      intSum?: opentelemetryProto.metrics.v1.Sum;
+      doubleSum?: opentelemetryProto.metrics.v1.Sum;
+      intHistogram?: opentelemetryProto.metrics.v1.Histogram;
+      doubleHistogram?: opentelemetryProto.metrics.v1.Histogram;
     }
 
-    export interface Int64DataPoint {
+    export interface Gauge {
+      dataPoints: opentelemetryProto.metrics.v1.DataPoint[];
+    }
+
+    export interface Sum {
+      dataPoints: opentelemetryProto.metrics.v1.DataPoint[];
+      aggregationTemporality: opentelemetryProto.metrics.v1.AggregationTemporality;
+      isMonotonic: boolean;
+    }
+
+    export interface Histogram {
+      dataPoints: opentelemetryProto.metrics.v1.HistogramDataPoint[];
+      aggregationTemporality: opentelemetryProto.metrics.v1.AggregationTemporality;
+    }
+
+    export interface DataPoint {
       labels: opentelemetryProto.common.v1.StringKeyValue[];
       startTimeUnixNano: number;
       timeUnixNano: number;
       value: number;
+      exemplars?: opentelemetryProto.metrics.v1.Exemplar[];
     }
 
-    export interface DoubleDataPoint {
-      labels: opentelemetryProto.common.v1.StringKeyValue[];
-      startTimeUnixNano: number;
+    export interface Exemplar {
+      filteredLabels: opentelemetryProto.common.v1.StringKeyValue[];
       timeUnixNano: number;
       value: number;
+      spanId: Uint8Array;
+      traceId: Uint8Array;
     }
 
     export interface HistogramDataPoint {
@@ -72,41 +94,9 @@ export namespace opentelemetryProto {
       timeUnixNano: number;
       count: number;
       sum: number;
-      buckets?: opentelemetryProto.metrics.v1.HistogramDataPointBucket[];
+      bucketCounts?: number[];
       explicitBounds?: number[];
-    }
-
-    export interface HistogramDataPointBucket {
-      count: number;
-      exemplar?: opentelemetryProto.metrics.v1.HistogramExemplar;
-    }
-
-    export interface HistogramExemplar {
-      value: number;
-      timeUnixNano: number;
-      attachments: opentelemetryProto.common.v1.StringKeyValue[];
-    }
-
-    export interface SummaryDataPoint {
-      labels: opentelemetryProto.common.v1.StringKeyValue[];
-      startTimeUnixNano: number;
-      timeUnixNano: number;
-      count?: number;
-      sum?: number;
-      percentileValues: opentelemetryProto.metrics.v1.SummaryDataPointValueAtPercentile[];
-    }
-
-    export interface SummaryDataPointValueAtPercentile {
-      percentile: number;
-      value: number;
-    }
-
-    export interface MetricDescriptor {
-      name: string;
-      description: string;
-      unit: string;
-      type: opentelemetryProto.metrics.v1.MetricDescriptorType;
-      temporality: opentelemetryProto.metrics.v1.MetricDescriptorTemporality;
+      exemplars?: opentelemetryProto.metrics.v1.Exemplar[][];
     }
 
     export interface InstrumentationLibraryMetrics {
@@ -119,21 +109,72 @@ export namespace opentelemetryProto {
       instrumentationLibraryMetrics: opentelemetryProto.metrics.v1.InstrumentationLibraryMetrics[];
     }
 
-    export enum MetricDescriptorType {
-      INVALID_TYPE,
-      INT64,
-      MONOTONIC_INT64,
-      DOUBLE,
-      MONOTONIC_DOUBLE,
-      HISTOGRAM,
-      SUMMARY,
-    }
+    export enum AggregationTemporality {
+      // UNSPECIFIED is the default AggregationTemporality, it MUST not be used.
+      AGGREGATION_TEMPORALITY_UNSPECIFIED = 0,
 
-    export enum MetricDescriptorTemporality {
-      INVALID_TEMPORALITY,
-      INSTANTANEOUS,
-      DELTA,
-      CUMULATIVE,
+      // DELTA is an AggregationTemporality for a metric aggregator which reports
+      // changes since last report time. Successive metrics contain aggregation of
+      // values from continuous and non-overlapping intervals.
+      //
+      // The values for a DELTA metric are based only on the time interval
+      // associated with one measurement cycle. There is no dependency on
+      // previous measurements like is the case for CUMULATIVE metrics.
+      //
+      // For example, consider a system measuring the number of requests that
+      // it receives and reports the sum of these requests every second as a
+      // DELTA metric:
+      //
+      //   1. The system starts receiving at time=t_0.
+      //   2. A request is received, the system measures 1 request.
+      //   3. A request is received, the system measures 1 request.
+      //   4. A request is received, the system measures 1 request.
+      //   5. The 1 second collection cycle ends. A metric is exported for the
+      //      number of requests received over the interval of time t_0 to
+      //      t_0+1 with a value of 3.
+      //   6. A request is received, the system measures 1 request.
+      //   7. A request is received, the system measures 1 request.
+      //   8. The 1 second collection cycle ends. A metric is exported for the
+      //      number of requests received over the interval of time t_0+1 to
+      //      t_0+2 with a value of 2.
+      AGGREGATION_TEMPORALITY_DELTA = 1,
+
+      // CUMULATIVE is an AggregationTemporality for a metric aggregator which
+      // reports changes since a fixed start time. This means that current values
+      // of a CUMULATIVE metric depend on all previous measurements since the
+      // start time. Because of this, the sender is required to retain this state
+      // in some form. If this state is lost or invalidated, the CUMULATIVE metric
+      // values MUST be reset and a new fixed start time following the last
+      // reported measurement time sent MUST be used.
+      //
+      // For example, consider a system measuring the number of requests that
+      // it receives and reports the sum of these requests every second as a
+      // CUMULATIVE metric:
+      //
+      //   1. The system starts receiving at time=t_0.
+      //   2. A request is received, the system measures 1 request.
+      //   3. A request is received, the system measures 1 request.
+      //   4. A request is received, the system measures 1 request.
+      //   5. The 1 second collection cycle ends. A metric is exported for the
+      //      number of requests received over the interval of time t_0 to
+      //      t_0+1 with a value of 3.
+      //   6. A request is received, the system measures 1 request.
+      //   7. A request is received, the system measures 1 request.
+      //   8. The 1 second collection cycle ends. A metric is exported for the
+      //      number of requests received over the interval of time t_0 to
+      //      t_0+2 with a value of 5.
+      //   9. The system experiences a fault and loses state.
+      //   10. The system recovers and resumes receiving at time=t_1.
+      //   11. A request is received, the system measures 1 request.
+      //   12. The 1 second collection cycle ends. A metric is exported for the
+      //      number of requests received over the interval of time t_1 to
+      //      t_0+1 with a value of 1.
+      //
+      // Note: Even though, when reporting changes since last report time, using
+      // CUMULATIVE is valid, it is not recommended. This may cause problems for
+      // systems that do not use start_time to determine when the aggregation
+      // value was reset (e.g. Prometheus).
+      AGGREGATION_TEMPORALITY_CUMULATIVE = 2,
     }
   }
 
@@ -163,11 +204,11 @@ export namespace opentelemetryProto {
 
       export enum SpanKind {
         SPAN_KIND_UNSPECIFIED,
-        INTERNAL,
-        SERVER,
-        CLIENT,
-        PRODUCER,
-        CONSUMER,
+        SPAN_KIND_INTERNAL,
+        SPAN_KIND_SERVER,
+        SPAN_KIND_CLIENT,
+        SPAN_KIND_PRODUCER,
+        SPAN_KIND_CONSUMER,
       }
 
       export type TraceState = string | undefined;
@@ -304,9 +345,12 @@ export interface CollectorExporterConfigBase {
  * Mapping between api SpanKind and proto SpanKind
  */
 export const COLLECTOR_SPAN_KIND_MAPPING = {
-  [SpanKind.INTERNAL]: opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
-  [SpanKind.SERVER]: opentelemetryProto.trace.v1.Span.SpanKind.SERVER,
-  [SpanKind.CLIENT]: opentelemetryProto.trace.v1.Span.SpanKind.CLIENT,
-  [SpanKind.PRODUCER]: opentelemetryProto.trace.v1.Span.SpanKind.PRODUCER,
-  [SpanKind.CONSUMER]: opentelemetryProto.trace.v1.Span.SpanKind.CONSUMER,
+  [SpanKind.INTERNAL]:
+    opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL,
+  [SpanKind.SERVER]: opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_SERVER,
+  [SpanKind.CLIENT]: opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_CLIENT,
+  [SpanKind.PRODUCER]:
+    opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_PRODUCER,
+  [SpanKind.CONSUMER]:
+    opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_CONSUMER,
 };

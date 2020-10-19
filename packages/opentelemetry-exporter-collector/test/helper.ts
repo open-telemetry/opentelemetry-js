@@ -17,17 +17,22 @@
 import { TraceFlags, ValueType } from '@opentelemetry/api';
 import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
+import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
+import { InstrumentationLibrary } from '@opentelemetry/core';
 import * as assert from 'assert';
 import { opentelemetryProto } from '../src/types';
 import * as collectorTypes from '../src/types';
-import {
-  MetricRecord,
-  MetricKind,
-  SumAggregator,
-  MinMaxLastSumCountAggregator,
-  HistogramAggregator,
-} from '@opentelemetry/metrics';
-import { InstrumentationLibrary } from '@opentelemetry/core';
+
+const meterProvider = new MeterProvider({
+  interval: 30000,
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+});
+
+const meter = meterProvider.getMeter('default', '0.0.1');
 
 if (typeof Buffer === 'undefined') {
   (window as any).Buffer = {
@@ -37,109 +42,66 @@ if (typeof Buffer === 'undefined') {
   };
 }
 
-export function mockCounter(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-counter',
+export async function mockCounter(): Promise<MetricRecord> {
+  const name = 'int-counter';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createCounter(name, {
       description: 'sample counter description',
-      unit: '1',
-      metricKind: MetricKind.COUNTER,
       valueType: ValueType.INT,
-    },
-    labels: {},
-    aggregator: new SumAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockDoubleCounter(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-counter',
+export async function mockDoubleCounter(): Promise<MetricRecord> {
+  const name = 'double-counter';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createCounter(name, {
       description: 'sample counter description',
-      unit: '1',
-      metricKind: MetricKind.COUNTER,
       valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new SumAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockObserver(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-observer',
+export async function mockObserver(): Promise<MetricRecord> {
+  const name = 'double-observer';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createValueObserver(name, {
       description: 'sample observer description',
-      unit: '2',
-      metricKind: MetricKind.VALUE_OBSERVER,
       valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new MinMaxLastSumCountAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockValueRecorder(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-recorder',
+export async function mockValueRecorder(): Promise<MetricRecord> {
+  const name = 'int-recorder';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      unit: '3',
-      metricKind: MetricKind.VALUE_RECORDER,
       valueType: ValueType.INT,
-    },
-    labels: {},
-    aggregator: new MinMaxLastSumCountAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+      boundaries: [0, 100],
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockHistogram(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-hist',
-      description: 'sample observer description',
-      unit: '2',
-      metricKind: MetricKind.VALUE_OBSERVER,
-      valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new HistogramAggregator([10, 20]),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
-}
-
-const traceIdBase64 = 'HxAI3I4nDoXECg18OTmyeA==';
-const spanIdBase64 = 'XhByYfZPpT4=';
-const parentIdBase64 = 'eKiRUJiGQ4g=';
+const traceIdHex = '1f1008dc8e270e85c40a0d7c3939b278';
+const spanIdHex = '5e107261f64fa53e';
+const parentIdHex = '78a8915098864388';
 
 export const mockedReadableSpan: ReadableSpan = {
   name: 'documentFetch',
@@ -289,41 +251,49 @@ export const multiResourceTrace: ReadableSpan[] = [
   },
 ];
 
-export const multiResourceMetrics: MetricRecord[] = [
-  {
-    ...mockCounter(),
-    resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
-  },
-  {
-    ...mockObserver(),
-    resource: mockedResources[1],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
-  },
-  {
-    ...mockCounter(),
-    resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
-  },
-];
+export const multiResourceMetricsGet = async function (): Promise<
+  MetricRecord[]
+> {
+  return [
+    {
+      ...(await mockCounter()),
+      resource: mockedResources[0],
+      instrumentationLibrary: mockedInstrumentationLibraries[0],
+    },
+    {
+      ...(await mockObserver()),
+      resource: mockedResources[1],
+      instrumentationLibrary: mockedInstrumentationLibraries[0],
+    },
+    {
+      ...(await mockCounter()),
+      resource: mockedResources[0],
+      instrumentationLibrary: mockedInstrumentationLibraries[0],
+    },
+  ];
+};
 
-export const multiInstrumentationLibraryMetrics: MetricRecord[] = [
-  {
-    ...mockCounter(),
-    resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
-  },
-  {
-    ...mockObserver(),
-    resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[1],
-  },
-  {
-    ...mockCounter(),
-    resource: mockedResources[0],
-    instrumentationLibrary: mockedInstrumentationLibraries[0],
-  },
-];
+export const multiInstrumentationLibraryMetricsGet = async function (): Promise<
+  MetricRecord[]
+> {
+  return [
+    {
+      ...(await mockCounter()),
+      resource: mockedResources[0],
+      instrumentationLibrary: mockedInstrumentationLibraries[0],
+    },
+    {
+      ...(await mockObserver()),
+      resource: mockedResources[0],
+      instrumentationLibrary: mockedInstrumentationLibraries[1],
+    },
+    {
+      ...(await mockCounter()),
+      resource: mockedResources[0],
+      instrumentationLibrary: mockedInstrumentationLibraries[0],
+    },
+  ];
+};
 
 export const multiInstrumentationLibraryTrace: ReadableSpan[] = [
   {
@@ -423,8 +393,8 @@ export function ensureLinksAreCorrect(
     attributes,
     [
       {
-        traceId: traceIdBase64,
-        spanId: parentIdBase64,
+        traceId: traceIdHex,
+        spanId: parentIdHex,
         attributes: [
           {
             key: 'component',
@@ -452,17 +422,17 @@ export function ensureSpanIsCorrect(
   if (span.links) {
     ensureLinksAreCorrect(span.links);
   }
-  assert.deepStrictEqual(span.traceId, traceIdBase64, 'traceId is wrong');
-  assert.deepStrictEqual(span.spanId, spanIdBase64, 'spanId is wrong');
+  assert.deepStrictEqual(span.traceId, traceIdHex, 'traceId is wrong');
+  assert.deepStrictEqual(span.spanId, spanIdHex, 'spanId is wrong');
   assert.deepStrictEqual(
     span.parentSpanId,
-    parentIdBase64,
+    parentIdHex,
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
   assert.strictEqual(
     span.kind,
-    opentelemetryProto.trace.v1.Span.SpanKind.INTERNAL,
+    opentelemetryProto.trace.v1.Span.SpanKind.SPAN_KIND_INTERNAL,
     'kind is wrong'
   );
   assert.strictEqual(
@@ -524,25 +494,23 @@ export function ensureCounterIsCorrect(
   time: number
 ) {
   assert.deepStrictEqual(metric, {
-    metricDescriptor: {
-      name: 'test-counter',
-      description: 'sample counter description',
-      unit: '1',
-      type:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
-          .MONOTONIC_INT64,
-      temporality:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-          .CUMULATIVE,
+    name: 'int-counter',
+    description: 'sample counter description',
+    unit: '1',
+    intSum: {
+      dataPoints: [
+        {
+          labels: [],
+          value: 1,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      isMonotonic: true,
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_DELTA,
     },
-    int64DataPoints: [
-      {
-        labels: [],
-        value: 1,
-        startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: time,
-      },
-    ],
   });
 }
 
@@ -551,25 +519,23 @@ export function ensureDoubleCounterIsCorrect(
   time: number
 ) {
   assert.deepStrictEqual(metric, {
-    metricDescriptor: {
-      name: 'test-counter',
-      description: 'sample counter description',
-      unit: '1',
-      type:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
-          .MONOTONIC_DOUBLE,
-      temporality:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-          .CUMULATIVE,
+    name: 'double-counter',
+    description: 'sample counter description',
+    unit: '1',
+    doubleSum: {
+      dataPoints: [
+        {
+          labels: [],
+          value: 8,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
+      isMonotonic: true,
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_DELTA,
     },
-    doubleDataPoints: [
-      {
-        labels: [],
-        value: 8,
-        startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: time,
-      },
-    ],
   });
 }
 
@@ -578,95 +544,47 @@ export function ensureObserverIsCorrect(
   time: number
 ) {
   assert.deepStrictEqual(metric, {
-    metricDescriptor: {
-      name: 'test-observer',
-      description: 'sample observer description',
-      unit: '2',
-      type:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
-          .SUMMARY,
-      temporality:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-          .DELTA,
+    name: 'double-observer',
+    description: 'sample observer description',
+    unit: '1',
+    doubleGauge: {
+      dataPoints: [
+        {
+          labels: [],
+          value: 6,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+        },
+      ],
     },
-    summaryDataPoints: [
-      {
-        startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: time,
-        count: 2,
-        sum: 9,
-        labels: [],
-        percentileValues: [
-          {
-            percentile: 0,
-            value: 3,
-          },
-          { percentile: 100, value: 6 },
-        ],
-      },
-    ],
   });
 }
 
 export function ensureValueRecorderIsCorrect(
   metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
+  time: number,
+  infinityIsNull?: boolean
 ) {
   assert.deepStrictEqual(metric, {
-    metricDescriptor: {
-      name: 'test-recorder',
-      description: 'sample recorder description',
-      unit: '3',
-      type:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
-          .SUMMARY,
-      temporality:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-          .DELTA,
+    name: 'int-recorder',
+    description: 'sample recorder description',
+    unit: '1',
+    intHistogram: {
+      dataPoints: [
+        {
+          labels: [],
+          sum: 21,
+          count: 2,
+          startTimeUnixNano: 1592602232694000000,
+          timeUnixNano: time,
+          bucketCounts: [2, 0],
+          explicitBounds: [infinityIsNull ? null : Infinity],
+        },
+      ],
+      aggregationTemporality:
+        collectorTypes.opentelemetryProto.metrics.v1.AggregationTemporality
+          .AGGREGATION_TEMPORALITY_CUMULATIVE,
     },
-    summaryDataPoints: [
-      {
-        count: 1,
-        sum: 5,
-        labels: [],
-        percentileValues: [
-          { percentile: 0, value: 5 },
-          { percentile: 100, value: 5 },
-        ],
-        startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: time,
-      },
-    ],
-  });
-}
-
-export function ensureHistogramIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
-  time: number
-) {
-  assert.deepStrictEqual(metric, {
-    metricDescriptor: {
-      name: 'test-hist',
-      description: 'sample observer description',
-      unit: '2',
-      type:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorType
-          .HISTOGRAM,
-      temporality:
-        collectorTypes.opentelemetryProto.metrics.v1.MetricDescriptorTemporality
-          .DELTA,
-    },
-    histogramDataPoints: [
-      {
-        labels: [],
-        buckets: [{ count: 1 }, { count: 1 }, { count: 0 }],
-        count: 2,
-        sum: 21,
-        explicitBounds: [10, 20],
-        startTimeUnixNano: 1592602232694000000,
-        timeUnixNano: time,
-      },
-    ],
   });
 }
 
@@ -709,7 +627,7 @@ export function ensureExportMetricsServiceRequestIsSet(
   const resourceMetrics = json.resourceMetrics;
   assert.strictEqual(
     resourceMetrics.length,
-    4,
+    1,
     'resourceMetrics has incorrect length'
   );
 
@@ -732,10 +650,8 @@ export function ensureExportMetricsServiceRequestIsSet(
     'instrumentationLibrary is missing'
   );
 
-  const metric1 = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
-  const metric2 = resourceMetrics[1].instrumentationLibraryMetrics[0].metrics;
-  assert.strictEqual(metric1.length, 1, 'Metrics are missing');
-  assert.strictEqual(metric2.length, 1, 'Metrics are missing');
+  const metrics = resourceMetrics[0].instrumentationLibraryMetrics[0].metrics;
+  assert.strictEqual(metrics.length, 3, 'Metrics are missing');
 }
 
 export function ensureHeadersContain(

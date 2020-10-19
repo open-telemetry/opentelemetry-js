@@ -19,7 +19,7 @@ import {
   defaultSetter,
   TextMapPropagator,
   SpanContext,
-  getExtractedSpanContext,
+  getActiveSpan,
   setExtractedSpanContext,
 } from '@opentelemetry/api';
 import { Context, ROOT_CONTEXT } from '@opentelemetry/context-base';
@@ -113,9 +113,9 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new B3MultiPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getExtractedSpanContext(
+      const spanContext = getActiveSpan(
         composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
-      );
+      )?.context();
 
       if (!spanContext) {
         throw new Error('no extracted context');
@@ -132,9 +132,9 @@ describe('Composite Propagator', () => {
       const composite = new CompositePropagator({
         propagators: [new ThrowingPropagator(), new HttpTraceContext()],
       });
-      const spanContext = getExtractedSpanContext(
+      const spanContext = getActiveSpan(
         composite.extract(ROOT_CONTEXT, carrier, defaultGetter)
-      );
+      )?.context();
 
       if (!spanContext) {
         throw new Error('no extracted context');
