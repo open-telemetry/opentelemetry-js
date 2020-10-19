@@ -15,8 +15,6 @@
  */
 
 import { Context } from '@opentelemetry/context-base';
-import { SetterFunction } from './setter';
-import { GetterFunction } from './getter';
 
 /**
  * Injects `Context` into and extracts it from carriers that travel
@@ -29,7 +27,7 @@ import { GetterFunction } from './getter';
  * usually implemented via library-specific request interceptors, where the
  * client-side injects values and the server-side extracts them.
  */
-export interface TextMapPropagator {
+export interface TextMapPropagator<Carrier = any> {
   /**
    * Injects values from a given `Context` into a carrier.
    *
@@ -40,10 +38,14 @@ export interface TextMapPropagator {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
-   * @param setter a function which accepts a carrier, key, and value, which
-   *     sets the key on the carrier to the value.
+   * @param setter an optional {@link TextMapSetter}. If undefined, values will be
+   *     set by direct object assignment.
    */
-  inject(context: Context, carrier: unknown, setter: SetterFunction): void;
+  inject(
+    context: Context,
+    carrier: Carrier,
+    setter: TextMapSetter<Carrier>
+  ): void;
 
   /**
    * Given a `Context` and a carrier, extract context values from a
@@ -54,8 +56,77 @@ export interface TextMapPropagator {
    *     the wire.
    * @param carrier the carrier of propagation fields, such as http request
    *     headers.
-   * @param getter a function which accepts a carrier and a key, and returns
-   *     the value from the carrier identified by the key.
+   * @param getter an optional {@link TextMapGetter}. If undefined, keys will be all
+   *     own properties, and keys will be accessed by direct object access.
    */
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context;
+  extract(
+    context: Context,
+    carrier: Carrier,
+    getter: TextMapGetter<Carrier>
+  ): Context;
 }
+
+/**
+ * A setter is specified by the caller to define a specific method
+ * to set key/value pairs on the carrier within a propagator.
+ */
+export interface TextMapSetter<Carrier = any> {
+  /**
+   * Callback used to set a key/value pair on an object.
+   *
+   * Should be called by the propagator each time a key/value pair
+   * should be set, and should set that key/value pair on the propagator.
+   *
+   * @param carrier object or class which carries key/value pairs
+   * @param key string key to modify
+   * @param value value to be set to the key on the carrier
+   */
+  set(carrier: Carrier, key: string, value: string): void;
+}
+
+/**
+ * A getter is specified by the caller to define a specific method
+ * to get the value of a key from a carrier.
+ */
+export interface TextMapGetter<Carrier = any> {
+  /**
+   * Get a list of all keys available on the carrier.
+   *
+   * @param carrier
+   */
+  keys(carrier: Carrier): string[];
+
+  /**
+   * Get the value of a specific key from the carrier.
+   *
+   * @param carrier
+   * @param key
+   */
+  get(carrier: Carrier, key: string): undefined | string | string[];
+}
+
+export const defaultTextMapGetter: TextMapGetter = {
+  get(carrier, key) {
+    if (carrier == null) {
+      return undefined;
+    }
+    return carrier[key];
+  },
+
+  keys(carrier) {
+    if (carrier == null) {
+      return [];
+    }
+    return Object.keys(carrier);
+  },
+};
+
+export const defaultTextMapSetter: TextMapSetter = {
+  set(carrier, key, value) {
+    if (carrier == null) {
+      return;
+    }
+
+    carrier[key] = value;
+  },
+};

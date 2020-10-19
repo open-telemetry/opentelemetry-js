@@ -16,8 +16,8 @@
 
 import * as assert from 'assert';
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   SpanContext,
   TraceFlags,
   getActiveSpan,
@@ -57,7 +57,7 @@ describe('B3Propagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1';
@@ -78,7 +78,7 @@ describe('B3Propagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       assert.strictEqual(
@@ -106,7 +106,7 @@ describe('B3Propagator', () => {
       const context = propagator.extract(
         ROOT_CONTEXT,
         b3SingleCarrier,
-        defaultGetter
+        defaultTextMapGetter
       );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
@@ -122,7 +122,7 @@ describe('B3Propagator', () => {
       const context = propagator.extract(
         ROOT_CONTEXT,
         b3MultiCarrier,
-        defaultGetter
+        defaultTextMapGetter
       );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
@@ -138,7 +138,7 @@ describe('B3Propagator', () => {
       const context = propagator.extract(
         ROOT_CONTEXT,
         b3MixedCarrier,
-        defaultGetter
+        defaultTextMapGetter
       );
 
       const extractedSpanContext = getActiveSpan(context)?.context();

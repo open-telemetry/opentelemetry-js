@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-import * as assert from 'assert';
 import {
-  defaultGetter,
-  defaultSetter,
-  SpanContext,
-  TraceFlags,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   INVALID_SPANID,
   INVALID_TRACEID,
   getActiveSpan,
   setExtractedSpanContext,
+  SpanContext,
+  TraceFlags,
 } from '@opentelemetry/api';
 import { ROOT_CONTEXT } from '@opentelemetry/context-base';
+import * as assert from 'assert';
+import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
 import {
   B3SinglePropagator,
   B3_CONTEXT_HEADER,
 } from '../../src/context/propagation/B3SinglePropagator';
-import { B3_DEBUG_FLAG_KEY } from '../../src/context/propagation/b3-common';
 
 describe('B3SinglePropagator', () => {
   const propagator = new B3SinglePropagator();
@@ -51,7 +51,7 @@ describe('B3SinglePropagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1';
@@ -68,7 +68,7 @@ describe('B3SinglePropagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-0';
@@ -87,7 +87,7 @@ describe('B3SinglePropagator', () => {
       propagator.inject(
         setExtractedSpanContext(context, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       const expected = '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-d';
@@ -104,7 +104,7 @@ describe('B3SinglePropagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
@@ -120,7 +120,7 @@ describe('B3SinglePropagator', () => {
       propagator.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
 
       assert.strictEqual(carrier[B3_CONTEXT_HEADER], undefined);
@@ -134,7 +134,11 @@ describe('B3SinglePropagator', () => {
           '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1-05e3ac9a4f6e3b90',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
@@ -151,7 +155,11 @@ describe('B3SinglePropagator', () => {
           '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-1',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
@@ -168,7 +176,11 @@ describe('B3SinglePropagator', () => {
           '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
@@ -184,7 +196,11 @@ describe('B3SinglePropagator', () => {
         [B3_CONTEXT_HEADER]: '4aaba1a52cf8ee09-e457b5a2e4d86bd1',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
@@ -201,7 +217,11 @@ describe('B3SinglePropagator', () => {
           '80f198ee56343ba864fe8b2a57d3eff7-e457b5a2e4d86bd1-d',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(extractedSpanContext, {
@@ -218,7 +238,11 @@ describe('B3SinglePropagator', () => {
         [B3_CONTEXT_HEADER]: 'abc123-e457b5a2e4d86bd1',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
@@ -229,7 +253,11 @@ describe('B3SinglePropagator', () => {
         [B3_CONTEXT_HEADER]: '80f198ee56343ba864fe8b2a57d3eff7-abc123',
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
@@ -240,7 +268,11 @@ describe('B3SinglePropagator', () => {
         [B3_CONTEXT_HEADER]: `${INVALID_TRACEID}-e457b5a2e4d86bd1`,
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);
@@ -251,7 +283,11 @@ describe('B3SinglePropagator', () => {
         [B3_CONTEXT_HEADER]: `80f198ee56343ba864fe8b2a57d3eff7-${INVALID_SPANID}`,
       };
 
-      const context = propagator.extract(ROOT_CONTEXT, carrier, defaultGetter);
+      const context = propagator.extract(
+        ROOT_CONTEXT,
+        carrier,
+        defaultTextMapGetter
+      );
 
       const extractedSpanContext = getActiveSpan(context)?.context();
       assert.deepStrictEqual(undefined, extractedSpanContext);

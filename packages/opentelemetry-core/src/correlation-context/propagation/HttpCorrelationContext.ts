@@ -17,9 +17,9 @@
 import {
   Context,
   CorrelationContext,
-  GetterFunction,
+  TextMapGetter,
   TextMapPropagator,
-  SetterFunction,
+  TextMapSetter,
 } from '@opentelemetry/api';
 import {
   getCorrelationContext,
@@ -50,7 +50,7 @@ type KeyPair = {
  * https://w3c.github.io/correlation-context/
  */
 export class HttpCorrelationContext implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const correlationContext = getCorrelationContext(context);
     if (!correlationContext) return;
     const keyPairs = this._getKeyPairs(correlationContext)
@@ -60,7 +60,7 @@ export class HttpCorrelationContext implements TextMapPropagator {
       .slice(0, MAX_NAME_VALUE_PAIRS);
     const headerValue = this._serializeKeyPairs(keyPairs);
     if (headerValue.length > 0) {
-      setter(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
+      setter.set(carrier, CORRELATION_CONTEXT_HEADER, headerValue);
     }
   }
 
@@ -80,8 +80,8 @@ export class HttpCorrelationContext implements TextMapPropagator {
     );
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const headerValue: string = getter(
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const headerValue: string = getter.get(
       carrier,
       CORRELATION_CONTEXT_HEADER
     ) as string;

@@ -15,8 +15,8 @@
  */
 
 import {
-  defaultGetter,
-  defaultSetter,
+  defaultTextMapGetter,
+  defaultTextMapSetter,
   SpanContext,
   TraceFlags,
   getActiveSpan,
@@ -50,7 +50,7 @@ describe('HttpTraceContext', () => {
       httpTraceContext.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[TRACE_PARENT_HEADER],
@@ -70,7 +70,7 @@ describe('HttpTraceContext', () => {
       httpTraceContext.inject(
         setExtractedSpanContext(ROOT_CONTEXT, spanContext),
         carrier,
-        defaultSetter
+        defaultTextMapSetter
       );
       assert.deepStrictEqual(
         carrier[TRACE_PARENT_HEADER],
@@ -85,7 +85,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] =
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -100,7 +100,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] =
         'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -115,7 +115,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] =
         'cc-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01-what-the-future-will-be-like';
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       assert.deepStrictEqual(extractedSpanContext, {
@@ -129,7 +129,7 @@ describe('HttpTraceContext', () => {
     it('returns null if traceparent header is missing', () => {
       assert.deepStrictEqual(
         getActiveSpan(
-          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         )?.context(),
         undefined
       );
@@ -139,7 +139,7 @@ describe('HttpTraceContext', () => {
       carrier[TRACE_PARENT_HEADER] = 'invalid!';
       assert.deepStrictEqual(
         getActiveSpan(
-          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         )?.context(),
         undefined
       );
@@ -152,7 +152,7 @@ describe('HttpTraceContext', () => {
 
       assert.deepStrictEqual(
         getActiveSpan(
-          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         )?.context(),
         undefined
       );
@@ -163,7 +163,7 @@ describe('HttpTraceContext', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01',
       ];
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
@@ -178,7 +178,7 @@ describe('HttpTraceContext', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       carrier[TRACE_STATE_HEADER] = 'foo=bar,baz=qux';
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       assert.deepStrictEqual(
@@ -196,7 +196,7 @@ describe('HttpTraceContext', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       carrier[TRACE_STATE_HEADER] = ['foo=bar,baz=qux', 'quux=quuz'];
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
       assert.deepStrictEqual(extractedSpanContext, {
         spanId: 'b7ad6b7169203331',
@@ -250,7 +250,7 @@ describe('HttpTraceContext', () => {
         carrier[TRACE_PARENT_HEADER] = testCases[testCase];
 
         const extractedSpanContext = getActiveSpan(
-          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+          httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
         )?.context();
         assert.deepStrictEqual(extractedSpanContext, undefined, testCase);
       });
@@ -261,7 +261,7 @@ describe('HttpTraceContext', () => {
         '00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01';
       carrier[TRACE_STATE_HEADER] = 'foo=1 \t , \t bar=2, \t baz=3 ';
       const extractedSpanContext = getActiveSpan(
-        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultGetter)
+        httpTraceContext.extract(ROOT_CONTEXT, carrier, defaultTextMapGetter)
       )?.context();
 
       assert.deepStrictEqual(extractedSpanContext!.traceState!.get('foo'), '1');
@@ -270,21 +270,19 @@ describe('HttpTraceContext', () => {
     });
 
     it('should fail gracefully on bad responses from getter', () => {
-      const ctx1 = httpTraceContext.extract(
-        ROOT_CONTEXT,
-        carrier,
-        (c, k) => 1 // not a number
-      );
-      const ctx2 = httpTraceContext.extract(
-        ROOT_CONTEXT,
-        carrier,
-        (c, k) => [] // empty array
-      );
-      const ctx3 = httpTraceContext.extract(
-        ROOT_CONTEXT,
-        carrier,
-        (c, k) => undefined // missing value
-      );
+      const ctx1 = httpTraceContext.extract(ROOT_CONTEXT, carrier, {
+        // @ts-expect-error
+        get: (c, k) => 1, // not a number
+        keys: () => [],
+      });
+      const ctx2 = httpTraceContext.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => [], // empty array
+        keys: () => [],
+      });
+      const ctx3 = httpTraceContext.extract(ROOT_CONTEXT, carrier, {
+        get: (c, k) => undefined, // missing value
+        keys: () => [],
+      });
 
       assert.ok(ctx1 === ROOT_CONTEXT);
       assert.ok(ctx2 === ROOT_CONTEXT);

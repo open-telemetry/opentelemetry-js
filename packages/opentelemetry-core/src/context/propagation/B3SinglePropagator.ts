@@ -16,15 +16,15 @@
 
 import {
   Context,
-  GetterFunction,
-  TextMapPropagator,
-  SetterFunction,
-  TraceFlags,
+  getParentSpanContext,
+  isSpanContextValid,
   isValidSpanId,
   isValidTraceId,
-  isSpanContextValid,
-  getParentSpanContext,
   setExtractedSpanContext,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  TraceFlags,
 } from '@opentelemetry/api';
 import { B3_DEBUG_FLAG_KEY } from './b3-common';
 
@@ -52,18 +52,18 @@ function convertToTraceFlags(samplingState: string | undefined): TraceFlags {
  * Based on: https://github.com/openzipkin/b3-propagation
  */
 export class B3SinglePropagator implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext || !isSpanContextValid(spanContext)) return;
 
     const samplingState =
       context.getValue(B3_DEBUG_FLAG_KEY) || spanContext.traceFlags & 0x1;
     const value = `${spanContext.traceId}-${spanContext.spanId}-${samplingState}`;
-    setter(carrier, B3_CONTEXT_HEADER, value);
+    setter.set(carrier, B3_CONTEXT_HEADER, value);
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const header = getter(carrier, B3_CONTEXT_HEADER);
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const header = getter.get(carrier, B3_CONTEXT_HEADER);
     const b3Context = Array.isArray(header) ? header[0] : header;
     if (typeof b3Context !== 'string') return context;
 
