@@ -26,12 +26,10 @@ import * as collectorTypes from '../../src/types';
 import {
   mockCounter,
   mockObserver,
-  mockHistogram,
   ensureExportMetricsServiceRequestIsSet,
   ensureCounterIsCorrect,
   mockValueRecorder,
   ensureValueRecorderIsCorrect,
-  ensureHistogramIsCorrect,
   ensureObserverIsCorrect,
 } from '../helper';
 import { MetricRecord } from '@opentelemetry/metrics';
@@ -75,7 +73,7 @@ describe('CollectorMetricExporter - node with json over http', () => {
   });
 
   describe('export', () => {
-    beforeEach(() => {
+    beforeEach(async () => {
       spyRequest = sinon.stub(http, 'request').returns(fakeRequest as any);
       spyWrite = sinon.stub(fakeRequest, 'write');
       collectorExporterConfig = {
@@ -94,17 +92,16 @@ describe('CollectorMetricExporter - node with json over http', () => {
         value: 1592602232694000000,
       });
       metrics = [];
-      metrics.push(mockCounter());
-      metrics.push(mockObserver());
-      metrics.push(mockHistogram());
-      metrics.push(mockValueRecorder());
+      metrics.push(await mockCounter());
+      metrics.push(await mockObserver());
+      metrics.push(await mockValueRecorder());
       metrics[0].aggregator.update(1);
       metrics[1].aggregator.update(3);
       metrics[1].aggregator.update(6);
       metrics[2].aggregator.update(7);
       metrics[2].aggregator.update(14);
-      metrics[3].aggregator.update(5);
     });
+
     afterEach(() => {
       spyRequest.restore();
       spyWrite.restore();
@@ -146,11 +143,10 @@ describe('CollectorMetricExporter - node with json over http', () => {
         const metric1 =
           json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
         const metric2 =
-          json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
         const metric3 =
-          json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-        const metric4 =
-          json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+          json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+
         assert.ok(typeof metric1 !== 'undefined', "counter doesn't exist");
         ensureCounterIsCorrect(
           metric1,
@@ -162,17 +158,10 @@ describe('CollectorMetricExporter - node with json over http', () => {
           core.hrTimeToNanoseconds(metrics[1].aggregator.toPoint().timestamp)
         );
         assert.ok(typeof metric3 !== 'undefined', "histogram doesn't exist");
-        ensureHistogramIsCorrect(
-          metric3,
-          core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-        );
-        assert.ok(
-          typeof metric4 !== 'undefined',
-          "value recorder doesn't exist"
-        );
         ensureValueRecorderIsCorrect(
-          metric4,
-          core.hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+          metric3,
+          core.hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+          true
         );
 
         ensureExportMetricsServiceRequestIsSet(json);
@@ -221,7 +210,6 @@ describe('CollectorMetricExporter - node with json over http', () => {
         callback(mockResError);
         setTimeout(() => {
           const response = spyLoggerError.args[0][0] as string;
-          console.log(response);
           assert.ok(response.includes('"code":"400"'));
           assert.strictEqual(responseSpy.args[0][0], 1);
           done();

@@ -33,12 +33,11 @@ import {
   ensureWebResourceIsCorrect,
   ensureExportMetricsServiceRequestIsSet,
   ensureHeadersContain,
-  mockHistogram,
   mockValueRecorder,
   ensureValueRecorderIsCorrect,
-  ensureHistogramIsCorrect,
 } from '../helper';
 import { hrTimeToNanoseconds } from '@opentelemetry/core';
+
 const sendBeacon = navigator.sendBeacon;
 
 describe('CollectorMetricExporter - web', () => {
@@ -48,22 +47,20 @@ describe('CollectorMetricExporter - web', () => {
   let spyBeacon: any;
   let metrics: MetricRecord[];
 
-  beforeEach(() => {
+  beforeEach(async () => {
     spyOpen = sinon.stub(XMLHttpRequest.prototype, 'open');
     spySend = sinon.stub(XMLHttpRequest.prototype, 'send');
     spyBeacon = sinon.stub(navigator, 'sendBeacon');
     metrics = [];
-    metrics.push(mockCounter());
-    metrics.push(mockObserver());
-    metrics.push(mockHistogram());
-    metrics.push(mockValueRecorder());
+    metrics.push(await mockCounter());
+    metrics.push(await mockObserver());
+    metrics.push(await mockValueRecorder());
 
     metrics[0].aggregator.update(1);
     metrics[1].aggregator.update(3);
     metrics[1].aggregator.update(6);
     metrics[2].aggregator.update(7);
     metrics[2].aggregator.update(14);
-    metrics[3].aggregator.update(5);
   });
 
   afterEach(() => {
@@ -99,11 +96,10 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-          const metric4 =
-            json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
+
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(
@@ -128,20 +124,10 @@ describe('CollectorMetricExporter - web', () => {
             "third metric doesn't exist"
           );
           if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-            );
-          }
-
-          assert.ok(
-            typeof metric4 !== 'undefined',
-            "fourth metric doesn't exist"
-          );
-          if (metric4) {
             ensureValueRecorderIsCorrect(
-              metric4,
-              hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+              metric3,
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+              true
             );
           }
 
@@ -238,11 +224,9 @@ describe('CollectorMetricExporter - web', () => {
           const metric1 =
             json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[0];
           const metric2 =
-            json.resourceMetrics[1].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[1];
           const metric3 =
-            json.resourceMetrics[2].instrumentationLibraryMetrics[0].metrics[0];
-          const metric4 =
-            json.resourceMetrics[3].instrumentationLibraryMetrics[0].metrics[0];
+            json.resourceMetrics[0].instrumentationLibraryMetrics[0].metrics[2];
           assert.ok(typeof metric1 !== 'undefined', "metric doesn't exist");
           if (metric1) {
             ensureCounterIsCorrect(
@@ -266,20 +250,10 @@ describe('CollectorMetricExporter - web', () => {
             "third metric doesn't exist"
           );
           if (metric3) {
-            ensureHistogramIsCorrect(
-              metric3,
-              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp)
-            );
-          }
-
-          assert.ok(
-            typeof metric4 !== 'undefined',
-            "fourth metric doesn't exist"
-          );
-          if (metric4) {
             ensureValueRecorderIsCorrect(
-              metric4,
-              hrTimeToNanoseconds(metrics[3].aggregator.toPoint().timestamp)
+              metric3,
+              hrTimeToNanoseconds(metrics[2].aggregator.toPoint().timestamp),
+              true
             );
           }
 

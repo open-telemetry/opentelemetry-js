@@ -19,134 +19,104 @@ import { ReadableSpan } from '@opentelemetry/tracing';
 import { Resource } from '@opentelemetry/resources';
 import { collectorTypes } from '@opentelemetry/exporter-collector';
 import * as assert from 'assert';
-import {
-  MetricRecord,
-  MetricKind,
-  SumAggregator,
-  MinMaxLastSumCountAggregator,
-  HistogramAggregator,
-} from '@opentelemetry/metrics';
+import { MetricRecord, MeterProvider } from '@opentelemetry/metrics';
 import * as grpc from 'grpc';
 
+const meterProvider = new MeterProvider({
+  interval: 30000,
+  resource: new Resource({
+    service: 'ui',
+    version: 1,
+    cost: 112.12,
+  }),
+});
+
+const meter = meterProvider.getMeter('default', '0.0.1');
+
 const traceIdArr = [
-  31,
-  16,
-  8,
+  213,
+  253,
+  116,
+  211,
+  199,
+  92,
+  241,
+  237,
+  187,
+  209,
+  239,
+  57,
+  115,
+  141,
+  26,
+  209,
+  222,
   220,
-  142,
-  39,
-  14,
-  133,
-  196,
-  10,
-  13,
-  124,
-  57,
-  57,
-  178,
-  120,
+  223,
+  221,
+  253,
+  111,
+  110,
+  252,
 ];
-const spanIdArr = [94, 16, 114, 97, 246, 79, 165, 62];
-const parentIdArr = [120, 168, 145, 80, 152, 134, 67, 136];
+const spanIdArr = [229, 237, 116, 239, 110, 181, 127, 174, 31, 107, 157, 222];
+const parentIdArr = [239, 198, 188, 247, 94, 116, 247, 207, 58, 227, 127, 60];
 
-export function mockCounter(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-counter',
+export async function mockCounter(): Promise<MetricRecord> {
+  const name = 'int-counter';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createCounter(name, {
       description: 'sample counter description',
-      unit: '1',
-      metricKind: MetricKind.COUNTER,
       valueType: ValueType.INT,
-    },
-    labels: {},
-    aggregator: new SumAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockDoubleCounter(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-counter',
+export async function mockDoubleCounter(): Promise<MetricRecord> {
+  const name = 'double-counter';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createCounter(name, {
       description: 'sample counter description',
-      unit: '1',
-      metricKind: MetricKind.COUNTER,
       valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new SumAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockObserver(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-observer',
+export async function mockObserver(): Promise<MetricRecord> {
+  const name = 'double-observer';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createValueObserver(name, {
       description: 'sample observer description',
-      unit: '2',
-      metricKind: MetricKind.VALUE_OBSERVER,
       valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new MinMaxLastSumCountAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+    });
+  metric.clear();
+  metric.bind({});
+
+  return (await metric.getMetricRecord())[0];
 }
 
-export function mockValueRecorder(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-recorder',
+export async function mockValueRecorder(): Promise<MetricRecord> {
+  const name = 'int-recorder';
+  const metric =
+    meter['_metrics'].get(name) ||
+    meter.createValueRecorder(name, {
       description: 'sample recorder description',
-      unit: '3',
-      metricKind: MetricKind.VALUE_RECORDER,
       valueType: ValueType.INT,
-    },
-    labels: {},
-    aggregator: new MinMaxLastSumCountAggregator(),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
-}
+      boundaries: [0, 100],
+    });
+  metric.clear();
+  metric.bind({});
 
-export function mockHistogram(): MetricRecord {
-  return {
-    descriptor: {
-      name: 'test-hist',
-      description: 'sample observer description',
-      unit: '2',
-      metricKind: MetricKind.VALUE_OBSERVER,
-      valueType: ValueType.DOUBLE,
-    },
-    labels: {},
-    aggregator: new HistogramAggregator([10, 20]),
-    resource: new Resource({
-      service: 'ui',
-      version: 1,
-      cost: 112.12,
-    }),
-    instrumentationLibrary: { name: 'default', version: '0.0.1' },
-  };
+  return (await metric.getMetricRecord())[0];
 }
 
 export const mockedReadableSpan: ReadableSpan = {
@@ -335,7 +305,7 @@ export function ensureExportedSpanIsCorrect(
     'parentIdArr is wrong'
   );
   assert.strictEqual(span.name, 'documentFetch', 'name is wrong');
-  assert.strictEqual(span.kind, 'INTERNAL', 'kind is wrong');
+  assert.strictEqual(span.kind, 'SPAN_KIND_INTERNAL', 'kind is wrong');
   assert.strictEqual(
     span.startTimeUnixNano,
     '1574120165429803008',
@@ -355,118 +325,84 @@ export function ensureExportedSpanIsCorrect(
   assert.strictEqual(span.droppedLinksCount, 0, 'droppedLinksCount is wrong');
   assert.deepStrictEqual(
     span.status,
-    { code: 'Ok', message: '' },
+    { code: 'STATUS_CODE_OK', message: '' },
     'status is wrong'
   );
 }
 
 export function ensureExportedCounterIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time?: number
 ) {
-  assert.deepStrictEqual(metric.metricDescriptor, {
-    name: 'test-counter',
+  assert.deepStrictEqual(metric, {
+    name: 'int-counter',
     description: 'sample counter description',
     unit: '1',
-    type: 'MONOTONIC_INT64',
-    temporality: 'CUMULATIVE',
+    data: 'intSum',
+    intSum: {
+      dataPoints: [
+        {
+          labels: [],
+          exemplars: [],
+          value: '1',
+          startTimeUnixNano: '1592602232694000128',
+          timeUnixNano: String(time),
+        },
+      ],
+      isMonotonic: true,
+      aggregationTemporality: 'AGGREGATION_TEMPORALITY_DELTA',
+    },
   });
-  assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
-  assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.ok(metric.int64DataPoints);
-  assert.deepStrictEqual(metric.int64DataPoints[0].labels, []);
-  assert.deepStrictEqual(metric.int64DataPoints[0].value, '1');
-  assert.deepStrictEqual(
-    metric.int64DataPoints[0].startTimeUnixNano,
-    '1592602232694000128'
-  );
 }
 
 export function ensureExportedObserverIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time?: number
 ) {
-  assert.deepStrictEqual(metric.metricDescriptor, {
-    name: 'test-observer',
+  assert.deepStrictEqual(metric, {
+    name: 'double-observer',
     description: 'sample observer description',
-    unit: '2',
-    type: 'SUMMARY',
-    temporality: 'DELTA',
+    unit: '1',
+    data: 'doubleGauge',
+    doubleGauge: {
+      dataPoints: [
+        {
+          labels: [],
+          exemplars: [],
+          value: 6,
+          startTimeUnixNano: '1592602232694000128',
+          timeUnixNano: String(time),
+        },
+      ],
+    },
   });
-
-  assert.deepStrictEqual(metric.int64DataPoints, []);
-  assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.ok(metric.summaryDataPoints);
-  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
-  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 9);
-  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '2');
-  assert.deepStrictEqual(
-    metric.summaryDataPoints[0].startTimeUnixNano,
-    '1592602232694000128'
-  );
-  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
-    { percentile: 0, value: 3 },
-    { percentile: 100, value: 6 },
-  ]);
-}
-
-export function ensureExportedHistogramIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
-) {
-  assert.deepStrictEqual(metric.metricDescriptor, {
-    name: 'test-hist',
-    description: 'sample observer description',
-    unit: '2',
-    type: 'HISTOGRAM',
-    temporality: 'DELTA',
-  });
-  assert.deepStrictEqual(metric.int64DataPoints, []);
-  assert.deepStrictEqual(metric.summaryDataPoints, []);
-  assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.ok(metric.histogramDataPoints);
-  assert.deepStrictEqual(metric.histogramDataPoints[0].labels, []);
-  assert.deepStrictEqual(metric.histogramDataPoints[0].count, '2');
-  assert.deepStrictEqual(metric.histogramDataPoints[0].sum, 21);
-  assert.deepStrictEqual(metric.histogramDataPoints[0].buckets, [
-    { count: '1', exemplar: null },
-    { count: '1', exemplar: null },
-    { count: '0', exemplar: null },
-  ]);
-  assert.deepStrictEqual(metric.histogramDataPoints[0].explicitBounds, [
-    10,
-    20,
-  ]);
-  assert.deepStrictEqual(
-    metric.histogramDataPoints[0].startTimeUnixNano,
-    '1592602232694000128'
-  );
 }
 
 export function ensureExportedValueRecorderIsCorrect(
-  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric
+  metric: collectorTypes.opentelemetryProto.metrics.v1.Metric,
+  time?: number
 ) {
-  assert.deepStrictEqual(metric.metricDescriptor, {
-    name: 'test-recorder',
+  assert.deepStrictEqual(metric, {
+    name: 'int-recorder',
     description: 'sample recorder description',
-    unit: '3',
-    type: 'SUMMARY',
-    temporality: 'DELTA',
+    unit: '1',
+    data: 'intHistogram',
+    intHistogram: {
+      dataPoints: [
+        {
+          labels: [],
+          exemplars: [],
+          sum: '21',
+          count: '2',
+          startTimeUnixNano: '1592602232694000128',
+          timeUnixNano: String(time),
+          bucketCounts: ['2', '0'],
+          explicitBounds: [Infinity],
+        },
+      ],
+      aggregationTemporality: 'AGGREGATION_TEMPORALITY_CUMULATIVE',
+    },
   });
-  assert.deepStrictEqual(metric.histogramDataPoints, []);
-  assert.deepStrictEqual(metric.int64DataPoints, []);
-  assert.deepStrictEqual(metric.doubleDataPoints, []);
-  assert.ok(metric.summaryDataPoints);
-  assert.deepStrictEqual(metric.summaryDataPoints[0].labels, []);
-  assert.deepStrictEqual(
-    metric.summaryDataPoints[0].startTimeUnixNano,
-    '1592602232694000128'
-  );
-  assert.deepStrictEqual(metric.summaryDataPoints[0].percentileValues, [
-    { percentile: 0, value: 5 },
-    { percentile: 100, value: 5 },
-  ]);
-  assert.deepStrictEqual(metric.summaryDataPoints[0].count, '1');
-  assert.deepStrictEqual(metric.summaryDataPoints[0].sum, 5);
 }
 
 export function ensureResourceIsCorrect(

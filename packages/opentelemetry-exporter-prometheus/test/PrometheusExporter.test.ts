@@ -20,7 +20,8 @@ import {
   SumAggregator,
   Meter,
   MeterProvider,
-  MinMaxLastSumCountAggregator,
+  LastValueAggregator,
+  HistogramAggregator,
 } from '@opentelemetry/metrics';
 import * as assert from 'assert';
 import * as http from 'http';
@@ -29,7 +30,8 @@ import { mockAggregator, mockedHrTimeMs } from './util';
 
 describe('PrometheusExporter', () => {
   mockAggregator(SumAggregator);
-  mockAggregator(MinMaxLastSumCountAggregator);
+  mockAggregator(LastValueAggregator);
+  mockAggregator(HistogramAggregator);
 
   describe('constructor', () => {
     it('should construct an exporter', done => {
@@ -263,14 +265,10 @@ describe('PrometheusExporter', () => {
 
                   assert.deepStrictEqual(lines, [
                     '# HELP metric_observer a test description',
-                    '# TYPE metric_observer summary',
-                    `metric_observer_count{pid="123",core="1"} 1 ${mockedHrTimeMs}`,
-                    `metric_observer_sum{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
-                    `metric_observer{pid="123",core="1",quantile="0"} 0.999 ${mockedHrTimeMs}`,
-                    `metric_observer{pid="123",core="1",quantile="1"} 0.999 ${mockedHrTimeMs}`,
+                    '# TYPE metric_observer gauge',
+                    `metric_observer{pid="123",core="1"} 0.999 ${mockedHrTimeMs}`,
                     '',
                   ]);
-
                   done();
                 });
               })
@@ -537,11 +535,11 @@ describe('PrometheusExporter', () => {
 
                 assert.deepStrictEqual(lines, [
                   '# HELP value_recorder a test description',
-                  '# TYPE value_recorder summary',
+                  '# TYPE value_recorder histogram',
                   `value_recorder_count{key1="labelValue1"} 1 ${mockedHrTimeMs}`,
                   `value_recorder_sum{key1="labelValue1"} 20 ${mockedHrTimeMs}`,
-                  `value_recorder{key1="labelValue1",quantile="0"} 20 ${mockedHrTimeMs}`,
-                  `value_recorder{key1="labelValue1",quantile="1"} 20 ${mockedHrTimeMs}`,
+                  `value_recorder_bucket{key1="labelValue1",le="Infinity"} 1 ${mockedHrTimeMs}`,
+                  `value_recorder_bucket{key1="labelValue1",le="+Inf"} 1 ${mockedHrTimeMs}`,
                   '',
                 ]);
 
