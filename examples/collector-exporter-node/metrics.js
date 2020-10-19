@@ -25,9 +25,14 @@ const upDownCounter = meter.createUpDownCounter('test_up_down_counter', {
   description: 'Example of a UpDownCounter',
 });
 
+const recorder = meter.createValueRecorder('test_value_recorder', {
+  description: 'Example of a ValueRecorder',
+});
+
 const labels = { pid: process.pid, environment: 'staging' };
 
 setInterval(() => {
   requestCounter.bind(labels).add(1);
   upDownCounter.bind(labels).add(Math.random() > 0.5 ? 1 : -1);
+  recorder.bind(labels).record(Math.random());
 }, 1000);

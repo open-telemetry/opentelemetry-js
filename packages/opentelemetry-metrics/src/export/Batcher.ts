@@ -56,10 +56,13 @@ export class UngroupedBatcher extends Batcher {
       case MetricKind.UP_DOWN_SUM_OBSERVER:
         return new aggregators.SumAggregator();
       case MetricKind.VALUE_RECORDER:
+        return new aggregators.HistogramAggregator(
+          metricDescriptor.boundaries || [Infinity]
+        );
       case MetricKind.VALUE_OBSERVER:
-        return new aggregators.MinMaxLastSumCountAggregator();
+        return new aggregators.LastValueAggregator();
       default:
-        return new aggregators.MinMaxLastSumCountAggregator();
+        return new aggregators.LastValueAggregator();
     }
   }
 

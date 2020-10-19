@@ -139,8 +139,8 @@ export function toCollectorLinks(
 ): opentelemetryProto.trace.v1.Span.Link[] {
   return span.links.map((link: Link) => {
     const protoLink: opentelemetryProto.trace.v1.Span.Link = {
-      traceId: core.hexToBase64(link.context.traceId),
-      spanId: core.hexToBase64(link.context.spanId),
+      traceId: link.context.traceId,
+      spanId: link.context.spanId,
       attributes: toCollectorAttributes(link.attributes || {}),
       droppedAttributesCount: 0,
     };
@@ -156,11 +156,9 @@ export function toCollectorSpan(
   span: ReadableSpan
 ): opentelemetryProto.trace.v1.Span {
   return {
-    traceId: core.hexToBase64(span.spanContext.traceId),
-    spanId: core.hexToBase64(span.spanContext.spanId),
-    parentSpanId: span.parentSpanId
-      ? core.hexToBase64(span.parentSpanId)
-      : undefined,
+    traceId: span.spanContext.traceId,
+    spanId: span.spanContext.spanId,
+    parentSpanId: span.parentSpanId ? span.parentSpanId : undefined,
     traceState: toCollectorTraceState(span.spanContext.traceState),
     name: span.name,
     kind: toCollectorKind(span.kind),
