@@ -16,13 +16,13 @@
 
 import {
   Context,
-  GetterFunction,
-  TextMapPropagator,
-  SetterFunction,
-  SpanContext,
-  TraceFlags,
   getParentSpanContext,
   setExtractedSpanContext,
+  SpanContext,
+  TextMapGetter,
+  TextMapPropagator,
+  TextMapSetter,
+  TraceFlags,
 } from '@opentelemetry/api';
 import { TraceState } from '../../trace/TraceState';
 
@@ -85,7 +85,7 @@ export function parseTraceParent(traceParent: string): SpanContext | null {
  * https://www.w3.org/TR/trace-context/
  */
 export class HttpTraceContext implements TextMapPropagator {
-  inject(context: Context, carrier: unknown, setter: SetterFunction) {
+  inject(context: Context, carrier: unknown, setter: TextMapSetter) {
     const spanContext = getParentSpanContext(context);
     if (!spanContext) return;
 
@@ -93,14 +93,18 @@ export class HttpTraceContext implements TextMapPropagator {
       spanContext.spanId
     }-0${Number(spanContext.traceFlags || TraceFlags.NONE).toString(16)}`;
 
-    setter(carrier, TRACE_PARENT_HEADER, traceParent);
+    setter.set(carrier, TRACE_PARENT_HEADER, traceParent);
     if (spanContext.traceState) {
-      setter(carrier, TRACE_STATE_HEADER, spanContext.traceState.serialize());
+      setter.set(
+        carrier,
+        TRACE_STATE_HEADER,
+        spanContext.traceState.serialize()
+      );
     }
   }
 
-  extract(context: Context, carrier: unknown, getter: GetterFunction): Context {
-    const traceParentHeader = getter(carrier, TRACE_PARENT_HEADER);
+  extract(context: Context, carrier: unknown, getter: TextMapGetter): Context {
+    const traceParentHeader = getter.get(carrier, TRACE_PARENT_HEADER);
     if (!traceParentHeader) return context;
     const traceParent = Array.isArray(traceParentHeader)
       ? traceParentHeader[0]
@@ -111,7 +115,7 @@ export class HttpTraceContext implements TextMapPropagator {
 
     spanContext.isRemote = true;
 
-    const traceStateHeader = getter(carrier, TRACE_STATE_HEADER);
+    const traceStateHeader = getter.get(carrier, TRACE_STATE_HEADER);
     if (traceStateHeader) {
       // If more than one `tracestate` header is found, we merge them into a
       // single header.
